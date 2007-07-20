@@ -526,7 +526,7 @@
     <xsl:variable name="tekst">
       <xsl:value-of select="."/>
     </xsl:variable>
-    
+
     <a:p>
       <xsl:call-template name="InsertParagraphProperties"/>
 
@@ -535,17 +535,21 @@
         <xsl:when test="$tekst = '' and not(text:s) and not(text:span)">
           <xsl:call-template name="InsertEndPara"/>
         </xsl:when>
-        
+
         <!-- text:p without text:span -->
         <xsl:when test="not(text:span)">
           <a:r>
-            <xsl:call-template name="InsertRunProperties"/>
+            <a:rPr lang="en-EN" sz="1200">
+              <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
+                <xsl:call-template name="InsertRunProperties"/>
+              </xsl:for-each>
+            </a:rPr>
             <a:t>
               <xsl:apply-templates mode="text-box"/>
             </a:t>
           </a:r>
         </xsl:when>
-        
+
         <xsl:otherwise>
           <xsl:apply-templates mode="text-box"/>
         </xsl:otherwise>
@@ -562,7 +566,11 @@
     <xsl:choose>
       <xsl:when test="$tekst != '' or text:s">
         <a:r>
-          <xsl:call-template name="InsertRunProperties"/>
+          <a:rPr lang="en-EN" sz="1200">
+            <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
+              <xsl:call-template name="InsertRunProperties"/>
+            </xsl:for-each>
+          </a:rPr>
           <a:t>
             <xsl:apply-templates mode="text-box"/>
           </a:t>
@@ -576,7 +584,11 @@
 
   <!--xsl:template match="text()[parent::text:p]" mode="text-box">
     <a:r>
-      <xsl:call-template name="InsertRunProperties"/>
+      <a:rPr lang="en-EN" sz="1200">
+        <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
+          <xsl:call-template name="InsertRunProperties"/>
+        </xsl:for-each>
+      </a:rPr>
       <a:t>
         <xsl:value-of select="."/>
       </a:t>
@@ -609,264 +621,258 @@
   </xsl:template>
 
   <xsl:template name="InsertRunProperties">
-    <!-- font size 12 default -->
-    <a:rPr lang="en-EN" sz="1200">
+    <!-- used by text-boxes and charts -->
 
-      <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
+    <!-- font-size -->
+    <xsl:if test="@fo:font-size">
+      <xsl:attribute name="sz">
+        <!-- in charts @fo:font-size can be a fraction so it is rounded -->
+        <xsl:value-of select="number(round(substring-before(@fo:font-size,'pt')) * 100)"/>
+      </xsl:attribute>
+    </xsl:if>
 
-        <!-- font-size -->
-        <xsl:if test="@fo:font-size">
-          <xsl:attribute name="sz">
-            <xsl:value-of select="number(substring-before(@fo:font-size,'pt') * 100)"/>
-          </xsl:attribute>
-        </xsl:if>
+    <!-- bold -->
+    <xsl:if test="@fo:font-weight = 'bold' ">
+      <xsl:attribute name="b">
+        <xsl:text>1</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
 
-        <!-- bold -->
-        <xsl:if test="@fo:font-weight = 'bold' ">
-          <xsl:attribute name="b">
-            <xsl:text>1</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
+    <!-- italic -->
+    <xsl:if test="@fo:font-style = 'italic' ">
+      <xsl:attribute name="i">
+        <xsl:text>1</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
 
-        <!-- italic -->
-        <xsl:if test="@fo:font-style = 'italic' ">
-          <xsl:attribute name="i">
-            <xsl:text>1</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
+    <!-- strike-through -->
+    <xsl:choose>
+      <xsl:when test="@style:text-line-through-type = 'solid' ">
+        <xsl:attribute name="strike">
+          <xsl:text>sngStrike</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="contains(@style:text-line-through-type,'double' )">
+        <xsl:attribute name="strike">
+          <xsl:text>dblStrike</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- style:text-line-through-style-->
+      <xsl:when test="@style:text-line-through-style = 'solid' ">
+        <xsl:attribute name="strike">
+          <xsl:text>sngStrike</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
 
-        <!-- strike-through -->
+    <!-- font underline-->
+    <xsl:choose>
+      <!-- double-->
+      <xsl:when
+        test="@style:text-underline-style = 'solid' and contains(@style:text-underline-type, 'double' )">
+        <xsl:attribute name="u">
+          <xsl:text>dbl</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- bold -->
+      <xsl:when
+        test="@style:text-underline-style  = 'solid' and contains(@style:text-underline-width, 'bold' )">
+        <xsl:attribute name="u">
+          <xsl:text>heavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- single-->
+      <xsl:when
+        test="@style:text-underline-style = 'solid' and contains(@style:text-underline-width, 'auto' )">
+        <xsl:attribute name="u">
+          <xsl:text>sng</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- dotted -->
+      <xsl:when
+        test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'auto' )">
+        <xsl:attribute name="u">
+          <xsl:text>dotted</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- bold dotted -->
+      <xsl:when
+        test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'bold' )">
+        <xsl:attribute name="u">
+          <xsl:text>dottedHeavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- dash -->
+      <xsl:when
+        test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'auto' )">
+        <xsl:attribute name="u">
+          <xsl:text>dash</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- bold dash-->
+      <xsl:when
+        test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'bold' )">
+        <xsl:attribute name="u">
+          <xsl:text>dashHeavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- dash long -->
+      <xsl:when
+        test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'auto' )">
+        <xsl:attribute name="u">
+          <xsl:text>dashLong</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- bold dash long -->
+      <xsl:when
+        test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'bold' )">
+        <xsl:attribute name="u">
+          <xsl:text>dashLongHeavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- dot dash -->
+      <xsl:when
+        test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'auto' )">
+        <xsl:attribute name="u">
+          <xsl:text>dotDash</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- bold dot dash -->
+      <xsl:when
+        test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'bold' )">
+        <xsl:attribute name="u">
+          <xsl:text>dotDashHeavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- dot-dot-dash -->
+      <xsl:when
+        test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'auto' )">
+        <xsl:attribute name="u">
+          <xsl:text>dotDotDash</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- bold dot-dot-dash -->
+      <xsl:when
+        test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'bold' )">
+        <xsl:attribute name="u">
+          <xsl:text>dotDotDashHeavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- double wavy -->
+      <xsl:when
+        test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-type, 'double' )">
+        <xsl:attribute name="u">
+          <xsl:text>wavyDbl</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- wavy -->
+      <xsl:when
+        test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'auto' )">
+        <xsl:attribute name="u">
+          <xsl:text>wavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- bold wavy -->
+      <xsl:when
+        test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'bold' )">
+        <xsl:attribute name="u">
+          <xsl:text>wavyHeavy</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+
+    <!-- text position -->
+    <xsl:if test="@style:text-position">
+      <xsl:attribute name="baseline">
         <xsl:choose>
-          <xsl:when test="@style:text-line-through-type = 'solid' ">
-            <xsl:attribute name="strike">
-              <xsl:text>sngStrike</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="contains(@style:text-line-through-type,'double' )">
-            <xsl:attribute name="strike">
-              <xsl:text>dblStrike</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- style:text-line-through-style-->
-          <xsl:when test="@style:text-line-through-style = 'solid' ">
-            <xsl:attribute name="strike">
-              <xsl:text>sngStrike</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-
-        <!-- font underline-->
-        <xsl:choose>
-          <!-- double-->
-          <xsl:when
-            test="@style:text-underline-style = 'solid' and contains(@style:text-underline-type, 'double' )">
-            <xsl:attribute name="u">
-              <xsl:text>dbl</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- bold -->
-          <xsl:when
-            test="@style:text-underline-style  = 'solid' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name="u">
-              <xsl:text>heavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- single-->
-          <xsl:when
-            test="@style:text-underline-style = 'solid' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name="u">
-              <xsl:text>sng</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- dotted -->
-          <xsl:when
-            test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name="u">
-              <xsl:text>dotted</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- bold dotted -->
-          <xsl:when
-            test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name="u">
-              <xsl:text>dottedHeavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- dash -->
-          <xsl:when
-            test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name="u">
-              <xsl:text>dash</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- bold dash-->
-          <xsl:when
-            test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name="u">
-              <xsl:text>dashHeavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- dash long -->
-          <xsl:when
-            test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name="u">
-              <xsl:text>dashLong</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- bold dash long -->
-          <xsl:when
-            test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name="u">
-              <xsl:text>dashLongHeavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- dot dash -->
-          <xsl:when
-            test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name="u">
-              <xsl:text>dotDash</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- bold dot dash -->
-          <xsl:when
-            test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name="u">
-              <xsl:text>dotDashHeavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- dot-dot-dash -->
-          <xsl:when
-            test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name="u">
-              <xsl:text>dotDotDash</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- bold dot-dot-dash -->
-          <xsl:when
-            test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name="u">
-              <xsl:text>dotDotDashHeavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- double wavy -->
-          <xsl:when
-            test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-type, 'double' )">
-            <xsl:attribute name="u">
-              <xsl:text>wavyDbl</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- wavy -->
-          <xsl:when
-            test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name="u">
-              <xsl:text>wavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <!-- bold wavy -->
-          <xsl:when
-            test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name="u">
-              <xsl:text>wavyHeavy</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-
-        <!-- text position -->
-        <xsl:if
-          test="contains(@style:text-position, 'sub' ) or contains(@style:text-position, 'super' )">
-          <xsl:attribute name="baseline">
-            <xsl:choose>
-              <!-- superscript -->
-              <xsl:when test="substring-before(@style:text-position,' ') = 'super' ">
-                <xsl:value-of
-                  select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"
-                />
-              </xsl:when>
-              <!-- subscript -->
-              <xsl:when test="substring-before(@style:text-position,' ') = 'sub' ">
-                <xsl:text>-</xsl:text>
-                <xsl:value-of
-                  select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"
-                />
-              </xsl:when>
-            </xsl:choose>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!-- letter kerning-->
-        <xsl:if test="style:text-properties/@style:letter-kerning = 'true' ">
-          <xsl:attribute name="kern">
-            <xsl:value-of select="100"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!--character spacing -->
-        <xsl:if test="@fo:letter-spacing">
-          <xsl:attribute name="spc">
-            <!-- condensed -->
-            <xsl:if test="substring-before(@fo:letter-spacing, 'cm' )&lt; 0 ">
-              <xsl:value-of
-                select="format-number(substring-before(@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"
-              />
-            </xsl:if>
-            <!-- expanded -->
-            <xsl:if test="substring-before(@fo:letter-spacing, 'cm' ) &gt;= 0">
-              <xsl:value-of
-                select="format-number((substring-before(@fo:letter-spacing, 'cm' ) * 72 div 2.54) *100 ,'#')"
-              />
-            </xsl:if>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!-- font color -->
-        <xsl:if test="@fo:color">
-          <a:solidFill>
-            <a:srgbClr>
-              <xsl:attribute name="val">
-                <xsl:value-of select="substring-after(@fo:color,'#')"/>
-              </xsl:attribute>
-            </a:srgbClr>
-          </a:solidFill>
-        </xsl:if>
-
-        <!-- text shadow -->
-        <xsl:if test="@fo:text-shadow != 'none'">
-          <a:effectLst>
-            <a:outerShdw blurRad="38100" dist="38100" dir="2700000">
-              <a:srgbClr val="000000">
-                <a:alpha val="43137"/>
-              </a:srgbClr>
-            </a:outerShdw>
-          </a:effectLst>
-        </xsl:if>
-
-        <xsl:if test="@style:text-underline-color">
-          <a:uFill>
-            <a:solidFill>
-              <a:srgbClr>
-                <xsl:attribute name="val">
-                  <xsl:value-of select="substring-after(@style:text-underline-color,'#')"/>
-                </xsl:attribute>
-              </a:srgbClr>
-            </a:solidFill>
-          </a:uFill>
-        </xsl:if>
-
-      </xsl:for-each>
-
-      <!-- font family  (Times New Roman default)-->
-      <a:latin typeface="Times New Roman" charset="0">
-        <xsl:if
-          test="key('style',@text:style-name)/style:text-properties/@fo:font-family">
-          <xsl:attribute name="typeface">
+          <!-- superscript -->
+          <xsl:when test="substring-before(@style:text-position,' ') = 'super' ">
             <xsl:value-of
-              select="translate(key('style',@text:style-name)/style:text-properties/@fo:font-family, &quot;'&quot;,'')"
+              select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"
             />
-          </xsl:attribute>
-        </xsl:if>
-      </a:latin>
+          </xsl:when>
+          <!-- subscript -->
+          <xsl:when test="substring-before(@style:text-position,' ') = 'sub' ">
+            <xsl:text>-</xsl:text>
+            <xsl:value-of
+              select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"
+            />
+          </xsl:when>
+          <!-- when position is specified like 30% 75% -->
+          <xsl:when test="contains(@style:text-position, ' ')">
+            <xsl:value-of select="number(substring-before(@style:text-position,'%' )) * 1000"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
 
-    </a:rPr>
+    <!-- letter kerning-->
+    <xsl:if test="style:text-properties/@style:letter-kerning = 'true' ">
+      <xsl:attribute name="kern">
+        <xsl:value-of select="100"/>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!--character spacing -->
+    <xsl:if test="@fo:letter-spacing">
+      <xsl:attribute name="spc">
+        <!-- condensed -->
+        <xsl:if test="substring-before(@fo:letter-spacing, 'cm' )&lt; 0 ">
+          <xsl:value-of
+            select="format-number(substring-before(@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"/>
+        </xsl:if>
+        <!-- expanded -->
+        <xsl:if test="substring-before(@fo:letter-spacing, 'cm' ) &gt;= 0">
+          <xsl:value-of
+            select="format-number((substring-before(@fo:letter-spacing, 'cm' ) * 72 div 2.54) *100 ,'#')"
+          />
+        </xsl:if>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- font color -->
+    <xsl:if test="@fo:color">
+      <a:solidFill>
+        <a:srgbClr>
+          <xsl:attribute name="val">
+            <xsl:value-of select="substring-after(@fo:color,'#')"/>
+          </xsl:attribute>
+        </a:srgbClr>
+      </a:solidFill>
+    </xsl:if>
+
+    <!-- text shadow -->
+    <xsl:if test="@fo:text-shadow != 'none'">
+      <a:effectLst>
+        <a:outerShdw blurRad="38100" dist="38100" dir="2700000">
+          <a:srgbClr val="000000">
+            <a:alpha val="43137"/>
+          </a:srgbClr>
+        </a:outerShdw>
+      </a:effectLst>
+    </xsl:if>
+
+    <xsl:if test="@style:text-underline-color">
+      <a:uFill>
+        <a:solidFill>
+          <a:srgbClr>
+            <xsl:attribute name="val">
+              <xsl:value-of select="substring-after(@style:text-underline-color,'#')"/>
+            </xsl:attribute>
+          </a:srgbClr>
+        </a:solidFill>
+      </a:uFill>
+    </xsl:if>
+
+    <!-- font family  (Times New Roman default)-->
+    <a:latin typeface="Times New Roman" charset="0">
+      <xsl:if test="@fo:font-family">
+        <xsl:attribute name="typeface">
+          <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
+        </xsl:attribute>
+      </xsl:if>
+    </a:latin>
+
   </xsl:template>
 
   <xsl:template name="InsertParagraphProperties">
@@ -975,8 +981,7 @@
 
   <xsl:template name="InsertTextBoxProperties">
     <a:bodyPr wrap="square" rtlCol="0" anchor="t">
-      <xsl:for-each
-        select="key('style',@draw:style-name)/style:graphic-properties">
+      <xsl:for-each select="key('style',@draw:style-name)/style:graphic-properties">
 
         <xsl:if test="@fo:padding-left">
           <xsl:attribute name="lIns">
