@@ -455,48 +455,14 @@
         <a:avLst/>
       </a:prstGeom>
 
-      <xsl:if test="key('style', @draw:style-name)/style:graphic-properties/@draw:stroke != 'none' ">
-
-        <xsl:variable name="strokeWeight">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length"
-              select="key('style', @draw:style-name)/style:graphic-properties/@svg:stroke-width"/>
-            <xsl:with-param name="unit">emu</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:variable name="BorderColor">
-          <xsl:choose>
-            <xsl:when
-              test="key('style', @draw:style-name)/style:graphic-properties/@svg:stroke-color != ''">
-              <xsl:value-of
-                select="substring-after(key('style', @draw:style-name)/style:graphic-properties/@svg:stroke-color, '#')"
-              />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>000000</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
+      <!--xsl:if test="key('style', @draw:style-name)/style:graphic-properties/@draw:stroke != 'none' "-->
 
         <xsl:for-each select="key('style', @draw:style-name)/style:graphic-properties">
           <xsl:call-template name="InsertDrawingFill"/>
+          <xsl:call-template name="InsertDrawingBorder"/>
         </xsl:for-each>
 
-        <!-- line style -->
-        <a:ln>
-          <xsl:attribute name="w">
-            <xsl:value-of select="$strokeWeight"/>
-          </xsl:attribute>
-          <a:solidFill>
-            <a:srgbClr>
-              <xsl:attribute name="val">
-                <xsl:value-of select="$BorderColor"/>
-              </xsl:attribute>
-            </a:srgbClr>
-          </a:solidFill>
-        </a:ln>
-      </xsl:if>
+      <!--/xsl:if-->
 
     </xdr:spPr>
 
@@ -1033,7 +999,44 @@
         <a:noFill/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
 
+  <xsl:template name="InsertDrawingBorder">
+    
+    <!-- line style -->
+    <a:ln>
+      <xsl:attribute name="w">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="@svg:stroke-width"/>
+          <xsl:with-param name="unit">emu</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+        
+        <xsl:choose>
+          <xsl:when test="@draw-stroke != 'none' ">
+            <a:solidFill>
+              <a:srgbClr>
+                
+              <xsl:attribute name="val">
+                <xsl:choose>
+                  <xsl:when test="@svg:stroke-color != '' ">
+                    <xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>000000</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+                
+              </a:srgbClr>
+              </a:solidFill>
+          </xsl:when>
+          <xsl:otherwise>
+            <a:noFill/>
+          </xsl:otherwise>
+        </xsl:choose>
+        
+    </a:ln>
   </xsl:template>
 
 </xsl:stylesheet>
