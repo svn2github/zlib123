@@ -35,6 +35,8 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
   <xsl:import href="relationships.xsl"/>
@@ -48,7 +50,7 @@
   <xsl:import href="validation.xsl"/>
   <xsl:import href="elements.xsl"/>
   <xsl:import href="measures.xsl"/>
-
+  <xsl:import href="ole_objects.xsl"/>
   <xsl:import href="connections.xsl"/>
 
 
@@ -409,8 +411,8 @@
           <xsl:value-of select="$checkedName"/>
         </xsl:with-param>
       </xsl:apply-templates>
-
-      <xsl:call-template name="InsertSheetContent">
+      
+        <xsl:call-template name="InsertSheetContent">
         <xsl:with-param name="sheet">
           <xsl:value-of select="$Id"/>
         </xsl:with-param>
@@ -737,7 +739,10 @@
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
 
-
+    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:oleObjects">
+        <xsl:call-template name="InsertOLEObjects"/>  
+    </xsl:for-each>
+    
     <xsl:call-template name="InsertColumns">
       <xsl:with-param name="sheet" select="$sheet"/>
     </xsl:call-template>
