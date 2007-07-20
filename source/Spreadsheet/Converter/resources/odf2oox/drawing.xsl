@@ -479,29 +479,9 @@
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="FillColor">
-          <xsl:if test="key('style', @draw:style-name)/style:graphic-properties/@draw:fill-color">
-            <xsl:value-of
-              select="substring-after(key('style', @draw:style-name)/style:graphic-properties/@draw:fill-color, '#')"
-            />
-          </xsl:if>
-        </xsl:variable>
-
-        <!-- background color-->
-        <xsl:choose>
-          <xsl:when test="$FillColor != '' ">
-            <a:solidFill>
-              <a:srgbClr>
-                <xsl:attribute name="val">
-                  <xsl:value-of select="$FillColor"/>
-                </xsl:attribute>
-              </a:srgbClr>
-            </a:solidFill>
-          </xsl:when>
-          <xsl:otherwise>
-            <a:noFill/>
-          </xsl:otherwise>
-        </xsl:choose>
+         <xsl:for-each select="key('style', @draw:style-name)/style:graphic-properties">
+           <xsl:call-template name="InsertDrawingFill"/> 
+         </xsl:for-each>
 
         <!-- line style -->
         <a:ln>
@@ -1023,4 +1003,25 @@
     </a:bodyPr>
 
   </xsl:template>
+
+<xsl:template name="InsertDrawingFill">
+  
+  <!-- background color-->
+  <xsl:choose>
+    <xsl:when test="@draw:fill != 'none' ">
+      <a:solidFill>
+        <a:srgbClr>
+          <xsl:attribute name="val">
+            <xsl:value-of select="substring-after(@draw:fill-color, '#')"/>
+          </xsl:attribute>
+        </a:srgbClr>
+      </a:solidFill>
+    </xsl:when>
+    <xsl:otherwise>
+      <a:noFill/>
+    </xsl:otherwise>    
+  </xsl:choose>
+  
+</xsl:template>
+  
 </xsl:stylesheet>
