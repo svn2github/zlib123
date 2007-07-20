@@ -986,7 +986,7 @@
 
     <!-- background color-->
     <xsl:choose>
-      <xsl:when test="@draw:fill != 'none' ">
+      <xsl:when test="not(@draw:fill = 'none' )">
         <a:solidFill>
           <a:srgbClr>
             <xsl:attribute name="val">
@@ -1013,7 +1013,7 @@
       </xsl:attribute>
         
         <xsl:choose>
-          <xsl:when test="@draw-stroke != 'none' ">
+          <xsl:when test="not(@draw:stroke = 'none' )">
             <a:solidFill>
               <a:srgbClr>
                 
