@@ -128,8 +128,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             get
             {
                 XmlReaderSettings xrs = new XmlReaderSettings();
-                //  look for DTD
-                xrs.ProhibitDtd = false;
+                // do not look for DTD
+                xrs.ProhibitDtd = true;
                 if (this.ExternalResources == null)
                 {
                     xrs.XmlResolver = this.ResourceResolver;
@@ -167,7 +167,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (!this.compiledProcessors.Contains(xslLocation))
             {
                 // create a xsl transformer
+
+                // JP - 03/07/2007
+                // Activation of XSL Debugging only in "DEBUG" compilation mode
+
+#if DEBUG
+                XslCompiledTransform xslt = new XslCompiledTransform(true);
+#else
                 XslCompiledTransform xslt = new XslCompiledTransform();
+#endif
+
+                //JP - 03/07/2007
+
+
+
                 // compile the stylesheet. 
                 // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
                 xslt.Load(xslDoc, this.XsltProcSettings, this.ResourceResolver);
@@ -249,6 +262,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
+        
         private void _Transform(string inputFile, string outputFile)
         {
             // this throws an exception in the the following cases:
@@ -262,7 +276,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
            
             try
             {
-                XslCompiledTransform xslt = this.Load(outputFile == null);
+                XslCompiledTransform xslt =  this.Load(outputFile == null);
                 zipResolver = new ZipResolver(inputFile);
                 XsltArgumentList parameters = new XsltArgumentList();
                 parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
@@ -287,6 +301,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 source = this.Source;
                 // Apply the transformation
+                
                 xslt.Transform(source, parameters, writer, zipResolver);
             }
             finally

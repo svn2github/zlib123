@@ -650,6 +650,28 @@
         <xsl:with-param name="styleName" select="parent::style:style/@style:name"/>
       </xsl:call-template>
     </xsl:variable>
+    
+    <!-- left indent -->
+    <xsl:variable name="leftInd">
+      <xsl:call-template name="ComputeAdditionalIndent">
+        <xsl:with-param name="side" select="'left'"/>
+        <xsl:with-param name="style" select="parent::style:style|parent::style:default-style" />
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- right indent -->
+    <xsl:variable name="rightInd">
+      <xsl:call-template name="ComputeAdditionalIndent">
+        <xsl:with-param name="side" select="'right'"/>
+        <xsl:with-param name="style" select="parent::style:style|parent::style:default-style" />
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- first line indent -->
+    <xsl:variable name="firstLineIndent">
+      <xsl:call-template name="GetFirstLineIndent">
+        <xsl:with-param name="style" select="parent::style:style|parent::style:default-style" />
+      </xsl:call-template>
+    </xsl:variable>
+    
     <xsl:choose>
       <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
         <xsl:call-template name="OverrideNumberingProperty">
@@ -657,31 +679,19 @@
           <xsl:with-param name="property">indent</xsl:with-param>
         </xsl:call-template>
       </xsl:when>
+      <xsl:when test="$rightInd = 0 and $leftInd = 0 and $firstLineIndent = 0"></xsl:when>
       <xsl:otherwise>
+        
         <w:ind>
-          <!-- left indent -->
+         
           <xsl:attribute name="w:left">
-            <xsl:call-template name="ComputeAdditionalIndent">
-              <xsl:with-param name="side" select="'left'"/>
-              <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"
-              />
-            </xsl:call-template>
+            <xsl:value-of select="$leftInd"/>
           </xsl:attribute>
-          <!-- right indent -->
+          
           <xsl:attribute name="w:right">
-            <xsl:call-template name="ComputeAdditionalIndent">
-              <xsl:with-param name="side" select="'right'"/>
-              <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"
-              />
-            </xsl:call-template>
+            <xsl:value-of select="$rightInd"/>
           </xsl:attribute>
-          <!-- first line indent -->
-          <xsl:variable name="firstLineIndent">
-            <xsl:call-template name="GetFirstLineIndent">
-              <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"
-              />
-            </xsl:call-template>
-          </xsl:variable>
+          
           <xsl:choose>
             <xsl:when test="$firstLineIndent != 0">
               <xsl:choose>

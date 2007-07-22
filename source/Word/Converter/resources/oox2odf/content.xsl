@@ -91,7 +91,7 @@
   <xsl:template name="InsertFrameStyle">
     <xsl:if test="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
       <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict"
-        mode="automaticstyles"/>
+        mode="automaticpict"/>
     </xsl:if>
   </xsl:template>
 
@@ -359,8 +359,7 @@
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
       
       <xsl:when
-        test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
-        and not($outlineLevel != '' and $numId != '' )">
+        test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
         <!--xsl:when
           test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
           and not(document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
@@ -711,6 +710,10 @@
       <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
     </xsl:variable>
 
+    <xsl:variable name="Id">
+      <xsl:value-of select="@w:id"/>
+    </xsl:variable>
+
     <xsl:choose>
       <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != ''">
         <text:bookmark>
@@ -727,6 +730,14 @@
           </xsl:attribute>
         </text:toc-mark-start>
       </xsl:when>
+      <!-- a bookmark must begin and end in the same text flow -->
+      <xsl:when test="ancestor::w:tc and not(ancestor::w:tc//w:bookmarkEnd[@w:id=$Id])">
+        <text:bookmark>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="$NameBookmark"/>
+          </xsl:attribute>
+        </text:bookmark>
+      </xsl:when>
       <xsl:otherwise>
         <text:bookmark-start>
           <xsl:attribute name="text:name">
@@ -738,6 +749,11 @@
 </xsl:if>
   </xsl:template>
   <xsl:template match="w:bookmarkEnd">
+
+    <xsl:variable name="Id">
+      <xsl:value-of select="@w:id"/>
+    </xsl:variable>
+
     <xsl:if test="ancestor::w:p">
     <xsl:variable name="NameBookmark">
       <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
@@ -753,13 +769,14 @@
           </xsl:attribute>
         </text:toc-mark-end>
       </xsl:when>
-      <xsl:otherwise>
+      <!-- a bookmark must begin and end in the same text flow -->
+      <xsl:when test="not(ancestor::w:tc) or ancestor::w:tc//w:bookmarkStart[@w:id=$Id]">
         <text:bookmark-end>
           <xsl:attribute name="text:name">
             <xsl:value-of select="$NameBookmark"/>
           </xsl:attribute>
         </text:bookmark-end>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
       </xsl:if>
   </xsl:template>

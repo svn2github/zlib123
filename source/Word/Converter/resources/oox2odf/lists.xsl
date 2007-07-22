@@ -423,8 +423,8 @@
                   select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/></xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
-				<xsl:when test="$WFirstLine = '0'"><xsl:value-of
-                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/></xsl:when>
+                <xsl:when test="$WFirstLine = '0'">0<!--<xsl:value-of
+                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0--></xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:with-param>
@@ -494,7 +494,7 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!-- types of bullets -->
+  <!-- ➢types of bullets -->
 
   <xsl:template name="TextChar">
     <xsl:choose>
@@ -503,15 +503,17 @@
       <xsl:when test="w:lvlText[@w:val = '' ]">☑</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '•' ]">•</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">●</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">➢</xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '' ]"></xsl:when>
+      <!--<xsl:when test="w:lvlText[@w:val = '➢' ]">➢</xsl:when>-->
       <xsl:when test="w:lvlText[@w:val = '' ]">✔</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">■</xsl:when>
       <xsl:when test="w:lvlText[@w:val = 'o' ]">○</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">➔</xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '']">➔</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">✗</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '-' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '–' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">–</xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '' ]"></xsl:when>
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1028,55 +1030,60 @@
       <!--create outline level style only for styles which have outlineLvl and numId what means that list level is linked to a style -->
       <xsl:for-each
         select="document('word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
-        <xsl:variable name="numId" select="w:pPr/w:numPr/w:numId/@w:val"/>
-        <xsl:variable name="levelId" select="w:pPr/w:numPr/w:ilvl/@w:val | w:pPr/w:outlineLvl/@w:val"/>
-        <text:outline-level-style>
-          <xsl:attribute name="text:level">
-            <xsl:value-of select="./w:pPr/w:outlineLvl/@w:val +1"/>
-          </xsl:attribute>
-          <xsl:for-each select="document('word/numbering.xml')">
-            <xsl:variable name="abstractNum" select="key('abstractNumId',key('numId',$numId)/w:abstractNumId/@w:val)"/>
-           <!--w:lvl shows which level defintion should be taken from abstract num-->
-            <xsl:for-each select="$abstractNum/w:lvl[@w:ilvl = $levelId][1]">
-              <xsl:if
-                test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
-                <xsl:attribute name="style:num-suffix">
-                  <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"
-                  />
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test="./w:lvlText/@w:val != ''">
-                <xsl:call-template name="NumFormat">
-                  <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
-                  <xsl:with-param name="BeforeAfterNum" select="./w:lvlText/@w:val"/>
-                </xsl:call-template>
-              </xsl:if>
-              <xsl:variable name="display">
-                <xsl:call-template name="CountDisplayListLevels">
-                  <xsl:with-param name="string">
-                    <xsl:value-of select="./w:lvlText/@w:val"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="count">0</xsl:with-param>
-                </xsl:call-template>
-              </xsl:variable>
-              <xsl:if test="$display &gt; 1">
-                <xsl:attribute name="text:display-levels">
-                  <xsl:value-of select="$display"/>
-                </xsl:attribute>
-              </xsl:if>
-              <style:list-level-properties>
-              <!--  <xsl:variable name="Ind" select="./w:pPr/w:ind"/>
-                <xsl:attribute name="text:space-before">
-                  <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
-                </xsl:attribute>
-                <xsl:attribute name="text:min-label-distance">
-                  <xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
-                </xsl:attribute>-->
-                <xsl:call-template name="InsertListLevelProperties"/>
-              </style:list-level-properties>
+        <xsl:variable name="styleId">
+          <xsl:value-of select="@w:styleId"/>
+        </xsl:variable>
+        <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val=$styleId]/w:numPr)">
+          <xsl:variable name="numId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+          <xsl:variable name="levelId" select="w:pPr/w:numPr/w:ilvl/@w:val | w:pPr/w:outlineLvl/@w:val"/>
+          <text:outline-level-style>
+            <xsl:attribute name="text:level">
+              <xsl:value-of select="./w:pPr/w:outlineLvl/@w:val +1"/>
+            </xsl:attribute>
+            <xsl:for-each select="document('word/numbering.xml')">
+              <xsl:variable name="abstractNum" select="key('abstractNumId',key('numId',$numId)/w:abstractNumId/@w:val)"/>
+              <!--w:lvl shows which level defintion should be taken from abstract num-->
+              <xsl:for-each select="$abstractNum/w:lvl[@w:ilvl = $levelId][1]">
+                <xsl:if
+                  test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
+                  <xsl:attribute name="style:num-suffix">
+                    <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"
+                    />
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="./w:lvlText/@w:val != ''">
+                  <xsl:call-template name="NumFormat">
+                    <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
+                    <xsl:with-param name="BeforeAfterNum" select="./w:lvlText/@w:val"/>
+                  </xsl:call-template>
+                </xsl:if>
+                <xsl:variable name="display">
+                  <xsl:call-template name="CountDisplayListLevels">
+                    <xsl:with-param name="string">
+                      <xsl:value-of select="./w:lvlText/@w:val"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="count">0</xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:if test="$display &gt; 1">
+                  <xsl:attribute name="text:display-levels">
+                    <xsl:value-of select="$display"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <style:list-level-properties>
+                  <!--  <xsl:variable name="Ind" select="./w:pPr/w:ind"/>
+                    <xsl:attribute name="text:space-before">
+                    <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="text:min-label-distance">
+                    <xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
+                    </xsl:attribute>-->
+                  <xsl:call-template name="InsertListLevelProperties"/>
+                </style:list-level-properties>
+              </xsl:for-each>
             </xsl:for-each>
-          </xsl:for-each>
-        </text:outline-level-style>
+          </text:outline-level-style>
+        </xsl:if>
       </xsl:for-each>
     </text:outline-style>
   </xsl:template>

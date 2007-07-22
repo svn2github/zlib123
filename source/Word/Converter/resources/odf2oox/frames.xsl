@@ -2305,7 +2305,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:if test="$frameW != '' ">
+    <xsl:if test="$frameW != '' and $frameW != 0">
       <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
     </xsl:if>
 
@@ -2318,7 +2318,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:if test="$frameH != '' ">
+    <xsl:if test="$frameH != '' and $frameH != 0">
       <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
     </xsl:if>
 
@@ -2351,8 +2351,16 @@
           <xsl:message terminate="no">translation.odf2oox.scaledImage</xsl:message>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:variable name="relWidth"
-            select="substring-before($shapeProperties/@style:rel-width,'%')"/>
+          <xsl:variable name="relWidth">
+            <xsl:choose>
+              <xsl:when test="contains($shapeProperties/@style:rel-width,'%')">
+                <xsl:value-of select="substring-before($shapeProperties/@style:rel-width,'%')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$shapeProperties/@style:rel-width"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
           <xsl:if test="$relWidth != '' ">
             <xsl:text>mso-width-percent:</xsl:text>
             <xsl:value-of select="number($relWidth) * 10"/>
@@ -2370,8 +2378,16 @@
           <xsl:message terminate="no">translation.odf2oox.scaledImage</xsl:message>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:variable name="relHeight"
-            select="substring-before($shapeProperties/@style:rel-height,'%')"/>
+          <xsl:variable name="relHeight">
+            <xsl:choose>
+              <xsl:when test="contains($shapeProperties/@style:rel-height,'%')">
+                <xsl:value-of select="substring-before($shapeProperties/@style:rel-height,'%')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$shapeProperties/@style:rel-height"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
           <xsl:if test="$relHeight != '' ">
             <xsl:text>mso-height-percent:</xsl:text>
             <xsl:value-of select="number($relHeight) * 10"/>

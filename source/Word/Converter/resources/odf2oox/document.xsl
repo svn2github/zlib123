@@ -261,7 +261,54 @@
         <xsl:value-of select="@text:style-name"/>
       </xsl:with-param>
     </xsl:call-template>
+    
+    <!--  indent  -->
+    <xsl:variable name="styleName">
+      <xsl:value-of select="@text:style-name"/>
+    </xsl:variable>
+    <xsl:if test="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-left">
+      <w:ind>
+        <xsl:attribute name="w:left">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-left"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:if test="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-right">
+        <xsl:attribute name="w:right">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-right"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:text-indent">
+          <xsl:variable name="Indent">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:text-indent"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when  test="$Indent &lt; 0">
+              <xsl:attribute name="w:hanging">
+                    <xsl:value-of select="-$Indent"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$Indent &gt; 0">
+              <xsl:attribute name="w:firstLine">
+                    <xsl:value-of select="$Indent"/>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:if>
+      </w:ind>
+    </xsl:if>
 
+    
     <!-- insert page break before table when required -->
     <xsl:choose>
       <xsl:when test="$isFirstRow = 'true' ">

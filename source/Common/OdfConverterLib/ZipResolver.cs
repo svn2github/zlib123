@@ -38,7 +38,8 @@ using CleverAge.OdfConverter.OdfZipUtils;
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
 	/// <summary>
-	/// An XmlUrlResolver for zip packaged files
+	/// An XmlUrlResolver for zip packaged files. 
+    /// This resolver is mostly invoked when using the XSL document() function.
 	/// </summary>
 	public class ZipResolver : XmlUrlResolver, IDisposable
     {
@@ -104,17 +105,23 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 				if (entries.Contains(absoluteUri.AbsoluteUri))
 				{
 					stream = archive.GetEntry((string) entries[absoluteUri.AbsoluteUri]);
+                    
 				}
 				
 				if (stream == null)
 				{
 					stream = new MemoryStream();
 				}
-				return stream;
-				
+                // Cannot have a 0 byte xml document !
+                else if (stream.Length == 0)
+                { 
+                    throw new IOException(entries[absoluteUri.AbsoluteUri] + " is 0 length");
+                }
+                return stream;
 			} 
 			catch (Exception) 
 			{
+                // failsafe on a dummy xml document
 				return EmbeddedResourceResolver.GetSharedResource("source.xml");
 			}
 		}

@@ -27,12 +27,69 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main">
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:ct="http://schemas.openxmlformats.org/package/2006/content-types">
+
   <xsl:template match="/oox:source">
-    <xsl:apply-templates select="document('word/document.xml')//w:p"/>
+    <xsl:call-template name="VisitPart">
+      <xsl:with-param name="content-type" select="'main+xml'"/>
+    </xsl:call-template>
+    <xsl:call-template name="VisitPart">
+      <xsl:with-param name="content-type" select="'styles+xml'"/>
+    </xsl:call-template>
+    <xsl:call-template name="VisitPart">
+      <xsl:with-param name="content-type" select="'header+xml'"/>
+    </xsl:call-template>
+    <xsl:call-template name="VisitPart">
+      <xsl:with-param name="content-type" select="'footer+xml'"/>
+    </xsl:call-template>
+    <xsl:call-template name="VisitPart">
+      <xsl:with-param name="content-type" select="'footnotes+xml'"/>
+    </xsl:call-template>
+    <xsl:call-template name="VisitPart">
+      <xsl:with-param name="content-type" select="'endnotes+xml'"/>
+    </xsl:call-template>
   </xsl:template>
-  <xsl:template match="w:t">
-    <xsl:message terminate="no">progress:w:t</xsl:message>
+
+  <xsl:template name="VisitPart">
+    <xsl:param name="content-type"/>
+    <xsl:for-each
+      select="document('[Content_types].xml')/ct:Types/ct:Override[contains(@ContentType, $content-type)]">
+      <xsl:variable name="path" select="substring-after(@PartName, '/')"/>
+      <xsl:for-each select="document($path)">
+        <xsl:apply-templates/>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="w:body">
     <xsl:apply-templates/>
   </xsl:template>
+
+  <xsl:template match="w:p">
+    <xsl:message terminate="no">progress:w:p</xsl:message>
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="w:r">
+    <xsl:message terminate="no">progress:w:r</xsl:message>
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="w:pPr">
+    <xsl:message terminate="no">progress:w:pPr</xsl:message>
+  </xsl:template>
+
+  <xsl:template match="w:rPr">
+    <xsl:message terminate="no">progress:w:rPr</xsl:message>
+  </xsl:template>
+
+  <xsl:template match="w:t">
+    <xsl:message terminate="no">progress:w:t</xsl:message>
+  </xsl:template>
+
+  <xsl:template match="w:style">
+    <xsl:message terminate="no">progress:w:style</xsl:message>
+  </xsl:template>
+
 </xsl:stylesheet>

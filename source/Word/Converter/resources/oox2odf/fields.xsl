@@ -331,6 +331,12 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  <!-- template with mode automaticpict should behave as with mode automaticstyles -->
+
+  <xsl:template match="w:instrText" mode="automaticpict">
+    <xsl:apply-templates select="." mode="automaticstyles"/>
+  </xsl:template>
 
   <!--cross-reference-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'REF')]" mode="fields">
@@ -704,7 +710,14 @@
   
   <xsl:template match="w:fldSimple">
     <text:span text:style-name="{generate-id(w:r)}">
+      <xsl:choose>
+        <xsl:when test="preceding::w:instrText[contains(.,'AUTOTEXT')]">
+          <xsl:apply-templates select="descendant::w:t"/>
+        </xsl:when>
+        <xsl:otherwise>
       <xsl:apply-templates select="." mode="fields"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </text:span>
   </xsl:template>
 

@@ -24,7 +24,7 @@ SourceFiles=SourceFiles
 InstallPrompt=
 DisplayLicense=
 FinishMessage=
-TargetName=OdfAddInForWordSetup.exe
+TargetName=OdfAddInForWordSetup-pl.exe
 FriendlyName=ODF Add-In for Word
 AppLaunched=CMD /C SetupPrepare.bat
 PostInstallCmd=<None>
@@ -36,10 +36,13 @@ FILE2="extensibilityMSM.msi"
 FILE3="lockbackRegKey.msi"
 FILE4="office2003-kb907417sfxcab-ENU.exe"
 FILE5="SetupPrepare.bat"
+FILE6="o2003pia.msi"
+FILE7="o2003pia_eula.txt"
 [SourceFiles]
 SourceFiles0=
 SourceFiles1=KB908002\
 SourceFiles2=..\
+SourceFiles3=PIA2003\
 [SourceFiles0]
 %FILE0%=
 %FILE1%=
@@ -49,3 +52,6 @@ SourceFiles2=..\
 %FILE4%=
 [SourceFiles2]
 %FILE5%=
+[SourceFiles3]
+%FILE6%=
+%FILE7%=

@@ -463,7 +463,7 @@
         <xsl:attribute name="style:page-layout-name">
           <xsl:choose>
             <xsl:when
-              test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or not(preceding::w:sectPr)">
+              test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or (preceding::w:sectPr/w:cols and not(./w:cols)) or (not(preceding::w:sectPr/w:cols) and ./w:cols) or preceding::w:sectPr/w:cols/@w:num != ./w:cols/@w:num or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or not(preceding::w:sectPr) or (document('word/document.xml')/w:document/w:body/w:sectPr/w:cols and not(./w:cols)) or (not(document('word/document.xml')/w:document/w:body/w:sectPr/w:cols) and ./w:cols) or document('word/document.xml')/w:document/w:body/w:sectPr/w:cols/@w:num != ./w:cols/@w:num">
               <xsl:value-of select="concat('PAGE',generate-id(.))"/>
             </xsl:when>
             <xsl:otherwise>
@@ -1308,11 +1308,7 @@
                 <xsl:value-of select="w:pgNumType/@w:start"/>
               </xsl:attribute>
             </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise> 
-            <!--  shouldnt  line above look like following:
-              <xsl:otherwise><xsl:attribute name="style:num-format">1</xsl:attribute></xsl:otherwise> 
-              ???
-            -->
+            <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:when test="w:pgNumType/@w:fmt = 'lowerLetter' ">
@@ -1526,6 +1522,25 @@
               <xsl:value-of select="w:next/@w:val"/>
             </xsl:attribute>
           </xsl:if>
+          <xsl:choose> <!--Begin part responsible for numbering paragrafs -->
+            <xsl:when test="w:pPr/w:outlineLvl/@w:val&lt;9">
+              <!--<xsl:attribute name="style:default-outline-level">
+                <xsl:value-of select="number(w:pPr/w:outlineLvl/@w:val)+1"/>
+                </xsl:attribute>-->
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="w:basedOn">
+                <xsl:variable name="parentStyle">
+                  <xsl:value-of select="w:basedOn/@w:val"/>
+                </xsl:variable>
+                <xsl:if test="ancestor::node()/w:style[@w:styleId=$parentStyle]/w:pPr/w:outlineLvl/@w:val&lt;9">
+                  <xsl:attribute name="style:default-outline-level">
+                    <xsl:value-of select="number(ancestor::node()/w:style[@w:styleId=$parentStyle]/w:pPr/w:outlineLvl/@w:val)+1" />
+                  </xsl:attribute>
+                </xsl:if>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose> <!--End part responsible for numbering paragrafs-->
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:otherwise>
@@ -1559,11 +1574,21 @@
   <xsl:template name="InsertDefaultParagraphProperties">
     <xsl:if test="self::w:p[not(w:pPr)]">
       <style:paragraph-properties>
+        
         <!-- no spacing in OOX. when the paragraph is in table-->
         <xsl:if test="ancestor::w:tc">
           <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
           <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
         </xsl:if>
+        
+        <!-- Sets top and/or bottom  margin if contextual spacing applies -->
+        <xsl:call-template name="contextualSpacing">
+          <xsl:with-param name="prevP" select="preceding-sibling::w:p[1]"/>
+          <xsl:with-param name="nextP" select="following-sibling::w:p[1]"/>
+        </xsl:call-template>
+        
+        <xsl:call-template name="InsertParagraphWidowControl"/>
+        
         <xsl:call-template name="InsertDropCapProperties"/>
       </style:paragraph-properties>
     </xsl:if>
@@ -1948,10 +1973,11 @@
       w:afterAutospacing and w:beforeAutospacing attributes are lost
       w:afterLines and w:beforeLines attributes are lost 
     -->
-
+    
     <xsl:variable name="StyleId">
       <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
     </xsl:variable>
+    
     <!-- are we in a list -->
     <xsl:variable name="CheckIfList">
       <xsl:call-template name="CheckIfList">
@@ -1960,6 +1986,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
     <!-- left indent -->
     <xsl:variable name="IndLeft">
       <xsl:choose>
@@ -1974,6 +2001,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
+    
     <!-- hanging indent -->
     <xsl:variable name="IndHanging">
       <xsl:choose>
@@ -1988,6 +2016,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
+    
     <!-- margin left -->
     <xsl:variable name="MarginLeft">
       <xsl:call-template name="CalculateMarginLeft">
@@ -2012,13 +2041,20 @@
       test="contains(parent::w:p/w:r/w:pict/v:shape/@style,'mso-position-horizontal-relative:char') and not(w:textAlignment)">
       <xsl:attribute name="style:vertical-align">bottom</xsl:attribute>
     </xsl:if>
+    
     <!-- no spacing in OOX. when the paragraph is in table-->
     <xsl:if test="ancestor::w:tc">
       <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
       <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
     </xsl:if>
+    
+    <!-- Sets top and/or bottom  margin if contextual spacing applies -->
+    <xsl:call-template name="contextualSpacing"/>
+    
+    
     <!-- insert attributes using match -->
     <xsl:apply-templates mode="pPrChildren"/>
+    
     <!-- insert attributes using template -->
     <xsl:call-template name="InsertParagraphBreakBefore"/>
     <xsl:call-template name="InsertParagraphAutoSpace"/>
@@ -2030,6 +2066,7 @@
     </xsl:call-template>
     <xsl:call-template name="InsertParagraphWidowControl"/>
     <xsl:call-template name="InsertSuppressLineNumbering"/>
+    
     <!-- child elements : -->
     <!-- tab-stops -->
     <xsl:call-template name="InsertParagraphTabStops">
@@ -2037,10 +2074,129 @@
       <xsl:with-param name="parentStyleId" select="w:pStyle/@w:val|parent::w:style/w:basedOn/@w:val"
       />
     </xsl:call-template>
+    
     <!-- drop cap properties -->
     <xsl:call-template name="InsertDropCapProperties"/>
   </xsl:template>
 
+  
+  <xsl:template name="contextualSpacing">
+    <!-- @Description: Sets top and bottom margin to zero to emulate contextual spacing feature -->
+    <!-- @Context: A paragraph node (i.e. &lt;w:Ppr&gt;), or a node paragraph property node (i.e. &lt;w:Ppr&gt;) -->
+    <!-- @Returns: Nothing -->
+    
+    <xsl:param name="prevP" select="parent::w:p/preceding-sibling::w:p[1]"/> <!-- The previous paragraph -->
+    <xsl:param name="nextP" select="parent::w:p/following-sibling::w:p[1]"/> <!-- The next paragraph -->
+                
+    <xsl:variable name="isContextualSpacing"> 
+      <xsl:call-template name="isContextualSpacing"/>
+    </xsl:variable>
+    
+    <!-- if contextual spacing is applied to the current paragraph -->
+    <xsl:if test="$isContextualSpacing = 'true' ">
+    
+      <!-- Sets the top margin if there is a preceding paragraph... -->
+      <xsl:if test="$prevP">
+        
+        <xsl:variable name="prevStyle" select="$prevP/w:pPr/w:pStyle/@w:val"/>      <!-- The previous paragraph's style  -->
+        
+        <!-- ... and the previous pararaph has the same style -->
+        <xsl:if test="w:pStyle/@w:val = $prevStyle or
+          (boolean(w:pStyle/@w:val) = false() and boolean($prevStyle) = false())">
+          <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
+        </xsl:if>
+      </xsl:if>
+              
+      <!-- Sets the bottom margin if there is a following paragraph... -->
+      <xsl:if test="$nextP">
+        
+        <xsl:variable name="nextStyle" select="$nextP/w:pPr/w:pStyle/@w:val" />     <!-- The next paragraph's style  -->
+        
+        <!-- ... and the next paragraph has the same style  -->
+        <xsl:if test="w:pStyle/@w:val = $nextStyle or 
+          (boolean(w:pStyle/@w:val) = false() and boolean($nextStyle) = false())">
+          <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>    
+        </xsl:if>
+      </xsl:if>   
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="isContextualSpacing">
+    <!-- @Description:  Checks whether the current paragraph has contextual spacing -->
+    <!-- @Context: A paragraph node (i.e. &lt;w:Ppr&gt;), or a node paragraph property node (i.e. &lt;w:Ppr&gt;)-->
+    <!-- @Returns: <b>true</b> if the current paragraph has contextual spacing, <b>false</b> otherwise    -->
+    
+    <xsl:choose>
+      
+      <!-- is Contextual Spacing defined in current paragraph properties?... -->
+      <xsl:when test="w:contextualSpacing/@w:val= '0' ">false</xsl:when>
+      <xsl:when test="w:contextualSpacing">true</xsl:when>
+      
+      <!-- is Contextual Spacing defined in parent style?... -->
+      <xsl:when test="w:pStyle/@w:val">
+        <xsl:call-template name="isContextualSpacingInStyle">
+          <xsl:with-param name="styleID" select="w:pStyle/@w:val"/>
+        </xsl:call-template>
+      </xsl:when>
+      
+      <!-- is Contextual Spacing defined in default style?... -->
+      <xsl:otherwise>
+        <xsl:call-template name="isContextualSpacingInStyle"/>
+      </xsl:otherwise>        
+    </xsl:choose>        
+  </xsl:template>
+  
+  <xsl:template name="isContextualSpacingInStyle">
+    <!-- @Description: Checks a given style for contextual spacing. If not found, 
+                       will search recursively in the parent's styles -->
+    <!-- @Context:     none -->
+    <!-- @Returns:     <b>true</b> if the element &lt;w:contextualSpacing/&gt; is found, 
+                       <b>false</b> otherwise. -->
+    
+    <xsl:param name="styleID" /> <!-- The style ID of the style to be parsed. 
+                                      If not specified will use the default style -->
+    
+    <!-- Switch context in order to parse the styles in word/styles.xml -->
+    <xsl:for-each select="document('word/styles.xml')/w:styles">
+      <xsl:choose>
+        
+        <!-- We have a named style... -->
+        <xsl:when test="$styleID">
+          <xsl:variable name="style" select="key('StyleId', $styleID)"/> <!--  The style to be parsed -->
+          
+          <xsl:choose>
+            <xsl:when test="$style/w:pPr/w:contextualSpacing/@w:val= '0' ">false</xsl:when>
+            <xsl:when test="$style/w:pPr/w:contextualSpacing">true</xsl:when>
+            
+            <!-- Search the parent style if any... -->
+            <xsl:otherwise>
+              <xsl:variable name="parentStyleID" select="$style/w:basedOn/@w:val"/>
+              <xsl:choose>                                                                
+                <xsl:when test="$parentStyleID">
+                  <xsl:call-template name="isContextualSpacingInStyle">
+                    <xsl:with-param name="styleID" select="$parentStyleID"/>
+                  </xsl:call-template>
+                </xsl:when>                
+                <xsl:otherwise>false</xsl:otherwise>
+              </xsl:choose>                            
+            </xsl:otherwise>
+          </xsl:choose>           
+        </xsl:when>
+        
+        <!-- Checks the default style...  -->
+        <xsl:otherwise>
+          <xsl:variable name="style" select="key('default-styles', 'paragraph')"/>
+          <xsl:choose>
+            <xsl:when test="$style/w:pPr/w:contextualSpacing">true</xsl:when>
+            <xsl:otherwise>false</xsl:otherwise>
+          </xsl:choose> 
+        </xsl:otherwise>
+        
+      </xsl:choose>               
+    </xsl:for-each>    
+  </xsl:template>
+  
+  
   <!-- avoid inserting text in paragraph properties -->
   <xsl:template match="w:t" mode="pPrChildren">
     <xsl:apply-templates mode="automaticstyles"/>
@@ -3424,11 +3580,18 @@
             <xsl:value-of select="concat(number($percentValue),' 100')"/>
           </xsl:attribute>
         </xsl:when>
-        <xsl:otherwise>
+        
+        <!-- BUG [ 1743455 ] DOCX: 3 files corrupted during conversion
+               03 / 07 / 2007
+               It seems the Text-position value is wrong for the otherwise condition
+               Somes files are crashing with Open Office 2.2, not with older version 2.0
+                Value in the otherwise condition is the same than the positioning of normal text...
+          -->
+        <!--xsl:otherwise>
           <xsl:attribute name="style:text-position">
             <xsl:value-of select="concat(number($percentValue),' 100')"/>
           </xsl:attribute>
-        </xsl:otherwise>
+        </xsl:otherwise-->
 
       </xsl:choose>
     </xsl:if>

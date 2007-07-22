@@ -173,17 +173,16 @@ namespace CleverAge.OdfConverter.Word
 				else
 				{
 					//we decrease numberOfParagraphs variable when we are processing unnecessary paragraphs
-					if(this.numberOfParagraphs > 0)
+					if (this.numberOfParagraphs > 0 && this.context2.Count > 0)
 					{
-						Element element = (Element)this.context2.Peek();
-						if(IsParagraph(element.Name)){
+						Element element = (Element) this.context2.Peek();
+						if (IsParagraph(element.Name)) {
 							this.numberOfParagraphs--;
 						}
 						this.context2.Pop();
 					}
 					else
 					{
-						
         				this.nextWriter.WriteEndElement();
         			}
 				}

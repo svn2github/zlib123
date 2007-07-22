@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfPPTXPAddin", "Presentati
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfPPTXPAddinSetup", "Presentation\OdfPPTXPAddin\OdfPPTXPAddinSetup\OdfPPTXPAddinSetup.vdproj", "{8C9A5EBC-D752-4650-9EEE-0B6B429C63A6}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-ja", "Word\Setup\OdfConverterForWordSetup-ja\OdfAddInForWordSetup-ja.vdproj", "{E37B280C-A542-40BF-A8F4-F5D170977922}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +197,10 @@ Global
 		{8C9A5EBC-D752-4650-9EEE-0B6B429C63A6}.Debug|Any CPU.Build.0 = Debug
 		{8C9A5EBC-D752-4650-9EEE-0B6B429C63A6}.Release|Any CPU.ActiveCfg = Release
 		{8C9A5EBC-D752-4650-9EEE-0B6B429C63A6}.Release|Any CPU.Build.0 = Release
+		{E37B280C-A542-40BF-A8F4-F5D170977922}.Debug|Any CPU.ActiveCfg = Debug
+		{E37B280C-A542-40BF-A8F4-F5D170977922}.Debug|Any CPU.Build.0 = Debug
+		{E37B280C-A542-40BF-A8F4-F5D170977922}.Release|Any CPU.ActiveCfg = Release
+		{E37B280C-A542-40BF-A8F4-F5D170977922}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -232,5 +238,6 @@ Global
 		{0A04F05F-EB4D-433C-B81B-51C784C14D31} = {05D4C0EB-A6B0-4551-AFB0-EAD538D2C3A4}
 		{D06B7BC0-638A-4043-8941-76BA12B4E813} = {05D4C0EB-A6B0-4551-AFB0-EAD538D2C3A4}
 		{C9577E7C-5012-4886-9210-7F81DAFCC177} = {05D4C0EB-A6B0-4551-AFB0-EAD538D2C3A4}
+		{E37B280C-A542-40BF-A8F4-F5D170977922} = {05D4C0EB-A6B0-4551-AFB0-EAD538D2C3A4}
 	EndGlobalSection
 EndGlobal

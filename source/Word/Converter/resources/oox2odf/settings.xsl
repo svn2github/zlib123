@@ -11,13 +11,13 @@
       <office:settings>
         <config:config-item-set config:name="ooo:view-settings">
           <xsl:choose>
-            <xsl:when 
-            test="document('word/document.xml')/w:document/w:body/descendant::w:ins or 
+            <xsl:when
+              test="document('word/document.xml')/w:document/w:body/descendant::w:ins or 
         document('word/document.xml')/w:document/w:body/descendant::w:del or
         document('word/document.xml')/w:document/w:body/descendant::w:pPrChange or
         document('word/document.xml')/w:document/w:body/descendant::w:rPrChange">
-            <config:config-item config:name="ShowRedlineChanges" config:type="boolean"
-            >true</config:config-item>
+              <config:config-item config:name="ShowRedlineChanges" config:type="boolean"
+              >true</config:config-item>
             </xsl:when>
             <xsl:otherwise>
               <config:config-item config:name="ShowRedlineChanges" config:type="boolean"
@@ -25,12 +25,24 @@
             </xsl:otherwise>
           </xsl:choose>
         </config:config-item-set>
-        <!-- uncommenting this breaks numbering! -->
-        <!--config:config-item-set config:name="ooo:configuration-settings">
-          <config:config-item config:name="AddParaTableSpacing" config:type="boolean"
-          >false</config:config-item>
-        </config:config-item-set-->
+
+        <!-- Uncommenting AddParaTableSpacing will introduce a side effect on line length in OpenOffice 2.x.!!  -->
+        <!--
+        <config:config-item-set config:name="ooo:configuration-settings">                   
+          <config:config-item config:name="AddParaTableSpacing" config:type="boolean">
+            <xsl:choose>
+              <xsl:when test="document('word/settings.xml')/w:settings/w:compat/w:doNotUseHTMLParagraphAutoSpacing">true</xsl:when>
+              <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>                        
+          </config:config-item>
+          <config:config-item config:name="UseOldNumbering" config:type="boolean">false</config:config-item>
+        </config:config-item-set>
+          -->
+
       </office:settings>
     </office:document-settings>
   </xsl:template>
+
+  <xsl:template match="w:compat"> </xsl:template>
+
 </xsl:stylesheet>

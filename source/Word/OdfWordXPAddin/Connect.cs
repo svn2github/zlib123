@@ -127,6 +127,13 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
                 .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "Language", null) as string;
+
+            if (languageVal == null)
+            {
+                languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Clever Age\Odf Add-in for Word", "Language", null) as string;
+            }
+
             if (languageVal != null)
             {
                 int.TryParse(languageVal, out culture);
@@ -353,7 +360,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                     // name of the file to create
                     string odfFileName = sfd.FileName;
                     // multi dotted extensions support
-                    if (!odfFileName.Equals(ext))
+                    if (!odfFileName.EndsWith(ext))
                     {
                     	odfFileName += ext;
                     }
@@ -381,6 +388,18 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                             object tempCopyName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
                             File.Copy((string)sourceFileName, (string)tempCopyName);
 
+                            //BUG FIX #1743469
+                            FileInfo lFi;
+
+                            lFi = new FileInfo((string)tempCopyName);
+
+                            if (lFi.IsReadOnly)
+                            {
+                                lFi.IsReadOnly = false;
+                            }
+                            //BUG FIX #1743469
+
+
                             // open the duplicated file
                             object addToRecentFiles = false;
                             object readOnly = false;
@@ -396,16 +415,31 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                             // close and remove the duplicated file
                             object saveChanges = false;
                             newDoc.Close(ref saveChanges, ref missing, ref missing);
-                            File.Delete((string)tempCopyName);
 
+
+                            //BUG FIX #1743469
+                            try
+                            {
+                                File.Delete((string)tempCopyName);
+                            }
+                            catch (Exception NotManagedDelete)
+                            {
+                                //If delete does not work, don't stop the rest of the process
+                                //The tempFile will be deleted by the system
+                            }
+                            //BUG FIX #1743469
+                            
                             // Now the file to be converted is
                             sourceFileName = tempDocxName;
                         }
                         catch (Exception ex)
                         {
                             this.applicationObject.System.Cursor = currentCursor;
-                            System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
-                            System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfExportErrorTryDocxFirst"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+
+                            String lMsg;
+
+                            lMsg =  addinLib.GetString("OdfExportErrorTryDocxFirst");
+                            System.Windows.Forms.MessageBox.Show(lMsg, DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
                             return;
                         }
                     }
