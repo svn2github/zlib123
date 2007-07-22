@@ -7,6 +7,7 @@ Content
 The project is made of several subprojects and has the following struture:
 
 + lib                                Shared Dlls
++ packages                           Visual Studio Packages (patches for building setup executable)
 + source
   + Additional Tools                 External tools/source used by the converter
   | + OdfInstallHelper               Custom actions for the VS Windows Installer
@@ -25,8 +26,6 @@ The project is made of several subprojects and has the following struture:
     + Converter			     Word converter engine
     + Setup                          Setup projects
     | + OdfAddInForWordSetup         The ODF Add-in setup programs in english
-    | | + dotnetfx                   Visual Studio patch for building setup executable
-    | | + KB908002                   Visual Studio patch for building setup executable
     | + OdfAddInForWordSetup-xx      The ODF Add-in setup programs in different languages
     + OdfWordAddInLib                A library used by all the Word Add-in projects
     + OdfWordXXXAddIn                The ODF Add-in for Word 2007/2003/XP
@@ -43,12 +42,11 @@ Requirements
 
 To compile the sources, you will need .NET Framework 2.0 SDK.
 The Add-in setup programs (Word 2007, Word 2003 and Word XP) also require Visual Studio 2005.
-To compile Word 2003 & Word XP Add-in setup programs, you will also need to patch Visual Studio, 
-by following the instructions given at the following address: http://support.microsoft.com/kb/908002/en-us.
+To compile Word 2003 & Word XP Add-in setup programs, you will also need to patch Visual Studio, by following the instructions given at the following address: http://support.microsoft.com/kb/908002/en-us
 
 Notes
 -----
-To generate the OdfAddInForWordSetup project, you will have to copy the "packages" subfolders KB908002, DotNetFX, CompatibilityPack and PIA2003
-to <.NET 2.0 Framework SDK Folder>\Bootstrapper\Packages folder
-- OdfAddInForWordSetup/DotNetFX only contains localized strings , add these folders to the existing dotnetfx package folder
+
+To generate the OdfAddInForWordSetup project, you will have to copy the KB908002, CompatibilityPack and DotNetFX folders (from the packages directory) to "<.NET 2.0 Framework SDK Folder>\Bootstrapper\Packages" folder
+- OdfAddInForWordSetup/DotNetFX only contains localized strings, add these folders to the existing dotnetfx package folder
 - OdfAddInForWordSetup/KB908002 only contains an updated product.xml and new tool which detects if the office patch has been installed
