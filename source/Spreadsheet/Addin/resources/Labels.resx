@@ -135,4 +135,7 @@
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Open Office Calc supports only 256 sheets. Any sheets above 256 will be lost permanently</value>
   </data>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>Open Office Calc supports only OLEObject implemented as link to file.</value>
+  </data>
 </root>

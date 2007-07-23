@@ -43,13 +43,18 @@
 
   
   <xsl:template name="InsertOLEObjects">
-    <xsl:if test="e:oleObject[not(@r:id)]">
-    <table:shapes>
-        <xsl:for-each select="e:oleObject ">
+    <xsl:choose>
+      <xsl:when test="e:oleObject[not(@r:id)]">
+        <table:shapes>
+          <xsl:for-each select="e:oleObject ">
             <xsl:call-template name="InsertOLEObjectsLinks"/>    
-        </xsl:for-each>
-    </table:shapes>  
-    </xsl:if>
+          </xsl:for-each>
+        </table:shapes>
+      </xsl:when>
+      <xsl:when test="e:oleObject">
+          <xsl:message terminate="no">translation.oox2odf.OLEObject</xsl:message>  
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template name="InsertOLEObjectsLinks">
@@ -353,6 +358,6 @@
       <xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
     </xsl:if>
   </xsl:template>
-  
+
 
 </xsl:stylesheet>
