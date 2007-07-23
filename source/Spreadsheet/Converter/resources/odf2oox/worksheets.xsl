@@ -204,10 +204,7 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      <!-- insert sort -->
-      <xsl:call-template name="InsertSort">
-        <xsl:with-param name="tableName" select="@table:name"/>
-      </xsl:call-template>
+      
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
@@ -316,7 +313,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="textBox">
         <xsl:choose>
           <xsl:when test="descendant::draw:frame/draw:text-box">
@@ -664,6 +661,11 @@
       </xsl:apply-templates>
     </sheetData>
 
+    <!-- insert sort -->
+    <xsl:call-template name="InsertSort">
+      <xsl:with-param name="tableName" select="@table:name"/>
+    </xsl:call-template>
+    
     <!-- Insert Data Validation -->
 
     <xsl:if test="table:table-row/table:table-cell/@table:content-validation-name != ''">
