@@ -117,7 +117,14 @@
                                     <xsl:with-param name="EndCell">
                                         <xsl:value-of select="substring-after(@sqref, ':')"/>
                                     </xsl:with-param>
+                                    <xsl:with-param name="dxfIdStyle">
+                                        <xsl:value-of select="$dxfIdStyle"/>
+                                    </xsl:with-param>
+                                    <xsl:with-param name="document">
+                                        <xsl:value-of select="$document"/>
+                                    </xsl:with-param>
                                 </xsl:call-template>
+                                
                             </xsl:with-param>
                             <xsl:with-param name="document">
                                 <xsl:value-of select="$document"/>
@@ -471,35 +478,16 @@
             </xsl:for-each>
         </xsl:variable>
 
-        <!--xsl:variable name="ConditionalCellStyle">
-                <xsl:for-each select="document(concat('xl/',$Id))">
-                    <xsl:call-template name="ConditionalCell">
-                        <xsl:with-param name="document">
-                            <xsl:text>style</xsl:text>
-                        </xsl:with-param>
-                    </xsl:call-template>
-                </xsl:for-each>
-                </xsl:variable-->
-
-
+        
         <xsl:for-each select="document(concat('xl/',$Id))">
 
             <xsl:apply-templates select="e:worksheet/e:dataValidations " mode="Validation">
                 <xsl:with-param name="sheet">
-                    <xsl:value-of select="$Id"/>
+                    <xsl:value-of select="$number"/>
                 </xsl:with-param>
             </xsl:apply-templates>
 
-
-            <!--xsl:apply-templates select="e:worksheet/e:sheetData/e:row/e:c" mode="ConditionalAndCellStyle">
-                <xsl:with-param name="ConditionalCell">
-                    <xsl:value-of select="$ConditionalCell"/>
-                </xsl:with-param>
-                <xsl:with-param name="ConditionalCellStyle">
-                    <xsl:value-of select="$ConditionalCellStyle"/>
-                </xsl:with-param>
-            </xsl:apply-templates-->
-
+         
         </xsl:for-each>
 
         <!-- Insert next Table -->
@@ -513,23 +501,34 @@
     </xsl:template>
 
     <xsl:template match="e:dataValidations" mode="Validation">
-        <xsl:call-template name="InsertValidationProperties"/>
+        <xsl:param name="sheet"/>
+        <xsl:call-template name="InsertValidationProperties">
+            <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+            </xsl:with-param>
+        </xsl:call-template>
     </xsl:template>
 
     <xsl:template name="InsertValidationProperties">
-
+        <xsl:param name="sheet"/>
         <table:content-validations>
-            <xsl:call-template name="InsertValidation"/>
+            <xsl:call-template name="InsertValidation">
+                <xsl:with-param name="sheet">
+                    <xsl:value-of select="$sheet"/>
+                </xsl:with-param>
+            </xsl:call-template>
         </table:content-validations>
     </xsl:template>
 
     <!-- Insert Data Validation -->
     <xsl:template name="InsertValidation">
+        <xsl:param name="sheet"/>
+        
         <xsl:for-each select="e:dataValidation">
             <xsl:sort select="@priority"/>
             <table:content-validation>
                 <xsl:attribute name="table:name">
-                    <xsl:value-of select=" 'val' "/>
+                    <xsl:value-of select="concat('val', $sheet) "/>
                     <xsl:number/>
                 </xsl:attribute>
 

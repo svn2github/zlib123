@@ -1048,7 +1048,7 @@
           <xsl:if
             test="contains(concat(';', $ValidationCell), concat(';', $rowNum, ':', $colNum, ';'))">
             <xsl:attribute name="table:content-validation-name">
-              <xsl:value-of select="(concat('val',(. + 1)))"/>
+              <xsl:value-of select="(concat('val', $sheetNr, (. + 1)))"/>
             </xsl:attribute>
             
           </xsl:if>

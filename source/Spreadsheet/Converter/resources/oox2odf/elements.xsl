@@ -261,7 +261,7 @@
             <xsl:value-of select="substring-before(substring-after(concat(';', $ValidationCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';')"/>
           </xsl:variable>
           <xsl:attribute name="table:content-validation-name">
-            <xsl:value-of select="concat('val', $ValidationStyle + 1)"/>
+            <xsl:value-of select="concat('val', $sheetNr, $ValidationStyle + 1)"/>
           </xsl:attribute>              
           
         </xsl:if>
@@ -657,7 +657,7 @@
                 <xsl:value-of select="substring-before(substring-after(concat(';', $ValidationCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';')"/>
               </xsl:variable>
               <xsl:attribute name="table:content-validation-name">
-                <xsl:value-of select="concat('val', $ValidationStyle + 1)"/>
+                <xsl:value-of select="concat('val', $sheetNr, $ValidationStyle + 1)"/>
               </xsl:attribute>              
             </xsl:if>
             
