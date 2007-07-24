@@ -74,6 +74,25 @@
   <xsl:key name="Col" match="e:col" use="''"/>
   <xsl:key name="ConditionalFormatting" match="e:conditionalFormatting" use="''"/>
 
+  <xsl:template name="recursive">
+    <xsl:param name="oldString" />
+    <xsl:param name="newString" />
+    <xsl:param name="wholeText" /> 
+    <xsl:choose>
+      <xsl:when test="contains($wholeText, $oldString)">
+        <xsl:value-of select="concat(substring-before($wholeText, $oldString), $newString)"/>
+        <xsl:call-template name="recursive">
+          <xsl:with-param name="oldString" select="$oldString" />
+          <xsl:with-param name="newString" select="$newString" />
+          <xsl:with-param name="wholeText" select="substring-after($wholeText, $oldString)" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$wholeText"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <xsl:template name="content">
     <office:document-content>
       <office:scripts/>
@@ -182,7 +201,7 @@
                 <xsl:value-of select="$number"/>
               </xsl:with-param>
               <xsl:with-param name="name">
-                <xsl:value-of select="translate(@name,'!-$#()','')"/>
+                <xsl:value-of select="translate(@name,'!-$#:()','')"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
@@ -233,7 +252,7 @@
           <xsl:value-of select="$number"/>
         </xsl:with-param>
         <xsl:with-param name="name">
-          <xsl:value-of select="translate(@name,'!-$#()','')"/>
+          <xsl:value-of select="translate(@name,'!-$#():','')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -402,14 +421,57 @@
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
       <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
-        <xsl:if
-          test="string($checkedName) = substring-before(./self::node(), '!') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
+        <!-- for the current sheet -->
+        <!-- if the print range is without apostrophes -->
+        <xsl:if test="string($checkedName) = substring-before(./self::node(), '!') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
+          <!-- one print range without apostrophes -->
+          <xsl:if test="not(contains(./self::node(), concat(',', $checkedName)))">
           <xsl:attribute name="table:print-ranges">
-            <xsl:value-of
+           <!-- <xsl:value-of
               select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
-            />
+             />-->
+            <xsl:call-template name="recursive">
+              <xsl:with-param name="wholeText" select="translate(self::node(), '!', '.')" />
+               <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"></xsl:with-param>
+              <xsl:with-param name="oldString" select="':'"></xsl:with-param>
+            </xsl:call-template>
           </xsl:attribute>
+          </xsl:if>
+          <!-- multiple print ranges without apostrophes -->
+          <xsl:if test="contains(./self::node(), concat(',', $checkedName))">
+            <xsl:attribute name="table:print-ranges">
+              <xsl:call-template name="recursive">
+                <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"></xsl:with-param>
+                <xsl:with-param name="wholeText" select="translate(translate(./self::node(), '!', '.'), ',', ' ')"></xsl:with-param>
+                <xsl:with-param name="oldString" select="':'"></xsl:with-param>
+              </xsl:call-template>
+              </xsl:attribute>
+          </xsl:if>
         </xsl:if>
+        <!-- if print range with apostrophes -->
+        <xsl:if test="contains(./self::node(), concat($apostrof, $checkedName))">
+          <!-- one print range with apostrophes -->
+          <xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">
+            <xsl:attribute name="table:print-ranges">
+            <xsl:call-template name="recursive">
+              <xsl:with-param name="oldString" select="':'"></xsl:with-param>
+              <xsl:with-param name="newString" select="concat(':', $apostrof, $checkedName, $apostrof, '.')"></xsl:with-param>
+              <xsl:with-param name="wholeText" select="translate(./self::node(), '!', '.')"></xsl:with-param>
+            </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <!-- multiple print ranges with apostrophes -->
+          <xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">
+            <xsl:attribute name="table:print-ranges">
+              <xsl:call-template name="recursive">
+                <xsl:with-param name="oldString" select="':'"></xsl:with-param>
+                <xsl:with-param name="newString" select="concat(':', $apostrof, $checkedName, $apostrof, '.')"></xsl:with-param>
+                <xsl:with-param name="wholeText" select="translate(translate(./self::node(), '!', '.'), ',', ' ')"></xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if>
+
       </xsl:for-each>
 
 
@@ -423,8 +485,8 @@
           <xsl:value-of select="$checkedName"/>
         </xsl:with-param>
       </xsl:apply-templates>
-      
-        <xsl:call-template name="InsertSheetContent">
+
+      <xsl:call-template name="InsertSheetContent">
         <xsl:with-param name="sheet">
           <xsl:value-of select="$Id"/>
         </xsl:with-param>
@@ -491,7 +553,7 @@
     <xsl:choose>
       <xsl:when test="contains($value, $name) and @name = '_xlnm.Print_Area' ">
 
-        <!--         
+    <!--         
         <xsl:variable name="apos">
           <xsl:text>&apos;</xsl:text>
         </xsl:variable>
@@ -515,7 +577,7 @@
         </xsl:variable>
 -->
 
-        <xsl:call-template name="InsertRanges">
+       <xsl:call-template name="InsertRanges">
           <xsl:with-param name="ranges" select="text()"/>
           <xsl:with-param name="mode" select="substring-after(text(),',')"/>
           <xsl:with-param name="checkedName" select="$checkedName"/>
@@ -632,7 +694,7 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <!--  
+<!--  
            <xsl:value-of
               select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
             <xsl:text> </xsl:text>
@@ -661,7 +723,7 @@
             </xsl:variable>
 
             <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
-            <xsl:variable name="endRange">
+           <xsl:variable name="endRange">
               <xsl:choose>
                 <xsl:when test="contains(substring-after($ranges, concat($sheetName,'!') ), ':' )">
                   <xsl:value-of select="substring-after($ranges,':')"/>
@@ -704,7 +766,7 @@
               </xsl:choose>
             </xsl:variable>
 
-            <!--          <xsl:value-of
+  <!--          <xsl:value-of
               select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
 -->
           </xsl:otherwise>
@@ -1294,6 +1356,7 @@
       <!-- when this row is not first one and there were pictures rows after previous non-empty row-->
       <xsl:when
         test="preceding::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding::e:row[1]/@r and $GetMinRowWithElement &lt; @r - 1">
+
         <xsl:call-template name="InsertElementsBetwenTwoRows">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -1986,15 +2049,15 @@
 
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
-      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-()#','') = $name][2]">
+      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-():#','') = $name][2]">
         <xsl:variable name="nameConflictsBefore">
           <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
           <xsl:value-of
-            select="count(parent::node()/e:sheet[translate(@name,'!$-()#','') = $name and position() &lt; $sheetNumber])"
+            select="count(parent::node()/e:sheet[translate(@name,'!$-():#','') = $name and position() &lt; $sheetNumber])"
           />
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
-        <xsl:value-of select="concat(translate(@name,'!$-()#',''),'_',$nameConflictsBefore + 1)"/>
+        <xsl:value-of select="concat(translate(@name,'!$-()#:',''),'_',$nameConflictsBefore + 1)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$name"/>
