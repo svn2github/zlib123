@@ -252,10 +252,14 @@
       </xsl:call-template>      
       <xsl:text>'</xsl:text>
     </xsl:variable>
-
+<xsl:if test="not(contains($range, '$'))">
     <xsl:value-of
       select="concat($sheetName,'!$',substring-before(substring-after($range,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"/>
-
+</xsl:if>
+    <xsl:if test="contains($range, '$')">
+      <xsl:value-of
+        select="concat($sheetName,'!',substring-before(substring-after($range,'.'),$row1),'', $row1,':','',$col2,'', $row2)"/>
+    </xsl:if>
     <!-- if there is next range there is a space before -->
     <xsl:if test="contains(substring-after(substring-after($range,'.'),'.'),' ')">
       <xsl:text>,</xsl:text>
