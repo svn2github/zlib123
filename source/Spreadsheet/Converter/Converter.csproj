@@ -77,8 +77,10 @@
     <EmbeddedResource Include="resources\oox2odf\border.xsl" />
     <EmbeddedResource Include="resources\oox2odf\headers.xsl" />
     <EmbeddedResource Include="resources\oox2odf\picture.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\insert_cols.xsl" />
     <EmbeddedResource Include="resources\oox2odf\note.xsl" />
     <EmbeddedResource Include="resources\oox2odf\groups.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\date_time.xsl" />
     <EmbeddedResource Include="resources\oox2odf\connections.xsl" />
     <EmbeddedResource Include="resources\oox2odf\validation.xsl" />
     <EmbeddedResource Include="resources\oox2odf\conditional.xsl" />
