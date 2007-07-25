@@ -445,9 +445,16 @@
         <table:sort-by table:data-type="automatic">
           
           <xsl:variable name="colNum">
+            <xsl:if test="contains(@ref, ':')">
             <xsl:call-template name="GetColNum">
               <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
             </xsl:call-template>
+            </xsl:if>
+            <xsl:if test="not(contains(@ref, ':'))">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell" select="@ref"/>
+              </xsl:call-template>
+            </xsl:if>
           </xsl:variable>
           
           <xsl:attribute name="table:field-number">
