@@ -42,6 +42,8 @@
 
   <xsl:key name="hyperlinkPosition" match="e:c" use="'@r'"/>
   <xsl:key name="ref" match="e:hyperlink" use="@ref"/>
+  <!--xsl:key name="outlineLevelRow" match="e:sheetFormatPr" use="@outlineLevelRow"/-->
+  <!--xsl:key name="outlineLevel" match="e:row" use="@outlineLevel"/-->
 
   <!-- Insert sheet without text -->
   <xsl:template name="InsertEmptySheet">
@@ -186,6 +188,7 @@
     <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
+    <xsl:param name="outlineLevel"/>
 
 
     <xsl:variable name="GetMinRowWithElements">
@@ -440,6 +443,17 @@
     <xsl:param name="headerColsEnd"/>
     <xsl:param name="beforeHeader" select="'false'"/>
     <xsl:param name="afterHeader" select="'false'"/>
+    <xsl:param name="outlineLevel"/>
+    <xsl:param name="GroupCell"/>
+
+    <!-- Insert Group Start -->
+  <xsl:if test="contains(concat(';', $GroupCell), concat(';', @min, ':'))">
+    <xsl:call-template name="InsertColumnGroupStart">
+      <xsl:with-param name="GroupCell">
+        <xsl:value-of select="$GroupCell"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:if>
 
     <table:table-column table:style-name="{generate-id(.)}">
 
@@ -2219,6 +2233,7 @@
 
   <xsl:template name="InsertColumns">
     <xsl:param name="sheet"/>
+    <xsl:param name="GroupCell"/>
 
     <xsl:variable name="DefaultCellStyleName">
       <xsl:for-each select="document('xl/styles.xml')">
@@ -2339,6 +2354,9 @@
         <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
         <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
         <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+        <xsl:with-param name="GroupCell">
+          <xsl:value-of select="$GroupCell"/>
+        </xsl:with-param>
       </xsl:apply-templates>
 
       <!-- if all columns are default (there aren't any e:col tags) and there is a header -->
@@ -2406,6 +2424,8 @@
     <xsl:param name="DefaultCellStyleName"/>
     <xsl:param name="headerColsStart"/>
     <xsl:param name="headerColsEnd"/>
+    <xsl:param name="GroupCell"/>    
+    
 
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>
@@ -2566,6 +2586,9 @@
             <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
             <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
             <xsl:with-param name="beforeHeader" select="'true'"/>
+            <xsl:with-param name="GroupCell">
+              <xsl:value-of select="$GroupCell"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
 
@@ -2632,6 +2655,9 @@
               <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
               <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
               <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+              <xsl:with-param name="GroupCell">
+                <xsl:value-of select="$GroupCell"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
 
@@ -2646,6 +2672,9 @@
               <xsl:with-param name="sheet" select="$sheet"/>
               <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
               <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+              <xsl:with-param name="GroupCell">
+                <xsl:value-of select="$GroupCell"/>
+              </xsl:with-param>
             </xsl:apply-templates>
           </xsl:if>
 
@@ -2674,6 +2703,9 @@
             <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
             <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
             <xsl:with-param name="afterHeader" select="'true'"/>
+            <xsl:with-param name="GroupCell">
+              <xsl:value-of select="$GroupCell"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
 
@@ -2684,6 +2716,9 @@
             <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
             <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
             <xsl:with-param name="afterHeader" select="'true'"/>
+            <xsl:with-param name="GroupCell">
+              <xsl:value-of select="$GroupCell"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:for-each>
 
@@ -2695,6 +2730,9 @@
             <xsl:when test="@min = $headerColsEnd + 1">
               <xsl:call-template name="InsertThisColumn">
                 <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+                <xsl:with-param name="GroupCell">
+                  <xsl:value-of select="$GroupCell"/>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -2714,6 +2752,9 @@
 
               <xsl:call-template name="InsertThisColumn">
                 <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+                <xsl:with-param name="GroupCell">
+                  <xsl:value-of select="$GroupCell"/>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -2725,6 +2766,9 @@
 
         <xsl:call-template name="InsertThisColumn">
           <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+          <xsl:with-param name="GroupCell">
+            <xsl:value-of select="$GroupCell"/>
+          </xsl:with-param>
         </xsl:call-template>
 
         <!-- insert default columns before header -->
@@ -2762,9 +2806,21 @@
       <xsl:otherwise>
         <xsl:call-template name="InsertThisColumn">
           <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+          <xsl:with-param name="GroupCell">
+            <xsl:value-of select="$GroupCell"/>
+          </xsl:with-param>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
+    
+    <!-- Insert Group End -->
+    <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
+    <xsl:call-template name="InsertColumnGroupEnd">
+      <xsl:with-param name="GroupCell">
+        <xsl:value-of select="$GroupCell"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    </xsl:if>
 
     <xsl:choose>
 
@@ -2780,6 +2836,9 @@
           <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
           <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
           <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+          <xsl:with-param name="GroupCell">
+            <xsl:value-of select="$GroupCell"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
 
@@ -2792,6 +2851,9 @@
           <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
           <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
           <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+          <xsl:with-param name="GroupCell">
+            <xsl:value-of select="$GroupCell"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
 
@@ -2805,6 +2867,9 @@
           <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
           <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
           <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+          <xsl:with-param name="GroupCell">
+            <xsl:value-of select="$GroupCell"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -2817,6 +2882,7 @@
     <xsl:param name="DefaultCellStyleName"/>
     <xsl:param name="headerColsStart"/>
     <xsl:param name="headerColsEnd"/>
+    <xsl:param name="GroupCell"/>
 
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>
@@ -2918,6 +2984,9 @@
     <xsl:call-template name="InsertThisColumn">
       <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
       <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+      <xsl:with-param name="GroupCell">
+        <xsl:value-of select="$GroupCell"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <!-- insert next column -->
@@ -2935,6 +3004,9 @@
           <xsl:with-param name="sheet" select="$sheet"/>
           <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
           <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+          <xsl:with-param name="GroupCell">
+            <xsl:value-of select="$GroupCell"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
 
@@ -3799,7 +3871,31 @@
     <xsl:attribute name="draw:caption-point-y">0in</xsl:attribute>
   </xsl:template>
 
+<xsl:template name="InsertColumnGroupStart">
+  <xsl:param name="GroupCell"/>
+  
+  <xsl:if test="contains(concat(';', $GroupCell), concat(';', @min, ':'))">
+    <table:table-column-group-start/>
+    <xsl:call-template name="InsertColumnGroupStart">
+      <xsl:with-param name="GroupCell">
+        <xsl:value-of select="substring-after(substring-after(concat(';', $GroupCell), concat(';', @min, ':')), ';')"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:if>
+  
+</xsl:template>
 
-
-
+  <xsl:template name="InsertColumnGroupEnd">
+    <xsl:param name="GroupCell"/>
+    
+    <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
+      <table:table-column-group-end/>
+      <xsl:call-template name="InsertColumnGroupStart">
+        <xsl:with-param name="GroupCell">
+          <xsl:value-of select="substring-after(concat(';', $GroupCell), concat(':', @max, ';'))"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
+  </xsl:template>
 </xsl:stylesheet>

@@ -404,6 +404,13 @@
 
 
     <table:table>
+
+      <xsl:variable name="GroupCell">
+        <xsl:apply-templates select="document(concat('xl/',$Id))/e:worksheet/e:cols/e:col[1]"
+          mode="groupTag"/>
+      </xsl:variable>
+       
+      
       <!-- Insert Table (Sheet) Name -->
       <xsl:attribute name="table:name">
         <!--        <xsl:value-of select="@name"/>-->
@@ -535,6 +542,9 @@
         </xsl:with-param>
         <xsl:with-param name="ConnectionsCell">
           <xsl:value-of select="$ConnectionCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="GroupCell">
+          <xsl:value-of select="$GroupCell"/>
         </xsl:with-param>
       </xsl:call-template>
 
@@ -812,6 +822,7 @@
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
+    <xsl:param name="GroupCell"/>
 
     <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:oleObjects">
         <xsl:call-template name="InsertOLEObjects"/>  
@@ -819,6 +830,9 @@
     
     <xsl:call-template name="InsertColumns">
       <xsl:with-param name="sheet" select="$sheet"/>
+      <xsl:with-param name="GroupCell">
+        <xsl:value-of select="$GroupCell"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <xsl:variable name="sheetName">
@@ -1207,6 +1221,7 @@
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
+    <xsl:param name="outlineLevel"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -1470,6 +1485,7 @@
       <xsl:with-param name="ConnectionsCell">
         <xsl:value-of select="$ConnectionsCell"/>
       </xsl:with-param>
+      <xsl:with-param name="outlineLevel"/>
     </xsl:call-template>
 
     <xsl:if
@@ -2063,6 +2079,76 @@
         <xsl:value-of select="$name"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+<!-- Insert groups -->
+
+  <xsl:template match="e:col" mode="groupTag">
+    <xsl:param name="level" select="0"/>
+
+
+    <xsl:variable name="min">
+      <xsl:value-of select="@min"/>
+    </xsl:variable>
+    <xsl:variable name="max">
+      <xsl:value-of select="@max"/>
+    </xsl:variable>
+    <xsl:variable name="outlineLevel">
+      <xsl:value-of select="@outlineLevel"/>
+    </xsl:variable>
+
+    <!-- when group starts -->
+    <xsl:if
+      test="@outlineLevel &gt; $level and not(preceding-sibling::e:col[1][@max = $min - 1 and @outlineLevel &gt; $level])">
+
+      <xsl:variable name="groupEnd">
+        <xsl:call-template name="FindGroupEnd">
+          <xsl:with-param name="level" select="$level + 1"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:value-of select="concat(@min,':',$groupEnd,';')"/>
+
+      <!-- search for subgroups-->
+      <xsl:apply-templates select="." mode="groupTag">
+        <xsl:with-param name="level" select="$level + 1"/>
+      </xsl:apply-templates>
+    </xsl:if>
+
+    <xsl:choose>
+      <!-- stop search for subgroups when group ends -->
+      <xsl:when
+        test="$level &gt; 0 and not(following-sibling::e:col[1][@outlineLevel &gt;= $level and @min = $max + 1])"/>
+      <xsl:otherwise>
+        <xsl:apply-templates select="following-sibling::e:col[1]" mode="groupTag">
+          <xsl:with-param name="level" select="$level"/>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="FindGroupEnd">
+    <xsl:param name="level"/>
+
+    <xsl:variable name="max">
+      <xsl:value-of select="@max"/>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when
+        test="following-sibling::e:col[1][@min = $max +1 and @outlineLevel &gt;= $level]">
+        <xsl:for-each select="following-sibling::e:col[1]">
+          <xsl:call-template name="FindGroupEnd">
+            <xsl:with-param name="level" select="$level"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@max"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>
