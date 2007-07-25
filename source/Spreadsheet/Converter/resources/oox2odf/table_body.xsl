@@ -3871,31 +3871,5 @@
     <xsl:attribute name="draw:caption-point-y">0in</xsl:attribute>
   </xsl:template>
 
-<xsl:template name="InsertColumnGroupStart">
-  <xsl:param name="GroupCell"/>
-  
-  <xsl:if test="contains(concat(';', $GroupCell), concat(';', @min, ':'))">
-    <table:table-column-group-start/>
-    <xsl:call-template name="InsertColumnGroupStart">
-      <xsl:with-param name="GroupCell">
-        <xsl:value-of select="substring-after(substring-after(concat(';', $GroupCell), concat(';', @min, ':')), ';')"/>
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:if>
-  
-</xsl:template>
 
-  <xsl:template name="InsertColumnGroupEnd">
-    <xsl:param name="GroupCell"/>
-    
-    <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
-      <table:table-column-group-end/>
-      <xsl:call-template name="InsertColumnGroupStart">
-        <xsl:with-param name="GroupCell">
-          <xsl:value-of select="substring-after(concat(';', $GroupCell), concat(':', @max, ';'))"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-    
-  </xsl:template>
 </xsl:stylesheet>

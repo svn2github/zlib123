@@ -64,6 +64,7 @@
   <xsl:import href="measures.xsl"/>
   <xsl:import href="ole_objects.xsl"/>
   <xsl:import href="connections.xsl"/>
+  <xsl:import href="groups.xsl"/>
 
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
@@ -2081,74 +2082,5 @@
     </xsl:choose>
   </xsl:template>
 
-<!-- Insert groups -->
-
-  <xsl:template match="e:col" mode="groupTag">
-    <xsl:param name="level" select="0"/>
-
-
-    <xsl:variable name="min">
-      <xsl:value-of select="@min"/>
-    </xsl:variable>
-    <xsl:variable name="max">
-      <xsl:value-of select="@max"/>
-    </xsl:variable>
-    <xsl:variable name="outlineLevel">
-      <xsl:value-of select="@outlineLevel"/>
-    </xsl:variable>
-
-    <!-- when group starts -->
-    <xsl:if
-      test="@outlineLevel &gt; $level and not(preceding-sibling::e:col[1][@max = $min - 1 and @outlineLevel &gt; $level])">
-
-      <xsl:variable name="groupEnd">
-        <xsl:call-template name="FindGroupEnd">
-          <xsl:with-param name="level" select="$level + 1"/>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:value-of select="concat(@min,':',$groupEnd,';')"/>
-
-      <!-- search for subgroups-->
-      <xsl:apply-templates select="." mode="groupTag">
-        <xsl:with-param name="level" select="$level + 1"/>
-      </xsl:apply-templates>
-    </xsl:if>
-
-    <xsl:choose>
-      <!-- stop search for subgroups when group ends -->
-      <xsl:when
-        test="$level &gt; 0 and not(following-sibling::e:col[1][@outlineLevel &gt;= $level and @min = $max + 1])"/>
-      <xsl:otherwise>
-        <xsl:apply-templates select="following-sibling::e:col[1]" mode="groupTag">
-          <xsl:with-param name="level" select="$level"/>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
-
-  </xsl:template>
-
-  <xsl:template name="FindGroupEnd">
-    <xsl:param name="level"/>
-
-    <xsl:variable name="max">
-      <xsl:value-of select="@max"/>
-    </xsl:variable>
-
-    <xsl:choose>
-      <xsl:when
-        test="following-sibling::e:col[1][@min = $max +1 and @outlineLevel &gt;= $level]">
-        <xsl:for-each select="following-sibling::e:col[1]">
-          <xsl:call-template name="FindGroupEnd">
-            <xsl:with-param name="level" select="$level"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="@max"/>
-      </xsl:otherwise>
-    </xsl:choose>
-
-  </xsl:template>
 
 </xsl:stylesheet>
