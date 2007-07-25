@@ -124,7 +124,7 @@
                                         <xsl:value-of select="$document"/>
                                     </xsl:with-param>
                                 </xsl:call-template>
-                                
+
                             </xsl:with-param>
                             <xsl:with-param name="document">
                                 <xsl:value-of select="$document"/>
@@ -478,7 +478,7 @@
             </xsl:for-each>
         </xsl:variable>
 
-        
+
         <xsl:for-each select="document(concat('xl/',$Id))">
 
             <xsl:apply-templates select="e:worksheet/e:dataValidations " mode="Validation">
@@ -487,7 +487,7 @@
                 </xsl:with-param>
             </xsl:apply-templates>
 
-         
+
         </xsl:for-each>
 
         <!-- Insert next Table -->
@@ -523,7 +523,7 @@
     <!-- Insert Data Validation -->
     <xsl:template name="InsertValidation">
         <xsl:param name="sheet"/>
-        
+
         <xsl:for-each select="e:dataValidation">
             <xsl:sort select="@priority"/>
             <table:content-validation>
@@ -663,7 +663,7 @@
                     </xsl:choose>
                 </xsl:attribute>
 
-                <!--xsl:if test="contains(@type, 'list')">
+                <xsl:if test="contains(@type, 'list')">
 
                     <xsl:choose>
                         <xsl:when test="contains(@type, 'list')">
@@ -700,7 +700,7 @@
                         </xsl:choose>
                     </xsl:attribute>
 
-                </xsl:if-->
+                </xsl:if>
 
                 <!-- Criteria Allow Blank Cells -->
                 <xsl:choose>
