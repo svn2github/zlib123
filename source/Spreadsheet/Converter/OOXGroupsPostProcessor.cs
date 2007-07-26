@@ -71,6 +71,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 this.groupEnd = true;
             }
+            else if ("table-row-group-start".Equals(localName))
+            {
+                this.nextWriter.WriteStartElement(prefix, "table-row-group", ns);
+                this.group = true;
+            }
+            else if ("table-row-group-end".Equals(localName))
+            {
+                this.groupEnd = true;
+            }
 
             else
             {
