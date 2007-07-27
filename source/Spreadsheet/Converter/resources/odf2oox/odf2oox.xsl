@@ -36,6 +36,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -98,12 +99,17 @@
       <pzip:entry pzip:target="xl/workbook.xml">
         <xsl:call-template name="InsertWorkbook"/>
       </pzip:entry>
-      
-      <!-- main content -->
-      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
-      <pzip:entry pzip:target="xl/connections.xml">
-        <xsl:call-template name="InsertConnections"/>
+
+
+      <pzip:entry pzip:target="xl/media/image1.emf">
+        <empty/>
       </pzip:entry>
+      <!-- main content -->
+      <xsl:if
+        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+        <pzip:entry pzip:target="xl/connections.xml">
+          <xsl:call-template name="InsertConnections"/>
+        </pzip:entry>
       </xsl:if>
 
       <!-- shared strings (ewentualny postprocessing)-->
@@ -182,21 +188,34 @@
           </xsl:for-each>
         </xsl:variable>
 
+        <xsl:variable name="oleObject">
+          <xsl:choose>
+            <xsl:when test="descendant::draw:frame/draw:object">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+
         <!-- insert comments -->
         <xsl:if test="$comment = 'true' ">
           <xsl:call-template name="InsertComments">
             <xsl:with-param name="sheetId" select="position()"/>
           </xsl:call-template>
-
-          <!-- create VmlDrawing.xml file -->
-          <xsl:call-template name="CreateVmlDrawing"/>
         </xsl:if>
+
+        <!-- create VmlDrawing.xml file -->
+        <xsl:call-template name="CreateVmlDrawing"/>
+
 
         <!-- <xsl:if test="$picture = 'true' or contains($chart,'true')"> -->
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
           <xsl:call-template name="CreateDrawing"/>
 
-          <xsl:if test="contains($chart,'true') or $picture='true'">
+          <xsl:if test="contains($chart,'true') or $picture='true' or $oleObject='true'">
             <xsl:call-template name="CreateDrawingRelationships"/>
           </xsl:if>
 
@@ -293,7 +312,7 @@
       <pzip:entry pzip:target="_rels/.rels">
         <xsl:call-template name="package-relationships"/>
       </pzip:entry>
-      
+
       <xsl:call-template name="InsertLinkExternalRels"/>
 
     </pzip:archive>
@@ -329,9 +348,22 @@
     <xsl:param name="textBox"/>
 
     <!--      <xsl:if
-        test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
+      test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
+
+    <xsl:variable name="OLEObject">
+      <xsl:choose>
+        <xsl:when
+          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame/draw:object">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+
+    </xsl:variable>
     <xsl:if
-      test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true' or $textBox = 'true' or document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+      test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true' or $textBox = 'true' or document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source or $OLEObject = 'true'">
       <!-- package relationship item -->
       <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
         <xsl:call-template name="InsertWorksheetsRels">
@@ -340,11 +372,20 @@
           <xsl:with-param name="picture" select="$picture"/>
           <xsl:with-param name="hyperlink" select="$hyperlink"/>
           <xsl:with-param name="chart" select="$chart"/>
+          <xsl:with-param name="OLEObject">
+            <xsl:value-of select="$OLEObject"/>
+          </xsl:with-param>
           <xsl:with-param name="textBox" select="$textBox"/>
         </xsl:call-template>
       </pzip:entry>
 
     </xsl:if>
+    <xsl:if test="$OLEObject = 'true'">
+      <xsl:call-template name="InsertOLE_rels"/>
+      <xsl:call-template name="InsertOLEexternalLinks"/>
+      <xsl:call-template name="OLEexternalLinks_rels"/>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="CreateDrawingRelationships">
@@ -372,6 +413,58 @@
         <xsl:for-each
           select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/descendant::table:table-row/table:table-cell/office:annotation">
           <xsl:call-template name="InsertTextBox"/>
+        </xsl:for-each>
+
+        <xsl:for-each
+          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
+
+          <xsl:variable name="width">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:width"/>
+            </xsl:call-template>
+          </xsl:variable>
+          
+          <xsl:variable name="height">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:height"/>
+            </xsl:call-template>
+          </xsl:variable>
+          
+        <xsl:variable name="z-index">
+          <xsl:value-of select="position()"/>
+        </xsl:variable>
+          
+          <xsl:variable name="margin-left">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:x"/>
+              </xsl:call-template>
+          </xsl:variable>
+          
+          <xsl:variable name="margin-top">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:y"/>
+            </xsl:call-template>
+          </xsl:variable>
+          
+          <v:shape type="#_x0000_t75"
+            style="position:absolute;
+            margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
+            filled="t" fillcolor="window [65]" stroked="t" strokecolor="windowText [64]"
+            o:insetmode="auto">
+
+            <xsl:attribute name="id">
+              <xsl:value-of select="concat('_x0000_s', 1025 + position())"/>
+            </xsl:attribute>
+            <v:fill color2="window [65]"/>
+            <v:imagedata o:relid="rId1" o:title=""/>
+            <x:ClientData ObjectType="Pict">
+              <x:SizeWithCells/>
+              <!--x:Anchor> 4, 0, 7, 0, 4, 46, 9, 11</x:Anchor-->
+              <x:CF>Pict</x:CF>
+              <x:AutoPict/>
+              <x:DDE/>
+            </x:ClientData>
+          </v:shape>
         </xsl:for-each>
       </pxsi:dummyContainer>
     </pzip:entry>

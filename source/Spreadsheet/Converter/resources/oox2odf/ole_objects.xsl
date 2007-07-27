@@ -58,7 +58,7 @@
   </xsl:template>
   
   <xsl:template name="InsertOLEObjectsLinks">
-    
+
     <xsl:variable name="ProgId">
       <xsl:value-of select="@progId"/>
     </xsl:variable>
@@ -86,7 +86,14 @@
       <xsl:for-each
         select="document($ExternalLinkRels)//node()[name()='Relationship']">
         <xsl:if test="./@Id = $ExternalLinkId">
-          <xsl:value-of select="translate(substring-after(./@Target, 'file://'), '\', '/')"/>
+          <xsl:choose>
+            <xsl:when test="contains(./@Target, 'file://')">
+              <xsl:value-of select="translate(substring-after(./@Target, 'file://'), '\', '/')"/>    
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="translate(concat('../', ./@Target), '\', '/')"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:if>
       </xsl:for-each>
     </xsl:variable>
@@ -95,12 +102,9 @@
       <xsl:value-of select="concat('_x0000_s', @shapeId)"/>
     </xsl:variable>
     
-    <xsl:if test="$XlinkOLEObject != ''">
-    
-    <draw:frame>
-      <xsl:for-each select="document('xl/drawings/vmlDrawing1.vml')">
-        <xsl:apply-templates select="xml/v:shape[@id = $ShapeId]"/>
-      </xsl:for-each>
+    <xsl:if test="$XlinkOLEObject != ''">    
+      <draw:frame>      
+        <xsl:apply-templates select="document('xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:shape' and contains(@id,$ShapeId)] "/>
     <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
       <xsl:attribute name="xlink:href">    
         <xsl:value-of select="$XlinkOLEObject"/>

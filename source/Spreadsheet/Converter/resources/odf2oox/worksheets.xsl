@@ -348,6 +348,15 @@
         <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
       </xsl:if>
 
+      <xsl:if test="table:shapes/draw:frame/draw:object">
+        <legacyDrawing r:id="{concat('rId',$sheetId)}"/>
+      </xsl:if>
+      
+      
+      <xsl:if test="table:shapes/draw:frame/draw:object">
+        <xsl:call-template name="InsertOLE_Object"/>
+      </xsl:if>
+
     </worksheet>
   </xsl:template>
 

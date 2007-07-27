@@ -62,14 +62,19 @@
       <Relationship Id="rId2"
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings"
         Target="sharedStrings.xml"/>
-      <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections" Target="connections.xml" />
+      <Relationship Id="rId3"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections"
+        Target="connections.xml"/>
+      <xsl:call-template name="InsertWorkobookExternalRels"/>
+
+
     </Relationships>
-    
+
   </xsl:template>
 
   <xsl:template name="TranslateIllegalChars">
     <xsl:param name="string"/>
-    
+
     <xsl:choose>
 
       <!-- remove space-->
@@ -88,7 +93,7 @@
           </xsl:when>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- change  '&lt;' to '%3C'  after conversion-->
       <xsl:when test="contains($string,'&lt;')">
         <xsl:choose>
@@ -132,7 +137,7 @@
       </xsl:otherwise>
     </xsl:choose>
 
-  </xsl:template>
+  </xsl:template>        
 
 
   <xsl:template name="InsertWorksheetsRels">
@@ -142,6 +147,7 @@
     <xsl:param name="hyperlink"/>
     <xsl:param name="chart"/>
     <xsl:param name="textBox"/>
+    <xsl:param name="OLEObject"/>
 
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <!-- comments.xml file -->
@@ -160,8 +166,7 @@
 
       <!--hyperlink-->
       <xsl:if test="$hyperlink = 'true' ">
-        <xsl:for-each
-          select="descendant::text:a[not(ancestor::draw:custom-shape)]">
+        <xsl:for-each select="descendant::text:a[not(ancestor::draw:custom-shape)]">
 
           <Relationship Id="{generate-id(.)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
@@ -209,19 +214,27 @@
           </Relationship>
         </xsl:for-each>
       </xsl:if>
-      
+
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">        
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
 
-          <Relationship Id="{generate-id()}" Target="{concat('../queryTables/queryTable', position(), '.xml')}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/queryTable"/>
+        <Relationship Id="{generate-id()}"
+          Target="{concat('../queryTables/queryTable', position(), '.xml')}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/queryTable"/>
 
-     </xsl:for-each>
+      </xsl:for-each>
 
       <!-- drawing.xml file -->
       <xsl:if test="contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
         <Relationship Id="{concat('d_rId',$sheetNum)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"
           Target="{concat('../drawings/drawing',$sheetNum,'.xml')}"/>
+      </xsl:if>
+      
+      <xsl:if test="$OLEObject = 'true'">
+        <Relationship Id="rId1"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"
+          Target="{concat('../drawings/vmlDrawing', $sheetNum,'.vml')}"/>
       </xsl:if>
     </Relationships>
   </xsl:template>
@@ -295,8 +308,8 @@
   </xsl:template>
 
   <xsl:template name="SpaceTo20Percent">
-  <xsl:param name="string"/>
-    
+    <xsl:param name="string"/>
+
     <xsl:choose>
       <!-- change space to  '%20' after conversion-->
       <xsl:when test="contains($string,' ')">
@@ -314,21 +327,43 @@
           </xsl:when>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:value-of select="$string"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertLinkExternalRels">
-    
-    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
-    
+
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+
       <xsl:call-template name="InsertQueryTable"/>
-      
-    
+
     </xsl:for-each>
   </xsl:template>
-  
+
+  <xsl:template name="InsertWorkobookExternalRels">
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink">
+        <xsl:attribute name="Id">
+          <xsl:value-of select="generate-id()"/>
+        </xsl:attribute>
+        
+        <xsl:variable name="NumberFile">
+          <xsl:value-of select="position()"/>
+        </xsl:variable>
+        
+        <xsl:attribute name="Target">
+          <xsl:for-each select="draw:object">
+            <xsl:value-of select="concat(concat('externalLinks/externalLink', $NumberFile), '.xml')"/>
+          </xsl:for-each> 
+        </xsl:attribute>
+      </Relationship>
+    </xsl:for-each>
+  </xsl:template>
+
 </xsl:stylesheet>

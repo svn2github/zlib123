@@ -74,8 +74,17 @@
       <xsl:call-template name="InsertCommentContentTypes"/>
       <xsl:call-template name="InsertDrawingContentTypes"/>
       <xsl:call-template name="InsertSheetContentTypes"/>
+      <xsl:call-template name="InsertExternalLinkTypes"/>
 
     </Types>
+  </xsl:template>
+  <!-- OLE object types -->
+  <xsl:template name="InsertExternalLinkTypes">
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
+      <Override PartName="{concat(concat('/xl/externalLinks/externalLink', position()),'.xml')}"
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml"/>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- Sheet content types -->
