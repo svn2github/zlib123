@@ -152,8 +152,50 @@
       </style:table-column-properties>
     </style:style>
 
+    <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
+      style:family="table-column">
+      <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks">
+        <style:table-column-properties fo:break-before="page">
+          <xsl:attribute name="style:column-width">
+            <xsl:choose>
+              <xsl:when
+                test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+                <xsl:call-template name="ConvertFromCharacters">
+                  <xsl:with-param name="value">
+                    <xsl:value-of
+                      select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <!-- Excel application default-->
+                <xsl:call-template name="ConvertFromCharacters">
+                  <xsl:with-param name="value" select="'8.43'"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </style:table-column-properties>
+      </xsl:if>
+    </style:style>
+
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols"
       mode="automaticstyles"/>
+  </xsl:template>
+
+  <xsl:template name="colBreakId">
+    <xsl:variable name="sheet">
+      <xsl:call-template name="GetTarget">
+        <xsl:with-param name="id">
+          <xsl:value-of select="@r:id"/>
+        </xsl:with-param>
+        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:attribute name="table:style-name">
+      <xsl:value-of select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)"/>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template match="e:col" mode="automaticstyles">
@@ -194,7 +236,19 @@
     <style:style
       style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
       style:family="table-row">
-      <style:table-row-properties fo:break-before="auto">
+      <style:table-row-properties>
+
+        <xsl:attribute name="fo:break-before">
+          <xsl:choose>
+            <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>auto</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+
         <xsl:attribute name="style:row-height">
           <xsl:choose>
             <xsl:when
