@@ -1232,7 +1232,7 @@
         <!-- insert cell style number -->
         <xsl:choose>
           <!-- if it is a multiline cell -->
-          <xsl:when test="text:p[2]">
+          <xsl:when test="text:p[2] and not(name() = 'table:covered-table-cell')">
 
             <xsl:variable name="multilineNumber">
               <xsl:for-each select="text:p[2]">
