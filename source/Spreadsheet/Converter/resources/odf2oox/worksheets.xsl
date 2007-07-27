@@ -233,6 +233,24 @@
 
       <xsl:call-template name="InsertHyperlinks"/>
 
+      <!-- Insert Data Validation -->
+      
+      <xsl:if test="table:table-row/table:table-cell/@table:content-validation-name != ''">
+        <dataValidations>
+          <xsl:apply-templates select="table:table-row[1]" mode="validation">
+            <xsl:with-param name="rowNumber">
+              <xsl:text>1</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="cellNumber">
+              <xsl:text>1</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="tableName" select="@table:name"/>
+            <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
+            <xsl:with-param name="MergeCell" select="$MergeCell"/>
+          </xsl:apply-templates>
+        </dataValidations>
+      </xsl:if>
+      
       <xsl:call-template name="InsertPageProperties">
         <xsl:with-param name="pageStyle" select="$pageStyle"/>
       </xsl:call-template>
@@ -352,7 +370,7 @@
         <legacyDrawing r:id="{concat('rId',$sheetId)}"/>
       </xsl:if>
       
-      
+      <!-- Insert OLEObject -->
       <xsl:if test="table:shapes/draw:frame/draw:object">
         <xsl:call-template name="InsertOLE_Object"/>
       </xsl:if>
@@ -674,24 +692,6 @@
     <xsl:call-template name="InsertSort">
       <xsl:with-param name="tableName" select="@table:name"/>
     </xsl:call-template>
-    
-    <!-- Insert Data Validation -->
-
-    <xsl:if test="table:table-row/table:table-cell/@table:content-validation-name != ''">
-      <dataValidations>
-        <xsl:apply-templates select="table:table-row[1]" mode="validation">
-          <xsl:with-param name="rowNumber">
-            <xsl:text>1</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="cellNumber">
-            <xsl:text>1</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="tableName" select="@table:name"/>
-          <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
-          <xsl:with-param name="MergeCell" select="$MergeCell"/>
-        </xsl:apply-templates>
-      </dataValidations>
-    </xsl:if>
 
   </xsl:template>
 

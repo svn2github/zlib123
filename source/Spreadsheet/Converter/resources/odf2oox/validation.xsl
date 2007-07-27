@@ -252,7 +252,9 @@
                     <xsl:when test="contains(@table:condition, 'cell-content-text-length')">
                         <xsl:text>textLength</xsl:text>
                     </xsl:when>
-                    <xsl:otherwise> </xsl:otherwise>
+                    <xsl:otherwise>
+                        <xsl:text>whole</xsl:text>
+                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
             
@@ -354,7 +356,7 @@
                 
                 <!-- Error Allert message -->
                 <xsl:attribute name="error">
-                    <xsl:value-of select="."/>
+                    <xsl:value-of select="substring(., 1, 255)"/>
                 </xsl:attribute>
             </xsl:for-each>
             
