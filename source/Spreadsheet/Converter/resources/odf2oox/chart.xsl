@@ -254,8 +254,9 @@
           </xsl:for-each>
         </xsl:if>
 
-        <xsl:if test="not(@chart:class= 'chart:circle' or @chart:class= 'chart:ring' )">
-          <xsl:for-each select="chart:axis[@chart:dimension = 'x' ]">
+        <xsl:if test="not(//chart:chart[attribute::chart:class='chart:ring'])">
+          <xsl:if test="not(//chart:chart[attribute::chart:class='chart:circle'])">
+        <xsl:for-each select="chart:axis[@chart:dimension = 'x' ]">
             <xsl:call-template name="InsertAxisX">
               <xsl:with-param name="chartWidth" select="$chartWidth"/>
               <xsl:with-param name="chartHeight" select="$chartHeight"/>
@@ -265,6 +266,16 @@
           <xsl:for-each select="chart:axis[@chart:dimension = 'y' ]">
             <xsl:call-template name="InsertAxisY">
               <xsl:with-param name="chartWidth" select="$chartWidth"/>
+              <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            </xsl:call-template>
+          </xsl:for-each>
+          </xsl:if>
+        </xsl:if>
+        <!-- for the Radar Chart -->
+        <xsl:if test="//chart:chart[attribute::chart:class='chart:radar']">
+          <xsl:for-each select="chart:axis[@chart:dimension = 'y' ]">
+            <xsl:call-template name="InsertCatAx">
+              <xsl:with-param name="chartWidth" select="$chartWidth+20"/>
               <xsl:with-param name="chartHeight" select="$chartHeight"/>
             </xsl:call-template>
           </xsl:for-each>
@@ -1503,6 +1514,9 @@
           <xsl:when test="parent::node()/@chart:dimension = 'y' ">
             <xsl:value-of select="1 - $yOffset div $chartHeight"/>
           </xsl:when>
+          <xsl:when test="//chart:chart[@chart:class='chart:radar']">
+            <xsl:value-of select="20"/>
+          </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$yOffset div $chartHeight"/>
           </xsl:otherwise>
@@ -1576,6 +1590,76 @@
       </c:h>
     </xsl:if>
 
+  </xsl:template>
+  
+  <xsl:template name="InsertCatAx">
+    <!-- @Description: Inserts Category Axis -->
+    <!-- @Context: chart:chart -->
+    <xsl:param name="chartWidth"/>
+    <xsl:param name="chartHeight"/>
+    
+    <c:catAx>
+      <c:axId val="110226048"/>
+      <c:scaling>
+        <c:orientation val="minMax"/>
+      </c:scaling>
+      
+      <c:axPos val="b"/>
+      <xsl:call-template name="InsertTitle">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+      </xsl:call-template>
+      <c:majorGridlines/>
+     
+      <xsl:call-template name="InsertTitle">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+      </xsl:call-template>
+      
+     <c:tickLblPos val="low">
+        <xsl:if
+          test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'false' ">
+          <xsl:attribute name="val">
+            <xsl:text>none</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </c:tickLblPos>
+      
+      <c:spPr>
+        <a:ln w="3175">
+          <a:solidFill>
+            <a:srgbClr val="000000"/>
+          </a:solidFill>
+          <a:prstDash val="solid"/>
+        </a:ln>
+      </c:spPr>
+      <c:txPr>
+        <a:bodyPr rot="0" vert="horz"/>
+        <a:lstStyle/>
+        <a:p>
+          <a:pPr>
+            <a:defRPr sz="700" b="0" i="0" u="none" strike="noStrike" baseline="0">
+              
+              <xsl:for-each select="key('style',@chart:style-name)/style:text-properties">
+                <!-- template common with text-box-->
+                <xsl:call-template name="InsertRunProperties"/>
+              </xsl:for-each>
+              
+              <!--a:solidFill>
+                <a:srgbClr val="000000"/>
+                </a:solidFill>
+                <a:latin typeface="Arial"/>
+                <a:ea typeface="Arial"/>
+                <a:cs typeface="Arial"/-->
+            </a:defRPr>
+          </a:pPr>
+          <a:endParaRPr lang="pl-PL"/>
+        </a:p>
+      </c:txPr>
+      <c:crossAx val="110498176"/>
+      <c:crosses val="autoZero"/>
+     
+    </c:catAx>
   </xsl:template>
 
 </xsl:stylesheet>
