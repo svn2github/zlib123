@@ -26,8 +26,14 @@ Copyright (c) 2007, Sonata Software Limited
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:odf="urn:odf">
 
-	<xsl:template match="/odf:source"/>
+	<xsl:template match="/odf:source">
+		<xsl:apply-templates select="document('content.xml')//text:p"/>
+	</xsl:template>
+	<xsl:template match="text:p">
+		<xsl:message terminate="no">progress:text:p</xsl:message>
+		<xsl:apply-templates/>
+	</xsl:template>
 
 </xsl:stylesheet>

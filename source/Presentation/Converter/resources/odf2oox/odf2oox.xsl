@@ -109,6 +109,8 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:call-template name="slideMaster1Rel">
 						<xsl:with-param name ="StartLayoutNo" select ="(position() + (10 *(position() - 1 )))"/>
 						<xsl:with-param name ="ThemeId" select ="position()"/>
+						<xsl:with-param name ="slideMasterName" select ="@style:name"/>
+						<xsl:with-param name ="slideNo" select ="position()"/>
 					</xsl:call-template >
 				</pzip:entry>
 				<xsl:call-template name ="CreateLaouts">
@@ -123,7 +125,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:for-each select ="document('content.xml')
 				/office:document-content/office:body/office:presentation/draw:page">
 				<xsl:variable name ="SlideName">
-					<xsl:value-of select ="concat(concat('Slide',position()),'.xml')"/>
+					<xsl:value-of select ="concat(concat('slide',position()),'.xml')"/>
 				</xsl:variable>
 				<pzip:entry pzip:target="{concat('ppt/slides/',$SlideName)}">
 					<!--<xsl:call-template name="slides" />-->
@@ -132,7 +134,9 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:apply-templates >
 				</pzip:entry>
 				<pzip:entry pzip:target="{concat(concat('ppt/slides/_rels/',$SlideName), '.rels')}">
-					<xsl:call-template name="slidesRel"/>
+					<xsl:call-template name="slidesRel">
+						<xsl:with-param name ="slideNo" select ="position()"/>
+					</xsl:call-template >
 				</pzip:entry>
 			</xsl:for-each>
 			<!--<pzip:entry pzip:target="ppt/slides/_rels/slide1.xml.rels">
@@ -267,6 +271,28 @@ Copyright (c) 2007, Sonata Software Limited
 			<Default Extension="jpg" ContentType="image/jpeg"/>
 			<Default Extension="gif" ContentType="image/gif"/>
 			<Default Extension="png" ContentType="image/png"/>
+			<!--Added By Sateesh-->
+     		 <Default Extension="emf" ContentType="image/emf"/>
+     		 <Default Extension="wmf" ContentType="image/wmf"/>
+     		 <Default Extension="jfif" ContentType="image/jfif"/>
+     		 <Default Extension="jpe" ContentType="image/jpe"/>
+     		 <Default Extension="bmp" ContentType="image/bmp"/>
+     		 <Default Extension="dib" ContentType="image/dib"/>
+     		 <Default Extension="rle" ContentType="image/rle"/>
+     		 <Default Extension="bmz" ContentType="image/bmz"/>
+     		 <Default Extension="gfa" ContentType="image/gfa"/>
+     		 <Default Extension="emz" ContentType="image/emz"/>
+     		 <Default Extension="wmz" ContentType="image/wmz"/>
+     		 <Default Extension="pcz" ContentType="image/pcz"/>
+     		 <Default Extension="tif" ContentType="image/tif"/>
+     		 <Default Extension="tiff" ContentType="image/tiff"/>
+     		 <Default Extension="cdr" ContentType="image/cdr"/>
+     		 <Default Extension="cgm" ContentType="image/cgm"/>
+     		 <Default Extension="eps" ContentType="image/eps"/>
+     		 <Default Extension="pct" ContentType="image/pct"/>
+     		 <Default Extension="pict" ContentType="image/pict"/>
+     		 <Default Extension="wpg" ContentType="image/wpg"/>
+
 			<!-- Added By Vijayeta,Extensions of the images,to be added in package-->
 			<!--<Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>-->
 
