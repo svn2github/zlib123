@@ -26,8 +26,14 @@ Copyright (c) 2007, Sonata Software Limited
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:oox="urn:oox">
 
-	<xsl:template match="/odf:source"/>
+	<xsl:template match="/oox:source">
+		<xsl:apply-templates select="document('ppt/slides/slide1.xml')//p:cSld"/>
+	</xsl:template>
+	<xsl:template match="p:cSld">
+		<xsl:message terminate="no">progress:p:cSld</xsl:message>
+		<xsl:apply-templates/>
+	</xsl:template>
 
 </xsl:stylesheet>

@@ -794,7 +794,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
-      <!-- Trapezoid -->
+	  <!-- Trapezoid (Added by A.Mathi as on 24/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='trapezoid')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
@@ -804,14 +804,22 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 914400 914400" 
-											draw:extrusion-allowed="true" 
-											draw:text-areas="152400 152400 762000 914400" 
-											draw:glue-points="457200 0 114300 457200 457200 914400 800100 457200" 
-											draw:type="mso-spt100" 
-											draw:enhanced-path="M 0 914400 L 228600 0 L 685800 0 L 914400 914400 Z N">
-            <draw:handle/>
-          </draw:enhanced-geometry>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="?f6 10800 10800 21600 ?f5 10800 10800 0" 
+					draw:text-areas="?f3 ?f3 ?f4 ?f4" 
+					draw:mirror-vertical="true" 
+					draw:type="trapezoid" 
+					draw:modifiers="5400" 
+					draw:enhanced-path="M 0 0 L 21600 0 ?f0 21600 ?f1 21600 Z N">
+					<draw:equation draw:name="f0" draw:formula="21600-$0 "/>
+					<draw:equation draw:name="f1" draw:formula="$0 "/>
+					<draw:equation draw:name="f2" draw:formula="$0 *10/18"/>
+					<draw:equation draw:name="f3" draw:formula="?f2 +1750"/>
+					<draw:equation draw:name="f4" draw:formula="21600-?f3 "/>
+					<draw:equation draw:name="f5" draw:formula="$0 /2"/>
+					<draw:equation draw:name="f6" draw:formula="21600-?f5 "/>
+					<draw:handle draw:handle-position="$0 bottom" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
+				</draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -910,6 +918,103 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
+		<!-- Circular Arrow or CurvedLeftArrow or curvedRightArrow or  CurvedDownArrow or CurvedUpArrow -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='circularArrow' or p:spPr/a:prstGeom/@prst='curvedRightArrow' or p:spPr/a:prstGeom/@prst='curvedLeftArrow' or p:spPr/a:prstGeom/@prst='curvedDownArrow' or p:spPr/a:prstGeom/@prst='curvedUpArrow'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600"  draw:text-areas="0 0 21600 21600" draw:type="circular-arrow" draw:modifiers="180 0 5500" draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="$1 "/>
+					<draw:equation draw:name="f2" draw:formula="$2 "/>
+					<draw:equation draw:name="f3" draw:formula="10800+$2 "/>
+					<draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))"/>
+					<draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))"/>
+					<draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f8" draw:formula="?f4 +10800"/>
+					<draw:equation draw:name="f9" draw:formula="?f5 +10800"/>
+					<draw:equation draw:name="f10" draw:formula="?f6 +10800"/>
+					<draw:equation draw:name="f11" draw:formula="?f7 +10800"/>
+					<draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))"/>
+					<draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))"/>
+					<draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f16" draw:formula="?f12 +10800"/>
+					<draw:equation draw:name="f17" draw:formula="?f13 +10800"/>
+					<draw:equation draw:name="f18" draw:formula="?f14 +10800"/>
+					<draw:equation draw:name="f19" draw:formula="?f15 +10800"/>
+					<draw:equation draw:name="f20" draw:formula="21600-?f3 "/>
+					<draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
+					<draw:equation draw:name="f24" draw:formula="?f22 +10800"/>
+					<draw:equation draw:name="f25" draw:formula="$2 -2700"/>
+					<draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f28" draw:formula="?f26 +10800"/>
+					<draw:equation draw:name="f29" draw:formula="?f27 +10800"/>
+					<draw:equation draw:name="f30" draw:formula="($1+45)*pi/180"/>
+					<draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))"/>
+					<draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31"/>
+					<draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)"/>
+					<draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)"/>
+					<draw:equation draw:name="f35" draw:formula="?f28+?f33"/>
+					<draw:equation draw:name="f36" draw:formula="?f29+?f34"/>
+					<draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
+					<draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Left-Up Arrow -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='leftUpArrow'">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:text-areas="?f2 ?f7 ?f1 ?f1 ?f7 ?f2 ?f1 ?f1" draw:type="mso-spt89" draw:modifiers="10062 18378 6098" draw:enhanced-path="M 0 ?f5 L ?f2 ?f0 ?f2 ?f7 ?f7 ?f7 ?f7 ?f2 ?f0 ?f2 ?f5 0 21600 ?f2 ?f1 ?f2 ?f1 ?f1 ?f2 ?f1 ?f2 21600 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="$1 "/>
+					<draw:equation draw:name="f2" draw:formula="$2 "/>
+					<draw:equation draw:name="f3" draw:formula="21600-$0 "/>
+					<draw:equation draw:name="f4" draw:formula="?f3 /2"/>
+					<draw:equation draw:name="f5" draw:formula="$0 +?f4 "/>
+					<draw:equation draw:name="f6" draw:formula="21600-$1 "/>
+					<draw:equation draw:name="f7" draw:formula="$0 +?f6 "/>
+					<draw:equation draw:name="f8" draw:formula="21600-?f6 "/>
+					<draw:equation draw:name="f9" draw:formula="?f8 -?f6 "/>
+					<draw:handle draw:handle-position="$1 $2" draw:handle-range-x-minimum="?f5" draw:handle-range-x-maximum="21600" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="$0"/>
+					<draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="$2" draw:handle-range-x-maximum="?f9"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Bent-Up Arrow -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='bentUpArrow'">
+			<draw:custom-shape draw:layer="layout" draw:transform="rotate (1.5707963267946) translate (10cm 14.5cm)">
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+
+				<draw:enhanced-geometry svg:viewBox="0 0 841 854" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="non-primitive" draw:enhanced-path="M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N"/>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
       <!-- Cube -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='cube')">
         <draw:custom-shape draw:layer="layout" >
@@ -973,8 +1078,557 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
+		<!-- Cross (Added by A.Mathi as on 19/07/2007)-->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='plus')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
+					draw:path-stretchpoint-x="10800" 
+					draw:path-stretchpoint-y="10800" 
+					draw:text-areas="?f1 ?f1 ?f2 ?f3" 
+					draw:type="cross" 
+					draw:modifiers="5400" 
+					draw:enhanced-path="M ?f1 0 L ?f2 0 ?f2 ?f1 21600 ?f1 21600 ?f3 ?f2 ?f3 ?f2 21600 ?f1 21600 ?f1 ?f3 0 ?f3 0 ?f1 ?f1 ?f1 ?f1 0 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 *10799/10800"/>
+					<draw:equation draw:name="f1" draw:formula="?f0 "/>
+					<draw:equation draw:name="f2" draw:formula="right-?f0 "/>
+					<draw:equation draw:name="f3" draw:formula="bottom-?f0 "/>
+					<draw:handle draw:handle-position="$0 top" 
+						draw:handle-switched="true" 
+						draw:handle-range-x-minimum="0" 
+						draw:handle-range-x-maximum="10800"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- "No" Symbol (Added by A.Mathi as on 19/07/2007)-->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='noSmoking')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" 
+					draw:text-areas="3200 3200 18400 18400" 
+					draw:type="forbidden" 
+					draw:modifiers="2700" 
+					draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z B ?f0 ?f0 ?f1 ?f1 ?f9 ?f10 ?f11 ?f12 Z B ?f0 ?f0 ?f1 ?f1 ?f13 ?f14 ?f15 ?f16 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="21600-$0 "/>
+					<draw:equation draw:name="f2" draw:formula="10800-$0 "/>
+					<draw:equation draw:name="f3" draw:formula="$0 /2"/>
+					<draw:equation draw:name="f4" draw:formula="sqrt(?f2 *?f2 -?f3 *?f3 )"/>
+					<draw:equation draw:name="f5" draw:formula="10800-?f3 "/>
+					<draw:equation draw:name="f6" draw:formula="10800+?f3 "/>
+					<draw:equation draw:name="f7" draw:formula="10800-?f4 "/>
+					<draw:equation draw:name="f8" draw:formula="10800+?f4 "/>
+					<draw:equation draw:name="f9" draw:formula="(cos(45*(pi/180))*(?f5 -10800)+sin(45*(pi/180))*(?f7 -10800))+10800"/>
+					<draw:equation draw:name="f10" draw:formula="-(sin(45*(pi/180))*(?f5 -10800)-cos(45*(pi/180))*(?f7 -10800))+10800"/>
+					<draw:equation draw:name="f11" draw:formula="(cos(45*(pi/180))*(?f5 -10800)+sin(45*(pi/180))*(?f8 -10800))+10800"/>
+					<draw:equation draw:name="f12" draw:formula="-(sin(45*(pi/180))*(?f5 -10800)-cos(45*(pi/180))*(?f8 -10800))+10800"/>
+					<draw:equation draw:name="f13" draw:formula="(cos(45*(pi/180))*(?f6 -10800)+sin(45*(pi/180))*(?f8 -10800))+10800"/>
+					<draw:equation draw:name="f14" draw:formula="-(sin(45*(pi/180))*(?f6 -10800)-cos(45*(pi/180))*(?f8 -10800))+10800"/>
+					<draw:equation draw:name="f15" draw:formula="(cos(45*(pi/180))*(?f6 -10800)+sin(45*(pi/180))*(?f7 -10800))+10800"/>
+					<draw:equation draw:name="f16" draw:formula="-(sin(45*(pi/180))*(?f6 -10800)-cos(45*(pi/180))*(?f7 -10800))+10800"/>
+					<draw:handle draw:handle-position="$0 10800" 
+						draw:handle-range-x-minimum="0" 
+						draw:handle-range-x-maximum="7200"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--  Folded Corner (Added by A.Mathi as on 19/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='foldedCorner')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
+					draw:text-areas="0 0 21600 ?f11" 
+					draw:type="paper" 
+					draw:modifiers="18900" 
+					draw:enhanced-path="M 0 0 L 21600 0 21600 ?f0 ?f0 21600 0 21600 Z N M ?f0 21600 L ?f3 ?f0 C ?f8 ?f9 ?f10 ?f11 21600 ?f0 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="21600-?f0 "/>
+					<draw:equation draw:name="f2" draw:formula="?f1 *8000/10800"/>
+					<draw:equation draw:name="f3" draw:formula="21600-?f2 "/>
+					<draw:equation draw:name="f4" draw:formula="?f1 /2"/>
+					<draw:equation draw:name="f5" draw:formula="?f1 /4"/>
+					<draw:equation draw:name="f6" draw:formula="?f1 /7"/>
+					<draw:equation draw:name="f7" draw:formula="?f1 /16"/>
+					<draw:equation draw:name="f8" draw:formula="?f3 +?f5 "/>
+					<draw:equation draw:name="f9" draw:formula="?f0 +?f6 "/>
+					<draw:equation draw:name="f10" draw:formula="21600-?f4 "/>
+					<draw:equation draw:name="f11" draw:formula="?f0 +?f7 "/>
+					<draw:handle draw:handle-position="$0 bottom" 
+						draw:handle-range-x-minimum="10800" 
+						draw:handle-range-x-maximum="21600"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--  Lightning Bolt (Added by A.Mathi as on 20/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='lightningBolt')">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 640 861" 
+					draw:text-areas="257 295 414 566" 
+					draw:type="non-primitive" 
+					draw:enhanced-path="M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N"/>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--  Explosion 1 (Added by A.Mathi as on 20/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='irregularSeal1')">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="9722 1887 0 12875 11614 18844 21600 6646" 
+					draw:text-areas="5400 6570 14160 15290" 
+					draw:type="bang" 
+					draw:enhanced-path="M 11464 4340 L 9722 1887 8548 6383 4503 3626 5373 7816 1174 8270 3934 11592 0 12875 3329 15372 1283 17824 4804 18239 4918 21600 7525 18125 8698 19712 9871 17371 11614 18844 12178 15937 14943 17371 14640 14348 18878 15632 16382 12311 18270 11292 16986 9404 21600 6646 16382 6533 18005 3172 14524 5778 14789 0 11464 4340 Z N"/>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Chord (Added by A.Mathi as on 20/07/2007)-->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='chord')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" 
+					draw:text-areas="3200 3200 18400 18400" 
+					draw:type="ellipse"/>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Left Bracket (Added by A.Mathi as on 20/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='leftBracket')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+			    </xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="21600 0 0 10800 21600 21600" draw:text-areas="6350 ?f3 21600 ?f4" draw:type="left-bracket" draw:modifiers="1800" draw:enhanced-path="M 21600 0 C 10800 0 0 ?f3 0 ?f1 L 0 ?f2 C 0 ?f4 10800 21600 21600 21600 N">
+					<draw:equation draw:name="f0" draw:formula="$0 /2"/>
+					<draw:equation draw:name="f1" draw:formula="top+$0 "/>
+					<draw:equation draw:name="f2" draw:formula="bottom-$0 "/>
+					<draw:equation draw:name="f3" draw:formula="top+?f0 "/>
+					<draw:equation draw:name="f4" draw:formula="bottom-?f0 "/>
+					<draw:handle draw:handle-position="left $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Right Bracket (Added by A.Mathi as on 20/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBracket')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="0 0 0 21600 21600 10800" draw:text-areas="0 ?f3 15150 ?f4" draw:type="right-bracket" draw:modifiers="1800" draw:enhanced-path="M 0 0 C 10800 0 21600 ?f3 21600 ?f1 L 21600 ?f2 C 21600 ?f4 10800 21600 0 21600 N">
+					<draw:equation draw:name="f0" draw:formula="$0 /2"/>
+					<draw:equation draw:name="f1" draw:formula="top+$0 "/>
+					<draw:equation draw:name="f2" draw:formula="bottom-$0 "/>
+					<draw:equation draw:name="f3" draw:formula="top+?f0 "/>
+					<draw:equation draw:name="f4" draw:formula="bottom-?f0 "/>
+					<draw:handle draw:handle-position="right $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Left Brace (Added by A.Mathi as on 20/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='leftBrace')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="21600 0 0 10800 21600 21600" draw:text-areas="13800 ?f9 21600 ?f10" draw:type="left-brace" draw:modifiers="1800 10800" draw:enhanced-path="M 21600 0 C 16200 0 10800 ?f0 10800 ?f1 L 10800 ?f2 C 10800 ?f3 5400 ?f4 0 ?f4 5400 ?f4 10800 ?f5 10800 ?f6 L 10800 ?f7 C 10800 ?f8 16200 21600 21600 21600 N">
+					<draw:equation draw:name="f0" draw:formula="$0 /2"/>
+					<draw:equation draw:name="f1" draw:formula="$0 "/>
+					<draw:equation draw:name="f2" draw:formula="?f4 -$0 "/>
+					<draw:equation draw:name="f3" draw:formula="?f4 -?f0 "/>
+					<draw:equation draw:name="f4" draw:formula="$1 "/>
+					<draw:equation draw:name="f5" draw:formula="?f4 +?f0 "/>
+					<draw:equation draw:name="f6" draw:formula="?f4 +$0 "/>
+					<draw:equation draw:name="f7" draw:formula="21600-$0 "/>
+					<draw:equation draw:name="f8" draw:formula="21600-?f0 "/>
+					<draw:equation draw:name="f9" draw:formula="$0 *10000/31953"/>
+					<draw:equation draw:name="f10" draw:formula="21600-?f9 "/>
+					<draw:handle draw:handle-position="10800 $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="5400"/>
+					<draw:handle draw:handle-position="left $1" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="21600"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Right Brace (Added by A.Mathi as on 23/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBrace')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="0 0 0 21600 21600 10800" 
+					draw:text-areas="0 ?f9 7800 ?f10" 
+					draw:type="right-brace" 
+					draw:modifiers="1800 10800" 
+					draw:enhanced-path="M 0 0 C 5400 0 10800 ?f0 10800 ?f1 L 10800 ?f2 C 10800 ?f3 16200 ?f4 21600 ?f4 16200 ?f4 10800 ?f5 10800 ?f6 L 10800 ?f7 C 10800 ?f8 5400 21600 0 21600 N">
+					<draw:equation draw:name="f0" draw:formula="$0 /2"/>
+					<draw:equation draw:name="f1" draw:formula="$0 "/>
+					<draw:equation draw:name="f2" draw:formula="?f4 -$0 "/>
+					<draw:equation draw:name="f3" draw:formula="?f4 -?f0 "/>
+					<draw:equation draw:name="f4" draw:formula="$1 "/>
+					<draw:equation draw:name="f5" draw:formula="?f4 +?f0 "/>
+					<draw:equation draw:name="f6" draw:formula="?f4 +$0 "/>
+					<draw:equation draw:name="f7" draw:formula="21600-$0 "/>
+					<draw:equation draw:name="f8" draw:formula="21600-?f0 "/>
+					<draw:equation draw:name="f9" draw:formula="$0 *10000/31953"/>
+					<draw:equation draw:name="f10" draw:formula="21600-?f9 "/>
+					<draw:handle draw:handle-position="10800 $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="5400"/>
+					<draw:handle draw:handle-position="right $1" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="21600"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeRectCallout')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="10800 0 0 10800 10800 21600 21600 10800 ?f40 ?f41" 
+					draw:text-areas="0 0 21600 21600" 
+					draw:type="rectangular-callout" 
+					draw:modifiers="1011.57024793388 43743.8237608183" 
+					draw:enhanced-path="M 0 0 L 0 3590 ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 0 21600 3590 21600 ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 21600 21600 21600 18010 ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 21600 0 18010 0 ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 3590 0 0 0 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 -10800"/>
+					<draw:equation draw:name="f1" draw:formula="$1 -10800"/>
+					<draw:equation draw:name="f2" draw:formula="if(?f18 ,$0 ,0)"/>
+					<draw:equation draw:name="f3" draw:formula="if(?f18 ,$1 ,6280)"/>
+					<draw:equation draw:name="f4" draw:formula="if(?f23 ,$0 ,0)"/>
+					<draw:equation draw:name="f5" draw:formula="if(?f23 ,$1 ,15320)"/>
+					<draw:equation draw:name="f6" draw:formula="if(?f26 ,$0 ,6280)"/>
+					<draw:equation draw:name="f7" draw:formula="if(?f26 ,$1 ,21600)"/>
+					<draw:equation draw:name="f8" draw:formula="if(?f29 ,$0 ,15320)"/>
+					<draw:equation draw:name="f9" draw:formula="if(?f29 ,$1 ,21600)"/>
+					<draw:equation draw:name="f10" draw:formula="if(?f32 ,$0 ,21600)"/>
+					<draw:equation draw:name="f11" draw:formula="if(?f32 ,$1 ,15320)"/>
+					<draw:equation draw:name="f12" draw:formula="if(?f34 ,$0 ,21600)"/>
+					<draw:equation draw:name="f13" draw:formula="if(?f34 ,$1 ,6280)"/>
+					<draw:equation draw:name="f14" draw:formula="if(?f36 ,$0 ,15320)"/>
+					<draw:equation draw:name="f15" draw:formula="if(?f36 ,$1 ,0)"/>
+					<draw:equation draw:name="f16" draw:formula="if(?f38 ,$0 ,6280)"/>
+					<draw:equation draw:name="f17" draw:formula="if(?f38 ,$1 ,0)"/>
+					<draw:equation draw:name="f18" draw:formula="if($0 ,-1,?f19 )"/>
+					<draw:equation draw:name="f19" draw:formula="if(?f1 ,-1,?f22 )"/>
+					<draw:equation draw:name="f20" draw:formula="abs(?f0 )"/>
+					<draw:equation draw:name="f21" draw:formula="abs(?f1 )"/>
+					<draw:equation draw:name="f22" draw:formula="?f20 -?f21 "/>
+					<draw:equation draw:name="f23" draw:formula="if($0 ,-1,?f24 )"/>
+					<draw:equation draw:name="f24" draw:formula="if(?f1 ,?f22 ,-1)"/>
+					<draw:equation draw:name="f25" draw:formula="$1 -21600"/>
+					<draw:equation draw:name="f26" draw:formula="if(?f25 ,?f27 ,-1)"/>
+					<draw:equation draw:name="f27" draw:formula="if(?f0 ,-1,?f28 )"/>
+					<draw:equation draw:name="f28" draw:formula="?f21 -?f20 "/>
+					<draw:equation draw:name="f29" draw:formula="if(?f25 ,?f30 ,-1)"/>
+					<draw:equation draw:name="f30" draw:formula="if(?f0 ,?f28 ,-1)"/>
+					<draw:equation draw:name="f31" draw:formula="$0 -21600"/>
+					<draw:equation draw:name="f32" draw:formula="if(?f31 ,?f33 ,-1)"/>
+					<draw:equation draw:name="f33" draw:formula="if(?f1 ,?f22 ,-1)"/>
+					<draw:equation draw:name="f34" draw:formula="if(?f31 ,?f35 ,-1)"/>
+					<draw:equation draw:name="f35" draw:formula="if(?f1 ,-1,?f22 )"/>
+					<draw:equation draw:name="f36" draw:formula="if($1 ,-1,?f37 )"/>
+					<draw:equation draw:name="f37" draw:formula="if(?f0 ,?f28 ,-1)"/>
+					<draw:equation draw:name="f38" draw:formula="if($1 ,-1,?f39 )"/>
+					<draw:equation draw:name="f39" draw:formula="if(?f0 ,-1,?f28 )"/>
+					<draw:equation draw:name="f40" draw:formula="$0 "/>
+					<draw:equation draw:name="f41" draw:formula="$1 "/>
+					<draw:handle draw:handle-position="$0 $1"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Rounded Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeRoundRectCallout')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:text-areas="800 800 20800 20800" 
+					draw:type="round-rectangular-callout" 
+					draw:modifiers="2125.14757969303 44984.4217151849" 
+					draw:enhanced-path="M 3590 0 X 0 3590 L ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 Y 3590 21600 L ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 X 21600 18010 L ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 Y 18010 0 L ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 -10800"/>
+					<draw:equation draw:name="f1" draw:formula="$1 -10800"/>
+					<draw:equation draw:name="f2" draw:formula="if(?f18 ,$0 ,0)"/>
+					<draw:equation draw:name="f3" draw:formula="if(?f18 ,$1 ,6280)"/>
+					<draw:equation draw:name="f4" draw:formula="if(?f23 ,$0 ,0)"/>
+					<draw:equation draw:name="f5" draw:formula="if(?f23 ,$1 ,15320)"/>
+					<draw:equation draw:name="f6" draw:formula="if(?f26 ,$0 ,6280)"/>
+					<draw:equation draw:name="f7" draw:formula="if(?f26 ,$1 ,21600)"/>
+					<draw:equation draw:name="f8" draw:formula="if(?f29 ,$0 ,15320)"/>
+					<draw:equation draw:name="f9" draw:formula="if(?f29 ,$1 ,21600)"/>
+					<draw:equation draw:name="f10" draw:formula="if(?f32 ,$0 ,21600)"/>
+					<draw:equation draw:name="f11" draw:formula="if(?f32 ,$1 ,15320)"/>
+					<draw:equation draw:name="f12" draw:formula="if(?f34 ,$0 ,21600)"/>
+					<draw:equation draw:name="f13" draw:formula="if(?f34 ,$1 ,6280)"/>
+					<draw:equation draw:name="f14" draw:formula="if(?f36 ,$0 ,15320)"/>
+					<draw:equation draw:name="f15" draw:formula="if(?f36 ,$1 ,0)"/>
+					<draw:equation draw:name="f16" draw:formula="if(?f38 ,$0 ,6280)"/>
+					<draw:equation draw:name="f17" draw:formula="if(?f38 ,$1 ,0)"/>
+					<draw:equation draw:name="f18" draw:formula="if($0 ,-1,?f19 )"/>
+					<draw:equation draw:name="f19" draw:formula="if(?f1 ,-1,?f22 )"/>
+					<draw:equation draw:name="f20" draw:formula="abs(?f0 )"/>
+					<draw:equation draw:name="f21" draw:formula="abs(?f1 )"/>
+					<draw:equation draw:name="f22" draw:formula="?f20 -?f21 "/>
+					<draw:equation draw:name="f23" draw:formula="if($0 ,-1,?f24 )"/>
+					<draw:equation draw:name="f24" draw:formula="if(?f1 ,?f22 ,-1)"/>
+					<draw:equation draw:name="f25" draw:formula="$1 -21600"/>
+					<draw:equation draw:name="f26" draw:formula="if(?f25 ,?f27 ,-1)"/>
+					<draw:equation draw:name="f27" draw:formula="if(?f0 ,-1,?f28 )"/>
+					<draw:equation draw:name="f28" draw:formula="?f21 -?f20 "/>
+					<draw:equation draw:name="f29" draw:formula="if(?f25 ,?f30 ,-1)"/>
+					<draw:equation draw:name="f30" draw:formula="if(?f0 ,?f28 ,-1)"/>
+					<draw:equation draw:name="f31" draw:formula="$0 -21600"/>
+					<draw:equation draw:name="f32" draw:formula="if(?f31 ,?f33 ,-1)"/>
+					<draw:equation draw:name="f33" draw:formula="if(?f1 ,?f22 ,-1)"/>
+					<draw:equation draw:name="f34" draw:formula="if(?f31 ,?f35 ,-1)"/>
+					<draw:equation draw:name="f35" draw:formula="if(?f1 ,-1,?f22 )"/>
+					<draw:equation draw:name="f36" draw:formula="if($1 ,-1,?f37 )"/>
+					<draw:equation draw:name="f37" draw:formula="if(?f0 ,?f28 ,-1)"/>
+					<draw:equation draw:name="f38" draw:formula="if($1 ,-1,?f39 )"/>
+					<draw:equation draw:name="f39" draw:formula="if(?f0 ,-1,?f28 )"/>
+					<draw:equation draw:name="f40" draw:formula="$0 "/>
+					<draw:equation draw:name="f41" draw:formula="$1 "/>
+					<draw:handle draw:handle-position="$0 $1"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Oval Callout (Added by A.Mathi as on 23/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='wedgeEllipseCallout')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160 ?f14 ?f15" 
+					draw:text-areas="3200 3200 18400 18400" 
+					draw:type="round-callout" 
+					draw:modifiers="4965 38560" 
+					draw:enhanced-path="W 0 0 21600 21600 ?f22 ?f23 ?f18 ?f19 L ?f14 ?f15 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 -10800"/>
+					<draw:equation draw:name="f1" draw:formula="$1 -10800"/>
+					<draw:equation draw:name="f2" draw:formula="?f0 *?f0 "/>
+					<draw:equation draw:name="f3" draw:formula="?f1 *?f1 "/>
+					<draw:equation draw:name="f4" draw:formula="?f2 +?f3 "/>
+					<draw:equation draw:name="f5" draw:formula="sqrt(?f4 )"/>
+					<draw:equation draw:name="f6" draw:formula="?f5 -10800"/>
+					<draw:equation draw:name="f7" draw:formula="atan2(?f1 ,?f0 )/(pi/180)"/>
+					<draw:equation draw:name="f8" draw:formula="?f7 -10"/>
+					<draw:equation draw:name="f9" draw:formula="?f7 +10"/>
+					<draw:equation draw:name="f10" draw:formula="10800*cos(?f7 *(pi/180))"/>
+					<draw:equation draw:name="f11" draw:formula="10800*sin(?f7 *(pi/180))"/>
+					<draw:equation draw:name="f12" draw:formula="?f10 +10800"/>
+					<draw:equation draw:name="f13" draw:formula="?f11 +10800"/>
+					<draw:equation draw:name="f14" draw:formula="if(?f6 ,$0 ,?f12 )"/>
+					<draw:equation draw:name="f15" draw:formula="if(?f6 ,$1 ,?f13 )"/>
+					<draw:equation draw:name="f16" draw:formula="10800*cos(?f8 *(pi/180))"/>
+					<draw:equation draw:name="f17" draw:formula="10800*sin(?f8 *(pi/180))"/>
+					<draw:equation draw:name="f18" draw:formula="?f16 +10800"/>
+					<draw:equation draw:name="f19" draw:formula="?f17 +10800"/>
+					<draw:equation draw:name="f20" draw:formula="10800*cos(?f9 *(pi/180))"/>
+					<draw:equation draw:name="f21" draw:formula="10800*sin(?f9 *(pi/180))"/>
+					<draw:equation draw:name="f22" draw:formula="?f20 +10800"/>
+					<draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
+					<draw:handle draw:handle-position="$0 $1"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+		    </draw:custom-shape>
+		</xsl:when>
+		<!-- Cloud Callout (Added by A.Mathi as on 23/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='cloudCallout')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="GraphicId" />
+					<xsl:with-param name ="prID" select ="ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:text-areas="3000 3320 17110 17330" 
+					draw:type="cloud-callout" 
+					draw:modifiers="6775 39682" 
+					draw:enhanced-path="M 1930 7160 C 1530 4490 3400 1970 5270 1970 5860 1950 6470 2210 6970 2600 7450 1390 8340 650 9340 650 10004 690 10710 1050 11210 1700 11570 630 12330 0 13150 0 13840 0 14470 460 14870 1160 15330 440 16020 0 16740 0 17910 0 18900 1130 19110 2710 20240 3150 21060 4580 21060 6220 21060 6720 21000 7200 20830 7660 21310 8460 21600 9450 21600 10460 21600 12750 20310 14680 18650 15010 18650 17200 17370 18920 15770 18920 15220 18920 14700 18710 14240 18310 13820 20240 12490 21600 11000 21600 9890 21600 8840 20790 8210 19510 7620 20000 7930 20290 6240 20290 4850 20290 3570 19280 2900 17640 1300 17600 480 16300 480 14660 480 13900 690 13210 1070 12640 380 12160 0 11210 0 10120 0 8590 840 7330 1930 7160 Z N M 1930 7160 C 1950 7410 2040 7690 2090 7920 F N M 6970 2600 C 7200 2790 7480 3050 7670 3310 F N M 11210 1700 C 11130 1910 11080 2160 11030 2400 F N M 14870 1160 C 14720 1400 14640 1720 14540 2010 F N M 19110 2710 C 19130 2890 19230 3290 19190 3380 F N M 20830 7660 C 20660 8170 20430 8620 20110 8990 F N M 18660 15010 C 18740 14200 18280 12200 17000 11450 F N M 14240 18310 C 14320 17980 14350 17680 14370 17360 F N M 8220 19510 C 8060 19250 7960 18950 7860 18640 F N M 2900 17640 C 3090 17600 3280 17540 3460 17450 F N M 1070 12640 C 1400 12900 1780 13130 2330 13040 F N U ?f17 ?f18 1800 1800 0 23592960 Z N U ?f19 ?f20 1200 1200 0 23592960 Z N U ?f13 ?f14 700 700 0 23592960 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 -10800"/>
+					<draw:equation draw:name="f1" draw:formula="$1 -10800"/>
+					<draw:equation draw:name="f2" draw:formula="atan2(?f1 ,?f0 )/(pi/180)"/>
+					<draw:equation draw:name="f3" draw:formula="10800*cos(?f2 *(pi/180))"/>
+					<draw:equation draw:name="f4" draw:formula="10800*sin(?f2 *(pi/180))"/>
+					<draw:equation draw:name="f5" draw:formula="?f3 +10800"/>
+					<draw:equation draw:name="f6" draw:formula="?f4 +10800"/>
+					<draw:equation draw:name="f7" draw:formula="$0 -?f5 "/>
+					<draw:equation draw:name="f8" draw:formula="$1 -?f6 "/>
+					<draw:equation draw:name="f9" draw:formula="?f7 /3"/>
+					<draw:equation draw:name="f10" draw:formula="?f8 /3"/>
+					<draw:equation draw:name="f11" draw:formula="?f7 *2/3"/>
+					<draw:equation draw:name="f12" draw:formula="?f8 *2/3"/>
+					<draw:equation draw:name="f13" draw:formula="$0 "/>
+					<draw:equation draw:name="f14" draw:formula="$1 "/>
+					<draw:equation draw:name="f15" draw:formula="?f3 /12"/>
+					<draw:equation draw:name="f16" draw:formula="?f4 /12"/>
+					<draw:equation draw:name="f17" draw:formula="?f9 +?f5 -?f15 "/>
+					<draw:equation draw:name="f18" draw:formula="?f10 +?f6 -?f16 "/>
+					<draw:equation draw:name="f19" draw:formula="?f11 +?f5 "/>
+					<draw:equation draw:name="f20" draw:formula="?f12 +?f6 "/>
+					<draw:handle draw:handle-position="$0 $1"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='bentArrow')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="GraphicId" />
+					<xsl:with-param name ="prID" select ="ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 841 854" 
+					draw:mirror-horizontal="false" 
+					draw:mirror-vertical="true" 
+					draw:type="non-primitive" 
+					draw:enhanced-path="M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N">
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- U-Turn Arrow (Added by A.Mathi as on 23/07/2007) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='uturnArrow')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="grID" select ="GraphicId" />
+					<xsl:with-param name ="prID" select ="ParaId" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:text-areas="0 0 21600 21600" 
+					draw:type="circular-arrow" 
+					draw:modifiers="180 0 5500" 
+					draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="$1 "/>
+					<draw:equation draw:name="f2" draw:formula="$2 "/>
+					<draw:equation draw:name="f3" draw:formula="10800+$2 "/>
+					<draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))"/>
+					<draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))"/>
+					<draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f8" draw:formula="?f4 +10800"/>
+					<draw:equation draw:name="f9" draw:formula="?f5 +10800"/>
+					<draw:equation draw:name="f10" draw:formula="?f6 +10800"/>
+					<draw:equation draw:name="f11" draw:formula="?f7 +10800"/>
+					<draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))"/>
+					<draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))"/>
+					<draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f16" draw:formula="?f12 +10800"/>
+					<draw:equation draw:name="f17" draw:formula="?f13 +10800"/>
+					<draw:equation draw:name="f18" draw:formula="?f14 +10800"/>
+					<draw:equation draw:name="f19" draw:formula="?f15 +10800"/>
+					<draw:equation draw:name="f20" draw:formula="21600-?f3 "/>
+					<draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
+					<draw:equation draw:name="f24" draw:formula="?f22 +10800"/>
+					<draw:equation draw:name="f25" draw:formula="$2 -2700"/>
+					<draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))"/>
+					<draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))"/>
+					<draw:equation draw:name="f28" draw:formula="?f26 +10800"/>
+					<draw:equation draw:name="f29" draw:formula="?f27 +10800"/>
+					<draw:equation draw:name="f30" draw:formula="($1+45)*pi/180"/>
+					<draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))"/>
+					<draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31"/>
+					<draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)"/>
+					<draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)"/>
+					<draw:equation draw:name="f35" draw:formula="?f28+?f33"/>
+					<draw:equation draw:name="f36" draw:formula="?f29+?f34"/>
+					<draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
+					<draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
       <!--Text Box-->
-      <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]">
+      <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')]  
+                     or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]">
         <xsl:choose>
           <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')]">
             <draw:custom-shape draw:layer="layout">
@@ -993,6 +1647,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <xsl:otherwise>
             <draw:frame draw:layer="layout">
+
               <xsl:call-template name ="CreateShape">
                 <xsl:with-param name="grID" select ="$GraphicId"/>
                 <xsl:with-param name ="prID" select="$ParaId" />
@@ -1000,12 +1655,29 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
                 <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
               </xsl:call-template>
+
               <xsl:copy-of select="$varHyperLinksForShapes" />
             </draw:frame>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
+      <!--added by vipul for Word Art-->
+      <!--Start-->
+      <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'WordArt')]">
+        <draw:frame draw:layer="layout">
+          <draw:text-box>
+            <xsl:call-template name ="CreateShape">
+              <xsl:with-param name="grID" select ="$GraphicId"/>
+              <xsl:with-param name ="prID" select="$ParaId" />
+              <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+              <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+              <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            </xsl:call-template>
+          </draw:text-box>
+              <xsl:copy-of select="$varHyperLinksForShapes" />
+            </draw:frame>
+      </xsl:when>
+       <!--End-->
       <!-- Basic shapes end-->
 
       <!-- Connectors -->
@@ -1647,7 +2319,7 @@ Copyright (c) 2007, Sonata Software Limited
 
     <!-- For the Grouping of Shapes Bug Fixing -->
     <xsl:choose>
-      <xsl:when test ="parent::node()/p:grpSpPr/a:xfrm">
+      <xsl:when test ="parent::node()/p:grpSp/p:grpSpPr/a:xfrm">
         <xsl:for-each select ="p:spPr/a:xfrm">
           <xsl:attribute name ="svg:width">
             <xsl:call-template name="ConvertEmu">
@@ -1657,17 +2329,13 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-
           <xsl:attribute name ="svg:height">
             <xsl:call-template name="ConvertEmu">
               <!--<xsl:with-param name="length" select="(($aExtcy) + ($aExtSpcy))"/>-->
-              <xsl:with-param name="length" select="((parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:ext/@cy - 
-											parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:chExt/@cy)
-											+ a:ext/@cy)"/>
+              <xsl:with-param name="length" select="((parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:ext/@cy - parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:chExt/@cy)+ a:ext/@cy)"/>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-
           <xsl:attribute name ="svg:x">
             <xsl:call-template name="ConvertEmu">
               <!--<xsl:with-param name="length" select="(($aOffx) + ($aOffSpx))"/>-->
@@ -1677,7 +2345,6 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-
           <xsl:attribute name ="svg:y">
             <xsl:call-template name="ConvertEmu">
               <!--<xsl:with-param name="length" select="(($aOffy) + ($aOffSpy))"/>-->
@@ -1689,114 +2356,85 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
         </xsl:for-each>
       </xsl:when>
-      <xsl:otherwise>
-        <!-- End of code for Grouping of shapes Bug -->
+      <!-- End of code for Grouping of shapes Bug -->
+     <xsl:when test="p:spPr/a:xfrm">
+       <!--Added by Vipul for rotation-->
+       <!--Start-->
+       <xsl:call-template name="tmpWriteCordinates"/>
+       <!--End-->
+     </xsl:when>
+   </xsl:choose>
+   <xsl:choose>
+     <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')])">
+       <draw:text-box>
+         <xsl:call-template name ="AddShapeText">
+           <xsl:with-param name ="prID" select ="$prID" />
+           <!-- Addition of a parameter,by vijayeta,for bullets and numbering in shapes-->
+           <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+         </xsl:call-template>
+       </draw:text-box>
+     </xsl:when>
+     <xsl:otherwise>
+       <xsl:call-template name ="AddShapeText">
+         <xsl:with-param name ="prID" select ="$prID" />
+         <!-- Addition of a parameter,by vijayeta,for bullets and numbering in shapes-->
+         <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+       </xsl:call-template>
+     </xsl:otherwise>
+   </xsl:choose>
+ </xsl:template>
+ <!-- Draw line -->
+ <xsl:template name ="DrawLine">
+   <xsl:param name ="grID" />
 
-        <!--<xsl:when test ="p:spPr/a:xfrm">-->
-        <xsl:for-each select ="p:spPr/a:xfrm">
-          <xsl:attribute name ="svg:width">
-            <xsl:call-template name="ConvertEmu">
-              <xsl:with-param name="length" select="a:ext/@cx"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
+   <xsl:attribute name ="draw:style-name">
+     <xsl:value-of select ="$grID"/>
+   </xsl:attribute>
 
-          <xsl:attribute name ="svg:height">
-            <xsl:call-template name="ConvertEmu">
-              <xsl:with-param name="length" select="a:ext/@cy"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-
-          <xsl:attribute name ="svg:x">
-            <xsl:call-template name="ConvertEmu">
-              <xsl:with-param name="length" select="a:off/@x"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-
-          <xsl:attribute name ="svg:y">
-            <xsl:call-template name="ConvertEmu">
-              <xsl:with-param name="length" select="a:off/@y"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:for-each>
-        <!--</xsl:when>-->
-      </xsl:otherwise>
-    </xsl:choose>
-
-    <xsl:choose>
-      <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')])">
-        <draw:text-box>
-          <xsl:call-template name ="AddShapeText">
-            <xsl:with-param name ="prID" select ="$prID" />
-            <!-- Addition of a parameter,by vijayeta,for bullets and numbering in shapes-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-          </xsl:call-template>
-        </draw:text-box>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name ="AddShapeText">
-          <xsl:with-param name ="prID" select ="$prID" />
-          <!-- Addition of a parameter,by vijayeta,for bullets and numbering in shapes-->
-          <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  <!-- Draw line -->
-  <xsl:template name ="DrawLine">
-    <xsl:param name ="grID" />
-
-    <xsl:attribute name ="draw:style-name">
-      <xsl:value-of select ="$grID"/>
-    </xsl:attribute>
-
-    <xsl:for-each select ="p:spPr/a:xfrm">
-      <xsl:variable name ="xCenter">
-        <xsl:value-of select ="a:off/@x + (a:ext/@cx div 2)"/>
-      </xsl:variable>
-      <xsl:variable name ="yCenter">
-        <xsl:value-of select ="a:off/@y + (a:ext/@cy div 2)"/>
-      </xsl:variable>
-      <xsl:variable name ="angle">
-        <xsl:if test ="not(@rot)">
-          <xsl:value-of select="0" />
-        </xsl:if>
-        <xsl:if test ="@rot">
-          <xsl:value-of select ="(@rot div 60000) * ((22 div 7) div 180)"/>
-        </xsl:if>
-      </xsl:variable>
-      <xsl:variable name ="cxBy2">
-        <xsl:if test ="(@flipH = 1)">
-          <xsl:value-of select ="(-1 * a:ext/@cx) div 2"/>
-        </xsl:if>
-        <xsl:if test ="not(@flipH) or (@flipH != 1) ">
-          <xsl:value-of select ="a:ext/@cx div 2"/>
-        </xsl:if>
-      </xsl:variable>
-      <xsl:variable name ="cyBy2">
-        <xsl:if test ="(@flipV = 1)">
-          <xsl:value-of select ="(-1 * a:ext/@cy) div 2"/>
-        </xsl:if>
-        <xsl:if test ="not(@flipV) or (@flipV != 1)">
-          <xsl:value-of select ="a:ext/@cy div 2"/>
-        </xsl:if>
-      </xsl:variable>
-      <xsl:attribute name ="svg:x1">
-        <xsl:value-of select ="concat('svg-x1:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-      </xsl:attribute>
-      <xsl:attribute name ="svg:y1">
-        <xsl:value-of select ="concat('svg-y1:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-      </xsl:attribute>
-      <xsl:attribute name ="svg:x2">
-        <xsl:value-of select ="concat('svg-x2:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-      </xsl:attribute>
-      <xsl:attribute name ="svg:y2">
-        <xsl:value-of select ="concat('svg-y2:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-      </xsl:attribute>
-      <!--<xsl:attribute name ="svg:x1">
+   <xsl:for-each select ="p:spPr/a:xfrm">
+     <xsl:variable name ="xCenter">
+       <xsl:value-of select ="a:off/@x + (a:ext/@cx div 2)"/>
+     </xsl:variable>
+     <xsl:variable name ="yCenter">
+       <xsl:value-of select ="a:off/@y + (a:ext/@cy div 2)"/>
+     </xsl:variable>
+     <xsl:variable name ="angle">
+       <xsl:if test ="not(@rot)">
+         <xsl:value-of select="0" />
+       </xsl:if>
+       <xsl:if test ="@rot">
+         <xsl:value-of select ="(@rot div 60000) * ((22 div 7) div 180)"/>
+       </xsl:if>
+     </xsl:variable>
+     <xsl:variable name ="cxBy2">
+       <xsl:if test ="(@flipH = 1)">
+         <xsl:value-of select ="(-1 * a:ext/@cx) div 2"/>
+       </xsl:if>
+       <xsl:if test ="not(@flipH) or (@flipH != 1) ">
+         <xsl:value-of select ="a:ext/@cx div 2"/>
+       </xsl:if>
+     </xsl:variable>
+     <xsl:variable name ="cyBy2">
+       <xsl:if test ="(@flipV = 1)">
+         <xsl:value-of select ="(-1 * a:ext/@cy) div 2"/>
+       </xsl:if>
+       <xsl:if test ="not(@flipV) or (@flipV != 1)">
+         <xsl:value-of select ="a:ext/@cy div 2"/>
+       </xsl:if>
+     </xsl:variable>
+     <xsl:attribute name ="svg:x1">
+       <xsl:value-of select ="concat('svg-x1:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+     </xsl:attribute>
+     <xsl:attribute name ="svg:y1">
+       <xsl:value-of select ="concat('svg-y1:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+     </xsl:attribute>
+     <xsl:attribute name ="svg:x2">
+       <xsl:value-of select ="concat('svg-x2:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+     </xsl:attribute>
+     <xsl:attribute name ="svg:y2">
+       <xsl:value-of select ="concat('svg-y2:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+     </xsl:attribute>
+     <!--<xsl:attribute name ="svg:x1">
 				<xsl:value-of select ="$xCenter - m:cos($angle) * $cxBy2 + m:sin($angle) * $cyBy2"/>
 			</xsl:attribute>
 			<xsl:attribute name ="svg:y1">
@@ -1819,9 +2457,10 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:variable name ="SlideNumber" select ="substring-before(substring-after($SlideRelationId,'ppt/slides/_rels/'),'.xml.rels')"/>
     <!--concat($SlideNumber,'textboxshape_List',position()-->
     <xsl:for-each select ="p:txBody">
+      <xsl:variable name ="textNumber" select ="./parent::node()/p:nvSpPr/p:cNvPr/@id"/>
       <!--code inserted by Vijayeta,InsertStyle For Bullets and Numbering-->
       <xsl:variable name ="listStyleName">
-        <xsl:value-of select ="concat($SlideNumber,'textboxshape_List',position())"/>
+        <xsl:value-of select ="concat($SlideNumber,'textboxshape_List',$textNumber)"/>
       </xsl:variable>
       <xsl:for-each select ="a:p">
         <!--Code Inserted by Vijayeta for Bullets And Numbering
@@ -1917,108 +2556,12 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:for-each>
 
   </xsl:template>
-  <!-- Generate autometic styles in contet.xsl for graphic properties-->
-  <!--<xsl:template name ="InsertStylesForGraphicProperties"  >
-		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
-			<xsl:variable name ="SlideId">
-				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
-			</xsl:variable>
-			-->
-  <!-- Graphic properties for shapes with p:sp nodes-->
-  <!--
-			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp">
-				-->
-  <!--Check for shape or texbox -->
-  <!--
-				-->
-  <!--<xsl:if test = "p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or 
-										   p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')] or 
-										   p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')] or 
-										   p:nvSpPr/p:cNvPr/@name[contains(., 'Line')]">-->
-  <!--
-					-->
-  <!-- Generate graphic properties ID-->
-  <!--
-					<xsl:variable  name ="GraphicId">
-						<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('gr',position()))"/>
-					</xsl:variable>
-
-					<style:style style:family="graphic" style:parent-style-name="standard">
-						<xsl:attribute name ="style:name">
-							<xsl:value-of select ="$GraphicId"/>
-						</xsl:attribute >
-						<style:graphic-properties>
-
-							-->
-  <!-- FILL -->
-  <!--
-							<xsl:call-template name ="Fill" />
-
-							-->
-  <!-- LINE COLOR -->
-  <!--
-							<xsl:call-template name ="LineColor" />
-
-							-->
-  <!-- LINE STYLE -->
-  <!--
-							<xsl:call-template name ="LineStyle"/>
-
-							-->
-  <!-- TEXT ALIGNMENT -->
-  <!--
-							<xsl:call-template name ="TextLayout" />
-
-						</style:graphic-properties >
-						<xsl:if test ="p:txBody/a:bodyPr/@vert">
-							<style:paragraph-properties>
-								<xsl:attribute name ="style:writing-mode">
-									<xsl:call-template name ="getTextDirection">
-										<xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
-									</xsl:call-template>
-								</xsl:attribute>
-							</style:paragraph-properties>
-						</xsl:if>
-					</style:style>
-				-->
-  <!--</xsl:if >-->
-  <!--
-			</xsl:for-each>
-			-->
-  <!-- Graphic properties for shapes with p:cxnSp nodes-->
-  <!--
-			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:cxnSp">
-				-->
-  <!-- Generate graphic properties ID-->
-  <!--
-				<xsl:variable  name ="GraphicId">
-					<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('grLine',position()))"/>
-				</xsl:variable>
-
-				<style:style style:family="graphic" style:parent-style-name="standard">
-					<xsl:attribute name ="style:name">
-						<xsl:value-of select ="$GraphicId"/>
-					</xsl:attribute >
-					<style:graphic-properties>
-
-						-->
-  <!-- LINE COLOR -->
-  <!--
-						<xsl:call-template name ="LineColor" />
-
-						-->
-  <!-- LINE STYLE -->
-  <!--
-						<xsl:call-template name ="LineStyle"/>
-
-					</style:graphic-properties >
-				</style:style>
-
-			</xsl:for-each>
-		</xsl:for-each>
-	</xsl:template>-->
   <xsl:template name ="InsertStylesForGraphicProperties"  >
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+      <!-- Added by vipul-->
+      <!--Start-->
+      <xsl:variable name="SlidePos" select="position()"/>
+      <!--End-->
       <xsl:variable name ="SlideId">
         <xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
       </xsl:variable>
@@ -2028,6 +2571,45 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name ="grID" select ="'gr'" />
         </xsl:call-template>
       </xsl:for-each>
+      <!--Added by Vipul to insert style for Layout shapes-->
+      <!--Start-->
+      <xsl:variable name ="slideRel">
+        <xsl:value-of select ="concat(concat('ppt/slides/_rels/',$SlideId),'.rels')"/>
+      </xsl:variable>
+      <xsl:variable name ="LayoutFileNo">
+        <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
+          <xsl:value-of select ="concat('ppt',substring(.,3))"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:for-each select ="document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp">
+        <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph)">
+          <xsl:variable  name ="GraphicId">
+            <xsl:value-of select ="concat('SL',$SlidePos,'LYT','gr',position())"/>
+          </xsl:variable>
+          <xsl:variable name ="ParaId">
+            <xsl:value-of select ="concat('SL',$SlidePos,'LYT','PARA',position())"/>
+          </xsl:variable>
+          <style:style style:family="graphic" style:parent-style-name="standard">
+            <xsl:attribute name ="style:name">
+              <xsl:value-of select ="$GraphicId"/>
+            </xsl:attribute >
+            <style:graphic-properties>
+              <!--FILL-->
+              <xsl:call-template name ="Fill" />
+              <!--LINE COLOR-->
+              <xsl:call-template name ="LineColor" />
+              <!--LINE STYLE-->
+              <xsl:call-template name ="LineStyle"/>
+              <!--TEXT ALIGNMENT-->
+              <xsl:call-template name ="TextLayout" />
+            </style:graphic-properties >
+          </style:style>
+          <xsl:call-template name="tmpShapeTextProcess">
+            <xsl:with-param name="ParaId" select="$ParaId"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:for-each>
+      <!--End-->
     </xsl:for-each>
   </xsl:template>
   <xsl:template name="getGraphicProperties">
@@ -2114,7 +2696,6 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:value-of select="'#ffffff'"/>
         </xsl:attribute>
       </xsl:when>
-
       <!-- Solid fill-->
       <xsl:when test ="p:spPr/a:solidFill">
         <xsl:attribute name ="draw:fill">
@@ -2166,8 +2747,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </xsl:if>
       </xsl:when>
-
-      <xsl:otherwise>
+      <xsl:when test ="p:style/a:fillRef">
         <!--Fill refernce-->
         <xsl:if test ="p:style/a:fillRef">
           <xsl:attribute name ="draw:fill">
@@ -2219,6 +2799,11 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:if>-->
           </xsl:if>
         </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name ="draw:fill">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -2520,87 +3105,110 @@ Copyright (c) 2007, Sonata Software Limited
   <!-- Get text layout for shapes -->
   <xsl:template name ="TextLayout">
     <xsl:for-each select="p:txBody">
-      <xsl:attribute name ="draw:textarea-horizontal-align">
+      <xsl:if test="a:bodyPr/@vert='vert'">
         <xsl:choose>
-          <!--BugFixed-1709909-->
-          <xsl:when test ="p:txBody/a:bodyPr/@anchorCtr= 1">
-            <xsl:value-of select ="'center'"/>
+          <xsl:when test="(a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='b' and not(a:bodyPr/@anchorCtr))">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'left'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'top'"/>
+            </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="p:txBody/a:bodyPr/@anchorCtr= 0">
-            <xsl:value-of select ="'justify'"/>
+          <xsl:when test="(a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='t' and not(a:bodyPr/@anchorCtr))">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'right'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'top'"/>
+            </xsl:attribute>
           </xsl:when>
-          <!--Justify alignment-->
-          <xsl:otherwise>
-            <xsl:value-of select ="'justify'"/>
-          </xsl:otherwise>
+          <xsl:when test="(a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='ctr' and not(a:bodyPr/@anchorCtr))">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'center'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'top'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='1'">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'right'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'middle'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='1'">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'center'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'middle'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='1'">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'left'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'middle'"/>
+            </xsl:attribute>
+          </xsl:when>
         </xsl:choose>
-        <!-- Center alignment
-					<xsl:when test ="(a:p/a:pPr/@algn ='ctr') or (a:bodyPr/@anchorCtr = '1')">
-						<xsl:value-of select ="'center'"/>
-					</xsl:when>-->
-        <!-- Right alignment
-					<xsl:when test ="a:p/a:pPr/@algn ='r'">
-						<xsl:value-of select ="'right'"/>
-					</xsl:when>-->
-        <!--Justify alignment
-					<xsl:when test ="(a:p/a:pPr/@algn ='just') or (a:bodyPr/@anchorCtr = '0')">
-						<xsl:value-of select ="'justify'"/>
-					</xsl:when>-->
-        <!-- Left alignment
-					<xsl:otherwise>
-						<xsl:value-of select ="'left'"/>
-					</xsl:otherwise>-->
-
-      </xsl:attribute>
-      <xsl:attribute name ="draw:textarea-vertical-align">
+      </xsl:if>
+      <xsl:if test="a:bodyPr/@vert='horz' or not(a:bodyPr/@vert) ">
         <xsl:choose>
-          <!-- Middle alignment-->
-          <xsl:when test ="a:bodyPr/@anchor ='ctr'">
-            <xsl:value-of select ="'middle'"/>
+          <xsl:when test="(a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='t' and not(a:bodyPr/@anchorCtr))">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'justify'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'top'"/>
+            </xsl:attribute>
           </xsl:when>
-          <!-- Bottom alignment-->
-          <xsl:when test ="a:bodyPr/@anchor ='b'">
-            <xsl:value-of select ="'bottom'"/>
+          <xsl:when test="(a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='ctr' and not(a:bodyPr/@anchorCtr))  ">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'justify'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'middle'"/>
+            </xsl:attribute>
           </xsl:when>
-          <!-- Top alignment -->
-          <xsl:otherwise>
-            <xsl:value-of select ="'top'"/>
-          </xsl:otherwise>
+          <xsl:when test="a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='1'">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'center'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'top'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="(a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='b' and not(a:bodyPr/@anchorCtr))">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'justify'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'bottom'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='1'">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'center'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'middle'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='1'">
+            <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:value-of select="'center'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:textarea-vertical-align">
+              <xsl:value-of select="'bottom'"/>
+            </xsl:attribute>
+          </xsl:when>
         </xsl:choose>
-      </xsl:attribute>
-
-      <!--fo:padding-->
-      <!--<xsl:if test ="a:bodyPr/@lIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
-				<xsl:attribute name ="fo:padding-left">
-					<xsl:call-template name="getPadding">
-						<xsl:with-param name="length" select="a:bodyPr/@lIns"/>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-
-			<xsl:if test ="a:bodyPr/@tIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
-				<xsl:attribute name ="fo:padding-top">
-					<xsl:call-template name="getPadding">
-						<xsl:with-param name="length" select="a:bodyPr/@tIns"/>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-
-			<xsl:if test ="a:bodyPr/@rIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
-				<xsl:attribute name ="fo:padding-right">
-					<xsl:call-template name="getPadding">
-						<xsl:with-param name="length" select="a:bodyPr/@rIns"/>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-
-			<xsl:if test ="a:bodyPr/@bIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
-				<xsl:attribute name ="fo:padding-bottom">
-					<xsl:call-template name="getPadding">
-						<xsl:with-param name="length" select="a:bodyPr/@bIns"/>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>-->
+      </xsl:if>
 
       <xsl:if test ="a:bodyPr/@lIns">
         <xsl:attribute name ="fo:padding-left">

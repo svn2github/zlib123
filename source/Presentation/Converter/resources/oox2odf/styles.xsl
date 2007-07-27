@@ -81,55 +81,20 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:text>document styles</xsl:text>
 			<office:styles>
 				<xsl:call-template name ="InsertDefaultStyles" />
-                                <xsl:call-template name="SlideMaster"/>
+        <xsl:call-template name="SlideMaster"/>
 				<xsl:call-template name="InsertShapeStyles"/>
 				<xsl:call-template name ="InsertLayoutStyle"/>
 			</office:styles>
-			
-			
-			<xsl:text>automatic styles</xsl:text>
-			<office:automatic-styles>
+		<office:automatic-styles>
         <!-- added by Vipul to insert background color for Slide master-->
         <!--start-->
-        <xsl:call-template name="slideMasterDrawingPage"/>
+        <xsl:call-template name="tmpSMDrawingPageStyle"/>
         <!-- end-->
 				<xsl:call-template name="InsertSlideSize"/><!-- Change By Vijayeta-->
 				<xsl:call-template name="InsertNotesSize"/>
-				<style:style style:name="pr1" style:family="presentation" style:parent-style-name="Default-backgroundobjects">
-					<style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.449cm"/>
-				</style:style>
-        <!-- Change by Vijayeta-->
-        <style:style style:name="P1" style:family="paragraph">
-          <style:paragraph-properties fo:text-align="start" />
-          <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt" />
-        </style:style>
-        <style:style style:name="P2" style:family="paragraph">
-          <style:paragraph-properties fo:text-align="center" />
-          <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt" />
-        </style:style>
-        <style:style style:name="P3" style:family="paragraph">
-          <style:paragraph-properties fo:text-align="end" />
-          <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt" />
-        </style:style>
-        <!-- Change by Vijayeta-->
-       
-        <style:style style:name="prp" style:family="presentation" style:parent-style-name="slideMaster1-outline1">
-          <style:graphic-properties draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="12.573cm" />
-        </style:style>
-        <xsl:call-template name ="TextParagraphProp"/>
-          
- 
         <!--Added by Vipul to insert style for shapes-->
         <xsl:call-template name="GraphicStyleForSlideMaster"/>
 			</office:automatic-styles>
-			<xsl:text>master styles</xsl:text>
-      <!--commented by vipul as this will be covereded in Slide Master.xsl-->
-      <!--start-->
-			<!--<office:master-styles>
-				<xsl:call-template name="InsertMasterStylesDefinition"/>
-			</office:master-styles>-->
-           <!--end-->
-      <!--added by Vipul for slide master page style-->
       <xsl:call-template name="slideMasterStylePage"></xsl:call-template>
 		</office:document-styles>
 
@@ -183,20 +148,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:line-height="100%" text:enable-numbering="false" fo:text-indent="0cm"/>
 			<style:text-properties style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" fo:font-family="Arial" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:font-family-asian="&apos;Arial Unicode MS&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-family-complex="Tahoma" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none"/>
 		</style:style>
-	<!--<style:default-style>
-			<xsl:attribute name ="style:family">
-				<xsl:value-of select ="'graphic'"/>
-			</xsl:attribute>
-		</style:default-style>
-		<style:style>
-			<xsl:attribute name ="style:name">
-				<xsl:value-of select ="standard"/>
-			</xsl:attribute>
-			<xsl:attribute name ="style:family">
-				<xsl:value-of select ="graphic"/>
-			</xsl:attribute>
-		</style:style>-->
-	</xsl:template>
+		</xsl:template>
 	
 	<xsl:template name="InsertShapeStyles">
 
