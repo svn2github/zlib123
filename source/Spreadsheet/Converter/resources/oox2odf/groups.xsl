@@ -129,7 +129,7 @@
         
         <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
             <table:table-column-group-end/>
-            <xsl:call-template name="InsertColumnGroupStart">
+            <xsl:call-template name="InsertColumnGroupEnd">
                 <xsl:with-param name="GroupCell">
                     <xsl:value-of select="substring-after(concat(';', $GroupCell), concat(':', @max, ';'))"/>
                 </xsl:with-param>
