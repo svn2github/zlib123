@@ -154,6 +154,7 @@ namespace OdfPPT2003Addin
             {
                 // otherwise, create a new one
                 importButton = (CommandBarButton)commandBar1.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 3, true);
+                importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
             }
             // set item's label
             importButton.Caption = this.addinLib.GetString("OdfImportLabel");
@@ -162,7 +163,6 @@ namespace OdfPPT2003Addin
             //importButton.OnAction = "!<OdfConverterPPT2003Addin.Connect>";
             importButton.OnAction = "!<OdfPPT2003Addin.Connect>";
             importButton.Visible = true;
-            importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
 
             // Add export button
             try
@@ -174,6 +174,7 @@ namespace OdfPPT2003Addin
             {
                 // otherwise, create a new one
                 exportButton = (CommandBarButton)commandBar1.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 4, true);
+                exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
             }
             // set item's label
             exportButton.Caption = this.addinLib.GetString("OdfExportLabel");
@@ -183,7 +184,7 @@ namespace OdfPPT2003Addin
             exportButton.OnAction = "!<OdfPPT2003Addin.Connect>";
             exportButton.Visible = true;
             exportButton.Enabled = true;
-            exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
+            
 		}
 
         private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
