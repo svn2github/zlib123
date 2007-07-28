@@ -113,7 +113,7 @@
     <xsl:template name="InsertColumnGroupStart">
         <xsl:param name="GroupCell"/>
         
-        <xsl:if test="contains(concat(';', $GroupCell), concat(';', @min, ':'))">
+        <xsl:if test="$GroupCell != '' and contains(concat(';', $GroupCell), concat(';', @min, ':'))">
             <table:table-column-group-start/>
             <xsl:call-template name="InsertColumnGroupStart">
                 <xsl:with-param name="GroupCell">
@@ -127,11 +127,11 @@
     <xsl:template name="InsertColumnGroupEnd">
         <xsl:param name="GroupCell"/>
         
-        <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
+        <xsl:if test="$GroupCell != '' and contains(concat(';', $GroupCell), concat(':', @max, ';')) and preceding-sibling::e:col[1]/@max != @max">            
             <table:table-column-group-end/>
             <xsl:call-template name="InsertColumnGroupEnd">
                 <xsl:with-param name="GroupCell">
-                    <xsl:value-of select="substring-after(concat(';', $GroupCell), concat(':', @max, ';'))"/>
+                    <xsl:value-of select="substring-after(concat(';', $GroupCell), concat(':', @min, ';'))"/>
                 </xsl:with-param>
             </xsl:call-template>
         </xsl:if>

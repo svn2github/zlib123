@@ -682,15 +682,6 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <!-- Insert Group End -->
-    <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
-      <xsl:call-template name="InsertColumnGroupEnd">
-        <xsl:with-param name="GroupCell">
-          <xsl:value-of select="$GroupCell"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-
     <xsl:choose>
 
       <!-- calc supports only 256 columns -->
@@ -1198,6 +1189,17 @@
         </xsl:attribute>
       </xsl:if>
     </table:table-column>
+    
+    <!-- Insert Group End -->
+    
+    <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
+      <xsl:call-template name="InsertColumnGroupEnd">
+        <xsl:with-param name="GroupCell">
+          <xsl:value-of select="$GroupCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
   </xsl:template>
   
   <xsl:template name="GetMaxValueBetweenTwoValues">

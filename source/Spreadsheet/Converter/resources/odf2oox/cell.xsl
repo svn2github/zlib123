@@ -51,7 +51,7 @@
     <xsl:variable name="max">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
-          <xsl:value-of select="$colNumber+@table:number-columns-repeated "/>
+          <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$colNumber"/>
@@ -96,9 +96,11 @@
           </xsl:variable>
         </xsl:for-each>
 
+        <xsl:if test="ancestor::table:table-column-group != 0">
         <xsl:attribute name="outlineLevel">
           <xsl:value-of select="count(ancestor::table:table-column-group)"/>
         </xsl:attribute>
+        </xsl:if>
 
         <xsl:if test="@table:visibility = 'collapse'">
           <xsl:attribute name="hidden">1</xsl:attribute>
@@ -581,9 +583,11 @@
           </xsl:variable>
         </xsl:for-each>
 
+        <xsl:if test="ancestor::table:table-row-group != 0">
         <xsl:attribute name="outlineLevel">
           <xsl:value-of select="count(ancestor::table:table-row-group)"/>
         </xsl:attribute>
+        </xsl:if>
 
         <xsl:if
           test="@table:visibility = 'collapse' or (@table:visibility = 'filter' and $ignoreFilter = '')">
@@ -810,7 +814,7 @@
               <xsl:attribute name="customHeight">1</xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="parent::table:table-row-group">
+            <xsl:if test="parent::table:table-row-group and count(ancestor::table:table-row-group) != 0">
               <xsl:attribute name="outlineLevel">
                 <xsl:value-of select="count(ancestor::table:table-row-group)"/>
               </xsl:attribute>
