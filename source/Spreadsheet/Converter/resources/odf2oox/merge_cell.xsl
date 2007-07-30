@@ -94,7 +94,7 @@
     
     <xsl:choose>
       <!-- next row is a sibling -->
-      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId]">
+      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ])">
         <xsl:apply-templates select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]" mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
@@ -111,8 +111,8 @@
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
-        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
+      <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ]">
+        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
           mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
@@ -122,6 +122,12 @@
                   select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"
                 />
               </xsl:when>
+              <xsl:when
+                test="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated">
+                <xsl:value-of
+                  select="$rowNumber + following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated"
+                />
+                </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
@@ -131,7 +137,7 @@
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
       <xsl:when
-        test="parent::node()[name()='table:table-header-rows'] and not(following-sibling::node()[1][name() = 'table:table-row' ])">
+        test="(parent::node()[name()='table:table-header-rows'] or parent::node()[name()='table:table-row-group']) and not(following-sibling::node()[1][name() = 'table:table-row' ])">
         <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
           mode="mergestyle">
           <xsl:with-param name="rowNumber">
@@ -454,12 +460,12 @@
     <xsl:variable name="tableId">
       <xsl:value-of select="generate-id(ancestor::table:table)"/>
     </xsl:variable>
-    
+
     <!-- Check if next row exist -->
     <xsl:choose>
       <!-- next row is a sibling -->
-      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId]">
-        <xsl:apply-templates select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]" mode="merge">
+      <xsl:when test="following-sibling::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ])">
+        <xsl:apply-templates select="following::table:table-row[1][generate-id(ancestor::table:table) = $tableId][1]" mode="merge">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
@@ -472,9 +478,9 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
-      <!-- next row is inside header rows -->
+      <!-- next row is inside header rows or in group-->
       <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
-        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
+       <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
           mode="merge">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
@@ -483,7 +489,7 @@
                 <xsl:value-of
                   select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"
                 />
-              </xsl:when>
+              </xsl:when>             
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber + 1"/>
               </xsl:otherwise>
@@ -491,15 +497,15 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
-      <!-- this is last row inside header rows, next row is outside -->
-      <xsl:when test="parent::node()[name()='table:table-header-rows'] and not(following-sibling::node()[1][name() = 'table:table-row' ])">
-        <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="merge">
+      <xsl:when test="following-sibling::node()[1][name() = 'table:table-row-group' ]">
+        <xsl:apply-templates select="following-sibling::table:table-row-group[1]/descendant::table:table-row[1]"
+          mode="merge">
           <xsl:with-param name="rowNumber">
-            <xsl:choose>
+            <xsl:choose>           
               <xsl:when
-                test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+                test="following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated">
                 <xsl:value-of
-                  select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"
+                  select="$rowNumber + following-sibling::table:table-row-group/table:table-row[1]/@table:number-rows-repeated"
                 />
               </xsl:when>
               <xsl:otherwise>
@@ -507,12 +513,54 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
-        </xsl:apply-templates>
+        </xsl:apply-templates>    
       </xsl:when>
+      <!-- this is last row inside header rows or group, next row is outside -->
+      <xsl:when test="(parent::node()[name()='table:table-header-rows'] or parent::node()[name()='table:table-row-group']) and not(following-sibling::node()[1][name() = 'table:table-row' ])">
+       <xsl:choose>
+          <xsl:when test="parent::node()[name()='table:table-header-rows']">
+            <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="merge">
+              <xsl:with-param name="rowNumber">
+              <xsl:choose>
+              <xsl:when
+              test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+              <xsl:value-of
+              select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"
+              />
+              </xsl:when>
+              <xsl:otherwise>
+              <xsl:value-of select="$rowNumber + 1"/>
+              </xsl:otherwise>
+              </xsl:choose>
+              </xsl:with-param>             
+              </xsl:apply-templates>    
+          </xsl:when>
+         <xsl:when test="ancestor::table:table-row-group">
+          
+           <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="merge">
+              <xsl:with-param name="rowNumber">
+              <xsl:choose>
+              <xsl:when
+                test="ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+              <xsl:value-of
+                select="$rowNumber + ancestor::node()[name()='table:table-row-group']/following-sibling::table:table-row[1]/@table:number-rows-repeated"
+              />
+              </xsl:when>
+              <xsl:otherwise>
+              <xsl:value-of select="$rowNumber + 1"/>
+              </xsl:otherwise>
+              </xsl:choose>
+              </xsl:with-param>          
+           </xsl:apply-templates>
+           
+         </xsl:when>
+         
+        </xsl:choose>
+        
+      </xsl:when>
+      
     </xsl:choose>
-    
   </xsl:template>
-  
   
   <!-- to insert merge cell -->
   <xsl:template name="MergeRow">

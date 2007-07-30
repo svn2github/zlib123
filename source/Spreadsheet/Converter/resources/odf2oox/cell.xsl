@@ -448,7 +448,7 @@
 
     <xsl:choose>
       <xsl:when
-        test="not(following-sibling::table:table-row or following-sibling::table:table-header-rows) and @table:visibility='collapse'">
+        test="not(following-sibling::table:table-row or following-sibling::table:table-header-rows or following-sibling::table:table-row-group) and @table:visibility='collapse'">
         <xsl:variable name="CheckNumber">
           <xsl:choose>
             <xsl:when test="@table:number-rows-repeated">
@@ -485,9 +485,9 @@
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:when>
-          <xsl:when test="name(following-sibling::node()[1]) = 'table:table-header-rows'">
+          <xsl:when test="name(following-sibling::node()[1]) = 'table:table-header-rows' or name(following-sibling::node()[1]) = 'table:table-row-group'">
             <xsl:apply-templates
-              select="following-sibling::table:table-header-rows/table:table-row[1]"
+              select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
               mode="zeroHeight">
               <xsl:with-param name="rowNumber">
                 <xsl:choose>
@@ -502,7 +502,7 @@
             </xsl:apply-templates>
           </xsl:when>
           <xsl:when
-            test="name(parent::node()) = 'table:table-header-rows' and parent::node()/following-sibling::table:table-row">
+            test="(name(parent::node()) = 'table:table-header-rows' or name(parent::node()) = 'table:table-row-group') and parent::node()/following-sibling::table:table-row">
             <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
               mode="zeroHeight">
               <xsl:with-param name="rowNumber">
@@ -583,7 +583,7 @@
           </xsl:variable>
         </xsl:for-each>
 
-        <xsl:if test="ancestor::table:table-row-group != 0">
+        <xsl:if test="ancestor::table:table-row-group">
         <xsl:attribute name="outlineLevel">
           <xsl:value-of select="count(ancestor::table:table-row-group)"/>
         </xsl:attribute>
@@ -701,8 +701,8 @@
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
-        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
+      <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ]">
+        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
           mode="sheet">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
@@ -741,7 +741,7 @@
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
       <xsl:when
-        test="parent::node()[name()='table:table-header-rows'] and not(following-sibling::node()[1][name() = 'table:table-row' ])">
+        test="(parent::node()[name()='table:table-header-rows'] or parent::node()[name()='table:table-row-group']) and not(following-sibling::node()[1][name() = 'table:table-row' ])">
         <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
           mode="sheet">
           <xsl:with-param name="rowNumber">
@@ -814,7 +814,7 @@
               <xsl:attribute name="customHeight">1</xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="parent::table:table-row-group and count(ancestor::table:table-row-group) != 0">
+            <xsl:if test="parent::table:table-row-group and count(ancestor::table:table-row-group)">
               <xsl:attribute name="outlineLevel">
                 <xsl:value-of select="count(ancestor::table:table-row-group)"/>
               </xsl:attribute>

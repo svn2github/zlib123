@@ -95,11 +95,14 @@
 
       <xsl:variable name="MergeCell">
         <xsl:call-template name="WriteMergeCell"/>
+       
       </xsl:variable>
 
       <xsl:variable name="MergeCellStyle">
         <xsl:call-template name="WriteMergeStyle"/>
       </xsl:variable>
+
+  <xsl:call-template name="WriteMergeCell"/>
 
       <xsl:variable name="masterPage">
         <xsl:value-of select="key('tableMasterPage',@table:style-name)/@style:master-page-name"/>
