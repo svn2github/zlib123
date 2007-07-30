@@ -1001,7 +1001,7 @@
               <xsl:with-param name="colNum">
                 <xsl:value-of select="$colNum"/>
               </xsl:with-param>
-              <xsl:with-param name="ConnecionsCell">
+              <xsl:with-param name="ConnectionsCell">
                 <xsl:value-of select="$ConnectionsCell"/>
               </xsl:with-param>
               <xsl:with-param name="sheetNr">
@@ -1317,7 +1317,7 @@
               <xsl:with-param name="ConditionalCellStyle">
                 <xsl:value-of select="$ConditionalCellStyle"/>
               </xsl:with-param>
-              <xsl:with-param name="ConnecionsCell">
+              <xsl:with-param name="ConnectionsCell">
                 <xsl:value-of select="$ConnectionsCell"/>
               </xsl:with-param>
               <xsl:with-param name="ValidationCell">
@@ -1371,7 +1371,7 @@
                 <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
                 </xsl:with-param>
-                <xsl:with-param name="ConnecionsCell">
+                <xsl:with-param name="ConnectionsCell">
                   <xsl:value-of select="$ConnectionsCell"/>
                 </xsl:with-param>
                 <xsl:with-param name="ValidationCell">
@@ -1427,7 +1427,7 @@
                 <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
                 </xsl:with-param>
-                <xsl:with-param name="ConnecionsCell">
+                <xsl:with-param name="ConnectionsCell">
                   <xsl:value-of select="$ConnectionsCell"/>
                 </xsl:with-param>
                 <xsl:with-param name="ValidationCell">
@@ -1495,7 +1495,7 @@
             <xsl:with-param name="ConditionalCellStyle">
               <xsl:value-of select="$ConditionalCellStyle"/>
             </xsl:with-param>
-            <xsl:with-param name="ConnecionsCell">
+            <xsl:with-param name="ConnectionsCell">
               <xsl:value-of select="$ConnectionsCell"/>
             </xsl:with-param>
             <xsl:with-param name="ValidationCell">
@@ -1553,7 +1553,7 @@
           <xsl:with-param name="EndColl">
             <xsl:text>256</xsl:text>
           </xsl:with-param>
-          <xsl:with-param name="ConnecionsCell">
+          <xsl:with-param name="ConnectionsCell">
             <xsl:value-of select="$ConnectionsCell"/>
           </xsl:with-param>
           <xsl:with-param name="ValidationCell">

@@ -50,9 +50,9 @@
         </xsl:for-each>
     </xsl:template>
     
-    <xsl:template match="e:definedName" mode="connections">
+    <xsl:template match="e:definedName" mode="Connections">
         <xsl:param name="number"/>
-        <xsl:param name="ConncectionsCell"/>
+        <xsl:param name="ConnectionsCell"/>
 
         <xsl:choose>
             <xsl:when test="not(contains(@name, '_xlnm.Print_Titles')) and not(contains(@name, '_xlnm.Print_Area')) and @localSheetId = $number">
@@ -99,13 +99,13 @@
                             <xsl:with-param name="number">
                                 <xsl:value-of select="$number"/>                            
                             </xsl:with-param>
-                            <xsl:with-param name="ConncectionsCell">                            
+                            <xsl:with-param name="ConnectionsCell">                            
                                 <xsl:value-of select="$ConnectionsCellResult"/>
                             </xsl:with-param>
                         </xsl:apply-templates>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="concat($ConncectionsCell, $ConnectionsCellResult)"/>
+                        <xsl:value-of select="concat($ConnectionsCell, $ConnectionsCellResult)"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 
@@ -118,13 +118,13 @@
                             <xsl:with-param name="number">
                                 <xsl:value-of select="$number"/>                            
                             </xsl:with-param>
-                            <xsl:with-param name="ConncectionsCell">                            
-                                <xsl:value-of select="$ConncectionsCell"/>
+                            <xsl:with-param name="ConnectionsCell">                            
+                                <xsl:value-of select="$ConnectionsCell"/>
                             </xsl:with-param>
                         </xsl:apply-templates>        
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="$ConncectionsCell"/>
+                        <xsl:value-of select="$ConnectionsCell"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 
@@ -137,23 +137,22 @@
     <xsl:template name="InsertConnections">
         <xsl:param name="rowNum"/>
         <xsl:param name="colNum"/>
-        <xsl:param name="ConnecionsCell"/>
+        <xsl:param name="ConnectionsCell"/>
         <xsl:param name="sheetNr"/>
         
         <xsl:variable name="EndRow">
-            <xsl:value-of select="substring-before(substring-after(concat(';', $ConnecionsCell), concat(';', $rowNum, ':', $colNum, '-')), ':')"/>
+            <xsl:value-of select="substring-before(substring-after(concat(';', $ConnectionsCell), concat(';', $rowNum, ':', $colNum, '-')), ':')"/>
         </xsl:variable>
         
         <xsl:variable name="EndCol">
-            <xsl:value-of select="substring-before(substring-after(substring-after(concat(';', $ConnecionsCell), concat(';', $rowNum, ':', $colNum, '-')), ':'), '=')"/>
+            <xsl:value-of select="substring-before(substring-after(substring-after(concat(';', $ConnectionsCell), concat(';', $rowNum, ':', $colNum, '-')), ':'), '=')"/>
         </xsl:variable>
         
         <xsl:variable name="ConnectionName">
-            <xsl:value-of select="substring-before(substring-after(substring-after(concat(';', $ConnecionsCell), concat(';', $rowNum, ':', $colNum, '-')), '='), ';')"/>
+            <xsl:value-of select="substring-before(substring-after(substring-after(concat(';', $ConnectionsCell), concat(';', $rowNum, ':', $colNum, '-')), '='), ';')"/>
         </xsl:variable>
-        
-        
-        
+      
+     
         <table:cell-range-source table:filter-name="calc_HTML_WebQuery">
             
               <xsl:attribute name="table:last-row-spanned">
@@ -174,7 +173,7 @@
             </xsl:call-template>
             
         </table:cell-range-source>
-      
+
     </xsl:template>
     
     <!-- Insert connection properties -->
