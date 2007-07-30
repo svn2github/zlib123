@@ -169,9 +169,7 @@
                     />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of
-                      select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"
-                    />
+                    <xsl:value-of select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
@@ -188,9 +186,7 @@
                 />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of
-                  select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"
-                />
+                <xsl:value-of select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"/>
               </xsl:otherwise>
             </xsl:choose>            
           </xsl:otherwise>
@@ -308,12 +304,10 @@
                 <xsl:value-of
                   select="concat($StartRowNum, ':', $StartColNum, ';', '-', $dxfIdStyle, ';',$ConditionalCell)"
                 />
-                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of
-                  select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"
-                />
+                  select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
@@ -343,12 +337,9 @@
             <xsl:value-of
               select="concat($StartRowNum, ':', $StartColNum, ';', '-', $dxfIdStyle, ';',$ConditionalCell)"
             />
-            />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of
-              select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"
-            />
+            <xsl:value-of select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -373,14 +364,12 @@
                 <xsl:value-of
                   select="concat($StartRowNum, ':', $StartColNum, ';', '-', $dxfIdStyle, ';',$ConditionalCell)"
                 />
-                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of
-                  select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"
-                />
+                  select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"/>
               </xsl:otherwise>
-            </xsl:choose>            
+            </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="StartRowNum">
             <xsl:value-of select="$StartRowNum "/>
@@ -408,12 +397,9 @@
             <xsl:value-of
               select="concat($StartRowNum, ':', $StartColNum, ';', '-', $dxfIdStyle, ';',$ConditionalCell)"
             />
-            />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of
-              select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"
-            />
+            <xsl:value-of select="concat($StartRowNum, ':', $StartColNum, ';', $ConditionalCell)"/>
           </xsl:otherwise>
         </xsl:choose>        
       </xsl:otherwise>
@@ -548,8 +534,7 @@
         <xsl:when test="@operator='between'">
           <xsl:attribute name="style:condition">
             <xsl:value-of
-              select="concat('cell-content-is-between(', e:formula, ',', e:formula[2], ')') "
-            />
+              select="concat('cell-content-is-between(', e:formula, ',', e:formula[2], ')') "/>
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="@operator='notBetween'">
@@ -645,10 +630,10 @@
            <xsl:call-template name="InsertConditional"/>
          </xsl:for-each>
        </style:style>
-     
-   </xsl:if>
-    
-   </xsl:template>
-  
+
+    </xsl:if>
+
+  </xsl:template>
+
 
 </xsl:stylesheet>
