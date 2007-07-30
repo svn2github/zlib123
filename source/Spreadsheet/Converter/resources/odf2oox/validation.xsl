@@ -38,7 +38,7 @@
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     exclude-result-prefixes="table r">
     <xsl:import href="conditional.xsl"/>
-    
+
     <!-- search validation -->
     <xsl:template match="table:table-row" mode="validation">
         <xsl:param name="rowNumber"/>
@@ -46,8 +46,9 @@
         <xsl:param name="TableColumnTagNum"/>
         <xsl:param name="MergeCell"/>
         <xsl:param name="tableName"/>
-        
-        <xsl:apply-templates select="child::node()[name() = 'table:table-cell'][1]" mode="validation">
+
+        <xsl:apply-templates select="child::node()[name() = 'table:table-cell'][1]"
+            mode="validation">
             <xsl:with-param name="colNumber">
                 <xsl:text>0</xsl:text>
             </xsl:with-param>
@@ -56,12 +57,13 @@
             <xsl:with-param name="MergeCell" select="$MergeCell"/>
             <xsl:with-param name="tableName" select="$tableName"/>
         </xsl:apply-templates>
-        
+
         <!-- check next row -->
         <xsl:choose>
             <!-- next row is a sibling -->
             <xsl:when test="following-sibling::node()[1][name() = 'table:table-row' ]">
-                <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="validation">
+                <xsl:apply-templates select="following-sibling::table:table-row[1]"
+                    mode="validation">
                     <xsl:with-param name="rowNumber">
                         <xsl:choose>
                             <xsl:when test="@table:number-rows-repeated">
@@ -80,84 +82,8 @@
                     <xsl:with-param name="tableName" select="$tableName"/>
                 </xsl:apply-templates>
             </xsl:when>
-            
-            <!-- next row is inside header rows -->
-            <!--xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
-                <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
-                    mode="conditional">
-                    <xsl:with-param name="rowNumber">
-                        <xsl:choose>
-                            <xsl:when test="@table:number-rows-repeated">
-                                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="$rowNumber+1"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:with-param>
-                    <xsl:with-param name="cellNumber">
-                        <xsl:text>0</xsl:text>
-                    </xsl:with-param>
-                    <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
-                    <xsl:with-param name="MergeCell" select="$MergeCell"/>
-                    <xsl:with-param name="tableName" select="$tableName"/>
-                </xsl:apply-templates>
-            </xsl:when-->
-            <!-- this is last row inside header rows, next row is outside -->
-            <!--xsl:when
-                test="parent::node()[name()='table:table-header-rows'] and not(following-sibling::node()[1][name() = 'table:table-row' ])">
-                <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
-                    mode="conditional">
-                    <xsl:with-param name="rowNumber">
-                        <xsl:choose>
-                            <xsl:when test="@table:number-rows-repeated">
-                                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="$rowNumber+1"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:with-param>
-                    <xsl:with-param name="cellNumber">
-                        <xsl:text>0</xsl:text>
-                    </xsl:with-param>
-                    <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
-                    <xsl:with-param name="MergeCell" select="$MergeCell"/>
-                    <xsl:with-param name="tableName" select="$tableName"/>
-                </xsl:apply-templates>
-            </xsl:when-->
         </xsl:choose>
     </xsl:template>
-    
-    <!--xsl:template match="table:covered-table-cell" mode="conditional">
-        <xsl:param name="colNumber"/>
-        <xsl:param name="rowNumber"/>
-        <xsl:param name="TableColumnTagNum"/>
-        <xsl:param name="MergeCell"/>
-        <xsl:param name="tableName"/>
-        <xsl:if test="following-sibling::table:table-cell">
-            <xsl:apply-templates
-                select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]"
-                mode="conditional">
-                <xsl:with-param name="colNumber">
-                    <xsl:choose>
-                        <xsl:when test="@table:number-columns-repeated != ''">
-                            <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="$colNumber + 1"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="rowNumber">
-                    <xsl:value-of select="$rowNumber"/>
-                </xsl:with-param>
-                <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
-                <xsl:with-param name="MergeCell" select="$MergeCell"/>
-                <xsl:with-param name="tableName" select="$tableName"/>
-            </xsl:apply-templates>
-        </xsl:if>
-        </xsl:template-->
     
     <!-- insert validation -->
     <xsl:template match="table:table-cell" mode="validation">
@@ -166,46 +92,50 @@
         <xsl:param name="TableColumnTagNum"/>
         <xsl:param name="MergeCell"/>
         <xsl:param name="tableName"/>
-        
+
         <xsl:if test="@table:content-validation-name != ''">
-            
+
             <xsl:variable name="ValidationName">
                 <xsl:value-of select="@table:content-validation-name"/>
             </xsl:variable>
-            
+
             <xsl:variable name="RowsRepeated">
                 <xsl:value-of select="parent::table:table-row/@table:number-rows-repeated"/>
             </xsl:variable>
-            
+
             <xsl:variable name="CollRepeated">
-                <xsl:value-of select="@table:number-columns-repeated"/>    
+                <xsl:value-of select="@table:number-columns-repeated"/>
             </xsl:variable>
-            
+
             <xsl:for-each
                 select="ancestor::office:body/office:spreadsheet/table:content-validations/table:content-validation[@table:name = $ValidationName]">
-                 <xsl:call-template name="dataValid">
-                     <xsl:with-param name="rowNumber">
-                         <xsl:value-of select="$rowNumber"/>
-                     </xsl:with-param>
-                     <xsl:with-param name="colNumber">
-                         <xsl:value-of select="$colNumber"/>
-                     </xsl:with-param>
-                     <xsl:with-param name="RowsRepeated">
-                         <xsl:value-of select="$RowsRepeated"/>
-                     </xsl:with-param>
-                     <xsl:with-param name="CollRepeated">
-                         <xsl:value-of select="$CollRepeated"/>
-                     </xsl:with-param>
-                 </xsl:call-template>
+                <xsl:call-template name="dataValid">
+                    <xsl:with-param name="rowNumber">
+                        <xsl:value-of select="$rowNumber"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="colNumber">
+                        <xsl:value-of select="$colNumber"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="RowsRepeated">
+                        <xsl:value-of select="$RowsRepeated"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="CollRepeated">
+                        <xsl:value-of select="$CollRepeated"/>
+                    </xsl:with-param>
+                </xsl:call-template>
             </xsl:for-each>
         </xsl:if>
-        
+
         <xsl:if test="following-sibling::table:table-cell">
-            <xsl:apply-templates select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]" mode="validation">
+            <xsl:apply-templates
+                select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]"
+                mode="validation">
                 <xsl:with-param name="colNumber">
                     <xsl:choose>
                         <xsl:when test="@table:number-columns-repeated != ''">
-                            <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
+                            <xsl:value-of
+                                select="number($colNumber) + number(@table:number-columns-repeated)"
+                            />
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="$colNumber + 1"/>
@@ -220,16 +150,16 @@
                 <xsl:with-param name="tableName" select="$tableName"/>
             </xsl:apply-templates>
         </xsl:if>
-        
+
     </xsl:template>
-    
-   <!-- Data Validation Template --> 
-    <xsl:template name="dataValid">      
+
+    <!-- Data Validation Template -->
+    <xsl:template name="dataValid">
         <xsl:param name="colNumber"/>
         <xsl:param name="rowNumber"/>
         <xsl:param name="RowsRepeated"/>
         <xsl:param name="CollRepeated"/>
-        
+
         <dataValidation>
             <!-- Criteria Allow -->
             <xsl:attribute name="type">
@@ -257,7 +187,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
-            
+
             <!-- Error Allert Action-->
             <xsl:for-each select="table:error-message">
                 <xsl:attribute name="errorStyle">
@@ -275,7 +205,7 @@
                     </xsl:choose>
                 </xsl:attribute>
             </xsl:for-each>
-            
+
             <!-- Criteria Data -->
             <xsl:attribute name="operator">
                 <xsl:choose>
@@ -305,7 +235,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
-            
+
             <!-- Criteria Allow Blank Cells -->
             <xsl:choose>
                 <xsl:when test="contains(@table:allow-empty-cell, 'true')">
@@ -315,7 +245,7 @@
                 </xsl:when>
                 <xsl:otherwise/>
             </xsl:choose>
-            
+
             <!-- Input Help - Show input help when cell is selected -->
             <xsl:for-each select="table:help-message">
                 <xsl:choose>
@@ -326,18 +256,18 @@
                     </xsl:when>
                     <xsl:otherwise/>
                 </xsl:choose>
-                
+
                 <!-- Input Help Title -->
                 <xsl:attribute name="promptTitle">
                     <xsl:value-of select="@table:title"/>
                 </xsl:attribute>
-                
+
                 <!-- Input Help - input help -->
                 <xsl:attribute name="prompt">
                     <xsl:value-of select="."/>
                 </xsl:attribute>
             </xsl:for-each>
-            
+
             <!-- Show error message wheninvalid values are entered -->
             <xsl:for-each select="table:error-message">
                 <xsl:choose>
@@ -348,18 +278,18 @@
                     </xsl:when>
                     <xsl:otherwise/>
                 </xsl:choose>
-                
+
                 <!-- Error Allert Title -->
                 <xsl:attribute name="errorTitle">
                     <xsl:value-of select="@table:title"/>
                 </xsl:attribute>
-                
+
                 <!-- Error Allert message -->
                 <xsl:attribute name="error">
                     <xsl:value-of select="substring(., 1, 255)"/>
                 </xsl:attribute>
             </xsl:for-each>
-            
+
             <!-- Converts number of column on letter -->
             <xsl:variable name="Collnumber2Char">
                 <xsl:call-template name="NumbersToChars">
@@ -368,13 +298,13 @@
                     </xsl:with-param>
                 </xsl:call-template>
             </xsl:variable>
-            
+
             <!-- Defines range of cells -->
             <xsl:attribute name="sqref">
-                
+
                 <xsl:choose>
                     <xsl:when test="$RowsRepeated !='' and $CollRepeated !='' ">
-                        <xsl:variable name="RownumberEnd">                                
+                        <xsl:variable name="RownumberEnd">
                             <xsl:value-of select="$rowNumber + $RowsRepeated"/>
                         </xsl:variable>
                         <xsl:variable name="CollnumberEnd2Char">
@@ -384,16 +314,20 @@
                                 </xsl:with-param>
                             </xsl:call-template>
                         </xsl:variable>
-                        <xsl:value-of select="concat((concat((concat($Collnumber2Char, $rowNumber)), ':')), concat($CollnumberEnd2Char, $RownumberEnd))"/>
+                        <xsl:value-of
+                            select="concat((concat((concat($Collnumber2Char, $rowNumber)), ':')), concat($CollnumberEnd2Char, $RownumberEnd))"
+                        />
                     </xsl:when>
-                    
+
                     <xsl:when test="$RowsRepeated !='' and $CollRepeated =''">
-                        <xsl:variable name="RownumberEnd">                                
+                        <xsl:variable name="RownumberEnd">
                             <xsl:value-of select="$rowNumber + $RowsRepeated - 1"/>
                         </xsl:variable>
-                        <xsl:value-of select="concat((concat((concat($Collnumber2Char, $rowNumber)), ':')), concat($Collnumber2Char, $RownumberEnd))"/>
+                        <xsl:value-of
+                            select="concat((concat((concat($Collnumber2Char, $rowNumber)), ':')), concat($Collnumber2Char, $RownumberEnd))"
+                        />
                     </xsl:when>
-                    
+
                     <xsl:when test="$RowsRepeated ='' and $CollRepeated !=''">
                         <xsl:variable name="CollnumberEnd2Char">
                             <xsl:call-template name="NumbersToChars">
@@ -402,24 +336,26 @@
                                 </xsl:with-param>
                             </xsl:call-template>
                         </xsl:variable>
-                        <xsl:value-of select="concat((concat((concat($Collnumber2Char, $rowNumber)), ':')), concat($CollnumberEnd2Char, $rowNumber))"/>
+                        <xsl:value-of
+                            select="concat((concat((concat($Collnumber2Char, $rowNumber)), ':')), concat($CollnumberEnd2Char, $rowNumber))"
+                        />
                     </xsl:when>
-                    
+
                     <xsl:otherwise>
-                        <xsl:value-of select="concat($Collnumber2Char, $rowNumber)"/>        
+                        <xsl:value-of select="concat($Collnumber2Char, $rowNumber)"/>
                     </xsl:otherwise>
                 </xsl:choose>
-            
+
             </xsl:attribute>
-            
+
             <!-- inserts formula template -->
             <xsl:call-template name="InsertValidityFormula">
                 <xsl:with-param name="tableName" select="@table:name"/>
             </xsl:call-template>
-        
+
         </dataValidation>
     </xsl:template>
-    
+
     <!-- Insert Criteria Formula of Data Validation -->
     <xsl:template name="InsertValidityFormula">
         <xsl:param name="tableName"/>
@@ -433,7 +369,7 @@
             <xsl:when test="contains(@table:condition, 'is-true-formula')">
                 <formula1/>
             </xsl:when>
-            
+
             <!-- Condition: Cell content is less than or equal to-->
             <xsl:when test="contains(@table:condition, '&lt;=')">
                 <formula1>
@@ -518,25 +454,9 @@
                     </xsl:call-template>
                 </formula2>
             </xsl:when>
-
-            <xsl:otherwise>
-                <formula1>
-                    <!--          <xsl:choose>
-                        <xsl:when test="contains(@style:condition, '[')">
-                        <xsl:value-of
-                        select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
-                        />
-                        </xsl:when>
-                        <xsl:otherwise>
-                        <xsl:value-of select="substring-after(@style:condition, '=')"/>
-                        </xsl:otherwise>
-                        </xsl:choose>-->
-                </formula1>
-            </xsl:otherwise>
+        
         </xsl:choose>
     </xsl:template>
-
-
 
     <xsl:template name="TranslateReferences">
         <xsl:param name="string"/>
@@ -552,7 +472,7 @@
                 <xsl:variable name="reference">
                     <xsl:value-of select="substring-before(substring-after($string,'['),']')"/>
                 </xsl:variable>
-                
+
                 <xsl:choose>
                     <!-- when reference is to a cell in the same sheet ($sheet_name.ref or .ref)-->
                     <xsl:when
@@ -574,7 +494,8 @@
                             <xsl:choose>
                                 <xsl:when test="starts-with($reference,'$')">
                                     <xsl:value-of
-                                        select="substring-after(substring-before($reference,'.'),'$')"/>
+                                        select="substring-after(substring-before($reference,'.'),'$')"
+                                    />
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="substring-before($reference,'.')"/>
@@ -605,10 +526,6 @@
                             </xsl:for-each>
                         </xsl:variable>
 
-                        <!--            <xsl:value-of select="$refSheetNumber"/>
-                            <xsl:text>####</xsl:text>
-                            <xsl:value-of select="$checkedName"/>-->
-                        <!--<xsl:value-of select="$sheet"/>-->
                         <xsl:call-template name="TranslateReferences">
                             <xsl:with-param name="string">
                                 <xsl:value-of select="substring-before($string,'[')"/>
@@ -629,11 +546,11 @@
                     </xsl:when>
                 </xsl:choose>
             </xsl:when>
-            
+
             <xsl:otherwise>
                 <xsl:value-of select="$string"/>
             </xsl:otherwise>
-            
+
         </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>
