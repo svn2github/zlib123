@@ -234,30 +234,7 @@
                 </xsl:with-param>
             </xsl:call-template>
         </xsl:variable>
-
-        <xsl:variable name="RepeatRowValidation">
-            <!--xsl:call-template name="RepeatRowValidation">
-                <xsl:with-param name="StartColNum">
-                    <xsl:value-of select="$StartColNum"/>
-                </xsl:with-param>
-                <xsl:with-param name="EndColNum">
-                    <xsl:value-of select="$EndColNum"/>
-                </xsl:with-param>
-                <xsl:with-param name="StartRowNum">
-                    <xsl:value-of select="$StartRowNum"/>
-                </xsl:with-param>
-                <xsl:with-param name="EndRowNum">
-                    <xsl:value-of select="$EndRowNum"/>
-                </xsl:with-param>
-                <xsl:with-param name="document">
-                    <xsl:value-of select="$document"/>
-                </xsl:with-param>
-                <xsl:with-param name="dxfIdStyle">
-                    <xsl:value-of select="$dxfIdStyle"/>
-                </xsl:with-param>
-            </xsl:call-template-->
-        </xsl:variable>
-
+        
         <xsl:variable name="RepeatColValidation">
             <xsl:call-template name="RepeatColValidation">
                 <xsl:with-param name="StartColNum">
@@ -281,7 +258,7 @@
             </xsl:call-template>
         </xsl:variable>
 
-        <xsl:value-of select="concat($ValidationCell, $RepeatColValidation, $RepeatRowValidation)"/>
+        <xsl:value-of select="concat($ValidationCell, $RepeatColValidation)"/>
 
     </xsl:template>
 
@@ -355,22 +332,19 @@
 
         <xsl:choose>
             <xsl:when test="$StartColNum &lt;= $EndColNum">
-
+                
                 <xsl:call-template name="RepeatColValidation">
                     <xsl:with-param name="ValidationCell">
-
+                        
                         <xsl:call-template name="RepeatRowValidation">
                             <xsl:with-param name="ValidationCell">
                                 <xsl:choose>
                                     <xsl:when test="$document='style'">
-                                        <xsl:value-of
-                                            select="concat($StartRowNum, ':', $StartColNum, ';', '-', $dxfIdStyle, ';',$ValidationCell)"
-                                        />
+                                        <xsl:value-of select="concat($StartRowNum, ':', $StartColNum, ';', '-', $dxfIdStyle, ';',$ValidationCell)"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of
-                                            select="concat($StartRowNum, ':', $StartColNum, ';', $ValidationCell)"
-                                        />
+                                            select="concat($StartRowNum, ':', $StartColNum, ';', $ValidationCell)"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:with-param>
@@ -414,9 +388,7 @@
                         <xsl:value-of select="$dxfIdStyle"/>
                     </xsl:with-param>
                 </xsl:call-template>
-
-
-
+            
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
@@ -443,8 +415,7 @@
                     </xsl:with-param>
                     <xsl:with-param name="Result">
                         <xsl:value-of
-                            select="concat($Result,  concat(substring-before($ValidationCell, ':'), ';'))"
-                        />
+                            select="concat($Result,  concat(substring-before($ValidationCell, ':'), ';'))"/>
                     </xsl:with-param>
                 </xsl:call-template>
             </xsl:when>
@@ -477,17 +448,13 @@
                 <xsl:call-template name="ValidationCell"/>
             </xsl:for-each>
         </xsl:variable>
-
-
+        
         <xsl:for-each select="document(concat('xl/',$Id))">
-
             <xsl:apply-templates select="e:worksheet/e:dataValidations " mode="Validation">
                 <xsl:with-param name="sheet">
                     <xsl:value-of select="$number"/>
                 </xsl:with-param>
             </xsl:apply-templates>
-
-
         </xsl:for-each>
 
         <!-- Insert next Table -->
@@ -497,7 +464,6 @@
                 <xsl:value-of select="$number + 1"/>
             </xsl:with-param>
         </xsl:apply-templates>
-
     </xsl:template>
 
     <xsl:template match="e:dataValidations" mode="Validation">
@@ -534,7 +500,7 @@
 
                 <!-- Criteria Data -->
                 <xsl:attribute name="table:condition">
-
+                    
                     <xsl:choose>
                         <xsl:when test="contains(@type, 'whole')">
                             <xsl:text>oooc:cell-content-is-whole-number()</xsl:text>
@@ -548,7 +514,6 @@
                         <xsl:when test="contains(@type, 'time')">
                             <xsl:text>oooc:cell-content-is-time()</xsl:text>
                         </xsl:when>
-
                         <xsl:otherwise/>
                     </xsl:choose>
 
@@ -561,13 +526,11 @@
                             <xsl:choose>
                                 <xsl:when test="contains(@operator, 'notBetween')">
                                     <xsl:value-of
-                                        select="concat('oooc:cell-content-text-length-is-not-between(', e:formula1, ',', e:formula2, ')') "
-                                    />
+                                        select="concat('oooc:cell-content-text-length-is-not-between(', e:formula1, ',', e:formula2, ')') "/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of
-                                        select="concat('oooc:cell-content-text-length-is-between(', e:formula1, ',', e:formula2, ')') "
-                                    />
+                                        select="concat('oooc:cell-content-text-length-is-between(', e:formula1, ',', e:formula2, ')') "/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:if>
@@ -582,14 +545,12 @@
                         <xsl:when
                             test="contains(@type, 'textLength') and contains(@operator, 'lessThanOrEqual')">
                             <xsl:value-of
-                                select="concat('oooc:cell-content-text-length()&lt;=',$valuue)"
-                            />
+                                select="concat('oooc:cell-content-text-length()&lt;=',$valuue)"/>
                         </xsl:when>
                         <xsl:when
                             test="contains(@type, 'textLength') and contains(@operator, 'greaterThanOrEqual')">
                             <xsl:value-of
-                                select="concat('oooc:cell-content-text-length()&gt;=',$valuue)"
-                            />
+                                select="concat('oooc:cell-content-text-length()&gt;=',$valuue)"/>
                         </xsl:when>
                         <xsl:when
                             test="contains(@type, 'textLength') and contains(@operator, 'greaterThan')">
@@ -620,13 +581,11 @@
                                     <xsl:choose>
                                         <xsl:when test="contains(@operator, 'notBetween')">
                                             <xsl:value-of
-                                                select="concat(' and cell-content-is-not-between(', e:formula1, ',', e:formula2, ')') "
-                                            />
+                                                select="concat(' and cell-content-is-not-between(', e:formula1, ',', e:formula2, ')') "/>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:value-of
-                                                select="concat(' and cell-content-is-between(', e:formula1, ',', e:formula2, ')') "
-                                            />
+                                                select="concat(' and cell-content-is-between(', e:formula1, ',', e:formula2, ')') "/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xsl:if>
@@ -672,8 +631,7 @@
                                     <xsl:value-of select="e:formula1"/>
                                 </xsl:variable>
                                 <xsl:value-of
-                                    select="concat('oooc:cell-content-is-in-list(&quot;',$ListValue,'&quot;)')"
-                                />
+                                    select="concat('oooc:cell-content-is-in-list(&quot;',$ListValue,'&quot;)')"/>
                             </xsl:attribute>
                         </xsl:when>
                     </xsl:choose>
@@ -699,7 +657,6 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-
                 </xsl:if>
 
                 <!-- Criteria Allow Blank Cells -->
