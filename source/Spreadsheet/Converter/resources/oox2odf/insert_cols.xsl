@@ -39,10 +39,7 @@
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
 
-
-
-
-  <xsl:template match="e:col" mode="header">
+<xsl:template match="e:col" mode="header">
     <xsl:param name="number"/>
     <xsl:param name="sheet"/>
     <xsl:param name="DefaultCellStyleName"/>
@@ -183,13 +180,8 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
-
     </xsl:choose>
-
   </xsl:template>
-
-
-
 
   <xsl:template match="e:col">
     <xsl:param name="number"/>
@@ -216,19 +208,15 @@
               <xsl:text>1</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
 
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>
       <!-- when this column is the first non-default one but it's not the column A -->
       <xsl:when
         test="$number = 1 and @min &gt; 1 and ($headerColsStart= '' or $headerColsStart &gt; 1)">
-
-
         <xsl:call-template name="InsertColBreak">
           <xsl:with-param name="ManualColBreaks">
             <xsl:value-of select="$ManualColBreaks"/>
@@ -242,22 +230,23 @@
           <xsl:with-param name="DefaultCellStyleName">
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:with-param>
+        
         </xsl:call-template>
 
         <xsl:variable name="ManualCol">
-            <xsl:call-template name="GetMaxValueBetweenTwoValues">
-              <xsl:with-param name="min">
-                <xsl:value-of select="preceding-sibling::e:col/@max +1"/>
-              </xsl:with-param>
-              <xsl:with-param name="max">
-                <xsl:value-of select="@min"/>
-              </xsl:with-param>
-              <xsl:with-param name="value">
-                <xsl:value-of select="$ManualColBreaks"/>                
-              </xsl:with-param>
-            </xsl:call-template>
+          <xsl:call-template name="GetMaxValueBetweenTwoValues">
+            <xsl:with-param name="min">
+              <xsl:value-of select="preceding-sibling::e:col/@max +1"/>
+            </xsl:with-param>
+            <xsl:with-param name="max">
+              <xsl:value-of select="@min"/>
+            </xsl:with-param>
+            <xsl:with-param name="value">
+              <xsl:value-of select="$ManualColBreaks"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:variable>
-        
+
         <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="document(concat('xl/',$sheet))">
@@ -268,7 +257,7 @@
           <xsl:attribute name="table:default-cell-style-name">
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:attribute>
-          
+
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:choose>
               <!-- when there is a header -->
@@ -313,7 +302,7 @@
       </xsl:when>
       <!-- when this column is not first non-default one and there were default columns after previous non-default column (if there was a gap between this and previous column)-->
       <xsl:when test="preceding-sibling::e:col[1]/@max &lt; @min - 1">
-        
+
         <xsl:call-template name="InsertColBreak">
           <xsl:with-param name="ManualColBreaks">
             <xsl:value-of select="$ManualColBreaks"/>
@@ -327,8 +316,9 @@
           <xsl:with-param name="DefaultCellStyleName">
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:with-param>
-        </xsl:call-template>
         
+        </xsl:call-template>
+
         <xsl:variable name="ManualCol">
           <xsl:call-template name="GetMaxValueBetweenTwoValues">
             <xsl:with-param name="min">
@@ -338,11 +328,11 @@
               <xsl:value-of select="@min"/>
             </xsl:with-param>
             <xsl:with-param name="value">
-              <xsl:value-of select="$ManualColBreaks"/>                
+              <xsl:value-of select="$ManualColBreaks"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:choose>
           <!-- when there is a header -->
           <xsl:when test="$headerColsStart != '' ">
@@ -430,7 +420,7 @@
                   <xsl:otherwise>
                     <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
                   </xsl:otherwise>
-                </xsl:choose>                
+                </xsl:choose>
               </xsl:attribute>
 
               <xsl:attribute name="table:default-cell-style-name">
@@ -738,14 +728,19 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <xsl:template name="InsertColBreak">
     <xsl:param name="GetMinManualColBreak"/>
     <xsl:param name="ManualColBreaks"/>
     <xsl:param name="sheet"/>
     <xsl:param name="DefaultCellStyleName"/>
     <xsl:param name="prevManualBreak" select="0"/>
+    <xsl:param name="GetFirstManualColBreakAfterColWithStyle"/>
+    <xsl:param name="GetLastManualBreak"/>
+    
     <xsl:choose>
+
+      <!-- if manual colBreak ist  first after default cols -->
       <xsl:when test="@min &gt; $GetMinManualColBreak and not(preceding-sibling::e:col)">
 
         <table:table-column>
@@ -800,20 +795,8 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+
+      <!-- manual colBreak between styled cols -->
       <xsl:when test="@min &gt; $GetMinManualColBreak and preceding-sibling::e:col">
         <table:table-column>
           <xsl:attribute name="table:style-name">
@@ -821,11 +804,11 @@
               <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
             </xsl:for-each>
           </xsl:attribute>
-          
+
           <xsl:attribute name="table:default-cell-style-name">
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:attribute>
-          
+
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:choose>
               <xsl:when test="$prevManualBreak &gt; 0">
@@ -835,30 +818,16 @@
                 <xsl:value-of select="$GetMinManualColBreak - preceding::e:col[1]/@max"/>
               </xsl:otherwise>
             </xsl:choose>
-            
-
-            
-<!-- 
-              GetMinManualColBreak<xsl:value-of select="$GetMinManualColBreak"/>
-              prevManualBreak<xsl:value-of select="$prevManualBreak"/>
-              ManualColBreaks<xsl:value-of select="$ManualColBreaks"/>
-              preceding::e:col[1]/@min<xsl:value-of select="preceding::e:col[1]/@min"/>
-              preceding::e:col[1]/@max<xsl:value-of select="preceding::e:col[1]/@max"/>
-              preceding-sibling::e:col[1]/@min<xsl:value-of select="preceding-sibling::e:col[1]/@min"/>
-              preceding-sibling::e:col[1]/@max<xsl:value-of select="preceding-sibling::e:col[1]/@max"/>
--->
-            
           </xsl:attribute>
-
         </table:table-column>
-        
+
         <table:table-column
           table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}">
           <xsl:attribute name="table:default-cell-style-name">
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:attribute>
         </table:table-column>
-        
+
         <xsl:variable name="GetTemplate_GetMinRowWithPicture">
           <xsl:call-template name="GetMinRowWithPicture">
             <xsl:with-param name="PictureRow">
@@ -869,7 +838,7 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:call-template name="InsertColBreak">
           <xsl:with-param name="ManualColBreaks">
             <xsl:value-of select="$ManualColBreaks"/>
@@ -889,20 +858,71 @@
         </xsl:call-template>
       </xsl:when>
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+      <!-- manual Breake at the end  -->
+      <xsl:when test="$GetLastManualBreak &gt;= $prevManualBreak">
+        
+        <xsl:variable name="GetNextManualColBreake">
+          <xsl:call-template name="GetMinRowWithPicture">
+            <xsl:with-param name="PictureRow">
+              <xsl:value-of select="$ManualColBreaks"/>
+            </xsl:with-param>
+            <xsl:with-param name="AfterRow">
+              <xsl:value-of select="$GetFirstManualColBreakAfterColWithStyle + 1"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <table:table-column>
+          <xsl:attribute name="table:style-name">
+            <xsl:for-each select="document(concat('xl/',$sheet))">
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+            </xsl:for-each>
+          </xsl:attribute>
+          
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+          
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:choose>
+              <xsl:when test="$GetNextManualColBreake">
+                <xsl:value-of select="$GetNextManualColBreake - $prevManualBreak"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$GetNextManualColBreake - $GetFirstManualColBreakAfterColWithStyle"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </table:table-column>
+       
+        <table:table-column
+          table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}">
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+        </table:table-column>
+        
+        <xsl:call-template name="InsertColBreak">
+          <xsl:with-param name="ManualColBreaks">
+            <xsl:value-of select="$ManualColBreaks"/>
+          </xsl:with-param>
+          <xsl:with-param name="GetFirstManualColBreakAfterColWithStyle">
+            <xsl:value-of select="$GetNextManualColBreake"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="DefaultCellStyleName">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:with-param>
+          <xsl:with-param name="prevManualBreak">
+            <xsl:value-of select="$GetNextManualColBreake + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="GetLastManualBreak">
+            <xsl:value-of select="$GetLastManualBreak"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
@@ -1065,6 +1085,80 @@
 
     <!-- apply default column style for last columns which style wasn't changed -->
     <xsl:for-each select="document(concat('xl/',$sheet))">
+      
+      <xsl:variable name="GetMinColAfterMaxColStyle">
+        <xsl:value-of select="key('Col', '')[last()]/@max"/>
+      </xsl:variable>
+
+      <xsl:variable name="GetFirstManualColBreakAfterColWithStyle">
+        <xsl:call-template name="GetMinRowWithPicture">
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="$ManualColBreaks"/>
+          </xsl:with-param>
+          <xsl:with-param name="AfterRow">
+            <xsl:choose>
+              <xsl:when test="$GetMinColAfterMaxColStyle">
+                <xsl:value-of select="$GetMinColAfterMaxColStyle"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>1</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="GetLastManualBreak">
+        <xsl:value-of select="e:worksheet/e:colBreaks/e:brk[last()]/@id"/>
+      </xsl:variable>
+
+      <xsl:if test="$GetFirstManualColBreakAfterColWithStyle &gt; $GetMinColAfterMaxColStyle">
+        <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+          table:number-columns-repeated="{$GetFirstManualColBreakAfterColWithStyle - $GetMinColAfterMaxColStyle}">
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+        </table:table-column>
+        <table:table-column
+          table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}">
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+        </table:table-column>
+      </xsl:if>
+      
+      <xsl:choose>
+        <xsl:when test="$GetLastManualBreak &gt;= $GetFirstManualColBreakAfterColWithStyle">
+
+        <xsl:call-template name="InsertColBreak">
+
+          <xsl:with-param name="GetLastManualBreak">
+            <xsl:value-of select="$GetLastManualBreak"/>
+          </xsl:with-param>
+          
+          <xsl:with-param name="ManualColBreaks">
+            <xsl:value-of select="$ManualColBreaks"/>
+          </xsl:with-param>
+
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="DefaultCellStyleName">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:with-param>
+          
+          <xsl:with-param name="prevManualBreak">
+            <xsl:value-of select="$GetFirstManualColBreakAfterColWithStyle +1"/>
+          </xsl:with-param>
+          
+          <xsl:with-param name="GetFirstManualColBreakAfterColWithStyle">
+            <xsl:value-of select="$GetFirstManualColBreakAfterColWithStyle"/>
+          </xsl:with-param>
+
+        </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+      
       <xsl:choose>
         <xsl:when
           test="$headerColsStart != '' and not(key('Col', '')[@max &gt; $headerColsEnd])">
@@ -1189,9 +1283,9 @@
         </xsl:attribute>
       </xsl:if>
     </table:table-column>
-    
+
     <!-- Insert Group End -->
-    
+
     <xsl:if test="contains(concat(';', $GroupCell), concat(':', @max, ';'))">
       <xsl:call-template name="InsertColumnGroupEnd">
         <xsl:with-param name="GroupCell">
@@ -1199,9 +1293,9 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="GetMaxValueBetweenTwoValues">
     <xsl:param name="max"/>
     <xsl:param name="min"/>
@@ -1211,7 +1305,7 @@
     <xsl:variable name="FirstValue">
       <xsl:value-of select="substring-before($value, ';')"/>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="$value = ''">
         <xsl:value-of select="$result"/>
@@ -1229,23 +1323,17 @@
           </xsl:with-param>
           <xsl:with-param name="result">
             <xsl:choose>
-              <xsl:when test="($FirstValue &gt; $result) and ($FirstValue &gt;= $min) and ($FirstValue &lt;= $max)">
+              <xsl:when
+                test="($FirstValue &gt; $result) and ($FirstValue &gt;= $min) and ($FirstValue &lt;= $max)">
                 <xsl:value-of select="$FirstValue"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$result"/>
               </xsl:otherwise>
-            </xsl:choose>    
-          </xsl:with-param>              
+            </xsl:choose>
+          </xsl:with-param>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
-    
-    
-    
-    
-    
-    
   </xsl:template>
-
 </xsl:stylesheet>
