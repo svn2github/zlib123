@@ -834,9 +834,15 @@
 
   <xsl:template name="InsertWallProperties">
     <!-- c:chartSpace/c:chart/c:backWall -->
+    <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:spPr">
     <style:style style:name="wall" style:family="chart">
-      <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+      <style:graphic-properties>
+        <!-- Insert Borders Wall style, color, fill, transparency -->        
+        <xsl:call-template name="InsertLineColor"/>
+        <xsl:call-template name="InsertLineStyle"/>
+      </style:graphic-properties>
     </style:style>
+      </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertFloorProperties">
