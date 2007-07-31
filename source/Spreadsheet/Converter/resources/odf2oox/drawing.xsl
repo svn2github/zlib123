@@ -1028,6 +1028,17 @@
                 </xsl:choose>
               </xsl:attribute>
                 
+                <xsl:if test="@svg:stroke-opacity != ''">
+                  <xsl:variable name="transparency">
+                    <xsl:value-of select="substring-before(@svg:stroke-opacity, '%')"/>
+                  </xsl:variable>
+                  <a:alpha>
+                    <xsl:attribute name="val">
+                      <xsl:value-of select="$transparency * 1000"/>
+                    </xsl:attribute>
+                  </a:alpha>
+                </xsl:if>
+                
               </a:srgbClr>
               </a:solidFill>
           </xsl:when>
