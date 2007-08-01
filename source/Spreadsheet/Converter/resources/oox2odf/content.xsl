@@ -404,6 +404,11 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <xsl:variable name="AllRowBreakes">
+      <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:rowBreaks/e:brk">
+        <xsl:value-of select="concat(@id + 1,';')"/>
+      </xsl:for-each>
+    </xsl:variable>
 
     <table:table>
 
@@ -488,15 +493,15 @@
 
       </xsl:for-each>
 
-      
+
       <xsl:variable name="GroupRowStart">
         <xsl:call-template name="GroupRow">
           <xsl:with-param name="Id">
             <xsl:value-of select="$Id"/>
           </xsl:with-param>
-        </xsl:call-template>        
+        </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:variable name="GroupRowEnd">
         <xsl:call-template name="GroupRowEnd">
           <xsl:with-param name="Id">
@@ -504,7 +509,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:apply-templates
         select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1]"
         mode="PrintArea">
@@ -574,6 +579,9 @@
         </xsl:with-param>
         <xsl:with-param name="GroupRowEnd">
           <xsl:value-of select="$GroupRowEnd"/>
+        </xsl:with-param>
+        <xsl:with-param name="AllRowBreakes">
+          <xsl:value-of select="$AllRowBreakes"/>
         </xsl:with-param>
       </xsl:call-template>
 
@@ -854,18 +862,19 @@
     <xsl:param name="GroupCell"/>
     <xsl:param name="GroupRowStart"/>
     <xsl:param name="GroupRowEnd"/>
+    <xsl:param name="AllRowBreakes"/>
 
     <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:oleObjects">
       <xsl:call-template name="InsertOLEObjects"/>
     </xsl:for-each>
-    
+
 
     <xsl:variable name="ManualColBreaks">
       <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
         <xsl:value-of select="concat(@id,';')"/>
       </xsl:for-each>
     </xsl:variable>
-  
+
 
     <xsl:call-template name="InsertColumns">
       <xsl:with-param name="sheet" select="$sheet"/>
@@ -1177,11 +1186,14 @@
                 <xsl:with-param name="ConnectionsCell">
                   <xsl:value-of select="$ConnectionsCell"/>
                 </xsl:with-param>
-				<xsl:with-param name="GroupRowStart">
+                <xsl:with-param name="GroupRowStart">
                   <xsl:value-of select="$GroupRowStart"/>
                 </xsl:with-param>
                 <xsl:with-param name="GroupRowEnd">
                   <xsl:value-of select="$GroupRowEnd"/>
+                </xsl:with-param>
+                <xsl:with-param name="AllRowBreakes">
+                  <xsl:value-of select="$AllRowBreakes"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:when>
@@ -1272,6 +1284,7 @@
     <xsl:param name="outlineLevel"/>
     <xsl:param name="GroupRowStart"/>
     <xsl:param name="GroupRowEnd"/>
+    <xsl:param name="AllRowBreakes"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -1310,7 +1323,9 @@
     <xsl:variable name="GetMinRowWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
-          <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow)"/>
+          <xsl:value-of
+            select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow, $AllRowBreakes)"
+          />
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
           <xsl:choose>
@@ -1382,6 +1397,9 @@
           </xsl:with-param>
           <xsl:with-param name="ValidationCellStyle">
             <xsl:value-of select="$ValidationCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="AllRowBreakes">
+            <xsl:value-of select="$AllRowBreakes"/>
           </xsl:with-param>
         </xsl:call-template>
 
@@ -1466,6 +1484,9 @@
           <xsl:with-param name="ValidationCellStyle">
             <xsl:value-of select="$ValidationCellStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="AllRowBreakes">
+            <xsl:value-of select="$AllRowBreakes"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:when>
@@ -1482,14 +1503,14 @@
       </xsl:otherwise>
     </xsl:choose>
 
-<xsl:if test="contains(concat(':', $GroupRowStart), concat(':', @r, ':'))">
-  <xsl:call-template name="InsertRowGroupStart">
-    <xsl:with-param name="GroupCell">
-      <xsl:value-of select="$GroupRowStart"/>
-    </xsl:with-param>
-  </xsl:call-template>
-</xsl:if>
-    
+    <xsl:if test="contains(concat(':', $GroupRowStart), concat(':', @r, ':'))">
+      <xsl:call-template name="InsertRowGroupStart">
+        <xsl:with-param name="GroupCell">
+          <xsl:value-of select="$GroupRowStart"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+
     <!-- insert this row -->
     <xsl:call-template name="InsertThisRow">
       <xsl:with-param name="BigMergeCell">
@@ -1544,8 +1565,11 @@
         <xsl:value-of select="$ConnectionsCell"/>
       </xsl:with-param>
       <xsl:with-param name="outlineLevel"/>
+      <xsl:with-param name="AllRowBreakes">
+        <xsl:value-of select="$AllRowBreakes"/>
+      </xsl:with-param>
     </xsl:call-template>
-    
+
     <xsl:if test="contains(concat(':', $GroupRowEnd), concat(':', @r, ':'))">
       <xsl:call-template name="InsertRowGroupEnd">
         <xsl:with-param name="GroupCell">

@@ -439,6 +439,8 @@
     <xsl:param name="ValidationCell"/>     
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>  
+    <xsl:param name="AllRowBreakes"/>
+
 
     <xsl:variable name="id">
       <xsl:value-of select="key('drawing', '')/@r:id"/>
@@ -449,7 +451,7 @@
     </xsl:variable>
 
     <xsl:variable name="AllElementsRow">
-      <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow)"/>
+      <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow, $AllRowBreakes)"/>
     </xsl:variable>
 
     <xsl:variable name="GetMinRowWithElement">
@@ -501,7 +503,20 @@
     <xsl:if test="$GetMinRowWithElement != '' and $GetMinRowWithElement &lt;= $EndRow">
 
       <xsl:for-each select="document(concat('xl/',$sheet))">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+        <table:table-row>
+          <xsl:choose>
+            <xsl:when test="contains(concat(';', $AllRowBreakes), concat(';', $GetMinRowWithElement))">
+              <xsl:attribute name="table:style-name">
+                <xsl:value-of select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="table:style-name">
+                <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+          
           <xsl:call-template name="InsertElementsInThisRow">
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
@@ -590,6 +605,9 @@
         </xsl:with-param>
         <xsl:with-param name="ValidationCellStyle">
           <xsl:value-of select="$ValidationCellStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="AllRowBreakes">
+          <xsl:value-of select="$AllRowBreakes"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>

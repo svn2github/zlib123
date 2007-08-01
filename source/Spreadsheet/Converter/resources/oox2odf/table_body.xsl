@@ -193,8 +193,8 @@
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
     <xsl:param name="outlineLevel"/>
-
-
+    <xsl:param name="AllRowBreakes"/>
+    
     <xsl:variable name="GetMinRowWithElements">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -247,6 +247,11 @@
               <xsl:when test="@ht">
                 <xsl:value-of select="generate-id(.)"/>
               </xsl:when>
+              
+              <xsl:when test="contains(concat(';', $AllRowBreakes), concat(';', @r, ';'))">
+                <xsl:value-of select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
+              </xsl:when>
+              
               <xsl:otherwise>
                 <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
               </xsl:otherwise>
@@ -304,6 +309,9 @@
               </xsl:with-param>
               <xsl:with-param name="ConnectionsCell">
                 <xsl:value-of select="$ConnectionsCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="AllRowBreakes">
+                <xsl:value-of select="$AllRowBreakes"/>
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:if>
