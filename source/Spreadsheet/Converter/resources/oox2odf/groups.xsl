@@ -127,7 +127,7 @@
     <xsl:template name="InsertColumnGroupEnd">
         <xsl:param name="GroupCell"/>
         
-        <xsl:if test="$GroupCell != '' and contains(concat(';', $GroupCell), concat(':', @max, ';')) and preceding-sibling::e:col[1]/@max != @max">            
+        <xsl:if test="$GroupCell != '' and contains(concat(';', $GroupCell), concat(':', @max, ';')) and (preceding-sibling::e:col[1]/@max != @max or not(preceding-sibling::e:col[1]/@max))">            
             <table:table-column-group-end/>
             <xsl:call-template name="InsertColumnGroupEnd">
                 <xsl:with-param name="GroupCell">
