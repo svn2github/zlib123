@@ -38,6 +38,8 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table r">
 
+  <xsl:import href="measures.xsl"/>
+  
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
     <xsl:param name="colNumber"/>
@@ -550,7 +552,7 @@
 
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
-
+     <xsl:if test="table:covered-table-cell">
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -610,7 +612,8 @@
           </xsl:with-param>
           <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
         </xsl:apply-templates>
-      </row>
+    </row>
+      </xsl:if>
 
       <!-- insert repeated rows -->
       <xsl:if test="@table:number-rows-repeated">
