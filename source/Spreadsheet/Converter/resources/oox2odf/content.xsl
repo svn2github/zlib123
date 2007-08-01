@@ -48,9 +48,7 @@
   xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" office:version="1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
-
-
-
+  
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="database-ranges.xsl"/>
   <xsl:import href="styles.xsl"/>
@@ -65,9 +63,8 @@
   <xsl:import href="ole_objects.xsl"/>
   <xsl:import href="connections.xsl"/>
   <xsl:import href="groups.xsl"/>
-
-
-
+  
+  
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
   <xsl:key name="Dxf" match="e:styleSheet/e:dxfs/e:dxf" use="''"/>
@@ -404,6 +401,7 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <!-- variable with values of all manual row breakes-->
     <xsl:variable name="AllRowBreakes">
       <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:rowBreaks/e:brk">
         <xsl:value-of select="concat(@id + 1,';')"/>
@@ -1579,12 +1577,12 @@
     </xsl:if>
 
     <xsl:if
-      test="not(following-sibling::e:row) and ($PictureRow != '' or $NoteRow != '' or $ConditionalRow != '' or $ValidationRow != '')">
+      test="not(following-sibling::e:row) and ($PictureRow != '' or $NoteRow != '' or $ConditionalRow != '' or $ValidationRow != '' or $AllRowBreakes!='' )">
 
       <xsl:variable name="GetMinRowWithElementAfterLastRow">
         <xsl:call-template name="GetMinRowWithPicture">
           <xsl:with-param name="PictureRow">
-            <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow)"/>
+            <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $AllRowBreakes)"/>
           </xsl:with-param>
           <xsl:with-param name="AfterRow">
             <xsl:value-of select="@r"/>
@@ -1636,11 +1634,11 @@
         <xsl:with-param name="ValidationCellStyle">
           <xsl:value-of select="$ValidationCellStyle"/>
         </xsl:with-param>
+        <xsl:with-param name="AllRowBreakes">
+          <xsl:value-of select="$AllRowBreakes"/>
+        </xsl:with-param>
       </xsl:call-template>
-
     </xsl:if>
-
-
   </xsl:template>
 
   <xsl:template match="e:row" mode="headers">
@@ -1790,6 +1788,7 @@
       <xsl:with-param name="CheckIfBigMerge">
         <xsl:value-of select="$CheckIfBigMerge"/>
       </xsl:with-param>
+      
       <xsl:with-param name="this" select="$this"/>
       <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
