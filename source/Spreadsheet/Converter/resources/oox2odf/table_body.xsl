@@ -43,7 +43,7 @@
   <xsl:import href="date_time.xsl"/>
   <xsl:import href="insert_text.xsl"/>
   <xsl:import href="elements.xsl"/>
-  
+
   <xsl:key name="hyperlinkPosition" match="e:c" use="'@r'"/>
   <xsl:key name="ref" match="e:hyperlink" use="@ref"/>
   <!--xsl:key name="outlineLevelRow" match="e:sheetFormatPr" use="@outlineLevelRow"/-->
@@ -63,15 +63,17 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
-    <xsl:param name="ValidationCell"/>     
+    <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationRow"/>
-    <xsl:param name="ValidationCellStyle"/>    
+    <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="sheetNr"/>
-
+    <xsl:param name="AllRowBreakes"/>
+    
+    
     <xsl:choose>
       <!-- when sheet is empty  -->
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = '' and $NoteCell = '' and $ConditionalCell = '' and $ValidationCell = ''">
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = '' and $NoteCell = '' and $ConditionalCell = '' and $ValidationCell = '' and $AllRowBreakes = '' ">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="65536">
           <table:table-cell table:number-columns-repeated="256"/>
@@ -79,7 +81,7 @@
       </xsl:when>
       <!-- when there are only picture, conditional and note in sheet  -->
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and ($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '' or $ValidationCell != '')">
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and ($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '' or $ValidationCell != '' or $AllRowBreakes != '')">
 
         <xsl:call-template name="InsertEmptySheetWithElements">
           <xsl:with-param name="sheet">
@@ -118,6 +120,9 @@
           </xsl:with-param>
           <xsl:with-param name="ValidationCellStyle">
             <xsl:value-of select="$ValidationCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="AllRowBreakes">
+            <xsl:value-of select="$AllRowBreakes"/>
           </xsl:with-param>
         </xsl:call-template>
 
@@ -194,7 +199,7 @@
     <xsl:param name="ConnectionsCell"/>
     <xsl:param name="outlineLevel"/>
     <xsl:param name="AllRowBreakes"/>
-    
+
     <xsl:variable name="GetMinRowWithElements">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -247,11 +252,12 @@
               <xsl:when test="@ht">
                 <xsl:value-of select="generate-id(.)"/>
               </xsl:when>
-              
+
               <xsl:when test="contains(concat(';', $AllRowBreakes), concat(';', @r, ';'))">
-                <xsl:value-of select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
+                <xsl:value-of
+                  select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
               </xsl:when>
-              
+
               <xsl:otherwise>
                 <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
               </xsl:otherwise>
@@ -449,7 +455,7 @@
 
   </xsl:template>
 
-  
+
 
   <xsl:template name="InsertEmptyCell">
     <xsl:param name="BeforeMerge"/>
@@ -466,7 +472,7 @@
     <xsl:param name="PictureColl"/>
     <xsl:param name="NoteColl"/>
     <xsl:param name="sheet"/>
-    <xsl:param name="ValidationCell"/>     
+    <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ValidationColl"/>
@@ -986,7 +992,7 @@
             <xsl:attribute name="table:content-validation-name">
               <xsl:value-of select="(concat('val', $sheetNr, (. + 1)))"/>
             </xsl:attribute>
-            
+
           </xsl:if>
 
           <xsl:if test="e:v">
@@ -1176,7 +1182,7 @@
 
   </xsl:template>
 
-  
+
   <xsl:template name="InsertNextCell">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
@@ -1198,7 +1204,7 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
-    <xsl:param name="ValidationCell"/>     
+    <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ValidationColl"/>
@@ -1266,7 +1272,7 @@
     <xsl:variable name="ElementsColl">
       <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl)"/>
     </xsl:variable>
-    
+
     <xsl:variable name="GetMinCollAfterThisCell">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -1277,7 +1283,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
- 
+
     <xsl:choose>
 
       <!-- calc supports only 256 columns -->
