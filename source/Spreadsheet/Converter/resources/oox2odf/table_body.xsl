@@ -206,7 +206,7 @@
           <xsl:value-of select="concat($PictureRow, $NoteRow)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$lastCellColumnNumber"/>
+          <xsl:value-of select="preceding::e:row[1]/@r"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
