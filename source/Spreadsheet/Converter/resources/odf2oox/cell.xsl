@@ -552,7 +552,7 @@
 
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
-     <!--xsl:if test="table:covered-table-cell"-->
+
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -613,7 +613,7 @@
           <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
         </xsl:apply-templates>
     </row>
-      <!--/xsl:if-->
+
 
       <!-- insert repeated rows -->
       <xsl:if test="@table:number-rows-repeated">
