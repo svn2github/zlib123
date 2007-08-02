@@ -47,6 +47,7 @@
   <xsl:import href="common.xsl"/>
   <xsl:import href="sortFilter.xsl"/>
   <xsl:import href="validation.xsl"/>
+  <xsl:import href="data_consolidation.xsl"/>
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
@@ -695,6 +696,8 @@
     <xsl:call-template name="InsertSort">
       <xsl:with-param name="tableName" select="@table:name"/>
     </xsl:call-template>
+
+    <xsl:call-template name="InsertDataConsolidate"/>
 
   </xsl:template>
 

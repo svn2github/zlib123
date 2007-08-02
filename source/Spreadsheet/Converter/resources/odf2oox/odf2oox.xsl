@@ -459,7 +459,6 @@
             <v:imagedata o:relid="rId1" o:title=""/>
             <x:ClientData ObjectType="Pict">
               <x:SizeWithCells/>
-              <!--x:Anchor> 4, 0, 7, 0, 4, 46, 9, 11</x:Anchor-->
               <x:CF>Pict</x:CF>
               <x:AutoPict/>
               <x:DDE/>

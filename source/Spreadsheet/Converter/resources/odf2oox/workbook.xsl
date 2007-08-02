@@ -109,7 +109,7 @@
         <sheet>
           <!-- characters "*\/[];'?" can not occur in sheet name -->
           <xsl:attribute name="name">
-            <!-- if there is a shheet with the same name modify name -->
+            <!-- if there is a sheet with the same name modify name -->
             <xsl:call-template name="CheckSheetName">
               <xsl:with-param name="sheetNumber">
                 <xsl:value-of select="position()"/>
