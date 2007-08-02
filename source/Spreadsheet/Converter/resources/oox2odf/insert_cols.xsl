@@ -925,6 +925,75 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="InsertColBreaksWhenThereAreNotCols">    
+    <xsl:param name="ManualColBreaks"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="DefaultCellStyleName"/>
+    <xsl:param name="prevManualBreak" select="0"/>
+    
+    <xsl:variable name="GetMinManualColBreake">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$ManualColBreaks"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="0"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    
+    <xsl:choose>
+      <xsl:when test="$GetMinManualColBreake != ''">
+        <xsl:if test="$GetMinManualColBreake - $prevManualBreak &gt; 0">
+        <table:table-column>
+          <xsl:attribute name="table:style-name">
+            <xsl:for-each select="document(concat('xl/',$sheet))">
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+            </xsl:for-each>
+          </xsl:attribute>
+          
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+          
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="$GetMinManualColBreake - $prevManualBreak"/>
+          </xsl:attribute>
+        </table:table-column>
+        </xsl:if>
+        
+        <table:table-column
+          table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}">
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+        </table:table-column>    
+      </xsl:when>
+      <xsl:otherwise>
+        <table:table-column>
+          <xsl:attribute name="table:style-name">
+            <xsl:for-each select="document(concat('xl/',$sheet))">
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+            </xsl:for-each>
+          </xsl:attribute>
+          
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+          
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="256 - $prevManualBreak"/>
+          </xsl:attribute>
+        </table:table-column>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    
+    
+    
+  </xsl:template>
 
   <xsl:template name="InsertColumns">
     <xsl:param name="sheet"/>
@@ -1169,6 +1238,19 @@
             </xsl:attribute>
           </table:table-column>
         </xsl:when>
+        <xsl:when test="not(key('Col', '')) and $ManualColBreaks != ''">
+          <xsl:call-template name="InsertColBreaksWhenThereAreNotCols">           
+            <xsl:with-param name="ManualColBreaks">
+              <xsl:value-of select="$ManualColBreaks"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="DefaultCellStyleName">
+              <xsl:value-of select="$DefaultCellStyleName"/>
+            </xsl:with-param>            
+          </xsl:call-template>
+         </xsl:when>
         <xsl:when test="not(key('Col', ''))">
           <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
             table:number-columns-repeated="256">
