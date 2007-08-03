@@ -209,11 +209,11 @@
             <!-- Criteria Data -->
             <xsl:attribute name="operator">
                 <xsl:choose>
-                    <xsl:when test="contains(@table:condition, '&lt;')">
-                        <xsl:text>lessThan</xsl:text>
-                    </xsl:when>
                     <xsl:when test="contains(@table:condition, '&lt;=')">
                         <xsl:text>lessThanOrEqual</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="contains(@table:condition, '&lt;')">
+                        <xsl:text>lessThan</xsl:text>
                     </xsl:when>
                     <xsl:when test="contains(@table:condition, '&gt;=')">
                         <xsl:text>greaterThanOrEqual</xsl:text>
@@ -230,6 +230,9 @@
                     <xsl:when test="contains(@table:condition, 'is-not-between')">
                         <xsl:text>notBetween</xsl:text>
                     </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>equal</xsl:text>
+                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
 
