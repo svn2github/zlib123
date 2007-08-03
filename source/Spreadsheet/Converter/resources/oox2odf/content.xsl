@@ -435,6 +435,7 @@
       <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
         <!-- for the current sheet -->
         <!-- if the print range is without apostrophes -->
+        <xsl:if test="not(contains(self::node(),'#REF'))">
         <xsl:if
           test="string($checkedName) = substring-before(./self::node(), '!') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
           <!-- one print range without apostrophes -->
@@ -488,7 +489,7 @@
             </xsl:attribute>
           </xsl:if>
         </xsl:if>
-
+        </xsl:if>
       </xsl:for-each>
 
 
