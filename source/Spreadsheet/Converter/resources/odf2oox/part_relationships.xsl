@@ -345,6 +345,7 @@
   </xsl:template>
 
   <xsl:template name="InsertWorkobookExternalRels">
+<xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame/draw:object">
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
       <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
@@ -364,6 +365,7 @@
         </xsl:attribute>
       </Relationship>
     </xsl:for-each>
+</xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>
