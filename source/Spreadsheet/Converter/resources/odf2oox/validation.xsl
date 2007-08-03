@@ -84,7 +84,7 @@
             </xsl:when>
         </xsl:choose>
     </xsl:template>
-    
+
     <!-- insert validation -->
     <xsl:template match="table:table-cell" mode="validation">
         <xsl:param name="colNumber"/>
@@ -224,15 +224,12 @@
                     <xsl:when test="contains(@table:condition, '!=')">
                         <xsl:text>notEqual</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains(@table:condition, 'cell-content-is-between')">
+                    <xsl:when test="contains(@table:condition, 'is-between')">
                         <xsl:text>between</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains(@table:condition, 'cell-content-is-not-between')">
+                    <xsl:when test="contains(@table:condition, 'is-not-between')">
                         <xsl:text>notBetween</xsl:text>
                     </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text>equal</xsl:text>
-                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
 
@@ -454,7 +451,7 @@
                     </xsl:call-template>
                 </formula2>
             </xsl:when>
-        
+
         </xsl:choose>
     </xsl:template>
 
