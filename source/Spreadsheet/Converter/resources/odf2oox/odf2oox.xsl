@@ -175,6 +175,8 @@
 
         <xsl:variable name="chart">
           <xsl:for-each select="descendant::draw:frame/draw:object">
+            <xsl:choose>
+              <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
             <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
               <xsl:choose>
                 <xsl:when test="office:document-content/office:body/office:chart">
@@ -185,6 +187,11 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
 

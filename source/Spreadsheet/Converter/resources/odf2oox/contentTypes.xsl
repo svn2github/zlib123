@@ -112,6 +112,8 @@
 
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
+          <xsl:choose>
+            <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
           <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
             <xsl:choose>
               <xsl:when test="office:document-content/office:body/office:chart">
@@ -122,6 +124,11 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
             
@@ -155,6 +162,9 @@
         
         <xsl:call-template name="InsertChartContentTypes">
           <xsl:with-param name="sheetNum" select="position()"></xsl:with-param>
+          <xsl:with-param name="chart">
+            <xsl:value-of select="$chart"/>
+          </xsl:with-param>
         </xsl:call-template>         
         
       </xsl:if>
@@ -163,11 +173,15 @@
   
     <xsl:template name="InsertChartContentTypes">
       <xsl:param name="sheetNum"/>
+      <xsl:param name="chart"/>
+
+      <xsl:if test="contains($chart, 'true')">
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <Override PartName="{concat('/xl/charts/chart',$sheetNum,'_',position(),'.xml')}"
           ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>        
-        </xsl:for-each>
+      </xsl:for-each>
+      </xsl:if>
     </xsl:template>
   
   <xsl:template name="InsertConnectionContentTypes">

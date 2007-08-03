@@ -245,12 +245,36 @@
 
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <!-- chart rels -->
+      <xsl:variable name="chart">
+        <xsl:for-each select="descendant::draw:frame/draw:object">
+          <xsl:choose>
+            <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
+              <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+                <xsl:choose>
+                  <xsl:when test="office:document-content/office:body/office:chart">
+                    <xsl:text>true</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>false</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:variable>
+      
+      <xsl:if test="contains($chart, 'true')">
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <Relationship Id="{generate-id(parent::node())}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"
           Target="{concat('../charts/chart',$sheetNum,'_',position(),'.xml')}"/>
       </xsl:for-each>
+      </xsl:if>
 
       <!-- pictures -->
       <xsl:for-each
