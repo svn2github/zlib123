@@ -1,0 +1,101 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F9071930-348E-4A30-A0F6-A1A3DF3A587B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CleverAge.OdfConverter.Word</RootNamespace>
+    <AssemblyName>WordConverter</AssemblyName>
+    <ReferencePath>C:\Documents and Settings\yves\Mes documents\Shared0129\source\TextProcessing</ReferencePath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Converter.cs" />
+    <Compile Include="OdfCheckIfIndexPostProcessor.cs" />
+    <Compile Include="OdfParagraphPostProcessor.cs" />
+    <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
+    <Compile Include="OoxChangeTrackingPostProcessor.cs" />
+    <Compile Include="OoxParagraphsPostProcessor.cs" />
+    <Compile Include="OoxSectionsPostProcessor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="resources\odf2oox\bookmarks.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\change-tracking.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\comments.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\dataStyles.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\docprops.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\document.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\endnotes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\fonts.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\footnotes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\frames.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\header-footer.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\indexes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\numbering.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\package_relationships.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\part_relationships.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\sections.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\settings.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\source.xml" />
+    <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\office.dtd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">
+      <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
+      <Name>OdfConverterLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\comments.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\common.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\content.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\fields.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\fonts.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\footnotes.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\frames.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\indexes.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\lists.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\pictures.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\sections.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\source.xml" />
+    <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\tables.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\track.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\common.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\tables.xsl" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

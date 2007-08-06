@@ -1,0 +1,167 @@
+<html>
+  <head>
+    <title>ODF Add-in dla Microsoft Word</title>
+  </head>
+  <body>
+    <h1>
+      <a name="top">ODF Add-in dla Microsoft Word</a>
+    </h1>
+    <p> Dzi&#281;kujemy za pobranie ODF Add-in dla Word. Celem tej aplikacji jest
+      umo&#380;liwienie u&#380;ytkownikom otwierania dokument&oacute;w opartych o
+      specyfikacj&#281; ODF w aplikacji Microsoft Word i demonstracja
+      wsp&oacute;&#322;dzia&#322;ania pomi&#281;dzy specyfikacjami OpenXML i ODF.
+      Projekt jest umieszczony na sourceforge.net (Szczeg&oacute;&#322;y i planowane wydania
+      patrz: plan projektu pod adresem <a href="http://sourceforge.net/projects/odf-converter"
+        >sourceforge.net </a> ). </p>
+    <p>Ta wtyczka zosta?a sfinansowana przez <a href="http://www.microsoft.com/">Microsoft</a> a zrealizowana przez
+	<a href="http://www.clever-age.com/">Clever Age</a>, <a href="http://www.dialogika.de/">DIaLOGIKa</a> i <a href="http://www.aztecsoft.com/">Aztecsoft</a> (wi?cej informacji znajdziesz na
+	<a href="http://odf-converter.sourceforge.net/">stronie projektu</a>).</p>
+    <h2>Spis tre&#347;ci</h2>
+    <ul>
+      <li>
+        <a href="#hRequirements">Wymagania systemowe</a>
+      </li>
+      <li>
+        <a href="#hInstall">Instalacja wtyczki</a>
+      </li>
+      <li>
+        <a href="#hTroobleshooting">Rozwi&#261;zywanie problem&oacute;w z wtyczk&#261;</a>
+        <ul>
+          <li>
+            <a href="#hTroobleshootingXP2003">Microsoft Word XP/2003</a>
+          </li>
+          <li>
+            <a href="#hTroobleshooting2007">Microsoft Word 2007</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#hFeatures">Funkcje/opcje nieobs&#322;ugiwane przez wtyczk&#281;</a>
+      </li>
+    </ul>
+    <h2>
+      <a name="hRequirements"> Wymagania systemowe</a>
+    </h2>
+    <p>Przed instalacj&#261; wtyczki upewnij si&#281;, &#380;e masz zainstalowane
+      poni&#380;sze programy...</p>
+    <ul>
+      <li>Microsoft Word XP</li>
+      <li>
+        <a href="http://www.microsoft.com/downloads/details.aspx?displaylang=pl&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office Compatibility
+          Pack</a>
+      </li>
+      <li>
+        <a
+          href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+          >.NET framework 2.0</a>
+      </li>
+    </ul>
+    <p>
+      <strong>lub</strong>
+    </p>
+    <ul>
+      <li>Microsoft Word 2003</li>
+      <li>
+        <a href="http://www.microsoft.com/downloads/details.aspx?displaylang=pl&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office Compatibility
+          Pack</a>
+      </li>
+      <li>
+        <a
+          href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+          >.NET framework 2.0*</a>
+      </li>
+    </ul>
+    <p>
+      <strong>lub</strong>
+    </p>
+    <ul>
+      <li><a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word
+        2007</a> z aktywowanym ".NET Programmability Support" </li>
+      <li>
+        <a
+          href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+          >.NET framework 2.0*</a>
+      </li>
+    </ul>
+    <p><strong>(*) Uwaga:</strong> je&#380;eli zainstalujesz Worda 2007 przed
+      instalacj&#261; .NET Framework, to po zainstalowaniu .NET Framework b&#281;dziesz
+      musia&#322; uaktualni&#263; swoj&#261; instalacj&#281; aplikacji Word,
+      wykonuj&#261;c nast&#281;puj&#261;ce kroki: </p>
+    <ol>
+      <li>Otw&oacute;rz "Dodaj/Usu&#324; programy" z Panelu sterowania.</li>
+      <li>Wyszukaj wpis Word 2007 i wybierz "Zmie&#324;".</li>
+      <li>Podczas procesu instalacji wybierz "Dodaj albo usu&#324; programy", nast&#281;pnie
+        dodaj ".NET Programmability Support" w sekcji "Microsoft Office Word".</li>
+    </ol>
+    <p>
+      <a href="#top" class="back">Wr&oacute;&#263; do pocz&#261;tku</a>
+    </p>
+    <h2>
+      <a name="hInstall">Instalacja wtyczki</a>
+    </h2>
+    <p>Kliknij dwukrotnie na plik instalacyjny: <strong>"OdfAddInForWordSetup-en-1.0.exe"</strong></p>
+    <p> Je&#347;li instalacja zosta&#322;a wykonana pomy&#347;lnie, w menu
+      &#8220;Plik&#8221; powinna si&#281; pojawi&#263; nowa pozycja
+      &#8222;Otw&oacute;rz ODF&#8221;, za pomoc&#261; kt&oacute;rej
+      mo&#380;na otworzy&#263; dokument w formacie ODF. Ponadto klikaj&#261;c na ten
+      dokument prawym przyciskiem myszy w przegl&#261;darce plik&oacute;w, powinna
+      by&#263; widoczna opcja "Otw&oacute;rz w Microsoft Word".</p>
+    <p>
+      <strong>Uwaga:</strong> Plik ODF otwierany za pomoc&#261; wtyczki jest importowany jako
+      plik .docx tylko do odczytu (jest to nowy format dodany w wersji Office 2007). Je&#380;eli
+      chcesz zapisa&#263; go jako ODF musisz najpierw utworzy&#263; kopie dokumentu (Menu
+      Plik &gt; Zapisz jako), nast&#281;pnie u&#380;y&#263; opcji
+      &#8222;Eksportuj do ODF&#8221;. </p>
+    <p>
+      <a href="#top" class="back">Wr&oacute;&#263; do pocz&#261;tku</a>
+    </p>
+    <h2>
+      <a name="hTroobleshooting">Rozwi&#261;zywanie problem&oacute;w z wtyczk&#261;</a>
+    </h2>
+    <p> Je&#347;li w menu &#8220;Plik&#8221; nie pojawi&#322; si&#281; nowy wpis
+      &#8220;Otw&oacute;rz ODF&#8221; mo&#380;e by&#263; to zwi&#261;zane z
+      niespe&#322;nionymu wymaganiami systemowymi Worda (przeczytaj <a href="#hRequirements"
+        >Wymagania systemowe</a> powy&#380;ej) lub problem z instalacj&#261; pakietu "Word
+      Primary Interop Assemblies". Niezb&#281;dne b&#281;dzie wtedy aktywowanie wtyczki w
+      nast&#281;puj&#261;cy spos&oacute;b:</p>
+    <h3>
+      <a name="hTroobleshootingXP2003">Microsoft Word XP/2003</a>
+    </h3>
+    <ol>
+      <li>Wybierz menu &#8222;Narz&#281;dzia &gt; Dostosuj&#8221; a nastepnie
+        kliknij zak&#322;adk&#281; &#8222;Komendy&#8221;.</li>
+      <li>W ramce "Kategorie" kliknij na "Narz&#281;dzia".</li>
+      <li>Przeci&#261;gnij &#8222;COM Add-Ins&#8221; z pola
+        &#8222;Komendy&#8221; do pola &#8222;Narz&#281;dzia&#8221; </li>
+      <li>Kliknij "Zamknij".</li>
+      <li>Nast&#281;pnie z menu &#8222;Narz&#281;dzia&#8221; wybierz &#8222;COM
+        Add-Ins&#8221;. Aby za&#322;adowa&#263; wtyczk&#281; zaznacz j&#261;.
+        Je&#347;li wtyczka, kt&oacute;rej szukasz nie znajduje si&#281; w liscie wybierz
+        &#8222;Dodaj&#8221;. Odszukaj i zaznacz brakuj&#261;c&#261;
+        wtyczk&#281;, nastepnie kliknij &#8222;Ok&#8221;.</li>
+    </ol>
+    <h3>
+      <a name="hTroobleshooting2007">Microsoft Word 2007</a>
+    </h3>
+    <ol>
+      <li>Wybierz &#8222;Opcje Worda&#8221; w menu &#8220;Plik&#8221;</li>
+      <li>W zak&#322;adce &#8220;Wtyczki&#8221; wybierz &#8222;COM
+        Add-Ins&#8221; z listy i naci&#347;nij przycisk &#8222;Przejd&#378;
+        do&#8221;</li>
+      <li>Zaznacz &#8220;ODF Word 2007 Add-in&#8221; oraz potwierd&#378;
+        wyb&oacute;r naciskaj&#261;c przycisk &#8222;Ok&#8221;.</li>
+    </ol>
+    <p>
+      <a href="#top" class="back">Wr&oacute;&#263; do pocz&#261;tku</a>
+    </p>
+    <h2>
+      <a name="hFeatures">Funkcje/opcje nieobs&#322;ugiwane przez wtyczk&#281;</a>
+    </h2>
+    <p>Pe&#322;na lista nieobs&#322;ugiwanych funkcji jest dostepna na stronie domowej
+      projektu. Mo&#380;esz j&#261; przeczyta&#263;<a
+        href="http://odf-converter.sourceforge.net/features.html">tutaj</a>.</p>
+    <p>
+      <a href="#top" class="back">Wr&oacute;&#263; do pocz&#261;tku</a>
+    </p>
+  </body>
+</html>
