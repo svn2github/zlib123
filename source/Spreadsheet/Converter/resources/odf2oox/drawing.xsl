@@ -43,7 +43,7 @@
 
   <!-- Insert Drawing (picture, chart)  -->
   <xsl:template name="InsertDrawing">
-    
+
     <xsl:variable name="chart">
       <xsl:for-each select="descendant::draw:frame/draw:object">
         <xsl:choose>
@@ -65,15 +65,14 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xdr:wsDr>
       <!--Insert Chart -->
       <xsl:for-each select="descendant::draw:frame">
 
         <xsl:choose>
           <!-- insert chart -->
-          <xsl:when
-            test="contains($chart, 'true')">
+          <xsl:when test="contains($chart, 'true')">
             <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:graphicFrame macro="">
@@ -480,10 +479,10 @@
 
       <!--xsl:if test="key('style', @draw:style-name)/style:graphic-properties/@draw:stroke != 'none' "-->
 
-        <xsl:for-each select="key('style', @draw:style-name)/style:graphic-properties">
-          <xsl:call-template name="InsertDrawingFill"/>
-          <xsl:call-template name="InsertDrawingBorder"/>
-        </xsl:for-each>
+      <xsl:for-each select="key('style', @draw:style-name)/style:graphic-properties">
+        <xsl:call-template name="InsertDrawingFill"/>
+        <xsl:call-template name="InsertDrawingBorder"/>
+      </xsl:for-each>
 
       <!--/xsl:if-->
 
@@ -975,9 +974,9 @@
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
-          </xsl:choose>          
+          </xsl:choose>
         </xsl:attribute>
-        
+
         <xsl:attribute name="tIns">
           <xsl:choose>
             <xsl:when test="@fo:padding-top">
@@ -989,7 +988,7 @@
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
-          </xsl:choose>          
+          </xsl:choose>
         </xsl:attribute>
 
         <xsl:attribute name="rIns">
@@ -1003,7 +1002,7 @@
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
-          </xsl:choose>          
+          </xsl:choose>
         </xsl:attribute>
 
         <xsl:attribute name="bIns">
@@ -1017,7 +1016,7 @@
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
-          </xsl:choose>          
+          </xsl:choose>
         </xsl:attribute>
 
       </xsl:for-each>
@@ -1035,6 +1034,16 @@
             <xsl:attribute name="val">
               <xsl:value-of select="substring-after(@draw:fill-color, '#')"/>
             </xsl:attribute>
+
+            <!-- transparency -->
+            <xsl:if test="@draw:opacity">
+              <a:alpha>
+                <xsl:attribute name="val">
+                  <xsl:value-of select="substring-before(@draw:opacity,'%' ) * 1000"/>
+                </xsl:attribute>
+              </a:alpha>
+            </xsl:if>
+
           </a:srgbClr>
         </a:solidFill>
       </xsl:when>
@@ -1045,7 +1054,7 @@
   </xsl:template>
 
   <xsl:template name="InsertDrawingBorder">
-    
+
     <!-- line style -->
     <a:ln>
       <xsl:attribute name="w">
@@ -1054,12 +1063,12 @@
           <xsl:with-param name="unit">emu</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-        
-        <xsl:choose>
-          <xsl:when test="not(@draw:stroke = 'none' )">
-            <a:solidFill>
-              <a:srgbClr>
-                
+
+      <xsl:choose>
+        <xsl:when test="not(@draw:stroke = 'none' )">
+          <a:solidFill>
+            <a:srgbClr>
+
               <xsl:attribute name="val">
                 <xsl:choose>
                   <xsl:when test="@svg:stroke-color != '' ">
@@ -1070,26 +1079,26 @@
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
-                
-                <xsl:if test="@svg:stroke-opacity != ''">
-                  <xsl:variable name="transparency">
-                    <xsl:value-of select="substring-before(@svg:stroke-opacity, '%')"/>
-                  </xsl:variable>
-                  <a:alpha>
-                    <xsl:attribute name="val">
-                      <xsl:value-of select="$transparency * 1000"/>
-                    </xsl:attribute>
-                  </a:alpha>
-                </xsl:if>
-                
-              </a:srgbClr>
-              </a:solidFill>
-          </xsl:when>
-          <xsl:otherwise>
-            <a:noFill/>
-          </xsl:otherwise>
-        </xsl:choose>
-        
+
+              <xsl:if test="@svg:stroke-opacity != ''">
+                <xsl:variable name="transparency">
+                  <xsl:value-of select="substring-before(@svg:stroke-opacity, '%')"/>
+                </xsl:variable>
+                <a:alpha>
+                  <xsl:attribute name="val">
+                    <xsl:value-of select="$transparency * 1000"/>
+                  </xsl:attribute>
+                </a:alpha>
+              </xsl:if>
+
+            </a:srgbClr>
+          </a:solidFill>
+        </xsl:when>
+        <xsl:otherwise>
+          <a:noFill/>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </a:ln>
   </xsl:template>
 
