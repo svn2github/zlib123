@@ -1,8 +1,0 @@
-Ver.2003/05/31
---------------
-    Assemblies are now signed
-    Fixed the missing resource bug
-
-Ver.2002/06/23
---------------
-    Re-compiled with Visual Studio.Net to fix a reported problem.
