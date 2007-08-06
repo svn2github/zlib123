@@ -676,7 +676,7 @@
           <xsl:call-template name="InsertFill"/>
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
-        </style:graphic-properties>       
+        </style:graphic-properties>
       </style:style>
     </xsl:for-each>
   </xsl:template>
@@ -835,14 +835,15 @@
   <xsl:template name="InsertWallProperties">
     <!-- c:chartSpace/c:chart/c:backWall -->
     <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:spPr">
-    <style:style style:name="wall" style:family="chart">
-      <style:graphic-properties>
-        <!-- Insert Borders Wall style, color, fill, transparency -->        
-        <xsl:call-template name="InsertLineColor"/>
-        <xsl:call-template name="InsertLineStyle"/>
-      </style:graphic-properties>
-    </style:style>
-      </xsl:for-each>
+      <style:style style:name="wall" style:family="chart">
+        <style:graphic-properties>
+          <!-- Insert Borders Wall style, color, fill, transparency -->
+          <xsl:call-template name="InsertLineColor"/>
+          <xsl:call-template name="InsertLineStyle"/>
+          <xsl:call-template name="InsertFill"/>
+        </style:graphic-properties>
+      </style:style>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertFloorProperties">
@@ -946,7 +947,7 @@
 
       <!-- line charts or radar charts with symbols -->
       <xsl:if
-        test="(c:lineChart/c:marker/@val = 1 and c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none')]) or 
+        test="c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or 
         (c:radarChart/c:radarStyle/@val = 'marker' and c:radarChart/c:ser[not(c:marker/c:symbol/@val = 'none')])">
         <xsl:attribute name="chart:symbol-type">
           <xsl:text>automatic</xsl:text>
