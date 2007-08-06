@@ -124,62 +124,65 @@
   <xsl:template name="InsertSheetColumnStyles">
     <xsl:param name="sheet"/>
 
-    <!-- default style -->
-    <style:style
-      style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-      style:family="table-column">
-      <style:table-column-properties fo:break-before="auto">
-        <xsl:attribute name="style:column-width">
-          <xsl:choose>
-            <xsl:when
-              test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-              <xsl:call-template name="ConvertFromCharacters">
-                <xsl:with-param name="value">
-                  <xsl:value-of
-                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
-                  />
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- Excel application default-->
-              <xsl:call-template name="ConvertFromCharacters">
-                <xsl:with-param name="value" select="'8.43'"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </style:table-column-properties>
-    </style:style>
-
-    <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
-      style:family="table-column">
-      <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks">
-        <style:table-column-properties fo:break-before="page">
-          <xsl:attribute name="style:column-width">
-            <xsl:choose>
-              <xsl:when
-                test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-                <xsl:call-template name="ConvertFromCharacters">
-                  <xsl:with-param name="value">
-                    <xsl:value-of
-                      select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
-                    />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- Excel application default-->
-                <xsl:call-template name="ConvertFromCharacters">
-                  <xsl:with-param name="value" select="'8.43'"/>
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </style:table-column-properties>
-      </xsl:if>
-    </style:style>
-
+    <!-- default & column Breake style -->
+    <xsl:choose>
+      <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks">
+        <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
+          style:family="table-column">
+          <style:table-column-properties fo:break-before="page">
+            <xsl:attribute name="style:column-width">
+              <xsl:choose>
+                <xsl:when
+                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+                  <xsl:call-template name="ConvertFromCharacters">
+                    <xsl:with-param name="value">
+                      <xsl:value-of
+                        select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- Excel application default-->
+                  <xsl:call-template name="ConvertFromCharacters">
+                    <xsl:with-param name="value" select="'8.43'"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </style:table-column-properties>
+        </style:style>
+      </xsl:when>
+      <xsl:otherwise>
+        <style:style
+          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+          style:family="table-column">
+          <style:table-column-properties fo:break-before="auto">
+            <xsl:attribute name="style:column-width">
+              <xsl:choose>
+                <xsl:when
+                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+                  <xsl:call-template name="ConvertFromCharacters">
+                    <xsl:with-param name="value">
+                      <xsl:value-of
+                        select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- Excel application default-->
+                  <xsl:call-template name="ConvertFromCharacters">
+                    <xsl:with-param name="value" select="'8.43'"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </style:table-column-properties>
+        </style:style>
+      </xsl:otherwise>
+    </xsl:choose>
+    
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols"
       mode="automaticstyles"/>
   </xsl:template>
@@ -232,63 +235,66 @@
   <xsl:template name="InsertSheetRowStyles">
     <xsl:param name="sheet"/>
 
-    <!-- default style -->
-    <style:style
-      style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-      style:family="table-row">
-      <style:table-row-properties fo:break-before="auto">
-        <xsl:attribute name="style:row-height">
-          <xsl:choose>
-            <xsl:when
-              test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
-              <xsl:call-template name="ConvertToCentimeters">
-                <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="concat(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
-                  />
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- Excel application default-->
-              <xsl:call-template name="ConvertToCentimeters">
-                <xsl:with-param name="length" select="'20px'"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </style:table-row-properties>
-    </style:style>
+    <!-- default & row Break style -->
     
-    <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)}"
-      style:family="table-row">
-      <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
-        <style:table-row-properties fo:break-before="page">
-          <xsl:attribute name="style:row-height">
-            <xsl:choose>
-              <xsl:when
-                test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
-                <xsl:call-template name="ConvertToCentimeters">
-                  <xsl:with-param name="length">
-                    <xsl:value-of
-                      select="concat(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
-                    />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- Excel application default-->
-                <xsl:call-template name="ConvertToCentimeters">
-                  <xsl:with-param name="length" select="'20px'"/>
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </style:table-row-properties>
-      </xsl:if>
-    </style:style>
+    <xsl:choose>
+      <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
+        <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)}"
+          style:family="table-row">
+          <style:table-row-properties fo:break-before="page">
+            <xsl:attribute name="style:row-height">
+              <xsl:choose>
+                <xsl:when
+                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
+                  <xsl:call-template name="ConvertToCentimeters">
+                    <xsl:with-param name="length">
+                      <xsl:value-of
+                        select="concat(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- Excel application default-->
+                  <xsl:call-template name="ConvertToCentimeters">
+                    <xsl:with-param name="length" select="'20px'"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </style:table-row-properties>
+        </style:style>
+      </xsl:when>
+      <xsl:otherwise>
+        <style:style
+          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+          style:family="table-row">
+          <style:table-row-properties fo:break-before="auto">
+            <xsl:attribute name="style:row-height">
+              <xsl:choose>
+                <xsl:when
+                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
+                  <xsl:call-template name="ConvertToCentimeters">
+                    <xsl:with-param name="length">
+                      <xsl:value-of
+                        select="concat(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- Excel application default-->
+                  <xsl:call-template name="ConvertToCentimeters">
+                    <xsl:with-param name="length" select="'20px'"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </style:table-row-properties>
+        </style:style>
+      </xsl:otherwise>
+    </xsl:choose>
     
-
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:sheetData"
       mode="automaticstyles"/>
   </xsl:template>
