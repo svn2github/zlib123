@@ -964,41 +964,61 @@
     <a:bodyPr wrap="square" rtlCol="0" anchor="t">
       <xsl:for-each select="key('style',@draw:style-name)/style:graphic-properties">
 
-        <xsl:if test="@fo:padding-left">
-          <xsl:attribute name="lIns">
-            <xsl:call-template name="emu-measure">
-              <xsl:with-param name="unit" select="'cm'"/>
-              <xsl:with-param name="length" select="@fo:padding-left"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:attribute name="lIns">
+          <xsl:choose>
+            <xsl:when test="@fo:padding-left">
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="unit" select="'cm'"/>
+                <xsl:with-param name="length" select="@fo:padding-left"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:attribute>
+        
+        <xsl:attribute name="tIns">
+          <xsl:choose>
+            <xsl:when test="@fo:padding-top">
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="unit" select="'cm'"/>
+                <xsl:with-param name="length" select="@fo:padding-top"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:attribute>
 
-        <xsl:if test="@fo:padding-top">
-          <xsl:attribute name="tIns">
-            <xsl:call-template name="emu-measure">
-              <xsl:with-param name="unit" select="'cm'"/>
-              <xsl:with-param name="length" select="@fo:padding-top"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:attribute name="rIns">
+          <xsl:choose>
+            <xsl:when test="@fo:padding-right">
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="unit" select="'cm'"/>
+                <xsl:with-param name="length" select="@fo:padding-right"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:attribute>
 
-        <xsl:if test="@fo:padding-right">
-          <xsl:attribute name="rIns">
-            <xsl:call-template name="emu-measure">
-              <xsl:with-param name="unit" select="'cm'"/>
-              <xsl:with-param name="length" select="@fo:padding-right"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-
-        <xsl:if test="@fo:padding-bottom">
-          <xsl:attribute name="bIns">
-            <xsl:call-template name="emu-measure">
-              <xsl:with-param name="unit" select="'cm'"/>
-              <xsl:with-param name="length" select="@fo:padding-bottom"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:attribute name="bIns">
+          <xsl:choose>
+            <xsl:when test="@fo:padding-bottom">
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="unit" select="'cm'"/>
+                <xsl:with-param name="length" select="@fo:padding-bottom"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:attribute>
 
       </xsl:for-each>
     </a:bodyPr>
