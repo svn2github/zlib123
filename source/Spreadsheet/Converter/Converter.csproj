@@ -91,6 +91,7 @@
     <EmbeddedResource Include="resources\oox2odf\ole_objects.xsl" />
     <EmbeddedResource Include="resources\oox2odf\chart.xsl" />
     <EmbeddedResource Include="resources\oox2odf\insert_text.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\change_tracking.xsl" />
     <EmbeddedResource Include="resources\oox2odf\database-ranges.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />
