@@ -65,6 +65,7 @@
     <EmbeddedResource Include="resources\odf2oox\conditional.xsl" />
     <EmbeddedResource Include="resources\odf2oox\sortFilter.xsl" />
     <EmbeddedResource Include="resources\odf2oox\data_consolidation.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\scenario.xsl" />
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />

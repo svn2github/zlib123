@@ -48,6 +48,7 @@
   <xsl:import href="sortFilter.xsl"/>
   <xsl:import href="validation.xsl"/>
   <xsl:import href="data_consolidation.xsl"/>
+  <xsl:import href="scenario.xsl"/>
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
@@ -63,13 +64,15 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
 
+    <xsl:if test="not(table:scenario)">
     <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
       <xsl:call-template name="InsertWorksheet">
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
         <xsl:with-param name="sheetId" select="$sheetId"/>
       </xsl:call-template>
     </pzip:entry>
-
+    </xsl:if>
+    
     <!-- convert next table -->
     <xsl:apply-templates select="following-sibling::table:table[1]" mode="sheet">
       <xsl:with-param name="cellNumber">
@@ -235,6 +238,7 @@
         </xsl:apply-templates>
       </xsl:if>
 
+      <!-- Insert hyperlinks -->
       <xsl:call-template name="InsertHyperlinks"/>
 
       <!-- Insert Data Validation -->
@@ -703,9 +707,16 @@
     <xsl:call-template name="InsertSort">
       <xsl:with-param name="tableName" select="@table:name"/>
     </xsl:call-template>
-
+    
+    <!-- insert data consolidation -->
     <xsl:call-template name="InsertDataConsolidate"/>
-
+    
+    <!-- insert Scenario -->
+    <xsl:call-template name="InsertScenario"/>
+    
+    <!-- search scenario cells >
+    <xsl:call-template name="SearchScenarioCells"/-->
+    
   </xsl:template>
 
   <xsl:template name="InsertHeaderFooter">

@@ -44,6 +44,7 @@
       <!-- Sheet relationship -->
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+        <xsl:if test="not(table:scenario)">
         <Relationship Id="{generate-id(.)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
           <xsl:variable name="NumberSheet">
@@ -53,6 +54,7 @@
             <xsl:value-of select="concat(concat('worksheets/sheet', $NumberSheet), '.xml')"/>
           </xsl:attribute>
         </Relationship>
+       </xsl:if>
       </xsl:for-each>
 
       <!--  Static relationships -->

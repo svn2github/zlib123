@@ -106,6 +106,7 @@
   <xsl:template match="office:spreadsheet">
     <sheets>
       <xsl:for-each select="table:table">
+        <xsl:if test="not(table:scenario)">
         <sheet>
           <!-- characters "*\/[];'?" can not occur in sheet name -->
           <xsl:attribute name="name">
@@ -134,6 +135,7 @@
             </xsl:attribute>
           </xsl:if>
         </sheet>
+       </xsl:if>
       </xsl:for-each>
     </sheets>
     
