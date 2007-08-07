@@ -63,6 +63,7 @@
   <xsl:import href="ole_objects.xsl"/>
   <xsl:import href="connections.xsl"/>
   <xsl:import href="groups.xsl"/>
+  <xsl:import href="change_tracking.xsl"/>
 
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
@@ -125,7 +126,10 @@
 
     <office:body>
       <office:spreadsheet>
-
+        
+        <!--Insert Change Tracking -->
+        <xsl:call-template name="InsertChangeTracking"/>
+        
         <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
           mode="Validation">
           <xsl:with-param name="number">1</xsl:with-param>
