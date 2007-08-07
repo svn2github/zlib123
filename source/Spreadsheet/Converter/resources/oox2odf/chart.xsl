@@ -678,7 +678,7 @@
 
   <xsl:template name="InsertChartProperties">
       <style:style style:name="chart" style:family="chart">
-        <style:graphic-properties draw:stroke="solid" svg:stroke-color="#898989">
+        <style:graphic-properties draw:fill-color="#ffffff" draw:stroke="solid" svg:stroke-color="#898989">
           <xsl:for-each select="c:chartSpace/c:spPr">
             <!-- Insert Borders style, color, fill, transparency -->
           <xsl:call-template name="InsertFill"/>
