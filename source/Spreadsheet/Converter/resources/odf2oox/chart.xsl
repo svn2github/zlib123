@@ -84,35 +84,17 @@
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <pzip:entry pzip:target="{concat('xl/charts/chart',$sheetNum,'_',position(),'.xml')}">
 
-          <!-- example chart file-->
+          <!-- insert chart file content -->
           <xsl:for-each
             select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart">
             <c:chartSpace>
               <c:lang val="pl-PL"/>
 
               <xsl:for-each select="chart:chart">
-                <xsl:call-template name="InsertChart"/>
-
-                <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
-                  <c:spPr>
-
-                    <!--xsl:choose>
-                    <xsl:when test="@draw:fill = 'none' ">
-                      <a:solidFill>
-                        <a:srgbClr val="ffffff"/>
-                      </a:solidFill>
-                    </xsl:when>
-                    <xsl:otherwise-->
-                    <xsl:call-template name="InsertDrawingFill"/>
-                    <!--/xsl:otherwise>
-                  </xsl:choose-->
-
-                    <xsl:call-template name="InsertDrawingBorder"/>
-                  </c:spPr>
-                </xsl:for-each>
-
+                <xsl:call-template name="InsertChart"/>                
+                <!-- chart area properties -->
+                <xsl:call-template name="InsertSpPr"/>
               </xsl:for-each>
-
 
               <c:txPr>
                 <a:bodyPr/>
@@ -1111,6 +1093,17 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template name="InsertSpPr">
+    
+    <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
+      <c:spPr>
+        <xsl:call-template name="InsertDrawingFill"/>
+        <xsl:call-template name="InsertDrawingBorder"/>
+      </c:spPr>
+    </xsl:for-each>
+    
+  </xsl:template>
+  
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="styleName"/>
     <xsl:param name="parentStyleName"/>
