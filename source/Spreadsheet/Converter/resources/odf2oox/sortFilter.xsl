@@ -476,11 +476,11 @@
       <!-- sort range -->
       <xsl:attribute name="ref">
         <xsl:value-of select="concat($col1,$startRow,':')"/>
-        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        <xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"
         />
       </xsl:attribute>
       
-      <xsl:for-each select="table:sort/table:sort-by">
+      <xsl:for-each select="table:sort/table:sort-by[position()=1 or (@table:field-number!=preceding-sibling::table:sort-by/@table:field-number) or (@table:data-type-number!=preceding-sibling::table:sort-by/@table:data-type)]">
         <sortCondition>
           
           <!-- field selection -->
@@ -575,11 +575,11 @@
       <!-- sort range -->
       <xsl:attribute name="ref">
         <xsl:value-of select="concat($startCol,$row1,':')"/>
-        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        <xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"
         />
       </xsl:attribute>
       
-      <xsl:for-each select="table:sort/table:sort-by">
+      <xsl:for-each select="table:sort/table:sort-by[position()=1 or (@table:field-number!=preceding-sibling::table:sort-by/@table:field-number) or (@table:data-type-number!=preceding-sibling::table:sort-by/@table:data-type)]">
         <sortCondition>
           
           <!-- field selection -->
