@@ -119,8 +119,8 @@
             </xsl:variable>
             
             <xsl:for-each select="document($Target)/e:revisions">
-                <xsl:if test="e:rcc">
-                <xsl:apply-templates select="e:rcc">
+                <xsl:if test="e:rcc|e:rm">
+                    <xsl:apply-templates select="e:rcc|e:rm">
                     <xsl:with-param name="dateTime">
                         <xsl:value-of select="$dateTime"/>
                     </xsl:with-param>
@@ -147,80 +147,178 @@
         
     </xsl:template>
     
-    <xsl:template match="e:rcc">
+    <!-- Insert Text "Change Tracking" -->
+    
+    <xsl:template match="e:rcc|e:rm">
         <xsl:param name="dateTime"/>
         <xsl:param name="userName"/>
         <xsl:param name="positionHeader"/>
+
+        <xsl:choose>
+            <xsl:when test="name() = 'rcc'">
+                <table:cell-content-change>
+                    
+                    <xsl:attribute name="table:id">
+                        <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+                    </xsl:attribute>
+                    
+                    <xsl:variable name="colNum">
+                        <xsl:call-template name="GetColNum">
+                            <xsl:with-param name="cell">
+                                <xsl:choose>
+                                    <xsl:when test="e:oc/@r">
+                                        <xsl:value-of select="e:oc/@r"/>
+                                    </xsl:when>
+                                    <xsl:when test="e:nc/@r">
+                                        <xsl:value-of select="e:nc/@r"/>
+                                    </xsl:when>
+                                </xsl:choose>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <xsl:variable name="rowNum">
+                        <xsl:call-template name="GetRowNum">
+                            <xsl:with-param name="cell">
+                                <xsl:choose>
+                                    <xsl:when test="e:oc/@r">
+                                        <xsl:value-of select="e:oc/@r"/>
+                                    </xsl:when>
+                                    <xsl:when test="e:nc/@r">
+                                        <xsl:value-of select="e:nc/@r"/>
+                                    </xsl:when>
+                                </xsl:choose>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <table:cell-address>
+                        <xsl:attribute name="table:table">
+                            <xsl:value-of select="@sId - 1"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="table:row">
+                            <xsl:value-of select="$rowNum - 1"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="table:column">
+                            <xsl:value-of select="$colNum - 1"/>
+                        </xsl:attribute>
+                    </table:cell-address>
+                    
+                    
+                   <xsl:call-template name="InsertAuthorAndDateOfChange">
+                       <xsl:with-param name="userName">
+                           <xsl:value-of select="$userName"/>
+                       </xsl:with-param>
+                       <xsl:with-param name="dateTime">
+                           <xsl:value-of select="$dateTime"/>
+                       </xsl:with-param>
+                   </xsl:call-template>
+                    
+                    <table:previous>
+                        <table:change-track-table-cell office:value-type="string">
+                            <xsl:if test="e:oc/e:is/e:t">
+                                <text:p>
+                                    <xsl:value-of select="e:oc/e:is/e:t"/>
+                                </text:p>
+                            </xsl:if>
+                        </table:change-track-table-cell>
+                    </table:previous>
+                    
+                </table:cell-content-change>        
+            </xsl:when>
+            <xsl:when test="name() = 'rm'">
+                <table:movement>
+                    <xsl:attribute name="table:id">
+                        <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+                    </xsl:attribute>
+                    
+                    <xsl:variable name="colNumSource">
+                        <xsl:call-template name="GetColNum">
+                            <xsl:with-param name="cell">
+                                <xsl:value-of select="@source"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <xsl:variable name="rowNumSource">
+                        <xsl:call-template name="GetRowNum">
+                            <xsl:with-param name="cell">
+                                <xsl:value-of select="@source"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <table:source-range-address>
+                    <xsl:attribute name="table:column">
+                        <xsl:value-of select="$colNumSource - 1"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="table:row">
+                        <xsl:value-of select="$rowNumSource - 1"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="table:table">
+                        <xsl:value-of select="@sheetId - 1"/>
+                    </xsl:attribute>                    
+                    </table:source-range-address>
+                    
+                    <xsl:variable name="colNumDestination">
+                        <xsl:call-template name="GetColNum">
+                            <xsl:with-param name="cell">
+                                <xsl:value-of select="@destination"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <xsl:variable name="rowNumDestination">
+                        <xsl:call-template name="GetRowNum">
+                            <xsl:with-param name="cell">
+                                <xsl:value-of select="@destination"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <table:target-range-address>
+                        <xsl:attribute name="table:column">
+                            <xsl:value-of select="$colNumDestination - 1"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="table:row">
+                            <xsl:value-of select="$rowNumDestination - 1"/>
+                        </xsl:attribute>
+                    <xsl:attribute name="table:table">
+                        <xsl:value-of select="@sourceSheetId - 1"/>
+                    </xsl:attribute>                    
+                    </table:target-range-address>
+                    
+                    <xsl:call-template name="InsertAuthorAndDateOfChange">
+                        <xsl:with-param name="userName">
+                            <xsl:value-of select="$userName"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="dateTime">
+                            <xsl:value-of select="$dateTime"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                    
+                </table:movement>
+            </xsl:when>
+            <xsl:otherwise/>
+        </xsl:choose>
         
-        <table:cell-content-change>
-            
-            <xsl:attribute name="table:id">
-                <xsl:value-of select="concat('ct', $positionHeader, position())"/>
-            </xsl:attribute>
-            
-            <xsl:variable name="colNum">
-                <xsl:call-template name="GetColNum">
-                    <xsl:with-param name="cell">
-                        <xsl:choose>
-                            <xsl:when test="e:oc/@r">
-                                <xsl:value-of select="e:oc/@r"/>
-                            </xsl:when>
-                            <xsl:when test="e:nc/@r">
-                                <xsl:value-of select="e:nc/@r"/>
-                            </xsl:when>
-                        </xsl:choose>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </xsl:variable>
-            
-            <xsl:variable name="rowNum">
-                <xsl:call-template name="GetRowNum">
-                    <xsl:with-param name="cell">
-                        <xsl:choose>
-                            <xsl:when test="e:oc/@r">
-                                <xsl:value-of select="e:oc/@r"/>
-                            </xsl:when>
-                            <xsl:when test="e:nc/@r">
-                                <xsl:value-of select="e:nc/@r"/>
-                            </xsl:when>
-                        </xsl:choose>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </xsl:variable>
-            
-            <table:cell-address>
-                <xsl:attribute name="table:table">
-                    <xsl:value-of select="@sId - 1"/>
-                </xsl:attribute>
-                <xsl:attribute name="table:row">
-                    <xsl:value-of select="$rowNum - 1"/>
-                </xsl:attribute>
-                <xsl:attribute name="table:column">
-                    <xsl:value-of select="$colNum - 1"/>
-                </xsl:attribute>
-            </table:cell-address>
-            
-            
-            <office:change-info>
-                <dc:creator>
-                    <xsl:value-of select="$userName"/>
-                </dc:creator>
-                <dc:date>
-                    <xsl:value-of select="$dateTime"/>
-                </dc:date>
-            </office:change-info>
         
-        <table:previous>
-            <table:change-track-table-cell office:value-type="string">
-                <xsl:if test="e:oc/e:is/e:t">
-                <text:p>
-                    <xsl:value-of select="e:oc/e:is/e:t"/>
-                </text:p>
-                </xsl:if>
-            </table:change-track-table-cell>
-        </table:previous>
-            
-        </table:cell-content-change>
+        
+        
+    </xsl:template>
+    
+    <xsl:template name="InsertAuthorAndDateOfChange">
+        <xsl:param name="userName"/>
+        <xsl:param name="dateTime"/>
+        
+        <office:change-info>
+            <dc:creator>
+                <xsl:value-of select="$userName"/>
+            </dc:creator>
+            <dc:date>
+                <xsl:value-of select="$dateTime"/>
+            </dc:date>
+        </office:change-info>
         
     </xsl:template>
     
