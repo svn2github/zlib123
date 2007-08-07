@@ -238,9 +238,6 @@
         </xsl:apply-templates>
       </xsl:if>
 
-      <!-- Insert hyperlinks -->
-      <xsl:call-template name="InsertHyperlinks"/>
-
       <!-- Insert Data Validation -->
       
       <xsl:if test="table:table-row/table:table-cell/@table:content-validation-name != ''">
@@ -259,6 +256,9 @@
         </dataValidations>
       </xsl:if>
       
+      <!-- Insert hyperlinks -->
+      <xsl:call-template name="InsertHyperlinks"/>
+
       <xsl:call-template name="InsertPageProperties">
         <xsl:with-param name="pageStyle" select="$pageStyle"/>
       </xsl:call-template>
@@ -1351,6 +1351,17 @@
           </xsl:if>
           <xsl:value-of select="$colNumber"/>
 
+          <xsl:if test="@table:number-columns-repeated">
+            <xsl:call-template name="InsertRepeatedCols">
+              <xsl:with-param name="repeat">
+                <xsl:value-of select="@table:number-columns-repeated - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">
+                <xsl:value-of select="$colNumber + 1"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$colBreakes"/>
@@ -1379,8 +1390,26 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="InsertRepeatedCols">
+    <xsl:param name="repeat"/>
+    <xsl:param name="colNumber"/>
+
+    <xsl:text>;</xsl:text>
+    <xsl:value-of select="$colNumber"/>
+
+    <xsl:choose>
+      <xsl:when test="$repeat &gt; 1 ">
+        <xsl:call-template name="InsertRepeatedCols">
+          <xsl:with-param name="repeat" select="$repeat - 1"/>
+          <xsl:with-param name="colNumber" select="$colNumber +1"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
   <xsl:template name="InsertColBreakes">
     <xsl:param name="colBreakes"/>
+    <xsl:param name="breakes"/>
+    <xsl:param name="cols"/>
 
     <brk max="1048575" man="1">
       <xsl:attribute name="id">
