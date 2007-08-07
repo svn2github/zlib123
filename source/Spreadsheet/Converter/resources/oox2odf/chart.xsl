@@ -677,16 +677,16 @@
   </xsl:template>
 
   <xsl:template name="InsertChartProperties">
-    <xsl:for-each select="c:chartSpace/c:spPr">
       <style:style style:name="chart" style:family="chart">
         <style:graphic-properties draw:stroke="solid" svg:stroke-color="#898989">
-          <!-- Insert Borders style, color, fill, transparency -->
+          <xsl:for-each select="c:chartSpace/c:spPr">
+            <!-- Insert Borders style, color, fill, transparency -->
           <xsl:call-template name="InsertFill"/>
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
         </style:graphic-properties>
       </style:style>
-    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertChartTitleProperties">
