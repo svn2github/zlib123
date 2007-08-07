@@ -521,7 +521,6 @@
     <!-- @Description: Outputs chart title -->
     <!-- @Context: input chart file root -->
 
-
     <xsl:choose>
       <!-- title is set by user -->
       <xsl:when test="c:chartSpace/c:chart/c:title/c:tx">
@@ -539,16 +538,25 @@
           </text:p>
         </chart:title>
       </xsl:when>
-      <!-- default pie chart title is first series name -->
+
+      <!-- one series chart default title is first series name -->
       <xsl:when
-        test="c:chartSpace/c:chart/c:title and (c:chartSpace/c:chart/c:plotArea/c:pieChart or c:chartSpace/c:chart/c:plotArea/c:pie3DChart)">
-        <xsl:for-each select="key('dataSeries','')[1]/c:tx/descendant::c:v[1]">
+        test="c:chartSpace/c:chart/c:title/c:layout and count(key('dataSeries','')) = 1 and key('dataSeries','')/c:tx/descendant::c:v[1]">
+        <xsl:for-each select="key('dataSeries','')/c:tx/descendant::c:v[1]">
           <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
             <text:p>
               <xsl:value-of select="text()"/>
             </text:p>
           </chart:title>
         </xsl:for-each>
+      </xsl:when>
+      
+      <xsl:when test="c:chartSpace/c:chart/c:title/c:layout">
+        <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
+          <text:p>
+            <xsl:text>Chart Title</xsl:text>
+          </text:p>
+        </chart:title>        
       </xsl:when>
     </xsl:choose>
 
