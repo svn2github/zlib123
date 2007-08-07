@@ -91,7 +91,7 @@
               <c:lang val="pl-PL"/>
 
               <xsl:for-each select="chart:chart">
-                <xsl:call-template name="InsertChart"/>                
+                <xsl:call-template name="InsertChart"/>
                 <!-- chart area properties -->
                 <xsl:call-template name="InsertSpPr"/>
               </xsl:for-each>
@@ -1094,16 +1094,16 @@
   </xsl:template>
 
   <xsl:template name="InsertSpPr">
-    
+
     <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
       <c:spPr>
         <xsl:call-template name="InsertDrawingFill"/>
         <xsl:call-template name="InsertDrawingBorder"/>
       </c:spPr>
     </xsl:for-each>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="styleName"/>
     <xsl:param name="parentStyleName"/>
@@ -1136,28 +1136,29 @@
       </xsl:if>
 
       <!-- line color -->
-      <xsl:if
-        test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none') and 
-        (key('style',$styleName)/style:graphic-properties/@svg:stroke-color or key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color)">
+      <xsl:if test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none')">
         <a:ln w="3175">
           <a:solidFill>
             <a:srgbClr val="000000">
-              <xsl:attribute name="val">
-                <xsl:choose>
-                  <xsl:when
-                    test="key('style',$styleName)/style:graphic-properties/@svg:stroke-color">
-                    <xsl:value-of
-                      select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
-                    />
-                  </xsl:when>
-                  <xsl:when
-                    test="key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color">
-                    <xsl:value-of
-                      select="substring(key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color,2)"
-                    />
-                  </xsl:when>
-                </xsl:choose>
-              </xsl:attribute>
+              <xsl:if
+                test="(key('style',$styleName)/style:graphic-properties/@svg:stroke-color or key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color)">
+                <xsl:attribute name="val">
+                  <xsl:choose>
+                    <xsl:when
+                      test="key('style',$styleName)/style:graphic-properties/@svg:stroke-color">
+                      <xsl:value-of
+                        select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
+                      />
+                    </xsl:when>
+                    <xsl:when
+                      test="key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color">
+                      <xsl:value-of
+                        select="substring(key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color,2)"
+                      />
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:if>
             </a:srgbClr>
           </a:solidFill>
           <a:prstDash val="solid"/>
