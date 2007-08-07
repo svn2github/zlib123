@@ -550,13 +550,13 @@
           </chart:title>
         </xsl:for-each>
       </xsl:when>
-      
+
       <xsl:when test="c:chartSpace/c:chart/c:title/c:layout">
         <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
           <text:p>
             <xsl:text>Chart Title</xsl:text>
           </text:p>
-        </chart:title>        
+        </chart:title>
       </xsl:when>
     </xsl:choose>
 
@@ -679,7 +679,7 @@
   <xsl:template name="InsertChartProperties">
     <xsl:for-each select="c:chartSpace/c:spPr">
       <style:style style:name="chart" style:family="chart">
-        <style:graphic-properties>
+        <style:graphic-properties draw:stroke="solid" svg:stroke-color="#898989">
           <!-- Insert Borders style, color, fill, transparency -->
           <xsl:call-template name="InsertFill"/>
           <xsl:call-template name="InsertLineColor"/>
@@ -842,16 +842,16 @@
 
   <xsl:template name="InsertWallProperties">
     <!-- c:chartSpace/c:chart/c:backWall -->
-    <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:spPr">
-      <style:style style:name="wall" style:family="chart">
-        <style:graphic-properties>
-          <!-- Insert Borders Wall style, color, fill, transparency -->
+    <style:style style:name="wall" style:family="chart">
+      <style:graphic-properties draw:stroke="none" draw:fill="solid" draw:fill-color="#ffffff">
+        <!-- Insert Borders Wall style, color, fill, transparency -->
+        <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:spPr">
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
           <xsl:call-template name="InsertFill"/>
-        </style:graphic-properties>
-      </style:style>
-    </xsl:for-each>
+        </xsl:for-each>
+      </style:graphic-properties>
+    </style:style>
   </xsl:template>
 
   <xsl:template name="InsertFloorProperties">
