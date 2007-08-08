@@ -278,7 +278,7 @@
           </xsl:if>
         </xsl:if>
         <!-- for the Radar Chart -->
-        <xsl:if test="//chart:chart[attribute::chart:class='chart:radar']">
+        <xsl:if test="//chart:chart[attribute::chart:class='chart:radar'] and not(boolean(//chart:axis/chart:categories))">
           <xsl:for-each select="chart:axis[@chart:dimension = 'y' ]">
             <xsl:call-template name="InsertCatAx">
               <xsl:with-param name="chartWidth" select="$chartWidth+20"/>
