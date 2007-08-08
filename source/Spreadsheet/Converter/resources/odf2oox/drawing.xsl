@@ -44,32 +44,34 @@
   <!-- Insert Drawing (picture, chart)  -->
   <xsl:template name="InsertDrawing">
 
-    <xsl:variable name="chart">
-      <xsl:for-each select="descendant::draw:frame/draw:object">
-        <xsl:choose>
-          <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
-            <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
-              <xsl:choose>
-                <xsl:when test="office:document-content/office:body/office:chart">
-                  <xsl:text>true</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>false</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
-    </xsl:variable>
+    
 
     <xdr:wsDr>
       <!--Insert Chart -->
       <xsl:for-each select="descendant::draw:frame">
 
+        <xsl:variable name="chart">
+          <xsl:for-each select="descendant::draw:object">  
+            <xsl:choose>
+              <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
+                <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+                  <xsl:choose>
+                    <xsl:when test="office:document-content/office:body/office:chart">
+                      <xsl:text>true</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>false</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:variable>
+        
         <xsl:choose>
           <!-- insert chart -->
           <xsl:when test="contains($chart, 'true')">
