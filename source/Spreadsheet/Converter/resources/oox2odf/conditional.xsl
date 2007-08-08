@@ -36,6 +36,10 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
+  <xsl:import href="common.xsl"/>
+  <xsl:import href="relationships.xsl"/>
+  <xsl:import href="border.xsl"/>
+  <xsl:import href="styles.xsl"/>
 
   <!-- Get cell when the conditional is starting and ending -->
   <xsl:template name="ConditionalCell">
@@ -84,6 +88,9 @@
             <xsl:when test="contains(@sqref, ':')">
               <xsl:value-of select="substring-before(@sqref, ':')"/>
             </xsl:when>
+            <xsl:when test="contains(@sqref, ' ')">
+              <xsl:value-of select="substring-before(@sqref, ' ')"/>
+            </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="@sqref"/>
             </xsl:otherwise>
@@ -99,6 +106,9 @@
             <xsl:when test="contains(@sqref, ':')">
               <xsl:value-of select="substring-before(@sqref, ':')"/>
             </xsl:when>
+            <xsl:when test="contains(@sqref, ' ')">
+              <xsl:value-of select="substring-before(@sqref, ' ')"/>
+            </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="@sqref"/>
             </xsl:otherwise>
@@ -113,7 +123,6 @@
 
     <xsl:choose>
       <xsl:when test="contains(@sqref, ':')">
-
         <xsl:choose>
           <xsl:when test="following-sibling::e:conditionalFormatting">
             <xsl:apply-templates select="following-sibling::e:conditionalFormatting[1]">
@@ -128,6 +137,12 @@
                   <xsl:with-param name="EndCell">
                     <xsl:value-of select="substring-after(@sqref, ':')"/>
                   </xsl:with-param>
+                  <xsl:with-param name="document">
+                    <xsl:value-of select="$document"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="dxfIdStyle">
+                    <xsl:value-of select="$dxfIdStyle"/>
+                  </xsl:with-param>                  
                 </xsl:call-template>
               </xsl:with-param>
               <xsl:with-param name="document">
@@ -169,7 +184,7 @@
                     />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"/>
+                   <xsl:value-of select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>

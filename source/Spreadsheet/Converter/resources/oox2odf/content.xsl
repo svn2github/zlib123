@@ -1963,6 +1963,12 @@
         <xsl:value-of select="$NoteColl"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
+      <!--xsl:with-param name="ConditionalCell">
+        <xsl:value-of select="$ConditionalCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellStyle">
+        <xsl:value-of select="$ConditionalCellStyle"/>
+      </xsl:with-param-->
       <xsl:with-param name="ValidationCell">
         <xsl:value-of select="$ValidationCell"/>
       </xsl:with-param>
