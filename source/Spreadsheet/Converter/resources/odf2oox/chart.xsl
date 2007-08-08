@@ -82,18 +82,29 @@
     <xsl:if test="contains($chart, 'true')">
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
-        <pzip:entry pzip:target="{concat('xl/charts/chart',$sheetNum,'_',position(),'.xml')}">
 
-          <!-- insert chart file content -->
-          <xsl:for-each
-            select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart">
+        <xsl:variable name="chartDirectory">
+          <xsl:value-of select="translate(@xlink:href,'./','')"/>
+        </xsl:variable>
+
+        <xsl:variable name="chartNum">
+          <xsl:value-of select="position()"/>
+        </xsl:variable>
+
+        <!-- insert chart file content -->
+        <xsl:for-each
+          select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart">
+          <pzip:entry pzip:target="{concat('xl/charts/chart',$sheetNum,'_',$chartNum,'.xml')}">
+
             <c:chartSpace>
               <c:lang val="pl-PL"/>
 
               <xsl:for-each select="chart:chart">
                 <xsl:call-template name="InsertChart"/>
                 <!-- chart area properties -->
-                <xsl:call-template name="InsertSpPr"/>
+                <xsl:call-template name="InsertSpPr">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
               </xsl:for-each>
 
               <c:txPr>
@@ -121,10 +132,37 @@
                 <c:pageSetup/>
               </c:printSettings>
             </c:chartSpace>
-          </xsl:for-each>
-        </pzip:entry>
+          </pzip:entry>
+
+          <xsl:call-template name="CreateChartRelationships">
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+            <xsl:with-param name="chartFile">
+              <xsl:value-of select="concat('chart',$sheetNum,'_',$chartNum)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+
+        </xsl:for-each>
+
+
       </xsl:for-each>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="CreateChartRelationships">
+    <xsl:param name="chartFile"/>
+    <xsl:param name="chartDirectory"/>
+    
+    <!-- check if there is bitmap fill -->
+    <xsl:if
+      test="/office:document-content/office:automatic-styles/style:style/style:graphic-properties[@draw:fill = 'bitmap' ]">
+      <pzip:entry pzip:target="{concat('xl/charts/_rels/',$chartFile,'.xml.rels')}">
+        <xsl:call-template name="InsertChartRels">
+          <!--xsl:with-param name="sheetNum" select="position()"/-->
+          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        </xsl:call-template>
+      </pzip:entry>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="InsertChart">
@@ -1094,10 +1132,13 @@
   </xsl:template>
 
   <xsl:template name="InsertSpPr">
+    <xsl:param name="chartDirectory"/>
 
     <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
       <c:spPr>
-        <xsl:call-template name="InsertDrawingFill"/>
+        <xsl:call-template name="InsertDrawingFill">
+          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        </xsl:call-template>
         <xsl:call-template name="InsertDrawingBorder"/>
       </c:spPr>
     </xsl:for-each>

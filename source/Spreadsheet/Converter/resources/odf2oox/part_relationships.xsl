@@ -45,16 +45,16 @@
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
         <xsl:if test="not(table:scenario)">
-        <Relationship Id="{generate-id(.)}"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
-          <xsl:variable name="NumberSheet">
-            <xsl:value-of select="position()"/>
-          </xsl:variable>
-          <xsl:attribute name="Target">
-            <xsl:value-of select="concat(concat('worksheets/sheet', $NumberSheet), '.xml')"/>
-          </xsl:attribute>
-        </Relationship>
-       </xsl:if>
+          <Relationship Id="{generate-id(.)}"
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
+            <xsl:variable name="NumberSheet">
+              <xsl:value-of select="position()"/>
+            </xsl:variable>
+            <xsl:attribute name="Target">
+              <xsl:value-of select="concat(concat('worksheets/sheet', $NumberSheet), '.xml')"/>
+            </xsl:attribute>
+          </Relationship>
+        </xsl:if>
       </xsl:for-each>
 
       <!--  Static relationships -->
@@ -139,7 +139,7 @@
       </xsl:otherwise>
     </xsl:choose>
 
-  </xsl:template>        
+  </xsl:template>
 
 
   <xsl:template name="InsertWorksheetsRels">
@@ -232,7 +232,7 @@
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"
           Target="{concat('../drawings/drawing',$sheetNum,'.xml')}"/>
       </xsl:if>
-      
+
       <xsl:if test="$OLEObject = 'true'">
         <Relationship Id="rId1"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"
@@ -242,6 +242,43 @@
   </xsl:template>
 
 
+  <xsl:template name="InsertChartRels">
+    <xsl:param name="chartDirectory"/>
+    
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <!-- search for bitmap fills -->
+      <xsl:for-each
+        select="/office:document-content/office:automatic-styles/style:style/style:graphic-properties[@draw:fill = 'bitmap' ]">
+        
+        <xsl:variable name="fillImage">
+          <xsl:value-of select="@draw:fill-image-name"/>
+        </xsl:variable>
+        
+        <!-- go to bitmap-fill style -->
+        <xsl:for-each
+          select="document(concat($chartDirectory,'/styles.xml'))/office:document-styles/office:styles/draw:fill-image[@draw:name = $fillImage]">
+          
+          <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
+          
+          <pzip:copy pzip:source="{concat($chartDirectory,'/',@xlink:href)}" pzip:target="xl/media/{concat(generate-id(),$imageName)}"/>
+          
+          <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+            <xsl:attribute name="Id">
+              <xsl:value-of select="generate-id()"/>
+            </xsl:attribute>
+            
+            <xsl:attribute name="Target">
+              <xsl:text>../media/</xsl:text>
+              <!-- the same bitmap fill in two diferent charts has the same name so to distinct it is preceded with generate-id() -->
+              <xsl:value-of select="concat(generate-id(),$imageName)"/>
+            </xsl:attribute>
+          </Relationship>
+        </xsl:for-each>
+        
+      </xsl:for-each>
+    </Relationships>    
+  </xsl:template>
+  
   <xsl:template name="InsertDrawingRels">
     <xsl:param name="sheetNum"/>
 
@@ -268,14 +305,14 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
-      
+
       <xsl:if test="contains($chart, 'true')">
-      <xsl:for-each
-        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
-        <Relationship Id="{generate-id(parent::node())}"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"
-          Target="{concat('../charts/chart',$sheetNum,'_',position(),'.xml')}"/>
-      </xsl:for-each>
+        <xsl:for-each
+          select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
+          <Relationship Id="{generate-id(parent::node())}"
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"
+            Target="{concat('../charts/chart',$sheetNum,'_',position(),'.xml')}"/>
+        </xsl:for-each>
       </xsl:if>
 
       <!-- pictures -->
@@ -371,27 +408,29 @@
   </xsl:template>
 
   <xsl:template name="InsertWorkobookExternalRels">
-<xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame/draw:object">
-    <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
-      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink">
-        <xsl:attribute name="Id">
-          <xsl:value-of select="generate-id()"/>
-        </xsl:attribute>
-        
-        <xsl:variable name="NumberFile">
-          <xsl:value-of select="position()"/>
-        </xsl:variable>
-        
-        <xsl:attribute name="Target">
-          <xsl:for-each select="draw:object">
-            <xsl:value-of select="concat(concat('externalLinks/externalLink', $NumberFile), '.xml')"/>
-          </xsl:for-each> 
-        </xsl:attribute>
-      </Relationship>
-    </xsl:for-each>
-</xsl:if>
+    <xsl:if
+      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame/draw:object">
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink">
+          <xsl:attribute name="Id">
+            <xsl:value-of select="generate-id()"/>
+          </xsl:attribute>
+
+          <xsl:variable name="NumberFile">
+            <xsl:value-of select="position()"/>
+          </xsl:variable>
+
+          <xsl:attribute name="Target">
+            <xsl:for-each select="draw:object">
+              <xsl:value-of
+                select="concat(concat('externalLinks/externalLink', $NumberFile), '.xml')"/>
+            </xsl:for-each>
+          </xsl:attribute>
+        </Relationship>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

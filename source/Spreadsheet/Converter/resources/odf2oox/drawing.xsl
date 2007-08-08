@@ -44,17 +44,18 @@
   <!-- Insert Drawing (picture, chart)  -->
   <xsl:template name="InsertDrawing">
 
-    
+
 
     <xdr:wsDr>
       <!--Insert Chart -->
       <xsl:for-each select="descendant::draw:frame">
 
         <xsl:variable name="chart">
-          <xsl:for-each select="descendant::draw:object">  
+          <xsl:for-each select="descendant::draw:object">
             <xsl:choose>
               <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
-                <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+                <xsl:for-each
+                  select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
                   <xsl:choose>
                     <xsl:when test="office:document-content/office:body/office:chart">
                       <xsl:text>true</xsl:text>
@@ -71,7 +72,7 @@
             </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
-        
+
         <xsl:choose>
           <!-- insert chart -->
           <xsl:when test="contains($chart, 'true')">
@@ -1027,9 +1028,16 @@
   </xsl:template>
 
   <xsl:template name="InsertDrawingFill">
+    <xsl:param name="chartDirectory"/>
 
-    <!-- background color-->
     <xsl:choose>
+      <!-- background image -->
+      <xsl:when test="@draw:fill = 'bitmap' ">
+        <xsl:call-template name="InsertBitmapFill">
+          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- background color-->
       <xsl:when test="not(@draw:fill = 'none' )">
         <a:solidFill>
           <a:srgbClr>
@@ -1102,6 +1110,30 @@
       </xsl:choose>
 
     </a:ln>
+  </xsl:template>
+
+  <xsl:template name="InsertBitmapFill">
+    <xsl:param name="chartDirectory"/>
+
+    <xsl:variable name="fillImage">
+      <xsl:value-of select="@draw:fill-image-name"/>
+    </xsl:variable>
+
+    <xsl:for-each
+      select="document(concat($chartDirectory,'/styles.xml'))/office:document-styles/office:styles/draw:fill-image[@draw:name = $fillImage]">
+      <a:blipFill dpi="0" rotWithShape="1">
+        <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+          r:embed="{generate-id()}"/>
+        <a:srcRect/>
+        <a:tile tx="0" ty="0" sx="100000" sy="100000" flip="none" algn="tl"/>
+      </a:blipFill>
+    </xsl:for-each>
+
+    <!--pzip:copy pzip:source="{@xlink:href}" pzip:target="xl/media/{$imageName}"/-->
+
+    <!--xsl:for-each select="document()">
+    
+  </xsl:for-each-->
   </xsl:template>
 
 </xsl:stylesheet>
