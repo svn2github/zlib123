@@ -177,16 +177,17 @@
           <xsl:for-each select="descendant::draw:frame/draw:object">
             <xsl:choose>
               <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
-            <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
-              <xsl:choose>
-                <xsl:when test="office:document-content/office:body/office:chart">
-                  <xsl:text>true</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>false</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
+                <xsl:for-each
+                  select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+                  <xsl:choose>
+                    <xsl:when test="office:document-content/office:body/office:chart">
+                      <xsl:text>true</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>false</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>false</xsl:text>
@@ -217,8 +218,6 @@
         <!-- create VmlDrawing.xml file -->
         <xsl:call-template name="CreateVmlDrawing"/>
 
-
-        <!-- <xsl:if test="$picture = 'true' or contains($chart,'true')"> -->
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
           <xsl:call-template name="CreateDrawing"/>
 
@@ -430,29 +429,29 @@
               <xsl:with-param name="length" select="@svg:width"/>
             </xsl:call-template>
           </xsl:variable>
-          
+
           <xsl:variable name="height">
             <xsl:call-template name="point-measure">
               <xsl:with-param name="length" select="@svg:height"/>
             </xsl:call-template>
           </xsl:variable>
-          
-        <xsl:variable name="z-index">
-          <xsl:value-of select="position()"/>
-        </xsl:variable>
-          
+
+          <xsl:variable name="z-index">
+            <xsl:value-of select="position()"/>
+          </xsl:variable>
+
           <xsl:variable name="margin-left">
             <xsl:call-template name="point-measure">
               <xsl:with-param name="length" select="@svg:x"/>
-              </xsl:call-template>
+            </xsl:call-template>
           </xsl:variable>
-          
+
           <xsl:variable name="margin-top">
             <xsl:call-template name="point-measure">
               <xsl:with-param name="length" select="@svg:y"/>
             </xsl:call-template>
           </xsl:variable>
-          
+
           <v:shape type="#_x0000_t75"
             style="position:absolute;
             margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
