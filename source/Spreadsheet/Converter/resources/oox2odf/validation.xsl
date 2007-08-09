@@ -505,26 +505,9 @@
                 <!-- Criteria Data -->
                 <xsl:attribute name="table:condition">
 
-                    <xsl:choose>
-                        <xsl:when test="contains(@type, 'whole')">
-                            <xsl:text>oooc:cell-content-is-whole-number()</xsl:text>
-                        </xsl:when>
-                        <xsl:when test="contains(@type, 'decimal')">
-                            <xsl:text>oooc:cell-content-is-decimal-number()</xsl:text>
-                        </xsl:when>
-                        <xsl:when test="contains(@type, 'date')">
-                            <xsl:text>oooc:cell-content-is-date()</xsl:text>
-                        </xsl:when>
-                        <xsl:when test="contains(@type, 'time')">
-                            <xsl:text>oooc:cell-content-is-time()</xsl:text>
-                        </xsl:when>
-                        <xsl:otherwise/>
-                    </xsl:choose>
-
                     <xsl:variable name="valuue">
                         <xsl:value-of select="e:formula1"/>
                     </xsl:variable>
-
                     <xsl:variable name="chooseeBetween">
                         <xsl:if test="e:formula2">
                             <xsl:choose>
@@ -541,6 +524,22 @@
                             </xsl:choose>
                         </xsl:if>
                     </xsl:variable>
+
+
+                    <xsl:choose>
+                        <xsl:when test="contains(@type, 'whole')">
+                            <xsl:text>oooc:cell-content-is-whole-number()</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="contains(@type, 'decimal')">
+                            <xsl:text>oooc:cell-content-is-decimal-number()</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="contains(@type, 'date')">
+                            <xsl:text>oooc:cell-content-is-date()</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="contains(@type, 'time')">
+                            <xsl:text>oooc:cell-content-is-time()</xsl:text>
+                        </xsl:when>
+                    </xsl:choose>
 
                     <xsl:choose>
                         <xsl:when
@@ -671,29 +670,25 @@
                 </xsl:if>
 
                 <!-- Criteria Allow Blank Cells -->
-                <xsl:choose>
-                    <xsl:when test="contains(@allowBlank, '1')">
-                        <xsl:attribute name="table:allow-empty-cell">
+                <xsl:attribute name="table:allow-empty-cell">
+                    <xsl:choose>
+                        <xsl:when test="contains(@allowBlank, '1')">
                             <xsl:text>true</xsl:text>
-                        </xsl:attribute>
-                    </xsl:when>
-                    <xsl:otherwise>false</xsl:otherwise>
-                </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>false</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
 
                 <table:help-message>
                     <!-- Input Help - Show input help when cell is selected -->
-                    <xsl:choose>
-                        <xsl:when test="contains(@showInputMessage, '1')">
-                            <xsl:attribute name="table:display">
+                    <xsl:attribute name="table:display">
+                        <xsl:choose>
+                            <xsl:when test="contains(@showInputMessage, '1')">
                                 <xsl:text>true</xsl:text>
-                            </xsl:attribute>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:attribute name="table:display">
-                            <xsl:text>false</xsl:text>
-                          </xsl:attribute>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                            </xsl:when>
+                            <xsl:otherwise>false</xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
                     <!-- Input Help Title -->
                     <xsl:attribute name="table:title">
                         <xsl:value-of select="@promptTitle"/>
@@ -705,14 +700,14 @@
 
                 <table:error-message>
                     <!-- Error Alert - Show error alert when cell is selected -->
-                    <xsl:choose>
-                        <xsl:when test="contains(@showErrorMessage, '1')">
-                            <xsl:attribute name="table:display">
+                    <xsl:attribute name="table:display">
+                        <xsl:choose>
+                            <xsl:when test="contains(@showErrorMessage, '1')">
                                 <xsl:text>true</xsl:text>
-                            </xsl:attribute>
-                        </xsl:when>
-                        <xsl:otherwise>false</xsl:otherwise>
-                    </xsl:choose>
+                            </xsl:when>
+                            <xsl:otherwise>false</xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
                     <!-- Error Allert Action-->
                     <xsl:attribute name="table:message-type">
                         <xsl:choose>
