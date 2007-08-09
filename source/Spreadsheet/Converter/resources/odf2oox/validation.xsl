@@ -86,14 +86,14 @@
     </xsl:template>
 
     <!-- insert validation -->
-    <xsl:template match="table:table-cell" mode="validation">
+    <xsl:template match="table:table-cell|table:covered-table-cell" mode="validation">
         <xsl:param name="colNumber"/>
         <xsl:param name="rowNumber"/>
         <xsl:param name="TableColumnTagNum"/>
         <xsl:param name="MergeCell"/>
         <xsl:param name="tableName"/>
 
-        <xsl:if test="@table:content-validation-name != ''">
+        <xsl:if test="./@table:content-validation-name != ''">
 
             <xsl:variable name="ValidationName">
                 <xsl:value-of select="@table:content-validation-name"/>
@@ -128,7 +128,7 @@
 
         <xsl:if test="following-sibling::table:table-cell">
             <xsl:apply-templates
-                select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]"
+                select="following-sibling::node()[1][name() = 'table:table-cell' or name() = 'table:covered-table-cell']"
                 mode="validation">
                 <xsl:with-param name="colNumber">
                     <xsl:choose>
