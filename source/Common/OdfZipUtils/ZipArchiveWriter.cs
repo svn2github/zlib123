@@ -245,9 +245,11 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                   	case COPY_ELEMENT:
                         if (binarySource != null && binaryTarget != null)
                         {
-                        	if (binaries != null && !binaries.ContainsKey(binarySource))
+                        	if (binaries != null && !binaries.ContainsKey(binaryTarget))
                         	{
-                        		binaries.Add(binarySource, binaryTarget);
+                                //Target is the key because there is a case where one file has to be
+                                //coppied twice to different locations
+                        		binaries.Add(binaryTarget, binarySource);
                         	}
                         	binarySource = null;
                         	binaryTarget = null;
@@ -550,7 +552,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         {
         	foreach (string s in binaries.Keys) 
         	{
-        		CopyBinary(s, (string) binaries[s]);
+        		CopyBinary((string) binaries[s], s);
         	}
         }
 
