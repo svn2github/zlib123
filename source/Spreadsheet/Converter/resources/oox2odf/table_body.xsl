@@ -989,11 +989,14 @@
 
           <xsl:if
             test="contains(concat(';', $ValidationCell), concat(';', $rowNum, ':', $colNum, ';'))">
+            <xsl:variable name="ValidationStyle">
+              <xsl:value-of
+                select="substring-before(substring-after(concat(';', $ValidationCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')"
+              />
+            </xsl:variable>
             <xsl:attribute name="table:content-validation-name">
-              <!--xsl:value-of select="(concat('val', $sheetNr, (. + 1)))"/-->
-              <xsl:value-of select="(concat('val', $sheetNr, 1))"/>
+              <xsl:value-of select="(concat('val', $sheetNr, $ValidationStyle + 1))"/>
             </xsl:attribute>
-
           </xsl:if>
 
           <xsl:if test="e:v">

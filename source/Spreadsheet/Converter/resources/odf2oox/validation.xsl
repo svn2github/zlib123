@@ -201,7 +201,6 @@
                         <xsl:when test="contains(@table:message-type, 'stop')">
                             <xsl:text>stop</xsl:text>
                         </xsl:when>
-                        <xsl:otherwise> </xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
             </xsl:for-each>
@@ -243,51 +242,52 @@
                         <xsl:text>1</xsl:text>
                     </xsl:attribute>
                 </xsl:when>
-                <xsl:otherwise/>
             </xsl:choose>
 
             <!-- Input Help - Show input help when cell is selected -->
             <xsl:for-each select="table:help-message">
-                <xsl:choose>
-                    <xsl:when test="contains(@table:display, 'true')">
+                    <xsl:if test="contains(@table:display, 'true')">
                         <xsl:attribute name="showInputMessage">
                             <xsl:text>1</xsl:text>
                         </xsl:attribute>
-                    </xsl:when>
-                    <xsl:otherwise/>
-                </xsl:choose>
-
+                    </xsl:if>
+                
                 <!-- Input Help Title -->
-                <xsl:attribute name="promptTitle">
-                    <xsl:value-of select="@table:title"/>
-                </xsl:attribute>
+                <xsl:if test="@table:title !='' ">
+                    <xsl:attribute name="promptTitle">
+                        <xsl:value-of select="@table:title"/>
+                    </xsl:attribute>
+                </xsl:if>
 
                 <!-- Input Help - input help -->
-                <xsl:attribute name="prompt">
-                    <xsl:value-of select="."/>
-                </xsl:attribute>
+                <xsl:if test=".!=''">
+                    <xsl:attribute name="prompt">
+                        <xsl:value-of select="."/>
+                    </xsl:attribute>
+                </xsl:if>
             </xsl:for-each>
 
             <!-- Show error message wheninvalid values are entered -->
             <xsl:for-each select="table:error-message">
-                <xsl:choose>
-                    <xsl:when test="contains(@table:display, 'true')">
-                        <xsl:attribute name="showErrorMessage">
-                            <xsl:text>1</xsl:text>
-                        </xsl:attribute>
-                    </xsl:when>
-                    <xsl:otherwise/>
-                </xsl:choose>
+                <xsl:if test="contains(@table:display, 'true')">
+                    <xsl:attribute name="showErrorMessage">
+                        <xsl:text>1</xsl:text>
+                    </xsl:attribute>
+                </xsl:if>
 
                 <!-- Error Allert Title -->
-                <xsl:attribute name="errorTitle">
-                    <xsl:value-of select="@table:title"/>
-                </xsl:attribute>
+                <xsl:if test="@table:title !='' ">
+                    <xsl:attribute name="errorTitle">
+                        <xsl:value-of select="@table:title"/>
+                    </xsl:attribute>
+                </xsl:if>
 
                 <!-- Error Allert message -->
-                <xsl:attribute name="error">
-                    <xsl:value-of select="substring(., 1, 255)"/>
-                </xsl:attribute>
+                <xsl:if test=".!='' ">
+                    <xsl:attribute name="error">
+                        <xsl:value-of select="substring(., 1, 255)"/>
+                    </xsl:attribute>
+                </xsl:if>
             </xsl:for-each>
 
             <!-- Converts number of column on letter -->
