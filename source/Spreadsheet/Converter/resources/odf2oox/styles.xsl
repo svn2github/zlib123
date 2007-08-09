@@ -584,6 +584,7 @@
       <!-- default style -->
       <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
 
+      <!-- output cell formats from content.xml -->
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
         mode="cellFormats">
@@ -622,6 +623,7 @@
         </xsl:with-param>
       </xsl:apply-templates>
 
+      <!-- output cell formats from styles.xml -->
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/style:style"
         mode="cellFormats">

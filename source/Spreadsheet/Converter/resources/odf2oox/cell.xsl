@@ -1387,9 +1387,15 @@
                   <xsl:value-of select="@style:apply-style-name"/>
                 </xsl:variable>
 
-                <xsl:variable name="CountConditionalStyle">
+                <!--xsl:variable name="CountConditionalStyle">
                   <xsl:value-of
                     select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:apply-style-name])"
+                  />
+                </xsl:variable-->
+                
+                <xsl:variable name="CountStyle">
+                  <xsl:value-of
+                    select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleApplyStyleName])"
                   />
                 </xsl:variable>
 
@@ -1404,7 +1410,8 @@
                         <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                       </xsl:variable>
                       <xsl:attribute name="s">
-                        <xsl:value-of select="$CountConditionalStyle+$CountTableCell"/>
+                        <!--xsl:value-of select="$CountTableCell + $CountConditionalStyle"/-->
+                        <xsl:value-of select="$CountTableCell + $CountStyle"/>
                       </xsl:attribute>
                     </xsl:for-each>
                   </xsl:when>
