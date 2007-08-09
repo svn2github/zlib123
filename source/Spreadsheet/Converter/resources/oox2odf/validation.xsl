@@ -688,7 +688,11 @@
                                 <xsl:text>true</xsl:text>
                             </xsl:attribute>
                         </xsl:when>
-                        <xsl:otherwise>false</xsl:otherwise>
+                        <xsl:otherwise>
+                          <xsl:attribute name="table:display">
+                            <xsl:text>false</xsl:text>
+                          </xsl:attribute>
+                        </xsl:otherwise>
                     </xsl:choose>
                     <!-- Input Help Title -->
                     <xsl:attribute name="table:title">
