@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+ 
+  <data name="translation.odf2oox.paddingShortened" xml:space="preserve">
+    <value>スペースのサイズ</value>
+  </data>
+  <data name="translation.odf2oox.borderShortened" xml:space="preserve">
+    <value>罫線のサイズ</value>
+  </data>
+  <data name="translation.odf2oox.textBgColor" xml:space="preserve">
+    <value>文字列の背景色</value>
+  </data>
+  <data name="translation.odf2oox.dateFormat" xml:space="preserve">
+    <value>日付の書式</value>
+  </data>
+  <data name="translation.odf2oox.chapterField" xml:space="preserve">
+    <value>章タイトルのフィールド (スタイル未定義)</value>
+  </data>
+  <data name="translation.odf2oox.descriptionField" xml:space="preserve">
+    <value>説明フィールド</value>
+  </data>
+  <data name="translation.odf2oox.printedByField" xml:space="preserve">
+    <value>最終印刷者フィールド</value>
+  </data>
+  <data name="translation.odf2oox.pageVariableField" xml:space="preserve">
+    <value>ページ変数フィールド</value>
+  </data>
+  <data name="translation.odf2oox.ddeConnection" xml:space="preserve">
+    <value>DDE 接続</value>
+  </data>
+  <data name="translation.odf2oox.formulaField" xml:space="preserve">
+    <value>数式フィールド</value>
+  </data>
+  <data name="translation.odf2oox.internetProperties" xml:space="preserve">
+    <value>インターネットのプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.documentCreationDate" xml:space="preserve">
+    <value>ドキュメントの作成日</value>
+  </data>
+  <data name="translation.odf2oox.documentModificationDate" xml:space="preserve">
+    <value>ドキュメントの最終更新日</value>
+  </data>
+  <data name="translation.odf2oox.nestedFrames" xml:space="preserve">
+    <value>入れ子フレーム</value>
+  </data>
+  <data name="translation.odf2oox.positionInsideTextbox" xml:space="preserve">
+    <value>テキスト ボックス内のオブジェクトの位置</value>
+  </data>
+  <data name="translation.odf2oox.annotationsInsideTextbox" xml:space="preserve">
+    <value>テキスト ボックス内のコメント</value>
+  </data>
+  <data name="translation.odf2oox.annotationsInsideHeaderFooter" xml:space="preserve">
+    <value>ヘッダーまたはフッター内のコメント</value>
+  </data>
+  <data name="translation.odf2oox.hyperlinkName" xml:space="preserve">
+    <value>ハイパーリンクの名前</value>
+  </data>
+  <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve">
+    <value>表示済みリンクのスタイル</value>
+  </data>
+  <data name="translation.odf2oox.hiddenSection" xml:space="preserve">
+    <value>非表示セクション</value>
+  </data>
+  <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve">
+    <value>条件付き非表示セクション</value>
+  </data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve">
+    <value>%1 の保護キー</value>
+  </data>
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve">
+    <value>索引 %1 の章範囲</value>
+  </data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve">
+    <value>索引 %1 のインデントのプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve">
+    <value>索引 %1 の並べ替えアルゴリズム</value>
+  </data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve">
+    <value>索引 %1 の保護</value>
+  </data>
+  <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve">
+    <value>アルファベット順の索引の登録ファイル</value>
+  </data>
+  <data name="translation.odf2oox.dropcapSize" xml:space="preserve">
+    <value>ドロップ キャップのサイズ</value>
+  </data>
+  <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve">
+    <value>文末脚注前の改ページ</value>
+  </data>
+  <data name="translation.odf2oox.noteInList" xml:space="preserve">
+    <value>一覧のメモ</value>
+  </data>
+  <data name="translation.odf2oox.footnoteContinuationSeparator" xml:space="preserve">
+    <value>脚注の継続時の境界線</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorWidth" xml:space="preserve">
+    <value>脚注の境界線の幅</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorLength" xml:space="preserve">
+    <value>脚注の境界線の長さ</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorColor" xml:space="preserve">
+    <value>脚注の境界線の色</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorStyle" xml:space="preserve">
+    <value>脚注の境界線のスタイル</value>
+  </data>
+  <data name="translation.odf2oox.footnoteMaximumHeight" xml:space="preserve">
+    <value>脚注の高さの最大値</value>
+  </data>
+  <data name="translation.odf2oox.svmImage" xml:space="preserve">
+    <value>SVM イメージ</value>
+  </data>
+  <data name="translation.odf2oox.embeddedObject" xml:space="preserve">
+    <value>埋め込みオブジェクト</value>
+  </data>
+  <data name="translation.odf2oox.embeddedPluginFile" xml:space="preserve">
+    <value>プラグイン付き埋め込みファイル</value>
+  </data>
+  <data name="translation.odf2oox.applet" xml:space="preserve">
+    <value>アプレット</value>
+  </data>
+  <data name="translation.odf2oox.floatingFrame" xml:space="preserve">
+    <value>浮動フレーム</value>
+  </data>
+  <data name="translation.odf2oox.croppedImage" xml:space="preserve">
+    <value>イメージのトリミング</value>
+  </data>
+  <data name="translation.odf2oox.scaledImage" xml:space="preserve">
+    <value>イメージの拡大/縮小</value>
+  </data>
+  <data name="translation.odf2oox.valignInsideTextbox" xml:space="preserve">
+    <value>テキスト ボックス内の垂直方向の配置</value>
+  </data>
+  <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
+    <value>図形の上部/下部の折り返し</value>
+  </data>
+  <data name="translation.odf2oox.textOrientationInsideTextbox" xml:space="preserve">
+    <value>テキスト ボックス内の文字列の方向</value>
+  </data>
+  <data name="translation.odf2oox.alphabeticalIndexColumnNumber" xml:space="preserve">
+    <value>アルファベット順の索引の列番号</value>
+  </data>
+  <data name="translation.odf2oox.listBulletAlignment" xml:space="preserve">
+    <value>箇条書きの配置</value>
+  </data>
+  <data name="translation.odf2oox.distanceNumberingText" xml:space="preserve">
+    <value>段落番号と文字列の間隔</value>
+  </data>
+  <data name="translation.odf2oox.spacingTopPageAndTable" xml:space="preserve">
+    <value>ページ/表の上部の間隔</value>
+  </data>
+  <data name="translation.odf2oox.pageLayout" xml:space="preserve">
+    <value>ページ レイアウトのプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.alignmentLastLine" xml:space="preserve">
+    <value>最終行の配置</value>
+  </data>
+  <data name="translation.odf2oox.paragraphBgImage" xml:space="preserve">
+    <value>段落の背景イメージ</value>
+  </data>
+  <data name="translation.odf2oox.automaticPageBreak" xml:space="preserve">
+    <value>自動改ページ</value>
+  </data>
+  <data name="translation.odf2oox.numberWidowsOrphans" xml:space="preserve">
+    <value>孤立行の数</value>
+  </data>
+  <data name="translation.odf2oox.blinkingText" xml:space="preserve">
+    <value>点滅文字列</value>
+  </data>
+  <data name="translation.odf2oox.rotatedText" xml:space="preserve">
+    <value>回転された文字列</value>
+  </data>
+  <data name="translation.odf2oox.fontWeight" xml:space="preserve">
+    <value>フォントの太さ</value>
+  </data>
+  <data name="translation.odf2oox.capitalizedText" xml:space="preserve">
+    <value>先頭が大文字の文字列</value>
+  </data>
+  <data name="translation.odf2oox.lowercaseText" xml:space="preserve">
+    <value>小文字の文字列</value>
+  </data>
+  <data name="translation.odf2oox.textScale600pct" xml:space="preserve">
+    <value>600% より大きく拡大されて失われた文字列</value>
+  </data>
+  <data name="translation.odf2oox.leaderText" xml:space="preserve">
+    <value>リーダー文字</value>
+  </data>
+  <data name="translation.odf2oox.pageBgColor" xml:space="preserve">
+    <value>ページの背景色</value>
+  </data>
+  <data name="translation.odf2oox.paperTray" xml:space="preserve">
+    <value>用紙トレイ</value>
+  </data>
+  <data name="translation.odf2oox.lineNumbering" xml:space="preserve">
+    <value>行番号</value>
+  </data>
+  <data name="translation.odf2oox.headerDistance" xml:space="preserve">
+    <value>ヘッダーの寸法</value>
+  </data>
+  <data name="translation.odf2oox.footerDistance " xml:space="preserve">
+    <value>フッターの寸法</value>
+  </data>
+  <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
+    <value>列境界線のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.paragraphPageShadow" xml:space="preserve">
+    <value>段落/ページの影のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.subtableBordersPadding" xml:space="preserve">
+    <value>副表の境界線とスペース</value>
+  </data>
+  <data name="translation.odf2oox.consecutiveTables" xml:space="preserve">
+    <value>連続する表</value>
+  </data>
+  <data name="translation.odf2oox.tableHeaderRepeated" xml:space="preserve">
+    <value>表のヘッダーの繰り返し</value>
+  </data>
+  <data name="translation.odf2oox.tableHeaderRows" xml:space="preserve">
+    <value>表のヘッダー行</value>
+  </data>
+  <data name="translation.odf2oox.tableTogetherWithParagraph" xml:space="preserve">
+    <value>表と次の段落の連結のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.unsplitableTable" xml:space="preserve">
+    <value>分割不可能な表のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.tableBgImage" xml:space="preserve">
+    <value>表の背景イメージ</value>
+  </data>
+  <data name="translation.odf2oox.tableShadow" xml:space="preserve">
+    <value>表の影のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.tableManualAlignment" xml:space="preserve">
+    <value>表の手動配置</value>
+  </data>
+  <data name="translation.odf2oox.tableWith64Columns" xml:space="preserve">
+    <value>表内で索引 64 より上の列</value>
+  </data>
+  <data name="translation.odf2oox.rowBgImage" xml:space="preserve">
+    <value>行の背景イメージ</value>
+  </data>
+  <data name="translation.odf2oox.protectedCell" xml:space="preserve">
+    <value>保護されたセルのプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.cellBgImage" xml:space="preserve">
+    <value>セルの背景イメージ</value>
+  </data>
+  <data name="translation.odf2oox.cellShadow" xml:space="preserve">
+    <value>セルの影のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.cellContentNotPrinted" xml:space="preserve">
+    <value>印刷されないセル内容のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.cellContentRepeated" xml:space="preserve">
+    <value>繰り返されるセル内容のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve">
+    <value>セルの回転角度のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
+    <value>セルの回転配置のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+    <value>図表目次の形式</value>
+  </data>
+  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">
+    <value>取り消し線の幅のプロパティ</value>
+  </data>
+  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve">
+    <value>取り消し線の色のプロパティ</value>
+  </data>
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve">
+    <value>図形の 3-D 効果</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve">
+    <value>図形の影効果</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve">
+    <value>図形の影ぼかし効果</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve">
+    <value>図形の透視投影の影効果</value>
+  </data>
+  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve">
+    <value>透かし入り背景</value>
+  </data>
+  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve">
+    <value>テキスト ボックスの破線効果</value>
+  </data>
+  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve">
+    <value>目次の手動変更に対する保護</value>
+  </data>
+  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve">
+    <value>ヘッダー内のフレーム</value>
+  </data>
+  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve">
+    <value>フッター内のフレーム</value>
+  </data>
+  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve">
+    <value>フレームの相対サイズ</value>
+  </data>
+  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve">
+    <value>図の縦横比固定オプション</value>
+  </data>
+  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve">
+    <value>図の元のサイズを基準にするオプション</value>
+  </data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve">
+    <value>図のアンカー固定</value>
+  </data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve">
+    <value>図の重ねオプション</value>
+  </data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve">
+    <value>ドロップ キャップの [余白に表示] オプション</value>
+  </data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
+    <value>セクションごとの行番号の振り直し</value>
+  </data>
+</root>
