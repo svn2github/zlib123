@@ -2175,6 +2175,47 @@
       <xsl:attribute name="draw:fill-image-name">
         <xsl:value-of select="generate-id()"/>
       </xsl:attribute>
+
+      <xsl:for-each select="a:tile">
+        <xsl:attribute name="style:repeat">
+          <xsl:text>repeat</xsl:text>
+        </xsl:attribute>
+
+        <!-- bitmap position -->
+        <xsl:if test="@algn">
+          <xsl:attribute name="draw:fill-image-ref-point">
+          <xsl:choose>
+            <xsl:when test="@algn = 'tl' ">
+              <xsl:text>top-left</xsl:text>                
+            </xsl:when>
+            <xsl:when test="@algn = 't' ">
+              <xsl:text>top</xsl:text>                
+            </xsl:when>
+            <xsl:when test="@algn = 'tr' ">
+              <xsl:text>top-right</xsl:text>                
+            </xsl:when>
+            <xsl:when test="@algn = 'l' ">
+              <xsl:text>left</xsl:text>                
+            </xsl:when>            
+            <xsl:when test="@algn = 'ctr' ">
+              <xsl:text>center</xsl:text>                
+            </xsl:when>
+            <xsl:when test="@algn = 'r' ">
+              <xsl:text>right</xsl:text>                
+            </xsl:when>            
+            <xsl:when test="@algn = 'bl' ">
+              <xsl:text>bottom-left</xsl:text>                
+            </xsl:when>
+            <xsl:when test="@algn = 'b' ">
+              <xsl:text>bottom</xsl:text>                
+            </xsl:when>
+            <xsl:when test="@algn = 'br' ">
+              <xsl:text>bottom-right</xsl:text>                
+            </xsl:when>
+          </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:for-each>
     </xsl:for-each>
 
   </xsl:template>
