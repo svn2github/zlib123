@@ -52,7 +52,7 @@
 
     <xsl:variable name="max">
       <xsl:choose>
-        <xsl:when test="@table:number-columns-repeated">
+        <xsl:when test="@table:number-columns-repeated &gt; 0">
           <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
         </xsl:when>
         <xsl:otherwise>
