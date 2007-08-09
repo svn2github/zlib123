@@ -883,16 +883,19 @@
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:attribute>
           
-          <xsl:attribute name="table:number-columns-repeated">
-            <xsl:choose>
-              <xsl:when test="$GetNextManualColBreake">
+          <xsl:choose>
+            <xsl:when test="$GetNextManualColBreake and $GetNextManualColBreake!=$prevManualBreak">
+              <xsl:attribute name="table:number-columns-repeated">
                 <xsl:value-of select="$GetNextManualColBreake - $prevManualBreak"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$GetNextManualColBreake - $GetFirstManualColBreakAfterColWithStyle"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$GetNextManualColBreake=$prevManualBreak"/>
+            <xsl:otherwise>
+              <xsl:attribute name="table:number-columns-repeated">
+                <xsl:value-of select="- $GetFirstManualColBreakAfterColWithStyle"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
         </table:table-column>
        
         <table:table-column
