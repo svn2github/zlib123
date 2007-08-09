@@ -1549,9 +1549,10 @@
       <xsl:text>0.1</xsl:text>
     </xsl:variable>
 
+    <xsl:if test="$xOffset div $chartWidth">
     <c:x>
+      
       <xsl:attribute name="val">
-
         <xsl:variable name="correction">
           <xsl:choose>
             <xsl:when
@@ -1563,7 +1564,6 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
         <xsl:value-of select="$xOffset div $chartWidth + $correction"/>
       </xsl:attribute>
 
@@ -1574,29 +1574,44 @@
       </xsl:attribute-->
 
     </c:x>
-
-    <c:y>
-      <xsl:attribute name="val">
+    </xsl:if>
+    
+    
         <xsl:choose>
           <!-- when axis Y title -->
           <xsl:when test="parent::node()/@chart:dimension = 'y' ">
+            <xsl:if test="1 - $yOffset div $chartHeight">
+            <c:y>
+              <xsl:attribute name="val">
             <xsl:value-of select="1 - $yOffset div $chartHeight"/>
+              </xsl:attribute>
+            </c:y>
+            </xsl:if>
           </xsl:when>
           <xsl:when test="//chart:chart[@chart:class='chart:radar']">
-            <xsl:value-of select="20"/>
+            <c:y>
+              <xsl:attribute name="val">
+                <xsl:value-of select="20"/>
+              </xsl:attribute>
+           </c:y>
           </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$yOffset div $chartHeight"/>
-          </xsl:otherwise>
+          <xsl:when test="$yOffset div $chartHeight">
+            <c:y>
+              <xsl:attribute name="val">
+                <xsl:value-of select="$yOffset div $chartHeight"/>
+              </xsl:attribute>
+            </c:y>
+          </xsl:when>
+          <xsl:otherwise/>
         </xsl:choose>
-      </xsl:attribute>
+    
 
       <!--xsl:attribute name="zzzz">
         <xsl:value-of select="$yOffset"/>
         <xsl:text>#</xsl:text>
         <xsl:value-of select="$chartHeight"/>
       </xsl:attribute-->
-    </c:y>
+ 
 
     <xsl:if test="@svg:width">
       <c:w>
