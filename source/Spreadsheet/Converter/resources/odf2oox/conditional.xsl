@@ -182,7 +182,8 @@
               </xsl:attribute>
             </xsl:if>
             <xsl:attribute name="dxfId">
-              <xsl:value-of select="count(preceding::style:map) + 1"/>
+              <!-- style:map can also be in number style so we are counting only having style:style as a parent -->
+              <xsl:value-of select="count(preceding::style:map[name(parent::node()) = 'style:style']) + 1"/>
             </xsl:attribute>
             <xsl:if test="not(contains(@style:condition,'is-true-formula'))">
               <xsl:attribute name="operator">
