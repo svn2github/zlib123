@@ -188,7 +188,7 @@
 
   <xsl:template name="ExternalReference">
     <xsl:for-each select="table:shapes">
-      <xsl:if test="draw:frame">
+      <xsl:if test="draw:frame/draw:object">
       <externalReferences>
         <xsl:for-each select="draw:frame">
           <externalReference>
