@@ -291,7 +291,7 @@
             />
           </xsl:variable>
           <xsl:attribute name="table:content-validation-name">
-            <xsl:value-of select="concat('val', $sheetNr, $ValidationStyle + 1)"/>
+            <xsl:value-of select="concat('val', substring-before((substring-after($sheet, 'worksheets/sheet')), '.'), $ValidationStyle + 1)"/>
           </xsl:attribute>
 
         </xsl:if>
