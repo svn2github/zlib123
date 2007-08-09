@@ -1193,13 +1193,13 @@
 
       </xsl:when>
       <!-- default fill for textbox -->
-        <xsl:otherwise>
+      <xsl:otherwise>
         <xsl:if test="parent::node()/xdr:nvSpPr/xdr:cNvSpPr/@txBox = 1">
           <xsl:attribute name="draw:fill">
             <xsl:text>none</xsl:text>
           </xsl:attribute>
         </xsl:if>
-        </xsl:otherwise>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -2163,6 +2163,20 @@
       </style:text-properties>
 
     </style:style>
+  </xsl:template>
+
+  <xsl:template name="InsertBitmapFill">
+
+    <xsl:for-each select="a:blipFill">
+      <xsl:attribute name="draw:fill">
+        <xsl:text>bitmap</xsl:text>
+      </xsl:attribute>
+
+      <xsl:attribute name="draw:fill-image-name">
+        <xsl:value-of select="generate-id()"/>
+      </xsl:attribute>
+    </xsl:for-each>
+
   </xsl:template>
 
 </xsl:stylesheet>
