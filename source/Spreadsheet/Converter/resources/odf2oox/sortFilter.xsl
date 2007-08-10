@@ -477,7 +477,7 @@
       <!-- sort range -->
       <xsl:attribute name="ref">
         <xsl:value-of select="concat($col1,$startRow,':', $col2, $row2)"/>
-        <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
+      <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
       </xsl:attribute>
 
       <xsl:for-each
@@ -575,10 +575,9 @@
 
       <!-- sort range -->
       <xsl:attribute name="ref">
-        <xsl:value-of select="concat($startCol,$row1,':')"/>
-        <xsl:value-of
-          select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"
-        />
+        <xsl:value-of select="concat($startCol,$row1,':', $col2, $row2)"/>
+        <!--xsl:value-of select="concat($col1,$startRow,':', $col2, $row2)"/-->
+        <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
       </xsl:attribute>
 
       <xsl:for-each
