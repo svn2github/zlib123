@@ -2177,6 +2177,7 @@
       </xsl:attribute>
 
       <xsl:choose>
+        <!-- tile bitmap -->
         <xsl:when test="a:tile">
           <xsl:for-each select="a:tile">
             <xsl:attribute name="style:repeat">
@@ -2219,13 +2220,19 @@
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
-
         <xsl:otherwise>
           <xsl:attribute name="style:repeat">
             <xsl:text>stretch</xsl:text>
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
+      
+      <!-- transparency -->
+      <xsl:for-each select="a:blip/a:alphaModFix">
+        <xsl:attribute name="draw:opacity">
+          <xsl:value-of select="concat(@amt div 1000,'%' )"/>
+        </xsl:attribute>
+      </xsl:for-each>
     </xsl:for-each>
 
   </xsl:template>
