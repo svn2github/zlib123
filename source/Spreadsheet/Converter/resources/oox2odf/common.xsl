@@ -1482,22 +1482,30 @@
     <xsl:param name="color"/>
     <xsl:param name="lumMod"/>
     <xsl:param name="lumOff"/>
+    <xsl:param name="noTheme"/>
 
-    <xsl:variable name="ThemeColor">
-      <xsl:for-each select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
-        <xsl:for-each select="node()[name() = concat('a:',$color)]">
-
-          <xsl:choose>
-            <xsl:when test="contains(node()/@val,'window' ) ">
-              <xsl:value-of select="node()/@lastClr"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="node()/@val"/>
-            </xsl:otherwise>
-          </xsl:choose>
-
-        </xsl:for-each>
-      </xsl:for-each>
+    <xsl:variable name="baseColor">
+      <xsl:choose>
+        <xsl:when test="$noTheme != '' ">
+          <xsl:value-of select="$color"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:for-each select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
+            <xsl:for-each select="node()[name() = concat('a:',$color)]">
+              
+              <xsl:choose>
+                <xsl:when test="contains(node()/@val,'window' ) ">
+                  <xsl:value-of select="node()/@lastClr"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="node()/@val"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              
+            </xsl:for-each>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="BgTxColors">
@@ -1533,8 +1541,8 @@
     </xsl:variable>
 
     <xsl:variable name="NewColor">
-      <xsl:if test="$ThemeColor != '' ">
-        <xsl:value-of select="$ThemeColor"/>
+      <xsl:if test="$baseColor != '' ">
+        <xsl:value-of select="$baseColor"/>
       </xsl:if>
       <xsl:if test="$BgTxColors != '' ">
         <xsl:value-of select="$BgTxColors"/>

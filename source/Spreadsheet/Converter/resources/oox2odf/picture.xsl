@@ -1225,6 +1225,26 @@
             <xsl:value-of select="concat('#',a:ln/a:solidFill/a:srgbClr/@val)"/>
           </xsl:attribute>
 
+          <!-- if color is specified with luminance factors -->
+          <xsl:if test="a:ln/a:solidFill/a:srgbClr/a:lumMod">
+            <xsl:attribute name="svg:stroke-color">
+              <xsl:call-template name="getColorCode">
+                <xsl:with-param name="color">
+                  <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name="lumMod">
+                  <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumMod/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name="lumOff">
+                  <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name="noTheme">
+                  <xsl:text>true</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          
           <!-- Transparency percentage-->
           <xsl:if test="a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
             <xsl:variable name="alpha">
@@ -1240,7 +1260,7 @@
           </xsl:if>
         </xsl:if>
 
-        <!-- Theme color for border-->
+        <!-- Theme color for border -->
         <xsl:if test="a:ln/a:solidFill/a:schemeClr/@val">
           <xsl:attribute name="svg:stroke-color">
             <xsl:call-template name="getColorCode">
