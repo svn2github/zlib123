@@ -109,6 +109,10 @@
             <!-- unique chart identifier -->
             <xsl:value-of select="generate-id(.)"/>
           </xsl:variable>
+          
+          <xsl:variable name="width">
+            
+          </xsl:variable>
 
           <!-- finally go to a chart file -->
           <xsl:for-each select="document(concat('xl/',substring-after($chart,'/')))">

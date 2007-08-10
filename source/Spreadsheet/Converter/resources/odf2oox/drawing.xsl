@@ -1133,45 +1133,52 @@
 
         <a:srcRect/>
 
-        <xsl:if test="@style:repeat = 'repeat' ">
-          <a:tile tx="0" ty="0" sx="100000" sy="100000" flip="none" algn="tl">
+        <xsl:choose>
+          <xsl:when test="@style:repeat = 'repeat' ">
+            <a:tile tx="0" ty="0" sx="100000" sy="100000" flip="none" algn="tl">
 
-            <!-- bitmap position -->
-            <xsl:if test="@draw:fill-image-ref-point">
-              <xsl:attribute name="algn">
-                <xsl:choose>
-                  <xsl:when test="@draw:fill-image-ref-point = 'top-left' ">
-                    <xsl:text>tl</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'top' ">
-                    <xsl:text>t</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'top-right' ">
-                    <xsl:text>tr</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'left' ">
-                    <xsl:text>l</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'center' ">
-                    <xsl:text>ctr</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'right' ">
-                    <xsl:text>r</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'bottom-left' ">
-                    <xsl:text>bl</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'bottom' ">
-                    <xsl:text>b</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="@draw:fill-image-ref-point = 'bottom-right' ">
-                    <xsl:text>br</xsl:text>
-                  </xsl:when>
-                </xsl:choose>
-              </xsl:attribute>
-            </xsl:if>
-          </a:tile>
-        </xsl:if>
+              <!-- bitmap position -->
+              <xsl:if test="@draw:fill-image-ref-point">
+                <xsl:attribute name="algn">
+                  <xsl:choose>
+                    <xsl:when test="@draw:fill-image-ref-point = 'top-left' ">
+                      <xsl:text>tl</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'top' ">
+                      <xsl:text>t</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'top-right' ">
+                      <xsl:text>tr</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'left' ">
+                      <xsl:text>l</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'center' ">
+                      <xsl:text>ctr</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'right' ">
+                      <xsl:text>r</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'bottom-left' ">
+                      <xsl:text>bl</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'bottom' ">
+                      <xsl:text>b</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@draw:fill-image-ref-point = 'bottom-right' ">
+                      <xsl:text>br</xsl:text>
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:if>
+            </a:tile>
+          </xsl:when>
+          <xsl:otherwise>
+            <a:stretch>
+              <a:fillRect/>
+            </a:stretch>
+          </xsl:otherwise>
+        </xsl:choose>
 
       </a:blipFill>
     </xsl:if>
