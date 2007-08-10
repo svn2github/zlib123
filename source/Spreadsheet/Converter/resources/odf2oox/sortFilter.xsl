@@ -29,78 +29,79 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
-  
+
   <xsl:import href="common.xsl"/>
 
   <xsl:template name="MatchFilter">
     <!-- @Description: Checks if filter can be conversed and returnes true or false when parameter 'ignoreFilter' is not empty otherwise makes the conversion -->
     <!-- @Context: chart:chart -->
-    
+
     <xsl:param name="tableName"/>
     <xsl:param name="ignoreFilter"/>
-    
+
     <xsl:variable name="apos">
       <xsl:text>&apos;</xsl:text>
     </xsl:variable>
-    
+
     <xsl:for-each
       select="parent::node()/table:database-ranges/table:database-range[(table:filter or @table:display-filter-buttons = 'true') and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName]">
-      
+
       <xsl:variable name="andFieldNumber">
         <xsl:value-of
           select="table:filter/table:filter-and/table:filter-condition[1]/@table:field-number"/>
       </xsl:variable>
-      
+
       <xsl:variable name="orFieldNumber">
         <xsl:value-of
           select="table:filter/table:filter-or/table:filter-condition[1]/@table:field-number"/>
       </xsl:variable>
-      
+
       <!-- select filter combinations wchich will be converted -->
       <xsl:choose>
+        
         <!-- single condition filter (first 'or' when filter has no conditions)-->
         <xsl:when
           test="(@table:display-filter-buttons = 'true' and not (child::node())) or count(table:filter/child::node()) = 1 and table:filter/table:filter-condition">
           <xsl:call-template name="SingleConditionFilter"/>
         </xsl:when>
-        
+
         <!-- single column values selection fiter -->
         <xsl:when
           test="count(table:filter/child::node()) = 1 and table:filter/table:filter-or/table:filter-condition and not(table:filter/table:filter-or/table:filter-condition/@table:operator != '=') and
           not(table:filter/table:filter-or/table:filter-condition[@table:field-number != $orFieldNumber])">
-          
+
           <xsl:call-template name="ValueSelectionFilter"/>
         </xsl:when>
-        
+
         <!-- single AND filter -->
         <xsl:when
           test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition">
-          
+
           <xsl:choose>
             <!-- when there is top 10 condition then for this filed can not be another condition -->
             <xsl:when
               test="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
               @table:operator = 'bottom percent' ]">
-              
+
               <xsl:variable name="ignore">
                 <xsl:for-each
                   select="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
                   @table:operator = 'bottom percent' ]">
-                  
+
                   <xsl:variable name="fieldNumber">
                     <xsl:value-of select="@table:field-number"/>
                   </xsl:variable>
                   <xsl:variable name="conditionId">
                     <xsl:value-of select="generate-id(.)"/>
                   </xsl:variable>
-                  
+
                   <xsl:if
                     test="parent::node()/table:filter-condition[@table:field-number = $fieldNumber and generate-id(.) != $conditionId]">
                     <xsl:text>ignore</xsl:text>
                   </xsl:if>
                 </xsl:for-each>
               </xsl:variable>
-              
+
               <xsl:choose>
                 <xsl:when test="$ignore = '' ">
                   <xsl:call-template name="MultiColumnAndFilter"/>
@@ -475,10 +476,8 @@
 
       <!-- sort range -->
       <xsl:attribute name="ref">
-        <xsl:value-of select="concat($col1,$startRow,':')"/>
-        <xsl:value-of
-          select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"
-        />
+        <xsl:value-of select="concat($col1,$startRow,':', $col2, $row2)"/>
+        <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
       </xsl:attribute>
 
       <xsl:for-each
