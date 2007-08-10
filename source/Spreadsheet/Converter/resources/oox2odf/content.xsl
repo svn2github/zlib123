@@ -204,7 +204,7 @@
                 <xsl:value-of select="$number"/>
               </xsl:with-param>
               <xsl:with-param name="name">
-                <xsl:value-of select="translate(@name,'!-$#:()','')"/>
+                <xsl:value-of select="translate(@name,'!-$#:(),.+','')"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
@@ -255,7 +255,7 @@
           <xsl:value-of select="$number"/>
         </xsl:with-param>
         <xsl:with-param name="name">
-          <xsl:value-of select="translate(@name,'!-$#():','')"/>
+          <xsl:value-of select="translate(@name,'!-$#():,.+','')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -441,18 +441,25 @@
         <!-- if the print range is without apostrophes -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
         <xsl:if
-          test="string($checkedName) = substring-before(./self::node(), '!') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
+          test="string($checkedName) = translate(substring-before(self::node(), '!'), '!-$#:(),.+','') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
           <!-- one print range without apostrophes -->
           <xsl:if test="not(contains(./self::node(), concat(',', $checkedName)))">
-            <xsl:attribute name="table:print-ranges">
-              <!-- <xsl:value-of
-              select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
-             />-->
+            <xsl:variable name="temporary">
               <xsl:call-template name="recursive">
                 <xsl:with-param name="wholeText" select="translate(self::node(), '!', '.')"/>
                 <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"/>
                 <xsl:with-param name="oldString" select="':'"/>
               </xsl:call-template>
+            </xsl:variable>
+            <xsl:attribute name="table:print-ranges">
+              <!-- <xsl:value-of
+              select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
+                />-->
+               <xsl:call-template name="recursive">
+                 <xsl:with-param name="wholeText" select="$temporary"/>
+                 <xsl:with-param name="oldString" select="substring-before($temporary, '$')"/>
+                 <xsl:with-param name="newString" select="concat($checkedName, '.')"/>
+               </xsl:call-template>         
             </xsl:attribute>
           </xsl:if>
           <!-- multiple print ranges without apostrophes -->
@@ -2171,15 +2178,15 @@
 
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
-      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-():#','') = $name][2]">
+      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $name][2]">
         <xsl:variable name="nameConflictsBefore">
           <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
           <xsl:value-of
-            select="count(parent::node()/e:sheet[translate(@name,'!$-():#','') = $name and position() &lt; $sheetNumber])"
+            select="count(parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $name and position() &lt; $sheetNumber])"
           />
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
-        <xsl:value-of select="concat(translate(@name,'!$-()#:',''),'_',$nameConflictsBefore + 1)"/>
+        <xsl:value-of select="concat(translate(@name,'!$-()#:,.+',''),'_',$nameConflictsBefore + 1)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$name"/>

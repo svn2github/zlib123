@@ -103,7 +103,7 @@
                         </xsl:variable>
 
                         <xsl:variable name="invalidChars">
-                          <xsl:text>&apos;!$-()</xsl:text>
+                          <xsl:text>&apos;!,.+$-()</xsl:text>
                         </xsl:variable>
 
                         <xsl:variable name="checkedName">
