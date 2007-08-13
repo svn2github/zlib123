@@ -254,23 +254,28 @@
           <xsl:value-of select="@draw:fill-image-name"/>
         </xsl:variable>
         
+        <!-- id based on a style in content.xml -->
+        <xsl:variable name="fillId">
+          <xsl:value-of select="generate-id()"/>
+        </xsl:variable>
+        
         <!-- go to bitmap-fill style -->
         <xsl:for-each
           select="document(concat($chartDirectory,'/styles.xml'))/office:document-styles/office:styles/draw:fill-image[@draw:name = $fillImage]">
           
           <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
           
-          <pzip:copy pzip:source="{concat($chartDirectory,'/',@xlink:href)}" pzip:target="xl/media/{concat(generate-id(),$imageName)}"/>
+          <pzip:copy pzip:source="{concat($chartDirectory,'/',@xlink:href)}" pzip:target="xl/media/{concat($fillId,$imageName)}"/>
           
           <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
             <xsl:attribute name="Id">
-              <xsl:value-of select="generate-id()"/>
+              <xsl:value-of select="$fillId"/>
             </xsl:attribute>
             
             <xsl:attribute name="Target">
               <xsl:text>../media/</xsl:text>
-              <!-- the same bitmap fill in two diferent charts has the same name so to distinct it is preceded with generate-id() -->
-              <xsl:value-of select="concat(generate-id(),$imageName)"/>
+              <!-- the same bitmap fill in two diferent charts has the same name so to distinct them it is preceded with generate-id() -->
+              <xsl:value-of select="concat($fillId,$imageName)"/>
             </xsl:attribute>
           </Relationship>
         </xsl:for-each>

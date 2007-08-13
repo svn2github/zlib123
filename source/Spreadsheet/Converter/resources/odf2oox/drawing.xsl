@@ -1128,10 +1128,11 @@
 
     <xsl:if test="$fillId != '' ">
       <a:blipFill dpi="0" rotWithShape="1">
-        <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-          r:embed="{$fillId}">
-          
-          <xsl:if test="@draw:opacity">
+          <!-- id based on a style in content.xml -->
+          <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            r:embed="{generate-id()}">
+            
+            <xsl:if test="@draw:opacity">
             <a:alphaModFix>
               <xsl:attribute name="amt">
                 <xsl:value-of select="substring-before(@draw:opacity,'%' ) * 1000"/>
