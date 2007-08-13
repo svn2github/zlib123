@@ -109,10 +109,6 @@
             <!-- unique chart identifier -->
             <xsl:value-of select="generate-id(.)"/>
           </xsl:variable>
-          
-          <xsl:variable name="width">
-            
-          </xsl:variable>
 
           <!-- finally go to a chart file -->
           <xsl:for-each select="document(concat('xl/',substring-after($chart,'/')))">
@@ -123,7 +119,7 @@
                 <xsl:value-of select="concat('xl/',substring-after($chart,'/'))"/>
               </xsl:with-param>
             </xsl:call-template>
-            
+
           </xsl:for-each>
         </xsl:for-each>
       </xsl:for-each>
@@ -201,7 +197,7 @@
     <!-- (string) unique chart identifier -->
     <xsl:param name="inputChart"/>
     <!-- (string) input chart file directory -->
-    
+
     <xsl:call-template name="InsertChartContent">
       <xsl:with-param name="chartId" select="$chartId"/>
     </xsl:call-template>
@@ -210,7 +206,7 @@
       <xsl:with-param name="chartId" select="$chartId"/>
       <xsl:with-param name="inputChart" select="$inputChart"/>
     </xsl:call-template>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertChartContent">
@@ -254,7 +250,7 @@
     <!-- unique chart identifier -->
     <xsl:param name="inputChart"/>
     <!-- input chart file directory -->
-    
+
     <pzip:entry pzip:target="{concat('Object ',$chartId,'/styles.xml')}">
       <office:document-styles>
         <office:styles>
@@ -880,7 +876,7 @@
       <style:graphic-properties draw:stroke="none" draw:fill="solid" draw:fill-color="#ffffff">
         <!-- Insert Borders Wall style, color, fill, transparency -->
         <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:spPr">
-          
+
           <!-- Insert fill -->
           <xsl:choose>
             <xsl:when test="a:blipFill">
@@ -890,7 +886,7 @@
               <xsl:call-template name="InsertFill"/>
             </xsl:otherwise>
           </xsl:choose>
-          
+
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
         </xsl:for-each>
@@ -1009,14 +1005,14 @@
     </xsl:if>
 
   </xsl:template>
-  
-  <xsl:template name="InsertDrawFillImage">    
+
+  <xsl:template name="InsertDrawFillImage">
     <xsl:param name="chartId"/>
     <xsl:param name="inputChart"/>
 
     <xsl:for-each select="key('spPr','')/a:blipFill">
-      
-      
+
+
       <xsl:variable name="pzipsource">
         <xsl:call-template name="GetTarget">
           <xsl:with-param name="document">
@@ -1027,26 +1023,29 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-      
-      <xsl:variable name="pziptarget">
-        <xsl:value-of select="concat('Object ',$chartId,'/Pictures/',substring-after(substring-after($pzipsource, '/'), '/'))"/>
-      </xsl:variable>
-      
-      <pzip:copy pzip:source="{concat('xl/',substring-after($pzipsource, '/'))}" pzip:target="{$pziptarget}"/>
 
-      <draw:fill-image
-        xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-        
+      <xsl:variable name="pziptarget">
+        <xsl:value-of
+          select="concat('Object ',$chartId,'/Pictures/',substring-after(substring-after($pzipsource, '/'), '/'))"
+        />
+      </xsl:variable>
+
+      <pzip:copy pzip:source="{concat('xl/',substring-after($pzipsource, '/'))}"
+        pzip:target="{$pziptarget}"/>
+
+      <draw:fill-image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+
         <xsl:attribute name="draw:name">
           <xsl:value-of select="generate-id()"/>
         </xsl:attribute>
-        
+
         <xsl:attribute name="xlink:href">
-          <xsl:value-of select="concat('Pictures/',substring-after(substring-after($pzipsource, '/'), '/'))"/>
+          <xsl:value-of
+            select="concat('Pictures/',substring-after(substring-after($pzipsource, '/'), '/'))"/>
         </xsl:attribute>
       </draw:fill-image>
     </xsl:for-each>
-    
+
   </xsl:template>
 
 </xsl:stylesheet>
