@@ -813,12 +813,33 @@
       </xsl:attribute>
     </xsl:if>
 
+    <!-- font outline -->
+    <xsl:if test="@style:text-outline = 'true' ">
+      <a:ln>
+        <a:solidFill>
+          <a:srgbClr>
+            <xsl:attribute name="val">
+              <xsl:value-of select="substring-after(@fo:color,'#')"/>
+            </xsl:attribute>
+          </a:srgbClr>
+        </a:solidFill>
+      </a:ln>
+    </xsl:if>
+
     <!-- font color -->
     <xsl:if test="@fo:color">
       <a:solidFill>
         <a:srgbClr>
           <xsl:attribute name="val">
-            <xsl:value-of select="substring-after(@fo:color,'#')"/>
+            <xsl:choose>
+              <!-- when outline is set then 'white' -->
+              <xsl:when test="@style:text-outline = 'true' ">
+                <xsl:text>FFFFFF</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-after(@fo:color,'#')"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
         </a:srgbClr>
       </a:solidFill>
@@ -835,12 +856,21 @@
       </a:effectLst>
     </xsl:if>
 
+    <!-- underline color -->
     <xsl:if test="@style:text-underline-color">
       <a:uFill>
         <a:solidFill>
           <a:srgbClr>
             <xsl:attribute name="val">
-              <xsl:value-of select="substring-after(@style:text-underline-color,'#')"/>
+              <xsl:choose>
+                <!-- when outline is set then 'white' -->
+                <xsl:when test="@style:text-outline = 'true' ">
+                  <xsl:text>FFFFFF</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring-after(@style:text-underline-color,'#')"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </a:srgbClr>
         </a:solidFill>
@@ -1128,18 +1158,18 @@
 
     <xsl:if test="$fillId != '' ">
       <a:blipFill dpi="0" rotWithShape="1">
-          <!-- id based on a style in content.xml -->
-          <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-            r:embed="{generate-id()}">
-            
-            <xsl:if test="@draw:opacity">
+        <!-- id based on a style in content.xml -->
+        <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+          r:embed="{generate-id()}">
+
+          <xsl:if test="@draw:opacity">
             <a:alphaModFix>
               <xsl:attribute name="amt">
                 <xsl:value-of select="substring-before(@draw:opacity,'%' ) * 1000"/>
               </xsl:attribute>
             </a:alphaModFix>
           </xsl:if>
-          
+
         </a:blip>
 
         <a:srcRect/>
