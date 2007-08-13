@@ -880,9 +880,19 @@
       <style:graphic-properties draw:stroke="none" draw:fill="solid" draw:fill-color="#ffffff">
         <!-- Insert Borders Wall style, color, fill, transparency -->
         <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:spPr">
+          
+          <!-- Insert fill -->
+          <xsl:choose>
+            <xsl:when test="a:blipFill">
+              <xsl:call-template name="InsertBitmapFill"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertFill"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
-          <xsl:call-template name="InsertFill"/>
         </xsl:for-each>
       </style:graphic-properties>
     </style:style>

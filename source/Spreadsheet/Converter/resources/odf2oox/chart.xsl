@@ -100,7 +100,9 @@
               <c:lang val="pl-PL"/>
 
               <xsl:for-each select="chart:chart">
-                <xsl:call-template name="InsertChart"/>
+                <xsl:call-template name="InsertChart">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
                 <!-- chart area properties -->
                 <xsl:call-template name="InsertSpPr">
                   <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
@@ -168,6 +170,7 @@
   <xsl:template name="InsertChart">
     <!-- @Description: Writes chart definition to output chart file. -->
     <!-- @Context: chart:chart -->
+    <xsl:param name="chartDirectory"/>
 
     <xsl:variable name="chartWidth">
       <xsl:value-of select="substring-before(@svg:width,'cm')"/>
@@ -188,6 +191,7 @@
       <xsl:call-template name="InsertPlotArea">
         <xsl:with-param name="chartWidth" select="$chartWidth"/>
         <xsl:with-param name="chartHeight" select="$chartHeight"/>
+        <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertLegend">
@@ -258,6 +262,7 @@
     <!-- @Context: chart:chart -->
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>
+    <xsl:param name="chartDirectory"/>
 
     <xsl:for-each select="chart:plot-area">
 
@@ -328,11 +333,11 @@
           </xsl:for-each>
         </xsl:if>
 
-        <xsl:for-each select="key('style', chart:wall/@chart:style-name)/style:graphic-properties">
-          <c:spPr>
-            <xsl:call-template name="InsertDrawingFill"/>
-            <xsl:call-template name="InsertDrawingBorder"/>
-          </c:spPr>
+        <!-- plot area graphic properties -->
+        <xsl:for-each select="chart:wall">
+          <xsl:call-template name="InsertSpPr">
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          </xsl:call-template>
         </xsl:for-each>
 
       </c:plotArea>
