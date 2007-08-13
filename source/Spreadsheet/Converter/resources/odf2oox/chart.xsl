@@ -184,6 +184,7 @@
       <xsl:call-template name="InsertTitle">
         <xsl:with-param name="chartWidth" select="$chartWidth"/>
         <xsl:with-param name="chartHeight" select="$chartHeight"/>
+        <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertView3D"/>
@@ -208,6 +209,7 @@
     <!-- @Context: chart:chart -->
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>
+    <xsl:param name="chartDirectory"/>
 
     <xsl:for-each select="chart:title">
       <c:title>
@@ -247,13 +249,12 @@
 
           </c:manualLayout>
         </c:layout>
-        <c:spPr>
-          <a:noFill/>
-          <a:ln w="25400">
-            <a:noFill/>
-          </a:ln>
-        </c:spPr>
-      </c:title>
+        
+        <xsl:call-template name="InsertSpPr">
+          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        </xsl:call-template>
+        
+      </c:title>      
     </xsl:for-each>
   </xsl:template>
 

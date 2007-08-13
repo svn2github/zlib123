@@ -723,7 +723,22 @@
     <xsl:for-each select="c:chartSpace/c:chart/c:title">
       <style:style style:name="chart_title" style:family="chart">
         <style:chart-properties style:direction="ltr"/>
-        <style:graphic-properties draw:stroke="none" draw:fill="none"/>
+        <style:graphic-properties draw:stroke="none" draw:fill="none">
+          <xsl:for-each select="c:spPr">            
+            <!-- Insert fill -->
+            <xsl:choose>
+              <xsl:when test="a:blipFill">
+                <xsl:call-template name="InsertBitmapFill"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="InsertFill"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>          
+        </style:graphic-properties>
         <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
           style:font-pitch="variable" fo:font-size="13pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
