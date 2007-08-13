@@ -38,78 +38,90 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
-  xmlns:x="urn:schemas-microsoft-com:office:excel"
-  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:dc="http://purl.org/dc/elements/1.1/"
   exclude-result-prefixes="svg table r text style number fo">
-  
+
   <xsl:import href="sharedStrings.xsl"/>
-  
+
   <xsl:template name="comments">
     <xsl:param name="sheetNum"/>
     <comments xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <authors>
         <author>karolina</author>
       </authors>
-     <commentList>
-       <xsl:variable name="noteId" >
-         <xsl:number value="0"/>
-       </xsl:variable>
-       <xsl:apply-templates select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetNum]/descendant::table:table-row/table:table-cell/office:annotation">
+      <commentList>
+        <xsl:variable name="noteId">
+          <xsl:number value="0"/>
+        </xsl:variable>
+        <xsl:apply-templates
+          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetNum]/descendant::table:table-row/table:table-cell/office:annotation">
           <xsl:with-param name="noteId" select="$noteId+1"/>
         </xsl:apply-templates>
-    </commentList>
+      </commentList>
     </comments>
   </xsl:template>
-  
+
   <xsl:template match="office:annotation">
     <xsl:param name="noteId"/>
     <comment authorId="0" noteId="{count(preceding::office:annotation)+1}">
       <text>
-          <xsl:call-template name="InsertCommentText"/>
+        <xsl:call-template name="InsertCommentText"/>
       </text>
     </comment>
   </xsl:template>
-  
+
   <xsl:template name="InsertTextBox">
-    <v:shape noteId="{count(preceding::office:annotation)+1}" id="_x0000_s1025" type="#_x0000_t202" style='position:absolute;
+    <xsl:variable name="VisibleOrHidden">
+      <xsl:choose>
+        <xsl:when test="@office:display">
+          <xsl:text>visible</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>hidden</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <v:shape noteId="{count(preceding::office:annotation)+1}" id="_x0000_s1025" type="#_x0000_t202"
+      style="position:absolute;
         margin-left:204pt;margin-top:0;width:79.8pt;height:18.6pt;z-index:1;
-        visibility:hidden;mso-wrap-style:none;v-text-anchor:middle' fillcolor="#ffffc0"
-        o:insetmode="auto">
-        <v:fill color2="#00003f"/>
-        <v:stroke startarrow="block" joinstyle="round"/>
-        <v:shadow on="t" color="black" obscured="t"/>
-        <v:path arrowok="t" o:connecttype="none"/>
-        <v:textbox>
-          <div style='text-align:left'></div>
-        </v:textbox>
-        <x:ClientData ObjectType="Note">
-          <x:SizeWithCells/>
-          <x:Anchor>
-            9, 28, 2, 18, 10, 57, 5, 2</x:Anchor>
-          <x:Locked>False</x:Locked>
-          <x:PrintObject>False</x:PrintObject>
-          <x:AutoFill>False</x:AutoFill>
-          <x:AutoLine>False</x:AutoLine>
-          <x:LockText>False</x:LockText>
+        visibility:{$VisibleOrHidden};mso-wrap-style:none;v-text-anchor:middle"
+      fillcolor="#ffffc0" o:insetmode="auto">
+      <v:fill color2="#00003f"/>
+      <v:stroke startarrow="block" joinstyle="round"/>
+      <v:shadow on="t" color="black" obscured="t"/>
+      <v:path arrowok="t" o:connecttype="none"/>
+      <v:textbox>
+        <div style="text-align:left"/>
+      </v:textbox>
+      <x:ClientData ObjectType="Note">
+        <x:SizeWithCells/>
+        <x:Anchor> 9, 28, 2, 18, 10, 57, 5, 2</x:Anchor>
+        <x:Locked>False</x:Locked>
+        <x:PrintObject>False</x:PrintObject>
+        <x:AutoFill>False</x:AutoFill>
+        <x:AutoLine>False</x:AutoLine>
+        <x:LockText>False</x:LockText>
         <!--  <x:Row>2</x:Row>
           <x:Column>2</x:Column>-->
-        </x:ClientData>
-      </v:shape>
+        <xsl:if test="@office:display">
+          <x:Visible/>
+        </xsl:if>
+      </x:ClientData>
+    </v:shape>
   </xsl:template>
-  
-  <xsl:template match="dc:date" />
-  
-<xsl:template name="InsertCommentText">
-  <xsl:choose>
-    <xsl:when test="text:span|text:p/text:span">
-      <xsl:apply-templates mode="run"/>
-    </xsl:when>
-    <xsl:otherwise>
-      <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
-    </xsl:otherwise>
-  </xsl:choose>  
-</xsl:template>
-  
+
+  <xsl:template match="dc:date"/>
+
+  <xsl:template name="InsertCommentText">
+    <xsl:choose>
+      <xsl:when test="text:span|text:p/text:span">
+        <xsl:apply-templates mode="run"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 </xsl:stylesheet>
