@@ -63,6 +63,7 @@
   <xsl:import href="ole_objects.xsl"/>
   <xsl:import href="connections.xsl"/>
   <xsl:import href="groups.xsl"/>
+  <xsl:import href="scenario.xsl"/>
   <xsl:import href="change_tracking.xsl"/>
 
 
@@ -117,6 +118,9 @@
           mode="ConditionalStyle">
           <xsl:with-param name="number">1</xsl:with-param>
         </xsl:apply-templates>
+        <!-- Insert Scenario properties -->
+        <xsl:call-template name="InsertScenarioStyles"/>
+        
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
     </office:document-content>
@@ -347,6 +351,12 @@
       </xsl:for-each>
     </xsl:variable>
 
+    <!-- Check if Scenario are in this sheet -->
+    <xsl:variable name="ScenarioCell">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+        <xsl:call-template name="ScenarioCell"/>
+      </xsl:for-each>
+    </xsl:variable>
 
     <xsl:variable name="PictureRow">
       <xsl:for-each select="document(concat('xl/',$Id))">
@@ -596,6 +606,10 @@
       </xsl:call-template>
 
     </table:table>
+
+    <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:scenarios">
+      <xsl:call-template name="Scenarios"/>
+    </xsl:for-each>
 
   </xsl:template>
 

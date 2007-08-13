@@ -50,14 +50,7 @@
         <xsl:if test="following-sibling::table:table[1]/table:scenario">
 
             <scenarios>
-
                 <xsl:apply-templates select="following-sibling::table:table[1]" mode="scenario"/>
-
-                <!--xsl:call-template name="SearchScenarioCells">
-                    <xsl:with-param name="colNum"/>
-                    <xsl:with-param name="rows"/>
-                </xsl:call-template-->
-
             </scenarios>
 
         </xsl:if>
@@ -180,8 +173,6 @@
                     <xsl:message terminate="no">translation.odf2oox.ScenarioNumber</xsl:message>
                 </xsl:otherwise>
             </xsl:choose>
-
-
         </xsl:if>
 
     </xsl:template>
@@ -189,12 +180,8 @@
     <xsl:template name="SearchScenarioCells">
         <xsl:for-each select="/office:document-content/office:body/office:spreadsheet/table:table">
 
-            <!--xsl:call-template name="InsertScenario">
-                <xsl:with-param name="startCol"/>
-                <xsl:with-param name="endCol"/>
-            </xsl:call-template-->
-
             <xsl:for-each select="table:table-row/table:table-cell/text:p">
+                
                 <xsl:variable name="colPosition">
                     <xsl:for-each select="ancestor::table:table-cell">
                         <xsl:value-of
@@ -227,14 +214,7 @@
                         </xsl:call-template>
                     </xsl:for-each>
                 </xsl:variable>
-
-                <!--xsl:variable name="colChar">
-                    <xsl:call-template name="NumbersToChars">
-                        <xsl:with-param name="num" select="$colNum -1"/>
-                    </xsl:call-template>
-                    </xsl:variable-->
-
-                <!--inputCells r="{concat($colNum,':',$rows)}"/-->
+              
             </xsl:for-each>
         </xsl:for-each>
     </xsl:template>
@@ -247,7 +227,6 @@
         <xsl:param name="row2"/>
         <xsl:param name="startCol"/>
         <xsl:param name="endCol"/>
-
 
         <!-- Insert row in scenario -->
         <xsl:if test="$rowNumber &gt;= $row1 and $rowNumber &lt;=$row2">
@@ -282,7 +261,6 @@
                     <xsl:value-of select="$endCol"/>
                 </xsl:with-param>
             </xsl:call-template>
-
 
         </xsl:if>
 
@@ -369,7 +347,6 @@
             </xsl:call-template>
         </xsl:if>
 
-
     </xsl:template>
 
     <!-- insert scenario -->
@@ -380,7 +357,6 @@
         <xsl:param name="row2"/>
         <xsl:param name="startCol"/>
         <xsl:param name="endCol"/>
-
 
         <xsl:variable name="colChar">
             <xsl:call-template name="NumbersToChars">
@@ -465,7 +441,6 @@
             </xsl:when>
         </xsl:choose>
 
-
         <xsl:choose>
             <xsl:when test="following-sibling::table:table-cell">
 
@@ -502,7 +477,6 @@
                 </xsl:apply-templates>
 
             </xsl:when>
-
         </xsl:choose>
 
     </xsl:template>
