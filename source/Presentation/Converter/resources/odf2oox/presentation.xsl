@@ -60,6 +60,24 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:for-each>
         
       </p:sldMasterIdLst>
+      <p:notesMasterIdLst>
+        <p:notesMasterId r:id="noteMasterRel"/>
+      </p:notesMasterIdLst>
+<!-- Inserted by vijayeta
+           Add handoutMasterIdLst in presentation.xml 
+           Date: 30th July '07-->
+      <xsl:for-each select ="document('styles.xml')//office:master-styles/style:handout-master">
+        <p:handoutMasterIdLst>
+          <p:handoutMasterId >
+            <xsl:attribute name ="r:id">
+              <xsl:value-of select ="concat('hoId',position())"/>
+            </xsl:attribute>
+          </p:handoutMasterId>
+        </p:handoutMasterIdLst>
+      </xsl:for-each>
+      <!-- End of Snippet Inserted by vijayeta
+           Add handoutMasterIdLst in presentation.xml 
+           Date: 30th July '07-->
       <p:sldIdLst>
         <xsl:for-each select ="document('content.xml')
 					/office:document-content/office:body/office:presentation/draw:page">
@@ -102,44 +120,52 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
         </xsl:for-each >
       </p:sldSz >
-      <p:notesSz>
-        <xsl:if test ="document('styles.xml')//style:page-layout/@style:name[contains(.,'PM2')]">
-          <xsl:for-each select ="document('styles.xml')//style:page-layout[@style:name='PM2']">
-            <xsl:attribute name ="cx" >
-              <xsl:if test="style:page-layout-properties/@fo:page-width">
-                <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                  <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-width"/>
-                </xsl:call-template>
-              </xsl:if>
-              <!-- Modified by lohith - Always cx should be greater than 0-->
-              <xsl:if test="not(style:page-layout-properties/@fo:page-height)">
+      <!--NotesMaster-->
+         <xsl:for-each select="document('styles.xml')//office:master-styles/style:master-page">
+        <xsl:if test="position()=1">
+          <xsl:variable name="PMName" select="./presentation:notes/@style:page-layout-name"/>
+          <p:notesSz>
+            <xsl:if test ="document('styles.xml')//style:page-layout/@style:name = $PMName">
+              <xsl:for-each select ="document('styles.xml')//style:page-layout[@style:name=$PMName]">
+                <xsl:attribute name ="cx" >
+                  <xsl:if test="style:page-layout-properties/@fo:page-width">
+                    <xsl:call-template name ="convertToPoints">
+                      <xsl:with-param name ="unit" select ="'cm'"/>
+                      <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-width"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                  <!-- Modified by lohith - Always cx should be greater than 0-->
+                  <xsl:if test="not(style:page-layout-properties/@fo:page-width)">
+                    <xsl:value-of select ='7772400'/>
+                  </xsl:if>
+                </xsl:attribute>
+                <xsl:attribute name ="cy" >
+                  <xsl:if test="style:page-layout-properties/@fo:page-height">
+                    <xsl:call-template name ="convertToPoints">
+                      <xsl:with-param name ="unit" select ="'cm'"/>
+                      <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-height"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                  <!-- Modified by lohith - Always cy should be greater than 0-->
+                  <xsl:if test="not(style:page-layout-properties/@fo:page-height)">
+                    <xsl:value-of select ='10058400'/>
+                  </xsl:if>
+                </xsl:attribute>
+              </xsl:for-each>
+            </xsl:if>
+            <xsl:if test ="not(document('styles.xml')//style:page-layout/@style:name = $PMName)">
+              <xsl:attribute name ="cx" >
                 <xsl:value-of select ='7772400'/>
-              </xsl:if>
-            </xsl:attribute>
-            <xsl:attribute name ="cy" >
-              <xsl:if test="style:page-layout-properties/@fo:page-height">
-                <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                  <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-height"/>
-                </xsl:call-template>
-              </xsl:if>
-              <!-- Modified by lohith - Always cy should be greater than 0-->
-              <xsl:if test="not(style:page-layout-properties/@fo:page-height)">
+              </xsl:attribute>
+              <xsl:attribute name ="cy" >
                 <xsl:value-of select ='10058400'/>
-              </xsl:if>
-            </xsl:attribute>
-          </xsl:for-each>
+              </xsl:attribute>
+            </xsl:if>
+          </p:notesSz>
         </xsl:if>
-        <xsl:if test ="not(document('styles.xml')//style:page-layout/@style:name[contains(.,'PM2')])">
-          <xsl:attribute name ="cx" >
-            <xsl:value-of select ='7772400'/>
-          </xsl:attribute>
-          <xsl:attribute name ="cy" >
-            <xsl:value-of select ='10058400'/>
-          </xsl:attribute>
-        </xsl:if>
-      </p:notesSz>
+      </xsl:for-each>
+      <!--END-->
+      
       <!-- Changes made by vijayeta-->
       <!-- Custome Slide show - added by lohith.ar-->
       <xsl:call-template name="TemplateCustomSlideShow"/>
@@ -243,7 +269,7 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <xsl:template name ="presentationRel">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps" Target="presProps.xml"/>
+      <!--<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps" Target="presProps.xml"/>-->
       <!--<Relationship Id="sId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/>-->
       <!--<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>-->
       <Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles" Target="tableStyles.xml"/>
@@ -274,9 +300,41 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
         </Relationship>
       </xsl:for-each>
-      
+
+      <Relationship Id="noteMasterRel" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster"
+                    Target="notesMasters/notesMaster1.xml"/>
       <!-- @@Slide master code ends Pradeep Nemadi-->		 
 
+      <!-- Inserted by vijayeta
+       Add handoutmaster relatuionship in presentation.xml.rels 
+       Date: 30th July '07-->
+      <xsl:for-each select ="document('styles.xml')//office:master-styles/style:handout-master">
+        <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/handoutMaster">
+          <xsl:attribute name ="Id">
+            <xsl:value-of select ="concat('hoId',position())"/>
+          </xsl:attribute>
+          <xsl:attribute name ="Target">
+            <xsl:value-of select ="concat('handoutMasters/handoutMaster',position(),'.xml')"/>
+          </xsl:attribute>
+        </Relationship>
+      </xsl:for-each>
+      <!-- End of Snippet Inserted by vijayeta
+       Add handoutmaster relatuionship in presentation.xml.rels 
+       Date: 30th July '07-->
+      <!-- Inserted by vijayeta
+       Add PresProps relationship in presentation.xml.rels 
+       Date: 4th Aug '07-->
+      <xsl:for-each select ="document('content.xml')//office:body/office:presentation/presentation:settings">
+        <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps">
+          <xsl:attribute name ="Id">
+            <xsl:value-of select ="concat('presProps',position())"/>
+          </xsl:attribute>
+          <xsl:attribute name ="Target">
+            <xsl:value-of select ="'presProps.xml'"/>
+          </xsl:attribute>
+        </Relationship>
+      </xsl:for-each>
+      <!--End of Snippet to add PresProps relationship in presentation.xml.rels -->
 	</Relationships>
   </xsl:template >
 

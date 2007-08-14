@@ -48,15 +48,16 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:import href ="common.xsl"/>
   <xsl:template name ="InsertPicture">
     <xsl:param name ="imageNo" />
+    <xsl:param name ="picNo" />
     <xsl:param name ="master" />
     <xsl:variable name ="imageSerialNo">
-      <xsl:value-of select ="concat('sl',$imageNo,'Image' ,position())"/>
+      <xsl:value-of select ="concat('sl',$imageNo,'Image' ,$picNo)"/>
     </xsl:variable>
     <pzip:copy pzip:source="{@xlink:href}"
 				   pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
     <p:pic>
       <p:nvPicPr>
-        <p:cNvPr id="4" name="Content Placeholder 3">
+        <p:cNvPr id="4" name="Placeholder 3">
           <xsl:attribute name ="descr">
             <xsl:if test ="parent::node()/@draw:name">
               <xsl:value-of select ="parent::node()/@draw:name"/>
@@ -64,17 +65,17 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:if test ="not(parent::node()/@draw:name)">
               <xsl:value-of  select ="substring-after(@xlink:href,'/')"/>
             </xsl:if >
-          </xsl:attribute>         
+          </xsl:attribute>
         </p:cNvPr >
         <p:cNvPicPr>
           <a:picLocks noGrp="1" noChangeAspect="1" />
         </p:cNvPicPr>
-        <xsl:if test="$master=1">
+        <xsl:if test="$master='1'">
           <p:nvPr userDrawn="1"/>
         </xsl:if>
         <xsl:if test="not($master)">
           <p:nvPr>
-            <p:ph idx="{position()+5}" />
+            <p:ph idx="{$picNo+5}" />
           </p:nvPr>
         </xsl:if>
       </p:nvPicPr>
@@ -90,51 +91,51 @@ Copyright (c) 2007, Sonata Software Limited
       </p:blipFill>
       <p:spPr>
         <a:xfrm>
-			<xsl:variable name ="angle">
-				<xsl:value-of select="substring-after(substring-before(substring-before(parent::node()/@draw:transform,'translate'),')'),'(')" />
-			</xsl:variable>
-			<xsl:variable name ="x2">
-				<xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-			</xsl:variable>
-			<xsl:variable name ="y2">
-				<xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-			</xsl:variable>
-			<xsl:if test="parent::node()/@draw:transform">
-				<xsl:attribute name ="rot">
-					<xsl:value-of select ="concat('draw-transform:ROT:',substring-before(parent::node()/@svg:width,'cm'), ':',
+          <xsl:variable name ="angle">
+            <xsl:value-of select="substring-after(substring-before(substring-before(parent::node()/@draw:transform,'translate'),')'),'(')" />
+          </xsl:variable>
+          <xsl:variable name ="x2">
+            <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
+          </xsl:variable>
+          <xsl:variable name ="y2">
+            <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
+          </xsl:variable>
+          <xsl:if test="parent::node()/@draw:transform">
+            <xsl:attribute name ="rot">
+              <xsl:value-of select ="concat('draw-transform:ROT:',substring-before(parent::node()/@svg:width,'cm'), ':',
 																   substring-before(parent::node()/@svg:height,'cm'), ':', 
 																   $x2, ':',  $y2, ':', $angle)"/>
-				</xsl:attribute>
-			</xsl:if>
+            </xsl:attribute>
+          </xsl:if>
           <a:off>
-			  <xsl:if test="not(parent::node()/@draw:transform)">
-				  <xsl:attribute name ="x">
-					  <!--<xsl:value-of select ="@svg:x"/>-->
-					  <xsl:call-template name ="convertToPoints">
-						  <xsl:with-param name ="unit" select ="'cm'"/>
-						  <xsl:with-param name ="length" select ="parent::node()/@svg:x"/>
-					  </xsl:call-template>
-				  </xsl:attribute>
-				  <xsl:attribute name ="y">
-					  <!--<xsl:value-of select ="@svg:y"/>-->
-					  <xsl:call-template name ="convertToPoints">
-						  <xsl:with-param name ="unit" select ="'cm'"/>
-						  <xsl:with-param name ="length" select ="parent::node()/@svg:y"/>
-					  </xsl:call-template>
-				  </xsl:attribute>
-			  </xsl:if >
-			  <xsl:if test="parent::node()/@draw:transform">
-				  <xsl:attribute name ="x">
-					  <xsl:value-of select ="concat('draw-transform:X:',substring-before(parent::node()/@svg:width,'cm'), ':',
+            <xsl:if test="not(parent::node()/@draw:transform)">
+              <xsl:attribute name ="x">
+                <!--<xsl:value-of select ="@svg:x"/>-->
+                <xsl:call-template name ="convertToPoints">
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length" select ="parent::node()/@svg:x"/>
+                </xsl:call-template>
+              </xsl:attribute>
+              <xsl:attribute name ="y">
+                <!--<xsl:value-of select ="@svg:y"/>-->
+                <xsl:call-template name ="convertToPoints">
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length" select ="parent::node()/@svg:y"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if >
+            <xsl:if test="parent::node()/@draw:transform">
+              <xsl:attribute name ="x">
+                <xsl:value-of select ="concat('draw-transform:X:',substring-before(parent::node()/@svg:width,'cm'), ':',
 																   substring-before(parent::node()/@svg:height,'cm'), ':', 
 																   $x2, ':', $y2, ':', $angle)"/>
-				  </xsl:attribute>
-				  <xsl:attribute name ="y">
-					  <xsl:value-of select ="concat('draw-transform:Y:',substring-before(parent::node()/@svg:width,'cm'), ':',
+              </xsl:attribute>
+              <xsl:attribute name ="y">
+                <xsl:value-of select ="concat('draw-transform:Y:',substring-before(parent::node()/@svg:width,'cm'), ':',
 																   substring-before(parent::node()/@svg:height,'cm'), ':', 
 																   $x2, ':',$y2, ':', $angle)"/>
-				  </xsl:attribute>
-			  </xsl:if>
+              </xsl:attribute>
+            </xsl:if>
           </a:off >
           <a:ext>
             <xsl:attribute name ="cx">
@@ -162,104 +163,143 @@ Copyright (c) 2007, Sonata Software Limited
       </p:spPr>
     </p:pic>
   </xsl:template>
-  <xsl:template name ="InsertVideo">
+  <xsl:template name="InsertAudio">
     <xsl:param name ="imageNo" />
-    <xsl:variable name ="videoSerialNo">
-      <xsl:value-of select ="concat('sl',$imageNo,'Mo' ,position())"/>
+    <xsl:param name ="AudNo" />
+    <xsl:variable name="PostionCount">
+      <xsl:value-of select="$AudNo"/>
+    </xsl:variable>
+    <xsl:variable name ="audioSerialNo">
+      <xsl:value-of select ="concat('sl',$imageNo,'Au' ,$AudNo)"/>
     </xsl:variable>
     <xsl:variable name ="imageSerialNo">
-      <xsl:value-of select ="concat('sl',$imageNo,'Im' ,position())"/>
+      <xsl:value-of select ="concat('sl',$imageNo,'Im' ,$AudNo)"/>
     </xsl:variable>
-    <pzip:copy pzip:source="{@xlink:href}"
-				   pzip:target="{concat('ppt/image/',substring-after(@xlink:href,'/'))}"/>
+    <pzip:copy pzip:source="{'Thumbnails/thumbnail.png'}"
+				   pzip:target="{concat('ppt/media/thumbnail.png','')}"/>
+    <xsl:if test="@xlink:href">
+      <pzip:copy pzip:source="{@xlink:href}"
+       pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
+    </xsl:if>
+    <xsl:if test="./draw:image/@xlink:href">
+      <pzip:copy pzip:source="{./draw:image/@xlink:href}"
+         pzip:target="{concat('ppt/media/',substring-after(./draw:image/@xlink:href,'/'))}"/>
+    </xsl:if>
+    <xsl:variable name="varMediaFilePath">
+      <xsl:if test="@xlink:href [ contains(.,'../')]">
+        <xsl:value-of select="@xlink:href" />
+      </xsl:if>
+      <xsl:if test="not(@xlink:href [ contains(.,'../')])">
+        <xsl:value-of select="substring-after(@xlink:href,'/')" />
+      </xsl:if>
+    </xsl:variable>
+    <xsl:if test="@xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')]">
+      <pzip:import pzip:source="{$varMediaFilePath}" pzip:target="{concat('ppt/media/',$audioSerialNo,'.wav')}" />
+    </xsl:if>
     <p:pic>
       <p:nvPicPr>
-        <p:cNvPr id="4" name="Content Placeholder 3">
-          <xsl:attribute name ="descr">
-            <xsl:if test ="parent::node()/@draw:name">
-              <xsl:value-of select ="parent::node()/@draw:name"/>
-            </xsl:if>
-            <xsl:if test ="not(parent::node()/@draw:name)">
-              <xsl:value-of  select ="substring-after(@xlink:href,'/')"/>
-            </xsl:if >
-          </xsl:attribute>
-          <a:hlinkClick r:id="" action="ppaction://media" />
-        </p:cNvPr >
+        <p:cNvPr id="4" name="sound1">
+          <a:hlinkClick r:id="" action="ppaction://media"/>
+        </p:cNvPr>
         <p:cNvPicPr>
-          <a:picLocks noGrp="1" noChangeAspect="1" />
+          <a:picLocks noRot="1" noChangeAspect="1"/>
         </p:cNvPicPr>
         <p:nvPr>
-          <p:ph idx="{position()}" />
-          <a:videoFile r:link="rId1" >
-            <xsl:attribute name ="r:link">
-              <xsl:value-of select ="$videoSerialNo"/>
-            </xsl:attribute>
-          </a:videoFile >
+          <!--@xlink:href[ contains(.,'asf')] i am using this extension in Video file bcoz it is avilable in movies and sounds-->
+          <xsl:if test="@xlink:href[ contains(.,'mp3')] or @xlink:href[ contains(.,'m3u')] or @xlink:href[ contains(.,'wma')] or 
+          @xlink:href[ contains(.,'wax')] or @xlink:href[ contains(.,'aif')] or @xlink:href[ contains(.,'aifc')] or
+          @xlink:href[ contains(.,'aiff')] or @xlink:href[ contains(.,'au')] or @xlink:href[ contains(.,'snd')] or
+          @xlink:href[ contains(.,'mid')] or @xlink:href[ contains(.,'midi')] or @xlink:href[ contains(.,'rmi')]">
+            <a:audioFile>
+              <xsl:attribute name ="r:link">
+                <xsl:value-of select ="$audioSerialNo"/>
+              </xsl:attribute>
+            </a:audioFile>
+          </xsl:if>
+          <xsl:if test="not(@xlink:href[ contains(.,'mp3')] or @xlink:href[ contains(.,'m3u')] or @xlink:href[ contains(.,'wma')] or 
+          @xlink:href[ contains(.,'wax')] or @xlink:href[ contains(.,'aif')] or @xlink:href[ contains(.,'aifc')] or
+          @xlink:href[ contains(.,'aiff')] or @xlink:href[ contains(.,'au')] or @xlink:href[ contains(.,'snd')] or
+          @xlink:href[ contains(.,'mid')] or @xlink:href[ contains(.,'midi')] or @xlink:href[ contains(.,'rmi')])">
+            <xsl:if test="not(@xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')])">
+              <a:videoFile>
+                <xsl:attribute name ="r:link">
+                  <xsl:value-of select ="$audioSerialNo"/>
+                </xsl:attribute>
+              </a:videoFile>
+            </xsl:if>
+          </xsl:if>
+          <xsl:if test="@xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')]">
+            <a:wavAudioFile>
+              <xsl:attribute name ="r:embed">
+                <xsl:value-of select ="$audioSerialNo"/>
+              </xsl:attribute>
+              <xsl:attribute name ="name">
+                <xsl:value-of select ="'sound1'"/>
+              </xsl:attribute>
+            </a:wavAudioFile>
+          </xsl:if>
         </p:nvPr>
       </p:nvPicPr>
       <p:blipFill>
         <a:blip>
-          <xsl:attribute name ="r:embed">
-            <xsl:value-of select ="$imageSerialNo"/>
+          <xsl:attribute name="r:embed">
+            <xsl:value-of select="$imageSerialNo"/>
           </xsl:attribute>
-        </a:blip >
+        </a:blip>
         <a:stretch>
-          <a:fillRect />
+          <a:fillRect/>
         </a:stretch>
       </p:blipFill>
       <p:spPr>
         <a:xfrm>
-			<xsl:variable name ="angle">
-				<xsl:value-of select="substring-after(substring-before(substring-before(parent::node()/@draw:transform,'translate'),')'),'(')" />
-			</xsl:variable>
-			<xsl:variable name ="x2">
-				<xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-			</xsl:variable>
-			<xsl:variable name ="y2">
-				<xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-			</xsl:variable>
-			<xsl:if test="@draw:transform">
-				<xsl:attribute name ="rot">
-					<xsl:value-of select ="concat('draw-transform:ROT:',substring-before(parent::node()/@svg:width,'cm'), ':',
+          <xsl:variable name ="angle">
+            <xsl:value-of select="substring-after(substring-before(substring-before(parent::node()/@draw:transform,'translate'),')'),'(')" />
+          </xsl:variable>
+          <xsl:variable name ="x2">
+            <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
+          </xsl:variable>
+          <xsl:variable name ="y2">
+            <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
+          </xsl:variable>
+          <xsl:if test="@draw:transform">
+            <xsl:attribute name ="rot">
+              <xsl:value-of select ="concat('draw-transform:ROT:',substring-before(parent::node()/@svg:width,'cm'), ':',
 																   substring-before(parent::node()/@svg:height,'cm'), ':', 
 																   $x2, ':', 
                                    $y2, ':', 
 																   $angle)"/>
-				</xsl:attribute>
-			</xsl:if>
-			<a:off >
-				<xsl:if test="not(@draw:transform)">
-					<xsl:attribute name ="x">
-						<!--<xsl:value-of select ="@svg:x"/>-->
-						<xsl:call-template name ="convertToPoints">
-							<xsl:with-param name ="unit" select ="'cm'"/>
-							<xsl:with-param name ="length" select ="parent::node()/@svg:x"/>
-						</xsl:call-template>
-					</xsl:attribute>
-					<xsl:attribute name ="y">
-						<!--<xsl:value-of select ="@svg:y"/>-->
-						<xsl:call-template name ="convertToPoints">
-							<xsl:with-param name ="unit" select ="'cm'"/>
-							<xsl:with-param name ="length" select ="parent::node()/@svg:y"/>
-						</xsl:call-template>
-					</xsl:attribute>
-				</xsl:if >
-				<xsl:if test="@draw:transform">
-					<xsl:attribute name ="x">
-						<xsl:value-of select ="concat('draw-transform:X:',substring-before(parent::node()/@svg:width,'cm'), ':',
+            </xsl:attribute>
+          </xsl:if>
+          <a:off >
+            <xsl:if test="not(@draw:transform)">
+              <xsl:attribute name ="x">
+                <!--<xsl:value-of select ="@svg:x"/>-->
+                <xsl:call-template name ="convertToPoints">
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length" select ="parent::node()/@svg:x"/>
+                </xsl:call-template>
+              </xsl:attribute>
+              <xsl:attribute name ="y">
+                <!--<xsl:value-of select ="@svg:y"/>-->
+                <xsl:call-template name ="convertToPoints">
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length" select ="parent::node()/@svg:y"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if >
+            <xsl:if test="@draw:transform">
+              <xsl:attribute name ="x">
+                <xsl:value-of select ="concat('draw-transform:X:',substring-before(parent::node()/@svg:width,'cm'), ':',
 																   substring-before(parent::node()/@svg:height,'cm'), ':', 
 																   $x2, ':', $y2, ':', $angle)"/>
-					</xsl:attribute>
-					<xsl:attribute name ="y">
-						<xsl:value-of select ="concat('draw-transform:Y:',substring-before(parent::node()/@svg:width,'cm'), ':',
+              </xsl:attribute>
+              <xsl:attribute name ="y">
+                <xsl:value-of select ="concat('draw-transform:Y:',substring-before(parent::node()/@svg:width,'cm'), ':',
 																   substring-before(parent::node()/@svg:height,'cm'), ':', 
 																   $x2, ':',$y2, ':', $angle)"/>
-					</xsl:attribute>
-				</xsl:if>
-			</a:off>	
-          
-            
-          
+              </xsl:attribute>
+            </xsl:if>
+          </a:off>
           <a:ext>
             <xsl:attribute name ="cx">
               <!--<xsl:value-of select ="@svg:width"/>-->
@@ -277,7 +317,6 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </a:ext >
         </a:xfrm>
-        <xsl:call-template name ="pictureBorderLine"/>
         <a:prstGeom prst="rect">
           <a:avLst />
         </a:prstGeom>
@@ -314,5 +353,24 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:for-each>
 
   </xsl:template>
-  
+  <xsl:template name ="tmpInsertBackImage">
+    <xsl:param name ="FileName" />
+    <xsl:param name ="imageName" />
+    <xsl:variable name ="imageSerialNo">
+      <xsl:value-of select ="concat($FileName,'BackImg')"/>
+    </xsl:variable>
+    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$imageName]">
+      <pzip:copy pzip:source="{@xlink:href}"
+          pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
+    </xsl:for-each>
+
+    <a:blip>
+      <xsl:attribute name ="r:embed">
+        <xsl:value-of select ="$imageSerialNo"/>
+      </xsl:attribute>
+      <a:lum/>
+    </a:blip >
+
+  </xsl:template>
+
 </xsl:stylesheet>

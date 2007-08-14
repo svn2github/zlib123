@@ -48,6 +48,7 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:import href ="common.xsl"/>
 	<xsl:import href ="shapes_direct.xsl"/>
 	<xsl:import href ="picture.xsl"/>
+  <xsl:import href ="slides.xsl"/>
 	<xsl:template name ="slideMasters">
 		<xsl:param name="slideMasterName"/>
 		<xsl:param name ="smId" />
@@ -56,32 +57,105 @@ Copyright (c) 2007, Sonata Software Limited
 		xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
 			<p:cSld>
 				<!--Added by sateesh - Background Color-->
-				<p:bg>
-					<p:bgPr>
-						<a:solidFill>
-							<a:srgbClr>
-								<xsl:variable name="dpName">
-									<xsl:value-of select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/@draw:style-name"/>
-								</xsl:variable>
-								<xsl:choose>
-									<xsl:when test="document('styles.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill='solid'">
-										<xsl:attribute name="val">
-											<xsl:value-of select="substring-after(document('styles.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill-color,'#')" />
-										</xsl:attribute>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:if test="not(@draw:fill-color)">
-											<xsl:attribute name="val">
-												<xsl:value-of select="'ffffff'" />
-											</xsl:attribute>
-										</xsl:if>
-									</xsl:otherwise>
-								</xsl:choose>
-							</a:srgbClr>
-						</a:solidFill>
-						<a:effectLst/>
-					</p:bgPr>
-				</p:bg>
+
+        <xsl:variable name="dpName">
+          <xsl:value-of select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/@draw:style-name"/>
+        </xsl:variable>
+        <xsl:for-each select="document('styles.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
+          <xsl:choose>
+                <xsl:when test="@draw:fill='bitmap'">
+                  <p:bg>
+                    <p:bgPr>
+                      <a:blipFill dpi="0" rotWithShape="1">
+                        <xsl:call-template name="tmpInsertBackImage">
+                          <xsl:with-param name="FileName" select="$slideMasterName" />
+                          <xsl:with-param name="imageName" select="@draw:fill-image-name" />
+                        </xsl:call-template>
+                        <xsl:if test="@style:repeat='stretch'">
+                          <a:stretch>
+                            <a:fillRect />
+                          </a:stretch>
+                        </xsl:if>
+                        <xsl:if test="@draw:fill-image-ref-point-x or @draw:fill-image-ref-point-y">
+                          <a:tile tx="0" ty="0" flip="none">
+                            <xsl:if test="@draw:fill-image-ref-point-x">
+                              <xsl:attribute name="sx">
+                                <xsl:value-of select="number(substring-before(@draw:fill-image-ref-point-x,'%')) * 1000"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test="@draw:fill-image-ref-point-y">
+                              <xsl:attribute name="sy">
+                                <xsl:value-of select="number(substring-before(@draw:fill-image-ref-point-y,'%')) * 1000"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test="@draw:fill-image-ref-point">
+                              <xsl:attribute name="algn">
+                                <xsl:choose>
+                                  <xsl:when test="@draw:fill-image-ref-point='top-left'">
+                                    <xsl:value-of select ="'tl'"/>
+                                  </xsl:when>
+                                  <xsl:when test="@draw:fill-image-ref-point='top'">
+                                    <xsl:value-of select ="'t'"/>
+                                  </xsl:when>
+                                  <xsl:when test="@draw:fill-image-ref-point='top-right'">
+                                    <xsl:value-of select ="'tr'"/>
+                                  </xsl:when>
+                                  <xsl:when test="@draw:fill-image-ref-point='right'">
+                                    <xsl:value-of select ="'r'"/>
+                                  </xsl:when>
+                                  <xsl:when test="@draw:fill-image-ref-point='bottom-left'">
+                                    <xsl:value-of select ="'bl'"/>
+                                  </xsl:when>
+                                  <xsl:when test="@draw:fill-image-ref-point='bottom-right'">
+                                    <xsl:value-of select ="'br'"/>
+                                  </xsl:when>
+                                  <xsl:when test="@draw:fill-image-ref-point='bottom'">
+                                    <xsl:value-of select ="'b'"/>
+                                  </xsl:when>
+                                  <xsl:when test="@draw:fill-image-ref-point='center'">
+                                    <xsl:value-of select ="'ctr'"/>
+                                  </xsl:when>
+                                </xsl:choose>
+                              </xsl:attribute>
+                            </xsl:if>
+                          </a:tile>
+                        </xsl:if>
+                      </a:blipFill>
+                      <a:effectLst />
+                </p:bgPr>
+               </p:bg>
+              </xsl:when>
+                <xsl:when test="@draw:fill='solid'">
+                <p:bg>
+                  <p:bgPr>
+                <a:solidFill>
+                  <a:srgbClr>
+                    <xsl:attribute name="val">
+                      <xsl:if test="@draw:fill-color">
+                        <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
+                      </xsl:if>
+                       <xsl:if test="not(@draw:fill-color)">
+                            <xsl:value-of select="'ffffff'" />
+                          </xsl:if>
+                    </xsl:attribute>
+                  </a:srgbClr>
+                </a:solidFill>
+                    <a:effectLst />
+                  </p:bgPr>
+                </p:bg>
+              </xsl:when>
+              <xsl:otherwise>
+              <p:bg>
+                <p:bgPr>
+                  <a:solidFill>
+                    <a:srgbClr val="ffffff"/>
+                  </a:solidFill>
+                  <a:effectLst />
+                </p:bgPr>
+              </p:bg>
+          </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
 				<!--end-->
 				<p:spTree>
 					<p:nvGrpSpPr>
@@ -97,162 +171,182 @@ Copyright (c) 2007, Sonata Software Limited
 							<a:chExt cx="0" cy="0"/>
 						</a:xfrm>
 					</p:grpSpPr>
-					<xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/draw:frame">
-						<xsl:choose >
-							<!-- for convertion title-->
-							<xsl:when test ="@presentation:class ='title'">
-								<p:sp>
-									<p:nvSpPr>
-										<p:cNvPr name="Title Placeholder 1">
-											<xsl:attribute name="id">
-												<xsl:value-of select="position()+1"/>
-											</xsl:attribute>
-										</p:cNvPr>
-										<!-- End-->
-										<p:cNvSpPr>
-											<a:spLocks noGrp="1"/>
-										</p:cNvSpPr>
-										<p:nvPr>
-											<p:ph type="title"/>
-										</p:nvPr>
-									</p:nvSpPr>
-									<p:spPr>
-										<a:xfrm>
-											<xsl:call-template name ="writeCo-ordinates"/>
-										</a:xfrm>
-										<a:prstGeom prst="rect">
-											<a:avLst/>
-										</a:prstGeom>
-										<!-- Solid fill color -->
-										<xsl:variable name="prId">
-											<xsl:value-of select="@presentation:style-name"/>
-										</xsl:variable>
-										<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
-											<xsl:variable name="styleName">
-												<xsl:value-of select="@style:parent-style-name"/>
-											</xsl:variable>
-											<xsl:if test="not(style:graphic-properties/@draw:fill)">
-												<xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]/style:graphic-properties/@draw:fill-color">
-													<a:solidFill>
-														<a:srgbClr>
-															<xsl:attribute name="val">
-																<xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]">
-																	<!--<xsl:value-of select="./style:graphic-properties/@draw:fill-color"/>-->
-																	<xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
-																</xsl:for-each>
-															</xsl:attribute>
-														</a:srgbClr>
-													</a:solidFill>
-												</xsl:if>
-											</xsl:if>
-										</xsl:for-each>
-									</p:spPr>
-									<p:txBody>
-										<xsl:call-template name ="SlideMasterTextAlignment" >
-											<xsl:with-param name="masterName" select="$slideMasterName"/>
-											<xsl:with-param name ="prId" select ="@presentation:style-name"/>
-										</xsl:call-template >
-										<a:lstStyle/>
-										<xsl:call-template name ="Titlebody"/>
-										<!--<xsl:with-param name ="layoutName" select ="@presentation:class"/>
-                    </xsl:call-template >-->
-										<!--<xsl:call-template name ="processText" >
-                      <xsl:with-param name ="layoutName" select ="@presentation:class"/>
-                    </xsl:call-template >-->
-									</p:txBody>
-								</p:sp>
-							</xsl:when>
-							<!-- For Converting content -->
-							<xsl:when test ="@presentation:class ='outline'">
-								<p:sp>
-									<p:nvSpPr>
-										<p:cNvPr name="Text Placeholder 2">
-											<xsl:attribute name ="id">
-												<xsl:value-of select ="position()+1"/>
-											</xsl:attribute>
-										</p:cNvPr>
-										<p:cNvSpPr>
-											<a:spLocks noGrp="1"/>
-										</p:cNvSpPr>
-										<p:nvPr>
-											<p:ph type="body" idx="1"/>
-										</p:nvPr>
-									</p:nvSpPr>
-									<p:spPr>
-										<a:xfrm>
-											<xsl:call-template name ="writeCo-ordinates"/>
-										</a:xfrm>
-										<a:prstGeom prst="rect">
-											<a:avLst/>
-										</a:prstGeom>
-										<!-- Solid fill color -->
-										<xsl:variable name="prId">
-											<xsl:value-of select="@presentation:style-name"/>
-										</xsl:variable>
-										<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
-											<xsl:variable name="styleName">
-												<xsl:value-of select="@style:parent-style-name"/>
-											</xsl:variable>
-											<xsl:if test="not(style:graphic-properties/@draw:fill)">
-												<xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]/style:graphic-properties/@draw:fill-color">
-													<a:solidFill>
-														<a:srgbClr>
-															<xsl:attribute name="val">
-																<xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]">
-																	<xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
-																</xsl:for-each>
-															</xsl:attribute>
-														</a:srgbClr>
-													</a:solidFill>
-												</xsl:if>
-											</xsl:if>
-										</xsl:for-each>
-									</p:spPr>
-									<p:txBody>
-										<xsl:call-template name ="SlideMasterTextAlignment" >
-											<xsl:with-param name="masterName" select="$slideMasterName"/>
-											<xsl:with-param name ="prId" select ="@presentation:style-name"/>
-										</xsl:call-template >
-										<xsl:call-template name="Outlinebody"/>
-									</p:txBody>
-								</p:sp>
-							</xsl:when>
-							<!-- For Converting DateTime -->
-							<xsl:when test="@presentation:class ='date-time'">
-								<xsl:call-template name ="Datetime" >
-									<xsl:with-param name ="prId" select ="@presentation:style-name"/>
-									<xsl:with-param name="className" select="@presentation:class"/>
-								</xsl:call-template >
-							</xsl:when>
-							<!-- For Converting Footer -->
-							<xsl:when test="@presentation:class ='footer'">
-								<xsl:call-template name ="Footer" >
-									<xsl:with-param name ="prId" select ="@presentation:style-name"/>
-									<xsl:with-param name="className" select="@presentation:class"/>
-								</xsl:call-template >
-							</xsl:when>
-							<!-- For Converting PageNumber -->
-							<xsl:when test="@presentation:class ='page-number'">
-								<xsl:call-template name ="Pagenumber">
-									<xsl:with-param name ="prId" select ="@presentation:style-name"/>
-									<xsl:with-param name="className" select="@presentation:class"/>
-								</xsl:call-template >
-							</xsl:when>
-						</xsl:choose>
+					<xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]">
+            <xsl:for-each select="node()">
+              <xsl:choose>
+                <xsl:when test="name()='draw:frame'">
+                  <xsl:variable name="var_pos" select="position()"/>
+                  <xsl:for-each select=".">
+                    <xsl:choose>
+                      <xsl:when test="./draw:image">
+                        <xsl:for-each select="./draw:image">
+                          <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
+            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
+            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
+            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
+            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
+            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
+            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
+            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+                            <xsl:call-template name ="InsertPicture">
+                              <xsl:with-param name ="imageNo" select ="$slideMasterName"/>
+                              <xsl:with-param name ="master" select ="'1'"/>
+                              <xsl:with-param name="picNo" select="$var_pos" />
+                            </xsl:call-template>
+                          </xsl:if >
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:when test="@presentation:class[contains(.,'title')]
+                                  or @presentation:class[contains(.,'outline')]">
+                        <xsl:variable name ="masterPageName" select ="./parent::node()/@draw:master-page-name"/>
+                        <xsl:variable name="FrameCount" select="concat('Frame',$var_pos)"/>
+                        <p:sp>
+                          <p:nvSpPr>
+                            <xsl:choose>
+                              <xsl:when test ="@presentation:class[contains(.,'title')]">
+                                <p:cNvPr name="Title Placeholder 1">
+                                  <xsl:attribute name="id">
+                                    <xsl:value-of select="$var_pos+1"/>
+                                  </xsl:attribute>
+                                </p:cNvPr>
+                                <p:cNvSpPr>
+                                  <a:spLocks noGrp="1"/>
+                                </p:cNvSpPr>
+                                <p:nvPr>
+                                  <p:ph type="title"/>
+                                </p:nvPr>
+                              </xsl:when>
+                              <xsl:when test ="@presentation:class[contains(.,'outline')]">
+                                <p:cNvPr name="Text Placeholder 2">
+                                  <xsl:attribute name ="id">
+                                    <xsl:value-of select="$var_pos+1"/>
+                                  </xsl:attribute>
+                                </p:cNvPr>
+                                <p:cNvSpPr>
+                                  <a:spLocks noGrp="1"/>
+                                </p:cNvSpPr>
+                                <p:nvPr>
+                                  <p:ph type="body" idx="1"/>
+                                </p:nvPr>
+                              </xsl:when>
+                            </xsl:choose>
+                          </p:nvSpPr>
+                          <p:spPr>
+                            <a:xfrm>
+                              <xsl:call-template name ="writeCo-ordinates"/>
+                            </a:xfrm>
+                            <a:prstGeom prst="rect">
+                              <a:avLst/>
+                            </a:prstGeom>
+                            <!-- Solid fill color -->
+                            <xsl:variable name="prId">
+                              <xsl:value-of select="@presentation:style-name"/>
+                            </xsl:variable>
+                            <xsl:choose>
+                              <xsl:when test="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]">
+                                <xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
+                                  <xsl:variable name="styleName">
+                                    <xsl:value-of select="@style:parent-style-name"/>
+                                  </xsl:variable>
+                                  <xsl:if test="not(style:graphic-properties/@draw:fill)">
+                                    <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]/style:graphic-properties/@draw:fill-color">
+                                      <a:solidFill>
+                                        <a:srgbClr>
+                                          <xsl:attribute name="val">
+                                            <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]">
+                                              <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                                            </xsl:for-each>
+                                          </xsl:attribute>
+                                        </a:srgbClr>
+                                      </a:solidFill>
+                                    </xsl:if>
+                                  </xsl:if>
+                                </xsl:for-each>
+                              </xsl:when>
+                              <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$prId]">
+                                <xsl:if test="style:graphic-properties/@draw:fill='solid'">
+                                  <a:solidFill>
+                                    <a:srgbClr>
+                                      <xsl:attribute name="val">
+                                        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$prId]">
+                                          <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                                        </xsl:for-each>
+                                      </xsl:attribute>
+                                    </a:srgbClr>
+                                  </a:solidFill>
+                                </xsl:if>
+                             
+                              </xsl:when>
+                            </xsl:choose>
+                          </p:spPr>
+                            <p:txBody>
+                              <xsl:call-template name ="SlideMasterTextAlignment" >
+                                <xsl:with-param name="masterName" select="$slideMasterName"/>
+                                <xsl:with-param name ="prId" select ="@presentation:style-name"/>
+                              </xsl:call-template >
+                              <!--<xsl:if test ="@presentation:class[contains(.,'outline')]">
+                                <a:lstStyle />
+                              </xsl:if>-->
+                              <xsl:choose>
+                                <xsl:when test ="@presentation:class[contains(.,'title')]">
+                                  <xsl:call-template name ="Titlebody"/>
+                                </xsl:when>
+                                <xsl:when test ="@presentation:class[contains(.,'outline')]">
+                                <xsl:call-template name ="Outlinebody"/>
+                              </xsl:when>
+                            </xsl:choose>
+                          </p:txBody>
+                        </p:sp>
+                      </xsl:when>
+                      <!-- For Converting DateTime -->
+                      <xsl:when test="@presentation:class ='date-time'">
+                        <xsl:call-template name ="Datetime" >
+                          <xsl:with-param name ="prId" select ="@presentation:style-name"/>
+                          <xsl:with-param name="className" select="@presentation:class"/>
+                        </xsl:call-template >
+                      </xsl:when>
+                      <!-- For Converting Footer -->
+                      <xsl:when test="@presentation:class ='footer'">
+                        <xsl:call-template name ="Footer" >
+                          <xsl:with-param name ="prId" select ="@presentation:style-name"/>
+                          <xsl:with-param name="className" select="@presentation:class"/>
+                        </xsl:call-template >
+                      </xsl:when>
+                      <!-- For Converting PageNumber -->
+                      <xsl:when test="@presentation:class ='page-number'">
+                        <xsl:call-template name ="Pagenumber">
+                          <xsl:with-param name ="prId" select ="@presentation:style-name"/>
+                          <xsl:with-param name="className" select="@presentation:class"/>
+                        </xsl:call-template >
+                      </xsl:when>
+                      <xsl:when test ="(draw:text-box) and not(@presentation:style-name) and not(@presentation:class)">
+                        <xsl:call-template name ="CreateShape">
+                          <xsl:with-param name ="fileName" select ="'styles.xml'"/>
+                          <xsl:with-param name ="shapeName" select="'TextBox '" />
+                          <xsl:with-param name ="shapeCount" select="$var_pos" />
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="./draw:plugin">
+                        <xsl:for-each select="./draw:plugin">
+                          <xsl:call-template name="InsertAudio">
+                            <xsl:with-param name ="imageNo" select ="$slideMasterName"/>
+                            <xsl:with-param name="AudNo" select="$var_pos" />
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                    </xsl:choose>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- Code for shapes start-->
+                  <xsl:call-template name ="shapes" >
+                    <xsl:with-param name ="fileName" select ="'styles.xml'"/>
+                    <!-- Code for shapes End-->
+                  </xsl:call-template >
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
 					</xsl:for-each >
-
-					<!--Code for shapes start-->
-					<xsl:call-template name ="shapes" >
-						<xsl:with-param name ="fileName" select ="'styles.xml'"/>
-					</xsl:call-template >
-					<!-- Pictures/Images -->
-					<xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/draw:frame/draw:image">
-						<xsl:call-template name ="InsertPicture">
-							<xsl:with-param name ="imageNo" select ="1"/>
-							<xsl:with-param name ="master" select ="1"/>
-						</xsl:call-template>
-					</xsl:for-each>
-					<!-- Pictures/Images -->
 				</p:spTree>
 			</p:cSld>
 			<p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>
@@ -406,6 +500,37 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:attribute>
 								</xsl:if>
 								<!-- End -->
+								
+								<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+								<xsl:if test="./style:text-properties/@style:text-position">
+										<xsl:choose>
+											<xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+												  <xsl:variable name="blsuper">
+													  <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+												  </xsl:variable>
+												  <xsl:value-of select="($blsuper * 1000)"/>
+                          </xsl:attribute>
+											</xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+											<!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+												  <xsl:variable name="blsub">
+													  <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+												  </xsl:variable>
+												  <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+											</xsl:otherwise>-->
+										</xsl:choose>
+								</xsl:if>
+								
 								<!--Character Spacing-->
 								<xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">
 									<xsl:attribute name ="spc">
@@ -707,6 +832,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 									<xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">
 										<xsl:attribute name ="spc">
@@ -997,6 +1152,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -1304,6 +1489,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -1612,6 +1827,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -1913,6 +2158,35 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -2214,6 +2488,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -2515,6 +2819,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -2816,6 +3150,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -3117,6 +3481,36 @@ Copyright (c) 2007, Sonata Software Limited
 										</xsl:attribute>
 									</xsl:if>
 									<!-- End -->
+									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+									<xsl:if test="./style:text-properties/@style:text-position">
+                    <xsl:choose>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsuper">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsuper * 1000)"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!--<xsl:otherwise>
+                        <xsl:attribute name="baseline">
+                          <xsl:variable name="blsub">
+                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                          </xsl:variable>
+                          <xsl:value-of select="($blsub * (-1000))"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>-->
+                    </xsl:choose>
+									</xsl:if>
+									
 									<!--Character Spacing-->
 
 									<xsl:variable name ="space">
@@ -5408,11 +5802,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:with-param name="prId" select="$prId"/>
 				</xsl:call-template>
 				<a:lstStyle>
-					<a:lvl1pPr>
-						<xsl:if test ="./draw:text-box/text:p">
-							<xsl:variable name ="ParId">
-								<xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
-							</xsl:variable>
+				  <a:lvl1pPr>
+				   <xsl:variable name ="ParId">
+                                     <xsl:choose>
+                                     <xsl:when test="./draw:text-box/text:p/@text:style-name">
+					<xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
+                                     </xsl:when>
+                                    <xsl:otherwise>
+                                       <xsl:value-of select="$prId"/>
+                                    </xsl:otherwise>
+                                   </xsl:choose>
+				  </xsl:variable>
 							<xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]">
 								<xsl:attribute name="algn">
 									<xsl:choose >
@@ -5431,11 +5831,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:choose>
 								</xsl:attribute>
 							</xsl:for-each>
-						</xsl:if>
 						<a:defRPr>
-							<xsl:variable name ="ParId">
-								<xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
-							</xsl:variable>
+							
 							<xsl:variable name="txtId">
 								<xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
 							</xsl:variable>
@@ -5463,7 +5860,17 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:when>
 							</xsl:choose>
 							<!--sateesh-->
-							<xsl:for-each select="document('styles.xml')//style:style[@style:name=$txtId]">
+<xsl:variable name="testStyleName">
+                <xsl:choose>
+                  <xsl:when test="./draw:text-box/text:p/text:span/@text:style-name">
+                    <xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prId"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+							<xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">
 								<!--Font Bold attribute-->
 								<xsl:if test="./style:text-properties/@fo:font-weight='bold'">
 									<xsl:attribute name ="b">
@@ -5539,6 +5946,36 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:attribute >
 								</xsl:when>
 							</xsl:choose>
+							<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+							<xsl:if test="./style:text-properties/@style:text-position">
+                <xsl:choose>
+                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsuper">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsuper * 1000)"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsub">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsub * (-1000))"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <!--<xsl:otherwise>
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsub">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsub * (-1000))"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>-->
+                </xsl:choose>
+							</xsl:if>
+							
 							<!--Underline Color-->
 							<xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
 								<a:uFill>
@@ -5558,8 +5995,8 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
 									</xsl:variable>
 									<xsl:choose>
-										<xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:color">
-											<xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
+										<xsl:when test="document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:color">
+											<xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">
 												<xsl:attribute name="val">
 													<xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
 												</xsl:attribute>
@@ -5574,7 +6011,7 @@ Copyright (c) 2007, Sonata Software Limited
 								</a:srgbClr>
 							</a:solidFill>
 							<!--Shadow-->
-							<xsl:if test="document('styles.xml')//style:style[@style:name=$txtId]/style:text-properties/@fo:text-shadow">
+							<xsl:if test="document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:text-shadow">
 								<a:effectLst>
 									<a:outerShdw blurRad="38100" dist="38100" dir="2700000" algn="tl">
 										<a:srgbClr val="000000">
@@ -5587,6 +6024,9 @@ Copyright (c) 2007, Sonata Software Limited
 							<a:latin>
 								<xsl:attribute name="typeface">
 									<xsl:choose>
+                    <xsl:when test="translate(document('styles.xml')//style:style[@style:name=$txtId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')">
+                      <xsl:value-of select="translate(document('styles.xml')//style:style[@style:name=$txtId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')"/>
+                    </xsl:when>
 										<xsl:when test="translate(document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')">
 											<xsl:value-of select="translate(document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')"/>
 										</xsl:when>
@@ -5691,9 +6131,16 @@ Copyright (c) 2007, Sonata Software Limited
 				<a:lstStyle>
 					<a:lvl1pPr>
 						<!--<xsl:value-of select="'ctr'"/>-->
-						<xsl:if test ="./draw:text-box/text:p">
+						
 							<xsl:variable name ="ParId">
+              <xsl:choose>
+                <xsl:when test="./draw:text-box/text:p/@text:style-name">
 								<xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$prId"/>
+                </xsl:otherwise>
+              </xsl:choose>
 							</xsl:variable>
 							<xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]">
 								<xsl:attribute name="algn">
@@ -5713,11 +6160,9 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:choose>
 								</xsl:attribute>
 							</xsl:for-each>
-						</xsl:if>
+						
 						<a:defRPr>
-							<xsl:variable name ="ParId">
-								<xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
-							</xsl:variable>
+							
 							<xsl:variable name="textId">
 								<xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
 							</xsl:variable>
@@ -5745,7 +6190,17 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:when>
 							</xsl:choose>
 							<!--sateesh-->
-							<xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
+                                                         <xsl:variable name="testStyleName">
+                <xsl:choose>
+                  <xsl:when test="./draw:text-box/text:p/text:span/@text:style-name">
+                    <xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prId"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+							<xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">
 								<!--Font Bold attribute-->
 								<xsl:if test="./style:text-properties/@fo:font-weight='bold'">
 									<xsl:attribute name ="b">
@@ -5821,6 +6276,36 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:attribute >
 								</xsl:when>
 							</xsl:choose>
+							<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+							<xsl:if test="./style:text-properties/@style:text-position">
+                <xsl:choose>
+                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsuper">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsuper * 1000)"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsub">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsub * (-1000))"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <!--<xsl:otherwise>
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsub">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsub * (-1000))"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>-->
+                </xsl:choose>
+							</xsl:if>
+							
 							<!--Underline Color-->
 							<xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
 								<a:uFill>
@@ -5837,8 +6322,8 @@ Copyright (c) 2007, Sonata Software Limited
 							<a:solidFill>
 								<a:srgbClr>
 									<xsl:choose>
-										<xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:color">
-											<xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
+										<xsl:when test="document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:color">
+											<xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">
 												<xsl:attribute name="val">
 													<xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
 												</xsl:attribute>
@@ -5852,7 +6337,7 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:choose>
 								</a:srgbClr>
 							</a:solidFill>
-							<xsl:if test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:text-shadow">
+							<xsl:if test="document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:text-shadow">
 								<a:effectLst>
 									<a:outerShdw blurRad="38100" dist="38100" dir="2700000" algn="tl">
 										<a:srgbClr val="000000">
@@ -5864,6 +6349,9 @@ Copyright (c) 2007, Sonata Software Limited
 							<a:latin>
 								<xsl:attribute name="typeface">
 									<xsl:choose>
+                    <xsl:when test="translate(document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')">
+                      <xsl:value-of select="translate(document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')"/>
+                    </xsl:when>
 										<xsl:when test="translate(document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')">
 											<xsl:value-of select="translate(document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')"/>
 										</xsl:when>
@@ -5941,9 +6429,16 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:call-template>
 				<a:lstStyle>
 					<a:lvl1pPr>
-						<xsl:if test ="./draw:text-box/text:p">
+						
 							<xsl:variable name ="ParId">
+              <xsl:choose>
+                <xsl:when test="./draw:text-box/text:p/@text:style-name">
 								<xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$prId"/>
+                </xsl:otherwise>
+              </xsl:choose>
 							</xsl:variable>
 							<xsl:for-each select ="document('styles.xml')//style:style[@style:name=$ParId]">
 								<xsl:attribute name="algn">
@@ -5963,11 +6458,9 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:choose>
 								</xsl:attribute>
 							</xsl:for-each>
-						</xsl:if>
+					
 						<a:defRPr>
-							<xsl:variable name ="ParId">
-								<xsl:value-of select ="./draw:text-box/text:p/@text:style-name"/>
-							</xsl:variable>
+							
 							<xsl:variable name="textName">
 								<xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
 							</xsl:variable>
@@ -5993,7 +6486,17 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:attribute>
 								</xsl:when>
 							</xsl:choose>
-							<xsl:for-each select="document('styles.xml')//style:style[@style:name=$textName]">
+ <xsl:variable name="testStyleName">
+              <xsl:choose>
+                <xsl:when test="./draw:text-box/text:p/text:span/@text:style-name">
+                    <xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$prId"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              </xsl:variable>
+							<xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">
 								<!--Font Bold attribute-->
 								<xsl:if test="./style:text-properties/@fo:font-weight='bold'">
 									<xsl:attribute name ="b">
@@ -6069,6 +6572,36 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:attribute >
 								</xsl:when>
 							</xsl:choose>
+							<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
+							<xsl:if test="./style:text-properties/@style:text-position">
+                <xsl:choose>
+                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsuper">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsuper * 1000)"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsub">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsub * (-1000))"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <!--<xsl:otherwise>
+                    <xsl:attribute name="baseline">
+                      <xsl:variable name="blsub">
+                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+                      </xsl:variable>
+                      <xsl:value-of select="($blsub * (-1000))"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>-->
+                </xsl:choose>
+							</xsl:if>
+							
 							<!--Underline Color-->
 							<xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
 								<a:uFill>
@@ -6088,8 +6621,8 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>
 									</xsl:variable>
 									<xsl:choose>
-										<xsl:when test="document('styles.xml')//style:style[@style:name=$textId]/style:text-properties/@fo:color">
-											<xsl:for-each select="document('styles.xml')//style:style[@style:name=$textId]">
+										<xsl:when test="document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:color">
+											<xsl:for-each select="document('styles.xml')//style:style[@style:name=$testStyleName]">
 												<xsl:attribute name="val">
 													<xsl:value-of select="substring-after(style:text-properties/@fo:color,'#')"/>
 												</xsl:attribute>
@@ -6103,7 +6636,7 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:choose>
 								</a:srgbClr>
 							</a:solidFill>
-							<xsl:if test="document('styles.xml')//style:style[@style:name=$textName]/style:text-properties/@fo:text-shadow">
+							<xsl:if test="document('styles.xml')//style:style[@style:name=$testStyleName]/style:text-properties/@fo:text-shadow">
 								<a:effectLst>
 									<a:outerShdw blurRad="38100" dist="38100" dir="2700000" algn="tl">
 										<a:srgbClr val="000000">
@@ -6115,6 +6648,9 @@ Copyright (c) 2007, Sonata Software Limited
 							<a:latin>
 								<xsl:attribute name="typeface">
 									<xsl:choose>
+										<xsl:when test="translate(document('styles.xml')//style:style[@style:name=$textName]/style:text-properties/@fo:font-family, &quot;'&quot;,'')">
+											<xsl:value-of select="translate(document('styles.xml')//style:style[@style:name=$textName]/style:text-properties/@fo:font-family, &quot;'&quot;,'')"/>
+										</xsl:when>
 										<xsl:when test="translate(document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')">
 											<xsl:value-of select="translate(document('styles.xml')//style:style[@style:name=$ParId]/style:text-properties/@fo:font-family, &quot;'&quot;,'')"/>
 										</xsl:when>
@@ -6275,6 +6811,155 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:otherwise>
 				</xsl:choose>
 				</xsl:attribute>
+
+				<!--Added by Mathi for TextAlign in Textbox on 6th Aug 2007-->
+				<xsl:for-each select ="draw:frame">
+					<xsl:variable name="GrId">
+						<xsl:value-of select ="@draw:style-name"/>
+					</xsl:variable>
+				<xsl:for-each select ="document('styles.xml')//office:automatic-styles/style:style[@style:name=$GrId]/style:graphic-properties">
+					<!--<xsl:for-each select ="document($fileName)/child::node()[1]/office:automatic-styles/style:style[@style:name=$gr]/style:graphic-properties">-->
+					<!-- Vertical alignment -->
+					<xsl:if test="(./parent::node()/style:paragraph-properties/@style:writing-mode='tb-rl') or not(./parent::node()/style:paragraph-properties/@style:writing-mode='tb-rl')">
+						<xsl:choose>
+							<xsl:when test ="(@draw:textarea-vertical-align='top' and @draw:textarea-horizontal-align='left')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'b'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='top' and @draw:textarea-horizontal-align='right')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'t'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='top' and @draw:textarea-horizontal-align='center')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'ctr'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='right')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'t'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'1'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='center')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'ctr'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'1'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='left')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'b'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'1'"/>
+								</xsl:attribute>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:if>
+					<!-- Horizontal alignment -->
+					<xsl:if test="not(./parent::node()/style:paragraph-properties/@style:writing-mode='tb-rl')">
+						<xsl:choose>
+							<xsl:when test ="(@draw:textarea-horizontal-align='left' and @draw:textarea-vertical-align='middle')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'ctr'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-horizontal-align='left' and @draw:textarea-vertical-align='bottom')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'b'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='top' and @draw:textarea-horizontal-align='justify')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'t'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='justify')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'ctr'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-horizontal-align='center' and @draw:textarea-vertical-align='top')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'t'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'1'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='bottom' and @draw:textarea-horizontal-align='justify')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'b'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='center')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'ctr'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'1'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-vertical-align='bottom' and @draw:textarea-horizontal-align='center')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select ="'b'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select ="'1'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-horizontal-align='left')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select="'t'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test ="(@draw:textarea-horizontal-align='center')">
+								<xsl:attribute name ="anchor">
+									<xsl:value-of select="'t'"/>
+								</xsl:attribute>
+								<xsl:attribute name ="anchorCtr">
+									<xsl:value-of select="'1'"/>
+								</xsl:attribute>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:if>
+				</xsl:for-each>
+				</xsl:for-each>
+				
 				<xsl:variable name ="anchorValue">
 					<xsl:choose >
 						<xsl:when test ="@draw:textarea-vertical-align ='top'">
@@ -6967,16 +7652,16 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test="$format= 'a' and $suff=')' and $prefix='(' ">alphaLcParenBoth</xsl:when>
 			<xsl:when test="$format= 'i' and $suff='.' ">romanLcPeriod</xsl:when>
 			<xsl:when test="$format= 'I' and $suff='.' ">romanUcPeriod</xsl:when>
-			<xsl:otherwise>decimal</xsl:otherwise>
+      <xsl:otherwise>arabicPeriod</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	<!--End-->
 	<!--Relationships-->
 	<xsl:template name ="slideMaster1Rel">
-		<xsl:param name ="StartLayoutNo"/>
+    <xsl:param name ="StartLayoutNo"/>
 		<xsl:param name ="ThemeId"/>
 		<xsl:param name="slideNo" />
-		<xsl:param name ="slideMasterName"/>
+  		<xsl:param name ="slideMasterName"/>
 		<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" >
 				<xsl:attribute name ="Target">
@@ -7041,21 +7726,1671 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 			</Relationship >
 			<!-- code for picture feature start-->
-			<xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/draw:frame/draw:image">
-				<Relationship>
-					<xsl:attribute name="Id">
-						<xsl:value-of select="concat('sl',$slideNo,'Image',position())" />
-					</xsl:attribute>
-					<xsl:attribute name="Type">
-						<xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
-					</xsl:attribute>
-					<xsl:attribute name="Target">
-						<xsl:value-of select="concat('../media/',substring-after(@xlink:href,'/'))" />
-						<!-- <xsl:value-of select ="concat('../media/',substring-after(@xlink:href,'/'))"/>  -->
-					</xsl:attribute>
-				</Relationship>
+      
+			<xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]">
+        <xsl:for-each select="node()">
+          <xsl:choose>
+            <xsl:when test="name()='draw:frame'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:choose>
+                  <xsl:when test="./draw:image">
+                    <xsl:for-each select="./draw:image">
+                      <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
+            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
+            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
+            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
+            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
+            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
+            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
+            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+                        <Relationship>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat('sl',$slideNo,'Image',$var_pos)" />
+                          </xsl:attribute>
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="concat('../media/',substring-after(@xlink:href,'/'))" />
+                            <!-- <xsl:value-of select ="concat('../media/',substring-after(@xlink:href,'/'))"/>  -->
+                          </xsl:attribute>
+                        </Relationship>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="./draw:plugin">
+                    <xsl:for-each select="./draw:plugin">
+                      <Relationship >
+                        <xsl:attribute name ="Id">
+                          <xsl:value-of  select ="concat('sl',$slideNo,'Au',$var_pos)"/>
+                        </xsl:attribute>
+                        <xsl:variable name="wavId">
+                          <xsl:value-of  select ="concat('sl',$slideNo,'Au',$var_pos)"/>
+                        </xsl:variable>
+                        <xsl:attribute name ="Type" >
+                          <xsl:if test="@xlink:href[ contains(.,'mp3')] or @xlink:href[ contains(.,'m3u')] or @xlink:href[ contains(.,'wma')] or 
+          @xlink:href[ contains(.,'wax')] or @xlink:href[ contains(.,'aif')] or @xlink:href[ contains(.,'aifc')] or
+          @xlink:href[ contains(.,'aiff')] or @xlink:href[ contains(.,'au')] or @xlink:href[ contains(.,'snd')] or
+          @xlink:href[ contains(.,'mid')] or @xlink:href[ contains(.,'midi')] or @xlink:href[ contains(.,'rmi')] or @xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')]">
+                            <xsl:value-of select ="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                          </xsl:if>
+                          <xsl:if test="not(@xlink:href[ contains(.,'mp3')] or @xlink:href[ contains(.,'m3u')] or @xlink:href[ contains(.,'wma')] or 
+          @xlink:href[ contains(.,'wax')] or @xlink:href[ contains(.,'aif')] or @xlink:href[ contains(.,'aifc')] or
+          @xlink:href[ contains(.,'aiff')] or @xlink:href[ contains(.,'au')] or @xlink:href[ contains(.,'snd')] or
+          @xlink:href[ contains(.,'mid')] or @xlink:href[ contains(.,'midi')] or @xlink:href[ contains(.,'rmi')] or @xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')])">
+                            <xsl:value-of select ="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/video'"/>
+                          </xsl:if>
+                        </xsl:attribute>
+                        <xsl:attribute name ="Target">
+                          <xsl:choose>
+                            <xsl:when test="@xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')]">
+                              <xsl:value-of select="concat('../media/',$wavId,'.wav')"/>
+                            </xsl:when>
+                            <xsl:when test="@xlink:href[ contains(.,'./')]">
+                              <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                <xsl:value-of select="/"/>
+                              </xsl:if>
+                              <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+                              </xsl:if>
+                            </xsl:when>
+                            <xsl:when test="not(@xlink:href[ contains(.,'./')])">
+                              <xsl:value-of select="concat('file:///',translate(substring-after(@xlink:href,'/'),'/','\'))"/>
+                            </xsl:when>
+                          </xsl:choose>
+                        </xsl:attribute>
+                        <xsl:if test="not(@xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')])">
+                          <xsl:attribute name="TargetMode">
+                            <xsl:value-of select="'External'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                      </Relationship >
+                      <!-- for image link -->
+                      <Relationship>
+                        <xsl:attribute name ="Id">
+                          <xsl:value-of  select ="concat('sl',$slideNo,'Im',position())"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="Type" >
+                          <xsl:value-of select ="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="Target">
+                          <xsl:if test="./draw:image/@xlink:href">
+                            <xsl:value-of select ="concat('../media/',substring-after(./draw:image/@xlink:href,'/'))"/>
+                          </xsl:if>
+                          <xsl:if test="not(./draw:image/@xlink:href)">
+                            <xsl:value-of select ="concat('../media/','thumbnail.png')"/>
+                          </xsl:if>
+                          <!--<xsl:if test="@xlink:href">
+                <xsl:value-of select ="concat('../image/',substring-after(@xlink:href,'/'))"/>  
+              </xsl:if>-->
+                        </xsl:attribute>
+                      </Relationship >
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="PostionCount">
+                      <xsl:value-of select="$var_pos"/>
+                    </xsl:variable>
+                    <xsl:if test="not(@presentation:style-name) and not(@presentation:class)">
+                      <xsl:for-each select="draw:text-box">
+                        <xsl:variable name="shapeId">
+                          <xsl:value-of select="concat('text-box',$PostionCount)"/>
+                        </xsl:variable>
+                        <xsl:for-each select="text:p">
+                          <xsl:if test="text:a/@xlink:href">
+                            <Relationship>
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                              </xsl:attribute>
+                              <xsl:choose>
+                                <xsl:when test="text:a/@xlink:href[contains(.,'#Slide')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="concat('slide',substring-after(text:a/@xlink:href,'Slide '),'.xml')"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:when test="text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="text:a/@xlink:href"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:if test="text:a/@xlink:href[ contains (.,':') ]">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('file:///',translate(substring-after(text:a/@xlink:href,'/'),'/','\'))"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                  <xsl:if test="not(text:a/@xlink:href[ contains (.,':') ])">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="substring-after(text:a/@xlink:href,'../')"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </Relationship>
+                          </xsl:if>
+                          <xsl:if test="text:span/text:a/@xlink:href">
+                            <Relationship>
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                              </xsl:attribute>
+                              <xsl:choose>
+                                <xsl:when test="text:span/text:a/@xlink:href[contains(.,'#Slide')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="concat('slide',substring-after(text:span/text:a/@xlink:href,'Slide '),'.xml')"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:when test="text:span/text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="text:span/text:a/@xlink:href"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:if test="text:span/text:a/@xlink:href[ contains (.,':') ]">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('file:///',translate(substring-after(text:span/text:a/@xlink:href,'/'),'/','\'))"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                  <xsl:if test="not(text:span/text:a/@xlink:href[ contains (.,':') ])">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="substring-after(text:span/text:a/@xlink:href,'../')"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </Relationship>
+                          </xsl:if>
+                        </xsl:for-each>
+                        <xsl:for-each select="text:list">
+                          <xsl:variable name="forCount" select="position()" />
+                          <xsl:variable name="bulletlvl">
+                            <xsl:call-template name ="getListLevel">
+                              <xsl:with-param name ="levelCount"/>
+                            </xsl:call-template>
+                          </xsl:variable>
+                          <xsl:variable name="blvl">
+                            <xsl:if test="$bulletlvl > 0">
+                              <xsl:value-of select="$bulletlvl"/>
+                            </xsl:if>
+                            <xsl:if test="not($bulletlvl > 0)">
+                              <xsl:value-of select="'0'"/>
+                            </xsl:if>
+                          </xsl:variable>
+                          <xsl:variable name="xhrefValue">
+                            <xsl:call-template name ="getTextHyperlinksForBulltes">
+                              <xsl:with-param name ="blvl" select="$blvl"/>
+                            </xsl:call-template>
+                          </xsl:variable>
+                          <xsl:if test="string-length($xhrefValue) > 0">
+                            <Relationship>
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat($shapeId,'BLVL',$blvl,'Link',$forCount)"/>
+                              </xsl:attribute>
+                              <xsl:choose>
+                                <xsl:when test="contains($xhrefValue,'#Slide')">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="concat('slide',substring-after($xhrefValue,'Slide '),'.xml')"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:when test="contains($xhrefValue,'http://') or contains($xhrefValue,'mailto:')">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="$xhrefValue"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:if test="contains($xhrefValue,':')">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('file:///',translate(substring-after($xhrefValue,'/'),'/','\'))"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                  <xsl:if test="not(contains ($xhrefValue,':'))">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="substring-after($xhrefValue,'../')"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </Relationship>
+                          </xsl:if>
+                        </xsl:for-each>
+                      </xsl:for-each>
+                    </xsl:if>
+                    <xsl:if test="@presentation:class">
+                      <xsl:variable name="FrameCount">
+                        <xsl:value-of select="concat('Frame',$var_pos)"/>
+                      </xsl:variable>
+                      <xsl:for-each select="draw:text-box">
+                        <xsl:for-each select="text:p">
+                          <xsl:if test="text:a/@xlink:href">
+                            <Relationship>
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat('TextHLAtchFileId',$PostionCount,'Link',position())"/>
+                              </xsl:attribute>
+                              <xsl:choose>
+                                <xsl:when test="text:a/@xlink:href[contains(.,'#Slide')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="concat('slide',substring-after(text:a/@xlink:href,'Slide '),'.xml')"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:when test="text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="text:a/@xlink:href"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:if test="text:a/@xlink:href[ contains (.,':') ]">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('file:///',translate(substring-after(text:a/@xlink:href,'/'),'/','\'))"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                  <xsl:if test="not(text:a/@xlink:href[ contains (.,':') ])">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="substring-after(text:a/@xlink:href,'../')"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </Relationship>
+                          </xsl:if>
+                          <xsl:if test="text:span/text:a/@xlink:href">
+                            <Relationship>
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat('TextHLAtchFileId',$PostionCount,'Link',position())"/>
+                              </xsl:attribute>
+                              <xsl:choose>
+                                <xsl:when test="text:span/text:a/@xlink:href[contains(.,'#Slide')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="concat('slide',substring-after(text:span/text:a/@xlink:href,'Slide '),'.xml')"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:when test="text:span/text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="text:span/text:a/@xlink:href"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:if test="text:span/text:a/@xlink:href[ contains (.,':') ]">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('file:///',translate(substring-after(text:span/text:a/@xlink:href,'/'),'/','\'))"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                  <xsl:if test="not(text:span/text:a/@xlink:href[ contains (.,':') ])">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="substring-after(text:span/text:a/@xlink:href,'../')"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </Relationship>
+                          </xsl:if>
+                        </xsl:for-each>
+                        <xsl:for-each select="text:list">
+                          <xsl:variable name="forCount" select="position()" />
+                          <xsl:variable name="bulletlvl">
+                            <xsl:call-template name ="getListLevel">
+                              <xsl:with-param name ="levelCount"/>
+                            </xsl:call-template>
+                          </xsl:variable>
+                          <xsl:variable name="blvl">
+                            <xsl:if test="$bulletlvl > 0">
+                              <xsl:value-of select="$bulletlvl"/>
+                            </xsl:if>
+                            <xsl:if test="not($bulletlvl > 0)">
+                              <xsl:value-of select="'0'"/>
+                            </xsl:if>
+                          </xsl:variable>
+                          <xsl:variable name="xhrefValue">
+                            <xsl:call-template name ="getTextHyperlinksForBulltes">
+                              <xsl:with-param name ="blvl" select="$blvl"/>
+                            </xsl:call-template>
+                          </xsl:variable>
+                          <xsl:if test="string-length($xhrefValue) > 0">
+                            <Relationship>
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat($FrameCount,'BTHLFileId',$blvl,'Link',$forCount)"/>
+                              </xsl:attribute>
+                              <xsl:choose>
+                                <xsl:when test="contains($xhrefValue,'#Slide')">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="concat('slide',substring-after($xhrefValue,'Slide '),'.xml')"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:when test="contains($xhrefValue,'http://') or contains($xhrefValue,'mailto:')">
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="$xhrefValue"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:if test="contains($xhrefValue,':')">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('file:///',translate(substring-after($xhrefValue,'/'),'/','\'))"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                  <xsl:if test="not(contains ($xhrefValue,':'))">
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="substring-after($xhrefValue,'../')"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </Relationship>
+                          </xsl:if>
+                        </xsl:for-each>
+                      </xsl:for-each>
+                    </xsl:if>
+                    <xsl:if test="office:event-listeners">
+                      <xsl:for-each select=".">
+                        <xsl:variable name="PresentationClass">
+                          <xsl:if test="@presentation:class">
+                            <xsl:value-of select="1"/>
+                          </xsl:if>
+                          <xsl:if test="not(@presentation:class)">
+                            <xsl:value-of select="0"/>
+                          </xsl:if>
+                        </xsl:variable>
+                        <xsl:if test="$PresentationClass = 0">
+                          <xsl:for-each select ="office:event-listeners/presentation:event-listener">
+                            <xsl:if test="@xlink:href">
+                              <Relationship>
+                                <xsl:choose>
+                                  <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
+                                    <xsl:variable name="pageID">
+                                      <xsl:call-template name="getThePageId">
+                                        <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
+                                      </xsl:call-template>
+                                    </xsl:variable>
+                                    <xsl:if test="$pageID > 0">
+                                      <xsl:attribute name="Id">
+                                        <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
+                                      </xsl:attribute>
+                                      <xsl:attribute name="Type">
+                                        <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                      </xsl:attribute>
+                                      <xsl:attribute name="Target">
+                                        <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
+                                      </xsl:attribute>
+                                    </xsl:if>
+                                  </xsl:when>
+                                  <xsl:when test="@xlink:href">
+                                    <xsl:attribute name="Id">
+                                      <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:if test="@xlink:href[ contains(.,'./')]">
+                                        <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                          <xsl:value-of select="/"/>
+                                        </xsl:if>
+                                        <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                          <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+                                        </xsl:if>
+                                      </xsl:if>
+                                      <xsl:if test="not(@xlink:href[ contains(.,'./')])">
+                                        <xsl:value-of select="concat('file://',@xlink:href)"/>
+                                      </xsl:if>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="TargetMode">
+                                      <xsl:value-of select="'External'"/>
+                                    </xsl:attribute>
+                                  </xsl:when>
+                                </xsl:choose>
+                              </Relationship>
+                            </xsl:if>
+                            <xsl:if test="presentation:sound">
+                              <xsl:variable name="varblnDuplicateRelation">
+                                <xsl:call-template name="GetUniqueRelationIdForWavFile">
+                                  <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
+                                  <xsl:with-param name="ShapePosition" select="$PostionCount" />
+                                  <xsl:with-param name="ShapeType" select="'FRAME'" />
+                                  <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                                </xsl:call-template>
+                              </xsl:variable>
+                              <xsl:if test="$varblnDuplicateRelation != 1">
+                                <Relationship>
+                                  <xsl:variable name="varMediaFilePath">
+                                    <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                                      <xsl:value-of select="presentation:sound/@xlink:href" />
+                                    </xsl:if>
+                                    <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                                      <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                                    </xsl:if>
+                                  </xsl:variable>
+                                  <xsl:variable name="varFileRelId">
+                                    <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                                  </xsl:variable>
+                                  <xsl:attribute name="Id">
+                                    <xsl:value-of select="$varFileRelId"/>
+                                  </xsl:attribute>
+                                  <!--<xsl:attribute name="Id">
+                    <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
+                  </xsl:attribute>-->
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
+                                  </xsl:attribute>
+                                </Relationship>
+                              </xsl:if>
+                            </xsl:if>
+                          </xsl:for-each>
+                        </xsl:if>
+                      </xsl:for-each>
+                      <xsl:for-each select="./@presentation:class">
+                        <xsl:for-each select ="parent::node()/office:event-listeners/presentation:event-listener">
+                          <xsl:if test="@xlink:href">
+                            <Relationship>
+                              <xsl:choose>
+                                <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
+                                  <xsl:variable name="pageID">
+                                    <xsl:call-template name="getThePageId">
+                                      <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
+                                    </xsl:call-template>
+                                  </xsl:variable>
+                                  <xsl:if test="$pageID > 0">
+                                    <xsl:attribute name="Id">
+                                      <xsl:value-of select="concat('AtchFileId',$PostionCount)"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Type">
+                                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="Target">
+                                      <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
+                                    </xsl:attribute>
+                                  </xsl:if>
+                                </xsl:when>
+                                <xsl:when test="@xlink:href">
+                                  <xsl:attribute name="Id">
+                                    <xsl:value-of select="concat('AtchFileId',$PostionCount)"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Type">
+                                    <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="Target">
+                                    <xsl:if test="@xlink:href[ contains(.,'./')]">
+                                      <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                        <xsl:value-of select="/"/>
+                                      </xsl:if>
+                                      <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                        <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+                                      </xsl:if>
+                                    </xsl:if>
+                                    <xsl:if test="not(@xlink:href[ contains(.,'./')])">
+                                      <xsl:value-of select="concat('file://',@xlink:href)"/>
+                                    </xsl:if>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="TargetMode">
+                                    <xsl:value-of select="'External'"/>
+                                  </xsl:attribute>
+                                </xsl:when>
+                              </xsl:choose>
+                            </Relationship>
+                          </xsl:if>
+                          <xsl:if test="presentation:sound">
+                            <xsl:variable name="varblnDuplicateRelation">
+                              <xsl:call-template name="GetUniqueRelationIdForWavFile">
+                                <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
+                                <xsl:with-param name="ShapePosition" select="$PostionCount" />
+                                <xsl:with-param name="ShapeType" select="'FRAME'" />
+                                <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:if test="$varblnDuplicateRelation != 1">
+                              <Relationship>
+                                <xsl:variable name="varMediaFilePath">
+                                  <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                                    <xsl:value-of select="presentation:sound/@xlink:href" />
+                                  </xsl:if>
+                                  <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                                    <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                                  </xsl:if>
+                                </xsl:variable>
+                                <xsl:variable name="varFileRelId">
+                                  <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                                </xsl:variable>
+                                <xsl:attribute name="Id">
+                                  <xsl:value-of select="$varFileRelId"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
+                                </xsl:attribute>
+                              </Relationship>
+                            </xsl:if>
+                          </xsl:if>
+                        </xsl:for-each>
+                      </xsl:for-each>
+                    </xsl:if>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="name()='draw:custom-shape'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:choose>
+                  <xsl:when test="./office:event-listeners">
+                    <xsl:variable name="ShapePostionCount">
+                      <xsl:value-of select="$var_pos"/>
+                    </xsl:variable>
+                    <xsl:for-each select ="office:event-listeners/presentation:event-listener">
+                      <xsl:if test="@xlink:href">
+                        <Relationship>
+                          <xsl:choose>
+                            <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
+                              <xsl:variable name="pageID">
+                                <xsl:call-template name="getThePageId">
+                                  <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
+                                </xsl:call-template>
+                              </xsl:variable>
+                              <xsl:if test="$pageID > 0">
+                                <xsl:attribute name="Id">
+                                  <xsl:value-of select="concat('ShapeFileId',$ShapePostionCount)"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:when>
+                            <xsl:when test="@xlink:href">
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat('ShapeFileId',$ShapePostionCount)"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:if test="@xlink:href[ contains(.,'./')]">
+                                  <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                    <xsl:value-of select="/"/>
+                                  </xsl:if>
+                                  <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                    <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+                                  </xsl:if>
+                                </xsl:if>
+                                <xsl:if test="not(@xlink:href[ contains(.,'./')])">
+                                  <xsl:value-of select="concat('file://',@xlink:href)"/>
+                                </xsl:if>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                      <xsl:if test="presentation:sound">
+                        <xsl:variable name="varblnDuplicateRelation">
+                          <xsl:call-template name="GetUniqueRelationIdForWavFile">
+                            <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
+                            <xsl:with-param name="ShapePosition" select="$ShapePostionCount" />
+                            <xsl:with-param name="ShapeType" select="'CUSTOM'" />
+                            <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                          </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:if test="$varblnDuplicateRelation != 1">
+                          <Relationship>
+                            <xsl:variable name="varMediaFilePath">
+                              <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                                <xsl:value-of select="presentation:sound/@xlink:href" />
+                              </xsl:if>
+                              <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                                <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                              </xsl:if>
+                            </xsl:variable>
+                            <xsl:variable name="varFileRelId">
+                              <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                            </xsl:variable>
+                            <xsl:attribute name="Id">
+                              <xsl:value-of select="$varFileRelId"/>
+                            </xsl:attribute>
+                            <!--<xsl:attribute name="Id">
+                  <xsl:value-of select="concat('ShapeFileId',$ShapePostionCount)"/>
+                </xsl:attribute>-->
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
+                            </xsl:attribute>
+                          </Relationship>
+                        </xsl:if>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="ShapePostionCount">
+                      <xsl:value-of select="position()"/>
+                    </xsl:variable>
+                    <xsl:variable name="shapeId">
+                      <xsl:value-of select="concat('custom-shape',$var_pos)"/>
+                    </xsl:variable>
+                    <xsl:for-each select="text:p">
+                      <xsl:if test="text:a/@xlink:href">
+                        <Relationship>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                          </xsl:attribute>
+                          <xsl:choose>
+                            <xsl:when test="text:a/@xlink:href[contains(.,'#Slide')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',substring-after(text:a/@xlink:href,'Slide '),'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="text:a/@xlink:href"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:if test="text:a/@xlink:href[ contains (.,':') ]">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('file:///',translate(substring-after(text:a/@xlink:href,'/'),'/','\'))"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                              <xsl:if test="not(text:a/@xlink:href[ contains (.,':') ])">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="substring-after(text:a/@xlink:href,'../')"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                      <xsl:if test="text:span/text:a/@xlink:href">
+                        <Relationship>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                          </xsl:attribute>
+                          <xsl:choose>
+                            <xsl:when test="text:span/text:a/@xlink:href[contains(.,'#Slide')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',substring-after(text:span/text:a/@xlink:href,'Slide '),'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="text:span/text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="text:span/text:a/@xlink:href"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:if test="text:span/text:a/@xlink:href[ contains (.,':') ]">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('file:///',translate(substring-after(text:span/text:a/@xlink:href,'/'),'/','\'))"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                              <xsl:if test="not(text:span/text:a/@xlink:href[ contains (.,':') ])">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="substring-after(text:span/text:a/@xlink:href,'../')"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                    </xsl:for-each>
+                    <xsl:for-each select="text:list">
+                      <xsl:variable name="forCount" select="position()" />
+                      <xsl:variable name="bulletlvl">
+                        <xsl:call-template name ="getListLevel">
+                          <xsl:with-param name ="levelCount"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:variable name="blvl">
+                        <xsl:if test="$bulletlvl > 0">
+                          <xsl:value-of select="$bulletlvl"/>
+                        </xsl:if>
+                        <xsl:if test="not($bulletlvl > 0)">
+                          <xsl:value-of select="'0'"/>
+                        </xsl:if>
+                      </xsl:variable>
+                      <xsl:variable name="xhrefValue">
+                        <xsl:call-template name ="getTextHyperlinksForBulltes">
+                          <xsl:with-param name ="blvl" select="$blvl"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:if test="string-length($xhrefValue) > 0">
+                        <Relationship>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat($shapeId,'BLVL',$blvl,'Link',$forCount)"/>
+                          </xsl:attribute>
+                          <xsl:choose>
+                            <xsl:when test="contains($xhrefValue,'#Slide')">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',substring-after($xhrefValue,'Slide '),'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="contains($xhrefValue,'http://') or contains($xhrefValue,'mailto:')">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="$xhrefValue"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:if test="contains($xhrefValue,':')">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('file:///',translate(substring-after($xhrefValue,'/'),'/','\'))"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                              <xsl:if test="not(contains ($xhrefValue,':'))">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="substring-after($xhrefValue,'../')"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="name()='draw:rect'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:choose>
+                  <xsl:when test="./office:event-listeners">
+                    <xsl:variable name="ShapePostionCount">
+                      <xsl:value-of select="$var_pos"/>
+                    </xsl:variable>
+                    <xsl:for-each select ="office:event-listeners/presentation:event-listener">
+                      <xsl:if test="@xlink:href">
+                        <Relationship>
+                          <xsl:choose>
+                            <!--<xsl:when test="@xlink:href[contains(.,'#page')]">
+                    <xsl:attribute name="Type">
+                      <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="Target">
+                      <xsl:value-of select="concat('slide',substring-after(@xlink:href,'page'),'.xml')"/>
+                    </xsl:attribute>
+                  </xsl:when>-->
+                            <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
+                              <xsl:variable name="pageID">
+                                <xsl:call-template name="getThePageId">
+                                  <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
+                                </xsl:call-template>
+                              </xsl:variable>
+                              <xsl:if test="$pageID > 0">
+                                <xsl:attribute name="Id">
+                                  <xsl:value-of select="concat('RectAtachFileId',$ShapePostionCount)"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:when>
+                            <xsl:when test="@xlink:href">
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat('RectAtachFileId',$ShapePostionCount)"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:if test="@xlink:href[ contains(.,'./')]">
+                                  <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                    <xsl:value-of select="/"/>
+                                  </xsl:if>
+                                  <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                    <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+                                  </xsl:if>
+                                </xsl:if>
+                                <xsl:if test="not(@xlink:href[ contains(.,'./')])">
+                                  <xsl:value-of select="concat('file://',@xlink:href)"/>
+                                </xsl:if>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                      <xsl:if test="presentation:sound">
+                        <xsl:variable name="varblnDuplicateRelation">
+                          <xsl:call-template name="GetUniqueRelationIdForWavFile">
+                            <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
+                            <xsl:with-param name="ShapePosition" select="$ShapePostionCount" />
+                            <xsl:with-param name="ShapeType" select="'RECT'" />
+                            <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                          </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:if test="$varblnDuplicateRelation != 1">
+                          <Relationship>
+                            <xsl:variable name="varMediaFilePath">
+                              <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                                <xsl:value-of select="presentation:sound/@xlink:href" />
+                              </xsl:if>
+                              <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                                <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                              </xsl:if>
+                            </xsl:variable>
+                            <xsl:variable name="varFileRelId">
+                              <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                            </xsl:variable>
+                            <xsl:attribute name="Id">
+                              <xsl:value-of select="$varFileRelId"/>
+                            </xsl:attribute>
+                            <!--<xsl:attribute name="Id">
+                  <xsl:value-of select="concat('RectAtachFileId',$ShapePostionCount)"/>
+                </xsl:attribute>-->
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
+                            </xsl:attribute>
+                          </Relationship>
+                        </xsl:if>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="shapeId">
+                      <xsl:value-of select="concat('rect',$var_pos)"/>
+                    </xsl:variable>
+                    <xsl:for-each select="text:p">
+                      <xsl:if test="text:a/@xlink:href">
+                        <Relationship>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                          </xsl:attribute>
+                          <xsl:choose>
+                            <xsl:when test="text:a/@xlink:href[contains(.,'#Slide')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',substring-after(text:a/@xlink:href,'Slide '),'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="text:a/@xlink:href"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:if test="text:a/@xlink:href[ contains (.,':') ]">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('file:///',translate(substring-after(text:a/@xlink:href,'/'),'/','\'))"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                              <xsl:if test="not(text:a/@xlink:href[ contains (.,':') ])">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="substring-after(text:a/@xlink:href,'../')"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                      <xsl:if test="text:span/text:a/@xlink:href">
+                        <Relationship>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                          </xsl:attribute>
+                          <xsl:choose>
+                            <xsl:when test="text:span/text:a/@xlink:href[contains(.,'#Slide')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',substring-after(text:span/text:a/@xlink:href,'Slide '),'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="text:span/text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="text:span/text:a/@xlink:href"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:if test="text:span/text:a/@xlink:href[ contains (.,':') ]">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('file:///',translate(substring-after(text:span/text:a/@xlink:href,'/'),'/','\'))"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                              <xsl:if test="not(text:span/text:a/@xlink:href[ contains (.,':') ])">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="substring-after(text:span/text:a/@xlink:href,'../')"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                    </xsl:for-each>
+                    <xsl:for-each select="text:list">
+                      <xsl:variable name="forCount" select="position()" />
+                      <xsl:variable name="bulletlvl">
+                        <xsl:call-template name ="getListLevel">
+                          <xsl:with-param name ="levelCount"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:variable name="blvl">
+                        <xsl:if test="$bulletlvl > 0">
+                          <xsl:value-of select="$bulletlvl"/>
+                        </xsl:if>
+                        <xsl:if test="not($bulletlvl > 0)">
+                          <xsl:value-of select="'0'"/>
+                        </xsl:if>
+                      </xsl:variable>
+                      <xsl:variable name="xhrefValue">
+                        <xsl:call-template name ="getTextHyperlinksForBulltes">
+                          <xsl:with-param name ="blvl" select="$blvl"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:if test="string-length($xhrefValue) > 0">
+                        <Relationship>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="concat($shapeId,'BLVL',$blvl,'Link',$forCount)"/>
+                          </xsl:attribute>
+                          <xsl:choose>
+                            <xsl:when test="contains($xhrefValue,'#Slide')">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',substring-after($xhrefValue,'Slide '),'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="contains($xhrefValue,'http://') or contains($xhrefValue,'mailto:')">
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="$xhrefValue"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="TargetMode">
+                                <xsl:value-of select="'External'"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:if test="contains($xhrefValue,':')">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('file:///',translate(substring-after($xhrefValue,'/'),'/','\'))"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                              <xsl:if test="not(contains ($xhrefValue,':'))">
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="substring-after($xhrefValue,'../')"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="TargetMode">
+                                  <xsl:value-of select="'External'"/>
+                                </xsl:attribute>
+                              </xsl:if>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </Relationship>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="name()='draw:ellipse'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:variable name="shapeId">
+                  <xsl:value-of select="concat('ellipse',$var_pos)"/>
+                </xsl:variable>
+                <xsl:for-each select="text:p">
+                  <xsl:if test="text:a/@xlink:href">
+                    <Relationship>
+                      <xsl:attribute name="Id">
+                        <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                      </xsl:attribute>
+                      <xsl:choose>
+                        <xsl:when test="text:a/@xlink:href[contains(.,'#Slide')]">
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="concat('slide',substring-after(text:a/@xlink:href,'Slide '),'.xml')"/>
+                          </xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="text:a/@xlink:href"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="TargetMode">
+                            <xsl:value-of select="'External'"/>
+                          </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test="text:a/@xlink:href[ contains (.,':') ]">
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="concat('file:///',translate(substring-after(text:a/@xlink:href,'/'),'/','\'))"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test="not(text:a/@xlink:href[ contains (.,':') ])">
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="substring-after(text:a/@xlink:href,'../')"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </Relationship>
+                  </xsl:if>
+                  <xsl:if test="text:span/text:a/@xlink:href">
+                    <Relationship>
+                      <xsl:attribute name="Id">
+                        <xsl:value-of select="concat($shapeId,'Link',position())"/>
+                      </xsl:attribute>
+                      <xsl:choose>
+                        <xsl:when test="text:span/text:a/@xlink:href[contains(.,'#Slide')]">
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="concat('slide',substring-after(text:span/text:a/@xlink:href,'Slide '),'.xml')"/>
+                          </xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="text:span/text:a/@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="text:span/text:a/@xlink:href"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="TargetMode">
+                            <xsl:value-of select="'External'"/>
+                          </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test="text:span/text:a/@xlink:href[ contains (.,':') ]">
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="concat('file:///',translate(substring-after(text:span/text:a/@xlink:href,'/'),'/','\'))"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test="not(text:span/text:a/@xlink:href[ contains (.,':') ])">
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="substring-after(text:span/text:a/@xlink:href,'../')"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </Relationship>
+                  </xsl:if>
+                </xsl:for-each>
+                <xsl:for-each select="text:list">
+                  <xsl:variable name="forCount" select="position()" />
+                  <xsl:variable name="bulletlvl">
+                    <xsl:call-template name ="getListLevel">
+                      <xsl:with-param name ="levelCount"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="blvl">
+                    <xsl:if test="$bulletlvl > 0">
+                      <xsl:value-of select="$bulletlvl"/>
+                    </xsl:if>
+                    <xsl:if test="not($bulletlvl > 0)">
+                      <xsl:value-of select="'0'"/>
+                    </xsl:if>
+                  </xsl:variable>
+                  <xsl:variable name="xhrefValue">
+                    <xsl:call-template name ="getTextHyperlinksForBulltes">
+                      <xsl:with-param name ="blvl" select="$blvl"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:if test="string-length($xhrefValue) > 0">
+                    <Relationship>
+                      <xsl:attribute name="Id">
+                        <xsl:value-of select="concat($shapeId,'BLVL',$blvl,'Link',$forCount)"/>
+                      </xsl:attribute>
+                      <xsl:choose>
+                        <xsl:when test="contains($xhrefValue,'#Slide')">
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="concat('slide',substring-after($xhrefValue,'Slide '),'.xml')"/>
+                          </xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="contains($xhrefValue,'http://') or contains($xhrefValue,'mailto:')">
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="$xhrefValue"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="TargetMode">
+                            <xsl:value-of select="'External'"/>
+                          </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test="contains($xhrefValue,':')">
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="concat('file:///',translate(substring-after($xhrefValue,'/'),'/','\'))"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test="not(contains ($xhrefValue,':'))">
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:value-of select="substring-after($xhrefValue,'../')"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </Relationship>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="name()='draw:line'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:if test="./office:event-listeners">
+                  <xsl:variable name="ShapePostionCount">
+                    <xsl:value-of select="$var_pos"/>
+                  </xsl:variable>
+                  <xsl:for-each select ="office:event-listeners/presentation:event-listener">
+                    <xsl:if test="@xlink:href">
+                      <Relationship>
+                        <xsl:choose>
+                          <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
+                            <xsl:variable name="pageID">
+                              <xsl:call-template name="getThePageId">
+                                <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:if test="$pageID > 0">
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                          </xsl:when>
+                          <xsl:when test="@xlink:href">
+                            <xsl:attribute name="Id">
+                              <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:if test="@xlink:href[ contains(.,'./')]">
+                                <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                  <xsl:value-of select="/"/>
+                                </xsl:if>
+                                <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                  <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+                                </xsl:if>
+                              </xsl:if>
+                              <xsl:if test="not(@xlink:href[ contains(.,'./')])">
+                                <xsl:value-of select="concat('file://',@xlink:href)"/>
+                              </xsl:if>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:when>
+                        </xsl:choose>
+                      </Relationship>
+                    </xsl:if>
+                    <xsl:if test="presentation:sound">
+                      <xsl:variable name="varblnDuplicateRelation">
+                        <xsl:call-template name="GetUniqueRelationIdForWavFile">
+                          <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
+                          <xsl:with-param name="ShapePosition" select="$ShapePostionCount" />
+                          <xsl:with-param name="ShapeType" select="'LINE'" />
+                          <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:if test="$varblnDuplicateRelation != 1">
+                        <Relationship>
+                          <xsl:variable name="varMediaFilePath">
+                            <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                              <xsl:value-of select="presentation:sound/@xlink:href" />
+                            </xsl:if>
+                            <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                              <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                            </xsl:if>
+                          </xsl:variable>
+                          <xsl:variable name="varFileRelId">
+                            <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                          </xsl:variable>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="$varFileRelId"/>
+                          </xsl:attribute>
+                          <!--<xsl:attribute name="Id">
+                  <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
+                </xsl:attribute>-->
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
+                          </xsl:attribute>
+                        </Relationship>
+                      </xsl:if>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="name()='draw:connector'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:if test="./office:event-listener">
+                  <xsl:variable name="ShapePostionCount">
+                    <xsl:value-of select="$var_pos"/>
+                  </xsl:variable>
+                  <xsl:for-each select ="office:event-listeners/presentation:event-listener">
+                    <xsl:if test="@xlink:href">
+                      <Relationship>
+                        <xsl:choose>
+                          <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
+                            <xsl:variable name="pageID">
+                              <xsl:call-template name="getThePageId">
+                                <xsl:with-param name="PageName" select="substring-after(@xlink:href,'#')"/>
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:if test="$pageID > 0">
+                              <xsl:attribute name="Id">
+                                <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Type">
+                                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide'"/>
+                              </xsl:attribute>
+                              <xsl:attribute name="Target">
+                                <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                          </xsl:when>
+                          <xsl:when test="@xlink:href">
+                            <xsl:attribute name="Id">
+                              <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Type">
+                              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="Target">
+                              <xsl:if test="@xlink:href[ contains(.,'./')]">
+                                <xsl:if test="string-length(substring-after(@xlink:href, '../')) = 0">
+                                  <xsl:value-of select="/"/>
+                                </xsl:if>
+                                <xsl:if test="not(string-length(substring-after(@xlink:href, '../')) = 0)">
+                                  <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+                                </xsl:if>
+                              </xsl:if>
+                              <xsl:if test="not(@xlink:href[ contains(.,'./')])">
+                                <xsl:value-of select="concat('file://',@xlink:href)"/>
+                              </xsl:if>
+                            </xsl:attribute>
+                            <xsl:attribute name="TargetMode">
+                              <xsl:value-of select="'External'"/>
+                            </xsl:attribute>
+                          </xsl:when>
+                        </xsl:choose>
+                      </Relationship>
+                    </xsl:if>
+                    <xsl:if test="presentation:sound">
+                      <xsl:variable name="varblnDuplicateRelation">
+                        <xsl:call-template name="GetUniqueRelationIdForWavFile">
+                          <xsl:with-param name="FilePath" select="presentation:sound/@xlink:href" />
+                          <xsl:with-param name="ShapePosition" select="$ShapePostionCount" />
+                          <xsl:with-param name="ShapeType" select="'CONNECTOR'" />
+                          <xsl:with-param name="Page" select="parent::node()/parent::node()/parent::node()" />
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:if test="$varblnDuplicateRelation != 1">
+                        <Relationship>
+                          <xsl:variable name="varMediaFilePath">
+                            <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                              <xsl:value-of select="presentation:sound/@xlink:href" />
+                            </xsl:if>
+                            <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                              <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                            </xsl:if>
+                          </xsl:variable>
+                          <xsl:variable name="varFileRelId">
+                            <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                          </xsl:variable>
+                          <xsl:attribute name="Id">
+                            <xsl:value-of select="$varFileRelId"/>
+                          </xsl:attribute>
+                          <!--<xsl:attribute name="Id">
+                  <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
+                </xsl:attribute>-->
+                          <xsl:attribute name="Type">
+                            <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="Target">
+                            <xsl:value-of select="concat('../media/',$varFileRelId,'.wav')"/>
+                          </xsl:attribute>
+                        </Relationship>
+                      </xsl:if>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:for-each>
 			</xsl:for-each>
-			<!-- code for picture feature end -->
+      <!-- added by Vipul to set Relationship for background Image  Start-->
+      <xsl:variable name="dpName">
+        <xsl:value-of select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/@draw:style-name"/>
+      </xsl:variable>
+      <xsl:for-each select="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name= $dpName]/style:drawing-page-properties">
+        <xsl:if test="@draw:fill='bitmap'">
+          <xsl:variable name="var_imageName" select="@draw:fill-image-name"/>
+          <xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:styles/draw:fill-image[@draw:name=$var_imageName]">
+            <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
+            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
+            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
+            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
+            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
+            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
+            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
+            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+              <Relationship>
+                <xsl:attribute name="Id">
+                  <xsl:value-of select="concat($slideMasterName,'BackImg')" />
+                </xsl:attribute>
+                <xsl:attribute name="Type">
+                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
+                </xsl:attribute>
+                <xsl:attribute name="Target">
+                  <xsl:value-of select="concat('../media/',substring-after(@xlink:href,'/'))" />
+                  <!-- <xsl:value-of select ="concat('../media/',substring-after(@xlink:href,'/'))"/>  -->
+                </xsl:attribute>
+              </Relationship>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:if>
+
+      </xsl:for-each>
+
+      <!-- added by Vipul to set Relationship for background Image  End-->
 		</Relationships>
 	</xsl:template >
 	<xsl:template name ="writeCo-ordinates">
