@@ -579,8 +579,73 @@
                         </xsl:apply-templates>
                         
                     </xsl:when>
+                    
+                    <xsl:when test="@action = 'deleteRow'">
+                        <table:deletion table:type="row">
+                            
+                            <xsl:variable name="sqref">
+                                <xsl:value-of select="e:rfmt/@sqref"/>
+                            </xsl:variable>
+                            
+                            <xsl:attribute name="table:position">
+                                <xsl:value-of select="$rowNum - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:attribute name="table:table">
+                                <xsl:value-of select="e:rfmt/@sheetId - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:if test="not(substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';'))">
+                                <xsl:attribute name="table:multi-deletion-spanned">
+                                    <xsl:value-of select="count(following-sibling::e:rrc[e:rfmt/@sqref = $sqref]) + 1"/>
+                                </xsl:attribute>
+                            </xsl:if>
+                            
+                            <xsl:attribute name="table:id">
+                                <xsl:value-of select="$tableId"/>
+                            </xsl:attribute>
+                            
+                            <xsl:call-template name="InsertAuthorAndDateOfChange">
+                                <xsl:with-param name="userName">
+                                    <xsl:value-of select="$userName"/>
+                                </xsl:with-param>
+                                <xsl:with-param name="dateTime">
+                                    <xsl:value-of select="$dateTime"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                            
+                            <xsl:if test="substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';')">
+                                <table:deletions>
+                                    <table:change-deletion table:id="ct1">
+                                        <xsl:attribute name="table:id">
+                                            <xsl:value-of select="substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';')"/>
+                                        </xsl:attribute>
+                                    </table:change-deletion>
+                                </table:deletions>
+                            </xsl:if>
+                            
+                        </table:deletion>
+                        
+                        <xsl:apply-templates select="following-sibling::node()[1][name()='rcc' or name()='rm' or name()='rrc']">
+                            <xsl:with-param name="dateTime">
+                                <xsl:value-of select="$dateTime"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="userName">
+                                <xsl:value-of select="$userName"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="positionHeader">
+                                <xsl:value-of select="$positionHeader"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="previousStyle">
+                                <xsl:value-of select="concat($rowNum, ':', $colNum, '-', $tableId, ';', $previousStyle)"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="prevRangeMoved">
+                                <xsl:value-of select="$prevRangeMoved"/>
+                            </xsl:with-param>                  
+                        </xsl:apply-templates>
+                    </xsl:when>
+                    
                 </xsl:choose>
-                
                 
             </xsl:when>
             <xsl:otherwise/>
