@@ -1244,7 +1244,7 @@
               </xsl:call-template>
             </xsl:attribute>
           </xsl:if>
-          
+
           <!-- Transparency percentage-->
           <xsl:if test="a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
             <xsl:variable name="alpha">
@@ -1729,7 +1729,12 @@
           </xsl:for-each>
 
           <xsl:for-each select="a:p/a:r/a:rPr">
-            <xsl:call-template name="InsertTextBoxRunStyle"/>
+            <style:style style:name="{generate-id(parent::node())}" style:family="text">
+              <style:text-properties fo:font-family="Calibri" fo:font-size="11pt" fo:font-weight="normal"
+                fo:color="#000000">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </style:text-properties>
+            </style:style>            
           </xsl:for-each>
 
         </xsl:for-each>
@@ -1828,363 +1833,6 @@
     </style:style>
   </xsl:template>
 
-  <xsl:template name="InsertTextBoxRunStyle">
-
-    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-
-    <style:style style:name="{generate-id(parent::node())}" style:family="text">
-      <style:text-properties fo:font-family="Calibri" fo:font-size="11pt" fo:font-weight="normal"
-        fo:color="#000000">
-
-        <xsl:choose>
-          <xsl:when test="a:latin/@typeface != '+mn-lt' and a:latin/@typeface != '+mj-lt' ">
-            <xsl:attribute name="fo:font-family">
-              <xsl:value-of select="a:latin/@typeface"/>
-            </xsl:attribute>
-          </xsl:when>
-          <!--xsl:when test="not(a:latin) and a:cs">
-            <xsl:attribute name="fo:font-family">
-              <xsl:value-of select="a:cs/@typeface"/>
-            </xsl:attribute>
-          </xsl:when-->
-        </xsl:choose>
-
-        <!-- font size -->
-        <xsl:if test="@sz">
-          <xsl:attribute name="fo:font-size">
-            <xsl:value-of select="concat(format-number(@sz div 100,'0.##'), 'pt')"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!-- bold -->
-        <xsl:if test="@b = 1">
-          <xsl:attribute name="fo:font-weight">
-            <xsl:value-of select="'bold'"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!-- Italic-->
-        <xsl:if test="@i = 1">
-          <xsl:attribute name="fo:font-style">
-            <xsl:value-of select="'italic'"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!-- font color -->
-        <xsl:choose>
-          <xsl:when test="a:solidFill/a:srgbClr/@val">
-            <xsl:attribute name="fo:color">
-              <xsl:value-of select="concat('#',a:solidFill/a:srgbClr/@val)"/>
-            </xsl:attribute>
-          </xsl:when>
-
-          <!-- scheme color -->
-          <xsl:when test="a:solidFill/a:schemeClr/@val">
-            <xsl:attribute name="fo:color">
-              <xsl:call-template name="getColorCode">
-                <xsl:with-param name="color">
-                  <xsl:value-of select="a:solidFill/a:schemeClr/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name="lumMod">
-                  <xsl:value-of select="a:solidFill/a:schemeClr/a:lumMod/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name="lumOff">
-                  <xsl:value-of select="a:solidFill/a:schemeClr/a:lumOff/@val"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:when>
-
-          <!-- style color -->
-          <xsl:when
-            test="parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:srgbClr">
-            <xsl:attribute name="fo:color">
-              <xsl:value-of
-                select="concat('#',parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:srgbClr/@val)"
-              />
-            </xsl:attribute>
-          </xsl:when>
-
-          <!-- style scheme color -->
-          <xsl:when
-            test="parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:schemeClr">
-            <xsl:for-each
-              select="parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:schemeClr">
-              <xsl:attribute name="fo:color">
-                <xsl:call-template name="getColorCode">
-                  <xsl:with-param name="color">
-                    <xsl:value-of select="@val"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="lumMod">
-                    <xsl:value-of select="a:lumMod/@val"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="lumOff">
-                    <xsl:value-of select="a:lumOff/@val"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:for-each>
-          </xsl:when>
-        </xsl:choose>
-
-        <!-- style:text-underline-style -->
-        <xsl:if test="@u">
-          <!-- underline style -->
-          <xsl:choose>
-            <xsl:when test="@u = 'sng' ">
-              <xsl:attribute name="style:text-underline-type">
-                <xsl:text>single</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- double -->
-            <xsl:when test="@u = 'dbl' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>solid</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-type">
-                <xsl:text>double</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- bold -->
-            <xsl:when test="@u= 'heavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>solid</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>bold</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- dotted-->
-            <xsl:when test="@u= 'dotted' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dotted</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- bold dotted -->
-            <xsl:when test="@u = 'dottedHeavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dotted</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>bold</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- dash -->
-            <xsl:when test="@u = 'dash' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- bold dash -->
-            <xsl:when test="@u = 'dashHeavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>bold</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- long dash -->
-            <xsl:when test="@u = 'dashLong' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>long-dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- bold long dash -->
-            <xsl:when test="@u = 'dashLongHeavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>long-dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>bold</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- dot-dash -->
-            <xsl:when test="@u = 'dotDash' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dot-dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- bold dot-dash -->
-            <xsl:when test="@u = 'dotDashHeavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dot-dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>bold</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- dot-dot-dash -->
-            <xsl:when test="@u = 'dotDotDash' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dot-dot-dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- bold dot-dot-dash -->
-            <xsl:when test="@u = 'dotDotDashHeavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>dot-dot-dash</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>bold</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- wavy -->
-            <xsl:when test="@u = 'wavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>wave</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- bold wave -->
-            <xsl:when test="@u = 'wavyHeavy' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>wave</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>bold</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <!-- double wave -->
-            <xsl:when test="@u = 'wavyDbl' ">
-              <xsl:attribute name="style:text-underline-style">
-                <xsl:text>wave</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-type">
-                <xsl:text>double</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-
-            <xsl:otherwise>
-              <xsl:attribute name="style:text-underline-type">
-                <xsl:text>single</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="style:text-underline-width">
-                <xsl:text>auto</xsl:text>
-              </xsl:attribute>
-            </xsl:otherwise>
-          </xsl:choose>
-
-          <!-- underline color -->
-          <xsl:if test="a:uFill/a:solidFill/a:srgbClr/@val">
-            <xsl:attribute name="style:text-underline-color">
-              <xsl:value-of select="concat('#',a:uFill/a:solidFill/a:srgbClr/@val)"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="a:uFill/a:solidFill/a:schemeClr/@val">
-            <xsl:attribute name="style:text-underline-color">
-              <xsl:call-template name="getColorCode">
-                <xsl:with-param name="color">
-                  <xsl:value-of select="a:uFill/a:solidFill/a:schemeClr/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name="lumMod">
-                  <xsl:value-of select="a:uFill/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name="lumOff">
-                  <xsl:value-of select="a:uFill/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
-
-        <!-- strike-through -->
-        <xsl:if test="@strike">
-          <xsl:attribute name="style:text-line-through-style">
-            <xsl:text>solid</xsl:text>
-          </xsl:attribute>
-
-          <xsl:choose>
-            <xsl:when test="@strike = 'sngStrike' ">
-              <xsl:attribute name="style:text-line-through-type">
-                <xsl:value-of select="'single'"/>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:when test="@strike = 'dblStrike' ">
-              <xsl:attribute name="style:text-line-through-type">
-                <xsl:text>double</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:if>
-
-        <!-- text position -->
-        <xsl:if test="@baseline != 0">
-          <xsl:attribute name="style:text-position">
-            <xsl:value-of select="concat(@baseline div 1000,'%' )"/>
-            <xsl:text> 75%</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!-- character spacing -->
-        <xsl:if test="@spc">
-          <xsl:attribute name="fo:letter-spacing">
-            <xsl:variable name="length" select="@spc"/>
-            <xsl:value-of select="concat(format-number($length * 2.54 div 7200,'0.###'),'cm')"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!--Kerning true or false -->
-        <xsl:if test="@kern != 0">
-          <xsl:attribute name="style:letter-kerning">
-            <xsl:text>true</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!--Shadow fo:text-shadow-->
-        <xsl:if test="a:effectLst/a:outerShdw">
-          <xsl:attribute name="fo:text-shadow">
-            <xsl:text>1pt 1pt</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
-
-      </style:text-properties>
-
-    </style:style>
-  </xsl:template>
-
   <xsl:template name="InsertBitmapFill">
 
     <xsl:for-each select="a:blipFill">
@@ -2203,37 +1851,37 @@
             <xsl:attribute name="style:repeat">
               <xsl:text>repeat</xsl:text>
             </xsl:attribute>
-            
+
             <!-- bitmap position -->
             <xsl:if test="@algn">
               <xsl:attribute name="draw:fill-image-ref-point">
                 <xsl:choose>
                   <xsl:when test="@algn = 'tl' ">
-                    <xsl:text>top-left</xsl:text>                
+                    <xsl:text>top-left</xsl:text>
                   </xsl:when>
                   <xsl:when test="@algn = 't' ">
-                    <xsl:text>top</xsl:text>                
+                    <xsl:text>top</xsl:text>
                   </xsl:when>
                   <xsl:when test="@algn = 'tr' ">
-                    <xsl:text>top-right</xsl:text>                
+                    <xsl:text>top-right</xsl:text>
                   </xsl:when>
                   <xsl:when test="@algn = 'l' ">
-                    <xsl:text>left</xsl:text>                
-                  </xsl:when>            
+                    <xsl:text>left</xsl:text>
+                  </xsl:when>
                   <xsl:when test="@algn = 'ctr' ">
-                    <xsl:text>center</xsl:text>                
+                    <xsl:text>center</xsl:text>
                   </xsl:when>
                   <xsl:when test="@algn = 'r' ">
-                    <xsl:text>right</xsl:text>                
-                  </xsl:when>            
+                    <xsl:text>right</xsl:text>
+                  </xsl:when>
                   <xsl:when test="@algn = 'bl' ">
-                    <xsl:text>bottom-left</xsl:text>                
+                    <xsl:text>bottom-left</xsl:text>
                   </xsl:when>
                   <xsl:when test="@algn = 'b' ">
-                    <xsl:text>bottom</xsl:text>                
+                    <xsl:text>bottom</xsl:text>
                   </xsl:when>
                   <xsl:when test="@algn = 'br' ">
-                    <xsl:text>bottom-right</xsl:text>                
+                    <xsl:text>bottom-right</xsl:text>
                   </xsl:when>
                 </xsl:choose>
               </xsl:attribute>
@@ -2246,7 +1894,7 @@
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
-      
+
       <!-- transparency -->
       <xsl:for-each select="a:blip/a:alphaModFix">
         <xsl:attribute name="draw:opacity">
@@ -2257,4 +1905,350 @@
 
   </xsl:template>
 
+  <xsl:template name="TextBoxRunProperties">
+    
+    <xsl:choose>
+      <xsl:when test="a:latin/@typeface != '+mn-lt' and a:latin/@typeface != '+mj-lt' ">
+        <xsl:attribute name="fo:font-family">
+          <xsl:value-of select="a:latin/@typeface"/>
+        </xsl:attribute>
+      </xsl:when>
+      <!--xsl:when test="not(a:latin) and a:cs">
+            <xsl:attribute name="fo:font-family">
+              <xsl:value-of select="a:cs/@typeface"/>
+            </xsl:attribute>
+          </xsl:when-->
+    </xsl:choose>
+
+    <!-- font size -->
+    <xsl:if test="@sz">
+      <xsl:attribute name="fo:font-size">
+        <xsl:value-of select="concat(format-number(@sz div 100,'0.##'), 'pt')"/>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- bold -->
+    <xsl:if test="@b = 1">
+      <xsl:attribute name="fo:font-weight">
+        <xsl:value-of select="'bold'"/>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- Italic-->
+    <xsl:if test="@i = 1">
+      <xsl:attribute name="fo:font-style">
+        <xsl:value-of select="'italic'"/>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- font color -->
+    <xsl:choose>
+      <xsl:when test="a:solidFill/a:srgbClr/@val">
+        <xsl:attribute name="fo:color">
+          <xsl:value-of select="concat('#',a:solidFill/a:srgbClr/@val)"/>
+        </xsl:attribute>
+      </xsl:when>
+
+      <!-- scheme color -->
+      <xsl:when test="a:solidFill/a:schemeClr/@val">
+        <xsl:attribute name="fo:color">
+          <xsl:call-template name="getColorCode">
+            <xsl:with-param name="color">
+              <xsl:value-of select="a:solidFill/a:schemeClr/@val"/>
+            </xsl:with-param>
+            <xsl:with-param name="lumMod">
+              <xsl:value-of select="a:solidFill/a:schemeClr/a:lumMod/@val"/>
+            </xsl:with-param>
+            <xsl:with-param name="lumOff">
+              <xsl:value-of select="a:solidFill/a:schemeClr/a:lumOff/@val"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+
+      <!-- style color -->
+      <xsl:when
+        test="parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:srgbClr">
+        <xsl:attribute name="fo:color">
+          <xsl:value-of
+            select="concat('#',parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:srgbClr/@val)"
+          />
+        </xsl:attribute>
+      </xsl:when>
+
+      <!-- style scheme color -->
+      <xsl:when
+        test="parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:schemeClr">
+        <xsl:for-each
+          select="parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:schemeClr">
+          <xsl:attribute name="fo:color">
+            <xsl:call-template name="getColorCode">
+              <xsl:with-param name="color">
+                <xsl:value-of select="@val"/>
+              </xsl:with-param>
+              <xsl:with-param name="lumMod">
+                <xsl:value-of select="a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name="lumOff">
+                <xsl:value-of select="a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+
+    <!-- style:text-underline-style -->
+    <xsl:if test="@u">
+      <!-- underline style -->
+      <xsl:choose>
+        <xsl:when test="@u = 'sng' ">
+          <xsl:attribute name="style:text-underline-type">
+            <xsl:text>single</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- double -->
+        <xsl:when test="@u = 'dbl' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>solid</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">
+            <xsl:text>double</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- bold -->
+        <xsl:when test="@u= 'heavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>solid</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- dotted-->
+        <xsl:when test="@u= 'dotted' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dotted</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- bold dotted -->
+        <xsl:when test="@u = 'dottedHeavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dotted</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- dash -->
+        <xsl:when test="@u = 'dash' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- bold dash -->
+        <xsl:when test="@u = 'dashHeavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- long dash -->
+        <xsl:when test="@u = 'dashLong' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>long-dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- bold long dash -->
+        <xsl:when test="@u = 'dashLongHeavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>long-dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- dot-dash -->
+        <xsl:when test="@u = 'dotDash' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dot-dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- bold dot-dash -->
+        <xsl:when test="@u = 'dotDashHeavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dot-dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- dot-dot-dash -->
+        <xsl:when test="@u = 'dotDotDash' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dot-dot-dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- bold dot-dot-dash -->
+        <xsl:when test="@u = 'dotDotDashHeavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>dot-dot-dash</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- wavy -->
+        <xsl:when test="@u = 'wavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>wave</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- bold wave -->
+        <xsl:when test="@u = 'wavyHeavy' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>wave</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>bold</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <!-- double wave -->
+        <xsl:when test="@u = 'wavyDbl' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>wave</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">
+            <xsl:text>double</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <xsl:otherwise>
+          <xsl:attribute name="style:text-underline-type">
+            <xsl:text>single</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">
+            <xsl:text>auto</xsl:text>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <!-- underline color -->
+      <xsl:if test="a:uFill/a:solidFill/a:srgbClr/@val">
+        <xsl:attribute name="style:text-underline-color">
+          <xsl:value-of select="concat('#',a:uFill/a:solidFill/a:srgbClr/@val)"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="a:uFill/a:solidFill/a:schemeClr/@val">
+        <xsl:attribute name="style:text-underline-color">
+          <xsl:call-template name="getColorCode">
+            <xsl:with-param name="color">
+              <xsl:value-of select="a:uFill/a:solidFill/a:schemeClr/@val"/>
+            </xsl:with-param>
+            <xsl:with-param name="lumMod">
+              <xsl:value-of select="a:uFill/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+            </xsl:with-param>
+            <xsl:with-param name="lumOff">
+              <xsl:value-of select="a:uFill/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:if>
+
+    <!-- strike-through -->
+    <xsl:if test="@strike">
+      <xsl:attribute name="style:text-line-through-style">
+        <xsl:text>solid</xsl:text>
+      </xsl:attribute>
+
+      <xsl:choose>
+        <xsl:when test="@strike = 'sngStrike' ">
+          <xsl:attribute name="style:text-line-through-type">
+            <xsl:value-of select="'single'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@strike = 'dblStrike' ">
+          <xsl:attribute name="style:text-line-through-type">
+            <xsl:text>double</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+
+    <!-- text position -->
+    <xsl:if test="@baseline != 0">
+      <xsl:attribute name="style:text-position">
+        <xsl:value-of select="concat(@baseline div 1000,'%' )"/>
+        <xsl:text> 75%</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- character spacing -->
+    <xsl:if test="@spc">
+      <xsl:attribute name="fo:letter-spacing">
+        <xsl:variable name="length" select="@spc"/>
+        <xsl:value-of select="concat(format-number($length * 2.54 div 7200,'0.###'),'cm')"/>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!--Kerning true or false -->
+    <xsl:if test="@kern != 0">
+      <xsl:attribute name="style:letter-kerning">
+        <xsl:text>true</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!--Shadow fo:text-shadow-->
+    <xsl:if test="a:effectLst/a:outerShdw">
+      <xsl:attribute name="fo:text-shadow">
+        <xsl:text>1pt 1pt</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
 </xsl:stylesheet>

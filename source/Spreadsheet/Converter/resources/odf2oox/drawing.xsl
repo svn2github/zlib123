@@ -480,14 +480,10 @@
         <a:avLst/>
       </a:prstGeom>
 
-      <!--xsl:if test="key('style', @draw:style-name)/style:graphic-properties/@draw:stroke != 'none' "-->
-
       <xsl:for-each select="key('style', @draw:style-name)/style:graphic-properties">
         <xsl:call-template name="InsertDrawingFill"/>
         <xsl:call-template name="InsertDrawingBorder"/>
       </xsl:for-each>
-
-      <!--/xsl:if-->
 
     </xdr:spPr>
 
