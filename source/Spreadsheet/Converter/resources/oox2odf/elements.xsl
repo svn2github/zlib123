@@ -61,7 +61,7 @@
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="AllRowBreakes"/>
-    
+
     <xsl:variable name="id">
       <xsl:value-of select="key('drawing', '')/@r:id"/>
     </xsl:variable>
@@ -71,7 +71,8 @@
     </xsl:variable>
 
     <xsl:variable name="AllElementsRow">
-      <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow, $AllRowBreakes)"/>
+      <xsl:value-of
+        select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow, $AllRowBreakes)"/>
     </xsl:variable>
 
     <xsl:variable name="GetMinRowWithElement">
@@ -111,8 +112,8 @@
 
       <xsl:for-each select="document(concat('xl/',$sheet))">
         <table:table-row>
-          
-          
+
+
           <xsl:choose>
             <xsl:when
               test="contains(concat(';', $AllRowBreakes), concat(';', $GetMinRowWithElement))">
@@ -127,10 +128,7 @@
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
-          
-          
-          
-          <!-- Tu będzie warunek na manual Break -->
+
           <xsl:call-template name="InsertElementsInThisRow">
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
@@ -291,7 +289,9 @@
             />
           </xsl:variable>
           <xsl:attribute name="table:content-validation-name">
-            <xsl:value-of select="concat('val', substring-before((substring-after($sheet, 'worksheets/sheet')), '.'), $ValidationStyle + 1)"/>
+            <xsl:value-of
+              select="concat('val', substring-before((substring-after($sheet, 'worksheets/sheet')), '.'), $ValidationStyle + 1)"
+            />
           </xsl:attribute>
 
         </xsl:if>
