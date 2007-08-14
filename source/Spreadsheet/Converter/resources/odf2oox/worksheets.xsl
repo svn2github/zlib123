@@ -99,7 +99,7 @@
 
       <xsl:variable name="MergeCell">
         <xsl:call-template name="WriteMergeCell"/>
-       
+
       </xsl:variable>
 
       <xsl:variable name="MergeCellStyle">
@@ -209,7 +209,7 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      
+
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
@@ -237,7 +237,7 @@
       </xsl:if>
 
       <!-- Insert Data Validation -->
-      
+
       <xsl:if test="table:table-row/table:table-cell/@table:content-validation-name != ''">
         <dataValidations>
           <xsl:apply-templates select="table:table-row[1]" mode="validation">
@@ -273,7 +273,7 @@
             <xsl:with-param name="tableId" select="generate-id(.)"/>
           </xsl:apply-templates>
         </xsl:variable>
-
+        
         <!-- if there are row breakes in this sheet -->
         <xsl:if test="$rowBreakes != '' ">
           <xsl:variable name="countBreakes">
@@ -382,7 +382,7 @@
       <xsl:if test="table:shapes/draw:frame/draw:object">
         <legacyDrawing r:id="{concat('rId',$sheetId)}"/>
       </xsl:if>
-      
+
       <!-- Insert OLEObject -->
       <xsl:if test="table:shapes/draw:frame/draw:object">
         <xsl:call-template name="InsertOLE_Object"/>
@@ -1136,7 +1136,7 @@
 
           <!-- real column number -->
           <xsl:variable name="colNum">
-            <xsl:for-each select="ancestor::table:table-row/table:table-cell[1]">
+            <xsl:for-each select="ancestor::table:table-row/child::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]">
               <xsl:call-template name="GetColNumber">
                 <xsl:with-param name="position">
                   <xsl:value-of select="$colPosition"/>
@@ -1144,7 +1144,7 @@
               </xsl:call-template>
             </xsl:for-each>
           </xsl:variable>
-
+          
           <xsl:variable name="rows">
             <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
 
@@ -1330,6 +1330,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template name="InsertRowBreakes">
     <xsl:param name="rowBreakes"/>
 
@@ -1420,7 +1421,6 @@
 
     <xsl:text>;</xsl:text>
     <xsl:value-of select="$colNumber"/>
-
     <xsl:choose>
       <xsl:when test="$repeat &gt; 1 ">
         <xsl:call-template name="InsertRepeatedManualColumnBreak">
@@ -1430,6 +1430,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template name="InsertColBreakes">
     <xsl:param name="colBreakes"/>
 
