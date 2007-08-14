@@ -76,9 +76,11 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         private const string ZIP_POST_PROCESS_NAMESPACE = "urn:cleverage:xmlns:post-processings:zip";
         private const string PART_ELEMENT = "entry";
         private const string ARCHIVE_ELEMENT = "archive";
-        private const string COPY_ELEMENT = "copy";  
+        private const string COPY_ELEMENT = "copy";
         //Added by Sonata
         private const string EXTRACT_ELEMENT = "extract";
+        private const string IMPORT_ELEMENT = "import";
+
 
         /// <summary>
         /// The zip archive
@@ -95,38 +97,46 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// The delegate settings
         /// </summary>
         private XmlWriterSettings delegateSettings = null;
-		private XmlResolver resolver;
-		/// <summary>
-		/// Source attribute of the currently processed binary file
-		/// </summary>
-		private string binarySource;
-		/// <summary>
-		/// Target attribute of the currently processed binary file
-		/// </summary>
-		private string binaryTarget;
-		/// <summary>
-		/// Table of binary files to be added to the package
-		/// </summary>
-		private Hashtable binaries;
+        private XmlResolver resolver;
+        /// <summary>
+        /// Source attribute of the currently processed binary file
+        /// </summary>
+        private string binarySource;
+        /// <summary>
+        /// Target attribute of the currently processed binary file
+        /// </summary>
+        private string binaryTarget;
+        /// <summary>
+        /// Table of binary files to be added to the package
+        /// </summary>
+        private Hashtable binaries;
 
+        #region New Coding for Import and Extract sound files
+
+        //Extract
         //Added  by sonata
         /// <summary>
-        /// Table of Audio files to be added to the package
+        /// extractFileList - list of files to be extracted from pptx zip archive
+        /// archiveFileSource - input pptx zip archive source
+        /// externalFileDestionation - external path to extraxct the media(.wav) files
         /// </summary>
-        private Hashtable audioFilesList;
+        private Hashtable extractFileList;
+        private string archiveFileSource;
+        private string externalFileDestionation;
 
+        //Import
         //Added  by sonata
         /// <summary>
-        /// source attribute of the currently processed audio file
+        /// importFileList - list of files to be imported from physical directory to PPTX zip archive
+        /// externalFileSource - physical directory path for the file to be copied
+        /// archiveFileDestination - pptx zip archive destination        
         /// </summary>
-        private string audioFileSource;
-        //Added  by sonata
-        /// <summary>
-        /// Target attribute of the currently processed audio file
-        /// </summary>
-        private string audioFileDestination;
+        private Hashtable importFileList;
+        private string externalFileSource;
+        private string archiveFileDestination;
 
-        
+        #endregion
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -146,15 +156,17 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             // with a single delegate that writes all the entries.
             // We must then use ConformanceLevel.Fragment and the xml declaration will be missing.
             delegateSettings.ConformanceLevel = ConformanceLevel.Document;
-        	
+
             resolver = res;
 
             //Debug.Listeners.Add(new TextWriterTraceListener("debug.txt"));
-   
+
         }
 
-        protected override void Dispose(bool disposing) {
-            if (disposing) {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
                 // Dispose managed resources
                 if (delegateWriter != null)
                     delegateWriter.Close();
@@ -215,10 +227,11 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     case ARCHIVE_ELEMENT:
                         if (zipOutputStream != null)
                         {
-                        	// Copy binaries before closing the archive
-                        	CopyBinaries();
+                            // Copy binaries before closing the archive
+                            CopyBinaries();
                             //Added by Sonata - Copy Audio files before closing archive
-                            CopyAudioFiles();
+                            ExtractFiles();
+                            ImportFiles();
                             Debug.WriteLine("[closing archive]");
                             zipOutputStream.Close();
                             zipOutputStream = null;
@@ -242,40 +255,50 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                             processingState = ProcessingState.EntryWaiting;
                         }
                         break;
-                  	case COPY_ELEMENT:
+                    case COPY_ELEMENT:
                         if (binarySource != null && binaryTarget != null)
                         {
-                        	if (binaries != null && !binaries.ContainsKey(binaryTarget))
-                        	{
-                                //Target is the key because there is a case where one file has to be
-                                //coppied twice to different locations
-                        		binaries.Add(binaryTarget, binarySource);
-                        	}
-                        	binarySource = null;
-                        	binaryTarget = null;
-                        }                       
-                        break;     
-                    case EXTRACT_ELEMENT:
-                        if (audioFileSource != null && audioFileDestination != null)
-                        {
-                            if (audioFilesList != null && !audioFilesList.ContainsKey(audioFileSource))
+                            if (binaries != null && !binaries.ContainsKey(binarySource))
                             {
-                                audioFilesList.Add(audioFileSource, audioFileDestination);
+                                binaries.Add(binarySource, binaryTarget);
                             }
-                            audioFileSource = null;
-                            audioFileDestination = null;
+                            binarySource = null;
+                            binaryTarget = null;
                         }
-                        break;     
+                        break;
+                    case EXTRACT_ELEMENT:
+                        if (archiveFileSource != null && externalFileDestionation != null)
+                        {
+                            if (extractFileList != null && !extractFileList.ContainsKey(externalFileDestionation))
+                            {
+                                extractFileList.Add(externalFileDestionation,archiveFileSource);
+                            }
+                            archiveFileSource = null;
+                            externalFileDestionation = null;
+                        }
+                        break;
+                    case IMPORT_ELEMENT:
+                        if (externalFileSource != null && archiveFileDestination != null)
+                        {
+                            if (importFileList != null && !importFileList.ContainsKey(archiveFileDestination))
+                            {
+                                importFileList.Add(archiveFileDestination, externalFileSource);
+                            }
+                            externalFileSource = null;
+                            archiveFileDestination = null;
+                        }
+                        break;
+
                 }
-         
+
             }
         }
 
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
             Node elt = (Node)elements.Peek();
- 			Debug.WriteLine("[WriteStartAttribute] prefix="+prefix+" localName"+localName+" ns="+ns +" element="+elt.Name);
-            
+            Debug.WriteLine("[WriteStartAttribute] prefix=" + prefix + " localName" + localName + " ns=" + ns + " element=" + elt.Name);
+
             if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
             {
                 if (delegateWriter != null)
@@ -293,8 +316,8 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         public override void WriteEndAttribute()
         {
             Node elt = (Node)elements.Peek();
-			Debug.WriteLine("[WriteEndAttribute] element="+elt.Name);
-            
+            Debug.WriteLine("[WriteEndAttribute] element=" + elt.Name);
+
             if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
             {
                 if (delegateWriter != null)
@@ -338,8 +361,10 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                                     zipOutputStream = ZipFactory.CreateArchive(text);
                                     processingState = ProcessingState.EntryWaiting;
                                     binaries = new Hashtable();
+
                                     //Added by sonata
-                                    audioFilesList = new Hashtable();
+                                    extractFileList = new Hashtable();
+                                    importFileList = new Hashtable();
                                 }
                                 break;
                             case PART_ELEMENT:
@@ -373,13 +398,28 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                                 {
                                     if (attr.Name.Equals("source"))
                                     {
-                                        audioFileSource += text;
-                                        Debug.WriteLine("copy source=" + audioFileSource);
+                                        archiveFileSource += text;
+                                        Debug.WriteLine("copy source=" + archiveFileSource);
                                     }
                                     if (attr.Name.Equals("target"))
                                     {
-                                        audioFileDestination += text;
-                                        Debug.WriteLine("copy target=" + audioFileDestination);
+                                        externalFileDestionation += text;
+                                        Debug.WriteLine("copy target=" + externalFileDestionation);
+                                    }
+                                }
+                                break;
+                            case IMPORT_ELEMENT:
+                                if (processingState != ProcessingState.None)
+                                {
+                                    if (attr.Name.Equals("source"))
+                                    {
+                                        externalFileSource += text;
+                                        Debug.WriteLine("copy source=" + externalFileSource);
+                                    }
+                                    if (attr.Name.Equals("target"))
+                                    {
+                                        archiveFileDestination += text;
+                                        Debug.WriteLine("copy target=" + archiveFileDestination);
                                     }
                                 }
                                 break;
@@ -506,13 +546,13 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         {
             get
             {
-            	if (delegateWriter != null)
-            	{
-            		return delegateWriter.WriteState;
-            	}
+                if (delegateWriter != null)
+                {
+                    return delegateWriter.WriteState;
+                }
                 else
                 {
-                	return WriteState.Start;
+                    return WriteState.Start;
                 }
             }
         }
@@ -520,11 +560,13 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         public override void Close()
         {
             // zipStream and delegate are closed elsewhere.... if everything else is fine
-            if (delegateWriter != null) {
+            if (delegateWriter != null)
+            {
                 delegateWriter.Close();
                 delegateWriter = null;
             }
-            if (zipOutputStream != null) {
+            if (zipOutputStream != null)
+            {
                 zipOutputStream.Close();
                 zipOutputStream = null;
             }
@@ -548,16 +590,16 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
         }
 
-        private void CopyBinaries() 
+        private void CopyBinaries()
         {
-        	foreach (string s in binaries.Keys) 
-        	{
-        		CopyBinary((string) binaries[s], s);
-        	}
+            foreach (string s in binaries.Keys)
+            {
+                CopyBinary(s, (string)binaries[s]);
+            }
         }
 
         private const int BUFFER_SIZE = 4096;
-        
+
         /// <summary>
         /// Transfer a binary file between two zip archives. 
         /// The source archive is handled by the resolver, while the destination archive 
@@ -566,266 +608,218 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// <param name="source">Relative path inside the source archive</param>
         /// <param name="target">Relative path inside the destination archive</param>
         private void CopyBinary(String source, String target)
-        {            
+        {
             Stream sourceStream = GetStream(source);
-        	
-    	    if (sourceStream != null && zipOutputStream != null)
-    	    {
-    		    // New file entry
-    		    zipOutputStream.AddEntry(target);            		
-    		    int bytesCopied = StreamCopy(sourceStream, zipOutputStream);            		
-    		    Debug.WriteLine("CopyBinary : "+source+" --> "+target+", bytes copied = "+bytesCopied);
-    	    }           
+
+            if (sourceStream != null && zipOutputStream != null)
+            {
+                // New file entry
+                zipOutputStream.AddEntry(target);
+                int bytesCopied = StreamCopy(sourceStream, zipOutputStream);
+                Debug.WriteLine("CopyBinary : " + source + " --> " + target + ", bytes copied = " + bytesCopied);
+            }
 
         }
 
-        //Added by Sonata to Copy the audio files From physical directory to Ziparchive and Vice versa
-        private void CopyAudioFiles()
+
+        #region new code for Extract and Import
+
+        //Added by Sonata
+        private void ExtractFiles()
         {
-            foreach (string strfile in audioFilesList.Keys)
+            foreach (string strfile in extractFileList.Keys)
             {
-                CopyAudioFile(strfile, (string)audioFilesList[strfile]);
+                ExtractFile(strfile, (string)extractFileList[strfile]);
             }
         }
 
-        //Added by Sonata to Copy the audio files From physical directory to Ziparchive and Vice versa
         /// <summary>
-        /// Transfer a audio file between ziparchive and physica directory 
-        /// The source archive is handled by the resolver, while the destination archive 
-        /// corresponds to our zipOutputStream.  
+        /// Extract files from the input PPTX zip archive to the specified physical directory
+        /// The source archive is handled by the resolver, while the destination correspond to physical dir 
         /// </summary>
-        /// <param name="inputFileSource">File path inside the source archive or physica directory</param>
-        /// <param name="outputFileTarget">File path inside the destination archive or physica directory</param>
-        private void CopyAudioFile(String inputFileSource, String outputFileTarget)
+        /// <param name="source">Relative path inside the source archive</param>
+        /// <param name="destination">Destination folder name and file name seperated by '|' character</param>
+        private void ExtractFile(string destination, string source)
         {
-            string inputFilePath = "";
-            string outputFilePath = "";
-            string targetFolderName = "";
-            string targetFileName = "";
+            // Retrive the Target folder name and Filename
+            string targetFolderName = destination.Substring(0, destination.IndexOf('|'));
+            string targetFileName = destination.Substring(destination.IndexOf('|') + 1);
 
-            bool ConvertPPTX2ODP = false;
-            bool isBatchODP = false;
-            bool isBatchPPTX = false;
+            //GetOutputFilepath - gets the path where the output ODP file will be copied
+            string strCurrentDirectory = GetOutputFilePath();
+            string strDestinationFilePath = strCurrentDirectory.Replace("\\", "//") + "//" + targetFolderName;
 
-            // Gets the Target folder name - Copying the .wav files for ODP
-            if (outputFileTarget.Contains("|"))
-            {
-                targetFolderName = outputFileTarget.Substring(0, outputFileTarget.IndexOf('|'));
-                targetFileName = outputFileTarget.Substring(outputFileTarget.IndexOf('|') + 1);
-            }
-
-            #region Get Input and Output path
-            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
-            {
-                if (Environment.GetCommandLineArgs()[i].Contains("/I"))
-                    inputFilePath = Environment.GetCommandLineArgs()[i + 1];
-                if (Environment.GetCommandLineArgs()[i].Contains("/O"))
-                    outputFilePath = Environment.GetCommandLineArgs()[i + 1];
-                if (Environment.GetCommandLineArgs()[i].Contains("/BATCH-ODP"))
-                    isBatchODP = true;
-                if (Environment.GetCommandLineArgs()[i].Contains("/BATCH-PPTX"))
-                    isBatchPPTX = true;
-            }
-            #endregion
-
-            #region For Addin Conversion
-            string strCurrentDirectory = Environment.CurrentDirectory;
-
-            if (inputFilePath == "" && outputFilePath == "")
-            {                
-                if (inputFileSource.Contains("ppt/media"))
-                {
-                   ConvertPPTX2ODP = true;
-                   inputFilePath = strCurrentDirectory + "\\Dummy.pptx";
-                }
-                else
-                {
-                    ConvertPPTX2ODP = false;
-                    inputFilePath = strCurrentDirectory + "\\Dummy.odp";
-                }
-            }
-            #endregion
-
-            string audioFilePath = "";
-            string directoryPath = "";
-            string absolutePath = "";
-            string relativePath = "";
-            int startIndex = 0;
-            int endIndex = 0;
-            int replaceIndex = 0;
-
-            #region Batch Processing
-
-            //For Batch ODP
-            if (isBatchODP)
-            {
-                if (outputFilePath != "")
-                {
-                    outputFilePath = outputFilePath.Replace("\\", "//");
-                    audioFilePath = outputFilePath + "//_MediaFilesForOdp_" + targetFolderName;
-                }
-            }
-
-            //For Batch PPTX
-            if (isBatchPPTX)
-            {
-                //to resolve relative path
-                if (inputFileSource.Contains(".."))
-                {
-                    absolutePath = inputFileSource;
-                    startIndex = absolutePath.IndexOf("../");
-                    endIndex = absolutePath.LastIndexOf("../");
-                    replaceIndex = endIndex / 3;
-
-                    relativePath = inputFileSource.Substring(endIndex + 3, absolutePath.Length - (endIndex + 3));
-                    absolutePath = "";
-                    string[] pathSplitArray = inputFilePath.Replace("\\", "|").Split('|');
-
-                    for (int cnt = 0; cnt < (pathSplitArray.Length - replaceIndex); cnt++)
-                    {
-                        absolutePath = absolutePath + pathSplitArray[cnt] + "//";
-                    }
-
-                    audioFilePath = absolutePath + relativePath.Replace("/", "//");
-                    audioFilePath = audioFilePath.Replace("%20", " ");
-                }
-                else
-                {
-                    audioFilePath = inputFileSource.Replace("/", "//").Replace("%20", " ");
-                }
-            }
-            #endregion
-
-            #region File Processing
-            else
-            {
-                if (outputFilePath != "")
-                {
-                    if (outputFilePath.Contains(".odp"))
-                    {
-                        directoryPath = Path.GetDirectoryName(outputFilePath).Replace("\\", "//");
-                        audioFilePath = directoryPath + "//_MediaFilesForOdp_" + targetFolderName;
-                    }
-                }
-                else
-                {
-                    if (inputFilePath.Contains(".pptx"))
-                    {
-                        directoryPath = Path.GetDirectoryName(inputFilePath).Replace("\\", "//");
-                        audioFilePath = directoryPath + "//_MediaFilesForOdp_" + targetFolderName;
-                        ConvertPPTX2ODP = true;
-                    }
-                    if (inputFilePath.Contains(".odp"))
-                    {
-                        if (inputFileSource.Contains(".."))
-                        {
-                            directoryPath = Path.GetDirectoryName(inputFilePath);
-                            absolutePath = inputFileSource;
-                            startIndex = absolutePath.IndexOf("../");
-                            endIndex = absolutePath.LastIndexOf("../");
-                            replaceIndex = endIndex / 3;
-
-                            relativePath = inputFileSource.Substring(endIndex + 3, absolutePath.Length - (endIndex + 3));
-
-                            absolutePath = "";
-                            string[] pathSplitArray = directoryPath.Replace("\\", "|").Split('|');
-                            for (int cnt = 0; cnt < (pathSplitArray.Length - replaceIndex); cnt++)
-                            {
-                                absolutePath = absolutePath + pathSplitArray[cnt] + "//";
-                            }
-
-                            audioFilePath = absolutePath + relativePath.Replace("/", "//");
-                            audioFilePath = audioFilePath.Replace("%20", " ");
-                        }
-                        else
-                        {
-                            audioFilePath = inputFileSource.Replace("/", "//").Replace("%20", " ");
-                        }
-                    }
-                }
-            }
-            #endregion
-
-            #region Add files From External Directory to ZipArchive - Vice versa
-            // Condition added by lohith.ar@sonata-software.com to check for audio files
+            //get the zipArchive stream
             try
             {
-
-                if (ConvertPPTX2ODP)
+                Stream inputStream = GetStream(source);
+                if (inputStream != null)
                 {
-                    //Copy ppt/Media files to external directory 
-                    Stream inputStream = GetStream(inputFileSource);
-                    if (inputStream != null)
+                    Directory.CreateDirectory(strDestinationFilePath);
+                    strDestinationFilePath = strDestinationFilePath + "//" + targetFileName;
+                    if (!File.Exists(strDestinationFilePath))
                     {
-                        Directory.CreateDirectory(audioFilePath);
-                        audioFilePath = audioFilePath + "//" + targetFileName;
-                        if (!File.Exists(audioFilePath))
-                        {
-                            FileStream fsFile = new FileStream(audioFilePath, FileMode.Create);
-                            StreamCopy(inputStream, fsFile);
-                        }
-                    }
-                }
-                else
-                {
-                    //Copy referd audio fiels from external directory to ppt/media
-                    if (zipOutputStream != null)
-                    {
-                        if (File.Exists(audioFilePath))
-                        {
-                            zipOutputStream.AddEntry(outputFileTarget);
-                            FileStream fsSourceFile = new FileStream(audioFilePath, FileMode.Open, FileAccess.Read);
-
-                            int bytesCopied = StreamCopy(fsSourceFile, zipOutputStream);
-                            Debug.WriteLine("CopyBinary : " + inputFileSource + " --> " + outputFileTarget + ", bytes copied = " + bytesCopied);
-                        }
+                        FileStream fsFile = new FileStream(strDestinationFilePath, FileMode.Create);
+                        StreamCopy(inputStream, fsFile);
+                        fsFile.Close();
                     }
                 }
             }
+
             catch (IOException e)
             {
                 ZipException exZip = new ZipException(e.Message);
                 throw exZip;
             }
-            #endregion
+        }
+
+
+        private void ImportFiles()
+        {
+            foreach (string strfile in importFileList.Keys)
+            {
+                ImportFile(strfile, (string)importFileList[strfile]);
+            }
+        }
+
+
+        /// <summary>
+        /// Imoprt files from the specified physical directory to otuput PPTX zip archive
+        /// The destination archive is handled by the resolver, while the source corresponds to physical dir 
+        /// </summary>
+        /// <param name="source">Source file pysical path - Relative/absolute </param>
+        /// <param name="destination">Destination path inside zip archive</param>        
+        private void ImportFile(string destination, string source)
+        {
+            string inputFilePath = "";
+
+            //Resolve relative path
+            if (source.StartsWith("../"))
+            {
+                inputFilePath = Path.GetFullPath(Path.Combine(GetInputFilePath(), source.Remove(0, 3))).Replace("/", "//").Replace("%20", " ");
+            }
+            else
+            {
+                inputFilePath = source.Replace("/", "//").Replace("%20", " ");
+            }
+
+            try
+            {
+                //Copy referd audio fiels from external directory to ppt/media
+                if (zipOutputStream != null)
+                {
+                    if (File.Exists(inputFilePath))
+                    {
+                        zipOutputStream.AddEntry(destination);
+                        FileStream fsSourceFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read);
+
+                        int bytesCopied = StreamCopy(fsSourceFile, zipOutputStream);
+                        Debug.WriteLine("CopyBinary : " + inputFilePath + " --> " + destination + ", bytes copied = " + bytesCopied);
+                    }
+                }
+            }
+
+            catch (IOException e)
+            {
+                ZipException exZip = new ZipException(e.Message);
+                throw exZip;
+            }
+        }
+
+        /// <summary>
+        /// Get the physical directory path of the input file (PPTX or ODP) to transformed        /// 
+        /// </summary>
+        /// <returns>Physical path of the input file </returns>
+        private string GetInputFilePath()
+        {
+            string returnInputFilePath = "";
+
+            // for Commandline tool
+            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            {
+                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                    returnInputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+            }
+
+            //for addinds
+            if (returnInputFilePath == "")
+            {
+                returnInputFilePath = Environment.CurrentDirectory;
+            }
+
+            return returnInputFilePath;
 
         }
-        
-        private Stream GetStream(string relativeUri) 
+
+        /// <summary>
+        /// Get the physical directory path of the output file
+        /// </summary>
+        /// <returns>Physical path of the output file </returns>
+        private string GetOutputFilePath()
         {
-        	Uri absoluteUri = resolver.ResolveUri(null, relativeUri);
+            string returnOutputFilePath = "";
+            string tempOutputFilePath = "";
+
+            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            {
+                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                    tempOutputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/O")
+                    returnOutputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+            }
+
+            // if /O is not specified /I will remain the pool to copy output file
+            if (returnOutputFilePath == "" && tempOutputFilePath != "")
+            {
+                returnOutputFilePath = tempOutputFilePath;
+            }
+
+            //For addins
+            else
+            {
+                returnOutputFilePath = Environment.CurrentDirectory;
+            }
+
+            return returnOutputFilePath;
+        }
+
+        #endregion
+
+        private Stream GetStream(string relativeUri)
+        {
+            Uri absoluteUri = resolver.ResolveUri(null, relativeUri);
             return (Stream)resolver.GetEntity(absoluteUri, null, Type.GetType("System.IO.Stream"));
         }
-        
-        
+
+
         private int StreamCopy(Stream source, Stream destination)
         {
-        	if (source != null && destination!= null)
-        	{
-        		byte [] data = new byte[BUFFER_SIZE];
-        		int length = (int) source.Length;
-        		int bytesCopied = 0;
-        		
-        		while (length > 0)
-        		{
-        			int read = source.Read(data, 0, System.Math.Min(BUFFER_SIZE, length));
-        			bytesCopied += read;
-        	
-        			if (read < 0)
-        			{
-        				throw new EndOfStreamException("Unexpected end of stream");
-        			}
-        			
-        			length -= read;
-        			destination.Write(data, 0, read);
-        		}
-        		
-        		return bytesCopied;
-        	}
-        	
-        	return -1;
+            if (source != null && destination != null)
+            {
+                byte[] data = new byte[BUFFER_SIZE];
+                int length = (int)source.Length;
+                int bytesCopied = 0;
+
+                while (length > 0)
+                {
+                    int read = source.Read(data, 0, System.Math.Min(BUFFER_SIZE, length));
+                    bytesCopied += read;
+
+                    if (read < 0)
+                    {
+                        throw new EndOfStreamException("Unexpected end of stream");
+                    }
+
+                    length -= read;
+                    destination.Write(data, 0, read);
+                }
+
+                return bytesCopied;
+            }
+
+            return -1;
         }
-        
+
         /// <summary>
         /// Simple representation of elements or attributes nodes
         /// </summary>
@@ -857,7 +851,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 this.ns = ns;
             }
         }
-       
+
 
     }
 
