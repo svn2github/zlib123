@@ -112,6 +112,20 @@
   <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\pictures.xsl" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\handOut.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\presProps.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\customAnimation.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\notesMasters.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\NotesOdp2Oox.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\customAnim.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\notesMaster.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\notesOox2Odf.xsl" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
