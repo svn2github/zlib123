@@ -218,7 +218,6 @@
           <a:bodyPr/>
           <a:lstStyle/>
 
-
           <a:p>
             <a:pPr>
               <a:defRPr sz="1300" b="0" i="0" u="none" strike="noStrike" baseline="0">
@@ -232,7 +231,7 @@
             <a:r>
               <a:rPr lang="pl-PL"/>
               <a:t>
-                <xsl:value-of select="text:p"/>
+                <xsl:value-of xml:space="preserve" select="text:p"/>
               </a:t>
             </a:r>
           </a:p>
@@ -312,6 +311,7 @@
               <xsl:call-template name="InsertAxisX">
                 <xsl:with-param name="chartWidth" select="$chartWidth"/>
                 <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
               </xsl:call-template>
             </xsl:for-each>
 
@@ -320,6 +320,7 @@
               <xsl:call-template name="InsertAxisY">
                 <xsl:with-param name="chartWidth" select="$chartWidth"/>
                 <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
               </xsl:call-template>
             </xsl:for-each>
           </xsl:if>
@@ -640,9 +641,10 @@
 
   <xsl:template name="InsertAxisX">
     <!-- @Description: Inserts X-Axis -->
-    <!-- @Context: chart:chart -->
+    <!-- @Context: chart:chart-axis -->
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>
+    <xsl:param name="chartDirectory"/>
 
     <c:catAx>
       <c:axId val="110226048"/>
@@ -651,15 +653,16 @@
       </c:scaling>
       <c:axPos val="b"/>
 
-      <!--xsl:if
-        test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' "-->
-      <!--xsl:for-each select="chart:axis[@chart:name = 'primary-x' ]">
-        <xsl:call-template name="InsertTitle">
-          <xsl:with-param name="chartWidth" select="$chartWidth"/>
-          <xsl:with-param name="chartHeight" select="$chartHeight"/>
-        </xsl:call-template>
-      </xsl:for-each-->
-      <!--/xsl:if-->
+      <xsl:if
+        test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
+        <xsl:for-each select="chart:title">
+          <xsl:call-template name="InsertTitle">
+            <xsl:with-param name="chartWidth" select="$chartWidth"/>
+            <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:if>
 
       <c:numFmt formatCode="General" sourceLinked="1"/>
 
@@ -672,34 +675,41 @@
         </xsl:if>
       </c:tickLblPos>
 
-      <!--xsl:if
-        test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' "-->
-      <c:spPr>
-        <a:ln w="3175">
-          <a:solidFill>
-            <a:srgbClr val="000000"/>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-        </a:ln>
-      </c:spPr>
-      <c:txPr>
-        <a:bodyPr rot="0" vert="horz"/>
-        <a:lstStyle/>
-        <a:p>
-          <a:pPr>
-            <a:defRPr>
+      <xsl:if
+        test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
+        <c:spPr>
+          <a:ln w="3175">
+            <a:solidFill>
+              <a:srgbClr val="000000"/>
+            </a:solidFill>
+            <a:prstDash val="solid"/>
+          </a:ln>
+        </c:spPr>
 
-              <xsl:for-each select="key('style',@chart:style-name)/style:text-properties">
-                <!-- template common with text-box-->
-                <xsl:call-template name="InsertRunProperties"/>
-              </xsl:for-each>
+        <!--xsl:for-each select="chart:title">
+          <xsl:call-template name="InsertSpPr">
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          </xsl:call-template>
+        </xsl:for-each-->
 
-            </a:defRPr>
-          </a:pPr>
-          <a:endParaRPr lang="pl-PL"/>
-        </a:p>
-      </c:txPr>
-      <!--/xsl:if-->
+        <c:txPr>
+          <a:bodyPr rot="0" vert="horz"/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr>
+              <a:defRPr>
+
+                <xsl:for-each select="key('style',@chart:style-name)/style:text-properties">
+                  <!-- template common with text-box-->
+                  <xsl:call-template name="InsertRunProperties"/>
+                </xsl:for-each>
+
+              </a:defRPr>
+            </a:pPr>
+            <a:endParaRPr lang="pl-PL"/>
+          </a:p>
+        </c:txPr>
+      </xsl:if>
 
       <c:crossAx val="110498176"/>
       <c:crossesAt val="0"/>
@@ -712,7 +722,7 @@
   </xsl:template>
 
   <xsl:template name="InsertAxisY">
-    <!-- @Description: Inserts X-Axis -->
+    <!-- @Description: Inserts Y-Axis -->
     <!-- @Context: chart:chart -->
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>

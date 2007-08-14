@@ -227,6 +227,7 @@
           <xsl:call-template name="InsertLegendProperties"/>
           <xsl:call-template name="InsertPlotAreaProperties"/>
           <xsl:call-template name="InsertAxisXProperties"/>
+          <xsl:call-template name="InsertAxisXTitleProperties"/>
           <xsl:call-template name="InsertAxisYProperties"/>
           <xsl:call-template name="InsertSeriesProperties"/>
           <xsl:call-template name="InsertWallProperties"/>
@@ -543,16 +544,17 @@
     <xsl:choose>
       <!-- title is set by user -->
       <xsl:when test="c:chartSpace/c:chart/c:title/c:tx">
-        <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
+        <chart:title svg:x="3.834cm" svg:y="0.184cm" chart:style-name="chart_title">
           <text:p>
-            <xsl:for-each select="c:chartSpace/c:chart/c:title/c:tx/c:rich/a:p/a:r">
-
+            <xsl:for-each select="c:chartSpace/c:chart/c:title/c:tx/c:rich/a:p">
               <!-- [ENTER] -->
-              <xsl:if test="preceding-sibling::node()[1][name() = 'a:br']">
+              <xsl:if test="preceding-sibling::node()[1][name() = 'a:p']">
                 <xsl:value-of select="'&#xD;&#xA;'"/>
               </xsl:if>
 
-              <xsl:value-of select="a:t"/>
+              <xsl:for-each select="a:r">
+                <xsl:value-of select="a:t"/>
+              </xsl:for-each>
             </xsl:for-each>
           </text:p>
         </chart:title>
@@ -562,7 +564,7 @@
       <xsl:when
         test="c:chartSpace/c:chart/c:title/c:layout and count(key('dataSeries','')) = 1 and key('dataSeries','')/c:tx/descendant::c:v[1]">
         <xsl:for-each select="key('dataSeries','')/c:tx/descendant::c:v[1]">
-          <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
+          <chart:title svg:x="3.834cm" svg:y="0.184cm" chart:style-name="chart_title">
             <text:p>
               <xsl:value-of select="text()"/>
             </text:p>
@@ -586,7 +588,7 @@
     <!-- @Context: input chart file root -->
 
     <xsl:for-each select="c:chartSpace/c:chart/c:legend">
-      <chart:legend chart:legend-position="end" svg:x="6.459cm" svg:y="3.005cm"
+      <chart:legend chart:legend-position="end" svg:x="11.251cm" svg:y="4.188cm"
         chart:style-name="legend">
         <!-- legend position -->
         <!--        <xsl:if test="c:legendPos/@val != '' ">
@@ -615,20 +617,55 @@
     <!-- @Description: Outputs chart X Axis -->
     <!-- @Context: inside input chart file -->
 
-    <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="axis-x">
-      <chart:categories>
-        <xsl:attribute name="table:cell-range-address">
-          <xsl:value-of select="concat('local-table.A2:.A',1 + key('numPoints','')/@val)"/>
-        </xsl:attribute>
-      </chart:categories>
-    </chart:axis>
+    <xsl:for-each select="key('plotArea','')/c:catAx[1]">
+
+      <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="axis-x">
+
+        <xsl:choose>
+          <!-- title is set by user -->
+          <xsl:when test="c:title/c:tx">
+            <chart:title chart:style-name="axis-x_title">
+              <text:p>
+                <xsl:for-each select="c:title/c:tx/c:rich/a:p">
+                  <!-- [ENTER] -->
+                  <xsl:if test="preceding-sibling::node()[1][name() = 'a:p']">
+                    <xsl:value-of select="'&#xD;&#xA;'"/>
+                  </xsl:if>
+                  
+                  <xsl:for-each select="a:r">
+                    <xsl:value-of select="a:t"/>
+                  </xsl:for-each>
+                </xsl:for-each>
+                
+              </text:p>
+            </chart:title>
+          </xsl:when>
+
+          <xsl:when test="c:title/c:layout">
+            <chart:title chart:style-name="axis-x_title">
+              <text:p>
+                <xsl:text>Axis Title</xsl:text>
+              </text:p>
+            </chart:title>
+          </xsl:when>
+        </xsl:choose>
+
+        <chart:categories>
+          <xsl:attribute name="table:cell-range-address">
+            <xsl:value-of select="concat('local-table.A2:.A',1 + key('numPoints','')/@val)"/>
+          </xsl:attribute>
+        </chart:categories>
+      </chart:axis>
+    </xsl:for-each>
+
   </xsl:template>
 
   <xsl:template name="InsertChartType">
     <!-- @Description: Inserts desired type of chart -->
     <!-- @Context: input chart file root -->
 
-    <chart:chart svg:width="8cm" svg:height="7cm" chart:class="chart:bar" chart:style-name="chart">
+    <chart:chart svg:width="13.066cm" svg:height="9.279cm" chart:class="chart:bar"
+      chart:style-name="chart">
 
       <xsl:attribute name="chart:class">
         <xsl:choose>
@@ -675,8 +712,8 @@
       <xsl:call-template name="InsertLegend"/>
 
       <chart:plot-area chart:style-name="plot_area" table:cell-range-address="Sheet1.$D$3:.$F$3"
-        chart:table-number-list="0" svg:x="0.36cm" svg:y="0.937cm" svg:width="5.98cm"
-        svg:height="5.923cm">
+        chart:table-number-list="0" svg:x="0.26cm" svg:y="2.087cm" svg:width="10.472cm"
+        svg:height="7.008cm">
 
         <xsl:call-template name="InsertXAxis"/>
 
@@ -746,7 +783,7 @@
           style:font-size-asian="13pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
           style:font-size-complex="13pt">
-          
+
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
@@ -758,11 +795,58 @@
             <xsl:otherwise>
               <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
                 <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>              
+              </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
-          
-          
+
+        </style:text-properties>
+      </style:style>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertAxisXTitleProperties">
+    <xsl:for-each select="key('plotArea','')/c:catAx[1]/c:title">
+      <style:style style:name="axis-x_title" style:family="chart">
+        <style:chart-properties style:direction="ltr"/>
+        <style:graphic-properties draw:stroke="none" draw:fill="none">
+          <xsl:for-each select="c:spPr">
+            <!-- Insert fill -->
+            <xsl:choose>
+              <xsl:when test="a:blipFill">
+                <xsl:call-template name="InsertBitmapFill"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="InsertFill"/>
+              </xsl:otherwise>
+            </xsl:choose>
+
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
+        </style:graphic-properties>
+        <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
+          style:font-pitch="variable" fo:font-size="13pt"
+          style:font-family-asian="&apos;MS Gothic&apos;"
+          style:font-family-generic-asian="system" style:font-pitch-asian="variable"
+          style:font-size-asian="13pt" style:font-family-complex="Tahoma"
+          style:font-family-generic-complex="system" style:font-pitch-complex="variable"
+          style:font-size-complex="13pt">
+
+          <xsl:choose>
+            <!-- custom title -->
+            <xsl:when test="c:tx">
+              <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </xsl:for-each>
+            </xsl:when>
+            <!-- default title -->
+            <xsl:otherwise>
+              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+
         </style:text-properties>
       </style:style>
     </xsl:for-each>
@@ -801,21 +885,51 @@
   </xsl:template>
 
   <xsl:template name="InsertAxisXProperties">
-    <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:catAx">
+    <xsl:for-each select="key('plotArea','')/c:catAx[1]">
       <style:style style:name="axis-x" style:family="chart" style:data-style-name="N0">
         <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
           chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
           text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
           style:direction="ltr"/>
         <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
-          svg:stroke-color="#000000"/>
+          svg:stroke-color="#000000">
+          <xsl:for-each select="c:spPr">
+            <!-- Insert fill -->
+            <xsl:choose>
+              <xsl:when test="a:blipFill">
+                <xsl:call-template name="InsertBitmapFill"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="InsertFill"/>
+              </xsl:otherwise>
+            </xsl:choose>
+
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
+        </style:graphic-properties>
         <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
           style:font-pitch="variable" fo:font-size="7pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
           style:font-size-asian="7pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="7pt"/>
+          style:font-size-complex="7pt">
+          <xsl:choose>
+            <!-- custom title -->
+            <xsl:when test="c:tx">
+              <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </xsl:for-each>
+            </xsl:when>
+            <!-- default title -->
+            <xsl:otherwise>
+              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </style:text-properties>
       </style:style>
     </xsl:for-each>
   </xsl:template>
