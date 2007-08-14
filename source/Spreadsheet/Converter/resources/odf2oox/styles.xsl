@@ -994,7 +994,8 @@
         </xsl:if>
 
         <!-- Indent  (can not be negative)-->
-        <xsl:if test="style:paragraph-properties/@fo:margin-left and not(starts-with(style:paragraph-properties/@fo:margin-left,'-'))">
+        <xsl:if
+          test="style:paragraph-properties/@fo:margin-left and not(starts-with(style:paragraph-properties/@fo:margin-left,'-'))">
           <xsl:attribute name="indent">
             <xsl:variable name="indentLeft">
               <xsl:value-of select="style:paragraph-properties/@fo:margin-left"/>
@@ -1006,7 +1007,7 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-              <xsl:value-of select="round($indent_value div 10)"/>
+            <xsl:value-of select="round($indent_value div 10)"/>
           </xsl:attribute>
         </xsl:if>
 
@@ -1217,7 +1218,58 @@
     <xsl:param name="parentCellStyleName"/>
     <xsl:param name="defaultCellStyleName"/>
     <xsl:if test="style:text-properties">
+      <xsl:variable name="FontSize">
+        <xsl:value-of select="@style:family"/>
+      </xsl:variable>
       <rPr>
+        <!-- if the style is for the text that is inside text:span tag -->
+        <xsl:if
+          test="style:text-properties/parent::node()/@style:name = //table:table-cell/child::*/text:span/@text:style-name and not(style:text-properties/parent::node()/@style:name = //table:table-cell/@table:style-name and not(style:text-properties/parent::node()/@style:name = //table:table-cell/child::*/text:span/@text:style-name))">
+          <xsl:variable name="StyleName">
+            <xsl:value-of select="@style:name"/>
+          </xsl:variable>
+          <xsl:variable name="ParentStyleName">
+            <xsl:value-of
+              select="//text:span[@text:style-name = $StyleName]/parent::node()/parent::node()/@table:style-name"
+            />
+          </xsl:variable>
+          <xsl:variable name="ParentFontSize">
+            <xsl:value-of
+              select="//style:style[@style:name = $ParentStyleName]/style:text-properties/@fo:font-size"
+            />
+          </xsl:variable>
+          <xsl:variable name="ParentFontWeight">
+            <xsl:value-of
+              select="//style:style[@style:name = $ParentStyleName]/style:text-properties/@fo:font-weight"
+            />
+          </xsl:variable>
+
+          <!-- if text surrounded by text:span -->
+          <xsl:if test="@style:family = 'text'">
+            <!-- font size -->
+            <sz>
+              <xsl:attribute name="val">
+                <!-- if there is font size for the current span -->
+                <xsl:if test="@fo:font-size!=''">
+                  <xsl:value-of select="@fo:font-size"/>
+                </xsl:if>
+                <!-- if not but there is a global font size, insert global font size -->
+                <xsl:if test="not(@fo:font-size) and $ParentFontSize!=''">
+                  <xsl:value-of select="translate(translate($ParentFontSize, 'p', ''), 't', '')"/>
+                </xsl:if>
+                <!-- else insert some default font size-->
+                <xsl:if test="not(@fo:font-size) and $ParentFontSize=''">
+                  <xsl:value-of select="10"/>
+                </xsl:if>
+              </xsl:attribute>
+            </sz>
+            <xsl:if test="not(@fo:font-weight) and $ParentFontWeight = 'bold'">
+              <b/>
+            </xsl:if>
+          </xsl:if>
+
+          
+        </xsl:if>
         <xsl:apply-templates select="style:text-properties" mode="textstyles">
           <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
           <xsl:with-param name="defaultCellStyleName" select="$defaultCellStyleName"/>
@@ -2348,8 +2400,7 @@
 
 
   <xsl:template name="InsertHyperlinksProperties">
-    <xsl:if
-      test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)]">
+    <xsl:if test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)]">
       <xsl:variable name="xfId">
         <xsl:value-of
           select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
