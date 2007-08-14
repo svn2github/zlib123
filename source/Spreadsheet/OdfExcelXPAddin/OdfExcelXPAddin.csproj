@@ -84,6 +84,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OdfExcelXPAddinSetup-chs\OdfExcelXPAddinSetup-chs.vdproj" />
+    <Content Include="OdfExcelXPAddinSetup-de\OdfExcelXPAddinSetup-de.vdproj" />
+    <Content Include="OdfExcelXPAddinSetup-fr\OdfExcelXPAddinSetup-fr.vdproj" />
+    <Content Include="OdfExcelXPAddinSetup-ja\OdfExcelXPAddinSetup-ja.vdproj" />
+    <Content Include="OdfExcelXPAddinSetup-nl\OdfExcelXPAddinSetup-nl.vdproj" />
+    <Content Include="OdfExcelXPAddinSetup-pl\OdfExcelXPAddinSetup-pl.vdproj" />
     <Content Include="OdfExcelXPAddinSetup\OdfExcelXPAddinSetup.vdproj" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
