@@ -84,6 +84,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OdfExcel2003AddinSetup-chs\OdfExcel2003AddinSetup-chs.vdproj" />
+    <Content Include="OdfExcel2003AddinSetup-de\OdfExcel2003AddinSetup-de.vdproj" />
+    <Content Include="OdfExcel2003AddinSetup-fr\OdfExcel2003AddinSetup-fr.vdproj" />
+    <Content Include="OdfExcel2003AddinSetup-ja\OdfExcel2003AddinSetup-ja.vdproj" />
+    <Content Include="OdfExcel2003AddinSetup-nl\OdfExcel2003AddinSetup-nl.vdproj" />
+    <Content Include="OdfExcel2003AddinSetup-pl\OdfExcel2003AddinSetup-pl.vdproj" />
     <Content Include="OdfExcel2003AddinSetup\OdfExcel2003AddinSetup.vdproj" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />

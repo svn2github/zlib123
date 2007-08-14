@@ -148,6 +148,18 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_0B1D98C8BB3F1638B363783A203A3605"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_86928FC5E79E32A6774A0D36F89C09D6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_44983F3428933A8BEF7F614DA24CAD2B"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -161,18 +173,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0B1D98C8BB3F1638B363783A203A3605"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_86928FC5E79E32A6774A0D36F89C09D6"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -321,6 +321,11 @@
             "AssemblyAsmDisplayName" = "8:ExcelAddin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_0B1D98C8BB3F1638B363783A203A3605"
+                    {
+                    "Name" = "8:ExcelAddin.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:ExcelAddin.dll"
             "TargetName" = "8:"
@@ -418,6 +423,11 @@
             "AssemblyAsmDisplayName" = "8:SpreadsheetConverter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_86928FC5E79E32A6774A0D36F89C09D6"
+                    {
+                    "Name" = "8:SpreadsheetConverter.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:SpreadsheetConverter.dll"
             "TargetName" = "8:"
@@ -472,9 +482,14 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=1.0.0.16821, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=1.0.0.24786, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_A6AD6C30D2F56B32985C13D4BC4AC14F"
+                    {
+                    "Name" = "8:OdfConverterLib.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:OdfConverterLib.dll"
             "TargetName" = "8:"
@@ -498,9 +513,14 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfAddinLib, Version=0.2.3.16823, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfAddinLib, Version=0.2.3.24788, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_CD88651C5EBFE9A530E978719B7DFA37"
+                    {
+                    "Name" = "8:OdfAddinLib.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:OdfAddinLib.dll"
             "TargetName" = "8:"
@@ -524,9 +544,14 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.16821, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.24785, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_E7C765C06937EE03624DD0CC14C3EAF0"
+                    {
+                    "Name" = "8:OdfZipUtils.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:OdfZipUtils.dll"
             "TargetName" = "8:"
@@ -602,7 +627,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ODF Addin for Excel 2007"
         "ProductCode" = "8:{7B8C1350-91E4-408D-8070-01D2F1268E6C}"
-        "PackageCode" = "8:{0C0A9252-2DF7-4402-ADD2-BB25A0DAF6B4}"
+        "PackageCode" = "8:{221D2C58-8ED1-4624-B344-390668E06623}"
         "UpgradeCode" = "8:{B404C630-2D11-4029-A863-75A6117BC2A2}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

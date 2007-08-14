@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="OdfImportLabel" xml:space="preserve">
+    <value>打开 ODF...</value>
+  </data>
+  <data name="OdfImportDescription" xml:space="preserve">
+    <value>打开开放文档格式（ODF）文件。</value>
+  </data>
+  <data name="OdfExportLabel" xml:space="preserve">
+    <value>另存为 ODF...</value>
+  </data>
+  <data name="OdfExportDescription" xml:space="preserve">
+    <value>用开放文档格式（ODF）保存该文档的副本。</value>
+  </data>
+  <data name="OdfMenuLabel" xml:space="preserve">
+    <value>ODF...</value>
+  </data>
+  <data name="OdfUnexpectedError" xml:space="preserve">
+    <value>遇到意外错误。过项目网站（http://odf-converter.sourceforge.net）提交错误报告（可附加文件）。</value>
+  </data>
+  <data name="AllFileType" xml:space="preserve">
+    <value>全部文件</value>
+  </data>
+  <data name="OdfFileType" xml:space="preserve">
+    <value>OpenDocument 文本文件</value>
+  </data>
+  <data name="NotImplemented" xml:space="preserve">
+    <value>对不起，尚未实现此功能</value>
+  </data>
+  <data name="ConversionFormTitle" xml:space="preserve">
+    <value>正在转换 %1...</value>
+  </data>
+  <data name="FeedbackLabel" xml:space="preserve">
+    <value>在转换过程中丢失某些元素。 如要查看可能丢失元素的列表，单击“详细信息”。</value>
+  </data>
+  <data name="EncryptedDocumentDetail" xml:space="preserve">
+    <value>此加载项的当前版本未实现此功能。</value>
+  </data>
+  <data name="EncryptedDocumentLabel" xml:space="preserve">
+    <value>此文档受密码保护。</value>
+  </data>
+  <data name="PossiblyEncryptedDocument" xml:space="preserve">
+    <value>无法打开此 ZIP 存档。您的文档是否未加密。</value>
+  </data>
+  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
+    <value>如果您认为这是一份有效的 ODF 文档，您应该通过项目网站（http://odf-converter.sourceforge.net）提交错误报告，并附上您的文件。</value>
+  </data>
+  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
+    <value>此文档看似并非有效的 OASIS OpenDocument 文件。</value>
+  </data>
+  <data name="OdfConverterNotInstalled" xml:space="preserve">
+    <value>Office 2007 文件转换器未安装：ODF 转换无法执行。</value>
+  </data>
+  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
+    <value>转换失败，请先尝试以 Word 2007 格式保存该文档。</value>
+  </data>
+  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
+    <value>请保存您的文档，然后再导出成 ODF</value>
+  </data>
+  <data name="OdfConverterTitle" xml:space="preserve">
+    <value>ODF 转换器</value>
+  </data>
+  <data name="UnableToCreateOutputDetail" xml:space="preserve">
+    <value>无法创建目标文件：检查路径是否正确，文件是否正被另一个应用程序使用。</value>
+  </data>
+  <data name="UnableToCreateOutputLabel" xml:space="preserve">
+    <value>无法创建目标文件</value>
+  </data>
+  <data name="OdfConversionCanceled" xml:space="preserve">
+    <value>转换被用户取消</value>
+  </data>
+  <data name="CorruptedInputFileDetail" xml:space="preserve">
+    <value>如果您认为这是一份有效的 ODF 文档，您应该通过项目网站（http://odf-converter.sourceforge.net）提交错误报告，并附上您的文件。</value>
+  </data>
+  <data name="CorruptedInputFileLabel" xml:space="preserve">
+    <value>此文档好像为已损坏的 OASIS OpenDocument 文件。</value>
+  </data>
+</root>

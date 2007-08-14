@@ -103,6 +103,12 @@
     <EmbeddedResource Include="resources\customUI.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OdfExcel2007AddinSetup-chs\OdfExcel2007AddinSetup-chs.vdproj" />
+    <Content Include="OdfExcel2007AddinSetup-de\OdfExcel2007AddinSetup-de.vdproj" />
+    <Content Include="OdfExcel2007AddinSetup-fr\OdfExcel2007AddinSetup-fr.vdproj" />
+    <Content Include="OdfExcel2007AddinSetup-ja\OdfExcel2007AddinSetup-ja.vdproj" />
+    <Content Include="OdfExcel2007AddinSetup-nl\OdfExcel2007AddinSetup-nl.vdproj" />
+    <Content Include="OdfExcel2007AddinSetup-pl\OdfExcel2007AddinSetup-pl.vdproj" />
     <Content Include="OdfExcel2007AddinSetup\OdfExcel2007AddinSetup.vdproj" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
