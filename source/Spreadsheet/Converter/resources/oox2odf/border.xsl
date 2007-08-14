@@ -227,7 +227,7 @@
         <xsl:text>0.088cm solid</xsl:text>
       </xsl:when>
       <xsl:when test="$style = 'thick'">
-        <xsl:text>0.095cm solid</xsl:text>
+        <xsl:text>0.141cm solid</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>0.002cm solid</xsl:text>
