@@ -109,6 +109,486 @@
    
     
     <!-- Insert Change Tracking Properties -->
+
+ <xsl:template match="e:header">
+        <xsl:param name="revisionLogFiles"/>
+        <xsl:param name="positionHeader" select="1"/>
+        <xsl:param name="previousStyle"/>
+        <xsl:param name="prevRangeMoved"/>
+        <xsl:param name="previousDelColStyle"/>
+
+        <xsl:variable name="userName">
+            <xsl:value-of select="@userName"/>
+        </xsl:variable>
+        
+        <xsl:variable name="dateTime">
+            <xsl:value-of select="@dateTime"/>
+        </xsl:variable>
+        
+        <xsl:variable name="id">
+            <xsl:value-of select="@r:id"/>
+        </xsl:variable>        
+        
+        <xsl:variable name="Target">
+            <xsl:for-each
+                select="document(concat('xl/', substring-before($revisionLogFiles, '/'), '/_rels/', substring-after($revisionLogFiles, '/'), '.rels'))//node()[name()='Relationship']">
+                <xsl:if test="./@Id=$id">
+                    <xsl:value-of select="concat('xl/', substring-before($revisionLogFiles, '/'), '/', ./@Target)"/>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        
+        <xsl:for-each select="document($Target)/e:revisions">
+           <xsl:if test="e:rcc|e:rm|e:rrc">
+                <xsl:apply-templates select="node()[1][name()='rcc' or name()='rm' or name() = 'rrc']">
+                    <xsl:with-param name="dateTime">
+                        <xsl:value-of select="$dateTime"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="userName">
+                        <xsl:value-of select="$userName"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="positionHeader">
+                        <xsl:value-of select="$positionHeader"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="previousStyle">
+                        <xsl:value-of select="$previousStyle"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="prevRangeMoved">
+                        <xsl:value-of select="$prevRangeMoved"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="previousDelColStyle">
+                        <xsl:value-of select="$previousDelColStyle"/>
+                    </xsl:with-param>
+                </xsl:apply-templates>
+            </xsl:if>
+        </xsl:for-each>
+        
+        <!-- Search Previous Style or Value in Change Tracking -->
+        <xsl:variable name="prevStyle">
+            <xsl:for-each select="document($Target)/e:revisions">
+                <xsl:if test="e:rcc|e:rm">
+                    <xsl:apply-templates select="node()[1][name()='rcc' or name()='rm']" mode="SearchPreviousStyle">
+                        <xsl:with-param name="dateTime">
+                            <xsl:value-of select="$dateTime"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="userName">
+                            <xsl:value-of select="$userName"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="positionHeader">
+                            <xsl:value-of select="$positionHeader"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="previousStyle">
+                            <xsl:value-of select="$previousStyle"/>
+                        </xsl:with-param>
+                    </xsl:apply-templates>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+     
+     <!-- Search Previous Delete Col in Change Tracking -->
+     
+     <xsl:variable name="prevDelColStyle">
+
+         <xsl:for-each select="document($Target)/e:revisions">
+
+             <xsl:if test="e:rrc">
+           
+                 <xsl:apply-templates select="node()[1][name()='rrc']" mode="prevDelColStyle">                        
+                     <xsl:with-param name="positionHeader">
+                         <xsl:value-of select="$positionHeader"/>
+                     </xsl:with-param>
+                     <xsl:with-param name="previousDelColStyle">
+                         <xsl:value-of select="$previousDelColStyle"/>
+                     </xsl:with-param>
+                 </xsl:apply-templates>
+             </xsl:if>
+         </xsl:for-each>
+     </xsl:variable>
+
+        <xsl:variable name="DeleteMovedRange">
+            <xsl:for-each select="document($Target)/e:revisions">
+                <xsl:choose>
+                    <xsl:when test="e:rcc|e:rm">
+                        <xsl:apply-templates select="node()[1][name()='rcc' or name()='rm']" mode="prevRangeMoved">                        
+                            <xsl:with-param name="positionHeader">
+                                <xsl:value-of select="$positionHeader"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="prevRangeMoved">
+                                <xsl:value-of select="$prevRangeMoved"/>
+                            </xsl:with-param>
+                        </xsl:apply-templates>        
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$prevRangeMoved"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>
+
+
+        <xsl:if test="following-sibling::e:header">
+            <xsl:apply-templates select="following-sibling::e:header[1]">
+                <xsl:with-param name="revisionLogFiles">
+                    <xsl:value-of select="$revisionLogFiles"/>
+                </xsl:with-param>
+                <xsl:with-param name="positionHeader">
+                    <xsl:value-of select="$positionHeader + 1"/>
+                </xsl:with-param>
+                <xsl:with-param name="previousStyle">
+                    <xsl:value-of select="$prevStyle"/>
+                </xsl:with-param>
+                <xsl:with-param name="prevRangeMoved">
+                    <xsl:value-of select="$DeleteMovedRange"/>
+                </xsl:with-param>
+                <xsl:with-param name="previousDelColStyle">
+                    <xsl:value-of select="$prevDelColStyle"/>
+                </xsl:with-param>
+            </xsl:apply-templates>
+        </xsl:if>
+        
+    </xsl:template>
+
+    <xsl:template match="e:rcc|e:rm|e:rrc">
+        <xsl:param name="dateTime"/>
+        <xsl:param name="userName"/>
+        <xsl:param name="positionHeader"/>
+        <xsl:param name="previousStyle"/>
+        <xsl:param name="prevRangeMoved"/>
+        <xsl:param name="previousDelColStyle"/>
+
+ <!-- Insert Text "Change Tracking" -->
+        
+        <xsl:variable name="Cell">
+        <xsl:choose>
+            <xsl:when test="e:oc/@r">
+                <xsl:choose>
+                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, ':')), ';')">
+                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, ':')), ';')"/>            
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="e:oc/@r"/>        
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="e:nc/@r">
+                <xsl:choose>
+                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, ':')), ';')">
+                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, ':')), ';')"/>            
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="e:nc/@r"/>        
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="@source">
+                <xsl:choose>
+                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
+                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>            
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="@source"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="e:rfmt/@sqref">
+                    <xsl:value-of select="substring-before(e:rfmt/@sqref, ':')"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+
+        
+    <xsl:variable name="tableId">
+            <xsl:choose>
+                <xsl:when test="./@rId">
+                    <xsl:value-of select="concat('ct', $positionHeader, ./@rId)"/>        
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+                    
+        <xsl:variable name="colNum">
+            <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                    <xsl:value-of select="$Cell"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:variable>
+                    
+        <xsl:variable name="rowNum">
+            <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell">
+                    <xsl:value-of select="$Cell"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:choose>
+            <xsl:when test="name() = 'rcc'">
+                <table:cell-content-change>
+                    
+                    <xsl:attribute name="table:id">
+                        <xsl:value-of select="$tableId"/>
+                    </xsl:attribute>
+                    
+                   
+                    <table:cell-address>
+                        <xsl:attribute name="table:table">
+                            <xsl:value-of select="@sId - 1"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="table:row">
+                            
+                            <xsl:value-of select="$rowNum - 1"/>
+                            
+                        </xsl:attribute>
+                        <xsl:attribute name="table:column">
+                            
+                            <xsl:value-of select="$colNum - 1"/>
+                            
+                        </xsl:attribute>
+                    </table:cell-address>
+                    
+                    
+                   <xsl:call-template name="InsertAuthorAndDateOfChange">
+                       <xsl:with-param name="userName">
+                           <xsl:value-of select="$userName"/>
+                       </xsl:with-param>
+                       <xsl:with-param name="dateTime">
+                           <xsl:value-of select="$dateTime"/>
+                       </xsl:with-param>
+                   </xsl:call-template>
+                    
+                    <table:previous>
+                        <xsl:if test="contains(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-'))">
+                        <xsl:attribute name="table:id">
+                            <xsl:value-of select="substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';')"/>
+                        </xsl:attribute>
+                        </xsl:if>
+                        <table:change-track-table-cell office:value-type="string">
+                            <xsl:if test="e:oc/e:is/e:t">
+                                <text:p>
+                                    <xsl:value-of select="e:oc/e:is/e:t"/>
+                                </text:p>
+                            </xsl:if>
+                        </table:change-track-table-cell>
+                    </table:previous>
+                    
+                </table:cell-content-change> 
+                
+
+                    <xsl:apply-templates select="following-sibling::node()[1][name()='rcc' or name()='rm']">
+                        <xsl:with-param name="dateTime">
+                            <xsl:value-of select="$dateTime"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="userName">
+                            <xsl:value-of select="$userName"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="positionHeader">
+                            <xsl:value-of select="$positionHeader"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="previousStyle">
+                            <xsl:value-of select="concat($rowNum, ':', $colNum, '-', $tableId, ';', $previousStyle)"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="prevRangeMoved">
+                            <xsl:value-of select="$prevRangeMoved"/>
+                        </xsl:with-param>
+                    </xsl:apply-templates>
+                
+                
+            </xsl:when>
+
+
+            <!-- Moved Cell -->
+
+            <xsl:when test="name() = 'rm'">
+                <table:movement>
+                    <xsl:attribute name="table:id">
+                        <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+                    </xsl:attribute>
+                    
+                    <xsl:variable name="colNumSource">
+                        <xsl:call-template name="GetColNum">
+                            <xsl:with-param name="cell">
+                                <xsl:value-of select="@source"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <xsl:variable name="rowNumSource">
+                        <xsl:call-template name="GetRowNum">
+                            <xsl:with-param name="cell">
+                                <xsl:value-of select="@source"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <table:source-range-address>
+                    <xsl:attribute name="table:column">
+                        <xsl:value-of select="$colNumSource - 1"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="table:row">
+                        <xsl:value-of select="$rowNumSource - 1"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="table:table">
+                        <xsl:value-of select="@sheetId - 1"/>
+                    </xsl:attribute>                    
+                    </table:source-range-address>
+                    
+                    <xsl:variable name="colNumDestination">
+                        <xsl:call-template name="GetColNum">
+                            <xsl:with-param name="cell">
+                            <xsl:choose>
+                                <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
+                                    <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>        
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="@destination"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <!--xsl:value-of select="@destination"/-->
+                                </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <xsl:variable name="rowNumDestination">
+                        <xsl:call-template name="GetRowNum">
+                            <xsl:with-param name="cell">
+                                <xsl:choose>
+                                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
+                                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>        
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="@destination"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                                <!--xsl:value-of select="@destination"/-->
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    
+                    <table:target-range-address>
+                        <xsl:attribute name="table:column">
+                            <xsl:value-of select="$colNumDestination - 1"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="table:row">
+                            <xsl:value-of select="$rowNumDestination - 1"/>
+                        </xsl:attribute>
+                    <xsl:attribute name="table:table">
+                        <xsl:value-of select="@sourceSheetId - 1"/>
+                    </xsl:attribute>                    
+                    </table:target-range-address>
+                    
+                    <xsl:call-template name="InsertAuthorAndDateOfChange">
+                        <xsl:with-param name="userName">
+                            <xsl:value-of select="$userName"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="dateTime">
+                            <xsl:value-of select="$dateTime"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                    
+                </table:movement>
+                
+                
+                <xsl:apply-templates select="following-sibling::node()[1][name()='rcc' or name()='rm']">
+                    <xsl:with-param name="dateTime">
+                        <xsl:value-of select="$dateTime"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="userName">
+                        <xsl:value-of select="$userName"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="positionHeader">
+                        <xsl:value-of select="$positionHeader"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="previousStyle">
+                        <xsl:value-of select="concat($rowNum, ':', $colNum, '-', $tableId, ';', $previousStyle)"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="prevRangeMoved">
+                        <xsl:value-of select="concat(substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';'), substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')))"/>
+                    </xsl:with-param>
+                </xsl:apply-templates>
+                
+            </xsl:when>
+
+            <xsl:when test="name() = 'rrc'">
+                <xsl:choose>
+                    <xsl:when test="@action = 'deleteCol'">
+                        
+                        <table:deletion table:type="column">
+                            
+                            <xsl:variable name="sqref">
+                                <xsl:value-of select="e:rfmt/@sqref"/>
+                            </xsl:variable>
+                            
+                            <xsl:attribute name="table:position">
+                                <xsl:value-of select="$colNum - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:attribute name="table:table">
+                                <xsl:value-of select="e:rfmt/@sheetId - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:if test="not(substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';'))">
+                                <xsl:attribute name="table:multi-deletion-spanned">
+                                    <xsl:value-of select="count(following-sibling::e:rrc[e:rfmt/@sqref = $sqref]) + 1"/>
+                                </xsl:attribute>
+                            </xsl:if>
+                            
+                            <xsl:attribute name="table:id">
+                                <xsl:value-of select="$tableId"/>
+                            </xsl:attribute>
+                            
+                            <xsl:call-template name="InsertAuthorAndDateOfChange">
+                                <xsl:with-param name="userName">
+                                    <xsl:value-of select="$userName"/>
+                                </xsl:with-param>
+                                <xsl:with-param name="dateTime">
+                                    <xsl:value-of select="$dateTime"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                            
+                            <xsl:if test="substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';')">
+                                <table:deletions>
+                                    <table:change-deletion table:id="ct1">
+                                        <xsl:attribute name="table:id">
+                                            <xsl:value-of select="substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';')"/>
+                                        </xsl:attribute>
+                                    </table:change-deletion>
+                                </table:deletions>
+                            </xsl:if>
+                            
+                        </table:deletion>
+                        
+                        <xsl:apply-templates select="following-sibling::node()[1][name()='rcc' or name()='rm' or name()='rrc']">
+                            <xsl:with-param name="dateTime">
+                                <xsl:value-of select="$dateTime"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="userName">
+                                <xsl:value-of select="$userName"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="positionHeader">
+                                <xsl:value-of select="$positionHeader"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="previousStyle">
+                                <xsl:value-of select="concat($rowNum, ':', $colNum, '-', $tableId, ';', $previousStyle)"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="prevRangeMoved">
+                                <xsl:value-of select="$prevRangeMoved"/>
+                            </xsl:with-param>                  
+                        </xsl:apply-templates>
+                        
+                    </xsl:when>
+                </xsl:choose>
+                
+                
+            </xsl:when>
+            <xsl:otherwise/>
+        </xsl:choose>
+    </xsl:template>
+
+  <!-- Insert Change Tracking Properties -->
+    
     
     <xsl:template match="e:header" mode="SearchRangeMoved">
         <xsl:param name="revisionLogFiles"/>
@@ -176,8 +656,15 @@
         <xsl:param name="positionHeader"/>
         <xsl:param name="previousRangeMoved"/>
 
-        <xsl:variable name="tableId">
-            <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+       <xsl:variable name="tableId">
+            <xsl:choose>
+                <xsl:when test="./@rId">
+                    <xsl:value-of select="concat('ct', $positionHeader, ./@rId)"/>        
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
       
         <xsl:choose>
@@ -294,128 +781,11 @@
             </xsl:otherwise>
             
         </xsl:choose>
-        
-        
-        
             
         
     </xsl:template>
     
     <!-- Insert Change Tracking Properties -->
-    
-    <xsl:template match="e:header">
-        <xsl:param name="revisionLogFiles"/>
-        <xsl:param name="positionHeader" select="1"/>
-        <xsl:param name="previousStyle"/>
-        <xsl:param name="prevRangeMoved"/>
-
-        <xsl:variable name="userName">
-            <xsl:value-of select="@userName"/>
-        </xsl:variable>
-        
-        <xsl:variable name="dateTime">
-            <xsl:value-of select="@dateTime"/>
-        </xsl:variable>
-        
-        <xsl:variable name="id">
-            <xsl:value-of select="@r:id"/>
-        </xsl:variable>        
-        
-        <xsl:variable name="Target">
-            <xsl:for-each
-                select="document(concat('xl/', substring-before($revisionLogFiles, '/'), '/_rels/', substring-after($revisionLogFiles, '/'), '.rels'))//node()[name()='Relationship']">
-                <xsl:if test="./@Id=$id">
-                    <xsl:value-of select="concat('xl/', substring-before($revisionLogFiles, '/'), '/', ./@Target)"/>
-                </xsl:if>
-            </xsl:for-each>
-        </xsl:variable>
-        
-        <xsl:for-each select="document($Target)/e:revisions">
-            <xsl:if test="e:rcc|e:rm">
-                <xsl:apply-templates select="node()[1][name()='rcc' or name()='rm']">
-                    <xsl:with-param name="dateTime">
-                        <xsl:value-of select="$dateTime"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="userName">
-                        <xsl:value-of select="$userName"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="positionHeader">
-                        <xsl:value-of select="$positionHeader"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="previousStyle">
-                        <xsl:value-of select="$previousStyle"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="prevRangeMoved">
-                        <xsl:value-of select="$prevRangeMoved"/>
-                    </xsl:with-param>
-                </xsl:apply-templates>
-            </xsl:if>
-        </xsl:for-each>
-        
-        <!-- Search Previous Style or Value in Change Tracking -->
-        <xsl:variable name="prevStyle">
-            <xsl:for-each select="document($Target)/e:revisions">
-                <xsl:if test="e:rcc|e:rm">
-                    <xsl:apply-templates select="node()[1][name()='rcc' or name()='rm']" mode="SearchPreviousStyle">
-                        <xsl:with-param name="dateTime">
-                            <xsl:value-of select="$dateTime"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="userName">
-                            <xsl:value-of select="$userName"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="positionHeader">
-                            <xsl:value-of select="$positionHeader"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="previousStyle">
-                            <xsl:value-of select="$previousStyle"/>
-                        </xsl:with-param>
-                    </xsl:apply-templates>
-                </xsl:if>
-            </xsl:for-each>
-        </xsl:variable>
-        
-        <xsl:variable name="DeleteMovedRange">
-            <xsl:for-each select="document($Target)/e:revisions">
-                <xsl:choose>
-                    <xsl:when test="e:rcc|e:rm">
-                        <xsl:apply-templates select="node()[1][name()='rcc' or name()='rm']" mode="prevRangeMoved">                        
-                            <xsl:with-param name="positionHeader">
-                                <xsl:value-of select="$positionHeader"/>
-                            </xsl:with-param>
-                            <xsl:with-param name="prevRangeMoved">
-                                <xsl:value-of select="$prevRangeMoved"/>
-                            </xsl:with-param>
-                        </xsl:apply-templates>        
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="$prevRangeMoved"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:for-each>
-        </xsl:variable>
-
-
-        <xsl:if test="following-sibling::e:header">
-            <xsl:apply-templates select="following-sibling::e:header[1]">
-                <xsl:with-param name="revisionLogFiles">
-                    <xsl:value-of select="$revisionLogFiles"/>
-                </xsl:with-param>
-                <xsl:with-param name="positionHeader">
-                    <xsl:value-of select="$positionHeader + 1"/>
-                </xsl:with-param>
-                <xsl:with-param name="previousStyle">
-                    <xsl:value-of select="$prevStyle"/>
-                </xsl:with-param>
-                <xsl:with-param name="prevRangeMoved">
-                    <xsl:value-of select="$DeleteMovedRange"/>
-                </xsl:with-param>
-            </xsl:apply-templates>
-        </xsl:if>
-        
-    </xsl:template>
-    
-    
-    
     <xsl:template match="e:rcc|e:rm" mode="SearchPreviousStyle">
         <xsl:param name="dateTime"/>
         <xsl:param name="userName"/>
@@ -423,7 +793,14 @@
         <xsl:param name="previousStyle"/>
         
         <xsl:variable name="tableId">
-            <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+            <xsl:choose>
+                <xsl:when test="./@rId">
+                    <xsl:value-of select="concat('ct', $positionHeader, ./@rId)"/>        
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
         
         <xsl:variable name="colNum">
@@ -526,255 +903,7 @@
     
     <!-- Insert Text "Change Tracking" -->
     
-    <xsl:template match="e:rcc|e:rm">
-        <xsl:param name="dateTime"/>
-        <xsl:param name="userName"/>
-        <xsl:param name="positionHeader"/>
-        <xsl:param name="previousStyle"/>
-        <xsl:param name="prevRangeMoved"/>
-
-        
-        <xsl:variable name="Cell">
-        <xsl:choose>
-            <xsl:when test="e:oc/@r">
-                <xsl:choose>
-                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, ':')), ';')">
-                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, ':')), ';')"/>            
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="e:oc/@r"/>        
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:when>
-            <xsl:when test="e:nc/@r">
-                <xsl:choose>
-                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, ':')), ';')">
-                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, ':')), ';')"/>            
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="e:nc/@r"/>        
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:when>
-            <xsl:when test="@source">
-                <xsl:choose>
-                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
-                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>            
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="@source"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:when>
-        </xsl:choose>
-        </xsl:variable>
-
-        
-        <xsl:variable name="tableId">
-            <xsl:value-of select="concat('ct', $positionHeader, position())"/>
-        </xsl:variable>
-                    
-        <xsl:variable name="colNum">
-            <xsl:call-template name="GetColNum">
-                <xsl:with-param name="cell">
-                    <xsl:value-of select="$Cell"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable>
-                    
-        <xsl:variable name="rowNum">
-            <xsl:call-template name="GetRowNum">
-                <xsl:with-param name="cell">
-                    <xsl:value-of select="$Cell"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:choose>
-            <xsl:when test="name() = 'rcc'">
-                <table:cell-content-change>
-                    
-                    <xsl:attribute name="table:id">
-                        <xsl:value-of select="$tableId"/>
-                    </xsl:attribute>
-                    
-                   
-                    <table:cell-address>
-                        <xsl:attribute name="table:table">
-                            <xsl:value-of select="@sId - 1"/>
-                        </xsl:attribute>
-                        <xsl:attribute name="table:row">
-                            
-                            <xsl:value-of select="$rowNum - 1"/>
-                            
-                        </xsl:attribute>
-                        <xsl:attribute name="table:column">
-                            
-                            <xsl:value-of select="$colNum - 1"/>
-                            
-                        </xsl:attribute>
-                    </table:cell-address>
-                    
-                    
-                   <xsl:call-template name="InsertAuthorAndDateOfChange">
-                       <xsl:with-param name="userName">
-                           <xsl:value-of select="$userName"/>
-                       </xsl:with-param>
-                       <xsl:with-param name="dateTime">
-                           <xsl:value-of select="$dateTime"/>
-                       </xsl:with-param>
-                   </xsl:call-template>
-                    
-                    <table:previous>
-                        <xsl:if test="contains(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-'))">
-                        <xsl:attribute name="table:id">
-                            <xsl:value-of select="substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';')"/>
-                        </xsl:attribute>
-                        </xsl:if>
-                        <table:change-track-table-cell office:value-type="string">
-                            <xsl:if test="e:oc/e:is/e:t">
-                                <text:p>
-                                    <xsl:value-of select="e:oc/e:is/e:t"/>
-                                </text:p>
-                            </xsl:if>
-                        </table:change-track-table-cell>
-                    </table:previous>
-                    
-                </table:cell-content-change> 
-                
-
-                    <xsl:apply-templates select="following-sibling::node()[1][name()='rcc' or name()='rm']">
-                        <xsl:with-param name="dateTime">
-                            <xsl:value-of select="$dateTime"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="userName">
-                            <xsl:value-of select="$userName"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="positionHeader">
-                            <xsl:value-of select="$positionHeader"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="previousStyle">
-                            <xsl:value-of select="concat($rowNum, ':', $colNum, '-', $tableId, ';', $previousStyle)"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="prevRangeMoved">
-                            <xsl:value-of select="$prevRangeMoved"/>
-                        </xsl:with-param>
-                    </xsl:apply-templates>
-                
-                
-            </xsl:when>
-            <xsl:when test="name() = 'rm'">
-                <table:movement>
-                    <xsl:attribute name="table:id">
-                        <xsl:value-of select="concat('ct', $positionHeader, position())"/>
-                    </xsl:attribute>
-                    
-                    <xsl:variable name="colNumSource">
-                        <xsl:call-template name="GetColNum">
-                            <xsl:with-param name="cell">
-                                <xsl:value-of select="@source"/>
-                            </xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:variable>
-                    
-                    <xsl:variable name="rowNumSource">
-                        <xsl:call-template name="GetRowNum">
-                            <xsl:with-param name="cell">
-                                <xsl:value-of select="@source"/>
-                            </xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:variable>
-                    
-                    <table:source-range-address>
-                    <xsl:attribute name="table:column">
-                        <xsl:value-of select="$colNumSource - 1"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="table:row">
-                        <xsl:value-of select="$rowNumSource - 1"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="table:table">
-                        <xsl:value-of select="@sheetId - 1"/>
-                    </xsl:attribute>                    
-                    </table:source-range-address>
-                    
-                    <xsl:variable name="colNumDestination">
-                        <xsl:call-template name="GetColNum">
-                            <xsl:with-param name="cell">
-                            <xsl:choose>
-                                <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
-                                    <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>        
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="@destination"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                            <!--xsl:value-of select="@destination"/-->
-                                </xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:variable>
-                    
-                    <xsl:variable name="rowNumDestination">
-                        <xsl:call-template name="GetRowNum">
-                            <xsl:with-param name="cell">
-                                <xsl:choose>
-                                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
-                                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>        
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="@destination"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                                <!--xsl:value-of select="@destination"/-->
-                            </xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:variable>
-                    
-                    <table:target-range-address>
-                        <xsl:attribute name="table:column">
-                            <xsl:value-of select="$colNumDestination - 1"/>
-                        </xsl:attribute>
-                        <xsl:attribute name="table:row">
-                            <xsl:value-of select="$rowNumDestination - 1"/>
-                        </xsl:attribute>
-                    <xsl:attribute name="table:table">
-                        <xsl:value-of select="@sourceSheetId - 1"/>
-                    </xsl:attribute>                    
-                    </table:target-range-address>
-                    
-                    <xsl:call-template name="InsertAuthorAndDateOfChange">
-                        <xsl:with-param name="userName">
-                            <xsl:value-of select="$userName"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="dateTime">
-                            <xsl:value-of select="$dateTime"/>
-                        </xsl:with-param>
-                    </xsl:call-template>
-                    
-                </table:movement>
-                
-                
-                <xsl:apply-templates select="following-sibling::node()[1][name()='rcc' or name()='rm']">
-                    <xsl:with-param name="dateTime">
-                        <xsl:value-of select="$dateTime"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="userName">
-                        <xsl:value-of select="$userName"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="positionHeader">
-                        <xsl:value-of select="$positionHeader"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="previousStyle">
-                        <xsl:value-of select="concat($rowNum, ':', $colNum, '-', $tableId, ';', $previousStyle)"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="prevRangeMoved">
-                        <xsl:value-of select="concat(substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';'), substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')))"/>
-                    </xsl:with-param>
-                </xsl:apply-templates>
-                
-            </xsl:when>
-            <xsl:otherwise/>
-        </xsl:choose>
-    </xsl:template>
+  
     
     <xsl:template match="e:rcc|e:rm" mode="prevRangeMoved">
         <xsl:param name="positionHeader"/>
@@ -863,6 +992,41 @@
             </dc:date>
         </office:change-info>
         
+    </xsl:template>
+
+    <!-- Insert Style Of Prev Delete Col -->
+ <xsl:template match="e:rrc" mode="prevDelColStyle">        
+       <xsl:param name="positionHeader"/>
+       <xsl:param name="previousDelColStyle"/>
+        
+        <xsl:variable name="tableId">
+            <xsl:choose>
+                <xsl:when test="./@rId">
+                    <xsl:value-of select="concat('ct', $positionHeader, ./@rId)"/>        
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat('ct', $positionHeader, position())"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+     
+                <xsl:choose>
+                    <xsl:when test="following-sibling::node()[1][name()='rrc']">
+                        <xsl:apply-templates select="following-sibling::node()[1][name()='rrc']" mode="prevDelColStyle">                         
+                            <xsl:with-param name="positionHeader">
+                                <xsl:value-of select="$positionHeader"/>
+                            </xsl:with-param>
+                            <xsl:with-param name="previousDelColStyle">
+                                <xsl:value-of select="concat(substring-before(e:rfmt/@sqref, ':'), '-', $tableId, ';', $previousDelColStyle)"/>
+                            </xsl:with-param>
+                        </xsl:apply-templates>        
+                    </xsl:when>
+                    <xsl:otherwise>
+                         <xsl:value-of select="$previousDelColStyle"/>
+                    </xsl:otherwise>
+                    </xsl:choose>
+
+     <xsl:value-of select="name()"/>
     </xsl:template>
     
     </xsl:stylesheet>
