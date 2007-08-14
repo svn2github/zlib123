@@ -813,33 +813,12 @@
       </xsl:attribute>
     </xsl:if>
 
-    <!-- font outline -->
-    <xsl:if test="@style:text-outline = 'true' ">
-      <a:ln>
-        <a:solidFill>
-          <a:srgbClr>
-            <xsl:attribute name="val">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:attribute>
-          </a:srgbClr>
-        </a:solidFill>
-      </a:ln>
-    </xsl:if>
-
     <!-- font color -->
     <xsl:if test="@fo:color">
       <a:solidFill>
         <a:srgbClr>
           <xsl:attribute name="val">
-            <xsl:choose>
-              <!-- when outline is set then 'white' -->
-              <xsl:when test="@style:text-outline = 'true' ">
-                <xsl:text>FFFFFF</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="substring-after(@fo:color,'#')"/>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="substring-after(@fo:color,'#')"/>
           </xsl:attribute>
         </a:srgbClr>
       </a:solidFill>
@@ -862,15 +841,7 @@
         <a:solidFill>
           <a:srgbClr>
             <xsl:attribute name="val">
-              <xsl:choose>
-                <!-- when outline is set then 'white' -->
-                <xsl:when test="@style:text-outline = 'true' ">
-                  <xsl:text>FFFFFF</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="substring-after(@style:text-underline-color,'#')"/>
-                </xsl:otherwise>
-              </xsl:choose>
+              <xsl:value-of select="substring-after(@style:text-underline-color,'#')"/>
             </xsl:attribute>
           </a:srgbClr>
         </a:solidFill>
