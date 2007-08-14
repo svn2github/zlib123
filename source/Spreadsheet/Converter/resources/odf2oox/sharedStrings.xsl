@@ -68,14 +68,16 @@
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]
       ">
       <si>
-        <xsl:choose>
-          <xsl:when test="text:span|text:p/text:span">
-            <xsl:apply-templates mode="run" select="text:p"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <t xml:space="preserve"><xsl:apply-templates mode="text" select="text:p"/></t>
-          </xsl:otherwise>
-        </xsl:choose>
+        <pxsi:maxlength xmlns:pxsi="urn:cleverage:xmlns:post-processings:cellText">        
+          <xsl:choose>
+            <xsl:when test="text:span|text:p/text:span">
+              <xsl:apply-templates mode="run" select="text:p"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <t xml:space="preserve"><xsl:apply-templates mode="text" select="text:p"/></t>
+            </xsl:otherwise>
+          </xsl:choose>
+        </pxsi:maxlength>
       </si>
     </xsl:for-each>
   </xsl:template>
