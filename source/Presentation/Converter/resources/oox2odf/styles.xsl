@@ -55,6 +55,8 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships" >
   <xsl:import href="SlideMaster.xsl"/>
+   <xsl:import href="notesMaster.xsl"/>
+  
 
 	<!--<xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
   <xsl:key name="default-styles"
@@ -84,22 +86,50 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name="SlideMaster"/>
 				<xsl:call-template name="InsertShapeStyles"/>
 				<xsl:call-template name ="InsertLayoutStyle"/>
+        <xsl:for-each select="document('ppt/presentation.xml')//p:sldMasterIdLst/p:sldMasterId">
+          <xsl:variable name="sldMasterIdRelation">
+            <xsl:value-of select="@r:id"></xsl:value-of>
+          </xsl:variable>
+          <xsl:for-each select="document('ppt/_rels/presentation.xml.rels')//node()[@Id=$sldMasterIdRelation]">
+            <xsl:variable name="slideMasterPath">
+              <xsl:value-of select="substring-after(@Target,'/')"/>
+            </xsl:variable>
+            <xsl:variable name="slideMasterName">
+              <xsl:value-of select="substring-before($slideMasterPath,'.xml')"/>
+            </xsl:variable>
+            <xsl:call-template name="NMasterSubtitleOutlineStyle">
+              <xsl:with-param name="slideMasterPath" select="'notesMaster1.xml'"/>
+              <xsl:with-param name="slideMasterName" select="$slideMasterName"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:for-each>
 			</office:styles>
 		<office:automatic-styles>
         <!-- added by Vipul to insert background color for Slide master-->
         <!--start-->
         <xsl:call-template name="tmpSMDrawingPageStyle"/>
         <!-- end-->
+      <!-- Template Added by Vijayeta
+           Insert Handout styles
+           Date:30th July-->
+      <xsl:call-template name="tmpHandoutDrawingPageStyle"/>
+      <!-- End of Template Added by Vijayeta to Insert Handout styles-->
 				<xsl:call-template name="InsertSlideSize"/><!-- Change By Vijayeta-->
-				<xsl:call-template name="InsertNotesSize"/>
+				<!--<xsl:call-template name="InsertNotesSize"/>-->
+       <xsl:call-template name ="InsertHandoutMasterSize"/>
+       <xsl:call-template name="NotesMasterSlideSize"/>
         <!--Added by Vipul to insert style for shapes-->
         <xsl:call-template name="GraphicStyleForSlideMaster"/>
+       <!-- Template Added by Vijayeta
+           Insert Handout Graphic styles
+           Date:30th July-->
+      <xsl:call-template name="tmpHandoutGraphicStyle"/>
+      <!-- End of Template Added by Vijayeta to Insert Handout Graphic styles-->
+       <xsl:call-template name="GraphicStyleForNotesMaster"/>
 			</office:automatic-styles>
       <xsl:call-template name="slideMasterStylePage"></xsl:call-template>
 		</office:document-styles>
-
 	</xsl:template>
-
 	<xsl:template name ="InsertDefaultStyles">
 		<style:style style:name="standard" style:family="graphic">
 			<style:graphic-properties draw:stroke="solid" svg:stroke-color="#385d8a" svg:stroke-width=".07cm" draw:marker-start-width="0.3cm" draw:marker-start-center="false" draw:marker-end-width="0.3cm" draw:marker-end-center="false" draw:fill="solid" draw:fill-color="#4F81BD" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm">
@@ -148,6 +178,18 @@ Copyright (c) 2007, Sonata Software Limited
 			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:line-height="100%" text:enable-numbering="false" fo:text-indent="0cm"/>
 			<style:text-properties style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" fo:font-family="Arial" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:font-family-asian="&apos;Arial Unicode MS&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-family-complex="Tahoma" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none"/>
 		</style:style>
+    <!-- Added by vijayeta, AL02T6 thumbnails defining all the slides, 30th july '07-->
+    <style:presentation-page-layout style:name="AL0T26">
+      <presentation:placeholder presentation:object="handout" svg:x="2.058cm" svg:y="1.743cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="10.962cm" svg:y="1.743cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="19.866cm" svg:y="1.743cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="2.058cm" svg:y="3.612cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="10.962cm" svg:y="3.612cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="19.866cm" svg:y="3.612cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="2.058cm" svg:y="5.481cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="10.962cm" svg:y="5.481cm" svg:width="6.104cm" svg:height="-0.233cm" />
+      <presentation:placeholder presentation:object="handout" svg:x="19.866cm" svg:y="5.481cm" svg:width="6.104cm" svg:height="-0.233cm" />
+    </style:presentation-page-layout>
 		</xsl:template>
 	
 	<xsl:template name="InsertShapeStyles">
@@ -211,6 +253,40 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:for-each >
 		
 	</xsl:template>
+
+  <!-- Notes Size-->
+  <xsl:template name="NotesMasterSlideSize">
+    <xsl:for-each select ="document('ppt/presentation.xml')//p:presentation/p:notesSz">
+      <style:page-layout style:name="PMNotes">
+        <style:page-layout-properties 
+				 fo:margin-top="0cm" 
+				 fo:margin-bottom="0cm" 
+				 fo:margin-left="0cm" 
+				 fo:margin-right="0cm">
+          <xsl:attribute name ="fo:page-width">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="@cx"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name ="fo:page-height">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="@cy"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name ="style:print-orientation">
+            <xsl:call-template name="CheckOrientation">
+              <xsl:with-param name="cx" select="@cx"/>
+              <xsl:with-param name="cy" select="@cy"/>
+            </xsl:call-template>
+            <!--<xsl:value-of select ="'portrait'"/>-->
+          </xsl:attribute>
+        </style:page-layout-properties>
+      </style:page-layout>
+    </xsl:for-each>
+  </xsl:template>
+  <!--End-->
 
 	<xsl:template name ="getArrowType">
 		<xsl:param name ="type" />
@@ -411,11 +487,11 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:for-each>
 	</xsl:template>
 	<!-- Notes Size-->
-	<xsl:template name="InsertNotesSize">
-		<!-- Check if notesSlide is present in the package-->
+	<!--<xsl:template name="InsertNotesSize">
+		--><!-- Check if notesSlide is present in the package--><!--
 		<xsl:if test ="document('ppt/notesSlides/notesSlide1.xml')">
 			<xsl:variable name ="Flag">
-				<!--Check if size defined in notesSlide -->
+				--><!--Check if size defined in notesSlide --><!--
 				<xsl:for-each select ="document('ppt/notesSlides/notesSlide1.xml')//p:notes/p:cSld/p:spTree/p:sp">
 					<xsl:if test ="p:nvSpPr/p:cNvPr/@name[contains(.,'Notes Placeholder 2')]">
 						<xsl:if test ="p:spPr/a:xfrm/a:ext[@cx]">
@@ -429,7 +505,7 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:variable>
 			<xsl:choose >
 				<xsl:when test ="$Flag='true'">
-					<!-- notesSlide has Size Definition(user defined)-->
+					--><!-- notesSlide has Size Definition(user defined)--><!--
 					<xsl:for-each select ="document('ppt/notesSlides/notesSlide1.xml')//p:notes/p:cSld/p:spTree/p:sp">
 						<xsl:if test ="p:nvSpPr/p:cNvPr/@name[contains(.,'Notes Placeholder 2')]">
 							<style:page-layout style:name="PM2">
@@ -462,7 +538,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:for-each>
 				</xsl:when>
 				<xsl:otherwise>
-					<!-- pre-defined size definition in notesMaster-->
+					--><!-- pre-defined size definition in notesMaster--><!--
 					<xsl:for-each select ="document('ppt/notesMasters/notesMaster1.xml')//p:notesMaster/p:cSld/p:spTree/p:sp">
 						<xsl:if test ="p:nvSpPr/p:cNvPr/@name[contains(.,'Notes Placeholder 4')]">
 							<style:page-layout style:name="PM2">
@@ -496,7 +572,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
-		<!--Default Size in presentation.xml-->
+		--><!--Default Size in presentation.xml--><!--
 		<xsl:if test ="not(document('ppt/notesSlides/notesSlide1.xml'))">
 			<xsl:for-each select ="document('ppt/presentation.xml')//p:presentation/p:notesSz">
 				<style:page-layout style:name="PM2">
@@ -523,8 +599,47 @@ Copyright (c) 2007, Sonata Software Limited
 				</style:page-layout>
 			</xsl:for-each>
 		</xsl:if>
-	</xsl:template>
+	</xsl:template>-->
 	<!-- Slide Number,The equvivalent Not present in ODP-->
+
+  <!-- Added by Vijayeta
+       Set Handout size(PM0)
+       Dated: 30th July '07-->
+  <xsl:template name ="InsertHandoutMasterSize">
+    <xsl:for-each select ="document('ppt/presentation.xml')//p:presentation/p:sldSz">
+      <style:page-layout style:name="PMhandOut">
+        <style:page-layout-properties
+         fo:margin-top="0cm"
+         fo:margin-bottom="0cm"
+         fo:margin-left="0cm"
+         fo:margin-right="0cm"
+         fo:page-width="27.94cm"
+         fo:page-height="21.59cm"
+         style:print-orientation="landscape" >
+          <!--<xsl:attribute name ="fo:page-width">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="@cx"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name ="fo:page-height">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="@cy"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name ="style:print-orientation">
+            <xsl:call-template name="CheckOrientation">
+              <xsl:with-param name="cx" select="@cx"/>
+              <xsl:with-param name="cy" select="@cy"/>
+            </xsl:call-template>
+            <xsl:value-of select ="'portrait'"/>
+          </xsl:attribute>-->
+        </style:page-layout-properties>
+      </style:page-layout>
+    </xsl:for-each>
+  </xsl:template>
+  <!--End of snippet added by Vijayeta Set Handout size(PM0)-->
 	<xsl:template name="InsertSlideNumber">
 		<xsl:for-each select ="document('ppt/presentation.xml')//p:presentation">
 			<draw:frame presentation:class="page-number">
@@ -544,7 +659,7 @@ Copyright (c) 2007, Sonata Software Limited
 
 	<xsl:template name="InsertMasterStylesDefinition">
 
-		<style:handout-master style:page-layout-name="PM0"/>
+		<!--<style:handout-master style:page-layout-name="PM0"/>-->
 		<style:master-page style:name="Default" style:page-layout-name="PM1">
 			<xsl:call-template name ="SetDateFooterPageNumberPosition">
 				<xsl:with-param name ="PlaceHolder">

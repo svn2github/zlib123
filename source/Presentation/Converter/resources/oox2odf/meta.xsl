@@ -37,7 +37,8 @@ Copyright (c) 2007, Sonata Software Limited
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0"
     xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
-    xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+    xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
+	exclude-result-prefixes="xlink">
     <xsl:template name="meta">
         <office:document-meta>
             <office:meta>
