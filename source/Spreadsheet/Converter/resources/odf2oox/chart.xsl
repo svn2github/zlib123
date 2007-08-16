@@ -215,7 +215,38 @@
     <c:title>
       <c:tx>
         <c:rich>
-          <a:bodyPr/>
+          <a:bodyPr>
+            <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
+
+              <!-- rotation -->
+              <xsl:if test="@style:rotation-angle">
+                <xsl:attribute name="rot">
+                  <xsl:choose>
+                    <!-- 0 deg -->
+                    <xsl:when test="@style:rotation-angle = 0">
+                      <xsl:text>0</xsl:text>
+                    </xsl:when>
+                    <!-- (0 ; 180> deg -->
+                    <xsl:when test="@style:rotation-angle &lt; 90 and @style:rotation-angle &lt;= 180">
+                      <xsl:text>-</xsl:text>
+                      <xsl:value-of select="@style:rotation-angle * 60000"/>
+                    </xsl:when>
+                    <!-- (180 ; 360) deg -->
+                    <xsl:otherwise>
+                      <xsl:value-of select="(360 - @style:rotation-angle) * 60000"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:if>
+              
+              <!-- vertically stacked -->
+              <xsl:if test="@style:direction = 'ttb' ">
+                <xsl:attribute name="vert">
+                  <xsl:text>wordArtVert</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+            </xsl:for-each>
+          </a:bodyPr>
           <a:lstStyle/>
 
           <a:p>
@@ -237,7 +268,10 @@
           </a:p>
         </c:rich>
       </c:tx>
-      <c:layout>
+      
+      <!-- best results are when position is default -->
+      
+      <!--c:layout>
         <c:manualLayout>
           <c:xMode val="edge"/>
           <c:yMode val="edge"/>
@@ -248,7 +282,7 @@
           </xsl:call-template>
 
         </c:manualLayout>
-      </c:layout>
+      </c:layout-->
 
       <xsl:call-template name="InsertSpPr">
         <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
@@ -275,7 +309,9 @@
       </xsl:variable>
 
       <c:plotArea>
-        <c:layout>
+        <!-- best results are when position is default -->
+        
+        <!--c:layout>
           <c:manualLayout>
             <c:layoutTarget val="inner"/>
             <c:xMode val="edge"/>
@@ -284,14 +320,14 @@
             <xsl:call-template name="InsideChartPosition">
               <xsl:with-param name="chartWidth" select="$chartWidth"/>
               <xsl:with-param name="chartHeight" select="$chartHeight"/>
-            </xsl:call-template>
+            </xsl:call-template-->
 
             <!--c:x val="0.10452961672473868"/>
           <c:y val="0.24334600760456274"/>
           <c:w val="0.68641114982578355"/>
           <c:h val="0.60836501901140683"/-->
-          </c:manualLayout>
-        </c:layout>
+          <!--/c:manualLayout>
+        </c:layout-->
 
         <xsl:for-each select="parent::node()">
           <xsl:call-template name="InsertChartType"/>
@@ -726,6 +762,7 @@
     <!-- @Context: chart:chart -->
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>
+    <xsl:param name="chartDirectory"/>
 
     <c:valAx>
       <c:axId val="110498176"/>
@@ -734,6 +771,18 @@
       </c:scaling>
 
       <c:axPos val="l"/>
+
+      <xsl:if
+        test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
+        <xsl:for-each select="chart:title">
+          <xsl:call-template name="InsertTitle">
+            <xsl:with-param name="chartWidth" select="$chartWidth"/>
+            <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:if>
+
       <c:majorGridlines>
         <c:spPr>
           <a:ln w="3175">
