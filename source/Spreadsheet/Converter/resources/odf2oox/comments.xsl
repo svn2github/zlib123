@@ -43,12 +43,13 @@
   exclude-result-prefixes="svg table r text style number fo">
 
   <xsl:import href="sharedStrings.xsl"/>
+  <xsl:import href="styles.xsl"/>
 
   <xsl:template name="comments">
     <xsl:param name="sheetNum"/>
     <comments xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <authors>
-        <author>karolina</author>
+        <author>Author</author>
       </authors>
       <commentList>
         <xsl:variable name="noteId">
@@ -71,53 +72,99 @@
     </comment>
   </xsl:template>
 
+
+
   <xsl:template name="InsertTextBox">
-    <xsl:variable name="VisibleOrHidden">
-      <xsl:choose>
-        <xsl:when test="@office:display">
-          <xsl:text>visible</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>hidden</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <v:shape noteId="{count(preceding::office:annotation)+1}" id="_x0000_s1025" type="#_x0000_t202"
-      style="position:absolute;
-        margin-left:204pt;margin-top:0;width:79.8pt;height:18.6pt;z-index:1;
+    <xsl:if
+      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/office:annotation">
+
+
+      <xsl:variable name="VisibleOrHidden">
+
+        <xsl:choose>
+          <xsl:when test="@office:display">
+            <xsl:text>visible</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>hidden</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="id">
+        <xsl:value-of select="1025 + count(preceding::office:annotation) + 1"/>
+      </xsl:variable>
+
+      <xsl:variable name="height">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:height"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="width">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:width"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="margin-left">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:x"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="margin-top">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:y"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="z-index">
+        <xsl:value-of select="position()"/>
+      </xsl:variable>
+
+      <v:shape noteId="{count(preceding::office:annotation)+1}" id="{concat('_x0000_s',$id)}"
+        type="#_x0000_t202"
+        style="position:absolute;
+        margin-left:{$margin-left}pt;margin-top:{$margin-top};width:{$width}pt;height:{$height}pt;z-index:{$z-index};
         visibility:{$VisibleOrHidden};mso-wrap-style:none;v-text-anchor:middle"
-      fillcolor="#ffffc0" o:insetmode="auto">
-      <v:fill color2="#00003f"/>
-      <v:stroke startarrow="block" joinstyle="round"/>
-      <v:shadow on="t" color="black" obscured="t"/>
-      <v:path arrowok="t" o:connecttype="none"/>
-      <v:textbox>
-        <div style="text-align:left"/>
-      </v:textbox>
-      <x:ClientData ObjectType="Note">
-        <x:SizeWithCells/>
-        <x:Anchor> 9, 28, 2, 18, 10, 57, 5, 2</x:Anchor>
-        <x:Locked>False</x:Locked>
-        <x:PrintObject>False</x:PrintObject>
-        <x:AutoFill>False</x:AutoFill>
-        <x:AutoLine>False</x:AutoLine>
-        <x:LockText>False</x:LockText>
-        <!--  <x:Row>2</x:Row>
+        fillcolor="#ffffc0" o:insetmode="auto">
+
+        <v:fill color2="#00003f"/>
+        <v:stroke startarrow="block" joinstyle="round"/>
+        <v:shadow on="t" color="black" obscured="t"/>
+        <v:path arrowok="t" o:connecttype="none"/>
+        <v:textbox>
+          <div style="text-align:left"/>
+        </v:textbox>
+        <x:ClientData ObjectType="Note">
+
+          <x:SizeWithCells/>
+
+          <x:Locked>False</x:Locked>
+          <x:PrintObject>False</x:PrintObject>
+          <x:AutoFill>False</x:AutoFill>
+          <x:AutoLine>False</x:AutoLine>
+          <x:LockText>False</x:LockText>
+          <!--  <x:Row>2</x:Row>
           <x:Column>2</x:Column>-->
-        <xsl:if test="@office:display">
-          <x:Visible/>
-        </xsl:if>
-      </x:ClientData>
-    </v:shape>
+          <xsl:if test="@office:display">
+            <x:Visible/>
+          </xsl:if>
+
+        </x:ClientData>
+      </v:shape>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="dc:date"/>
 
   <xsl:template name="InsertCommentText">
+
     <xsl:choose>
-      <xsl:when test="text:span|text:p/text:span">
+      <xsl:when test="text:span|text:p/text:span|text:p/text:span/text:a">
         <xsl:apply-templates mode="run"/>
       </xsl:when>
+      
       <xsl:otherwise>
         <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
       </xsl:otherwise>

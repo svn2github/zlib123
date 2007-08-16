@@ -1257,7 +1257,7 @@
           </xsl:when>
 
           <!-- if it is a hyperlink  in the cell-->
-          <xsl:when test="descendant::text:a">
+          <xsl:when test="descendant::text:a[not(ancestor::office:annotation)]">
 
             <xsl:variable name="multilines">
               <xsl:for-each

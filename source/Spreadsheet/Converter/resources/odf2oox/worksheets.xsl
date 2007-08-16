@@ -1114,9 +1114,9 @@
   <xsl:template name="InsertHyperlinks">
 
     <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
-    <xsl:if test="descendant::text:a[not(ancestor::draw:custom-shape)]">
+    <xsl:if test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
       <hyperlinks>
-        <xsl:for-each select="descendant::text:a[not(ancestor::draw:custom-shape)]">
+        <xsl:for-each select="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
           <xsl:variable name="ViewHyperlinks">
             <xsl:value-of select="."/>
           </xsl:variable>

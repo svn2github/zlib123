@@ -211,14 +211,7 @@
                 <xsl:value-of select="$firstRow"/>
             </xsl:with-param>
         </xsl:call-template>
-        <!--table:table-cell>
-                <xsl:attribute name="table:number-columns-repeated">
-                    <xsl:if test="$firstRow">
-                        <xsl:value-of select="256"/>
-                    </xsl:if>
-                </xsl:attribute>
-            </table:table-cell-->
-
+        
     </xsl:template>
 
     <xsl:template name="InsertRowScenario">
@@ -226,6 +219,7 @@
         <xsl:param name="ScenarioCells"/>
 
         <xsl:if test="contains(concat(';', $ScenarioCells), concat(';', $numRow, ':'))">
+            
             <table:table-row>
                 <xsl:call-template name="InsertCellScenario">
                     <xsl:with-param name="numRow">
@@ -236,7 +230,6 @@
                     </xsl:with-param>
                 </xsl:call-template>
             </table:table-row>
-
 
             <xsl:call-template name="InsertRowScenario">
                 <xsl:with-param name="numRow">
