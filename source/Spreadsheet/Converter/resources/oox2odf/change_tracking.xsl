@@ -262,8 +262,8 @@
         <xsl:choose>
             <xsl:when test="e:oc/@r">
                 <xsl:choose>
-                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, ':')), ';')">
-                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, ':')), ';')"/>            
+                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, '-')), ';')">
+                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:oc/@r, '-')), ';')"/>            
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="e:oc/@r"/>        
@@ -272,8 +272,8 @@
             </xsl:when>
             <xsl:when test="e:nc/@r">
                 <xsl:choose>
-                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, ':')), ';')">
-                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, ':')), ';')"/>            
+                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, '-')), ';')">
+                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', e:nc/@r, '-')), ';')"/>            
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="e:nc/@r"/>        
@@ -282,8 +282,8 @@
             </xsl:when>
             <xsl:when test="@source">
                 <xsl:choose>
-                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
-                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>            
+                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, '-')), ';')">
+                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, '-')), ';')"/>            
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="@source"/>
@@ -365,6 +365,7 @@
                             <xsl:value-of select="substring-before(substring-after(concat(';', $previousStyle), concat(';', $rowNum, ':', $colNum, '-')), ';')"/>
                         </xsl:attribute>
                         </xsl:if>
+                   
                         <table:change-track-table-cell office:value-type="string">
                             <xsl:if test="e:oc/e:is/e:t">
                                 <text:p>
@@ -410,7 +411,14 @@
                     <xsl:variable name="colNumSource">
                         <xsl:call-template name="GetColNum">
                             <xsl:with-param name="cell">
-                                <xsl:value-of select="@source"/>
+                                <xsl:choose>
+                                    <xsl:when test="contains(@source, ':')">
+                                        <xsl:value-of select="substring-before(@source, ':')"/>                                        
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="@source"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xsl:with-param>
                         </xsl:call-template>
                     </xsl:variable>
@@ -418,35 +426,115 @@
                     <xsl:variable name="rowNumSource">
                         <xsl:call-template name="GetRowNum">
                             <xsl:with-param name="cell">
-                                <xsl:value-of select="@source"/>
+                                <xsl:choose>
+                                    <xsl:when test="contains(@source, ':')">
+                                        <xsl:value-of select="substring-before(@source, ':')"/>                                        
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="@source"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xsl:with-param>
                         </xsl:call-template>
                     </xsl:variable>
-                    
+                   
                     <table:source-range-address>
-                    <xsl:attribute name="table:column">
-                        <xsl:value-of select="$colNumSource - 1"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="table:row">
-                        <xsl:value-of select="$rowNumSource - 1"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="table:table">
-                        <xsl:value-of select="@sheetId - 1"/>
-                    </xsl:attribute>                    
+                        
+                    <xsl:choose>
+                        <xsl:when test="contains(@source, ':')">
+                            
+                            <xsl:variable name="colNumSourceDestination">
+                                <xsl:call-template name="GetColNum">
+                                    <xsl:with-param name="cell">
+                                        <xsl:choose>
+                                            <xsl:when test="contains(@source, ':')">
+                                                <xsl:value-of select="substring-after(@source, ':')"/>                                        
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:value-of select="@source"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:with-param>
+                                </xsl:call-template>
+                            </xsl:variable>
+                            
+                            <xsl:variable name="rowNumSourceDestination">
+                                <xsl:call-template name="GetRowNum">
+                                    <xsl:with-param name="cell">
+                                        <xsl:choose>
+                                            <xsl:when test="contains(@source, ':')">
+                                                <xsl:value-of select="substring-after(@source, ':')"/>                                        
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:value-of select="@source"/>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:with-param>
+                                </xsl:call-template>
+                            </xsl:variable>
+                            
+                            <xsl:attribute name="table:start-table">
+                                <xsl:value-of select="@sheetId - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:attribute name="table:start-column">
+                                <xsl:value-of select="$colNumSource - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:attribute name="table:start-row">
+                                <xsl:value-of select="$rowNumSource - 1"/>
+                            </xsl:attribute>
+
+                            <xsl:attribute name="table:end-column">
+                                <xsl:value-of select="$colNumSourceDestination - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:attribute name="table:end-row">
+                                <xsl:value-of select="$rowNumSourceDestination - 1"/>
+                            </xsl:attribute>
+                            
+                            <xsl:attribute name="table:end-table">
+                                <xsl:value-of select="@sheetId - 1"/>
+                            </xsl:attribute>
+                            
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="table:column">
+                                <xsl:value-of select="$colNumSource - 1"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="table:row">
+                                <xsl:value-of select="$rowNumSource - 1"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="table:table">
+                                <xsl:value-of select="@sheetId - 1"/>
+                            </xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                        
                     </table:source-range-address>
+                    
+                    <xsl:variable name="cellDestination">
+                        <xsl:choose>
+                            <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, '-')), ';')">
+                                <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, '-')), ';')"/>        
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="@destination"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:variable>
                     
                     <xsl:variable name="colNumDestination">
                         <xsl:call-template name="GetColNum">
                             <xsl:with-param name="cell">
-                            <xsl:choose>
-                                <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
-                                    <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>        
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="@destination"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                            <!--xsl:value-of select="@destination"/-->
+                                <xsl:choose>
+                                    <xsl:when test="contains($cellDestination, ':')">
+                                        <xsl:value-of select="substring-before($cellDestination, ':')"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="$cellDestination"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 </xsl:with-param>
                         </xsl:call-template>
                     </xsl:variable>
@@ -455,19 +543,78 @@
                         <xsl:call-template name="GetRowNum">
                             <xsl:with-param name="cell">
                                 <xsl:choose>
-                                    <xsl:when test="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')">
-                                        <xsl:value-of select="substring-before(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';')"/>        
+                                    <xsl:when test="contains($cellDestination, ':')">
+                                        <xsl:value-of select="substring-before($cellDestination, ':')"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="@destination"/>
+                                        <xsl:value-of select="$cellDestination"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
-                                <!--xsl:value-of select="@destination"/-->
                             </xsl:with-param>
                         </xsl:call-template>
                     </xsl:variable>
                     
                     <table:target-range-address>
+                        
+                        <xsl:choose>
+                            <xsl:when test="contains(@source, ':')">
+                                
+                                <xsl:variable name="colNumEndDestination">
+                                    <xsl:call-template name="GetColNum">
+                                        <xsl:with-param name="cell">
+                                            <xsl:choose>
+                                                <xsl:when test="contains($cellDestination, ':')">
+                                                    <xsl:value-of select="substring-after($cellDestination, ':')"/>                                        
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="$cellDestination"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </xsl:with-param>
+                                    </xsl:call-template>
+                                </xsl:variable>
+                                
+                                <xsl:variable name="rowNumEndDestination">
+                                    <xsl:call-template name="GetRowNum">
+                                        <xsl:with-param name="cell">
+                                            <xsl:choose>
+                                                <xsl:when test="contains($cellDestination, ':')">
+                                                    <xsl:value-of select="substring-after($cellDestination, ':')"/>                                        
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="$cellDestination"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </xsl:with-param>
+                                    </xsl:call-template>
+                                </xsl:variable>
+                                
+                                <xsl:attribute name="table:start-table">
+                                    <xsl:value-of select="@sourceSheetId - 1"/>
+                                </xsl:attribute>
+                                
+                                <xsl:attribute name="table:start-column">
+                                    <xsl:value-of select="$colNumDestination - 1"/>
+                                </xsl:attribute>
+                                
+                                <xsl:attribute name="table:start-row">
+                                    <xsl:value-of select="$rowNumDestination - 1"/>
+                                </xsl:attribute>
+                                
+                                <xsl:attribute name="table:end-column">
+                                    <xsl:value-of select="$colNumEndDestination - 1"/>
+                                </xsl:attribute>
+                                
+                                <xsl:attribute name="table:end-row">
+                                    <xsl:value-of select="$rowNumEndDestination - 1"/>
+                                </xsl:attribute>
+                                
+                                <xsl:attribute name="table:end-table">
+                                    <xsl:value-of select="@sourceSheetId - 1"/>
+                                </xsl:attribute>
+                                
+                            </xsl:when>
+                            <xsl:otherwise>
                         <xsl:attribute name="table:column">
                             <xsl:value-of select="$colNumDestination - 1"/>
                         </xsl:attribute>
@@ -477,6 +624,9 @@
                     <xsl:attribute name="table:table">
                         <xsl:value-of select="@sourceSheetId - 1"/>
                     </xsl:attribute>                    
+                            </xsl:otherwise>
+                        </xsl:choose>
+                                    
                     </table:target-range-address>
                     
                     <xsl:call-template name="InsertAuthorAndDateOfChange">
@@ -505,7 +655,7 @@
                         <xsl:value-of select="concat($rowNum, ':', $colNum, '-', $tableId, ';', $previousStyle)"/>
                     </xsl:with-param>
                     <xsl:with-param name="prevRangeMoved">
-                        <xsl:value-of select="concat(substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')), ';'), substring-after(concat(';', $prevRangeMoved), concat(';', @source, ':')))"/>
+                        <xsl:value-of select="concat(substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', @source, '-')), ';'), substring-after(concat(';', $prevRangeMoved), concat(';', @source, '-')))"/>
                     </xsl:with-param>
                 </xsl:apply-templates>
                 
@@ -731,7 +881,7 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-      
+
         <xsl:choose>
             
             <xsl:when test="name() = 'rcc'">
@@ -765,7 +915,7 @@
                             <xsl:with-param name="previousRangeMoved">
                                 <xsl:call-template name="AddRangeMoved">
                                     <xsl:with-param name="previousRangeMoved">
-                                        <xsl:value-of select="concat($previousRangeMoved, @source, ':', @destination, ';')"/>
+                                        <xsl:value-of select="concat($previousRangeMoved, @source, '-', @destination, ';')"/>
                                     </xsl:with-param>
                                     <xsl:with-param name="source">
                                         <xsl:value-of select="@source"/>
@@ -774,14 +924,14 @@
                                         <xsl:value-of select="@destination"/>
                                     </xsl:with-param>
                                 </xsl:call-template>
-                                <!--xsl:value-of select="concat($previousRangeMoved, @source, ':', @destination, ';')"/-->
+                                <!--xsl:value-of select="concat($previousRangeMoved, @source, '-', @destination, ';')"/-->
                             </xsl:with-param>
                         </xsl:apply-templates>        
                     </xsl:when>
                     <xsl:otherwise>                    
                         <xsl:call-template name="AddRangeMoved">
                             <xsl:with-param name="previousRangeMoved">
-                                <xsl:value-of select="concat($previousRangeMoved, @source, ':', @destination, ';')"/>
+                                <xsl:value-of select="concat($previousRangeMoved, @source, '-', @destination, ';')"/>
                             </xsl:with-param>                            
                             <xsl:with-param name="source">
                                 <xsl:value-of select="@source"/>
@@ -790,7 +940,7 @@
                                 <xsl:value-of select="@destination"/>
                             </xsl:with-param>
                         </xsl:call-template>
-                        <!--xsl:value-of select="concat($previousRangeMoved, @source, ':', @destination,  ';')"/-->
+                        <!--xsl:value-of select="concat($previousRangeMoved, @source, '-', @destination,  ';')"/-->
                     </xsl:otherwise>
                 </xsl:choose>
                 
@@ -810,21 +960,21 @@
         <xsl:choose>
             <xsl:when test="$previousRangeMoved != ''">
                 <xsl:variable name="FromCell">
-                    <xsl:value-of select="substring-before($previousRangeMoved, ':')"/>
+                    <xsl:value-of select="substring-before($previousRangeMoved, '-')"/>
                 </xsl:variable>
                 
                 <xsl:variable name="ToCell">
-                    <xsl:value-of select="substring-before(substring-after($previousRangeMoved, ':'), ';')"/>
+                    <xsl:value-of select="substring-before(substring-after($previousRangeMoved, '-'), ';')"/>
                 </xsl:variable>
                 
                 <xsl:call-template name="AddRangeMoved">
                     <xsl:with-param name="Result">
                         <xsl:choose>
                             <xsl:when test="$ToCell = $source">
-                                <xsl:value-of select="concat($Result, $FromCell, ':', $destination, ';')"/>
+                                <xsl:value-of select="concat($Result, $FromCell, '-', $destination, ';')"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:value-of select="concat($Result, $FromCell, ':', $ToCell, ';')"/>
+                                <xsl:value-of select="concat($Result, $FromCell, '-', $ToCell, ';')"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:with-param>
@@ -1032,12 +1182,12 @@
                                 <xsl:value-of select="$positionHeader"/>
                             </xsl:with-param>
                             <xsl:with-param name="prevRangeMoved">
-                                <xsl:value-of select="substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', $Cell, ':')), ';')"/>
+                                <xsl:value-of select="substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', $Cell, '-')), ';')"/>
                             </xsl:with-param>
                         </xsl:apply-templates>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', $Cell, ':')), ';')"/>
+                        <xsl:value-of select="substring-after(substring-after(concat(';', $prevRangeMoved), concat(';', $Cell, '-')), ';')"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>           
@@ -1091,7 +1241,7 @@
                     </xsl:otherwise>
                     </xsl:choose>
 
-     <xsl:value-of select="name()"/>
+     
     </xsl:template>
     
     </xsl:stylesheet>
