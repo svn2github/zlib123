@@ -29,13 +29,13 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e ">
-  
+
   <xsl:import href="common.xsl"/>
-  
+
   <xsl:template name="InsertDatabaseRange">
     <xsl:param name="number"/>
     <xsl:param name="checkedName"/>
-    
+
     <!-- filter -->
     <xsl:for-each select="e:autoFilter">
       <table:database-range>
@@ -43,14 +43,14 @@
           <xsl:with-param name="number" select="$number"/>
           <xsl:with-param name="checkedName" select="$checkedName"/>
         </xsl:call-template>
-        
+
         <!-- filter can contain sort -->
         <xsl:for-each select="e:sortState">
           <xsl:call-template name="InsertRowSort"/>
         </xsl:for-each>
       </table:database-range>
     </xsl:for-each>
-    
+
     <!-- sort -->
     <xsl:for-each select="e:sortState">
       <table:database-range>
@@ -60,13 +60,13 @@
         </xsl:call-template>
       </table:database-range>
     </xsl:for-each>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="MatchFilter">
     <xsl:param name="number"/>
     <xsl:param name="checkedName"/>
-    
+
     <xsl:variable name="filtersNum">
       <xsl:value-of select="count(e:filterColumn/e:filters)"/>
     </xsl:variable>
@@ -76,35 +76,35 @@
     <xsl:variable name="topFiltersNum">
       <xsl:value-of select="count(e:filterColumn/e:top10)"/>
     </xsl:variable>
-    
+
     <xsl:choose>
       <!-- filter combination: column value multiple selection plus other condition is not allowed in Calc -->
       <xsl:when
         test="e:filterColumn/e:filters/e:filter[position() = 2] and $filtersNum + $customFiltersNum + $topFiltersNum &gt; 1">
         <xsl:message terminate="no">translation.oox2odf.RemovedFilter</xsl:message>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:call-template name="InsertFilter">
           <xsl:with-param name="checkedName" select="$checkedName"/>
         </xsl:call-template>
       </xsl:otherwise>
-      
-    </xsl:choose>    
+
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertFilter">
     <xsl:param name="checkedName"/>
-    
+
     <xsl:attribute name="table:display-filter-buttons">
       <xsl:text>true</xsl:text>
     </xsl:attribute>
-    
+
     <xsl:attribute name="table:name">
       <xsl:value-of select="translate($checkedName,' ','_')"/>
     </xsl:attribute>
     <xsl:attribute name="table:target-range-address">
-      
+
       <!-- sheet_name -->
       <xsl:if test="contains($checkedName,' ')">
         <xsl:text>&apos;</xsl:text>
@@ -113,11 +113,11 @@
       <xsl:if test="contains($checkedName,' ')">
         <xsl:text>&apos;</xsl:text>
       </xsl:if>
-      
+
       <xsl:text>.</xsl:text>
       <xsl:value-of select="substring-before(@ref,':')"/>
       <xsl:text>:</xsl:text>
-      
+
       <!-- sheet_name -->
       <xsl:if test="contains($checkedName,' ')">
         <xsl:text>&apos;</xsl:text>
@@ -126,11 +126,11 @@
       <xsl:if test="contains($checkedName,' ')">
         <xsl:text>&apos;</xsl:text>
       </xsl:if>
-      
+
       <xsl:text>.</xsl:text>
       <xsl:value-of select="substring-after(@ref,':')"/>
     </xsl:attribute>
-    
+
     <xsl:variable name="filtersNum">
       <xsl:value-of select="count(e:filterColumn/e:filters)"/>
     </xsl:variable>
@@ -140,38 +140,40 @@
     <xsl:variable name="topFiltersNum">
       <xsl:value-of select="count(e:filterColumn/e:top10)"/>
     </xsl:variable>
-    
-    <table:filter>
-      <xsl:choose>
-        
-        <xsl:when test="$filtersNum + $customFiltersNum + $topFiltersNum &gt; 1">
-          <table:filter-and>
+
+    <xsl:if test="child::node()">
+      <table:filter>
+        <xsl:choose>
+
+          <xsl:when test="$filtersNum + $customFiltersNum + $topFiltersNum &gt; 1">
+            <table:filter-and>
+              <xsl:for-each select="e:filterColumn">
+                <xsl:call-template name="InsertFilterConditions"/>
+              </xsl:for-each>
+            </table:filter-and>
+          </xsl:when>
+
+          <xsl:otherwise>
             <xsl:for-each select="e:filterColumn">
-              <xsl:call-template name="InsertFilterConditions"/>
+              <xsl:call-template name="InsertFilterConditions">
+                <xsl:with-param name="singleColumn" select="1"/>
+              </xsl:call-template>
             </xsl:for-each>
-          </table:filter-and>
-        </xsl:when>
-        
-        <xsl:otherwise>
-          <xsl:for-each select="e:filterColumn">
-            <xsl:call-template name="InsertFilterConditions">
-              <xsl:with-param name="singleColumn" select="1"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:otherwise>
-        
-      </xsl:choose>
-    </table:filter>
-    
+          </xsl:otherwise>
+
+        </xsl:choose>
+      </table:filter>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="InsertFilterConditions">
     <xsl:param name="singleColumn"/>
-    
+
     <xsl:variable name="field">
       <xsl:value-of select="@colId"/>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="e:top10">
         <xsl:for-each select="e:top10">
@@ -188,7 +190,7 @@
           </table:filter-condition>
         </xsl:for-each>
       </xsl:when>
-      
+
       <xsl:when test="count(e:filters/e:filter) &gt; 1">
         <table:filter-or>
           <xsl:for-each select="e:filters/e:filter">
@@ -203,7 +205,7 @@
           </xsl:for-each>
         </table:filter-or>
       </xsl:when>
-      
+
       <xsl:when test="e:filters/e:filter">
         <xsl:for-each select="e:filters/e:filter">
           <table:filter-condition table:operator="=">
@@ -216,7 +218,7 @@
           </table:filter-condition>
         </xsl:for-each>
       </xsl:when>
-      
+
       <xsl:when test="$singleColumn = 1 and e:customFilters/@and = 1">
         <table:filter-and>
           <xsl:for-each select="e:customFilters/e:customFilter">
@@ -234,7 +236,7 @@
           </xsl:for-each>
         </table:filter-and>
       </xsl:when>
-      
+
       <xsl:when test="e:customFilters/e:customFilter">
         <xsl:for-each select="e:customFilters/e:customFilter">
           <table:filter-condition>
@@ -254,7 +256,7 @@
   </xsl:template>
 
   <xsl:template name="TranslateFilterOperator">
-    
+
     <xsl:choose>
       <xsl:when test="substring(@val,1,1) = '*' or substring(@val,string-length(@val),1) = '*' ">
         <xsl:if test="@operator = 'notEqual' ">
@@ -291,7 +293,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="TranslateFilterValue">
     <xsl:choose>
       <!-- contains -->
@@ -316,31 +318,31 @@
         <xsl:value-of select="@val"/>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertSort">
     <xsl:param name="number"/>
     <xsl:param name="checkedName"/>
-    
+
     <xsl:attribute name="table:name">
       <xsl:value-of select="translate($checkedName,' ','_')"/>
     </xsl:attribute>
-    
+
     <xsl:variable name="colStart">
       <xsl:call-template name="GetColNum">
         <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="rowStart">
       <xsl:call-template name="GetRowNum">
         <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:attribute name="table:target-range-address">
-      
+
       <!-- sheet_name -->
       <xsl:if test="contains($checkedName,' ')">
         <xsl:text>&apos;</xsl:text>
@@ -350,11 +352,11 @@
         <xsl:text>&apos;</xsl:text>
       </xsl:if>
       <xsl:text>.</xsl:text>
-      
+
       <!-- range start (if there is a row/column before add it as a header) -->
       <xsl:choose>
         <xsl:when test="@columnSort = 1">
-          
+
           <xsl:variable name="colNum">
             <xsl:choose>
               <!-- when it's the column A -->
@@ -366,21 +368,21 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:call-template name="NumbersToChars">
             <!-- it is 0 based so decrease by 1 -->
             <xsl:with-param name="num" select="$colNum - 1"/>
           </xsl:call-template>
           <xsl:value-of select="$rowStart"/>
         </xsl:when>
-        
+
         <xsl:otherwise>
-          
+
           <xsl:call-template name="NumbersToChars">
             <!-- it is 0 based so decrease by 1 -->
             <xsl:with-param name="num" select="$colStart - 1"/>
           </xsl:call-template>
-          
+
           <xsl:choose>
             <!-- when it's the row 1 -->
             <xsl:when test="$rowStart = 1">
@@ -392,9 +394,9 @@
           </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
-      
+
       <xsl:text>:</xsl:text>
-      
+
       <!-- sheet_name -->
       <xsl:if test="contains($checkedName,' ')">
         <xsl:text>&apos;</xsl:text>
@@ -403,17 +405,17 @@
       <xsl:if test="contains($checkedName,' ')">
         <xsl:text>&apos;</xsl:text>
       </xsl:if>
-      
+
       <xsl:text>.</xsl:text>
       <xsl:value-of select="substring-after(@ref,':')"/>
     </xsl:attribute>
-    
+
     <xsl:if test="(@columnSort = 1 and $colStart = 1) or (not(@columnSort) and $rowStart = 1)">
       <xsl:attribute name="table:contains-header">
         <xsl:text>false</xsl:text>
       </xsl:attribute>
     </xsl:if>
-    
+
     <xsl:choose>
       <xsl:when test="@columnSort = 1">
         <xsl:call-template name="InsertColumnSort"/>
@@ -422,33 +424,33 @@
         <xsl:call-template name="InsertRowSort"/>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertRowSort">
-    
+
     <table:sort>
-      
+
       <xsl:if test="@caseSensitive = 1">
         <xsl:attribute name="table:case-sensitive">
           <xsl:text>true</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:variable name="colStart">
         <xsl:call-template name="GetColNum">
           <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:for-each select="e:sortCondition[not(@customList)]">
         <table:sort-by table:data-type="automatic">
-          
+
           <xsl:variable name="colNum">
             <xsl:if test="contains(@ref, ':')">
-            <xsl:call-template name="GetColNum">
-              <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
-            </xsl:call-template>
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
+              </xsl:call-template>
             </xsl:if>
             <xsl:if test="not(contains(@ref, ':'))">
               <xsl:call-template name="GetColNum">
@@ -456,61 +458,61 @@
               </xsl:call-template>
             </xsl:if>
           </xsl:variable>
-          
+
           <xsl:attribute name="table:field-number">
             <xsl:value-of select="$colNum - $colStart"/>
           </xsl:attribute>
-          
+
           <xsl:if test="@descending = 1">
             <xsl:attribute name="table:order">
               <xsl:text>descending</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
+
         </table:sort-by>
       </xsl:for-each>
-    </table:sort>    
+    </table:sort>
   </xsl:template>
 
   <xsl:template name="InsertColumnSort">
-    
+
     <xsl:attribute name="table:orientation">
       <xsl:text>column</xsl:text>
     </xsl:attribute>
-    
+
     <table:sort>
-      
+
       <xsl:if test="@caseSensitive = 1">
         <xsl:attribute name="table:case-sensitive">
           <xsl:text>true</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:variable name="rowStart">
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:for-each select="e:sortCondition[not(@customList)]">
         <table:sort-by table:data-type="automatic">
-          
+
           <xsl:variable name="rowNum">
             <xsl:call-template name="GetRowNum">
               <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
             </xsl:call-template>
           </xsl:variable>
-          
+
           <xsl:attribute name="table:field-number">
             <xsl:value-of select="$rowNum - $rowStart"/>
           </xsl:attribute>
-          
+
           <xsl:if test="@descending = 1">
             <xsl:attribute name="table:order">
               <xsl:text>descending</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
+
         </table:sort-by>
       </xsl:for-each>
     </table:sort>
