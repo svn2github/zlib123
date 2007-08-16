@@ -49,7 +49,7 @@
     xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" office:version="1.0">
 
-    <!-- We check cell when the validation is starting and ending -->
+    <!-- We check cell when the picture is starting and ending -->
     <xsl:template name="ValidationCell">
         <xsl:param name="sheet"/>
         <xsl:param name="document"/>
@@ -601,13 +601,13 @@
                             </xsl:variable>
 
                             <xsl:choose>
-                                <xsl:when test="contains(@operator, 'lessThan')">
-                                    <xsl:value-of
-                                        select="concat(' and cell-content()&lt;',$valuee)"/>
-                                </xsl:when>
                                 <xsl:when test="contains(@operator, 'lessThanOrEqual')">
                                     <xsl:value-of
                                         select="concat(' and cell-content()&lt;=',$valuee)"/>
+                                </xsl:when>
+                                <xsl:when test="contains(@operator, 'lessThan')">
+                                    <xsl:value-of
+                                        select="concat(' and cell-content()&lt;',$valuee)"/>
                                 </xsl:when>
                                 <xsl:when test="contains(@operator, 'greaterThanOrEqual')">
                                     <xsl:value-of
