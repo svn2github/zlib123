@@ -117,68 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>Otwórz ODF…</value>
+  <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
+    <value>Excel pozwala na nie więcej niż 256 znaków w nagłówku/stopce(łącznie z formatowaniem). Wszelkie nadmiarowe znaki zostaną utracone</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>Otwórz plik w formacie ODF.</value>
+  <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
+    <value>y musiały zostać usunięte ponieważ nie są wspierane przez Excela</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
-    <value>Zapisz jako ODF…</value>
+  <data name="translation.odf2oox.ScenarioNumber" xml:space="preserve">
+    <value>Zbyt wiele komórek scenariuszy. Excel pozwala na nie więcej niż 32 komórki scenariuszy</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>Zapisz kopię dokumentu w formacie ODF.</value>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Open Office Calc zawiera tylko kolumny do IV. Wszelkie kolumny po IV zostaną bezpowrotnie utracone</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>Open Office Calc wspiera tylko Ole-obiekty zaimplementowane jako link do pliku</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>Pojawił się niespodziewany błąd. Prosimy o wypełnienie raporu dotyczącego błędu na stronie projektu (http://odf-converter.sourceforge.net) załączając wadliwy plik.</value>
+  <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>Niektóre filtry musiały zostać usunięte ponieważ nie są wspierane przez Calca</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>Wszystkie pliki</value>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>Open Office Calc może zawierać nie więcej niż 65536 wierszy. Wszelkie nadmiarowe wiersze zostaną bezpowrotnie utracone</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>Dokument tekstowy</value>
+  <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
+    <value>Open Office Calc może zawierać nie więcej niż 256 arkuszy. Wszelkie nadmiarowe arkusze zostaną bezpowrotnie utracone</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>Przepraszamy, ta funkcja nie jest jeszcze wprowadzona.</value>
-  </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
-    <value>Postęp %1…</value>
-  </data>
-  <data name="FeedbackLabel" xml:space="preserve">
-    <value>Niektóre z elementów mogą zostać pominięte podczas transformacji. Aby zobaczyć listę potencjalnych pominiętych elementów naciśnij „Szczegóły”</value>
-  </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>a cecha nie jest przekształcana przez aktualną wtyczkę.</value>
-  </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>Dokument jest zabezpieczony hasłem.</value>
-  </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>Jeżeli walidacja pliku jest niepoprawna, wypełnij raport o powstałym błędzie na stronie http://odf-converter.sourceforge.net i załącz ten plik.</value>
-  </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>Ten dokument wydaje się nie być plikiem formatu OpenDocument.</value>
-  </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Konwerter dla Office 2007 nie jest zainstalowany, konwersja ODF bez nich jest niemożliwa.</value>
-  </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>Błąd konwersji, spróbuj najpierw zapisać dokument w formacie Word 2007.</value>
-  </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>Proszę zachować dokument przed eksportem do ODF</value>
-  </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
-    <value>ODF Converter</value>
-  </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>Stworzenie pliku okazało się niemożliwe: sprawdź, czy ścieżka do pliku jest właściwa i czy plik nie jest używany przez inną aplikację.</value>
-  </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>Stworzenie pliku okazało się niemożliwe</value>
-  </data>
- 
 </root>

@@ -1,49 +1,47 @@
 <html>
 <head>
-<title>ODF Add-in for Excel2007</title>
+<title>ODF Add-in dla Excel 2007</title>
 </head>
 <body>
-<h1>ODF Add-in for Excel2007</h1>
-Thank you for downloading ODF Add-in for Excel 2007. The purpose of the software is to enable users to open ODF Specification based documents in Excel 2007 and demonstrate the interoperability between OpenXML & ODF specifications. Since this is still a beta release, you may use and test it... at your own risk! Any feedback is welcome though! ;)<br/>
+<h1>ODF Add-in dla Excel 2007</h1>
+Dzi&#281;kujemy za pobranie ODF Add-in dla Excel 2007. Celem tej aplikacji jest umo&#380;liwienie u&#380;ytkownikom otwierania dokument&oacute;w opartych o specyfikacj&#281; ODF w aplikacji Excel 2003  i demonstracja wsp&oacute;&#322;dzia&#322;ania pomi&#281;dzy specyfikacjami OpenXML i ODF. Poniewa¿ jest to tylko beta release, u¿ywasz i testujesz t¹ aplikacjê na w³asne ryzyko! Wszelkie wsparcie mile widziane ;)<br/>
 <br/>
-<h2>Software Requirements</h2>
-To test the add-in, you will need the following:<br/>
+<h2>Wymagania systemowe</h2>
+Przed instalacj&#261; wtyczki upewnij si&#281;, &#380;e masz zainstalowane poni&#380;sze programy:<br/>
  1. Excel 2007<br/>
- 2. .NET Framework 2.0*<br/>
+ 2. .NET Framework 2.0<br/>
 <br/>
-IMPORTANT NOTES:<br/>
+WA¯NE INFORMACJE:<br/>
+<br/>Uwaga: W przypadku instalacji Microsoft Excel przed .NET Framework, nale¿y zaktualizowaæ instalacjê Excela w nastêpuj¹cy sposób:<br/>
+ 1. Otwórz "Dodaj lub usuñ programy" z Panelu sterowania<br/>
+ 2. ZnajdŸ ikonê Microsoft Excel i wybierz "zmieñ"<br/>
+ 3. Podczas instalcji wybierz "dodaj lub usuñ funkcje" a nastêpnie dodaj ".NET Programmability Support" w sekcji "Microsoft Office Excel".<br/>
 <br/>
-(*) Warning: if you install Microsoft Excel before the .NET Framework, you will need to update your Excel installation, by running the following these steps below.<br/>
+<h2>Instalacja wtyczki</h2>
+Kliknij dwukrotnie na plik instalacyjny<br/>
 <br/>
-   1. Open "Add or remove Programs" from the Control Panel<br/>
-   2. Find the Microsoft Excel entry and choose "Modify"<br/>
-   3. Within the installation process, choose "Add or remove features" then add ".NET Programmability Support" in the "Microsoft Office Excel" section.<br/>
+ Je&#347;li instalacja zosta&#322;a wykonana pomy&#347;lnie, w menu &#8220;Plik&#8221; powinna si&#281; pojawi&#263; nowe pozycje: &#8222;Otw&oacute;rz ODF&#8221; i &#8222;Zapisz jako ODF&#8221;, za pomoc&#261; kt&oacute;rych mo&#380;na otworzy&#263; dokument w formacie ODF i zapisaæ dokument Excela jako ODF<br/>
 <br/>
-<h2>Installing the add-in</h2>
-Run the downloaded install program and follow the steps...<br/>
+Uwaga:  Plik ODF otwierany za pomoc&#261; wtyczki jest importowany jako plik .xlsx tylko do odczytu .  Je&#380;eli chcesz zapisa&#263; go jako ODF musisz najpierw utworzy&#263; kopie dokumentu (Menu Plik &gt; Zapisz jako), nast&#281;pnie u&#380;y&#263; opcji &#8222;Eksportuj do ODF&#8221;. <br/>
 <br/>
-If installation is successful, you should see a new "Open ODF" entry in the “File” menu in Excel. It allows you to either import an ODF spreadsheet file or export your current working document as an ODF spreadsheet file (note that during development process, those functionalities might be temporary unavailable).<br/>
-<br/>
-Important note: The ODF file opened by the add-in is imported in Microsoft Excel as a read-only DOCX file. If you want to save it back as ODF, you will have to first make a copy of the document ("Menu>Save As") and then use the "Export as ODF" menu.<br/>
-<br/>
-<h2>Troubleshooting Guide</h2>
-If you don't see the ODF entry, it could be due to missing features in Excel (see the Software Requirements listed above). After completing the ODF Add-in installation,  you need to activate the Add-in by doing the following actions:<br/>
-<br/>
-* Click "Excel Options" in the File menu<br/>
-* In the "Add-ins" section, select "COM Add-ins" in the list box and press the "Go" button<br/>
-* Make sure to select the checkbox "ODF Excel 2007 Add-in" and validate with the "OK" button.<br/>
-<br/>
-<h2>Conversion currently supports</h2>
-For a complete list of features, please refer to our roadmap on sourceForge.net (https://sourceforge.net/project/showfiles.php?group_id=169337).<br/>
+<h2>Rozwi&#261;zywanie problem&oacute;w </h2>
+Je&#347;li w menu &#8220;Plik&#8221; nie pojawi&#322; si&#281; nowy wpis &#8220;Otw&oacute;rz ODF&#8221; mo&#380;e by&#263; to zwi&#261;zane z niespe&#322;nionymu wymaganiami systemowymi Excela (przeczytaj <a href="#hRequirements">Wymagania systemowe</a> powy&#380;ej). Niezb&#281;dne b&#281;dzie wtedy aktywowanie wtyczki w nast&#281;puj&#261;cy spos&oacute;b:<br/>
+<ol>
+      <li>Kliknij "Opcje Excela" w menu "Plik".</li>
+      <li>W sekcji "Wtyczki" wybierz "Wtyczki COM" i kliknij "Naprzód"</li>
+      <li>Upewnij siê ¿e zaznaczy³eœ pole "ODF Excel 2007 Add-in" i naciœnij "OK"</li>
+</ol>
+<h2>Funkcje/opcje obs&#322;ugiwane przez wtyczk&#281</h2>
+Pe&#322;na lista obs&#322;ugiwanych funkcji jest dostepna na mapie konwersji na sourceForge.net (https://sourceforge.net/project/showfiles.php?group_id=169337).<br/>
 <br/>
 <br/>
-<h2>Features/options lost in the ODF to OpenXML translation</h2>
-Please to refer to sourceForge (https://sourceforge.net/tracker/?group_id=169337&atid=932582) for a detailed list of unsupported features.<br/>
+<h2>Funkcje/opcje utracone podczas konwersji ODF do OpenXML</h2>
+Pe&#322;na lista nieobs&#322;ugiwanych funkcji jest dostepna na sourceForge (https://sourceforge.net/tracker/?group_id=169337&atid=932582).<br/>
 <br/>
-<h2>Release notes</h2>
-(1) The AddIn does not work when Office 2007 and 2003 are installed in parallel<br/>
+<h2>Uwagi</h2>
+(1) Wtyczka nie dzia³a prawid³owo gdy jednoczeœnie s¹ zainstalowane Office 2003 i Office 2007<br/>
 <br/>
-<h2>Unresolved bugs in M3</h2>
+<h2>Bugi nie rozwi¹zane w M3</h2>
 [ 1736396 ] XLSX: Conversion failed<br />
 [ 1740752 ] Negative test –Tag handling.<br />
 [ 1740145 ] Header & footers-Page number are retained as # after convers<br />
@@ -91,6 +89,7 @@ Please to refer to sourceForge (https://sourceforge.net/tracker/?group_id=169337
 [ 1705905 ] Comment not retained<br />
 [ 1705806 ] Performance: 061031_-_Pilotage_ADELE.CONFIDENTIAL.xlsx<br />
 [ 1686766 ] Roundtrip Conversion Crash: Diagrammtypen.xlsx<br />
-[ 1673978 ] Columns not wide enough (OOX -> ODT)<br />
-</body>
+[ 1673978 ] Columns not wide enough (OOX -> ODT)<br /></body>
 </html>
+
+
