@@ -1452,7 +1452,10 @@
     <xsl:if test="@rot">
       <xsl:attribute name="style:rotation-angle">
         <xsl:choose>
-          <xsl:when test="@rot &lt;= 0">
+          <xsl:when test="@rot = 0">
+            <xsl:text>0</xsl:text>
+          </xsl:when>
+          <xsl:when test="@rot &lt; 0">
             <xsl:value-of select="substring-after(@rot,'-') div 60000"/>
           </xsl:when>
           <xsl:otherwise>
