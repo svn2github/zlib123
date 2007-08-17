@@ -997,7 +997,7 @@
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:attribute>
         </table:table-column>
-        </xsl:when>
+      </xsl:when>
     </xsl:choose>
 
     <xsl:choose>
@@ -1247,7 +1247,7 @@
       <xsl:choose>
         <xsl:when test="$GetLastManualBreak &gt;= $GetFirstManualColBreakAfterColWithStyle">
 
-          <xsl:call-template name="InsertColBreak">
+          <xsl:call-template name="InsertNextColBreaksWhenThereAreNotCols">
 
             <xsl:with-param name="GetLastManualBreak">
               <xsl:value-of select="$GetLastManualBreak"/>
@@ -1264,11 +1264,9 @@
               <xsl:value-of select="$DefaultCellStyleName"/>
             </xsl:with-param>
 
-            <xsl:with-param name="prevManualBreak">
-              <xsl:value-of select="$GetFirstManualColBreakAfterColWithStyle +1"/>
-            </xsl:with-param>
+           
 
-            <xsl:with-param name="GetFirstManualColBreakAfterColWithStyle">
+            <xsl:with-param name="GetMinManualColBreake">
               <xsl:value-of select="$GetFirstManualColBreakAfterColWithStyle"/>
             </xsl:with-param>
 
