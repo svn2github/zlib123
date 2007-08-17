@@ -3241,7 +3241,7 @@ Copyright (c) 2007, Sonata Software Limited
 
       <xsl:otherwise>
         <!--Line reference-->
-        <xsl:if test ="not( (p:spPr/a:prstGeom/@prst='flowChartInternalStorage') or
+		  <xsl:if test ="not( (p:spPr/a:prstGeom/@prst='flowChartInternalStorage') or
 									(p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess') or
 									(p:spPr/a:prstGeom/@prst='flowChartSummingJunction') or
 									(p:spPr/a:prstGeom/@prst='flowChartOr') or
@@ -3252,9 +3252,67 @@ Copyright (c) 2007, Sonata Software Limited
 									(p:spPr/a:prstGeom/@prst='can') or
 									(p:spPr/a:prstGeom/@prst='cube') or
 									(p:spPr/a:prstGeom/@prst='foldedCorner') or
-									(p:spPr/a:prstGeom/@prst='noSmoking') )">
-			
-          <xsl:if test ="p:style/a:lnRef">
+									(p:spPr/a:prstGeom/@prst='noSmoking') or 
+									((p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')]) and (p:spPr/a:prstGeom/@prst='rect')) or
+									((p:nvSpPr/p:cNvPr/@name[contains(., 'Oval Custom')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or
+									((p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or 
+									(p:spPr/a:prstGeom/@prst='rightArrow') or
+									(p:spPr/a:prstGeom/@prst='upArrow') or 
+									(p:spPr/a:prstGeom/@prst='leftArrow') or 
+									(p:spPr/a:prstGeom/@prst='downArrow') or 
+									(p:spPr/a:prstGeom/@prst='leftRightArrow') or 
+									(p:spPr/a:prstGeom/@prst='upDownArrow') or 
+									(p:spPr/a:prstGeom/@prst='triangle') or 
+									(p:spPr/a:prstGeom/@prst='rtTriangle') or 
+									(p:spPr/a:prstGeom/@prst='parallelogram') or 
+									(p:spPr/a:prstGeom/@prst='trapezoid') or 
+									(p:spPr/a:prstGeom/@prst='diamond') or 
+									(p:spPr/a:prstGeom/@prst='pentagon') or 
+									(p:spPr/a:prstGeom/@prst='hexagon') or 
+									(p:spPr/a:prstGeom/@prst='octagon') or 
+									(p:spPr/a:prstGeom/@prst='circularArrow') or 
+									(p:spPr/a:prstGeom/@prst='curvedRightArrow') or 
+									(p:spPr/a:prstGeom/@prst='curvedLeftArrow') or 
+									(p:spPr/a:prstGeom/@prst='curvedDownArrow') or 
+									(p:spPr/a:prstGeom/@prst='curvedUpArrow') or 
+									(p:spPr/a:prstGeom/@prst='leftUpArrow') or 
+									(p:spPr/a:prstGeom/@prst='bentUpArrow') or 
+									(p:spPr/a:prstGeom/@prst='plus') or 
+									(p:spPr/a:prstGeom/@prst='lightningBolt') or 
+									(p:spPr/a:prstGeom/@prst='irregularSeal1') or 
+									(p:spPr/a:prstGeom/@prst='chord') or 
+									(p:spPr/a:prstGeom/@prst='wedgeRectCallout') or 
+									(p:spPr/a:prstGeom/@prst='wedgeRoundRectCallout') or 
+									(p:spPr/a:prstGeom/@prst='wedgeEllipseCallout') or 
+									(p:spPr/a:prstGeom/@prst='cloudCallout') or 
+									(p:spPr/a:prstGeom/@prst='bentArrow') or 
+									(p:spPr/a:prstGeom/@prst='uturnArrow') or 
+									(p:spPr/a:prstGeom/@prst='flowChartProcess') or 
+									(p:spPr/a:prstGeom/@prst='flowChartAlternateProcess') or 
+									(p:spPr/a:prstGeom/@prst='flowChartDecision') or 
+									(p:spPr/a:prstGeom/@prst='flowChartInputOutput') or  
+									(p:spPr/a:prstGeom/@prst='flowChartDocument') or  
+									(p:spPr/a:prstGeom/@prst='flowChartTerminator') or 
+									(p:spPr/a:prstGeom/@prst='flowChartPreparation') or 
+									(p:spPr/a:prstGeom/@prst='flowChartManualInput') or 
+									(p:spPr/a:prstGeom/@prst='flowChartManualOperation') or 
+									(p:spPr/a:prstGeom/@prst='flowChartConnector') or 
+									(p:spPr/a:prstGeom/@prst='flowChartOffpageConnector') or 
+									(p:spPr/a:prstGeom/@prst='flowChartPunchedCard') or 
+									(p:spPr/a:prstGeom/@prst='flowChartPunchedTape') or 
+									(p:spPr/a:prstGeom/@prst='flowChartCollate') or 
+									(p:spPr/a:prstGeom/@prst='flowChartExtract') or 
+									(p:spPr/a:prstGeom/@prst='flowChartMerge') or 
+									(p:spPr/a:prstGeom/@prst='flowChartOnlineStorage') or 
+									(p:spPr/a:prstGeom/@prst='flowChartDelay') or 
+									(p:spPr/a:prstGeom/@prst='flowChartMagneticTape') or 
+									(p:spPr/a:prstGeom/@prst='flowChartDisplay') or 
+									(p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle Custom')]) or 
+									(p:spPr/a:prstGeom/@prst='roundRect') or 
+									(p:spPr/a:prstGeom/@prst='snip1Rect') )">
+
+
+			  <xsl:if test ="p:style/a:lnRef">
             <xsl:attribute name ="draw:stroke">
               <xsl:value-of select="'solid'" />
             </xsl:attribute>

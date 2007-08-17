@@ -244,6 +244,71 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:attribute name="draw:fill">
                   <xsl:value-of select="'bitmap'"/>
                 </xsl:attribute>
+               <xsl:choose>
+                    <xsl:when test="p:bgPr/a:blipFill/a:stretch/a:fillRect">
+                      <xsl:attribute name="style:repeat">
+                        <xsl:value-of select="'stretch'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:when test="p:bgPr/a:blipFill/a:tile">
+                      <xsl:for-each select="./p:bgPr/a:blipFill/a:tile">
+                        <!--<xsl:if test="@tx">
+                      <xsl:attribute name="draw:fill-image-width">
+                        <xsl:value-of select ="concat(format-number(@tx div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+   
+                    <xsl:if test="@ty">
+                      <xsl:attribute name="draw:fill-image-height">
+                        <xsl:value-of select ="concat(format-number(@ty div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>-->
+                        <xsl:if test="@sx">
+                          <xsl:attribute name="draw:fill-image-ref-point-x">
+                            <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test="@sy">
+                          <xsl:attribute name="draw:fill-image-ref-point-y">
+                            <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test="@algn">
+                          <xsl:attribute name="draw:fill-image-ref-point">
+                            <xsl:choose>
+                              <xsl:when test="@algn='tl'">
+                                <xsl:value-of select ="'top-left'"/>
+                              </xsl:when>
+                              <xsl:when test="@algn='t'">
+                                <xsl:value-of select ="'top'"/>
+                              </xsl:when>
+                              <xsl:when test="@algn='tr'">
+                                <xsl:value-of select ="'top-right'"/>
+                              </xsl:when>
+                              <xsl:when test="@algn='r'">
+                                <xsl:value-of select ="'right'"/>
+                              </xsl:when>
+                              <xsl:when test="@algn='bl'">
+                                <xsl:value-of select ="'bottom-left'"/>
+                              </xsl:when>
+                              <xsl:when test="@algn='br'">
+                                <xsl:value-of select ="'bottom-right'"/>
+                              </xsl:when>
+                              <xsl:when test="@algn='b'">
+                                <xsl:value-of select ="'bottom'"/>
+                              </xsl:when>
+                              <xsl:when test="@algn='ctr'">
+                                <xsl:value-of select ="'center'"/>
+                              </xsl:when>
+                            </xsl:choose>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <!--<xsl:attribute name="draw:tile-repeat-offset">
+                      <xsl:value-of select ="'100% horizontal'"/>
+                    </xsl:attribute>-->
+                      </xsl:for-each>
+                    </xsl:when>
+                  </xsl:choose>
                 <xsl:attribute name="draw:fill-image-name">
                   <xsl:value-of select="concat(substring-before($SlideFileName,'.xml'),'BackImg')"/>
                 </xsl:attribute>
@@ -2477,11 +2542,11 @@ exclude-result-prefixes="p a r xlink rels">
                             <xsl:choose >
                               <!--Bug fix 1739611,by vijayeta,June 21st-->
                               <xsl:when test ="./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')]
-                                                or ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Subtitle')]                   
-                                                or ./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'subTitle')]
-                                                or ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'outline')] 
-                                                or ( ./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Rectangle')]) 
-                                                or (./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">
+                   or ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Subtitle')]                   
+                    or ./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'subTitle')]
+                    or ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'outline')] 
+                    or ( ./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Rectangle')]) 
+                      or (./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">
                                 <!-- Added by vijayeta on 19th june,to enable or disable depending on buNone-->
                                 <xsl:if test ="a:r/a:t">
                                   <xsl:if test ="a:pPr/a:buNone">
@@ -2579,43 +2644,46 @@ exclude-result-prefixes="p a r xlink rels">
                           <xsl:value-of select="concat($SlideNumber,generate-id())"/>
                         </xsl:attribute>
                         <style:text-properties>
-                          <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->                        
-							 <xsl:variable name ="fontFamily">
-								 <xsl:choose >
-									 <xsl:when test ="a:endParaRPr/a:latin/@typeface">
-										 <xsl:variable name ="typeFaceVal" select ="a:rPr/a:latin/@typeface"/>
-										 <xsl:for-each select ="a:endParaRPr/a:latin/@typeface">
-											 <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
-												 <xsl:value-of select ="$DefFont"/>
-											 </xsl:if>
-											 <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
-											 <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
-												 <xsl:value-of select ="."/>
-											 </xsl:if>
-										 </xsl:for-each>
-									 </xsl:when>
-									 <xsl:when test ="a:latin/@typeface">
-										 <xsl:variable name ="typeFaceVal" select ="a:latin/@typeface"/>
-										 <xsl:for-each select ="a:latin/@typeface">
-											 <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
-												 <xsl:value-of select ="$DefFont"/>
-											 </xsl:if>
-											 <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
-											 <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
-												 <xsl:value-of select ="."/>
-											 </xsl:if>
-										 </xsl:for-each>
-									 </xsl:when>
-									 <!--<xsl:when test ="not(a:endParaRPr/a:latin/@typeface)">
+                          <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
+                          <!-- Bug 1744106 fixed by vijayeta, date 16th Aug '07, font size and family from endPara-->
+                          <xsl:variable name="fontFamily">
+                            <xsl:choose>
+                              <xsl:when test="a:endParaRPr/a:latin/@typeface">
+                                <xsl:variable name="typeFaceVal" select="a:rPr/a:latin/@typeface" />
+                                <xsl:for-each select="a:endParaRPr/a:latin/@typeface">
+                                  <xsl:if test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+                                    <xsl:value-of select="$DefFont" />
+                                  </xsl:if>
+                                  <!--  Bug 1711910 Fixed,On date 2-06-07,by Vijayeta -->
+                                  <xsl:if test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                                    <xsl:value-of select="." />
+                                  </xsl:if>
+                                </xsl:for-each>
+                              </xsl:when>
+                              <xsl:when test="a:latin/@typeface">
+                                <xsl:variable name="typeFaceVal" select="a:latin/@typeface" />
+                                <xsl:for-each select="a:latin/@typeface">
+                                  <xsl:if test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+                                    <xsl:value-of select="$DefFont" />
+                                  </xsl:if>
+                                  <!--  Bug 1711910 Fixed,On date 2-06-07,by Vijayeta -->
+                                  <xsl:if test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                                    <xsl:value-of select="." />
+                                  </xsl:if>
+                                </xsl:for-each>
+                              </xsl:when>
+                              <!--<xsl:when test ="not(a:endParaRPr/a:latin/@typeface)">
                                   <xsl:value-of select ="$DefFont"/>
                              </xsl:when>-->
-								 </xsl:choose>
-							 </xsl:variable>
-							<xsl:if test ="$fontFamily!=''">
-							<xsl:attribute name ="fo:font-family">
-								<xsl:value-of select ="$fontFamily"/>							
-                             </xsl:attribute>
-							</xsl:if>
+                            </xsl:choose>
+                          </xsl:variable>
+                          <xsl:if test="$fontFamily!=''">
+                            <xsl:attribute name="fo:font-family">
+                              <xsl:value-of select="$fontFamily" />
+                            </xsl:attribute>
+                          </xsl:if>
+                          <!--End, Bug 1744106 fixed by vijayeta, date 16th Aug '07, font size and family from endPara
+                              if font size or family not present, slidemaster to stles mappin will set the values, hence 'DefFont' removed-->
                           <xsl:attribute name ="style:font-family-generic"	>
                             <xsl:value-of select ="'roman'"/>
                           </xsl:attribute>
