@@ -1142,7 +1142,7 @@
         <a:srcRect/>
 
         <xsl:choose>
-          <xsl:when test="@style:repeat = 'repeat' ">
+          <xsl:when test="not(@style:repeat = 'stretch' or @style:repeat = 'no-repeat')">
             <a:tile tx="0" ty="0" sx="100000" sy="100000" flip="none" algn="tl">
 
               <!-- bitmap position -->
