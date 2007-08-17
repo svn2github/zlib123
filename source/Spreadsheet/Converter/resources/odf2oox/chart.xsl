@@ -356,11 +356,28 @@
 
             <!-- TO DO secondary axis case -->
             <xsl:for-each select="chart:axis[@chart:name = 'primary-x' ]">
-              <xsl:call-template name="InsertAxisX">
-                <xsl:with-param name="chartWidth" select="$chartWidth"/>
-                <xsl:with-param name="chartHeight" select="$chartHeight"/>
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              </xsl:call-template>
+              <xsl:choose>
+                <!-- scater chart has value axis-X-->
+                <xsl:when test="key('chart','')/@chart:class = 'chart:scatter' ">
+                  <c:valAx>
+                    <xsl:call-template name="InsertAxisX">
+                      <xsl:with-param name="chartWidth" select="$chartWidth"/>
+                      <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                      <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                    </xsl:call-template>
+                  </c:valAx>
+                </xsl:when>
+                <xsl:otherwise>
+                  <c:catAx>
+                    <xsl:call-template name="InsertAxisX">
+                      <xsl:with-param name="chartWidth" select="$chartWidth"/>
+                      <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                      <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                    </xsl:call-template>
+                  </c:catAx>
+                </xsl:otherwise>
+              </xsl:choose>
+
             </xsl:for-each>
 
             <!-- TO DO secondary axis case -->
@@ -373,6 +390,7 @@
             </xsl:for-each>
           </xsl:if>
         </xsl:if>
+
         <!-- for the Radar Chart -->
         <xsl:if
           test="//chart:chart[attribute::chart:class='chart:radar'] and not(boolean(//chart:axis/chart:categories))">
@@ -711,7 +729,6 @@
     <xsl:param name="chartHeight"/>
     <xsl:param name="chartDirectory"/>
 
-    <c:catAx>
       <c:axId val="110226048"/>
       <c:scaling>
         <c:orientation val="minMax"/>
@@ -783,7 +800,6 @@
       <c:lblOffset val="100"/>
       <c:tickLblSkip val="1"/>
       <c:tickMarkSkip val="1"/>
-    </c:catAx>
   </xsl:template>
 
   <xsl:template name="InsertAxisY">
@@ -1004,7 +1020,7 @@
         <!-- in scatter chart series properties define properties of line between points -->
         <xsl:when test="$chartType = 'chart:scatter' ">
           <c:spPr>
-            
+
             <!-- draw line-->
             <xsl:for-each select="key('chart','')/chart:plot-area">
               <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
