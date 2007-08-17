@@ -650,7 +650,7 @@
       <chart:legend chart:legend-position="end" svg:x="11.251cm" svg:y="4.188cm"
         chart:style-name="legend">
         <!-- legend position -->
-        <!--        <xsl:if test="c:legendPos/@val != '' ">
+        <xsl:if test="c:legendPos/@val != '' ">
           <xsl:attribute name="chart:legend-position">
             <xsl:choose>
               <xsl:when test="c:legendPos/@val = 't' ">
@@ -665,9 +665,9 @@
               <xsl:when test="c:legendPos/@val = 'r' ">
                 <xsl:text>end</xsl:text>
               </xsl:when>
-            </xsl:choose>            
+            </xsl:choose>
           </xsl:attribute>
-        </xsl:if>-->
+        </xsl:if>
       </chart:legend>
     </xsl:for-each>
   </xsl:template>
@@ -1031,14 +1031,44 @@
   <xsl:template name="InsertLegendProperties">
     <xsl:for-each select="c:chartSpace/c:chart/c:legend">
       <style:style style:name="legend" style:family="chart">
-        <style:graphic-properties draw:fill="none"/>
-        <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="6pt"
+        <style:graphic-properties draw:fill="none" draw:stroke="none">
+          <xsl:for-each select="c:spPr">
+            <!-- Insert fill -->
+            <xsl:choose>
+              <xsl:when test="a:blipFill">
+                <xsl:call-template name="InsertBitmapFill"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="InsertFill"/>
+              </xsl:otherwise>
+            </xsl:choose>
+
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
+        </style:graphic-properties>
+        <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
+          style:font-pitch="variable" fo:font-size="10pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="6pt" style:font-family-complex="Tahoma"
+          style:font-size-asian="10pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="6pt"/>
+          style:font-size-complex="10pt">
+          <xsl:choose>
+            <!-- custom title -->
+            <xsl:when test="c:tx">
+              <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </xsl:for-each>
+            </xsl:when>
+            <!-- default title -->
+            <xsl:otherwise>
+              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </style:text-properties>
       </style:style>
     </xsl:for-each>
   </xsl:template>
