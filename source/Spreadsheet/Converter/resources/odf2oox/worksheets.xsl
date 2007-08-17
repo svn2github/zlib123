@@ -37,6 +37,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
 
   <!--<xsl:import href="measures.xsl"/>-->
@@ -65,14 +66,14 @@
     <xsl:param name="sheetId"/>
 
     <xsl:if test="not(table:scenario)">
-    <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
-      <xsl:call-template name="InsertWorksheet">
-        <xsl:with-param name="cellNumber" select="$cellNumber"/>
-        <xsl:with-param name="sheetId" select="$sheetId"/>
-      </xsl:call-template>
-    </pzip:entry>
+      <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
+        <xsl:call-template name="InsertWorksheet">
+          <xsl:with-param name="cellNumber" select="$cellNumber"/>
+          <xsl:with-param name="sheetId" select="$sheetId"/>
+        </xsl:call-template>
+      </pzip:entry>
     </xsl:if>
-    
+
     <!-- convert next table -->
     <xsl:apply-templates select="following-sibling::table:table[1]" mode="sheet">
       <xsl:with-param name="cellNumber">
@@ -253,7 +254,7 @@
           </xsl:apply-templates>
         </dataValidations>
       </xsl:if>
-      
+
       <!-- Insert hyperlinks -->
       <xsl:call-template name="InsertHyperlinks"/>
 
@@ -273,7 +274,7 @@
             <xsl:with-param name="tableId" select="generate-id(.)"/>
           </xsl:apply-templates>
         </xsl:variable>
-        
+
         <!-- if there are row breakes in this sheet -->
         <xsl:if test="$rowBreakes != '' ">
           <xsl:variable name="countBreakes">
@@ -353,16 +354,16 @@
         <xsl:for-each select="descendant::draw:frame/draw:object">
           <xsl:choose>
             <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
-          <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
-            <xsl:choose>
-              <xsl:when test="office:document-content/office:body/office:chart">
-                <xsl:text>true</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>false</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
+              <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+                <xsl:choose>
+                  <xsl:when test="office:document-content/office:body/office:chart">
+                    <xsl:text>true</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>false</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>false</xsl:text>
@@ -705,16 +706,16 @@
     <xsl:call-template name="InsertSort">
       <xsl:with-param name="tableName" select="@table:name"/>
     </xsl:call-template>
-    
+
     <!-- insert data consolidation -->
     <xsl:call-template name="InsertDataConsolidate"/>
-    
+
     <!-- insert Scenario -->
     <xsl:call-template name="InsertScenario"/>
-    
+
     <!-- search scenario cells >
     <xsl:call-template name="SearchScenarioCells"/-->
-    
+
   </xsl:template>
 
   <xsl:template name="InsertHeaderFooter">
@@ -873,10 +874,12 @@
     </xsl:for-each>
   </xsl:template>
 
+
   <xsl:template name="InsertMargins">
     <xsl:param name="pageStyle"/>
 
     <xsl:if test="@fo:margin-top or @fo:margin-bottom or @fo:margin-right or @fo:margin-left">
+
 
       <pageMargins left="0.78740157480314965" right="0.70866141732283472" top="0.74803149606299213"
         bottom="0.74803149606299213" header="0.31496062992125984" footer="0.31496062992125984">
@@ -894,6 +897,7 @@
             <xsl:value-of select="$twips div 1440"/>
           </xsl:attribute>
         </xsl:if>
+
 
         <xsl:if test="@fo:margin-right">
           <xsl:attribute name="right">
@@ -925,6 +929,61 @@
           </xsl:attribute>
         </xsl:if>
 
+        <xsl:if
+          test="@fo:margin-top and parent::node()/style:header-style/style:header-footer-properties[@svg:height != '' ]">
+
+          <xsl:attribute name="top">
+
+            <xsl:variable name="headerHeight">
+              <xsl:for-each
+                select="parent::node()/style:header-style/style:header-footer-properties[@svg:height != '' ]">
+
+                <xsl:variable name="height">
+                  <xsl:call-template name="ConvertMeasure">
+                    <xsl:with-param name="length" select="@svg:height"/>
+                    <xsl:with-param name="unit">
+                      <xsl:text>twips</xsl:text>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="$height div 1440"/>
+              </xsl:for-each>
+            </xsl:variable>
+
+            <xsl:variable name="mariginTop">
+              <xsl:variable name="twips">
+                <xsl:call-template name="ConvertMeasure">
+                  <xsl:with-param name="length" select="@fo:margin-top"/>
+                  <xsl:with-param name="unit">
+                    <xsl:text>twips</xsl:text>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$twips div 1440"/>
+            </xsl:variable>
+
+
+            <xsl:value-of select="$headerHeight + $mariginTop"/>
+
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:for-each
+          select="parent::node()/style:header-style/style:header-footer-properties[@svg:height != '' ]">
+          <xsl:attribute name="header">
+            <!-- 1 inch = 1440 twips -->
+            <xsl:variable name="height">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="@svg:height"/>
+                <xsl:with-param name="unit">
+                  <xsl:text>twips</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$height div 1440"/>
+          </xsl:attribute>
+        </xsl:for-each>
+
         <xsl:if test="@fo:margin-bottom">
           <xsl:attribute name="bottom">
             <!-- 1 inch = 1440 twips -->
@@ -939,6 +998,16 @@
             <xsl:value-of select="$twips div 1440"/>
           </xsl:attribute>
         </xsl:if>
+
+
+        <xsl:if
+          test="@fo:margin-bottom and parent::node()/style:header-style/style:header-footer-properties[@svg:height != '' ]">
+
+          <xsl:attribute name="bottom">
+            <xsl:text>0</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+
       </pageMargins>
     </xsl:if>
   </xsl:template>
@@ -1114,9 +1183,11 @@
   <xsl:template name="InsertHyperlinks">
 
     <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
-    <xsl:if test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+    <xsl:if
+      test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
       <hyperlinks>
-        <xsl:for-each select="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+        <xsl:for-each
+          select="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
           <xsl:variable name="ViewHyperlinks">
             <xsl:value-of select="."/>
           </xsl:variable>
@@ -1136,7 +1207,8 @@
 
           <!-- real column number -->
           <xsl:variable name="colNum">
-            <xsl:for-each select="ancestor::table:table-row/child::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]">
+            <xsl:for-each
+              select="ancestor::table:table-row/child::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]">
               <xsl:call-template name="GetColNumber">
                 <xsl:with-param name="position">
                   <xsl:value-of select="$colPosition"/>
@@ -1144,7 +1216,7 @@
               </xsl:call-template>
             </xsl:for-each>
           </xsl:variable>
-          
+
           <xsl:variable name="rows">
             <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
 
@@ -1276,7 +1348,7 @@
           </xsl:if>
           <xsl:value-of select="$rowNumber"/>
 
-          <xsl:if test="@table:number-rows-repeated">           
+          <xsl:if test="@table:number-rows-repeated">
             <xsl:call-template name="InsertRepeatedManualRowBreake">
               <xsl:with-param name="reepeat">
                 <xsl:value-of select="@table:number-rows-repeated - 1"/>
@@ -1318,7 +1390,7 @@
   <xsl:template name="InsertRepeatedManualRowBreake">
     <xsl:param name="reepeat"/>
     <xsl:param name="rowNumber"/>
-    
+
     <xsl:text>;</xsl:text>
     <xsl:value-of select="$rowNumber"/>
     <xsl:choose>
