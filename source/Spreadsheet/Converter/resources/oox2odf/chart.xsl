@@ -233,26 +233,27 @@
               <xsl:for-each
                 select="key('plotArea','')/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
                 <xsl:call-template name="InsertAxisXProperties"/>
+                <xsl:call-template name="InsertAxisXTitleProperties"/>
               </xsl:for-each>
               <xsl:for-each
                 select="key('plotArea','')/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
                 <xsl:call-template name="InsertAxisYProperties"/>
+                <xsl:call-template name="InsertAxisYTitleProperties"/>
               </xsl:for-each>
             </xsl:when>
 
             <xsl:otherwise>
               <xsl:for-each select="key('plotArea','')/c:catAx[1]">
                 <xsl:call-template name="InsertAxisXProperties"/>
+                <xsl:call-template name="InsertAxisXTitleProperties"/>
               </xsl:for-each>
               <xsl:for-each select="key('plotArea','')/c:valAx[1]">
                 <xsl:call-template name="InsertAxisYProperties"/>
+                <xsl:call-template name="InsertAxisYTitleProperties"/>
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
 
-
-          <xsl:call-template name="InsertAxisXTitleProperties"/>
-          <xsl:call-template name="InsertAxisYTitleProperties"/>
           <xsl:call-template name="InsertSeriesProperties"/>
           <xsl:call-template name="InsertWallProperties"/>
           <xsl:call-template name="InsertFloorProperties"/>
@@ -809,6 +810,7 @@
         chart:table-number-list="0" svg:x="0.26cm" svg:y="2.087cm" svg:width="10.472cm"
         svg:height="7.008cm">
 
+        <!-- Axes -->
         <xsl:choose>
           <!-- scatter chart has two value axes -->
           <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
@@ -821,7 +823,6 @@
               <xsl:call-template name="InsertYAxis"/>
             </xsl:for-each>
           </xsl:when>
-
           <xsl:otherwise>
             <xsl:for-each select="key('plotArea','')/c:catAx[1]">
               <xsl:call-template name="InsertXAxis"/>
@@ -917,7 +918,7 @@
   </xsl:template>
 
   <xsl:template name="InsertAxisXTitleProperties">
-    <xsl:for-each select="key('plotArea','')/c:catAx[1]/c:title">
+    <xsl:for-each select="c:title">
       <style:style style:name="axis-x_title" style:family="chart">
         <style:chart-properties style:direction="ltr"/>
         <style:graphic-properties draw:stroke="none" draw:fill="none">
@@ -965,7 +966,7 @@
   </xsl:template>
 
   <xsl:template name="InsertAxisYTitleProperties">
-    <xsl:for-each select="key('plotArea','')/c:valAx[1]/c:title">
+    <xsl:for-each select="c:title">
       <style:style style:name="axis-y_title" style:family="chart">
         <style:chart-properties style:direction="ltr">
           <xsl:choose>
