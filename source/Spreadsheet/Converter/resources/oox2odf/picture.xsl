@@ -1999,7 +1999,7 @@
     </xsl:choose>
 
     <!-- style:text-underline-style -->
-    <xsl:if test="@u">
+    <xsl:if test="@u != 'none' ">
       <!-- underline style -->
       <xsl:choose>
         <xsl:when test="@u = 'sng' ">
@@ -2201,7 +2201,7 @@
     </xsl:if>
 
     <!-- strike-through -->
-    <xsl:if test="@strike">
+    <xsl:if test="@strike != 'noStrike' ">
       <xsl:attribute name="style:text-line-through-style">
         <xsl:text>solid</xsl:text>
       </xsl:attribute>
