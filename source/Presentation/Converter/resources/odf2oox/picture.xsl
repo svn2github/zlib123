@@ -57,7 +57,7 @@ Copyright (c) 2007, Sonata Software Limited
 				   pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
     <p:pic>
       <p:nvPicPr>
-        <p:cNvPr id="4" name="Placeholder 3">
+        <p:cNvPr id="{$picNo + 1 }" name="Placeholder 3">
           <xsl:attribute name ="descr">
             <xsl:if test ="parent::node()/@draw:name">
               <xsl:value-of select ="parent::node()/@draw:name"/>

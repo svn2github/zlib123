@@ -206,7 +206,7 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:when test ="@presentation:class[contains(.,'title')]">
                                 <p:cNvPr name="Title Placeholder 1">
                                   <xsl:attribute name="id">
-                                    <xsl:value-of select="$var_pos+1"/>
+                                    <xsl:value-of select="'2'"/>
                                   </xsl:attribute>
                                 </p:cNvPr>
                                 <p:cNvSpPr>
@@ -219,7 +219,7 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:when test ="@presentation:class[contains(.,'outline')]">
                                 <p:cNvPr name="Text Placeholder 2">
                                   <xsl:attribute name ="id">
-                                    <xsl:value-of select="$var_pos+1"/>
+                                    <xsl:value-of select="'3'"/>
                                   </xsl:attribute>
                                 </p:cNvPr>
                                 <p:cNvSpPr>
@@ -5763,7 +5763,7 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name="className"/>
 		<p:sp>
 			<p:nvSpPr>
-				<p:cNvPr name="Date Placeholder 3" id="4"/>
+				<p:cNvPr name="Date Placeholder 3" id="16363"/>
 				<p:cNvSpPr>
 					<a:spLocks noGrp="1" />
 				</p:cNvSpPr>
@@ -6090,7 +6090,7 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name="className"/>
 		<p:sp>
 			<p:nvSpPr>
-				<p:cNvPr name="Footer Placeholder 4" id="5" />
+				<p:cNvPr name="Footer Placeholder 4" id="16361" />
 				<p:cNvSpPr>
 					<a:spLocks noGrp="1" />
 				</p:cNvSpPr>
@@ -6371,15 +6371,20 @@ Copyright (c) 2007, Sonata Software Limited
 					</a:lvl1pPr>
 				</a:lstStyle>
 				<a:p>
-					<a:r>
-						<a:rPr lang="en-US" dirty="0" smtClean="0"/>
-						<a:t>
-							<xsl:for-each select="./draw:text-box/text:p/text:span">
-								<xsl:value-of select="."/>
-							</xsl:for-each>
-						</a:t>
-					</a:r>
-					<a:endParaRPr lang="en-US"/>
+          <xsl:if test="not(./draw:text-box/text:p/text:span)">
+            <a:endParaRPr lang="en-US"/>
+          </xsl:if>
+          <xsl:if test="./draw:text-box/text:p/text:span">
+            <a:r>
+              <a:rPr lang="en-US" dirty="0" smtClean="0"/>
+              <a:t>
+                <xsl:for-each select="draw:text-box/text:p/text:span">
+                  <xsl:value-of select="."/>
+                </xsl:for-each>
+              </a:t>
+            </a:r>
+            <a:endParaRPr lang="en-US" dirty="0"/>
+          </xsl:if>
 				</a:p>
 			</p:txBody>
 		</p:sp >
@@ -6389,7 +6394,7 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name="className"/>
 		<p:sp>
 			<p:nvSpPr>
-				<p:cNvPr name="Slide Number Placeholder 5" id="6" />
+				<p:cNvPr name="Slide Number Placeholder 5" id="16362" />
 				<p:cNvSpPr>
 					<a:spLocks noGrp="1" />
 				</p:cNvSpPr>

@@ -1349,44 +1349,46 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:for-each select ="child::node()[position()]">
       <xsl:if test ="name()='text:span'">
         <xsl:if test ="not(./text:line-break)">
-			<xsl:if test ="child::node()">
-				<a:r>
-					<a:rPr lang="en-US" smtClean="0">
-						<!--Font Size -->
-						<xsl:variable name ="textId">
-							<xsl:value-of select ="@text:style-name"/>
-						</xsl:variable>
-						<xsl:if test ="not($textId ='')">
-							<xsl:call-template name ="fontStyles">
-								<xsl:with-param name ="Tid" select ="$textId" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								<xsl:with-param name ="lvl" select ="$lvl"/>
-								<xsl:with-param name ="masterPageName" select ="$masterPageName"/>
-								<xsl:with-param name ="fileName" select ="$fileName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test="./text:a">
-							<xsl:copy-of select="$HyperlinksForBullets"/>
-						</xsl:if>
-					</a:rPr >
-					<a:t>
-						<xsl:call-template name ="insertTab" />
-					</a:t>
-				</a:r>
-			</xsl:if>
-			<xsl:if test ="not(child::node())">
-				<a:endParaRPr lang="en-US" dirty="0" smtClean="0" >
-					<xsl:if test ="not(@text:style-name ='')">
-						<xsl:call-template name ="getFontSizeFamilyFromContentEndPara">
-							<xsl:with-param name ="Tid" select ="@text:style-name"/>							
-						</xsl:call-template>
-					</xsl:if >
-					<xsl:if test ="@text:style-name =''">
-						<a:endParaRPr lang="en-US" dirty="0" smtClean="0"/>
-					</xsl:if>
-				</a:endParaRPr>
-			</xsl:if>
-		</xsl:if>
+          <xsl:if test ="child::node()">
+            <a:r>
+              <a:rPr lang="en-US" smtClean="0">
+                <!--Font Size -->
+                <xsl:variable name ="textId">
+                  <xsl:value-of select ="@text:style-name"/>
+                </xsl:variable>
+                <xsl:if test ="not($textId ='')">
+                  <xsl:call-template name ="fontStyles">
+                    <xsl:with-param name ="Tid" select ="$textId" />
+                    <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                    <xsl:with-param name ="lvl" select ="$lvl"/>
+                    <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    <xsl:with-param name ="fileName" select ="$fileName"/>
+                  </xsl:call-template>
+                </xsl:if>
+              <xsl:if test="name()='text:a'">
+                  <xsl:copy-of select="$HyperlinksForBullets"/>
+                </xsl:if>
+              </a:rPr >
+              <a:t>
+                <xsl:call-template name ="insertTab" />
+              </a:t>
+            </a:r>
+          </xsl:if>
+          <!-- Bug 1744106 fixed by vijayeta, date 16th Aug '07, add a new templaet to set font size and family in endPara-->
+          <xsl:if test ="not(child::node())">
+            <a:endParaRPr lang="en-US" dirty="0" smtClean="0" >
+              <xsl:if test ="not(@text:style-name ='')">
+                <xsl:call-template name ="getFontSizeFamilyFromContentEndPara">
+                  <xsl:with-param name ="Tid" select ="@text:style-name"/>
+                </xsl:call-template>
+              </xsl:if >
+              <xsl:if test ="@text:style-name =''">
+                <a:endParaRPr lang="en-US" dirty="0" smtClean="0"/>
+              </xsl:if>
+            </a:endParaRPr>
+          </xsl:if>
+          <!--End, Bug 1744106 fixed by vijayeta, date 16th Aug '07, add a new templaet to set font size and family in endPara-->
+        </xsl:if>
         <xsl:if test ="./text:line-break">
           <xsl:call-template name ="processBR">
             <xsl:with-param name ="T" select ="@text:style-name" />
@@ -1416,7 +1418,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="fileName" select ="$fileName"/>
               </xsl:call-template>
             </xsl:if>
-            <xsl:if test="./text:a">
+            <xsl:if test="name()='text:a'">
               <xsl:copy-of select="$HyperlinksForBullets"/>
             </xsl:if>
           </a:rPr >
@@ -1441,25 +1443,27 @@ Copyright (c) 2007, Sonata Software Limited
 
     </a:br>
   </xsl:template>
-	<xsl:template name ="getFontSizeFamilyFromContentEndPara">
-		<xsl:param name ="Tid"/>
-		<xsl:for-each  select ="document('content.xml')//office:automatic-styles/style:style[@style:name =$Tid ]">
-			<xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
-				<xsl:attribute name ="sz">
-					<xsl:call-template name ="convertToPoints">
-						<xsl:with-param name ="unit" select ="'pt'"/>
-						<xsl:with-param name ="length" select ="style:text-properties/@fo:font-size"/>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="style:text-properties/@fo:font-family">
-				<a:latin charset="0" >
-					<xsl:attribute name ="typeface" >
-						<!-- fo:font-family-->
-						<xsl:value-of select ="translate(style:text-properties/@fo:font-family, &quot;'&quot;,'')" />
-					</xsl:attribute>
-				</a:latin >
-			</xsl:if>
-		</xsl:for-each>
-		</xsl:template>
+  <!-- Bug 1744106 fixed by vijayeta, date 16th Aug '07, add a new templaet to set font size and family in endPara-->
+  <xsl:template name="getFontSizeFamilyFromContentEndPara">
+    <xsl:param name="Tid" />
+    <xsl:for-each select="document('content.xml')//office:automatic-styles/style:style[@style:name =$Tid ]">
+      <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')> 0">
+        <xsl:attribute name="sz">
+          <xsl:call-template name="convertToPoints">
+            <xsl:with-param name="unit" select="'pt'" />
+            <xsl:with-param name="length" select="style:text-properties/@fo:font-size" />
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="style:text-properties/@fo:font-family">
+        <a:latin charset="0">
+          <xsl:attribute name="typeface">
+            <!--  fo:font-family-->
+            <xsl:value-of select="translate(style:text-properties/@fo:font-family,&quot;'&quot;,'')" />
+          </xsl:attribute>
+        </a:latin>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  <!--End of snippet for Bug 1744106, fixed by vijayeta, date 16th Aug '07, add a new template to set font size and family in endPara-->
 </xsl:stylesheet>
