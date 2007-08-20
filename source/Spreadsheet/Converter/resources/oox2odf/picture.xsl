@@ -1236,7 +1236,14 @@
                   <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumMod/@val"/>
                 </xsl:with-param>
                 <xsl:with-param name="lumOff">
-                  <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val"/>
+                  <xsl:choose>
+                    <xsl:when test="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val">
+                      <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>0</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:with-param>
                 <xsl:with-param name="noTheme">
                   <xsl:text>true</xsl:text>

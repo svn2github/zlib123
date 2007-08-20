@@ -772,20 +772,18 @@
 
     <xsl:if
       test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
-      <c:spPr>
+      <!--c:spPr>
         <a:ln w="3175">
           <a:solidFill>
             <a:srgbClr val="000000"/>
           </a:solidFill>
           <a:prstDash val="solid"/>
         </a:ln>
-      </c:spPr>
+      </c:spPr-->
 
-      <!--xsl:for-each select="chart:title">
-          <xsl:call-template name="InsertSpPr">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
-        </xsl:for-each-->
+      <xsl:call-template name="InsertSpPr">
+        <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+      </xsl:call-template>
 
       <c:txPr>
         <a:bodyPr rot="0" vert="horz"/>

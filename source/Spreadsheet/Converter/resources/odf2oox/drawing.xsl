@@ -1035,7 +1035,7 @@
         </xsl:call-template>
       </xsl:when>
       <!-- background color-->
-      <xsl:when test="not(@draw:fill = 'none' )">
+      <xsl:when test="not(@draw:fill = 'none' ) and @draw:fill-color">
         <a:solidFill>
           <a:srgbClr>
             <xsl:attribute name="val">
