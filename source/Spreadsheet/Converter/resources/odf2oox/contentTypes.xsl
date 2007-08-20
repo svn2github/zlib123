@@ -75,6 +75,7 @@
       <xsl:call-template name="InsertDrawingContentTypes"/>
       <xsl:call-template name="InsertSheetContentTypes"/>
       <xsl:call-template name="InsertExternalLinkTypes"/>
+      <xsl:call-template name="InsertChangeTrackingTypes"/>
 
     </Types>
   </xsl:template>
@@ -193,6 +194,36 @@
       <Override PartName="{$queryTableTarget}"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.queryTable+xml"/>    
     </xsl:for-each>   
+  </xsl:template>
+  
+  
+  <!-- Change Tracking -->
+  
+  <xsl:template name="InsertChangeTrackingTypes">
+    
+    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+      
+      <Override PartName="/xl/revisions/revisionHeaders.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.revisionHeaders+xml"/>
+      <xsl:apply-templates select="node()[1][name()='table:cell-content-change']" mode="Content_Types"/>
+    </xsl:for-each>
+    
+    <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+      <Override PartName="/xl/revisions/userNames.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.userNames+xml"/>
+    </xsl:if>
+    
+  </xsl:template>
+  
+  <xsl:template match="table:cell-content-change" mode="Content_Types">
+    
+    <Override PartName="{concat('/xl/revisions/revisionLog', generate-id(), '.xml')}"
+      ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.revisionLog+xml"/>
+    
+    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change']">
+      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change']" mode="Content_Types"/>
+    </xsl:if>
+    
   </xsl:template>
   
   

@@ -42,6 +42,7 @@
   <xsl:import href="sharedStrings.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="ole_objects.xsl"/>
+  <xsl:import href="change_tracking.xsl"/>
 
   <xsl:key name="ConfigItem" match="config:config-item" use="@config:name"/>
   <xsl:key name="style" match="style:style" use="@style:name"/>

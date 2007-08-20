@@ -56,6 +56,11 @@
           </Relationship>
         </xsl:if>
       </xsl:for-each>
+      
+      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+        <Relationship Id="{generate-id(.)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionHeaders" Target="revisions/revisionHeaders.xml" />
+        <Relationship Id="{concat(generate-id(.), 1)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/usernames" Target="revisions/userNames.xml" /> 
+      </xsl:if>
 
       <!--  Static relationships -->
       <Relationship Id="rId1"
@@ -72,6 +77,25 @@
 
     </Relationships>
 
+  </xsl:template>
+ 
+  
+  <xsl:template name="InsertRevisionsRels">
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes/table:cell-content-change">                
+        <Relationship Id="{generate-id()}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog" Target="{concat('revisionLog', generate-id(), '.xml')}" /> 
+      </xsl:for-each>
+    </Relationships>
+  </xsl:template>
+  
+  <xsl:template match="table:cell-content-change" mode="revisionRels">
+    
+    <Relationship Id="{generate-id()}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog" Target="{concat('revisionLog', generate-id(), '.xml')}" /> 
+    
+    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change']">
+      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change']" mode="revisionRels"/>
+    </xsl:if>
+    
   </xsl:template>
 
   <xsl:template name="TranslateIllegalChars">
@@ -437,5 +461,35 @@
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
+  
+  <!-- Insert Revision Headers -->
+  <xsl:template name="revisionHeaderProperties">
+    <headers xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+      guid="{'{1C7D3391-D6C0-452D-B2D6-CC40A62CFF51}'}" diskRevisions="1" revisionId="2" version="3">          
+      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">         
+        <xsl:apply-templates select="node()[1][name()='table:cell-content-change']" mode="revisionHeaders"/>
+      </xsl:for-each>
+    </headers>
+  </xsl:template>
+  
+  <xsl:template match="table:cell-content-change" mode="revisionHeaders">
+    
+    <header dateTime="2007-08-16T12:19:34"
+      maxSheetId="4" userName="Michał" r:id="{generate-id()}" guid="{'{1C7D3391-D6C0-452D-B2D6-CC40A62CFF51}'}">
+      <sheetIdMap count="3">
+        <sheetId val="1"/>
+        <sheetId val="2"/>
+        <sheetId val="3"/>
+      </sheetIdMap>
+    </header>
+    
+    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change']">
+      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change']" mode="revisionHeaders"/>
+    </xsl:if>
+    
+  </xsl:template>
+  
+  
 
 </xsl:stylesheet>

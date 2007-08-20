@@ -72,10 +72,17 @@
   <xsl:variable name="app-version">1.00</xsl:variable>
 
   <!-- existence of docProps/custom.xml file -->
-  <xsl:variable name="docprops-custom-file"
-    select="count(document('meta.xml')/office:document-meta/office:meta/meta:user-defined)"
-    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"/>
+  <xsl:variable name="docprops-custom-file">
+    <xsl:choose>
+      <xsl:when test="document('meta.xml')/office:document-meta/office:meta/meta:user-defined != ''">
+        <xsl:text>1</xsl:text>      
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>0</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+    
 
   <xsl:key name="chart" match="office:chart" use="''"/>
 
@@ -99,11 +106,7 @@
       <pzip:entry pzip:target="xl/workbook.xml">
         <xsl:call-template name="InsertWorkbook"/>
       </pzip:entry>
-
-
-      <pzip:entry pzip:target="xl/media/image1.emf">
-        <empty/>
-      </pzip:entry>
+      
       <!-- main content -->
       <xsl:if
         test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
@@ -216,8 +219,13 @@
         </xsl:if>
 
         <!-- create VmlDrawing.xml file -->
-        <xsl:call-template name="CreateVmlDrawing"/>
-
+        <xsl:if test="$oleObject = 'true'">
+            <xsl:call-template name="CreateVmlDrawing"/>
+          <pzip:entry pzip:target="xl/media/image1.emf">
+            <empty/>
+          </pzip:entry>          
+        </xsl:if>
+     
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
           <xsl:call-template name="CreateDrawing"/>
 
@@ -320,6 +328,14 @@
       </pzip:entry>
 
       <xsl:call-template name="InsertLinkExternalRels"/>
+      
+      <!-- Insert Change Tracking -->
+      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+        <xsl:call-template name="CreateRevisionHeadersRels"/>
+        <xsl:call-template name="CreateRevisionFiles"/>
+        <xsl:call-template name="revisionHeaders"/>
+        <xsl:call-template name="userName"/>
+      </xsl:if>
 
     </pzip:archive>
   </xsl:template>
@@ -480,5 +496,12 @@
       <xsl:call-template name="InsertDrawing"/>
     </pzip:entry>
   </xsl:template>
-
+  
+  <xsl:template name="CreateRevisionHeadersRels">
+    <pzip:entry pzip:target="xl/revisions/_rels/revisionHeaders.xml.rels">
+      <xsl:call-template name="InsertRevisionsRels"/>
+    </pzip:entry>
+  </xsl:template>
+  
+  
 </xsl:stylesheet>
