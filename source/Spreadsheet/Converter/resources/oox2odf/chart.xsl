@@ -1097,6 +1097,12 @@
         chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
         style:direction="ltr">
+        <xsl:if test="c:tickLblPos/@val = 'none' ">
+          <xsl:attribute name="chart:display-label">
+            <xsl:text>false</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        
         <xsl:for-each select="c:txPr/a:bodyPr">
           <xsl:call-template name="TextRotation"/>
         </xsl:for-each>
@@ -1127,20 +1133,20 @@
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
         chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
-        style:direction="ltr"/>
+        style:direction="ltr">
+        <xsl:if test="c:tickLblPos/@val = 'none' ">
+          <xsl:attribute name="chart:display-label">
+            <xsl:text>false</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <xsl:for-each select="c:txPr/a:bodyPr">
+          <xsl:call-template name="TextRotation"/>
+        </xsl:for-each>        
+      </style:chart-properties>
       <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
         svg:stroke-color="#000000">
         <xsl:for-each select="c:spPr">
-          <!-- Insert fill -->
-          <xsl:choose>
-            <xsl:when test="a:blipFill">
-              <xsl:call-template name="InsertBitmapFill"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="InsertFill"/>
-            </xsl:otherwise>
-          </xsl:choose>
-
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
         </xsl:for-each>
@@ -1152,20 +1158,9 @@
         style:font-size-asian="7pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
         style:font-size-complex="7pt">
-        <xsl:choose>
-          <!-- custom title -->
-          <xsl:when test="c:tx">
-            <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-              <xsl:call-template name="TextBoxRunProperties"/>
-            </xsl:for-each>
-          </xsl:when>
-          <!-- default title -->
-          <xsl:otherwise>
-            <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-              <xsl:call-template name="TextBoxRunProperties"/>
-            </xsl:for-each>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
+          <xsl:call-template name="TextBoxRunProperties"/>
+        </xsl:for-each>
       </style:text-properties>
     </style:style>
   </xsl:template>
