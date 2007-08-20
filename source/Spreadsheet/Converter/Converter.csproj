@@ -58,6 +58,7 @@
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
     <EmbeddedResource Include="resources\odf2oox\ole_objects.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\change_tracking.xsl" />
     <EmbeddedResource Include="resources\odf2oox\comments.xsl" />
     <EmbeddedResource Include="resources\odf2oox\connections.xsl" />
     <EmbeddedResource Include="resources\odf2oox\drawing.xsl" />
