@@ -115,7 +115,7 @@
         </pzip:entry>
       </xsl:if>
 
-      <!-- shared strings (ewentualny postprocessing)-->
+      <!-- shared strings -->
       <pzip:entry pzip:target="xl/sharedStrings.xml">
         <xsl:call-template name="InsertSharedStrings"/>
       </pzip:entry>
