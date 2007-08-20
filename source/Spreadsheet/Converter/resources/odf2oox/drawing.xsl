@@ -1193,4 +1193,37 @@
 
   </xsl:template>
 
+<xsl:template name="InsertTextRotation">
+  
+  <!-- rotation -->
+  <xsl:if test="@style:rotation-angle">
+    <xsl:attribute name="rot">
+      <xsl:choose>
+        <!-- 0 deg -->
+        <xsl:when test="@style:rotation-angle = 0">
+          <xsl:text>0</xsl:text>
+        </xsl:when>
+        <!-- (0 ; 180> deg -->
+        <xsl:when
+          test="@style:rotation-angle &lt; 90 and @style:rotation-angle &lt;= 180">
+          <xsl:text>-</xsl:text>
+          <xsl:value-of select="@style:rotation-angle * 60000"/>
+        </xsl:when>
+        <!-- (180 ; 360) deg -->
+        <xsl:otherwise>
+          <xsl:value-of select="(360 - @style:rotation-angle) * 60000"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:if>
+  
+  <!-- vertically stacked -->
+  <xsl:if test="@style:direction = 'ttb' ">
+    <xsl:attribute name="vert">
+      <xsl:text>wordArtVert</xsl:text>
+    </xsl:attribute>
+  </xsl:if>
+
+</xsl:template>
+  
 </xsl:stylesheet>

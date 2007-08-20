@@ -974,13 +974,13 @@
             <!-- custom title -->
             <xsl:when test="c:tx">
               <xsl:for-each select="c:tx/c:rich/a:bodyPr">
-                <xsl:call-template name="TitleTextRotation"/>
+                <xsl:call-template name="TextRotation"/>
               </xsl:for-each>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
               <xsl:for-each select="c:txPr/a:bodyPr">
-                <xsl:call-template name="TitleTextRotation"/>
+                <xsl:call-template name="TextRotation"/>
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
@@ -1096,7 +1096,11 @@
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
         chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
-        style:direction="ltr"/>
+        style:direction="ltr">
+        <xsl:for-each select="c:txPr/a:bodyPr">
+          <xsl:call-template name="TextRotation"/>
+        </xsl:for-each>
+      </style:chart-properties>
       <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
         svg:stroke-color="#000000">
         <xsl:for-each select="c:spPr">
@@ -1426,7 +1430,7 @@
 
   </xsl:template>
 
-  <xsl:template name="TitleTextRotation">
+  <xsl:template name="TextRotation">
 
     <!-- text rotation -->
     <xsl:if test="@rot">
@@ -1446,7 +1450,7 @@
     </xsl:if>
 
     <!-- vertiacally stacked-->
-    <xsl:if test="@vert">
+    <xsl:if test="@vert != '' and @vert != 'horz' ">
       <xsl:attribute name="style:direction">
         <xsl:text>ttb</xsl:text>
       </xsl:attribute>

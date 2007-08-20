@@ -44,10 +44,12 @@
   <!-- @Description: This stylesheet is used for charts conversion -->
   <!-- @Created: 2007-05-24 -->
 
+  <xsl:import href="number.xsl"/>
+
   <xsl:key name="rows" match="table:table-rows" use="''"/>
   <xsl:key name="header" match="table:table-header-rows" use="''"/>
   <xsl:key name="series" match="chart:series" use="''"/>
-  <xsl:key name="style" match="style:style" use="@style:name"/>
+  <xsl:key name="style" match="office:automatic-styles/child::node()" use="@style:name"/>
   <xsl:key name="chart" match="chart:chart" use="''"/>
 
   <xsl:template name="CreateChartFile">
@@ -218,35 +220,7 @@
         <c:rich>
           <a:bodyPr>
             <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
-
-              <!-- rotation -->
-              <xsl:if test="@style:rotation-angle">
-                <xsl:attribute name="rot">
-                  <xsl:choose>
-                    <!-- 0 deg -->
-                    <xsl:when test="@style:rotation-angle = 0">
-                      <xsl:text>0</xsl:text>
-                    </xsl:when>
-                    <!-- (0 ; 180> deg -->
-                    <xsl:when
-                      test="@style:rotation-angle &lt; 90 and @style:rotation-angle &lt;= 180">
-                      <xsl:text>-</xsl:text>
-                      <xsl:value-of select="@style:rotation-angle * 60000"/>
-                    </xsl:when>
-                    <!-- (180 ; 360) deg -->
-                    <xsl:otherwise>
-                      <xsl:value-of select="(360 - @style:rotation-angle) * 60000"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
-              </xsl:if>
-
-              <!-- vertically stacked -->
-              <xsl:if test="@style:direction = 'ttb' ">
-                <xsl:attribute name="vert">
-                  <xsl:text>wordArtVert</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
+              <xsl:call-template name="InsertTextRotation"/>
             </xsl:for-each>
           </a:bodyPr>
           <a:lstStyle/>
@@ -748,18 +722,35 @@
     </c:scaling>
     <c:axPos val="b"/>
 
-    <xsl:if
-      test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
-      <xsl:for-each select="chart:title">
-        <xsl:call-template name="InsertTitle">
-          <xsl:with-param name="chartWidth" select="$chartWidth"/>
-          <xsl:with-param name="chartHeight" select="$chartHeight"/>
-          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-        </xsl:call-template>
-      </xsl:for-each>
-    </xsl:if>
+    <xsl:for-each select="chart:title">
+      <xsl:call-template name="InsertTitle">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+        <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+      </xsl:call-template>
+    </xsl:for-each>
 
     <c:numFmt formatCode="General" sourceLinked="1"/>
+    
+      <!--c:numFmt formatCode="General">
+      <xsl:choose>
+        <xsl:when test="not(key('style',@chart:style-name)/@style:data-style-name)">
+          <xsl:attribute name="sourceLinked">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:for-each select="key('style',@chart:style-name)">
+            <xsl:variable name="styles">
+              <xsl:value-of select="concat(@style:data-style-name,';',@style:data-style-name,'P0;',@style:data-style-name,'P1;',@style:data-style-name,'P2;')"/>
+            </xsl:variable>
+            <xsl:for-each select="/office:document-content/office:automatic-styles[1]">
+              <xsl:apply-templates select="." mode="numFormat"/>
+            </xsl:for-each>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </c:numFmt-->
 
     <c:tickLblPos val="low">
       <xsl:if
@@ -772,21 +763,17 @@
 
     <xsl:if
       test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
-      <!--c:spPr>
-        <a:ln w="3175">
-          <a:solidFill>
-            <a:srgbClr val="000000"/>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-        </a:ln>
-      </c:spPr-->
 
       <xsl:call-template name="InsertSpPr">
         <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
       </xsl:call-template>
 
       <c:txPr>
-        <a:bodyPr rot="0" vert="horz"/>
+        <a:bodyPr rot="0" vert="horz">
+          <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
+            <xsl:call-template name="InsertTextRotation"/>
+          </xsl:for-each>
+        </a:bodyPr>
         <a:lstStyle/>
         <a:p>
           <a:pPr>
