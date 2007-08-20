@@ -44,7 +44,7 @@
   
   <xsl:template name="InsertOLEObjects">
     <xsl:choose>
-      <xsl:when test="e:oleObject[not(@r:id)]">
+      <xsl:when test="e:oleObject[not(@r:id)] and not (document('xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:group' ])">
         <table:shapes>
           <xsl:for-each select="e:oleObject ">
             <xsl:call-template name="InsertOLEObjectsLinks"/>    
