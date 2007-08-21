@@ -797,6 +797,10 @@
           <xsl:when test="key('plotArea','')/c:radarChart">
             <xsl:text>chart:radar</xsl:text>
           </xsl:when>
+          
+          <xsl:when test="key('plotArea','')/c:doughnutChart">
+            <xsl:text>chart:ring</xsl:text>
+          </xsl:when>
 
           <!-- making problems at this time -->
           <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
