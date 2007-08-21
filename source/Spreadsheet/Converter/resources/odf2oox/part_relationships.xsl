@@ -32,6 +32,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -466,26 +467,44 @@
   <xsl:template name="revisionHeaderProperties">
     <headers xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-      guid="{'{1C7D3391-D6C0-452D-B2D6-CC40A62CFF51}'}" diskRevisions="1" revisionId="2" version="3">          
+      guid="{concat('{', '100', '}')}" diskRevisions="1" revisionId="2" version="3">          
       <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">         
-        <xsl:apply-templates select="node()[1][name()='table:cell-content-change']" mode="revisionHeaders"/>
+        <xsl:apply-templates select="node()[1][name()='table:cell-content-change']" mode="revisionHeaders">
+          <xsl:with-param name="num">
+            <xsl:text>1</xsl:text>
+          </xsl:with-param>
+        </xsl:apply-templates>
       </xsl:for-each>
     </headers>
   </xsl:template>
   
   <xsl:template match="table:cell-content-change" mode="revisionHeaders">
+    <xsl:param name="num"/>
     
-    <header dateTime="2007-08-16T12:19:34"
-      maxSheetId="4" userName="Michał" r:id="{generate-id()}" guid="{'{1C7D3391-D6C0-452D-B2D6-CC40A62CFF51}'}">
-      <sheetIdMap count="3">
-        <sheetId val="1"/>
-        <sheetId val="2"/>
-        <sheetId val="3"/>
+    <header maxSheetId="4" r:id="{generate-id()}" guid="{concat('{', $num, '}')}">
+      <xsl:attribute name="userName">
+        <xsl:value-of select="office:change-info/dc:creator"/>
+      </xsl:attribute>
+      <xsl:attribute name="dateTime">
+        <xsl:value-of select="office:change-info/dc:date"/>
+      </xsl:attribute>
+      <sheetIdMap>
+      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">         
+        <sheetId>
+          <xsl:attribute name="val">
+            <xsl:value-of select="position()"/>
+          </xsl:attribute>
+        </sheetId>
+      </xsl:for-each>
       </sheetIdMap>
     </header>
     
     <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change']">
-      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change']" mode="revisionHeaders"/>
+      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change']" mode="revisionHeaders">
+        <xsl:with-param name="num">
+          <xsl:value-of select="$num + 1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
     </xsl:if>
     
   </xsl:template>
