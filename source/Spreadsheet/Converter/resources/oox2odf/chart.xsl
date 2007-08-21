@@ -232,7 +232,11 @@
             <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
               <xsl:for-each
                 select="key('plotArea','')/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
-                <xsl:call-template name="InsertAxisXProperties"/>
+                <xsl:call-template name="InsertAxisXProperties">
+                  <xsl:with-param name="type">
+                    <xsl:text>valAx</xsl:text>
+                  </xsl:with-param>
+                </xsl:call-template>
                 <xsl:call-template name="InsertAxisXTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridXProperties"/>
               </xsl:for-each>
@@ -246,7 +250,11 @@
 
             <xsl:otherwise>
               <xsl:for-each select="key('plotArea','')/c:catAx[1]">
-                <xsl:call-template name="InsertAxisXProperties"/>
+                <xsl:call-template name="InsertAxisXProperties">
+                  <xsl:with-param name="type">
+                    <xsl:text>catAx</xsl:text>
+                  </xsl:with-param>
+                </xsl:call-template>
                 <xsl:call-template name="InsertAxisXTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridXProperties"/>
               </xsl:for-each>
@@ -679,6 +687,7 @@
   <xsl:template name="InsertXAxis">
     <!-- @Description: Outputs chart X Axis -->
     <!-- @Context: inside input chart file -->
+    <xsl:param name="type"/>
 
     <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="axis-x">
 
@@ -712,7 +721,7 @@
         </xsl:when>
       </xsl:choose>
 
-      <xsl:if test="c:majorGridlines/c:spPr">
+      <xsl:if test="c:majorGridlines/c:spPr and $type = 'valAx' ">
         <chart:grid chart:style-name="majorGridX" chart:class="major"/>
       </xsl:if>
       
@@ -1113,7 +1122,104 @@
           chart:error-upper-limit="0" chart:error-category="none" chart:error-percentage="0"
           chart:regression-type="none" chart:data-label-number="none" chart:data-label-text="false"
           chart:data-label-symbol="false">
-          <xsl:call-template name="InsertStyleChartProperties"/>
+          <!-- data grouping-->
+          <xsl:choose>
+            <xsl:when test="key('grouping','')[1]/@val = 'stacked' ">
+              <xsl:attribute name="chart:stacked">
+                <xsl:text>true</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="key('grouping','')[1]/@val = 'percentStacked' ">
+              <xsl:attribute name="chart:percentage">
+                <xsl:text>true</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="key('grouping','')[1]/@val = 'standard' ">
+              <xsl:attribute name="chart:deep">
+                <xsl:text>true</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+          
+          <!-- 3D chart -->
+          <xsl:choose>
+            <xsl:when test="c:bar3DChart or c:line3DChart or c:area3DChart or c:pie3DChart">
+              <xsl:attribute name="chart:three-dimensional">
+                <xsl:text>true</xsl:text>
+              </xsl:attribute>
+              
+              <!-- 3D shape -->
+              <xsl:if test="c:bar3DChart">
+                <xsl:choose>
+                  <xsl:when test="descendant:: c:shape/@val != '' ">
+                    <xsl:for-each select="descendant::c:shape[1]">
+                      <xsl:if test="@val != 'box' ">
+                        <xsl:attribute name="chart:solid-type">
+                          <xsl:value-of select="@val"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:if>
+              
+            </xsl:when>
+          </xsl:choose>
+          
+          <!-- bar charts -->
+          <xsl:if test="c:barChart/c:barDir/@val = 'bar' ">
+            <xsl:attribute name="chart:vertical">
+              <xsl:text>true</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          
+          <!-- 3D bar charts  -->
+          <xsl:if test="c:bar3DChart/c:barDir/@val = 'bar' ">
+            <xsl:attribute name="chart:vertical">
+              <xsl:text>true</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          
+          <!-- interpolation line charts -->
+          <xsl:if
+            test="(c:lineChart/c:ser/c:smooth/@val = 1 and c:lineChart/c:grouping/@val = 'standard') or
+            c:scatterChart/c:ser/c:smooth/@val = 1">
+            <xsl:attribute name="chart:interpolation">
+              <xsl:text>cubic-spline</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          
+          <!-- lines between points in a scatter chart -->
+          <xsl:if test="c:scatterChart or c:bubbleChart">
+            <xsl:attribute name="chart:lines">
+              <xsl:choose>
+                <!-- if at least one series has line -->
+                <xsl:when
+                  test="c:scatterChart/c:ser/c:spPr/a:ln[not(a:noFill)] or
+                  c:scatterChart/c:ser[not(c:spPr/a:ln)]">
+                  <xsl:text>true</xsl:text>
+                </xsl:when>
+                <xsl:when
+                  test="c:bubbleChart/c:ser/c:spPr/a:ln[not(a:noFill)] or
+                  c:bubbleChart/c:ser[not(c:spPr/a:ln)]">
+                  <xsl:text>true</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>false</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+          
+          <!-- line, radar or scatter charts with symbols -->
+          <xsl:if
+            test="c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or 
+            (c:radarChart/c:radarStyle/@val = 'marker' and c:radarChart/c:ser[not(c:marker/c:symbol/@val = 'none')])
+            or c:scatterChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or c:bubbleChart/c:ser[not(c:marker/c:symbol/@val = 'none')]">
+            <xsl:attribute name="chart:symbol-type">
+              <xsl:text>automatic</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
         </style:chart-properties>
       </style:style>
     </xsl:for-each>
@@ -1231,8 +1337,22 @@
 
         </style:chart-properties>
 
-        <style:graphic-properties>
-          <xsl:call-template name="InsertStyleGraphicProperties"/>
+        <style:graphic-properties draw:stroke="none">
+          <xsl:for-each select="c:spPr">
+            
+            <!-- Insert fill -->
+            <xsl:choose>
+              <xsl:when test="a:blipFill">
+                <xsl:call-template name="InsertBitmapFill"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="InsertFill"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
         </style:graphic-properties>
         <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
           style:font-pitch="variable" fo:font-size="6pt"
@@ -1276,133 +1396,6 @@
         draw:marker-start-width="0.25cm" draw:marker-end-width="0.25cm" draw:fill="none"
         draw:fill-color="#999999"/>
     </style:style>
-  </xsl:template>
-
-  <xsl:template name="InsertStyleGraphicProperties">
-    <xsl:for-each select="c:spPr">
-
-      <!-- fill color -->
-      <xsl:if test="a:solidFill/a:srgbClr/@val != '' ">
-        <xsl:attribute name="draw:fill-color">
-          <xsl:value-of select="concat('#',a:solidFill/a:srgbClr/@val)"/>
-        </xsl:attribute>
-      </xsl:if>
-
-      <!-- line color -->
-      <xsl:if test="a:ln/a:solidFill/a:srgbClr/@val != '' ">
-        <xsl:attribute name="svg:stroke-color">
-          <xsl:value-of select="concat('#',a:ln/a:solidFill/a:srgbClr/@val)"/>
-        </xsl:attribute>
-      </xsl:if>
-
-    </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template name="InsertStyleChartProperties">
-
-    <xsl:if test="name() = 'c:plotArea' ">
-
-      <!-- data grouping-->
-      <xsl:choose>
-        <xsl:when test="key('grouping','')[1]/@val = 'stacked' ">
-          <xsl:attribute name="chart:stacked">
-            <xsl:text>true</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:when test="key('grouping','')[1]/@val = 'percentStacked' ">
-          <xsl:attribute name="chart:percentage">
-            <xsl:text>true</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:when test="key('grouping','')[1]/@val = 'standard' ">
-          <xsl:attribute name="chart:deep">
-            <xsl:text>true</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
-      </xsl:choose>
-
-      <!-- 3D chart -->
-      <xsl:choose>
-        <xsl:when test="c:bar3DChart or c:line3DChart or c:area3DChart or c:pie3DChart">
-          <xsl:attribute name="chart:three-dimensional">
-            <xsl:text>true</xsl:text>
-          </xsl:attribute>
-
-          <!-- 3D shape -->
-          <xsl:if test="c:bar3DChart">
-            <xsl:choose>
-              <xsl:when test="descendant:: c:shape/@val != '' ">
-                <xsl:for-each select="descendant::c:shape[1]">
-                  <xsl:if test="@val != 'box' ">
-                    <xsl:attribute name="chart:solid-type">
-                      <xsl:value-of select="@val"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:if>
-
-        </xsl:when>
-      </xsl:choose>
-
-      <!-- bar charts -->
-      <xsl:if test="c:barChart/c:barDir/@val = 'bar' ">
-        <xsl:attribute name="chart:vertical">
-          <xsl:text>true</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
-      <!-- 3D bar charts  -->
-      <xsl:if test="c:bar3DChart/c:barDir/@val = 'bar' ">
-        <xsl:attribute name="chart:vertical">
-          <xsl:text>true</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
-      <!-- interpolation line charts -->
-      <xsl:if
-        test="(c:lineChart/c:ser/c:smooth/@val = 1 and c:lineChart/c:grouping/@val = 'standard') or
-        c:scatterChart/c:ser/c:smooth/@val = 1">
-        <xsl:attribute name="chart:interpolation">
-          <xsl:text>cubic-spline</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
-      <!-- lines between points in a scatter chart -->
-      <xsl:if test="c:scatterChart or c:bubbleChart">
-        <xsl:attribute name="chart:lines">
-          <xsl:choose>
-            <!-- if at least one series has line -->
-            <xsl:when
-              test="c:scatterChart/c:ser/c:spPr/a:ln[not(a:noFill)] or
-              c:scatterChart/c:ser[not(c:spPr/a:ln)]">
-              <xsl:text>true</xsl:text>
-            </xsl:when>
-            <xsl:when
-              test="c:bubbleChart/c:ser/c:spPr/a:ln[not(a:noFill)] or
-              c:bubbleChart/c:ser[not(c:spPr/a:ln)]">
-              <xsl:text>true</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>false</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </xsl:if>
-
-      <!-- line, radar or scatter charts with symbols -->
-      <xsl:if
-        test="c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or 
-        (c:radarChart/c:radarStyle/@val = 'marker' and c:radarChart/c:ser[not(c:marker/c:symbol/@val = 'none')])
-        or c:scatterChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or c:bubbleChart/c:ser[not(c:marker/c:symbol/@val = 'none')]">
-        <xsl:attribute name="chart:symbol-type">
-          <xsl:text>automatic</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
-    </xsl:if>
-
   </xsl:template>
 
   <xsl:template name="InsertDrawFillImage">

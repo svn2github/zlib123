@@ -338,6 +338,9 @@
                       <xsl:with-param name="chartWidth" select="$chartWidth"/>
                       <xsl:with-param name="chartHeight" select="$chartHeight"/>
                       <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                      <xsl:with-param name="type">
+                        <xsl:text>valAx</xsl:text>
+                      </xsl:with-param>
                     </xsl:call-template>
                   </c:valAx>
                 </xsl:when>
@@ -347,6 +350,9 @@
                       <xsl:with-param name="chartWidth" select="$chartWidth"/>
                       <xsl:with-param name="chartHeight" select="$chartHeight"/>
                       <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                      <xsl:with-param name="type">
+                        <xsl:text>catAx</xsl:text>
+                      </xsl:with-param>
                     </xsl:call-template>
                   </c:catAx>
                 </xsl:otherwise>
@@ -734,34 +740,37 @@
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>
     <xsl:param name="chartDirectory"/>
+    <xsl:param name="type"/>
 
     <c:axId val="110226048"/>
 
     <c:scaling>
       <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
-        <xsl:if test="@chart:logarithmic = 'true' ">
+        <xsl:if test="@chart:logarithmic = 'true' and $type = 'valAx' ">
           <c:logBase val="10"/>
         </xsl:if>
       </xsl:for-each>
       <c:orientation val="minMax"/>
 
       <!-- axis min and max value -->
-      <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
-        <xsl:if test="@chart:maximum">
-          <c:max>
-            <xsl:attribute name="val">
-              <xsl:value-of select="@chart:maximum"/>
-            </xsl:attribute>
-          </c:max>
-        </xsl:if>
-        <xsl:if test="@chart:minimum">
-          <c:min>
-            <xsl:attribute name="val">
-              <xsl:value-of select="@chart:minimum"/>
-            </xsl:attribute>
-          </c:min>
-        </xsl:if>
-      </xsl:for-each>
+      <xsl:if test="$type = 'valAx' ">
+        <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
+          <xsl:if test="@chart:maximum">
+            <c:max>
+              <xsl:attribute name="val">
+                <xsl:value-of select="@chart:maximum"/>
+              </xsl:attribute>
+            </c:max>
+          </xsl:if>
+          <xsl:if test="@chart:minimum">
+            <c:min>
+              <xsl:attribute name="val">
+                <xsl:value-of select="@chart:minimum"/>
+              </xsl:attribute>
+            </c:min>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:if>
     </c:scaling>
 
     <c:axPos val="b"/>
@@ -908,34 +917,35 @@
       </c:crossesAt>
     </xsl:for-each>
 
-    <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
-      <xsl:choose>
-        <xsl:when test="@chart:interval-major">
-          <c:majorUnit>
-            <xsl:attribute name="val">
-              <xsl:value-of select="@chart:interval-major"/>
-            </xsl:attribute>
-          </c:majorUnit>
-          <xsl:if test="@chart:interval-minor-divisor">
-            <c:minorUnit>
+    <xsl:if test="$type = 'valAx' ">
+      <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
+        <xsl:choose>
+          <xsl:when test="@chart:interval-major">
+            <c:majorUnit>
               <xsl:attribute name="val">
-                <xsl:value-of select="@chart:interval-major div @chart:interval-minor-divisor"/>
+                <xsl:value-of select="@chart:interval-major"/>
               </xsl:attribute>
-            </c:minorUnit>
-          </xsl:if>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="@chart:interval-minor-divisor">
-            <c:minorUnit>
-              <xsl:attribute name="val">
-                <xsl:value-of select="@chart:maximum div @chart:interval-minor-divisor"/>
-              </xsl:attribute>
-            </c:minorUnit>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-
-    </xsl:for-each>
+            </c:majorUnit>
+            <xsl:if test="@chart:interval-minor-divisor">
+              <c:minorUnit>
+                <xsl:attribute name="val">
+                  <xsl:value-of select="@chart:interval-major div @chart:interval-minor-divisor"/>
+                </xsl:attribute>
+              </c:minorUnit>
+            </xsl:if>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="@chart:interval-minor-divisor">
+              <c:minorUnit>
+                <xsl:attribute name="val">
+                  <xsl:value-of select="@chart:maximum div @chart:interval-minor-divisor"/>
+                </xsl:attribute>
+              </c:minorUnit>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:if>
 
     <c:auto val="1"/>
     <c:lblAlgn val="ctr"/>
@@ -991,7 +1001,7 @@
           </xsl:call-template>
         </c:majorGridlines>
       </xsl:for-each>
-      
+
       <xsl:if
         test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
         <xsl:for-each select="chart:title">
@@ -1288,9 +1298,12 @@
         </xsl:when>
         <xsl:when test="$chartType = 'chart:ring'"/>
         <xsl:otherwise>
-          <xsl:call-template name="InsertSpPr">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:for-each select="key('series','')[position() = $number]">
+            <xsl:call-template name="InsertSpPr">
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              <xsl:with-param name="defaultFill" select="'solid'"/>
+            </xsl:call-template>
+          </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
 
@@ -1629,11 +1642,13 @@
 
   <xsl:template name="InsertSpPr">
     <xsl:param name="chartDirectory"/>
+    <xsl:param name="defaultFill"/>
 
     <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
       <c:spPr>
         <xsl:call-template name="InsertDrawingFill">
           <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          <xsl:with-param name="default" select="$defaultFill"/>
         </xsl:call-template>
         <xsl:call-template name="InsertDrawingBorder"/>
       </c:spPr>
@@ -1832,9 +1847,12 @@
             </c:v>
           </c:tx>
 
-          <xsl:call-template name="InsertShapeProperties">
-            <xsl:with-param name="styleName" select="$styleName"/>
-          </xsl:call-template>
+          <xsl:for-each select="key('series','')[position() = $primarySeries + 1 + $count]">
+            <xsl:call-template name="InsertSpPr">
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              <xsl:with-param name="defaultFill" select="'solid'"/>
+            </xsl:call-template>
+          </xsl:for-each>
 
           <!-- marker type -->
           <xsl:if

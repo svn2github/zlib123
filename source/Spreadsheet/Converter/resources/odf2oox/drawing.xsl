@@ -1026,6 +1026,7 @@
 
   <xsl:template name="InsertDrawingFill">
     <xsl:param name="chartDirectory"/>
+    <xsl:param name="default"/>
 
     <xsl:choose>
       <!-- background image -->
@@ -1054,6 +1055,7 @@
           </a:srgbClr>
         </a:solidFill>
       </xsl:when>
+      <xsl:when test="$default = 'solid' "/>
       <xsl:otherwise>
         <a:noFill/>
       </xsl:otherwise>
