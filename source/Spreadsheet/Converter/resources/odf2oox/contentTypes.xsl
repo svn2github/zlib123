@@ -205,7 +205,7 @@
       
       <Override PartName="/xl/revisions/revisionHeaders.xml"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.revisionHeaders+xml"/>
-      <xsl:apply-templates select="node()[1][name()='table:cell-content-change']" mode="Content_Types"/>
+      <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion']" mode="Content_Types"/>
     </xsl:for-each>
     
     <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
@@ -215,13 +215,13 @@
     
   </xsl:template>
   
-  <xsl:template match="table:cell-content-change" mode="Content_Types">
+  <xsl:template match="table:cell-content-change|table:deletion" mode="Content_Types">
     
     <Override PartName="{concat('/xl/revisions/revisionLog', generate-id(), '.xml')}"
       ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.revisionLog+xml"/>
     
-    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change']">
-      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change']" mode="Content_Types"/>
+    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']">
+      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']" mode="Content_Types"/>
     </xsl:if>
     
   </xsl:template>

@@ -51,11 +51,11 @@
     <!-- Create Revisions Files -->
     <xsl:template name="CreateRevisionFiles">
         <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">                
-            <xsl:apply-templates select="node()[1][name()='table:cell-content-change']" mode="revisionFiles"/>
+            <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion']" mode="revisionFiles"/>
         </xsl:for-each>
     </xsl:template>
     
-    <xsl:template match="table:cell-content-change" mode="revisionFiles">
+    <xsl:template match="table:cell-content-change|table:deletion" mode="revisionFiles">
         <xsl:param name="rId" select="1"/>
         
         <pzip:entry pzip:target="{concat('xl/revisions/revisionLog', generate-id(), '.xml')}">
@@ -66,8 +66,8 @@
             </xsl:call-template>
         </pzip:entry>
         
-        <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change']">
-            <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change']" mode="revisionFiles">
+        <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']">
+            <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']" mode="revisionFiles">
                 <xsl:with-param name="rId">
                     <xsl:value-of select="$rId+1"/>
                 </xsl:with-param>
@@ -87,6 +87,9 @@
     <xsl:template name="InsertChangeTrackingProperties">
         <xsl:param name="rId"/>
         
+        <revisions xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+            
         <xsl:if test="name() = 'table:cell-content-change'">
             
             <xsl:variable name="colNum">
@@ -109,8 +112,7 @@
                 <xsl:value-of select="table:cell-address/@table:table"/>
             </xsl:variable>
             
-        <revisions xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        
             <rcc>
                 
                 <xsl:attribute name="rId">
@@ -121,19 +123,26 @@
                     <xsl:value-of select="$sheetId + 1"/>
                 </xsl:attribute>
                 
-                <xsl:if test="table:previous/@table:id">
-                    
+          
                 <xsl:variable name="OldValue">
-                     <xsl:if test="key('OldValue', @table:id)">
-                         <xsl:choose>
-                             <xsl:when test="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/text:p">
-                                 <xsl:value-of select="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/text:p"/>        
-                             </xsl:when>
-                             <xsl:when test="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/@office:value">
-                                 <xsl:value-of select="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/@office:value"/>        
-                             </xsl:when>
-                         </xsl:choose>
-                     </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="table:previous/@table:id">
+                            <xsl:choose>
+                                <xsl:when test="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/text:p">
+                                    <xsl:value-of select="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/text:p"/>        
+                                </xsl:when>
+                                <xsl:when test="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/@office:value">
+                                    <xsl:value-of select="key('OldValue', @table:id)/table:previous/table:change-track-table-cell/@office:value"/>        
+                                </xsl:when>
+                            </xsl:choose>        
+                        </xsl:when>
+                        <xsl:when test="table:previous/table:change-track-table-cell/text:p">
+                            <xsl:value-of select="table:previous/table:change-track-table-cell/text:p"/>
+                        </xsl:when>
+                        <xsl:when test="table:previous/table:change-track-table-cell/@office:value">
+                            <xsl:value-of select="table:previous/table:change-track-table-cell/@office:value"/>
+                        </xsl:when>
+                    </xsl:choose>
                 </xsl:variable>
                     
                 <oc t="inlineStr">
@@ -146,8 +155,7 @@
                         </t>
                     </is>
                 </oc>
-                    
-                </xsl:if> 
+            
                 
                 <xsl:variable name="NewValue">
                     <xsl:choose>
@@ -191,8 +199,43 @@
                 </nc>
                 
             </rcc>
-        </revisions>
+
         </xsl:if>
+        
+        <xsl:if test="name()='table:deletion'">
+            
+            <xsl:variable name="rowNum">
+                <xsl:value-of select="./@table:position"/>
+            </xsl:variable>
+            
+            <xsl:variable name="colNumChar">
+                <xsl:call-template name="NumbersToChars">
+                    <xsl:with-param name="num">
+                        <xsl:value-of select="./@table:position"/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:variable>
+            
+            <xsl:variable name="sheetId">
+                <xsl:value-of select="./@table:table + 1"/>
+            </xsl:variable>
+            
+            <xsl:choose>
+                <xsl:when test="@table:type='column'">
+                    <rrc rId="{$rId}" sId="{$sheetId}" ref="{concat($colNumChar, '1', ':', $colNumChar, '1048576')}" action="deleteCol">
+                        <rfmt sheetId="{$sheetId}" xfDxf="1" sqref="{concat($colNumChar, '1', ':', $colNumChar, '1048576')}" start="0" length="0"/>
+                    </rrc>        
+                </xsl:when>
+                <xsl:when test="@table:type='row'">
+                    <rrc rId="{$rId}" sId="{$sheetId}" ref="{concat('A', $rowNum, ':', 'XFD',$rowNum)}" action="deleteRow">
+                        <rfmt sheetId="{$sheetId}" xfDxf="1" sqref="{concat('A', $rowNum, ':', 'XFD',$rowNum)}" start="0" length="0"/>
+                    </rrc>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:if>
+            
+        </revisions>
+        
     </xsl:template>
     
   <xsl:template name="SearchPresentValue">
