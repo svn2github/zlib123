@@ -747,6 +747,16 @@
 
     <c:axPos val="b"/>
 
+    <!-- grid lines -->
+    <xsl:for-each select="chart:grid">
+      <c:majorGridlines>
+        <xsl:call-template name="InsertSpPr">
+          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        </xsl:call-template>
+      </c:majorGridlines>
+    </xsl:for-each>
+
+    <!-- axis title -->
     <xsl:for-each select="chart:title">
       <xsl:call-template name="InsertTitle">
         <xsl:with-param name="chartWidth" select="$chartWidth"/>
@@ -954,6 +964,15 @@
 
       <c:axPos val="l"/>
 
+      <!-- grid lines -->
+      <xsl:for-each select="chart:grid">
+        <c:majorGridlines>
+          <xsl:call-template name="InsertSpPr">
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          </xsl:call-template>
+        </c:majorGridlines>
+      </xsl:for-each>
+      
       <xsl:if
         test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' ">
         <xsl:for-each select="chart:title">
@@ -964,22 +983,6 @@
           </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
-
-      <c:majorGridlines>
-        <c:spPr>
-          <a:ln w="3175">
-            <a:solidFill>
-              <a:srgbClr val="000000"/>
-            </a:solidFill>
-            <a:prstDash val="solid"/>
-          </a:ln>
-        </c:spPr>
-      </c:majorGridlines>
-
-      <!--xsl:call-template name="InsertTitle">
-        <xsl:with-param name="chartWidth" select="$chartWidth"/>
-        <xsl:with-param name="chartHeight" select="$chartHeight"/>
-      </xsl:call-template-->
 
       <c:numFmt formatCode="General" sourceLinked="0"/>
 
