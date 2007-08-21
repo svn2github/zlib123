@@ -390,7 +390,7 @@
       </table:table-cell>
 
       <!-- insert cell responding to axis x values -->
-      <xsl:if test="key('plotArea','')/c:scatterChart">
+      <xsl:if test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
         <table:table-cell>
           <text:p/>
         </table:table-cell>
@@ -487,7 +487,7 @@
           </table:table-cell>
 
           <!-- insert cell responding to axis x value -->
-          <xsl:if test="key('plotArea','')/c:scatterChart">
+          <xsl:if test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
             <xsl:for-each select="key('dataSeries','')[position() = 1]">
               <table:table-cell office:value-type="float"
                 office:value="{c:xVal/c:numRef/c:numCache/c:pt[@idx = $categoryNumber]/c:v}">
@@ -1342,13 +1342,18 @@
       </xsl:if>
 
       <!-- lines between points in a scatter chart -->
-      <xsl:if test="c:scatterChart">
+      <xsl:if test="c:scatterChart or c:bubbleChart">
         <xsl:attribute name="chart:lines">
           <xsl:choose>
             <!-- if at least one series has line -->
             <xsl:when
               test="c:scatterChart/c:ser/c:spPr/a:ln[not(a:noFill)] or
               c:scatterChart/c:ser[not(c:spPr/a:ln)]">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:when
+              test="c:bubbleChart/c:ser/c:spPr/a:ln[not(a:noFill)] or
+              c:bubbleChart/c:ser[not(c:spPr/a:ln)]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -1362,7 +1367,7 @@
       <xsl:if
         test="c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or 
         (c:radarChart/c:radarStyle/@val = 'marker' and c:radarChart/c:ser[not(c:marker/c:symbol/@val = 'none')])
-        or c:scatterChart/c:ser[not(c:marker/c:symbol/@val = 'none')]">
+        or c:scatterChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or c:bubbleChart/c:ser[not(c:marker/c:symbol/@val = 'none')]">
         <xsl:attribute name="chart:symbol-type">
           <xsl:text>automatic</xsl:text>
         </xsl:attribute>
