@@ -657,7 +657,26 @@
 
     <xsl:variable name="numPoints">
       <!-- (number) maximum number of data point -->
-      <xsl:value-of select="count(key('rows','')/table:table-row)"/>
+      <xsl:choose>
+        <!-- for 3D Area chart with swapped data sources -->
+        <xsl:when test="//style:chart-properties[@chart:series-source='rows']">
+          <xsl:call-template name="MaxPointNumber">
+            <xsl:with-param name="rowNumber">
+              <xsl:value-of select="number(1)"/>
+            </xsl:with-param>
+            <xsl:with-param name="CountCellsInRow"/>
+            <xsl:with-param name="maxValue">
+              <xsl:value-of select="number(0)"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowsQuantity">
+              <xsl:value-of select="count(//table:table-rows/table:table-row)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="count(key('rows','')/table:table-row)"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="reverseCategories">
@@ -1229,6 +1248,10 @@
               <xsl:value-of select="key('header','')/table:table-row/table:table-cell[$number + 2]"
               />
             </xsl:when>
+            <!-- for chart with swapped data sources-->
+            <xsl:when test="//style:chart-properties[@chart:series-source='rows']">
+              <xsl:value-of select="key('rows','')/table:table-row[$count+1]/table:table-cell[1]"/>
+            </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="key('header','')/table:table-row/table:table-cell[$number + 1]"
               />
@@ -1454,16 +1477,36 @@
 
     <xsl:param name="series"/>
 
-    <xsl:for-each select="table:table-row">
-      <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
-        <c:pt idx="{position() - 1}">
-          <c:v>
-            <!-- $ series + 2 because position starts with 1 and we skip first cell -->
-            <xsl:value-of select="table:table-cell[$series + 2]/text:p"/>
-          </c:v>
-        </c:pt>
-      </xsl:if>
-    </xsl:for-each>
+    <xsl:choose>
+      <xsl:when test="//style:chart-properties[@chart:series-source !='rows']">
+        <xsl:for-each select="table:table-row">
+          <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
+            <c:pt idx="{position() - 1}">
+              <c:v>
+                <!-- $ series + 2 because position starts with 1 and we skip first cell -->
+                <xsl:value-of select="table:table-cell[$series + 2]/text:p"/>
+              </c:v>
+            </c:pt>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- for chart with swapped data sources -->
+      <xsl:otherwise>
+        <xsl:for-each select="//table:table-rows/table:table-row">
+          <xsl:if test="position()-1 = $series ">
+            <xsl:for-each select="table:table-cell">
+              <xsl:if test="@office:value-type!='string'">
+              <c:pt idx="{position()-2  }">
+              <c:v>
+                  <xsl:value-of select="self::node()/text:p"/>
+              </c:v>
+              </c:pt>
+            </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertPointsReverse">
@@ -1503,14 +1546,30 @@
 
     <xsl:param name="numCategories"/>
 
-    <!-- categories names -->
-    <xsl:for-each select="table:table-row">
-      <c:pt idx="{position() - 1}">
-        <c:v>
-          <xsl:value-of select="table:table-cell[1]/text:p"/>
-        </c:v>
-      </c:pt>
-    </xsl:for-each>
+    <xsl:choose>
+	<!-- if chart with swapped data sources -->
+      <xsl:when test="not(//style:chart-properties[@chart:series-source='rows'])">
+        <!-- categories names -->
+        <xsl:for-each select="table:table-row">
+          <c:pt idx="{position() - 1}">
+            <c:v>
+              <xsl:value-of select="table:table-cell[1]/text:p"/>
+            </c:v>
+          </c:pt>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="//table:table-header-rows/table:table-row/table:table-cell/text:p">
+          <xsl:if test="./node() != '' and (position()-2) &gt; -1">
+            <c:pt idx="{position() - 2}">
+              <c:v>
+                <xsl:value-of select="./node()"/>
+              </c:v>
+            </c:pt>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertCategoriesReverse">
@@ -2100,10 +2159,6 @@
       </xsl:call-template>
       <c:majorGridlines/>
 
-      <xsl:call-template name="InsertTitle">
-        <xsl:with-param name="chartWidth" select="$chartWidth"/>
-        <xsl:with-param name="chartHeight" select="$chartHeight"/>
-      </xsl:call-template>
 
       <c:tickLblPos val="low">
         <xsl:if
@@ -2143,6 +2198,55 @@
       <c:crosses val="autoZero"/>
 
     </c:catAx>
+  </xsl:template>
+
+  <!-- template returning the maximum amount of non-string cells in a row  -->
+  <xsl:template name="MaxPointNumber">
+    <!-- global amount of rows to be processed -->
+    <xsl:param name="rowsQuantity"/>
+    <!-- current row number -->
+    <xsl:param name="rowNumber"/>
+    <!-- max value until now -->
+    <xsl:param name="maxValue"/>
+    <!-- cells amount in the current row -->
+    <xsl:param name="CountCellsInRow">
+      <xsl:value-of
+        select="count(//table:table-row[$rowNumber]/table:table-cell[@office:value-type != 'string'])"
+      />
+    </xsl:param>
+    <xsl:choose>
+      <xsl:when test="$maxValue &lt; $CountCellsInRow and $rowNumber = $rowsQuantity">
+        <xsl:value-of select="$CountCellsInRow"/>
+      </xsl:when>
+      <xsl:when
+        test="($maxValue = $CountCellsInRow or $maxValue &gt; $CountCellsInRow) and $rowNumber = $rowsQuantity">
+        <xsl:value-of select="$maxValue"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="MaxPointNumber">
+          <xsl:with-param name="rowsQuantity">
+            <xsl:value-of select="$rowsQuantity"/>
+          </xsl:with-param>
+          <xsl:with-param name="maxValue">
+            <xsl:if test="$maxValue &lt; $CountCellsInRow">
+              <xsl:value-of select="$CountCellsInRow"/>
+            </xsl:if>
+            <xsl:if test="not($maxValue &lt; $CountCellsInRow)">
+              <xsl:value-of select="$maxValue"/>
+            </xsl:if>
+          </xsl:with-param>
+          <xsl:with-param name="CountCellsInRow">
+            <xsl:value-of
+              select="count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])"
+            />
+          </xsl:with-param>
+          <xsl:with-param name="rowNumber">
+            <xsl:value-of select="$rowNumber+1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>

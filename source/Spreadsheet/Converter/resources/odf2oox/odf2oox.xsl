@@ -127,6 +127,11 @@
       <xsl:call-template name="InsertSheets"/>
       <!-- input: content.xml -->
       <!-- output:  xl/worksheets/sheet_N_.xml -->
+      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/draw:frame/draw:object">
+      <pzip:entry pzip:target="xl/media/image1.emf">
+        <empty/>
+      </pzip:entry>
+      </xsl:if>
 
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
@@ -221,9 +226,6 @@
         <!-- create VmlDrawing.xml file -->
         <xsl:if test="$oleObject = 'true'">
             <xsl:call-template name="CreateVmlDrawing"/>
-          <pzip:entry pzip:target="xl/media/image1.emf">
-            <empty/>
-          </pzip:entry>          
         </xsl:if>
      
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
