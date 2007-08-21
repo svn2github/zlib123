@@ -1094,18 +1094,13 @@
   <xsl:template name="InsertAxisXProperties">
     <style:style style:name="axis-x" style:family="chart" style:data-style-name="N0">
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
-        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
+        chart:tick-marks-major-outer="true" chart:tick-marks-minor-inner="false"
+        chart:tick-marks-minor-outer="false" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
         style:direction="ltr">
-        <xsl:if test="c:tickLblPos/@val = 'none' ">
-          <xsl:attribute name="chart:display-label">
-            <xsl:text>false</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
-        
-        <xsl:for-each select="c:txPr/a:bodyPr">
-          <xsl:call-template name="TextRotation"/>
-        </xsl:for-each>
+
+        <xsl:call-template name="SetAxisChartProperties"/>
+  
       </style:chart-properties>
       <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
         svg:stroke-color="#000000">
@@ -1134,15 +1129,9 @@
         chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
         style:direction="ltr">
-        <xsl:if test="c:tickLblPos/@val = 'none' ">
-          <xsl:attribute name="chart:display-label">
-            <xsl:text>false</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
         
-        <xsl:for-each select="c:txPr/a:bodyPr">
-          <xsl:call-template name="TextRotation"/>
-        </xsl:for-each>        
+        <xsl:call-template name="SetAxisChartProperties"/>
+
       </style:chart-properties>
       <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
         svg:stroke-color="#000000">
@@ -1453,4 +1442,149 @@
 
   </xsl:template>
 
+<xsl:template name="SetAxisChartProperties">
+  
+  <!-- valAx id (for axis at) -->
+  <xsl:variable name="id">
+    <xsl:value-of select="generate-id()"/>
+  </xsl:variable>
+  
+  <!-- axis labels -->
+  <xsl:if test="c:tickLblPos/@val = 'none' ">
+    <xsl:attribute name="chart:display-label">
+      <xsl:text>false</xsl:text>
+    </xsl:attribute>
+  </xsl:if>
+  
+  <!-- axis label rotation -->
+  <xsl:for-each select="c:txPr/a:bodyPr">
+    <xsl:call-template name="TextRotation"/>
+  </xsl:for-each>
+  
+  <!-- logarythmic scale -->
+  <xsl:if test="c:scaling/c:logBase">
+    <xsl:attribute name="chart:logarithmic">
+      <xsl:text>true</xsl:text>
+    </xsl:attribute>
+  </xsl:if>
+  
+  <!-- min/max value-->
+  <xsl:if test="c:scaling/c:max">
+    <xsl:attribute name="chart:maximum">
+      <xsl:value-of select="c:scaling/c:max/@val"/>
+    </xsl:attribute>
+  </xsl:if>
+  <xsl:if test="c:scaling/c:min">
+    <xsl:attribute name="chart:minimum">
+      <xsl:value-of select="c:scaling/c:min/@val"/>
+    </xsl:attribute>
+  </xsl:if>
+  
+  <!-- major interval marks-->
+  <xsl:if test="c:majorTickMark">
+    <xsl:choose>
+      <!-- cross-->
+      <xsl:when test="c:majorTickMark/@val = 'cross' ">
+        <xsl:attribute name="chart:tick-marks-major-inner">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:tick-marks-major-outer">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- in -->
+      <xsl:when test="c:majorTickMark/@val = 'in' ">
+        <xsl:attribute name="chart:tick-marks-major-inner">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:tick-marks-major-outer">
+          <xsl:text>false</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- out -->
+      <xsl:when test="c:majorTickMark/@val = 'out' ">
+        <xsl:attribute name="chart:tick-marks-major-inner">
+          <xsl:text>false</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:tick-marks-major-outer">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- none -->
+      <xsl:when test="c:majorTickMark/@val = 'none' ">
+        <xsl:attribute name="chart:tick-marks-major-inner">
+          <xsl:text>false</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:tick-marks-major-outer">
+          <xsl:text>false</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:if>
+  
+  <!-- minor interval marks-->
+  <xsl:if test="c:minorTickMark">
+    <xsl:choose>
+      <!-- cross-->
+      <xsl:when test="c:minorTickMark/@val = 'cross' ">
+        <xsl:attribute name="chart:tick-marks-minor-inner">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:tick-marks-minor-outer">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- in -->
+      <xsl:when test="c:minorTickMark/@val = 'in' ">
+        <xsl:attribute name="chart:tick-marks-minor-inner">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:tick-marks-minor-outer">
+          <xsl:text>false</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- out -->
+      <xsl:when test="c:minorTickMark/@val = 'out' ">
+        <xsl:attribute name="chart:tick-marks-minor-inner">
+          <xsl:text>false</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:tick-marks-minor-outer">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:if>
+  
+  <!-- axis at -->
+  <xsl:for-each select="parent::node()/c:valAx[generate-id(.) != $id][1]">
+    <xsl:if test="c:crossesAt">
+      <xsl:attribute name="chart:origin">
+        <xsl:value-of select="c:crossesAt/@val"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:for-each>
+  
+  <!-- major unit -->
+  <xsl:choose>
+    <xsl:when test="c:majorUnit">
+      <xsl:attribute name="chart:interval-major">
+        <xsl:value-of select="c:majorUnit/@val"/>
+      </xsl:attribute>
+      <xsl:if test="c:minorUnit">
+        <xsl:attribute name="chart:interval-minor-divisor">
+          <xsl:value-of select="c:majorUnit/@val div c:minorUnit/@val"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:when>
+    <xsl:otherwise>
+      <!-- when there is no majorUnit it has to be maximum of scale to calculate minor-divisor -->
+      <xsl:if test="c:minorUnit and c:scaling/c:max">
+        <xsl:attribute name="chart:interval-minor-divisor">
+          <xsl:value-of select="c:scaling/c:max/@val div c:minorUnit/@val"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+  
 </xsl:stylesheet>
