@@ -1350,15 +1350,53 @@
                 <c:symbol val="none"/>
               </c:marker>
             </xsl:when>
-            <xsl:otherwise>
-              <!-- if this series has 'no-symbol' property -->
-              <xsl:if
-                test="key('style',chart:series[position() = $number]/@chart:style-name )/style:chart-properties/@chart:symbol-type = 'none' ">
+            <xsl:when
+              test="key('style',$styleName)/style:chart-properties/@chart:symbol-type = 'none' ">
+              <c:marker>
+                <c:symbol val="none"/>
+              </c:marker>
+            </xsl:when>
+            <xsl:when
+              test="key('style',$styleName)/style:chart-properties/@chart:symbol-type = 'named-symbol' ">
+              <xsl:for-each select="key('style',$styleName)/style:chart-properties">
                 <c:marker>
-                  <c:symbol val="none"/>
+                  <c:symbol>
+                    <xsl:attribute name="val">
+                      <xsl:choose>
+                        <xsl:when test="@chart:symbol-name = 'diamond' ">
+                          <xsl:text>diamond</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="contains(@chart:symbol-name,'arrow')">
+                          <xsl:text>triangle</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:text>square</xsl:text>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:attribute>
+                  </c:symbol>
+                  <xsl:if test="@chart:symbol-width">
+                    <c:size>
+                      <xsl:attribute name="val">
+                        <xsl:variable name="size">
+                          <xsl:call-template name="point-measure">
+                            <xsl:with-param name="length" select="@chart:symbol-width"/>
+                          </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:value-of select="round($size)"/>
+                      </xsl:attribute>
+                    </c:size>
+                  </xsl:if>
+                  <c:spPr>
+                    <a:ln>
+                      <a:solidFill>
+                        <a:srgbClr val="000000"/>
+                      </a:solidFill>
+                    </a:ln>
+                  </c:spPr>
                 </c:marker>
-              </xsl:if>
-            </xsl:otherwise>
+              </xsl:for-each>
+            </xsl:when>
           </xsl:choose>
         </xsl:for-each>
       </xsl:if>
@@ -1509,12 +1547,12 @@
           <xsl:if test="position()-1 = $series ">
             <xsl:for-each select="table:table-cell">
               <xsl:if test="@office:value-type!='string'">
-              <c:pt idx="{position()-2  }">
-              <c:v>
-                  <xsl:value-of select="self::node()/text:p"/>
-              </c:v>
-              </c:pt>
-            </xsl:if>
+                <c:pt idx="{position()-2  }">
+                  <c:v>
+                    <xsl:value-of select="self::node()/text:p"/>
+                  </c:v>
+                </c:pt>
+              </xsl:if>
             </xsl:for-each>
           </xsl:if>
         </xsl:for-each>
@@ -1560,7 +1598,7 @@
     <xsl:param name="numCategories"/>
 
     <xsl:choose>
-	<!-- if chart with swapped data sources -->
+      <!-- if chart with swapped data sources -->
       <xsl:when test="not(//style:chart-properties[@chart:series-source='rows'])">
         <!-- categories names -->
         <xsl:for-each select="table:table-row">
