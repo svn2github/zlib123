@@ -51,11 +51,11 @@
     <!-- Create Revisions Files -->
     <xsl:template name="CreateRevisionFiles">
         <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">                
-            <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion']" mode="revisionFiles"/>
+            <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']" mode="revisionFiles"/>
         </xsl:for-each>
     </xsl:template>
     
-    <xsl:template match="table:cell-content-change|table:deletion" mode="revisionFiles">
+    <xsl:template match="table:cell-content-change|table:deletion|table:movement" mode="revisionFiles">
         <xsl:param name="rId" select="1"/>
         
         <pzip:entry pzip:target="{concat('xl/revisions/revisionLog', generate-id(), '.xml')}">
@@ -66,8 +66,8 @@
             </xsl:call-template>
         </pzip:entry>
         
-        <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']">
-            <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']" mode="revisionFiles">
+        <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']">
+            <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']" mode="revisionFiles">
                 <xsl:with-param name="rId">
                     <xsl:value-of select="$rId+1"/>
                 </xsl:with-param>
@@ -233,6 +233,102 @@
                 </xsl:when>
             </xsl:choose>
         </xsl:if>
+            
+            <xsl:if test="name()='table:movement'">
+                
+                <xsl:choose>
+                    <xsl:when test="table:source-range-address/@table:start-column and table:source-range-address/@table:start-row">
+                        
+                        <xsl:variable name="SourceRowNumStart">
+                            <xsl:value-of select="table:source-range-address/@table:start-row + 1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="SourceColNumStart">
+                            <xsl:call-template name="NumbersToChars">
+                                <xsl:with-param name="num">
+                                    <xsl:value-of select="table:source-range-address/@table:start-column"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="SourceRowNumEnd">
+                            <xsl:value-of select="table:source-range-address/@table:end-row + 1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="SourceColNumEnd">
+                            <xsl:call-template name="NumbersToChars">
+                                <xsl:with-param name="num">
+                                    <xsl:value-of select="table:source-range-address/@table:end-column"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="TargetRowNumStart">
+                            <xsl:value-of select="table:target-range-address/@table:start-row + 1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="TargetColNumStart">
+                            <xsl:call-template name="NumbersToChars">
+                                <xsl:with-param name="num">
+                                    <xsl:value-of select="table:target-range-address/@table:start-column"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="TargetRowNumEnd">
+                            <xsl:value-of select="table:target-range-address/@table:end-row + 1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="TargetColNumEnd">
+                            <xsl:call-template name="NumbersToChars">
+                                <xsl:with-param name="num">
+                                    <xsl:value-of select="table:target-range-address/@table:end-column"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <rm rId="{$rId}" sheetId="{table:source-range-address/@table:start-table + 1}" source="{concat($SourceColNumStart, $SourceRowNumStart, ':', $SourceColNumEnd, $SourceRowNumEnd)}" destination="{concat($TargetColNumStart, $TargetRowNumStart, ':', $TargetColNumEnd, $TargetRowNumEnd)}" sourceSheetId="{table:target-range-address/@table:start-table + 1}"/>
+                        
+                    </xsl:when>
+                    
+                    <xsl:otherwise>
+                        
+                        <xsl:variable name="SourceRowNum">
+                            <xsl:value-of select="table:source-range-address/@table:row + 1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="SourceColNum">
+                            <xsl:call-template name="NumbersToChars">
+                                <xsl:with-param name="num">
+                                    <xsl:value-of select="table:source-range-address/@table:column"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="TargetRowNum">
+                            <xsl:value-of select="table:target-range-address/@table:row + 1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="TargetColNum">
+                            <xsl:call-template name="NumbersToChars">
+                                <xsl:with-param name="num">
+                                    <xsl:value-of select="table:target-range-address/@table:column"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <rm rId="{$rId}" sheetId="{table:source-range-address/@table:table + 1}" source="{concat($SourceColNum, $SourceRowNum)}" destination="{concat($TargetColNum, $TargetRowNum)}" sourceSheetId="{table:target-range-address/@table:table + 1}"/>
+                        
+                    </xsl:otherwise>
+                </xsl:choose>
+                
+                
+                
+              
+                
+                <!--table:source-range-address table:column="4" table:row="14" table:table="0"/>
+                <table:target-range-address table:column="4" table:row="24" table:table="0"/-->
+            </xsl:if>
             
         </revisions>
         
