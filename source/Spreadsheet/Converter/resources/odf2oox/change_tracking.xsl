@@ -149,11 +149,13 @@
                     <xsl:attribute name="r">
                         <xsl:value-of select="concat($colNumChar, $rowNum + 1)"/>
                     </xsl:attribute>
+                    <xsl:if test="$OldValue != ''">
                     <is>
                         <t>
                             <xsl:value-of select="$OldValue"/>
                         </t>
                     </is>
+                    </xsl:if>
                 </oc>
             
                 
@@ -191,11 +193,13 @@
                     <xsl:attribute name="r">
                         <xsl:value-of select="concat($colNumChar, $rowNum + 1)"/>
                     </xsl:attribute>
+                    <xsl:if test="$NewValue != ''">
                     <is>
                         <t>
                             <xsl:value-of select="$NewValue"/>
                         </t>
                     </is>
+                    </xsl:if>
                 </nc>
                 
             </rcc>
