@@ -606,7 +606,7 @@
     <xsl:param name="styleNum" select="1"/>
 
     <xsl:choose>
-      <xsl:when test="substring-before($tags,'&amp;') = '' or substring-before($tags,'file:///&amp;Z&amp;F' ) = '' ">
+      <xsl:when test="substring-before($tags,'&amp;') = '' or ( contains($tags,'file:///&amp;Z&amp;F' ) and substring-before($tags,'file:///&amp;Z&amp;F' ) = '' )">
         <xsl:choose>
           <!-- page number -->
           <xsl:when
@@ -816,7 +816,7 @@
             (contains($tags,'&amp;Y' ) and substring-before($tags,'&amp;Y' ) = '' ) or (contains($tags,'&amp;U' ) and substring-before($tags,'&amp;U' ) = '' ) or
             (contains($tags,'&amp;E' ) and substring-before($tags,'&amp;E' ) = '' ) or (contains($tags,'&amp;B' ) and substring-before($tags,'&amp;B' ) = '' ) or
             (contains($tags,'&amp;I' ) and substring-before($tags,'&amp;I' ) = '' ) or (contains($tags,'&amp;O' ) and substring-before($tags,'&amp;O' ) = '' ) or
-            (contains($tags,'&amp;H' ) and substring-before($tags,'&amp;H' ) = '' )">
+            (contains($tags,'&amp;H' ) and substring-before($tags,'&amp;H' ) = '' ) or (contains($tags, '&amp;U'))">
             <xsl:call-template name="GetHeaderFooterFields">
               <xsl:with-param name="tags" select="substring($tags,3)"/>
               <xsl:with-param name="changedStyle" select="1"/>
@@ -824,7 +824,7 @@
               <xsl:with-param name="region" select="$region"/>
               <xsl:with-param name="paragraph" select="$paragraph"/>
               <xsl:with-param name="styleNum" select="$styleNum"/>
-            </xsl:call-template>
+            </xsl:call-template>            
           </xsl:when>
 
           <!-- plain text at the end -->
