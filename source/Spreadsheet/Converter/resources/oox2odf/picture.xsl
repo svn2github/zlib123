@@ -2010,6 +2010,9 @@
       <!-- underline style -->
       <xsl:choose>
         <xsl:when test="@u = 'sng' ">
+          <xsl:attribute name="style:text-underline-style">
+            <xsl:text>solid</xsl:text>
+          </xsl:attribute>
           <xsl:attribute name="style:text-underline-type">
             <xsl:text>single</xsl:text>
           </xsl:attribute>

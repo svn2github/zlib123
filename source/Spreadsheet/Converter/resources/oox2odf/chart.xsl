@@ -1095,8 +1095,20 @@
     <xsl:for-each select="c:chartSpace/c:chart/c:legend">
       <style:style style:name="legend" style:family="chart">
         <style:graphic-properties draw:fill="none" draw:stroke="none">
-          <xsl:call-template name="InsertLineColor"/>
-          <xsl:call-template name="InsertLineStyle"/>
+          <xsl:for-each select="c:spPr">
+            <!-- Insert fill -->
+            <xsl:choose>
+              <xsl:when test="a:blipFill">
+                <xsl:call-template name="InsertBitmapFill"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="InsertFill"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
         </style:graphic-properties>
         <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
           style:font-pitch="variable" fo:font-size="10pt"
