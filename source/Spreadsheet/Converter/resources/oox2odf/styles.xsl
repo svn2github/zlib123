@@ -42,6 +42,7 @@
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="headers.xsl"/>
+  <xsl:import href="insert_cols.xsl"/>
   <xsl:import href="note.xsl"/>
 
   <xsl:key name="Border" match="e:borders" use="''"/>
@@ -126,10 +127,17 @@
   <xsl:template name="InsertSheetColumnStyles">
     <xsl:param name="sheet"/>
 
+    <xsl:variable name="ManualColBreaks">
+      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
+        <xsl:value-of select="concat(@id,';')"/>
+      </xsl:for-each>
+    </xsl:variable>
+
     <!-- default & column Breake style -->
     <xsl:choose>
       <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks">
-        <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
+        <style:style
+          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
           style:family="table-column">
           <style:table-column-properties fo:break-before="page">
             <xsl:attribute name="style:column-width">
@@ -185,8 +193,10 @@
       </xsl:otherwise>
     </xsl:choose>
     
-    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols"
-      mode="automaticstyles"/>
+    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[1]"
+      mode="automaticstyles">
+      <xsl:with-param name="manualBreakes" select="$ManualColBreaks"/>
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template name="colBreakId">
@@ -204,17 +214,60 @@
   </xsl:template>
 
   <xsl:template match="e:col" mode="automaticstyles">
-    <style:style style:name="{generate-id(.)}" style:family="table-column">
-      <style:table-column-properties>
-        <xsl:if test="@width">
-          <xsl:attribute name="style:column-width">
-            <xsl:call-template name="ConvertFromCharacters">
-              <xsl:with-param name="value" select="@width"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-      </style:table-column-properties>
-    </style:style>
+    <xsl:param name="manualBreakes"/>
+
+    <xsl:variable name="breakes">
+      <xsl:choose>
+        <xsl:when test="substring-before($manualBreakes,';') &lt;= @max">
+          <xsl:call-template name="CutBreaks">
+            <xsl:with-param name="breakes" select="$manualBreakes"/>
+            <xsl:with-param name="max" select="@max"/>
+            <xsl:with-param name="mode">
+              <xsl:text>style</xsl:text>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$manualBreakes"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- insert column style with break -->
+    <xsl:if test="substring-before($manualBreakes,';') &lt;= @max">
+      <style:style style:name="{concat(generate-id(.),'-break')}" style:family="table-column">
+        <style:table-column-properties fo:break-before="page">
+          <xsl:if test="@width">
+            <xsl:attribute name="style:column-width">
+              <xsl:call-template name="ConvertFromCharacters">
+                <xsl:with-param name="value" select="@width"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+        </style:table-column-properties>
+      </style:style>
+    </xsl:if>
+
+    <xsl:if test="@min != @max">
+      <style:style style:name="{generate-id(.)}" style:family="table-column">
+        <style:table-column-properties>
+          <xsl:if test="@width">
+            <xsl:attribute name="style:column-width">
+              <xsl:call-template name="ConvertFromCharacters">
+                <xsl:with-param name="value" select="@width"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+        </style:table-column-properties>
+      </style:style>
+    </xsl:if>
+
+    <xsl:if test="following-sibling::e:col">
+      <xsl:apply-templates select="following-sibling::e:col[1]" mode="automaticstyles">
+        <xsl:with-param name="manualBreakes" select="$breakes"/>
+      </xsl:apply-templates>
+    </xsl:if>
+
   </xsl:template>
 
   <!-- insert row styles from all sheets -->
@@ -241,7 +294,8 @@
     
     <xsl:choose>
       <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
-        <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)}"
+        <style:style
+          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)}"
           style:family="table-row">
           <style:table-row-properties fo:break-before="page">
             <xsl:attribute name="style:row-height">
