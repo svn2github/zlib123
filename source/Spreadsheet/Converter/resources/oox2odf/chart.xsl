@@ -501,13 +501,24 @@
           <!-- insert cell responding to axis x value -->
           <xsl:if test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
             <xsl:for-each select="key('dataSeries','')[position() = 1]">
-              <table:table-cell office:value-type="float"
-                office:value="{c:xVal/c:numRef/c:numCache/c:pt[@idx = $categoryNumber]/c:v}">
-                <text:p>
-                  <xsl:value-of select="c:xVal/c:numRef/c:numCache/c:pt[@idx = $categoryNumber]/c:v"
-                  />
-                </text:p>
-              </table:table-cell>
+              <xsl:choose>
+                <xsl:when test="c:xVal">
+                  <table:table-cell office:value-type="float"
+                    office:value="{c:xVal/c:numRef/c:numCache/c:pt[@idx = $categoryNumber]/c:v}">
+                    <text:p>
+                      <xsl:value-of
+                        select="c:xVal/c:numRef/c:numCache/c:pt[@idx = $categoryNumber]/c:v"/>
+                    </text:p>
+                  </table:table-cell>
+                </xsl:when>
+                <xsl:otherwise>
+                  <table:table-cell office:value-type="float" office:value="{$categoryNumber + 1}">
+                    <text:p>
+                      <xsl:value-of select="$categoryNumber + 1"/>
+                    </text:p>
+                  </table:table-cell>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:for-each>
           </xsl:if>
 
@@ -724,12 +735,12 @@
       <xsl:if test="c:majorGridlines/c:spPr and $type = 'valAx' ">
         <chart:grid chart:style-name="majorGridX" chart:class="major"/>
       </xsl:if>
-      
+
       <chart:categories>
         <xsl:attribute name="table:cell-range-address">
           <xsl:value-of select="concat('local-table.A2:.A',1 + key('numPoints','')/@val)"/>
         </xsl:attribute>
-      </chart:categories>      
+      </chart:categories>
     </chart:axis>
 
   </xsl:template>
@@ -769,7 +780,7 @@
         </xsl:when>
       </xsl:choose>
 
-      <xsl:if test="c:majorGridlines/c:spPr">
+      <xsl:if test="c:majorGridlines">
         <chart:grid chart:style-name="majorGridY" chart:class="major"/>
       </xsl:if>
 
@@ -806,7 +817,7 @@
           <xsl:when test="key('plotArea','')/c:radarChart">
             <xsl:text>chart:radar</xsl:text>
           </xsl:when>
-          
+
           <xsl:when test="key('plotArea','')/c:doughnutChart">
             <xsl:text>chart:ring</xsl:text>
           </xsl:when>
@@ -990,7 +1001,7 @@
       </style:style>
     </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template name="InsertAxisYTitleProperties">
     <xsl:for-each select="c:title">
       <style:style style:name="axis-y_title" style:family="chart">
@@ -1065,14 +1076,16 @@
       </style:style>
     </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template name="InsertMajorGridYProperties">
-    <xsl:for-each select="c:majorGridlines/c:spPr">
+    <xsl:for-each select="c:majorGridlines">
       <style:style style:name="majorGridY" style:family="chart">
-        <style:graphic-properties svg:stroke-width="0.1cm" svg:stroke-color="#000000"
+        <style:graphic-properties svg:stroke-width="0cm" svg:stroke-color="#000000"
           draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
-          <xsl:call-template name="InsertLineColor"/>
-          <xsl:call-template name="InsertLineStyle"/>
+          <xsl:for-each select="c:spPr">
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
         </style:graphic-properties>
       </style:style>
     </xsl:for-each>
@@ -1140,14 +1153,14 @@
               </xsl:attribute>
             </xsl:when>
           </xsl:choose>
-          
+
           <!-- 3D chart -->
           <xsl:choose>
             <xsl:when test="c:bar3DChart or c:line3DChart or c:area3DChart or c:pie3DChart">
               <xsl:attribute name="chart:three-dimensional">
                 <xsl:text>true</xsl:text>
               </xsl:attribute>
-              
+
               <!-- 3D shape -->
               <xsl:if test="c:bar3DChart">
                 <xsl:choose>
@@ -1162,24 +1175,24 @@
                   </xsl:when>
                 </xsl:choose>
               </xsl:if>
-              
+
             </xsl:when>
           </xsl:choose>
-          
+
           <!-- bar charts -->
           <xsl:if test="c:barChart/c:barDir/@val = 'bar' ">
             <xsl:attribute name="chart:vertical">
               <xsl:text>true</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
+
           <!-- 3D bar charts  -->
           <xsl:if test="c:bar3DChart/c:barDir/@val = 'bar' ">
             <xsl:attribute name="chart:vertical">
               <xsl:text>true</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
+
           <!-- interpolation line charts -->
           <xsl:if
             test="(c:lineChart/c:ser/c:smooth/@val = 1 and c:lineChart/c:grouping/@val = 'standard') or
@@ -1188,7 +1201,7 @@
               <xsl:text>cubic-spline</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
+
           <!-- lines between points in a scatter chart -->
           <xsl:if test="c:scatterChart or c:bubbleChart">
             <xsl:attribute name="chart:lines">
@@ -1210,7 +1223,7 @@
               </xsl:choose>
             </xsl:attribute>
           </xsl:if>
-          
+
           <!-- line, radar or scatter charts with symbols -->
           <xsl:if
             test="c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none')] or 
@@ -1262,7 +1275,7 @@
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
         chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
-        style:direction="ltr">
+        style:direction="ltr" chart:origin="0">
 
         <xsl:call-template name="SetAxisChartProperties"/>
 
@@ -1337,17 +1350,17 @@
 
         </style:chart-properties>
 
-        <style:graphic-properties>
-          
+        <style:graphic-properties svg:stroke-width="0.079cm">
+
           <!-- default stroke for scatter and bubble chart -->
           <xsl:if test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
             <xsl:attribute name="draw:stroke">
               <xsl:text>none</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
+
           <xsl:for-each select="c:spPr">
-            
+
             <!-- Insert fill -->
             <xsl:choose>
               <xsl:when test="a:blipFill">
@@ -1357,7 +1370,7 @@
                 <xsl:call-template name="InsertFill"/>
               </xsl:otherwise>
             </xsl:choose>
-            
+
             <xsl:call-template name="InsertLineColor"/>
             <xsl:call-template name="InsertLineStyle"/>
           </xsl:for-each>
