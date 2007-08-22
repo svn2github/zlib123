@@ -556,12 +556,6 @@
           <xsl:with-param name="NoteRow">
             <xsl:value-of select="$NoteRow"/>
           </xsl:with-param>
-          <!--xsl:with-param name="ConditionalCell">
-            <xsl:value-of select="$ConditionalCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="ConditionalCellStyle">
-            <xsl:value-of select="$ConditionalCellStyle"/>
-            </xsl:with-param-->
           <xsl:with-param name="ElementsColl">
             <xsl:value-of select="$ElementsColl"/>
           </xsl:with-param>
@@ -611,12 +605,6 @@
           <xsl:with-param name="NoteRow">
             <xsl:value-of select="$NoteRow"/>
           </xsl:with-param>
-          <!--xsl:with-param name="ConditionalCell">
-            <xsl:value-of select="$ConditionalCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellStyle">
-            <xsl:value-of select="$ConditionalCellStyle"/>
-          </xsl:with-param-->
           <xsl:with-param name="ElementsColl">
             <xsl:value-of select="$ElementsColl"/>
           </xsl:with-param>
@@ -1553,12 +1541,6 @@
           <xsl:with-param name="NoteRow">
             <xsl:value-of select="$NoteRow"/>
           </xsl:with-param>
-          <!--xsl:with-param name="ConditionalCell">
-           <xsl:value-of select="$ConditionalCell"/>
-           </xsl:with-param>
-           <xsl:with-param name="ConditionalCellStyle">
-           <xsl:value-of select="$ConditionalCellStyle"/>
-           </xsl:with-param-->
           <xsl:with-param name="ElementsColl">
             <xsl:value-of select="$ElementsColl"/>
           </xsl:with-param>
@@ -1588,9 +1570,6 @@
             <xsl:value-of select="$ValidationColl"/>
           </xsl:with-param>
         </xsl:call-template>
-
-
-
 
       </xsl:when>
 
@@ -1668,37 +1647,93 @@
       <xsl:value-of select="generate-id($text)"/>
     </xsl:attribute>
     <xsl:attribute name="svg:width">
-      <xsl:call-template name="ConvertPoints">
-        <xsl:with-param name="length">
-          <xsl:value-of select="substring-before(substring-after(@style,'width:'),';')"/>
-        </xsl:with-param>
-        <xsl:with-param name="unit">in</xsl:with-param>
-      </xsl:call-template>
+
+      <xsl:variable name="width">
+        <xsl:call-template name="ConvertPoints">
+          <xsl:with-param name="length">
+            <xsl:value-of select="substring-before(substring-after(@style,'width:'),';')"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:choose>
+        <xsl:when test="substring($width,1,1) = '.' ">
+          <xsl:value-of select="concat('0',$width)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$width"/>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </xsl:attribute>
+
     <xsl:attribute name="svg:height">
+      
+      <xsl:variable name="height">
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length">
           <xsl:value-of select="substring-before(substring-after(@style,'height:'),';')"/>
         </xsl:with-param>
-        <xsl:with-param name="unit">in</xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:choose>
+        <xsl:when test="substring($height,1,1) = '.' ">
+          <xsl:value-of select="concat('0',$height)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$height"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      
     </xsl:attribute>
+    
     <xsl:attribute name="svg:x">
+      
+      <xsl:variable name="mariginLeft">
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length">
           <xsl:value-of select="substring-before(substring-after(@style,'margin-left:'),';')"/>
         </xsl:with-param>
-        <xsl:with-param name="unit">in</xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:choose>
+        <xsl:when test="substring($mariginLeft,1,1) = '.' ">
+          <xsl:value-of select="concat('0',$mariginLeft)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$mariginLeft"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      
     </xsl:attribute>
+    
     <xsl:attribute name="svg:y">
+      
+      <xsl:variable name="mariginTop">
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length">
           <xsl:value-of select="substring-before(substring-after(@style,'margin-top:'),';')"/>
         </xsl:with-param>
-        <xsl:with-param name="unit">in</xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:choose>
+        <xsl:when test="substring($mariginTop,1,1) = '.' ">
+          <xsl:value-of select="concat('0',$mariginTop)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$mariginTop"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      
     </xsl:attribute>
+    
     <xsl:attribute name="draw:caption-point-x">-0.2402in</xsl:attribute>
     <xsl:attribute name="draw:caption-point-y">0in</xsl:attribute>
   </xsl:template>

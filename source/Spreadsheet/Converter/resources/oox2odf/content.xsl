@@ -120,7 +120,14 @@
         </xsl:apply-templates>
         <!-- Insert Scenario properties -->
         <xsl:call-template name="InsertScenarioStyles"/>
-        
+        <!-- Insert Note Shape properties -->
+        <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+        <xsl:call-template name="InsertNoteStyles">
+          <xsl:with-param name="sheetNr">
+            <xsl:value-of select="position()"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        </xsl:for-each>
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
     </office:document-content>

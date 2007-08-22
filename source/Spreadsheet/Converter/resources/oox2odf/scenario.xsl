@@ -40,7 +40,7 @@
     xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     exclude-result-prefixes="e r">
 
-    <!-- Insert Coditional Styles -->
+    <!-- Insert Scenario Styles -->
 
     <xsl:template name="InsertScenarioStyles">
 

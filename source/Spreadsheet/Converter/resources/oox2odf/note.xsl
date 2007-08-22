@@ -33,11 +33,14 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  exclude-result-prefixes="e r draw">
 
+  <xsl:import href="common.xsl"/>
   <!-- Get cell with note -->
 
   <xsl:template name="NoteCell">
@@ -100,7 +103,6 @@
     </xsl:choose>
   </xsl:template>
 
-
   <!-- Insert Note in This Cell -->
   <xsl:template name="InsertNoteInThisCell">
     <xsl:param name="rowNum"/>
@@ -132,6 +134,12 @@
     <xsl:apply-templates
       select="document(concat('xl/comments',$fileNumber,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
       <xsl:with-param name="number" select="$fileNumber"/>
+      <xsl:with-param name="rowNum">
+        <xsl:value-of select="$rowNum"/>
+      </xsl:with-param>
+      <xsl:with-param name="colNum">
+        <xsl:value-of select="$colNum"/>
+      </xsl:with-param>
     </xsl:apply-templates>
 
   </xsl:template>
@@ -139,6 +147,8 @@
 
   <!-- Insert Comment -->
   <xsl:template match="e:comment">
+    <xsl:param name="rowNum"/>
+    <xsl:param name="colNum"/>
 
     <!--@Description: adds a note -->
     <!--@context: none -->
@@ -151,15 +161,113 @@
     </xsl:variable>
 
     <office:annotation>
+
+      <xsl:for-each
+        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
+
+        <xsl:attribute name="office:display">
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="propertyName" select="'visibility'"/>
+            <xsl:with-param name="shape" select="."/>
+          </xsl:call-template>
+        </xsl:attribute>
+
+      </xsl:for-each>
+
       <xsl:apply-templates
-        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[position()=$numberOfComment]"
+        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]"
         mode="drawing">
         <xsl:with-param name="text" select="e:text"/>
       </xsl:apply-templates>
+
       <text:p text:style-name="{generate-id(e:text)}">
         <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
       </text:p>
+
     </office:annotation>
+
+  </xsl:template>
+
+  <xsl:template name="GetShapeProperty">
+    <xsl:param name="shape"/>
+    <xsl:param name="propertyName"/>
+
+    <xsl:variable name="propertyValue">
+      <xsl:choose>
+        <xsl:when test="contains(substring-after($shape/@style,concat($propertyName,':')),';')">
+          <xsl:value-of
+            select="substring-before(substring-after($shape/@style,concat($propertyName,':')),';')"
+          />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after($shape/@style,concat($propertyName,';'))"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="CheckIfVisible">
+      <xsl:choose>
+        <xsl:when test="$propertyValue = 'visible'">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:value-of select="$CheckIfVisible"/>
+
+  </xsl:template>
+
+  <xsl:template name="InsertNoteStyles">
+    <xsl:param name="sheetNr"/>
+
+    <xsl:variable name="targetFile">
+      <xsl:value-of
+        select="document(concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing' )]/@Target"
+      />
+    </xsl:variable>
+
+    <xsl:for-each select="document(concat('xl/', substring-after($targetFile, '/')))/xml/v:shape">
+      <style:style style:name="{generate-id(.)}" style:family="graphic">
+        <style:graphic-properties>
+
+          <xsl:attribute name="fo:min-height">
+
+            <xsl:variable name="height">
+              <xsl:call-template name="ConvertPoints">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="substring-before(substring-after(@style,'height:'),';')"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <xsl:choose>
+              <xsl:when test="substring($height,1,1) = '.' ">
+                <xsl:value-of select="concat('0',$height)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$height"/>
+              </xsl:otherwise>
+            </xsl:choose>
+
+          </xsl:attribute>
+
+          <xsl:attribute name="draw:fill-color">
+            <xsl:choose>
+              <xsl:when test="@fillcolor">
+                <xsl:call-template name="InsertColor"/>
+                <xsl:value-of select="@fillcolor"/>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+
+        </style:graphic-properties>
+      </style:style>
+    </xsl:for-each>
+
   </xsl:template>
 
 </xsl:stylesheet>

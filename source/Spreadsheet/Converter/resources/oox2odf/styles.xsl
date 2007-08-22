@@ -36,11 +36,13 @@
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="a e r number">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="headers.xsl"/>
+  <xsl:import href="note.xsl"/>
 
   <xsl:key name="Border" match="e:borders" use="''"/>
   <xsl:key name="CellStylesId" match="e:cellStyle" use="@xfId"/>
@@ -635,9 +637,15 @@
 
     <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]"
       mode="automaticstyles"/>
-    <xsl:apply-templates select="document('xl/comments1.xml')/e:comments">
-      <xsl:with-param name="number">1</xsl:with-param>
-    </xsl:apply-templates>
+    
+    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+      <xsl:apply-templates select="document(concat('xl/comments', position(), '.xml'))/e:comments">
+        <xsl:with-param name="number">
+          <xsl:value-of select="position()"/>
+        </xsl:with-param>
+      </xsl:apply-templates>  
+    </xsl:for-each>
+
   </xsl:template>
 
   <xsl:template match="e:comments">
