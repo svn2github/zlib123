@@ -1337,7 +1337,15 @@
 
         </style:chart-properties>
 
-        <style:graphic-properties draw:stroke="none">
+        <style:graphic-properties>
+          
+          <!-- default stroke for scatter and bubble chart -->
+          <xsl:if test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
+            <xsl:attribute name="draw:stroke">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          
           <xsl:for-each select="c:spPr">
             
             <!-- Insert fill -->
