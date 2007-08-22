@@ -757,6 +757,13 @@
       </xsl:call-template>
     </xsl:for-each>
 
+    <xsl:if
+      test="key('style',chart:plot-area/chart:series/@chart:style-name)/style:chart-properties/@chart:data-label-number = 'value' or 
+      key('style',chart:plot-area/chart:series/@chart:style-name)/style:chart-properties/@chart:data-label-text = 'true' ">
+      <c:dLbls>
+        <c:showVal val="1"/>
+      </c:dLbls>
+    </xsl:if>
 
     <c:axId val="110226048"/>
     <c:axId val="110498176"/>
@@ -1094,9 +1101,11 @@
         </xsl:when>
         <xsl:when test="$chartType = 'chart:ring'"/>
         <xsl:otherwise>
-          <xsl:call-template name="InsertSpPr">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:for-each select="key('series','')[position() = $number]">
+            <xsl:call-template name="InsertSpPr">
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+            </xsl:call-template>
+          </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
 
@@ -1128,6 +1137,64 @@
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
+
+      <!-- label -->
+      <xsl:variable name="label">
+        <xsl:for-each select="key('series','')">
+          <xsl:if
+            test="key('style',@chart:style-name)/style:chart-properties/@chart:data-label-number = 'value' or 
+            key('style',@chart:style-name)/style:chart-properties/@chart:data-label-text = 'true' ">
+            <xsl:text>true</xsl:text>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <xsl:if test="$label != '' ">
+        <c:dLbls>
+          <xsl:for-each select="key('style',$styleName)">
+            <!-- label content -->
+            <xsl:for-each select="style:chart-properties">
+              <xsl:choose>
+                <xsl:when
+                  test="@chart:data-label-number = 'value' or @chart:data-label-text = 'true' ">
+                  <!-- value -->
+                  <xsl:if test="@chart:data-label-number = 'value' ">
+                    <c:showVal val="1"/>
+                  </xsl:if>
+                  <!-- name -->
+                  <xsl:if test="@chart:data-label-text = 'true' ">
+                    <c:showCatName val="1"/>
+                  </xsl:if>
+                  <!-- icon -->
+                  <xsl:if test="@chart:data-label-text = 'true' ">
+                    <c:showLegendKey val="1"/>
+                  </xsl:if>
+                </xsl:when>
+                <xsl:otherwise>
+                  <c:delete val="1"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+
+            <!-- lable text properties -->
+            <c:txPr>
+              <a:bodyPr rot="0" vert="horz"/>
+              <a:lstStyle/>
+              <a:p>
+                <a:pPr>
+                  <a:defRPr>
+                    <xsl:for-each select="style:text-properties">
+                      <!-- template common with text-box-->
+                      <xsl:call-template name="InsertRunProperties"/>
+                    </xsl:for-each>
+                  </a:defRPr>
+                </a:pPr>
+                <a:endParaRPr lang="pl-PL"/>
+              </a:p>
+            </c:txPr>
+          </xsl:for-each>
+        </c:dLbls>
+      </xsl:if>
 
       <!-- marker type -->
       <!-- if line chart or radar chart or bar chart with lines -->
@@ -1290,16 +1357,16 @@
 
     <xsl:choose>
       <xsl:when test="$seriesFrom != 'rows'">
-    <xsl:for-each select="table:table-row">
-      <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
-        <c:pt idx="{position() - 1}">
-          <c:v>
-            <!-- $ series + 2 because position starts with 1 and we skip first cell -->
-            <xsl:value-of select="table:table-cell[$series + 2]/text:p"/>
-          </c:v>
-        </c:pt>
-      </xsl:if>
-    </xsl:for-each>
+        <xsl:for-each select="table:table-row">
+          <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
+            <c:pt idx="{position() - 1}">
+              <c:v>
+                <!-- $ series + 2 because position starts with 1 and we skip first cell -->
+                <xsl:value-of select="table:table-cell[$series + 2]/text:p"/>
+              </c:v>
+            </c:pt>
+          </xsl:if>
+        </xsl:for-each>
       </xsl:when>
       <!-- for chart with swapped data sources -->
       <xsl:otherwise>
@@ -1307,12 +1374,12 @@
           <xsl:if test="position()-1 = $series ">
             <xsl:for-each select="table:table-cell">
               <xsl:if test="@office:value-type!='string'">
-              <c:pt idx="{position()-2  }">
-              <c:v>
-                  <xsl:value-of select="self::node()/text:p"/>
-              </c:v>
-              </c:pt>
-            </xsl:if>
+                <c:pt idx="{position()-2  }">
+                  <c:v>
+                    <xsl:value-of select="self::node()/text:p"/>
+                  </c:v>
+                </c:pt>
+              </xsl:if>
             </xsl:for-each>
           </xsl:if>
         </xsl:for-each>
@@ -1360,14 +1427,14 @@
 
     <xsl:choose>
       <xsl:when test="$seriesFrom != 'rows'">
-    <!-- categories names -->
-    <xsl:for-each select="table:table-row">
-      <c:pt idx="{position() - 1}">
-        <c:v>
-          <xsl:value-of select="table:table-cell[1]/text:p"/>
-        </c:v>
-      </c:pt>
-    </xsl:for-each>
+        <!-- categories names -->
+        <xsl:for-each select="table:table-row">
+          <c:pt idx="{position() - 1}">
+            <c:v>
+              <xsl:value-of select="table:table-cell[1]/text:p"/>
+            </c:v>
+          </c:pt>
+        </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each select="//table:table-header-rows/table:table-row/table:table-cell/text:p">

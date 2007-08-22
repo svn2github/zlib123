@@ -1348,14 +1348,46 @@
             </xsl:attribute>
           </xsl:if>
 
+          <!-- label -->
+          <xsl:for-each select="c:dLbls">
+            <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
+              <!-- value -->
+              <xsl:if test="c:showVal/@val = 1 ">
+                <xsl:attribute name="chart:data-label-number">
+                  <xsl:text>value</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+              <!-- name -->
+              <xsl:if test="c:showCatName/@val = 1 ">
+                <xsl:attribute name="chart:data-label-text">
+                  <xsl:text>true</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+              <!-- legend icon -->
+              <xsl:if test="c:showLegendKey/@val = 1 ">
+                <xsl:attribute name="chart:data-label-symbol">
+                  <xsl:text>true</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+            </xsl:if>
+          </xsl:for-each>
+
         </style:chart-properties>
 
-        <style:graphic-properties svg:stroke-width="0.079cm">
+        <style:graphic-properties>
 
           <!-- default stroke for scatter and bubble chart -->
-          <xsl:if test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
+          <xsl:if
+            test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart or key('plotArea','')/c:barChart or key('plotArea','')/c:bar3DChart">
             <xsl:attribute name="draw:stroke">
               <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+          <!-- default line width for line chart -->
+          <xsl:if test="key('plotArea','')/c:lineChart">
+            <xsl:attribute name="svg:stroke-width">
+              <xsl:text>0.079cm</xsl:text>
             </xsl:attribute>
           </xsl:if>
 
@@ -1374,14 +1406,23 @@
             <xsl:call-template name="InsertLineColor"/>
             <xsl:call-template name="InsertLineStyle"/>
           </xsl:for-each>
+
         </style:graphic-properties>
-        <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="6pt"
+        <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
+          style:font-pitch="variable" fo:font-size="10pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
           style:font-size-asian="6pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="6pt"/>
+          style:font-size-complex="6pt">
+          <xsl:for-each select="c:dLbls">
+            <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
+              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
+                <xsl:call-template name="TextBoxRunProperties"/>
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:for-each>
+        </style:text-properties>
       </style:style>
     </xsl:for-each>
   </xsl:template>
