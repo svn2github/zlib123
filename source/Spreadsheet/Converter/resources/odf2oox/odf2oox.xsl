@@ -223,6 +223,11 @@
           </xsl:call-template>
         </xsl:if>
 
+        <!-- create VmlDrawing.xml file for comment`s-->
+        <xsl:if test="$comment = 'true'">
+        <xsl:call-template name="CreateVmlDrawing"/>
+        </xsl:if>
+
         <!-- create VmlDrawing.xml file -->
         <xsl:if test="$oleObject = 'true'">
             <xsl:call-template name="CreateVmlDrawing"/>
