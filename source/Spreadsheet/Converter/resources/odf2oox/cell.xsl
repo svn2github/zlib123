@@ -539,6 +539,7 @@
     <xsl:param name="CheckRowHidden"/>
     <xsl:param name="CheckIfDefaultBorder"/>
     <xsl:param name="ignoreFilter"/>
+    <xsl:param name="tableId"/>
 
     <xsl:variable name="height">
       <xsl:call-template name="point-measure">
@@ -566,10 +567,7 @@
           </xsl:if>
         </xsl:if>
 
-        <xsl:variable name="tableId">
-          <xsl:value-of select="generate-id(ancestor::table:table)"/>
-        </xsl:variable>
-
+       
         <!--get parent table:table-row id-->
         <xsl:variable name="rowId">
           <xsl:value-of select="generate-id(.)"/>
@@ -580,7 +578,7 @@
           <xsl:variable name="number">
             <xsl:call-template name="GetRowNumber">
               <xsl:with-param name="rowId" select="$rowId"/>
-              <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
+              <xsl:with-param name="tableId" select="$tableId"/>
             </xsl:call-template>
           </xsl:variable>
         </xsl:for-each>
@@ -657,10 +655,7 @@
 
     </xsl:if>
 
-    <xsl:variable name="tableId">
-      <xsl:value-of select="generate-id(ancestor::table:table)"/>
-    </xsl:variable>
-
+   
     <!-- insert next row -->
     <xsl:choose>
       <!-- next row is a sibling -->
@@ -701,6 +696,9 @@
             <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
           <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+          <xsl:with-param name="tableId">
+            <xsl:value-of select="$tableId"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -740,6 +738,9 @@
             <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
           <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+          <xsl:with-param name="tableId">
+            <xsl:value-of select="$tableId"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
@@ -780,6 +781,9 @@
             <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
           <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+          <xsl:with-param name="tableId">
+            <xsl:value-of select="$tableId"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>

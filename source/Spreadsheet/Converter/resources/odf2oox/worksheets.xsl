@@ -64,12 +64,16 @@
   <xsl:template match="table:table" mode="sheet">
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
+    <xsl:param name="tableId" select="generate-id()"/>
 
     <xsl:if test="not(table:scenario)">
       <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
         <xsl:call-template name="InsertWorksheet">
           <xsl:with-param name="cellNumber" select="$cellNumber"/>
           <xsl:with-param name="sheetId" select="$sheetId"/>
+          <xsl:with-param name="tableId">
+            <xsl:value-of select="$tableId"/>
+          </xsl:with-param>
         </xsl:call-template>
       </pzip:entry>
     </xsl:if>
@@ -95,6 +99,7 @@
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
+    <xsl:param name="tableId"/>
 
     <worksheet>
 
@@ -196,6 +201,9 @@
           <xsl:value-of select="$defaultFontSize"/>
         </xsl:with-param>
         <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+        <xsl:with-param name="tableId">
+          <xsl:value-of select="$tableId"/>
+        </xsl:with-param>
       </xsl:call-template>
 
       <!-- insert filter -->
@@ -572,6 +580,7 @@
     <xsl:param name="ColumnTagNum"/>
     <xsl:param name="defaultFontSize"/>
     <xsl:param name="ignoreFilter"/>
+    <xsl:param name="tableId"/>
     <!-- baseFontSize -->
 
     <!-- compute default row height -->
@@ -699,6 +708,9 @@
           <xsl:value-of select="$CheckIfDefaultBorder"/>
         </xsl:with-param>
         <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+        <xsl:with-param name="tableId">
+          <xsl:value-of select="$tableId"/>
+        </xsl:with-param>
       </xsl:apply-templates>
     </sheetData>
 
