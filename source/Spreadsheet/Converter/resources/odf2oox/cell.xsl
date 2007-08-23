@@ -540,6 +540,10 @@
     <xsl:param name="CheckIfDefaultBorder"/>
     <xsl:param name="ignoreFilter"/>
     <xsl:param name="tableId"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
 
     <xsl:variable name="height">
       <xsl:call-template name="point-measure">
@@ -609,6 +613,18 @@
             <xsl:value-of select="$MergeCellStyle"/>
           </xsl:with-param>
           <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		<xsl:with-param name="cellFormats">
+        	<xsl:value-of select="$cellFormats"/>
+      	</xsl:with-param>
+        <xsl:with-param name="cellStyles">
+       	 <xsl:value-of select="$cellStyles"/>
+        </xsl:with-param>
         </xsl:apply-templates>
     </row>
 
@@ -617,7 +633,7 @@
       <xsl:if test="@table:number-rows-repeated">
         <xsl:if
           test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true')">
-          <xsl:call-template name="InsertRepeatedRows">
+          <!--xsl:call-template name="InsertRepeatedRows">
             <xsl:with-param name="numberRowsRepeated">
               <xsl:value-of select="@table:number-rows-repeated"/>
             </xsl:with-param>
@@ -649,7 +665,7 @@
               <xsl:value-of select="$CheckIfDefaultBorder"/>
             </xsl:with-param>
             <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
-          </xsl:call-template>
+          </xsl:call-template-->
         </xsl:if>
       </xsl:if>
 
@@ -699,6 +715,18 @@
           <xsl:with-param name="tableId">
             <xsl:value-of select="$tableId"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		  <xsl:with-param name="cellFormats">
+        	<xsl:value-of select="$cellFormats"/>
+      	  </xsl:with-param>
+      	  <xsl:with-param name="cellStyles">
+        	<xsl:value-of select="$cellStyles"/>
+      	  </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -741,6 +769,18 @@
           <xsl:with-param name="tableId">
             <xsl:value-of select="$tableId"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		  <xsl:with-param name="cellFormats">
+        	<xsl:value-of select="$cellFormats"/>
+      	  </xsl:with-param>
+      	  <xsl:with-param name="cellStyles">
+        	<xsl:value-of select="$cellStyles"/>
+      	  </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
@@ -784,6 +824,18 @@
           <xsl:with-param name="tableId">
             <xsl:value-of select="$tableId"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		  <xsl:with-param name="cellFormats">
+        	<xsl:value-of select="$cellFormats"/>
+      	  </xsl:with-param>
+      	  <xsl:with-param name="cellStyles">
+        	<xsl:value-of select="$cellStyles"/>
+      	  </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -906,6 +958,10 @@
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
     <xsl:message terminate="no">progress:table:table-cell</xsl:message>
     <xsl:variable name="CountStyleTableCell">
       <xsl:value-of
@@ -935,6 +991,18 @@
       </xsl:with-param>
       <xsl:with-param name="CountStyleTableCell">
         <xsl:value-of select="$CountStyleTableCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="multilines">
+        <xsl:value-of select="$multilines"/>
+      </xsl:with-param>
+      <xsl:with-param name="hyperlinkStyle">
+        <xsl:value-of select="$hyperlinkStyle"/>
+      </xsl:with-param>
+	  <xsl:with-param name="cellFormats">
+        <xsl:value-of select="$cellFormats"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellStyles">
+        <xsl:value-of select="$cellStyles"/>
       </xsl:with-param>
     </xsl:call-template>
 
@@ -981,6 +1049,10 @@
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
 
     <xsl:choose>
       <!-- Checks if  next index is table:table-cell-->
@@ -1011,6 +1083,18 @@
           <xsl:with-param name="MergeCellStyle">
             <xsl:value-of select="$MergeCellStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		  <xsl:with-param name="cellFormats">
+       		 <xsl:value-of select="$cellFormats"/>
+      	  </xsl:with-param>
+      	  <xsl:with-param name="cellStyles">
+        	<xsl:value-of select="$cellStyles"/>
+      	  </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!--  Checks if next index is table:covered-table-cell-->
@@ -1042,6 +1126,18 @@
           <xsl:with-param name="MergeCellStyle">
             <xsl:value-of select="$MergeCellStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		<xsl:with-param name="cellFormats">
+        <xsl:value-of select="$cellFormats"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellStyles">
+        <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -1059,6 +1155,11 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CountStyleTableCell"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
+
 
     <!-- do not show covered cells content -->
 
@@ -1083,6 +1184,18 @@
       </xsl:with-param>
       <xsl:with-param name="CountStyleTableCell">
         <xsl:value-of select="$CountStyleTableCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="multilines">
+        <xsl:value-of select="$multilines"/>
+      </xsl:with-param>
+      <xsl:with-param name="hyperlinkStyle">
+        <xsl:value-of select="$hyperlinkStyle"/>
+      </xsl:with-param>
+	  <xsl:with-param name="cellFormats">
+        <xsl:value-of select="$cellFormats"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellStyles">
+        <xsl:value-of select="$cellStyles"/>
       </xsl:with-param>
     </xsl:call-template>
 
@@ -1125,6 +1238,18 @@
           <xsl:with-param name="CountStyleTableCell">
             <xsl:value-of select="$CountStyleTableCell"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		  <xsl:with-param name="cellFormats">
+        	<xsl:value-of select="$cellFormats"/>
+      	  </xsl:with-param>
+      	  <xsl:with-param name="cellStyles">
+        	<xsl:value-of select="$cellStyles"/>
+      	 </xsl:with-param>
         </xsl:call-template>
 
       </xsl:when>
@@ -1150,6 +1275,18 @@
           <xsl:with-param name="MergeCellStyle">
             <xsl:value-of select="$MergeCellStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		  <xsl:with-param name="cellFormats">
+        	<xsl:value-of select="$cellFormats"/>
+      	  </xsl:with-param>
+      	  <xsl:with-param name="cellStyles">
+        	<xsl:value-of select="$cellStyles"/>
+      	  </xsl:with-param>
         </xsl:call-template>
 
       </xsl:otherwise>
@@ -1169,6 +1306,10 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CountStyleTableCell"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+     <xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
 
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
@@ -1219,17 +1360,6 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="cellFormats">
-      <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
-      />
-    </xsl:variable>
-
-    <xsl:variable name="cellStyles">
-      <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
-      />
-    </xsl:variable>
 
     <xsl:if
       test="child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
@@ -1263,12 +1393,12 @@
           <!-- if it is a hyperlink  in the cell-->
           <xsl:when test="descendant::text:a[not(ancestor::office:annotation)]">
 
-            <xsl:variable name="multilines">
+            <!--xsl:variable name="multilines">
               <xsl:for-each
                 select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
                 <xsl:value-of select="count(descendant::table:table-cell/text:p[2])"/>
               </xsl:for-each>
-            </xsl:variable>
+            </xsl:variable-->
 
             <xsl:attribute name="s">
               <xsl:choose>
@@ -1279,13 +1409,6 @@
                 </xsl:when>
 
                 <xsl:otherwise>
-                  <xsl:variable name="hyperlinkStyle">
-                    <xsl:for-each select="document('styles.xml')">
-                      <xsl:for-each select="key('style','Hyperlink')">
-                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                      </xsl:for-each>
-                    </xsl:for-each>
-                  </xsl:variable>
                   <xsl:value-of select="$CountStyleTableCell + $hyperlinkStyle"/>
                 </xsl:otherwise>
               </xsl:choose>
@@ -1308,7 +1431,7 @@
                         <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                       </xsl:attribute>
                     </xsl:for-each>
-                  </xsl:when>
+          </xsl:when>
                   <xsl:otherwise>
                     <xsl:variable name="TableStyleName">
                       <xsl:value-of select="@table:style-name"/>

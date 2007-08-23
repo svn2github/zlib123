@@ -161,12 +161,53 @@
 
   <!-- insert all sheets -->
   <xsl:template name="InsertSheets">
+    
+    <xsl:variable name="multilines">
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
+        <xsl:value-of select="count(descendant::table:table-cell/text:p[2])"/>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="hyperlinkStyle">
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:for-each select="key('style','Hyperlink')">
+          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:variable>
+
+
+    <xsl:variable name="cellFormats">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
+      />
+    </xsl:variable>
+
+    <xsl:variable name="cellStyles">
+      <xsl:value-of
+        select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
+      />
+    </xsl:variable>
+    
     <!-- convert first table -->
     <xsl:apply-templates
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[1]"
       mode="sheet">
       <xsl:with-param name="cellNumber">0</xsl:with-param>
       <xsl:with-param name="sheetId">1</xsl:with-param>
+      <xsl:with-param name="multilines">
+        <xsl:value-of select="$multilines"/>
+      </xsl:with-param>
+      <xsl:with-param name="hyperlinkStyle">
+        <xsl:value-of select="$hyperlinkStyle"/>
+      </xsl:with-param>
+	  <xsl:with-param name="cellFormats">
+        <xsl:value-of select="$cellFormats"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellStyles">
+        <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
     </xsl:apply-templates>
   </xsl:template>
 

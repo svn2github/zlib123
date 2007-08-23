@@ -65,6 +65,11 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
     <xsl:param name="tableId" select="generate-id()"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
+    
 
     <xsl:if test="not(table:scenario)">
       <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
@@ -74,6 +79,18 @@
           <xsl:with-param name="tableId">
             <xsl:value-of select="$tableId"/>
           </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+		 <xsl:with-param name="cellFormats">
+        	<xsl:value-of select="$cellFormats"/>
+      	</xsl:with-param>
+        <xsl:with-param name="cellStyles">
+        	<xsl:value-of select="$cellStyles"/>
+        </xsl:with-param>
         </xsl:call-template>
       </pzip:entry>
     </xsl:if>
@@ -91,6 +108,18 @@
       <xsl:with-param name="sheetId">
         <xsl:value-of select="$sheetId + 1"/>
       </xsl:with-param>
+      <xsl:with-param name="multilines">
+        <xsl:value-of select="$multilines"/>
+      </xsl:with-param>
+      <xsl:with-param name="hyperlinkStyle">
+        <xsl:value-of select="$hyperlinkStyle"/>
+      </xsl:with-param>
+	  <xsl:with-param name="cellFormats">
+        <xsl:value-of select="$cellFormats"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellStyles">
+        <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
     </xsl:apply-templates>
 
   </xsl:template>
@@ -100,6 +129,10 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
     <xsl:param name="tableId"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+ 	<xsl:param name="cellFormats"/>
+   <xsl:param name="cellStyles"/>
 
     <worksheet>
 
@@ -204,6 +237,18 @@
         <xsl:with-param name="tableId">
           <xsl:value-of select="$tableId"/>
         </xsl:with-param>
+        <xsl:with-param name="multilines">
+          <xsl:value-of select="$multilines"/>
+        </xsl:with-param>
+        <xsl:with-param name="hyperlinkStyle">
+          <xsl:value-of select="$hyperlinkStyle"/>
+        </xsl:with-param>
+	  <xsl:with-param name="cellFormats">
+        <xsl:value-of select="$cellFormats"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellStyles">
+        <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
       </xsl:call-template>
 
       <!-- insert filter -->
@@ -581,6 +626,11 @@
     <xsl:param name="defaultFontSize"/>
     <xsl:param name="ignoreFilter"/>
     <xsl:param name="tableId"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
+    
     <!-- baseFontSize -->
 
     <!-- compute default row height -->
@@ -711,6 +761,18 @@
         <xsl:with-param name="tableId">
           <xsl:value-of select="$tableId"/>
         </xsl:with-param>
+        <xsl:with-param name="multilines">
+          <xsl:value-of select="$multilines"/>
+        </xsl:with-param>
+        <xsl:with-param name="hyperlinkStyle">
+          <xsl:value-of select="$hyperlinkStyle"/>
+        </xsl:with-param>
+	  <xsl:with-param name="cellFormats">
+        <xsl:value-of select="$cellFormats"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellStyles">
+        <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
       </xsl:apply-templates>
     </sheetData>
 
