@@ -1414,6 +1414,105 @@
         </c:dLbls>
       </xsl:if>
 
+      <!-- error indicator -->
+      <xsl:for-each select="key('series','')[position() = $number]">
+        <xsl:if test="chart:error-indicator">
+          <xsl:variable name="type">
+            <xsl:value-of
+              select="key('style',$styleName)/style:chart-properties/@chart:error-category"/>
+          </xsl:variable>
+
+          <!-- only this types can be converted -->
+          <xsl:if test="$type = 'constant' or $type = 'percentage' ">
+            <c:errBars>
+
+              <xsl:for-each select="key('style',$styleName)/style:chart-properties">
+                
+                <!-- indicators -->
+                <c:errBarType val="both">
+                  <xsl:attribute name="val">
+                    <xsl:choose>
+                      <xsl:when
+                        test="@chart:error-upper-indicator = 'true' and @chart:error-lower-indicator = 'true' ">
+                        <xsl:text>both</xsl:text>
+                      </xsl:when>
+                      <xsl:when test="@chart:error-upper-indicator = 'true' ">
+                        <xsl:text>plus</xsl:text>
+                      </xsl:when>
+                      <xsl:when test="@chart:error-lower-indicator = 'true' ">
+                        <xsl:text>minus</xsl:text>
+                      </xsl:when>
+                    </xsl:choose>
+                  </xsl:attribute>
+                </c:errBarType>
+
+                <!-- error type -->
+                <xsl:choose>
+                  <!-- fixed value -->
+                  <xsl:when test="$type = 'constant' ">
+                    <xsl:choose>
+                      <xsl:when test="@chart:error-lower-limit = @chart:error-upper-limit">
+                        <c:errValType val="fixedVal"/>
+                        <c:val>
+                          <xsl:attribute name="val">
+                            <xsl:value-of select="@chart:error-lower-limit"/>
+                          </xsl:attribute>
+                        </c:val>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <c:errValType val="cust"/>
+                        <c:plus>
+                          <c:numLit>
+                            <c:formatCode>General</c:formatCode>
+                            <c:ptCount val="1"/>
+                            <c:pt idx="0">
+                              <c:v>
+                                <xsl:value-of select="@chart:error-upper-limit"/>
+                              </c:v>
+                            </c:pt>
+                          </c:numLit>
+                        </c:plus>
+                        <c:minus>
+                          <c:numLit>
+                            <c:formatCode>General</c:formatCode>
+                            <c:ptCount val="1"/>
+                            <c:pt idx="0">
+                              <c:v>
+                                <xsl:value-of select="@chart:error-lower-limit"/>
+                              </c:v>
+                            </c:pt>
+                          </c:numLit>
+                        </c:minus>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:when>
+                  <!-- percentage -->
+                  <xsl:when test="$type = 'percentage' ">
+                    <c:errValType val="percentage"/>
+                    <c:val>
+                      <xsl:attribute name="val">
+                        <xsl:value-of select="@chart:error-percentage"/>
+                      </xsl:attribute>
+                    </c:val>
+                  </xsl:when>
+                </xsl:choose>
+                
+              </xsl:for-each>
+
+              <!-- error indicator graphic properties -->
+              <xsl:for-each select="chart:error-indicator">
+                <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
+                  <c:spPr>
+                    <xsl:call-template name="InsertDrawingBorder"/>
+                  </c:spPr>
+                </xsl:for-each>
+              </xsl:for-each>
+
+            </c:errBars>
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
+
       <!-- marker type -->
       <!-- if line chart or radar chart or bar chart with lines -->
       <xsl:if
