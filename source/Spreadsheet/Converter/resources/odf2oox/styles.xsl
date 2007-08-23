@@ -2400,7 +2400,9 @@
 
 
   <xsl:template name="InsertHyperlinksProperties">
-    <xsl:if test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+    <xsl:if
+      test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+
       <xsl:variable name="xfId">
         <xsl:value-of
           select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
@@ -2419,12 +2421,21 @@
         />
       </xsl:variable>
 
-      <xf numFmtId="0" fillId="0" borderId="0" xfId="{$xfId}">
 
-        <xsl:attribute name="fontId">
-          <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
-        </xsl:attribute>
-      </xf>
+      <xsl:variable name="fontId">
+        <xsl:choose>
+          <xsl:when
+            test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' and @style:family = 'table-cell']">
+            <xsl:value-of select="$contentFontCount + $styleFontCount"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xf numFmtId="0" fillId="0" borderId="0" xfId="{$xfId}" fontId="{$fontId}"/>
+
     </xsl:if>
   </xsl:template>
 
