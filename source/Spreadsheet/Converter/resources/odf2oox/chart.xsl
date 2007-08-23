@@ -1119,7 +1119,7 @@
       <xsl:for-each
         select="key('style',parent::node()/chart:axis[@chart:name = 'primary-x']/@chart:style-name)/style:chart-properties">
         <xsl:choose>
-          <xsl:when test="@chart:origin != '' and @chart:origin != 0">
+          <xsl:when test="key('chart','')/@chart:class = 'chart:scatter' and @chart:origin != '' and @chart:origin != 0">
             <c:crossesAt>
               <xsl:attribute name="val">
                 <xsl:value-of select="@chart:origin"/>
