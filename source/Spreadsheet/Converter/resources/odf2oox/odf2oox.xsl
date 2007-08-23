@@ -231,6 +231,9 @@
         <!-- create VmlDrawing.xml file -->
         <xsl:if test="$oleObject = 'true'">
             <xsl:call-template name="CreateVmlDrawing"/>
+          <pzip:entry pzip:target="xl/media/image1.emf">
+            <empty/>
+          </pzip:entry>       
         </xsl:if>
      
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
