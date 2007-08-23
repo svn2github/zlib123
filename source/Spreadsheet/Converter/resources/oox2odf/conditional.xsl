@@ -547,8 +547,8 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()=</xsl:text>
-              <xsl:value-of select="e:formula"/>
+              <xsl:text>is-true-formula(FALSE)</xsl:text>
+              <!--for cfRules not supported by converter;-->
             </xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
