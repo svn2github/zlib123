@@ -56,6 +56,7 @@
   <xsl:key name="plotArea" match="c:plotArea" use="''"/>
   <xsl:key name="grouping" match="c:grouping" use="''"/>
   <xsl:key name="spPr" match="c:spPr" use="''"/>
+  <xsl:key name="error" match="c:errBars" use="''"/>
 
   <xsl:template name="CreateObjectCharts">
     <!-- @Description: Searches for all charts within workbook and starts conversion. -->
@@ -267,6 +268,7 @@
           </xsl:choose>
 
           <xsl:call-template name="InsertSeriesProperties"/>
+          <xsl:call-template name="InsertErrorProperties"/>
           <xsl:call-template name="InsertWallProperties"/>
           <xsl:call-template name="InsertFloorProperties"/>
         </office:automatic-styles>
@@ -312,6 +314,14 @@
           test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart and position() = 1">
           <chart:domain/>
         </xsl:if>
+
+        <!-- error indicator -->
+        <xsl:for-each select="c:errBars">
+          <xsl:if test="c:errValType/@val != 'stdErr' and c:errValType/@val != 'stdDev' ">
+            <chart:error-indicator chart:style-name="{concat('error',generate-id(.))}"/>
+          </xsl:if>
+        </xsl:for-each>
+
         <chart:data-point>
           <xsl:attribute name="chart:repeated">
             <xsl:value-of select="key('numPoints','')/@val"/>
@@ -1105,7 +1115,7 @@
                 <xsl:call-template name="InsertFill"/>
               </xsl:otherwise>
             </xsl:choose>
-            
+
             <xsl:call-template name="InsertLineColor"/>
             <xsl:call-template name="InsertLineStyle"/>
           </xsl:for-each>
@@ -1384,6 +1394,63 @@
             </xsl:if>
           </xsl:for-each>
 
+          <!-- error marker -->
+          <xsl:for-each
+            select="c:errBars[c:errValType/@val != 'stdErr' and c:errValType/@val != 'stdDev' ]">
+
+            <!-- error type -->
+            <xsl:choose>
+              <xsl:when test="c:errValType/@val = 'percentage' ">
+                <xsl:attribute name="chart:error-category">
+                  <xsl:text>percentage</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="c:errValType/@val = 'fixedVal' or c:errValType/@val = 'cust' ">
+                <xsl:attribute name="chart:error-category">
+                  <xsl:text>constant</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+
+            <!-- error range -->
+            <xsl:if test="c:errValType/@val = 'percentage' ">
+              <xsl:attribute name="chart:error-percentage">
+                <xsl:value-of select="c:val/@val"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="c:errValType/@val = 'fixedVal' ">
+              <xsl:for-each select="c:val">
+                <xsl:attribute name="chart:error-lower-limit">
+                  <xsl:value-of select="@val"/>
+                </xsl:attribute>
+                <xsl:attribute name="chart:error-upper-limit">
+                  <xsl:value-of select="@val"/>
+                </xsl:attribute>
+              </xsl:for-each>
+            </xsl:if>
+            <xsl:if test="c:errValType/@val = 'cust' ">
+              <xsl:attribute name="chart:error-lower-limit">
+                <xsl:value-of select="c:minus/c:numLit/c:pt[1]/c:v"/>
+              </xsl:attribute>
+              <xsl:attribute name="chart:error-upper-limit">
+                <xsl:value-of select="c:plus/c:numLit/c:pt[1]/c:v"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- indicators -->
+            <xsl:if test="c:errBarType/@val = 'plus' or c:errBarType/@val = 'both' ">
+              <xsl:attribute name="chart:error-upper-indicator">
+                <xsl:text>true</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="c:errBarType/@val = 'minus' or c:errBarType/@val = 'both' ">
+              <xsl:attribute name="chart:error-lower-indicator">
+                <xsl:text>true</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+
+          </xsl:for-each>
+
         </style:chart-properties>
 
         <style:graphic-properties>
@@ -1435,6 +1502,23 @@
             </xsl:if>
           </xsl:for-each>
         </style:text-properties>
+      </style:style>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertErrorProperties">
+    <xsl:for-each
+      select="key('error','')[c:errValType/@val != 'stdErr' and c:errValType/@val != 'stdDev' ]">
+      <style:style style:name="{concat('error',generate-id(.))}" style:family="chart">
+        <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
+          svg:stroke-color="#000000" draw:marker-start="" draw:marker-start-width="0.2cm"
+          draw:marker-start-center="false" draw:marker-end="" draw:marker-end-width="0.2cm"
+          draw:marker-end-center="false" svg:stroke-opacity="100%">
+          <xsl:for-each select="c:spPr">
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
+        </style:graphic-properties>
       </style:style>
     </xsl:for-each>
   </xsl:template>
