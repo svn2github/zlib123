@@ -248,7 +248,8 @@
       </style:style>
     </xsl:if>
 
-    <xsl:if test="@min != @max">
+    <!-- TO DO: do not create column style without break when this is e:col for single column and it has break -->
+    <!--xsl:if test="not(@min != @max and substring-before($manualBreakes,';') &lt;= @max)"-->
       <style:style style:name="{generate-id(.)}" style:family="table-column">
         <style:table-column-properties>
           <xsl:if test="@width">
@@ -260,7 +261,7 @@
           </xsl:if>
         </style:table-column-properties>
       </style:style>
-    </xsl:if>
+    <!--/xsl:if-->
 
     <xsl:if test="following-sibling::e:col">
       <xsl:apply-templates select="following-sibling::e:col[1]" mode="automaticstyles">
