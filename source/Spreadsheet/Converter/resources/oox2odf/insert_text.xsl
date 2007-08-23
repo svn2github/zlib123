@@ -26,19 +26,19 @@
       * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
       * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-  <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-      xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
-      xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-      xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-      xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-      xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-      xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-      xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-      xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-      xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
-      
-       <xsl:template name="InsertText">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+
+  <xsl:template name="InsertText">
     <xsl:param name="position"/>
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
@@ -270,7 +270,14 @@
             <xsl:attribute name="office:date-value">
               <xsl:call-template name="NumberToDate">
                 <xsl:with-param name="value">
-                  <xsl:value-of select="e:v"/>
+                  <xsl:choose>
+                    <xsl:when test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
+                      <xsl:value-of select="(e:v) + (1462)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="e:v"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:attribute>
@@ -392,31 +399,31 @@
         </text:p>
       </xsl:otherwise>
     </xsl:choose>
-       </xsl:template>
-    
-    <!-- change  '%20' to space  after conversion-->
-    <xsl:template name="Change20PercentToSpace">
-      <xsl:param name="string"/>
-      
-      <xsl:choose>
-        <xsl:when test="contains($string,'%20')">
-          <xsl:choose>
-            <xsl:when test="substring-before($string,'%20') =''">
-              <xsl:call-template name="Change20PercentToSpace">
-                <xsl:with-param name="string" select="concat(' ',substring-after($string,'%20'))"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="substring-before($string,'%20') !=''">
-              <xsl:call-template name="Change20PercentToSpace">
-                <xsl:with-param name="string"
-                  select="concat(substring-before($string,'%20'),' ',substring-after($string,'%20'))"
-                />
-              </xsl:call-template>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:when>
-        
-        <!--xsl:when test="contains($slash,'..\..\..\')">
+  </xsl:template>
+
+  <!-- change  '%20' to space  after conversion-->
+  <xsl:template name="Change20PercentToSpace">
+    <xsl:param name="string"/>
+
+    <xsl:choose>
+      <xsl:when test="contains($string,'%20')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'%20') =''">
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string" select="concat(' ',substring-after($string,'%20'))"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="substring-before($string,'%20') !=''">
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string"
+                select="concat(substring-before($string,'%20'),' ',substring-after($string,'%20'))"
+              />
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <!--xsl:when test="contains($slash,'..\..\..\')">
           <xsl:choose>
           <xsl:when test="substring-before($slash,'..\..\..\') =''">
           <xsl:call-template name="Change20PercentToSpace">
@@ -426,172 +433,172 @@
           </xsl:when>
           </xsl:choose>
           </xsl:when-->
-        
-        <xsl:when test="contains($string,'..\..\')">
-          <xsl:choose>
-            <xsl:when test="substring-before($string,'..\..\') =''">
-              
-              <xsl:call-template name="Change20PercentToSpace">
-                <xsl:with-param name="string"
-                  select="concat('../../../',substring-after($string,'..\..\'))"/>
-              </xsl:call-template>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:when>
-        
-        <xsl:when test="contains($string,'..\')">
-          <xsl:choose>
-            <xsl:when test="substring-before($string,'..\') =''">
-              
-              <xsl:call-template name="Change20PercentToSpace">
-                <xsl:with-param name="string" select="concat('../../',substring-after($string,'..\'))"
-                />
-              </xsl:call-template>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:when>
-        
-        
-        <xsl:when test="not(contains($string,'../')) and not(contains($string,'..\..\'))">
-          
-          <xsl:value-of select="concat('../',$string)">
-            <!--xsl:call-template name="Change20PercentToSpace">
+
+      <xsl:when test="contains($string,'..\..\')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'..\..\') =''">
+
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string"
+                select="concat('../../../',substring-after($string,'..\..\'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:when test="contains($string,'..\')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'..\') =''">
+
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string" select="concat('../../',substring-after($string,'..\'))"
+              />
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+
+      <xsl:when test="not(contains($string,'../')) and not(contains($string,'..\..\'))">
+
+        <xsl:value-of select="concat('../',$string)">
+          <!--xsl:call-template name="Change20PercentToSpace">
               <xsl:with-param name="slash" select="concat('..\',substring-after($string,''))"/>
               </xsl:call-template-->
-          </xsl:value-of>
-          
-        </xsl:when>
-        
-        <xsl:otherwise>
-          <xsl:value-of select="$string"/>
-          <!--xsl:value-of select="translate($string,'\','/')"/-->
-        </xsl:otherwise>
-      </xsl:choose>
-      
-    </xsl:template>
-    
-    <!--  convert multiple white spaces  -->
-    <xsl:template name="InsertWhiteSpaces">
-      <xsl:param name="string" select="."/>
-      <xsl:param name="length" select="string-length(.)"/>
-      <!-- string which doesn't contain whitespaces-->
-      <xsl:choose>
-        <xsl:when test="not(contains($string,' '))">
-          <xsl:value-of select="$string"/>
-        </xsl:when>
-        <!-- convert white spaces  -->
-        <xsl:otherwise>
-          <xsl:variable name="before">
-            <xsl:value-of select="substring-before($string,' ')"/>
-          </xsl:variable>
-          <xsl:variable name="after">
-            <xsl:call-template name="CutStartSpaces">
-              <xsl:with-param name="cuted">
-                <xsl:value-of select="substring-after($string,' ')"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:if test="$before != '' ">
-            <xsl:value-of select="concat($before,' ')"/>
-          </xsl:if>
-          <!--add remaining whitespaces as text:s if there are any-->
-          <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
-            <xsl:choose>
-              <xsl:when test="($length - string-length(concat($before, $after))) = 1">
-                <text:s/>
-              </xsl:when>
-              <xsl:otherwise>
-                <text:s>
-                  <xsl:attribute name="text:c">
-                    <xsl:choose>
-                      <xsl:when test="$before = ''">
-                        <xsl:value-of select="$length - string-length($after)"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$length - string-length(concat($before,' ', $after))"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:attribute>
-                </text:s>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
-          <!--repeat it for substring which has whitespaces-->
-          <xsl:if test="contains($string,' ') and $length &gt; 0">
-            <xsl:call-template name="InsertWhiteSpaces">
-              <xsl:with-param name="string">
-                <xsl:value-of select="$after"/>
-              </xsl:with-param>
-              <xsl:with-param name="length">
-                <xsl:value-of select="string-length($after)"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:template>
-    
-    <!--  cut start spaces -->
-    <xsl:template name="CutStartSpaces">
-      <xsl:param name="cuted"/>
-      <xsl:choose>
-        <xsl:when test="starts-with($cuted,' ')">
+        </xsl:value-of>
+
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:value-of select="$string"/>
+        <!--xsl:value-of select="translate($string,'\','/')"/-->
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <!--  convert multiple white spaces  -->
+  <xsl:template name="InsertWhiteSpaces">
+    <xsl:param name="string" select="."/>
+    <xsl:param name="length" select="string-length(.)"/>
+    <!-- string which doesn't contain whitespaces-->
+    <xsl:choose>
+      <xsl:when test="not(contains($string,' '))">
+        <xsl:value-of select="$string"/>
+      </xsl:when>
+      <!-- convert white spaces  -->
+      <xsl:otherwise>
+        <xsl:variable name="before">
+          <xsl:value-of select="substring-before($string,' ')"/>
+        </xsl:variable>
+        <xsl:variable name="after">
           <xsl:call-template name="CutStartSpaces">
             <xsl:with-param name="cuted">
-              <xsl:value-of select="substring-after($cuted,' ')"/>
+              <xsl:value-of select="substring-after($string,' ')"/>
             </xsl:with-param>
           </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$cuted"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:template>
-    
-    <xsl:template name="CountContinuous">
-      <xsl:param name="count" select="0"/>
-      
-      <xsl:variable name="carryOn">
-        <xsl:choose>
-          <xsl:when test="following-sibling::e:c[1]/@s and not(following-sibling::e:c[1]/e:v)">
-            <xsl:variable name="position">
-              <xsl:value-of select="following-sibling::e:c[1]/@s + 1"/>
-            </xsl:variable>
-            <xsl:variable name="horizontal">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
-              </xsl:for-each>
-            </xsl:variable>
-            
-            <xsl:choose>
-              <xsl:when test="$horizontal = 'centerContinuous' ">
-                <xsl:text>true</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>false</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-            
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      
+        </xsl:variable>
+        <xsl:if test="$before != '' ">
+          <xsl:value-of select="concat($before,' ')"/>
+        </xsl:if>
+        <!--add remaining whitespaces as text:s if there are any-->
+        <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
+          <xsl:choose>
+            <xsl:when test="($length - string-length(concat($before, $after))) = 1">
+              <text:s/>
+            </xsl:when>
+            <xsl:otherwise>
+              <text:s>
+                <xsl:attribute name="text:c">
+                  <xsl:choose>
+                    <xsl:when test="$before = ''">
+                      <xsl:value-of select="$length - string-length($after)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$length - string-length(concat($before,' ', $after))"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </text:s>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+        <!--repeat it for substring which has whitespaces-->
+        <xsl:if test="contains($string,' ') and $length &gt; 0">
+          <xsl:call-template name="InsertWhiteSpaces">
+            <xsl:with-param name="string">
+              <xsl:value-of select="$after"/>
+            </xsl:with-param>
+            <xsl:with-param name="length">
+              <xsl:value-of select="string-length($after)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--  cut start spaces -->
+  <xsl:template name="CutStartSpaces">
+    <xsl:param name="cuted"/>
+    <xsl:choose>
+      <xsl:when test="starts-with($cuted,' ')">
+        <xsl:call-template name="CutStartSpaces">
+          <xsl:with-param name="cuted">
+            <xsl:value-of select="substring-after($cuted,' ')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$cuted"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="CountContinuous">
+    <xsl:param name="count" select="0"/>
+
+    <xsl:variable name="carryOn">
       <xsl:choose>
-        <xsl:when test="$carryOn = 'true'">
-          <xsl:for-each select="following-sibling::e:c[1]">
-            <xsl:call-template name="CountContinuous">
-              <xsl:with-param name="count" select="$count + 1"/>
-            </xsl:call-template>
-          </xsl:for-each>
+        <xsl:when test="following-sibling::e:c[1]/@s and not(following-sibling::e:c[1]/e:v)">
+          <xsl:variable name="position">
+            <xsl:value-of select="following-sibling::e:c[1]/@s + 1"/>
+          </xsl:variable>
+          <xsl:variable name="horizontal">
+            <xsl:for-each select="document('xl/styles.xml')">
+              <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:choose>
+            <xsl:when test="$horizontal = 'centerContinuous' ">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+
         </xsl:when>
         <xsl:otherwise>
-          <!-- number of following cells plus the starting one -->
-          <xsl:value-of select="$count + 1"/>
+          <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:template>
-      
-      </xsl:stylesheet>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$carryOn = 'true'">
+        <xsl:for-each select="following-sibling::e:c[1]">
+          <xsl:call-template name="CountContinuous">
+            <xsl:with-param name="count" select="$count + 1"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- number of following cells plus the starting one -->
+        <xsl:value-of select="$count + 1"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+</xsl:stylesheet>
