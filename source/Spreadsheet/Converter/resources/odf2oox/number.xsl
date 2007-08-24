@@ -1027,7 +1027,7 @@
         <xsl:for-each
           select="document('styles.xml')/office:document-styles/office:styles/number:time-style[@style:name=$numStyle]">
           <xsl:value-of
-            select="count(preceding-sibling::number:date-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount+$dateStyleCount+$styleDateStyleCount+$timeStyleCount"
+            select="count(preceding-sibling::number:time-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount+$dateStyleCount+$styleDateStyleCount+$timeStyleCount"
           />
         </xsl:for-each>
       </xsl:when>
@@ -1072,7 +1072,7 @@
       <xsl:when test="$symbol = 'GBP' ">[$GBP]</xsl:when>
       <xsl:when test="$symbol = 'zł' ">&quot;zł&quot;</xsl:when>
       <xsl:when test="$symbol = 'PLN' ">[$PLN]</xsl:when>
-      <xsl:when test="$symbol = 'ДИН' ">[$Дин.-C1A]</xsl:when>
+      <xsl:when test="$symbol = 'Д�?Н' ">[$Дин.-C1A]</xsl:when>
       <xsl:when test="$symbol = 'лв' or $symbol = 'лв.' ">[$лв-402]</xsl:when>
       <xsl:when test="$symbol = '€' and $country = 'IE' and $language = 'ga' ">[$€-1809]</xsl:when>
       <xsl:when test="$symbol = '€' and $country = 'PT' and $language = 'pt' ">[$€-816]</xsl:when>
