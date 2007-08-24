@@ -973,6 +973,30 @@
           </xsl:call-template>
         </xsl:for-each>
       </c:hiLowLines>
+
+      <!-- stock gain/loss bars -->
+      <xsl:if test="$numSeries = 4">
+        <c:upDownBars>
+          <c:gapWidth val="150"/>
+          
+          <c:upBars>
+            <xsl:for-each select="chart:plot-area/chart:stock-gain-marker">
+              <xsl:call-template name="InsertSpPr">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:for-each>            
+          </c:upBars>
+          
+          <c:downBars>
+            <xsl:for-each select="chart:plot-area/chart:stock-loss-marker">
+              <xsl:call-template name="InsertSpPr">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:for-each>            
+          </c:downBars>
+          
+        </c:upDownBars>
+      </xsl:if>
     </xsl:if>
 
     <c:axId val="104463360"/>
@@ -1913,8 +1937,7 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:if>
-      <!--zzz><xsl:value-of select="$number"/>/<xsl:value-of select="$numSeries"/></zzz-->
-        
+
       <xsl:choose>
         <!-- insert X and Y values-->
         <xsl:when test="$chartType = 'chart:scatter' ">
