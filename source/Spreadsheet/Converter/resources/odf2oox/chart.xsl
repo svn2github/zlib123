@@ -273,6 +273,10 @@
     <xsl:param name="chartHeight"/>
     <xsl:param name="chartDirectory"/>
 
+    <xsl:variable name="chartType">
+      <xsl:value-of select="@chart:class"/>
+    </xsl:variable>
+
     <xsl:for-each select="chart:plot-area">
 
       <xsl:variable name="plotXOffset">
@@ -311,74 +315,193 @@
           </xsl:call-template>
         </xsl:for-each>
 
-        <!-- secondary chart -->
-        <xsl:if test="key('series','')[@chart:class]">
-          <xsl:for-each select="parent::node()">
-            <c:lineChart>
-              <c:grouping val="standard"/>
+        <!-- secondary charts -->
+        <xsl:choose>
+          <!-- line chart for 'bar chart with lines' -->
+          <xsl:when
+            test="$chartType = 'chart:bar' and key('series','')[@chart:class = 'chart:line' ]">
+            <xsl:for-each select="parent::node()">
+              <c:lineChart>
+                <c:grouping val="standard"/>
 
-              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:call-template name="InsertSecondaryChartContent">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
+
+              </c:lineChart>
+            </xsl:for-each>
+          </xsl:when>
+          <!-- bar chart for 'stock chart with bar'  (StockChart 3&4) -->
+          <xsl:when
+            test="$chartType = 'chart:scatter' and key('series','')[@chart:class = 'chart:bar' ]">
+            <xsl:for-each select="parent::node()">
+              <c:barChart>
+                <c:grouping val="standard"/>
+
+                <xsl:call-template name="InsertSecondaryChartContent">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
+
+              </c:barChart>
+            </xsl:for-each>
+          </xsl:when>
+          <!-- secondary axis case (eliminate for now case when third chart is required - bar chart with lines and secondary axis) -->
+          <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->          
+          <xsl:when
+            test="key('series','')[@chart:attached-axis = 'secondary-y'] and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])
+            and not($chartType = 'chart:stock')">
+            <xsl:for-each select="parent::node()">
+              <xsl:call-template name="InsertChartType">
                 <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="priority">
+                  <xsl:text>secondary</xsl:text>
+                </xsl:with-param>
               </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
 
-            </c:lineChart>
+        <xsl:if test="not(key('chart','')/@chart:class = 'chart:circle')">
+
+          <!-- primary X axis -->
+          <xsl:for-each select="chart:axis[@chart:name = 'primary-x' ]">
+            <xsl:choose>
+              <!-- scater chart has value axis-X-->
+              <xsl:when test="key('chart','')/@chart:class = 'chart:scatter' ">
+                <c:valAx>
+                  <xsl:call-template name="InsertAxisX">
+                    <xsl:with-param name="chartWidth" select="$chartWidth"/>
+                    <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                    <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                    <xsl:with-param name="priority">
+                      <xsl:text>primary</xsl:text>
+                    </xsl:with-param>
+                    <xsl:with-param name="type">
+                      <xsl:text>valAx</xsl:text>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </c:valAx>
+              </xsl:when>
+              <xsl:otherwise>
+                <c:catAx>
+                  <xsl:call-template name="InsertAxisX">
+                    <xsl:with-param name="chartWidth" select="$chartWidth"/>
+                    <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                    <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                    <xsl:with-param name="priority">
+                      <xsl:text>primary</xsl:text>
+                    </xsl:with-param>
+                    <xsl:with-param name="type">
+                      <xsl:text>catAx</xsl:text>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </c:catAx>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:for-each>
-        </xsl:if>
 
-        <xsl:if test="not(//chart:chart[attribute::chart:class='chart:ring'])">
-          <xsl:if test="not(//chart:chart[attribute::chart:class='chart:circle'])">
+          <!-- primary Y axis -->
+          <xsl:for-each select="chart:axis[@chart:name='primary-y']">
+            <xsl:call-template name="InsertAxisY">
+              <xsl:with-param name="chartWidth" select="$chartWidth"/>
+              <xsl:with-param name="chartHeight" select="$chartHeight"/>
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              <xsl:with-param name="priority">
+                <xsl:text>primary</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
 
-            <!-- TO DO secondary axis case -->
-            <xsl:for-each select="chart:axis[@chart:name = 'primary-x' ]">
-              <xsl:choose>
-                <!-- scater chart has value axis-X-->
-                <xsl:when test="key('chart','')/@chart:class = 'chart:scatter' ">
-                  <c:valAx>
-                    <xsl:call-template name="InsertAxisX">
-                      <xsl:with-param name="chartWidth" select="$chartWidth"/>
-                      <xsl:with-param name="chartHeight" select="$chartHeight"/>
-                      <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-                      <xsl:with-param name="type">
-                        <xsl:text>valAx</xsl:text>
-                      </xsl:with-param>
-                    </xsl:call-template>
-                  </c:valAx>
-                </xsl:when>
-                <xsl:otherwise>
-                  <c:catAx>
-                    <xsl:call-template name="InsertAxisX">
-                      <xsl:with-param name="chartWidth" select="$chartWidth"/>
-                      <xsl:with-param name="chartHeight" select="$chartHeight"/>
-                      <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-                      <xsl:with-param name="type">
-                        <xsl:text>catAx</xsl:text>
-                      </xsl:with-param>
-                    </xsl:call-template>
-                  </c:catAx>
-                </xsl:otherwise>
-              </xsl:choose>
+          <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->
+          <xsl:if test="chart:axis[contains(@chart:name,'secondary')] and not($chartType = 'chart:stock')">
 
-            </xsl:for-each>
+            <!-- secondary Y axis -->
+            <xsl:choose>
+              <xsl:when test="chart:axis[@chart:name='secondary-y']">
+                <xsl:for-each select="chart:axis[@chart:name='secondary-y']">
+                  <xsl:call-template name="InsertAxisY">
+                    <xsl:with-param name="chartWidth" select="$chartWidth"/>
+                    <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                    <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                    <xsl:with-param name="priority">
+                      <xsl:text>secondary</xsl:text>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:for-each>
+              </xsl:when>
+              <!-- hidden default axis -->
+              <xsl:otherwise>
+                <c:valAx>
+                  <c:axId val="104461824"/>
+                  <c:scaling>
+                    <c:orientation val="minMax"/>
+                  </c:scaling>
+                  <c:delete val="1"/>
+                  <c:axPos val="r"/>
+                  <c:numFmt formatCode="General" sourceLinked="0"/>
+                  <c:tickLblPos val="nextTo"/>
+                  <c:crossAx val="104425728"/>
+                  <c:crosses val="max"/>
+                  <c:crossBetween val="between"/>
+                </c:valAx>
+              </xsl:otherwise>
+            </xsl:choose>
 
-            <!-- TO DO secondary axis case -->
-            <xsl:for-each select="chart:axis[@chart:name='primary-y']">
-              <xsl:call-template name="InsertAxisY">
-                <xsl:with-param name="chartWidth" select="$chartWidth"/>
-                <xsl:with-param name="chartHeight" select="$chartHeight"/>
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              </xsl:call-template>
-            </xsl:for-each>
+            <!-- secondary X axis (there can't be one in Calc?) -->
+            <!-- default axes -->
+            <xsl:choose>
+              <!-- scater chart has value axis-X-->
+              <xsl:when test="key('chart','')/@chart:class = 'chart:scatter' ">
+                <c:valAx>
+                  <c:axId val="104425728"/>
+                  <c:scaling>
+                    <c:orientation val="minMax"/>
+                  </c:scaling>
+                  <c:delete val="1"/>
+                  <c:axPos val="t"/>
+                  <c:numFmt formatCode="General" sourceLinked="1"/>
+                  <c:tickLblPos val="nextTo"/>
+                  <c:crossAx val="104461824"/>
+                  <c:crossBetween val="midCat"/>
+                </c:valAx>
+              </xsl:when>
+              <xsl:otherwise>
+                <c:catAx>
+                  <c:axId val="104425728"/>
+                  <c:scaling>
+                    <c:orientation val="minMax"/>
+                  </c:scaling>
+                  <c:delete val="1"/>
+                  <c:axPos val="t"/>
+                  <c:tickLblPos val="nextTo"/>
+                  <c:crossAx val="104461824"/>
+                  <c:auto val="1"/>
+                  <c:lblAlgn val="ctr"/>
+                  <c:lblOffset val="100"/>
+                </c:catAx>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:if>
+
         </xsl:if>
 
         <!-- for the Radar Chart -->
         <xsl:if
-          test="//chart:chart[attribute::chart:class='chart:radar'] and not(boolean(//chart:axis/chart:categories))">
+          test="key('chart','')/@chart:class='chart:radar' and not(key('chart','')/chart:plot-area/chart:axis/chart:categories)">
           <xsl:for-each select="chart:axis[@chart:dimension = 'y' ]">
-            <xsl:call-template name="InsertCatAx">
-              <xsl:with-param name="chartWidth" select="$chartWidth+20"/>
-              <xsl:with-param name="chartHeight" select="$chartHeight"/>
-            </xsl:call-template>
+            <c:catAx>
+              <xsl:call-template name="InsertAxisX">
+                <xsl:with-param name="chartWidth" select="$chartWidth"/>
+                <xsl:with-param name="chartHeight" select="$chartHeight"/>
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="priority">
+                  <xsl:text>primary</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="type">
+                  <xsl:text>catAx</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </c:catAx>
           </xsl:for-each>
         </xsl:if>
 
@@ -466,6 +589,7 @@
     <!-- @Description: Inserts appriopiate type of chart -->
     <!-- @Context: chart:chart -->
     <xsl:param name="chartDirectory"/>
+    <xsl:param name="priority" select="'primary'"/>
 
     <xsl:choose>
       <xsl:when
@@ -487,9 +611,19 @@
             <xsl:call-template name="SetDataGroupingAtribute"/>
           </c:grouping>
 
-          <xsl:call-template name="InsertChartContent">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
           <!-- set shape -->
           <c:shape val="box">
@@ -523,9 +657,19 @@
             <xsl:call-template name="SetDataGroupingAtribute"/>
           </c:grouping>
 
-          <xsl:call-template name="InsertChartContent">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
           <!-- set overlap for stacked data charts -->
           <xsl:for-each
@@ -537,14 +681,25 @@
 
         </c:barChart>
       </xsl:when>
+
       <xsl:when
         test="@chart:class='chart:line' and key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:three-dimensional = 'true' ">
         <c:line3DChart>
           <c:grouping val="standard"/>
 
-          <xsl:call-template name="InsertChartContent">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
         </c:line3DChart>
       </xsl:when>
@@ -555,12 +710,23 @@
             <xsl:call-template name="SetDataGroupingAtribute"/>
           </c:grouping>
 
-          <xsl:call-template name="InsertChartContent">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
         </c:lineChart>
       </xsl:when>
+
       <xsl:when
         test="@chart:class='chart:area' and key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:three-dimensional = 'true' ">
         <c:area3DChart>
@@ -569,9 +735,19 @@
             <xsl:call-template name="SetDataGroupingAtribute"/>
           </c:grouping>
 
-          <xsl:call-template name="InsertChartContent">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
         </c:area3DChart>
       </xsl:when>
@@ -582,12 +758,23 @@
             <xsl:call-template name="SetDataGroupingAtribute"/>
           </c:grouping>
 
-          <xsl:call-template name="InsertChartContent">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
         </c:areaChart>
       </xsl:when>
+
       <xsl:when
         test="@chart:class='chart:circle' and key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:three-dimensional = 'true' ">
         <c:pie3DChart>
@@ -597,6 +784,7 @@
           </xsl:call-template>
         </c:pie3DChart>
       </xsl:when>
+
       <xsl:when test="@chart:class='chart:circle' ">
         <c:pieChart>
           <c:varyColors val="1"/>
@@ -605,6 +793,7 @@
           </xsl:call-template>
         </c:pieChart>
       </xsl:when>
+
       <xsl:when test="@chart:class='chart:ring' ">
         <c:doughnutChart>
           <c:varyColors val="1"/>
@@ -615,6 +804,7 @@
           <c:holeSize val="50"/>
         </c:doughnutChart>
       </xsl:when>
+
       <xsl:when test="@chart:class='chart:radar' ">
         <c:radarChart>
           <c:radarStyle val="marker"/>
@@ -623,20 +813,48 @@
           </xsl:call-template>
         </c:radarChart>
       </xsl:when>
-      <!-- making problems at this time -->
+
       <xsl:when test="@chart:class='chart:scatter' ">
         <c:scatterChart>
           <c:scatterStyle val="lineMarker"/>
-          <xsl:call-template name="InsertChartContent">
-            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          </xsl:call-template>
+
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+
         </c:scatterChart>
       </xsl:when>
+
       <!--xsl:when test="@chart:class='chart:stock' ">
         <c:stockChart>
-          <xsl:call-template name="InsertChartContent"/>
+
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary' ">
+              <xsl:call-template name="InsertChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertSecondaryChartContent">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="cause" select="'secondary-axis'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+
         </c:stockChart>
-      </xsl:when>-->
+      </xsl:when-->
+
       <!-- temporary otherwise eventually none -->
       <xsl:otherwise>
         <c:barChart>
@@ -664,7 +882,7 @@
 
     <xsl:variable name="numSeries">
       <!-- (number) number of series inside chart -->
-      <xsl:value-of select="count(key('series','')[not(@chart:class='chart:line')])"/>
+      <xsl:value-of select="count(key('series','')[not(@chart:class)])"/>
     </xsl:variable>
 
     <xsl:variable name="numPoints">
@@ -724,6 +942,10 @@
       </xsl:for-each>
     </xsl:variable>
 
+    <xsl:variable name="chartType">
+      <xsl:value-of select="@chart:class"/>
+    </xsl:variable>
+
     <xsl:for-each select="key('rows','')">
       <xsl:call-template name="InsertSeries">
         <xsl:with-param name="numSeries" select="$numSeries"/>
@@ -732,6 +954,7 @@
         <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
         <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
         <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+        <xsl:with-param name="chartType" select="$chartType"/>
       </xsl:call-template>
     </xsl:for-each>
 
@@ -743,8 +966,8 @@
       </c:dLbls>
     </xsl:if>
 
-    <c:axId val="110226048"/>
-    <c:axId val="110498176"/>
+    <c:axId val="104463360"/>
+    <c:axId val="104460288"/>
 
   </xsl:template>
 
@@ -754,9 +977,19 @@
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>
     <xsl:param name="chartDirectory"/>
+    <xsl:param name="priority"/>
     <xsl:param name="type"/>
 
-    <c:axId val="110226048"/>
+    <xsl:choose>
+      <!-- primary X id -->
+      <xsl:when test="$priority = 'primary' ">
+        <c:axId val="104463360"/>
+      </xsl:when>
+      <!-- secondary X id -->
+      <xsl:otherwise>
+        <c:axId val="104425728"/>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <c:scaling>
       <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
@@ -787,16 +1020,32 @@
       </xsl:if>
     </c:scaling>
 
-    <c:axPos val="b"/>
+    <xsl:choose>
+      <xsl:when test="$priority = 'primary'">
+        <c:axPos val="b"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <c:axPos val="t"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
 
     <!-- grid lines -->
-    <xsl:for-each select="chart:grid">
-      <c:majorGridlines>
-        <xsl:call-template name="InsertSpPr">
-          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-        </xsl:call-template>
-      </c:majorGridlines>
-    </xsl:for-each>
+    <xsl:choose>
+      <xsl:when test="chart:grid">
+        <xsl:for-each select="chart:grid">
+          <c:majorGridlines>
+            <xsl:call-template name="InsertSpPr">
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+            </xsl:call-template>
+          </c:majorGridlines>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="key('chart','')/@chart:class = 'chart:radar' ">
+        <c:majorGridlines/>
+      </xsl:when>
+    </xsl:choose>
+
 
     <!-- axis title -->
     <xsl:for-each select="chart:title">
@@ -831,7 +1080,7 @@
 
     <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
       <xsl:if
-        test="not (@chart:tick-marks-major-inner = 'false' and @chart:tick-marks-major-outer = 'true' )">
+        test="@chart:tick-marks-major-inner and not (@chart:tick-marks-major-inner = 'false' and @chart:tick-marks-major-outer = 'true' )">
         <c:majorTickMark>
           <xsl:attribute name="val">
             <xsl:choose>
@@ -914,7 +1163,17 @@
       </c:txPr>
     </xsl:if>
 
-    <c:crossAx val="110498176"/>
+    <xsl:choose>
+      <!-- primary Y id -->
+      <xsl:when test="$priority = 'primary' ">
+        <c:crossAx val="104460288"/>
+      </xsl:when>
+      <!-- secondary Y id -->
+      <xsl:otherwise>
+        <c:crossAx val="104461824"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
     <xsl:for-each
       select="key('style',parent::node()/chart:axis[@chart:name = 'primary-y']/@chart:style-name)/style:chart-properties">
       <c:crossesAt val="0">
@@ -974,9 +1233,20 @@
     <xsl:param name="chartWidth"/>
     <xsl:param name="chartHeight"/>
     <xsl:param name="chartDirectory"/>
+    <xsl:param name="priority"/>
 
     <c:valAx>
-      <c:axId val="110498176"/>
+
+      <xsl:choose>
+        <!-- primary Y id -->
+        <xsl:when test="$priority = 'primary' ">
+          <c:axId val="104460288"/>
+        </xsl:when>
+        <!-- secondary Y id -->
+        <xsl:otherwise>
+          <c:axId val="104461824"/>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <c:scaling>
         <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
@@ -1005,7 +1275,14 @@
         </xsl:for-each>
       </c:scaling>
 
-      <c:axPos val="l"/>
+      <xsl:choose>
+        <xsl:when test="$priority = 'primary'">
+          <c:axPos val="l"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <c:axPos val="r"/>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <!-- grid lines -->
       <xsl:for-each select="chart:grid">
@@ -1031,7 +1308,7 @@
 
       <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
         <xsl:if
-          test="not (@chart:tick-marks-major-inner = 'false' and @chart:tick-marks-major-outer = 'true' )">
+          test="@chart:tick-marks-major-inner and not (@chart:tick-marks-major-inner = 'false' and @chart:tick-marks-major-outer = 'true' )">
           <c:majorTickMark>
             <xsl:attribute name="val">
               <xsl:choose>
@@ -1076,6 +1353,17 @@
       </xsl:for-each>
 
       <c:tickLblPos val="low">
+        <xsl:attribute name="val">
+        <xsl:choose>
+          <xsl:when test="$priority = 'primary' ">
+            <xsl:text>low</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>nextTo</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        </xsl:attribute>
+        
         <xsl:if
           test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'false' ">
           <xsl:attribute name="val">
@@ -1114,20 +1402,38 @@
         </c:txPr>
       </xsl:if>
 
-      <c:crossAx val="110226048"/>
+      <xsl:choose>
+        <!-- primary X id -->
+        <xsl:when test="$priority = 'primary' ">
+          <c:crossAx val="104463360"/>
+        </xsl:when>
+        <!-- secondary X id -->
+        <xsl:otherwise>
+          <c:crossAx val="104425728"/>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <xsl:for-each
         select="key('style',parent::node()/chart:axis[@chart:name = 'primary-x']/@chart:style-name)/style:chart-properties">
         <xsl:choose>
-          <xsl:when test="key('chart','')/@chart:class = 'chart:scatter' and @chart:origin != '' and @chart:origin != 0">
+          <xsl:when
+            test="key('chart','')/@chart:class = 'chart:scatter' and @chart:origin != '' and @chart:origin != 0">
             <c:crossesAt>
               <xsl:attribute name="val">
                 <xsl:value-of select="@chart:origin"/>
               </xsl:attribute>
             </c:crossesAt>
           </xsl:when>
+          
           <xsl:otherwise>
-            <c:crosses val="autoZero"/>
+            <xsl:choose>
+              <xsl:when test="$priority = 'primary'">
+                <c:crosses val="autoZero"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <c:crosses val="max"/>                
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
@@ -1179,6 +1485,7 @@
     <xsl:param name="reverseCategories"/>
     <!-- series data source - rows or columns-->
     <xsl:param name="seriesFrom"/>
+    <xsl:param name="chartType"/>
 
     <xsl:variable name="number">
       <xsl:choose>
@@ -1194,7 +1501,7 @@
     <xsl:choose>
       <xsl:when test="$count &lt; $numSeries">
         <xsl:choose>
-          <!-- if therw is secondary axis ommit its series for now -->
+          <!-- if there is secondary axis ommit its series for now -->
           <xsl:when test="key('series','')[position() = $number and @chart:attached-axis]">
             <xsl:if
               test="key('series','')[position() = $number and @chart:attached-axis = 'primary-y']">
@@ -1206,6 +1513,7 @@
                 <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
                 <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
                 <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+                <xsl:with-param name="chartType" select="$chartType"/>
               </xsl:call-template>
             </xsl:if>
           </xsl:when>
@@ -1218,6 +1526,7 @@
               <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
               <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
               <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+              <xsl:with-param name="chartType" select="$chartType"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -1230,6 +1539,7 @@
           <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
           <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
           <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+          <xsl:with-param name="chartType" select="$chartType"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -1244,21 +1554,20 @@
     <xsl:param name="reverseCategories"/>
     <xsl:param name="chartDirectory"/>
     <xsl:param name="seriesFrom"/>
+    <xsl:param name="primarySeries" select="0"/>
+    <!-- (number) when this is secondary chart series primarySeries equals total number of primary series -->
+    <xsl:param name="chartType"/>
 
     <!-- count series from backwards if reverseSeries is = "true" -->
     <xsl:variable name="number">
       <xsl:choose>
         <xsl:when test="$reverseSeries = 'true' ">
-          <xsl:value-of select="$numSeries - $count"/>
+          <xsl:value-of select="$numSeries - $count + $primarySeries"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$count + 1"/>
+          <xsl:value-of select="$count + 1 + $primarySeries"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="chartType">
-      <xsl:value-of select="ancestor::chart:chart/@chart:class"/>
     </xsl:variable>
 
     <xsl:variable name="styleName">
@@ -1267,8 +1576,8 @@
     </xsl:variable>
 
     <c:ser>
-      <c:idx val="{$count}"/>
-      <c:order val="{$count}"/>
+      <c:idx val="{$primarySeries + $count}"/>
+      <c:order val="{$primarySeries + $count}"/>
 
       <!-- series name -->
       <c:tx>
@@ -1280,7 +1589,8 @@
             </xsl:when>
             <!-- for chart with swapped data sources-->
             <xsl:when test="$seriesFrom = 'rows'">
-              <xsl:value-of select="key('rows','')/table:table-row[$count+1]/table:table-cell[1]"/>
+              <xsl:value-of
+                select="key('rows','')/table:table-row[position() = $number]/table:table-cell[1]"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="key('header','')/table:table-row/table:table-cell[$number + 1]"
@@ -1427,7 +1737,7 @@
             <c:errBars>
 
               <xsl:for-each select="key('style',$styleName)/style:chart-properties">
-                
+
                 <!-- indicators -->
                 <c:errBarType val="both">
                   <xsl:attribute name="val">
@@ -1496,7 +1806,7 @@
                     </c:val>
                   </xsl:when>
                 </xsl:choose>
-                
+
               </xsl:for-each>
 
               <!-- error indicator graphic properties -->
@@ -1662,24 +1972,19 @@
                   </xsl:choose>
                 </xsl:variable>
 
-                <xsl:for-each select="ancestor::chart:chart">
+                <xsl:for-each select="key('rows','')">
                   <xsl:choose>
                     <xsl:when test="$reverseCategories = 'true' ">
-                      <xsl:for-each select="key('rows','')">
-                        <xsl:call-template name="InsertPointsReverse">
-                          <xsl:with-param name="series" select="$thisSeries"/>
-                          <xsl:with-param name="numCategories" select="$numPoints"/>
-                        </xsl:call-template>
-                      </xsl:for-each>
+                      <xsl:call-template name="InsertPointsReverse">
+                        <xsl:with-param name="series" select="$thisSeries + $primarySeries"/>
+                        <xsl:with-param name="numCategories" select="$numPoints"/>
+                      </xsl:call-template>
                     </xsl:when>
-
                     <xsl:otherwise>
-                      <xsl:for-each select="key('rows','')">
-                        <xsl:call-template name="InsertPoints">
-                          <xsl:with-param name="series" select="$thisSeries"/>
-                          <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
-                        </xsl:call-template>
-                      </xsl:for-each>
+                      <xsl:call-template name="InsertPoints">
+                        <xsl:with-param name="series" select="$thisSeries + $primarySeries"/>
+                        <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+                      </xsl:call-template>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:for-each>
@@ -1725,7 +2030,7 @@
       </xsl:when>
       <!-- for chart with swapped data sources -->
       <xsl:otherwise>
-        <xsl:for-each select="//table:table-rows/table:table-row">
+        <xsl:for-each select="key('rows','')/table:table-row">
           <xsl:if test="position()-1 = $series ">
             <xsl:for-each select="table:table-cell">
               <xsl:if test="@office:value-type!='string'">
@@ -1792,7 +2097,7 @@
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:for-each select="//table:table-header-rows/table:table-row/table:table-cell/text:p">
+        <xsl:for-each select="key('header','')/table:table-row/table:table-cell/text:p">
           <xsl:if test="./node() != '' and (position()-2) &gt; -1">
             <c:pt idx="{position() - 2}">
               <c:v>
@@ -2003,32 +2308,123 @@
     <!-- @Description: Inserts chart content -->
     <!-- @Context: chart:chart -->
     <xsl:param name="chartDirectory"/>
+    <xsl:param name="cause" select="'chart-class'"/>
+
+    <xsl:variable name="seriesFrom">
+      <xsl:value-of
+        select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:series-source"
+      />
+    </xsl:variable>
 
     <xsl:variable name="numSeries">
-      <!-- (number) number of series inside chart -->
-      <xsl:value-of select="count(key('series','')[@chart:class='chart:line'])"/>
+      <!-- (number) number of secondary series inside chart -->
+      <xsl:choose>
+        <xsl:when test="$cause = 'chart-class' ">
+          <xsl:value-of select="count(key('series','')[@chart:class])"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="count(key('series','')[@chart:attached-axis = 'secondary-y' ])"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="primarySeries">
+      <xsl:choose>
+        <xsl:when test="$cause = 'chart-class' ">
+          <xsl:value-of select="count(key('series','')[not(@chart:class)])"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="count(key('series','')[not(@chart:attached-axis = 'secondary-y' )])"
+          />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="chartType">
+      <xsl:value-of select="key('series','')[@chart:class][1]"/>
     </xsl:variable>
 
     <xsl:variable name="numPoints">
       <!-- (number) maximum number of data point -->
-      <xsl:value-of select="count(key('rows','')/table:table-row)"/>
+      <xsl:choose>
+        <!-- for chart with swapped data sources -->
+        <xsl:when test="$seriesFrom='rows'">
+          <xsl:call-template name="MaxPointNumber">
+            <xsl:with-param name="rowNumber">
+              <xsl:value-of select="number(1)"/>
+            </xsl:with-param>
+            <xsl:with-param name="CountCellsInRow"/>
+            <xsl:with-param name="maxValue">
+              <xsl:value-of select="number(0)"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowsQuantity">
+              <xsl:value-of select="count(key('rows','')/table:table-row)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="count(key('rows','')/table:table-row)"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="primarySeries">
-      <xsl:value-of select="count(key('series','')[not(@chart:class='chart:line')])"/>
+    <xsl:variable name="reverseCategories">
+      <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+        <xsl:choose>
+          <!-- reverse categories for: (pie charts) or (ring charts) or (2D bar charts stacked or percentage) -->
+          <xsl:when
+            test="(key('chart','')/@chart:class = 'chart:circle' ) or (key('chart','')/@chart:class = 'chart:ring' ) or 
+            (@chart:vertical = 'true' and @chart:three-dimensional = 'false' )">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="reverseSeries">
+      <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+        <xsl:choose>
+          <!-- reverse series for: (2D normal bar chart) or (2D normal area chart) or (ring:chart) -->
+          <xsl:when
+            test="(@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and @chart:three-dimensional = 'false' ) or 
+            (key('chart','')/@chart:class = 'chart:area' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and @chart:three-dimensional = 'false' ) or
+            (key('chart','')/@chart:class = 'chart:ring')">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
     </xsl:variable>
 
     <xsl:for-each select="key('rows','')">
       <xsl:call-template name="InsertSecondaryChartSeries">
         <xsl:with-param name="numSeries" select="$numSeries"/>
         <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+        <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
         <xsl:with-param name="primarySeries" select="$primarySeries"/>
         <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
       </xsl:call-template>
     </xsl:for-each>
 
-    <c:axId val="110226048"/>
-    <c:axId val="110498176"/>
+    <xsl:choose>
+      <!-- primary axes -->
+      <xsl:when test="not(chart:plot-area/chart:axis/@chart:name = 'secondary-y')">
+        <c:axId val="104463360"/>
+        <c:axId val="104460288"/>
+      </xsl:when>
+      <!-- secondary axes -->
+      <xsl:otherwise>
+        <c:axId val="104425728"/>
+        <c:axId val="104461824"/>
+      </xsl:otherwise>
+    </xsl:choose>
 
   </xsl:template>
 
@@ -2042,109 +2438,69 @@
     <xsl:param name="numPoints"/>
     <!-- (number) maximum number of data point -->
     <xsl:param name="primarySeries"/>
+    <xsl:param name="reverseCategories"/>
+    <xsl:param name="reverseSeries"/>
+    <xsl:param name="seriesFrom"/>
+    <xsl:param name="chartType"/>
     <xsl:param name="count" select="0"/>
     <!-- (number) loop counter -->
 
-    <!-- count series from backwards if reverseSeries is = "true" -->
-    <xsl:variable name="styleName">
-      <!-- (string) series style name -->
-      <xsl:value-of
-        select="key('series','')[position() = $primarySeries + 1 + $count]/@chart:style-name"/>
+    <xsl:variable name="number">
+      <xsl:choose>
+        <xsl:when test="$reverseSeries = 'true' ">
+          <xsl:value-of select="$numSeries - $count"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$count + 1"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:choose>
       <xsl:when test="$count &lt; $numSeries">
-        <c:ser>
-          <c:idx val="{$primarySeries + $count}"/>
-          <c:order val="{$primarySeries + $count}"/>
-
-          <!-- series name -->
-          <c:tx>
-            <c:v>
-              <xsl:value-of
-                select="key('header','')/table:table-row/table:table-cell[$primarySeries + $count + 2]"
-              />
-            </c:v>
-          </c:tx>
-
-          <xsl:for-each select="key('series','')[position() = $primarySeries + 1 + $count]">
-            <xsl:call-template name="InsertSpPr">
+        <xsl:choose>
+          <!-- if there is secondary axis ommit its series for now -->
+          <xsl:when test="key('series','')[position() = $number and @chart:attached-axis]">
+            <xsl:if
+              test="key('series','')[position() = $number and @chart:attached-axis = 'primary-y']">
+            <xsl:call-template name="Series">
+              <xsl:with-param name="numSeries" select="$numSeries"/>
+              <xsl:with-param name="primarySeries" select="$primarySeries"/>
+              <xsl:with-param name="numPoints" select="$numPoints"/>
+              <xsl:with-param name="count" select="$count"/>
+              <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+              <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
               <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              <xsl:with-param name="defaultFill" select="'solid'"/>
+              <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+              <xsl:with-param name="chartType" select="$chartType"/>
             </xsl:call-template>
-          </xsl:for-each>
-
-          <!-- marker type -->
-          <xsl:if
-            test="key('chart','' )/@chart:class = 'chart:line' or ancestor::chart:chart/chart:plot-area/chart:series[position() = $primarySeries + 1 + $count]/@chart:class = 'chart:line'">
-            <xsl:for-each
-              select="ancestor::chart:chart/chart:plot-area/chart:series[position() = $primarySeries + 1 + $count]">
-              <xsl:choose>
-                <xsl:when
-                  test="key('style',@chart:style-name )/style:chart-properties/@chart:symbol-type = 'none' ">
-                  <c:marker>
-                    <c:symbol val="none"/>
-                  </c:marker>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:for-each>
-          </xsl:if>
-
-          <!-- insert data categories -->
-          <c:cat>
-            <c:strLit>
-              <c:ptCount val="{$numPoints}"/>
-              <xsl:for-each select="key('rows','')">
-                <xsl:call-template name="InsertCategories">
-                  <xsl:with-param name="numCategories" select="$numPoints"/>
-                </xsl:call-template>
-              </xsl:for-each>
-            </c:strLit>
-          </c:cat>
-
-          <!-- series values -->
-          <c:val>
-            <c:numRef>
-              <!-- TO DO: reference to sheet cell -->
-              <!-- i.e. <c:f>Sheet1!$D$3:$D$4</c:f> -->
-              <c:numCache>
-                <c:formatCode>General</c:formatCode>
-                <c:ptCount val="{$numPoints}"/>
-
-                <!-- number of this series -->
-                <xsl:variable name="thisSeries">
-                  <xsl:value-of select="$primarySeries + $count"/>
-                </xsl:variable>
-
-                <xsl:for-each select="ancestor::chart:chart">
-                  <xsl:for-each select="key('rows','')">
-                    <xsl:call-template name="InsertPoints">
-                      <xsl:with-param name="series" select="$thisSeries"/>
-                    </xsl:call-template>
-                  </xsl:for-each>
-                </xsl:for-each>
-              </c:numCache>
-            </c:numRef>
-          </c:val>
-
-          <!-- smooth line -->
-          <xsl:for-each select="ancestor::chart:chart">
-            <xsl:if test="@chart:class = 'chart:line' ">
-              <xsl:for-each
-                select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
-                <xsl:if test="@chart:interpolation != 'none' ">
-                  <c:smooth val="1"/>
-                </xsl:if>
-              </xsl:for-each>
             </xsl:if>
-          </xsl:for-each>
-        </c:ser>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="Series">
+              <xsl:with-param name="numSeries" select="$numSeries"/>
+              <xsl:with-param name="primarySeries" select="$primarySeries"/>
+              <xsl:with-param name="numPoints" select="$numPoints"/>
+              <xsl:with-param name="count" select="$count"/>
+              <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+              <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+              <xsl:with-param name="chartType" select="$chartType"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
 
         <xsl:call-template name="InsertSecondaryChartSeries">
+          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
           <xsl:with-param name="numSeries" select="$numSeries"/>
           <xsl:with-param name="numPoints" select="$numPoints"/>
           <xsl:with-param name="primarySeries" select="$primarySeries"/>
+          <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+          <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+          <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
           <xsl:with-param name="count" select="$count + 1"/>
+          <xsl:with-param name="chartType" select="$chartType"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -2310,7 +2666,7 @@
           </c:y>
         </xsl:if>
       </xsl:when>
-      <xsl:when test="//chart:chart[@chart:class='chart:radar']">
+      <xsl:when test="key('chart','')/@chart:class = 'chart:radar' ">
         <c:y>
           <xsl:attribute name="val">
             <xsl:value-of select="20"/>
@@ -2378,66 +2734,6 @@
 
   </xsl:template>
 
-  <xsl:template name="InsertCatAx">
-    <!-- @Description: Inserts Category Axis -->
-    <!-- @Context: chart:chart -->
-    <xsl:param name="chartWidth"/>
-    <xsl:param name="chartHeight"/>
-
-    <c:catAx>
-      <c:axId val="110226048"/>
-      <c:scaling>
-        <c:orientation val="minMax"/>
-      </c:scaling>
-
-      <c:axPos val="b"/>
-      <xsl:call-template name="InsertTitle">
-        <xsl:with-param name="chartWidth" select="$chartWidth"/>
-        <xsl:with-param name="chartHeight" select="$chartHeight"/>
-      </xsl:call-template>
-      <c:majorGridlines/>
-
-
-      <c:tickLblPos val="low">
-        <xsl:if
-          test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'false' ">
-          <xsl:attribute name="val">
-            <xsl:text>none</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
-      </c:tickLblPos>
-
-      <c:spPr>
-        <a:ln w="3175">
-          <a:solidFill>
-            <a:srgbClr val="000000"/>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-        </a:ln>
-      </c:spPr>
-      <c:txPr>
-        <a:bodyPr rot="0" vert="horz"/>
-        <a:lstStyle/>
-        <a:p>
-          <a:pPr>
-            <a:defRPr sz="700" b="0" i="0" u="none" strike="noStrike" baseline="0">
-
-              <xsl:for-each select="key('style',@chart:style-name)/style:text-properties">
-                <!-- template common with text-box-->
-                <xsl:call-template name="InsertRunProperties"/>
-              </xsl:for-each>
-
-            </a:defRPr>
-          </a:pPr>
-          <a:endParaRPr lang="pl-PL"/>
-        </a:p>
-      </c:txPr>
-      <c:crossAx val="110498176"/>
-      <c:crosses val="autoZero"/>
-
-    </c:catAx>
-  </xsl:template>
-
   <!-- template returning the maximum amount of non-string cells in a row  -->
   <xsl:template name="MaxPointNumber">
     <!-- global amount of rows to be processed -->
@@ -2452,6 +2748,7 @@
         select="count(//table:table-row[$rowNumber]/table:table-cell[@office:value-type != 'string'])"
       />
     </xsl:param>
+
     <xsl:choose>
       <xsl:when test="$maxValue &lt; $CountCellsInRow and $rowNumber = $rowsQuantity">
         <xsl:value-of select="$CountCellsInRow"/>
