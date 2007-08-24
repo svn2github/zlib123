@@ -963,11 +963,7 @@
 	<xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:message terminate="no">progress:table:table-cell</xsl:message>
-    <xsl:variable name="CountStyleTableCell">
-      <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'])"
-      />
-    </xsl:variable>
+    
 
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
@@ -990,7 +986,7 @@
         <xsl:value-of select="$MergeCellStyle"/>
       </xsl:with-param>
       <xsl:with-param name="CountStyleTableCell">
-        <xsl:value-of select="$CountStyleTableCell"/>
+        <xsl:value-of select="$cellFormats - 1"/>
       </xsl:with-param>
       <xsl:with-param name="multilines">
         <xsl:value-of select="$multilines"/>
@@ -1025,12 +1021,15 @@
         <xsl:with-param name="num" select="$colNumber"/>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:variable name="noteId">
+      <xsl:value-of select="count(preceding::office:annotation)+1"/>
+    </xsl:variable>
     <pxsi:commentmark xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments"
-      ref="{concat($colChar,$rowNumber)}" noteId="{count(preceding::office:annotation)+1}"/>
+      ref="{concat($colChar,$rowNumber)}" noteId="{$noteId}"/>
 
     <pxsi:commentDrawingMark xmlns:x="urn:schemas-microsoft-com:office:excel"
       xmlns:pxsi="urn:cleverage:xmlns:post-processings:drawings"
-      noteId="{count(preceding::office:annotation)+1}">
+      noteId="{$noteId}">
       <x:Row>
         <xsl:value-of select="$rowNumber - 1"/>
       </x:Row>
@@ -1339,25 +1338,14 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="MergeStart">
-      <xsl:choose>
-        <xsl:when test="name() = 'table:covered-table-cell'">
-          <xsl:call-template name="CheckIfInMerge">
-            <xsl:with-param name="MergeCell">
-              <xsl:value-of select="$MergeCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="colNumber">
-              <xsl:value-of select="$colNumber + 1"/>
-            </xsl:with-param>
-            <xsl:with-param name="rowNumber">
-              <xsl:value-of select="$rowNumber"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>false</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
+    <xsl:variable name="colChar">
+      <xsl:call-template name="NumbersToChars">
+        <xsl:with-param name="num" select="$colNumber"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="cellNum">
+      <xsl:value-of select="concat($colChar, $rowNumber)"/>
     </xsl:variable>
 
 
@@ -1365,13 +1353,8 @@
       test="child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
 
       <c>
-        <xsl:attribute name="r">
-          <xsl:variable name="colChar">
-            <xsl:call-template name="NumbersToChars">
-              <xsl:with-param name="num" select="$colNumber"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="concat($colChar,$rowNumber)"/>
+        <xsl:attribute name="r">        
+          <xsl:value-of select="$cellNum"/>
         </xsl:attribute>
 
         <!-- insert cell style number -->
@@ -1393,13 +1376,6 @@
           <!-- if it is a hyperlink  in the cell-->
           <xsl:when test="descendant::text:a[not(ancestor::office:annotation)]">
 
-            <!--xsl:variable name="multilines">
-              <xsl:for-each
-                select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
-                <xsl:value-of select="count(descendant::table:table-cell/text:p[2])"/>
-              </xsl:for-each>
-            </xsl:variable-->
-
             <xsl:attribute name="s">
               <xsl:choose>
                 <!-- if there is no 'Hyperlink' style -->
@@ -1418,10 +1394,10 @@
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when
-                test="name() = 'table:covered-table-cell' and substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';') != ''">
+                test="name() = 'table:covered-table-cell' and substring-before(substring-after($MergeCellStyle, concat($cellNum, ':')), ';') != ''">
                 <xsl:variable name="style">
                   <xsl:value-of
-                    select="substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';')"
+                    select="substring-before(substring-after($MergeCellStyle, concat($cellNum, ':')), ';')"
                   />
                 </xsl:variable>
                 <xsl:choose>
@@ -1431,7 +1407,7 @@
                         <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                       </xsl:attribute>
                     </xsl:for-each>
-          </xsl:when>
+                    </xsl:when>
                   <xsl:otherwise>
                     <xsl:variable name="TableStyleName">
                       <xsl:value-of select="@table:style-name"/>

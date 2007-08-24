@@ -168,24 +168,27 @@
     <xsl:choose>
       <xsl:when test="@table:number-columns-spanned">
         
-        <xsl:variable name="CollStartChar">
-          <xsl:call-template name="NumbersToChars">
-            <xsl:with-param name="num">
-              <xsl:value-of select="$colNumber - 1"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
         
-        <xsl:variable name="CollEndChar">
-          <xsl:call-template name="NumbersToChars">
-            <xsl:with-param name="num">
-              <xsl:value-of select="@table:number-columns-spanned + $colNumber - 2"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>        
-        <xsl:value-of
-          select="concat(concat(concat(concat($CollStartChar,$rowNumber),':'),  @table:style-name), ';')"
-        />
+        <xsl:call-template name="InsertMergeStyle">
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNumber"/>
+          </xsl:with-param>
+          <xsl:with-param name="colNum">
+            <xsl:value-of select="$colNumber - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNumEnd">
+            <xsl:value-of select="$rowNumber + @table:number-rows-spanned - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="colNumEnd">
+            <xsl:value-of select="$colNumber + @table:number-columns-spanned - 2"/>
+          </xsl:with-param>
+          <xsl:with-param name="StyleName">
+            <xsl:value-of select="@table:style-name"/>
+          </xsl:with-param>
+        </xsl:call-template>
+    
+        
+        
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
@@ -238,7 +241,107 @@
   </xsl:template>
   
   
+  <xsl:template name="InsertMergeStyle">
+    <xsl:param name="rowNum"/>
+    <xsl:param name="colNum"/>
+    <xsl:param name="rowNumEnd"/>
+    <xsl:param name="colNumEnd"/>
+    <xsl:param name="StyleName"/>
+    <xsl:param name="Result"/>
+      
+    
+     <xsl:variable name="InsertMergeStyleCol">
+       <xsl:call-template name="InsertMergeStyleCol">
+       <xsl:with-param name="rowNum">
+         <xsl:value-of select="$rowNum"/>
+       </xsl:with-param>
+       <xsl:with-param name="colNum">
+         <xsl:value-of select="$colNum"/>
+       </xsl:with-param>
+       <xsl:with-param name="colNumEnd">
+         <xsl:value-of select="$colNumEnd"/>
+       </xsl:with-param>
+       <xsl:with-param name="StyleName">
+         <xsl:value-of select="$StyleName"/>
+       </xsl:with-param>      
+       </xsl:call-template>
+     </xsl:variable>
+      
+      <xsl:choose>
+        <xsl:when test="$rowNum &lt; $rowNumEnd">
+          <xsl:call-template name="InsertMergeStyle">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum + 1"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNumEnd">
+              <xsl:value-of select="$rowNumEnd"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNumEnd">
+              <xsl:value-of select="$colNumEnd"/>
+            </xsl:with-param>
+            <xsl:with-param name="StyleName">
+              <xsl:value-of select="$StyleName"/>
+            </xsl:with-param>
+            <xsl:with-param name="Result">
+              <xsl:value-of select="concat($Result, $InsertMergeStyleCol)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat($Result, $InsertMergeStyleCol)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+      
+      
+
+  </xsl:template>
   
+  <xsl:template name="InsertMergeStyleCol">
+    <xsl:param name="rowNum"/>
+    <xsl:param name="colNum"/>    
+    <xsl:param name="colNumEnd"/>
+    <xsl:param name="StyleName"/>
+    <xsl:param name="Result"/>
+    
+      <xsl:variable name="colNumChar">
+      <xsl:call-template name="NumbersToChars">
+        <xsl:with-param name="num">
+          <xsl:value-of select="$colNum"/>
+        </xsl:with-param>
+      </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:choose>
+        <xsl:when test="$colNum &lt; $colNumEnd">
+          <xsl:call-template name="InsertMergeStyleCol">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum + 1"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNumEnd">
+              <xsl:value-of select="$colNumEnd"/>
+            </xsl:with-param>
+            <xsl:with-param name="StyleName">
+              <xsl:value-of select="$StyleName"/>
+            </xsl:with-param>
+            <xsl:with-param name="Result">
+              <xsl:value-of select="concat($Result, $colNumChar, $rowNum, ':', $StyleName, ';')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat($Result, $colNumChar, $rowNum, ':', $StyleName, ';')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+      
+  </xsl:template>
   
   <!-- Variable with Merge Cell -->
   
