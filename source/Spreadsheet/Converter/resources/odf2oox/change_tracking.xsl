@@ -51,11 +51,11 @@
     <!-- Create Revisions Files -->
     <xsl:template name="CreateRevisionFiles">
         <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">                
-            <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']" mode="revisionFiles"/>
+            <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="revisionFiles"/>
         </xsl:for-each>
     </xsl:template>
     
-    <xsl:template match="table:cell-content-change|table:deletion|table:movement" mode="revisionFiles">
+    <xsl:template match="table:cell-content-change|table:deletion|table:movement|table:insertion|table:insertion" mode="revisionFiles">
         <xsl:param name="rId" select="1"/>
         
         <pzip:entry pzip:target="{concat('xl/revisions/revisionLog', generate-id(), '.xml')}">
@@ -66,8 +66,8 @@
             </xsl:call-template>
         </pzip:entry>
         
-        <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']">
-            <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']" mode="revisionFiles">
+        <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
+            <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="revisionFiles">
                 <xsl:with-param name="rId">
                     <xsl:value-of select="$rId+1"/>
                 </xsl:with-param>
@@ -326,12 +326,63 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 
-                
-                
               
+            </xsl:if>
+            
+            <xsl:if test="name()='table:insertion'">
                 
-                <!--table:source-range-address table:column="4" table:row="14" table:table="0"/>
-                <table:target-range-address table:column="4" table:row="24" table:table="0"/-->
+               
+                
+                <xsl:choose>
+                    
+                    <xsl:when test="@table:type='table'">
+                        
+                        <xsl:variable name="sheetId">
+                            <xsl:value-of select="@table:position+1"/>
+                        </xsl:variable>
+                        
+                        
+                        <ris rId="{$rId}" sheetId="{$sheetId}" name="{concat('[]', document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[position() = $sheetId]/@table:name)}" sheetPosition="{$sheetId}"/>
+        
+                    </xsl:when>
+                    
+                    <xsl:when test="@table:type='row'">
+                        
+                        <xsl:variable name="sheetId">
+                            <xsl:value-of select="@table:table+1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="rowInsert">
+                            <xsl:value-of select="@table:position + 1"/>
+                        </xsl:variable>
+                        
+                        <rrc rId="{$rId}" sId="{$sheetId}" ref="{concat('A', $rowInsert, ':XFD', $rowInsert)}" action="insertRow"/>
+                        
+                    </xsl:when>
+                    
+                    <xsl:when test="@table:type='column'">
+                        
+                        <xsl:variable name="sheetId">
+                            <xsl:value-of select="@table:table+1"/>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="colInsert">
+                            <xsl:call-template name="NumbersToChars">
+                                <xsl:with-param name="num">
+                                    <xsl:value-of select="@table:position"/>        
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <rrc rId="{$rId}" sId="{$sheetId}" ref="{concat($colInsert, '1:', $colInsert, '1048576')}" action="insertCol"/>
+                        
+                    </xsl:when>
+                    
+                </xsl:choose>
+                
+                
+                
+                
             </xsl:if>
             
         </revisions>

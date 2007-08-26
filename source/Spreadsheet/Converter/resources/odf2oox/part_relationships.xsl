@@ -83,7 +83,7 @@
   
   <xsl:template name="InsertRevisionsRels">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes/node()[name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']">                
+      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes/node()[name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">                
         <Relationship Id="{generate-id()}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog" Target="{concat('revisionLog', generate-id(), '.xml')}" /> 
       </xsl:for-each>
     </Relationships>
@@ -469,7 +469,7 @@
       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
       guid="{concat('{', '100', '}')}" diskRevisions="1" revisionId="2" version="3">          
       <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">         
-        <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']" mode="revisionHeaders">
+        <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="revisionHeaders">
           <xsl:with-param name="num">
             <xsl:text>1</xsl:text>
           </xsl:with-param>
@@ -478,7 +478,7 @@
     </headers>
   </xsl:template>
   
-  <xsl:template match="table:cell-content-change|table:deletion|table:movement" mode="revisionHeaders">
+  <xsl:template match="table:cell-content-change|table:deletion|table:movement|table:insertion" mode="revisionHeaders">
     <xsl:param name="num"/>
     
     <header maxSheetId="4" r:id="{generate-id()}" guid="{concat('{', $num, '}')}">
@@ -499,8 +499,8 @@
       </sheetIdMap>
     </header>
     
-    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']">
-      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']" mode="revisionHeaders">
+    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
+      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="revisionHeaders">
         <xsl:with-param name="num">
           <xsl:value-of select="$num + 1"/>
         </xsl:with-param>
