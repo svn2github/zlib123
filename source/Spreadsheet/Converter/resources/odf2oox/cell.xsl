@@ -122,7 +122,7 @@
           <xsl:if test="$checkColumnStyle = 'true' ">
             <xsl:for-each select="key('style',@table:default-cell-style-name)">
               <xsl:attribute name="style">
-                <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) - 1"/>
               </xsl:attribute>
             </xsl:for-each>
           </xsl:if>
@@ -544,6 +544,7 @@
     <xsl:param name="hyperlinkStyle"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
 
     <xsl:variable name="height">
       <xsl:call-template name="point-measure">
@@ -625,6 +626,9 @@
         <xsl:with-param name="cellStyles">
        	 <xsl:value-of select="$cellStyles"/>
         </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:apply-templates>
     </row>
 
@@ -679,6 +683,9 @@
             </xsl:with-param>
             <xsl:with-param name="cellStyles">
               <xsl:value-of select="$cellStyles"/>
+            </xsl:with-param>
+            <xsl:with-param name="CheckIfConditional">
+              <xsl:value-of select="$CheckIfConditional"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
@@ -742,6 +749,9 @@
       	  <xsl:with-param name="cellStyles">
         	<xsl:value-of select="$cellStyles"/>
       	  </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -796,6 +806,9 @@
       	  <xsl:with-param name="cellStyles">
         	<xsl:value-of select="$cellStyles"/>
       	  </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
@@ -851,6 +864,9 @@
       	  <xsl:with-param name="cellStyles">
         	<xsl:value-of select="$cellStyles"/>
       	  </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -874,6 +890,7 @@
     <xsl:param name="hyperlinkStyle"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
 
     <xsl:if
       test="table:table-cell/text:p or table:table-cell/@table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
@@ -932,6 +949,9 @@
               </xsl:with-param>
               <xsl:with-param name="cellStyles">
                 <xsl:value-of select="$cellStyles"/>
+              </xsl:with-param>
+              <xsl:with-param name="CheckIfConditional">
+                <xsl:value-of select="$CheckIfConditional"/>
               </xsl:with-param>
             </xsl:apply-templates>
           </row>
@@ -992,6 +1012,9 @@
               <xsl:with-param name="cellStyles">
                 <xsl:value-of select="$cellStyles"/>
               </xsl:with-param>
+              <xsl:with-param name="CheckIfConditional">
+                <xsl:value-of select="$CheckIfConditional"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
         </xsl:when>
@@ -1012,6 +1035,7 @@
     <xsl:param name="hyperlinkStyle"/>
 	<xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
     <xsl:message terminate="no">progress:table:table-cell</xsl:message>
     
 
@@ -1049,6 +1073,9 @@
       </xsl:with-param>
       <xsl:with-param name="cellStyles">
         <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
+      <xsl:with-param name="CheckIfConditional">
+        <xsl:value-of select="$CheckIfConditional"/>
       </xsl:with-param>
     </xsl:call-template>
 
@@ -1102,6 +1129,7 @@
     <xsl:param name="hyperlinkStyle"/>
 	<xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
 
     <xsl:choose>
       <!-- Checks if  next index is table:table-cell-->
@@ -1144,6 +1172,9 @@
       	  <xsl:with-param name="cellStyles">
         	<xsl:value-of select="$cellStyles"/>
       	  </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!--  Checks if next index is table:covered-table-cell-->
@@ -1187,6 +1218,9 @@
       <xsl:with-param name="cellStyles">
         <xsl:value-of select="$cellStyles"/>
       </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -1208,6 +1242,7 @@
     <xsl:param name="hyperlinkStyle"/>
 	<xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
 
 
     <!-- do not show covered cells content -->
@@ -1245,6 +1280,9 @@
       </xsl:with-param>
       <xsl:with-param name="cellStyles">
         <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
+      <xsl:with-param name="CheckIfConditional">
+        <xsl:value-of select="$CheckIfConditional"/>
       </xsl:with-param>
     </xsl:call-template>
 
@@ -1298,7 +1336,10 @@
       	  </xsl:with-param>
       	  <xsl:with-param name="cellStyles">
         	<xsl:value-of select="$cellStyles"/>
-      	 </xsl:with-param>
+      	  </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:when>
@@ -1336,6 +1377,9 @@
       	  <xsl:with-param name="cellStyles">
         	<xsl:value-of select="$cellStyles"/>
       	  </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:otherwise>
@@ -1359,6 +1403,7 @@
     <xsl:param name="hyperlinkStyle"/>
      <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
 
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
@@ -1454,7 +1499,7 @@
                   <xsl:when test="key('style', $style)">
                     <xsl:for-each select="key('style', $style)">
                       <xsl:attribute name="s">
-                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                       </xsl:attribute>
                     </xsl:for-each>
                     </xsl:when>
@@ -1462,22 +1507,20 @@
                     <xsl:variable name="TableStyleName">
                       <xsl:value-of select="@table:style-name"/>
                     </xsl:variable>
-                    <xsl:for-each select="document('styles.xml')">
-                      <xsl:for-each select="key('style',$TableStyleName)">
+                    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $TableStyleName ]">
                         <xsl:variable name="CountTableCell">
-                          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                         </xsl:variable>
                         <xsl:attribute name="s">
                           <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
                         </xsl:attribute>
-                      </xsl:for-each>
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
               <!-- when style is specified in cell -->
               <xsl:when
-                test="@table:style-name and not(name() ='table:covered-table-cell') and not(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != ''])">
+                test="@table:style-name and not(name() ='table:covered-table-cell') and not($CheckIfConditional = 'true')">
 
                 <xsl:variable name="StyleApplyStyleName">
                   <xsl:value-of select="@style:apply-style-name"/>
@@ -1487,7 +1530,7 @@
                   <xsl:when test="key('style',@table:style-name)">
                     <xsl:for-each select="key('style',@table:style-name)">
                       <xsl:attribute name="s">
-                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                       </xsl:attribute>
                     </xsl:for-each>
                   </xsl:when>
@@ -1495,15 +1538,13 @@
                     <xsl:variable name="TableStyleName">
                       <xsl:value-of select="@table:style-name"/>
                     </xsl:variable>
-                    <xsl:for-each select="document('styles.xml')">
-                      <xsl:for-each select="key('style',$TableStyleName)">
+                    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $TableStyleName ]">
                         <xsl:variable name="CountTableCell">
-                          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                         </xsl:variable>
                         <xsl:attribute name="s">
                           <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
                         </xsl:attribute>
-                      </xsl:for-each>
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
@@ -1514,27 +1555,25 @@
                   <xsl:when test="key('style',$columnCellStyle)">
                     <xsl:for-each select="key('style',$columnCellStyle)">
                       <xsl:attribute name="s">
-                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                       </xsl:attribute>
                     </xsl:for-each>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:for-each select="document('styles.xml')">
-                      <xsl:for-each select="key('style',$columnCellStyle)">
+                    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $columnCellStyle ]">
                         <xsl:variable name="CountTableCell">
-                          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                         </xsl:variable>
                         <xsl:attribute name="s">
                           <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
                         </xsl:attribute>
-                      </xsl:for-each>
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
               <!-- when style is specified for conditional -->
               <xsl:when
-                test="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+                test="$CheckIfConditional='true'">
 
                 <xsl:variable name="StyleApplyStyleName">
                   <xsl:value-of select="@style:apply-style-name"/>
@@ -1560,7 +1599,7 @@
                   <xsl:when test="key('style',@table:style-name)">
                     <xsl:for-each select="key('style',$TableStyleName)">
                       <xsl:variable name="CountTableCell">
-                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                       </xsl:variable>
                       <xsl:attribute name="s">
                         <!--xsl:value-of select="$CountTableCell + $CountConditionalStyle"/-->

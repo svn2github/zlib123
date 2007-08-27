@@ -69,6 +69,7 @@
     <xsl:param name="hyperlinkStyle"/>
 	<xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
     
 
     <xsl:if test="not(table:scenario)">
@@ -91,6 +92,9 @@
         <xsl:with-param name="cellStyles">
         	<xsl:value-of select="$cellStyles"/>
         </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
         </xsl:call-template>
       </pzip:entry>
     </xsl:if>
@@ -120,6 +124,9 @@
       <xsl:with-param name="cellStyles">
         <xsl:value-of select="$cellStyles"/>
       </xsl:with-param>
+      <xsl:with-param name="CheckIfConditional">
+        <xsl:value-of select="$CheckIfConditional"/>
+      </xsl:with-param>
     </xsl:apply-templates>
 
   </xsl:template>
@@ -131,8 +138,9 @@
     <xsl:param name="tableId"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
- 	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellFormats"/>
    <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
 
     <worksheet>
 
@@ -249,6 +257,9 @@
       <xsl:with-param name="cellStyles">
         <xsl:value-of select="$cellStyles"/>
       </xsl:with-param>
+        <xsl:with-param name="CheckIfConditional">
+          <xsl:value-of select="$CheckIfConditional"/>
+        </xsl:with-param>
       </xsl:call-template>
 
       <!-- insert filter -->
@@ -630,6 +641,7 @@
     <xsl:param name="hyperlinkStyle"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
+    <xsl:param name="CheckIfConditional"/>
     
     <!-- baseFontSize -->
 
@@ -773,6 +785,9 @@
       <xsl:with-param name="cellStyles">
         <xsl:value-of select="$cellStyles"/>
       </xsl:with-param>
+        <xsl:with-param name="CheckIfConditional">
+          <xsl:value-of select="$CheckIfConditional"/>
+        </xsl:with-param>
       </xsl:apply-templates>
     </sheetData>
 

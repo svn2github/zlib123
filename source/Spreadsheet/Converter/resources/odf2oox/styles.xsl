@@ -1192,7 +1192,7 @@
             test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
             <xsl:for-each
               select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
-              <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+              <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
             </xsl:for-each>
           </xsl:when>
           <!-- search parent style in content.xml -->
@@ -1698,17 +1698,15 @@
           <xsl:choose>
             <xsl:when test="key('style',@table:style-name)">
               <xsl:for-each select="key('style',@table:style-name)">
-                <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="TableStyleName">
                 <xsl:value-of select="@table:style-name"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')">
-                <xsl:for-each select="key('style',$TableStyleName)">
-                  <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                </xsl:for-each>
+              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$TableStyleName]">
+                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
@@ -1757,10 +1755,8 @@
                     <xsl:variable name="cellStyleName">
                       <xsl:value-of select="@table:style-name"/>
                     </xsl:variable>
-                    <xsl:for-each select="document('styles.xml')">
-                      <xsl:for-each select="key('style',$cellStyleName)">
+                    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$cellStyleName]">
                         <xsl:call-template name="XfId"/>
-                      </xsl:for-each>
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
@@ -1857,21 +1853,20 @@
                     </xsl:when>
                     <!-- when style is in styles.xml -->
                     <xsl:otherwise>
-                      <xsl:for-each select="document('styles.xml')">
-                        <xsl:for-each select="key('style',$columnCellStyle)">
+                      <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$columnCellStyle]">
+
 
                           <xsl:attribute name="xfId">
-                            <xsl:number count="style:style[@style:family='table-cell']" level="any"
-                            />
+                            <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
                           </xsl:attribute>
-
+                      
                           <xsl:call-template name="SetFormatProperties">
                             <xsl:with-param name="multiline">
                               <xsl:text>true</xsl:text>
                             </xsl:with-param>
                           </xsl:call-template>
 
-                        </xsl:for-each>
+
                       </xsl:for-each>
                     </xsl:otherwise>
                   </xsl:choose>

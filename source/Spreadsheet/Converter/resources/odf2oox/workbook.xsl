@@ -47,6 +47,7 @@
   <xsl:key name="ConfigItem" match="config:config-item" use="@config:name"/>
   <xsl:key name="style" match="style:style" use="@style:name"/>
   <xsl:key name="pageStyle" match="style:page-layout" use="@style:name"/>
+  <xsl:key name="styleMap" match="style:map" use="''"/>
 
   <!-- main workbook template-->
   <xsl:template name="InsertWorkbook">
@@ -170,11 +171,9 @@
     </xsl:variable>
     
     <xsl:variable name="hyperlinkStyle">
-      <xsl:for-each select="document('styles.xml')">
-        <xsl:for-each select="key('style','Hyperlink')">
-          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-        </xsl:for-each>
-      </xsl:for-each>
+      <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ]">
+          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell'])-1"/>
+        </xsl:for-each>  
     </xsl:variable>
 
 
@@ -188,6 +187,18 @@
       <xsl:value-of
         select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
       />
+    </xsl:variable>
+    
+    <xsl:variable name="CheckIfConditional">
+      <xsl:choose>
+        <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      
     </xsl:variable>
     
     <!-- convert first table -->
@@ -207,6 +218,9 @@
       </xsl:with-param>
       <xsl:with-param name="cellStyles">
         <xsl:value-of select="$cellStyles"/>
+      </xsl:with-param>
+      <xsl:with-param name="CheckIfConditional">
+        <xsl:value-of select="$CheckIfConditional"/>
       </xsl:with-param>
     </xsl:apply-templates>
   </xsl:template>
