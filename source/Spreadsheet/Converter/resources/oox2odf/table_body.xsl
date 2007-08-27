@@ -391,7 +391,7 @@
               </table:table-cell>
             </xsl:when>
             <xsl:when
-              test="($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '') and $GetMinRowWithElements=$currentRowNumber and not(e:c)">
+              test="($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '') and ($GetMinRowWithElements=$currentRowNumber or $GetMinRowWithElements=@r) and not(e:c)">
               <xsl:call-template name="InsertElementsBetweenTwoColl">
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
