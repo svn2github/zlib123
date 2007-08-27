@@ -993,10 +993,17 @@
     <!-- @Context: None -->
     
     <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
+      
+      <xsl:variable name="VarNumFmtId">
+        <xsl:value-of select="@numFmtId"/>
+      </xsl:variable>
+      
       <xsl:choose>
 
         <!-- time style -->
+        
         <xsl:when test="(@numFmtId &gt; 17 and @numFmtId &lt; 22) or (@numFmtId &gt; 44 and @numFmtId &lt; 48)">
+          <xsl:if test="not (preceding-sibling::e:xf/@numFmtId = $VarNumFmtId)">
           <number:time-style style:name="{concat('N',@numFmtId)}">
             <xsl:call-template name="InsertFixedTimeFormat">
               <xsl:with-param name="ID">
@@ -1004,6 +1011,7 @@
               </xsl:with-param>
             </xsl:call-template>
           </number:time-style>
+          </xsl:if>
         </xsl:when>
         
         <!-- date style -->

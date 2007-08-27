@@ -252,7 +252,7 @@
               test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
               <xsl:text>currency</xsl:text>
             </xsl:when>
-            <xsl:when test="$numId = 18">
+            <xsl:when test="$numId = 18 or $numId = 20 ">
               <xsl:text>time</xsl:text>
             </xsl:when>
             <xsl:when test="$numId = 49">
@@ -285,7 +285,7 @@
 
           <!--'and' at the end is for Latvian currency -->
           <xsl:when
-            test="(contains($numStyle,'h') or contains($numStyle,'s') or $numId = 18 and not(contains($numStyle,'[$Ls-426]')))">
+            test="(contains($numStyle,'h') or contains($numStyle,'s') or $numId = 18 or $numId = 20 and not(contains($numStyle,'[$Ls-426]')))">
             <xsl:attribute name="office:time-value">
               <xsl:call-template name="NumberToTime">
                 <xsl:with-param name="value">
