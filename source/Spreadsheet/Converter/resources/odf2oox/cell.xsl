@@ -665,6 +665,21 @@
               <xsl:value-of select="$CheckIfDefaultBorder"/>
             </xsl:with-param>
             <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+            <xsl:with-param name="tableId">
+              <xsl:value-of select="$tableId"/>
+            </xsl:with-param>
+            <xsl:with-param name="multilines">
+              <xsl:value-of select="$multilines"/>
+            </xsl:with-param>
+            <xsl:with-param name="hyperlinkStyle">
+              <xsl:value-of select="$hyperlinkStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="cellFormats">
+              <xsl:value-of select="$cellFormats"/>
+            </xsl:with-param>
+            <xsl:with-param name="cellStyles">
+              <xsl:value-of select="$cellStyles"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
       </xsl:if>
@@ -854,6 +869,11 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CheckIfDefaultBorder"/>
     <xsl:param name="ignoreFilter"/>
+    <xsl:param name="tableId"/>
+    <xsl:param name="multilines"/>
+    <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="cellFormats"/>
+    <xsl:param name="cellStyles"/>
 
     <xsl:if
       test="table:table-cell/text:p or table:table-cell/@table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
@@ -873,7 +893,7 @@
               <xsl:attribute name="customHeight">1</xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="parent::table:table-row-group and count(ancestor::table:table-row-group)">
+            <xsl:if test="parent::table:table-row-group and ancestor::table:table-row-group">
               <xsl:attribute name="outlineLevel">
                 <xsl:value-of select="count(ancestor::table:table-row-group)"/>
               </xsl:attribute>
@@ -897,6 +917,21 @@
               </xsl:with-param>
               <xsl:with-param name="MergeCellStyle">
                 <xsl:value-of select="$MergeCellStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="tableId">
+                <xsl:value-of select="$tableId"/>
+              </xsl:with-param>
+              <xsl:with-param name="multilines">
+                <xsl:value-of select="$multilines"/>
+              </xsl:with-param>
+              <xsl:with-param name="hyperlinkStyle">
+                <xsl:value-of select="$hyperlinkStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="cellFormats">
+                <xsl:value-of select="$cellFormats"/>
+              </xsl:with-param>
+              <xsl:with-param name="cellStyles">
+                <xsl:value-of select="$cellStyles"/>
               </xsl:with-param>
             </xsl:apply-templates>
           </row>
@@ -941,6 +976,21 @@
               </xsl:with-param>
               <xsl:with-param name="CheckIfDefaultBorder">
                 <xsl:value-of select="$CheckIfDefaultBorder"/>
+              </xsl:with-param>
+              <xsl:with-param name="tableId">
+                <xsl:value-of select="$tableId"/>
+              </xsl:with-param>
+              <xsl:with-param name="multilines">
+                <xsl:value-of select="$multilines"/>
+              </xsl:with-param>
+              <xsl:with-param name="hyperlinkStyle">
+                <xsl:value-of select="$hyperlinkStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="cellFormats">
+                <xsl:value-of select="$cellFormats"/>
+              </xsl:with-param>
+              <xsl:with-param name="cellStyles">
+                <xsl:value-of select="$cellStyles"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
