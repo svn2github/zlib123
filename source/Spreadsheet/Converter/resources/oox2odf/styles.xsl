@@ -133,66 +133,62 @@
       </xsl:for-each>
     </xsl:variable>
 
-    <!-- default & column Breake style -->
-    <xsl:choose>
-      <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks">
-        <style:style
-          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
-          style:family="table-column">
-          <style:table-column-properties fo:break-before="page">
-            <xsl:attribute name="style:column-width">
-              <xsl:choose>
-                <xsl:when
-                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-                  <xsl:call-template name="ConvertFromCharacters">
-                    <xsl:with-param name="value">
-                      <xsl:value-of
-                        select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
-                      />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <!-- Excel application default-->
-                  <xsl:call-template name="ConvertFromCharacters">
-                    <xsl:with-param name="value" select="'8.43'"/>
-                  </xsl:call-template>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </style:table-column-properties>
-        </style:style>
-      </xsl:when>
-      <xsl:otherwise>
-        <style:style
-          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-          style:family="table-column">
-          <style:table-column-properties fo:break-before="auto">
-            <xsl:attribute name="style:column-width">
-              <xsl:choose>
-                <xsl:when
-                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-                  <xsl:call-template name="ConvertFromCharacters">
-                    <xsl:with-param name="value">
-                      <xsl:value-of
-                        select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
-                      />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <!-- Excel application default-->
-                  <xsl:call-template name="ConvertFromCharacters">
-                    <xsl:with-param name="value" select="'8.43'"/>
-                  </xsl:call-template>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </style:table-column-properties>
-        </style:style>
-      </xsl:otherwise>
-    </xsl:choose>
-    
+    <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks">
+      <style:style
+        style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
+        style:family="table-column">
+        <style:table-column-properties fo:break-before="page">
+          <xsl:attribute name="style:column-width">
+            <xsl:choose>
+              <xsl:when
+                test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+                <xsl:call-template name="ConvertFromCharacters">
+                  <xsl:with-param name="value">
+                    <xsl:value-of
+                      select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <!-- Excel application default-->
+                <xsl:call-template name="ConvertFromCharacters">
+                  <xsl:with-param name="value" select="'8.43'"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </style:table-column-properties>
+      </style:style>
+    </xsl:if>
+
+    <style:style
+      style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+      style:family="table-column">
+      <style:table-column-properties fo:break-before="auto">
+        <xsl:attribute name="style:column-width">
+          <xsl:choose>
+            <xsl:when
+              test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+              <xsl:call-template name="ConvertFromCharacters">
+                <xsl:with-param name="value">
+                  <xsl:value-of
+                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                  />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- Excel application default-->
+              <xsl:call-template name="ConvertFromCharacters">
+                <xsl:with-param name="value" select="'8.43'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </style:table-column-properties>
+    </style:style>
+
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[1]"
       mode="automaticstyles">
       <xsl:with-param name="manualBreakes" select="$ManualColBreaks"/>
@@ -292,7 +288,7 @@
     <xsl:param name="sheet"/>
 
     <!-- default & row Break style -->
-    
+
     <xsl:choose>
       <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
         <style:style
@@ -351,7 +347,7 @@
         </style:style>
       </xsl:otherwise>
     </xsl:choose>
-    
+
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:sheetData"
       mode="automaticstyles"/>
   </xsl:template>
