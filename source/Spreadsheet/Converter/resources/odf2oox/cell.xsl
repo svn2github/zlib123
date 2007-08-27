@@ -633,7 +633,7 @@
       <xsl:if test="@table:number-rows-repeated">
         <xsl:if
           test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true')">
-          <!--xsl:call-template name="InsertRepeatedRows">
+          <xsl:call-template name="InsertRepeatedRows">
             <xsl:with-param name="numberRowsRepeated">
               <xsl:value-of select="@table:number-rows-repeated"/>
             </xsl:with-param>
@@ -665,7 +665,7 @@
               <xsl:value-of select="$CheckIfDefaultBorder"/>
             </xsl:with-param>
             <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
-          </xsl:call-template-->
+          </xsl:call-template>
         </xsl:if>
       </xsl:if>
 
