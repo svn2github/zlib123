@@ -438,20 +438,23 @@
   </xsl:template>
 
   <xsl:template name="InsertCellStyles">
-    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
-      mode="automaticstyles"/>
+    <xsl:variable name="mergedcellborder">
+     <xsl:call-template name="PreprocessMergedCellsForBorders"/>    
+    </xsl:variable>
+    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf">
+      <style:style style:name="{generate-id(.)}" style:family="table-cell">
+        <xsl:call-template name="InsertCellFormat">
+          <xsl:with-param name="mergedcellborder"><xsl:value-of select="$mergedcellborder"/></xsl:with-param>
+        </xsl:call-template>
+      </style:style> 
+    </xsl:for-each>
   </xsl:template>
 
   <!-- cell formats -->
-  <xsl:template match="e:xf" mode="automaticstyles">
-
-    <style:style style:name="{generate-id(.)}" style:family="table-cell">
-      <xsl:call-template name="InsertCellFormat"/>
-    </style:style>
-
-  </xsl:template>
 
   <xsl:template name="InsertCellFormat">
+    <xsl:param name="mergedcellborder"/>
+    
     <xsl:choose>
 
       <!-- existing number format -->
@@ -537,7 +540,9 @@
           </xsl:attribute>
         </xsl:if>
         <xsl:if test="@applyBorder = 1 or  @borderId != '0'">
-          <xsl:call-template name="InsertBorder"/>
+          <xsl:call-template name="InsertBorder">
+            <xsl:with-param name="mergedcellborder"><xsl:value-of select="$mergedcellborder"/></xsl:with-param>
+          </xsl:call-template>
         </xsl:if>
 
         <xsl:if test="@applyProtection=1 and e:protection">
