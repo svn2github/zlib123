@@ -616,8 +616,12 @@
 
     <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:scenarios">
       <xsl:call-template name="Scenarios"/>
-    </xsl:for-each>
-
+    </xsl:for-each> 
+    
+    <xsl:if test="document(concat('xl/',$Id))/e:worksheet/e:dataConsolidate">
+      <xsl:message terminate="no">translation.oox2odf.DataConsolidation</xsl:message>
+    </xsl:if>
+    
   </xsl:template>
 
   <xsl:template match="e:definedName" mode="PrintArea">
@@ -2214,6 +2218,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-
+  
+  
 </xsl:stylesheet>

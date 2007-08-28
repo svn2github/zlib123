@@ -141,4 +141,7 @@
   <data name="translation.oox2odf.OLEObject" xml:space="preserve">
     <value>Open Office Calc supports only OLEObject implemented as link to file.</value>
   </data>
+  <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
+    <value>Data consolidation cannot be conversed</value>
+  </data>  
 </root>
