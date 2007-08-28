@@ -37,6 +37,7 @@
     <Compile Include="OoxCommentsPostProcessor.cs" />
     <Compile Include="OoxDrawingsPostProcessor.cs" />
     <Compile Include="OOXGroupsPostProcessor.cs" />
+    <Compile Include="OOXStyleCellPostProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="resources\odf2oox\border.xsl" />
     <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />

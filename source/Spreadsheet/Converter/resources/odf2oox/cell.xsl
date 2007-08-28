@@ -1497,26 +1497,22 @@
                 </xsl:variable>
                 <xsl:choose>
                   <xsl:when test="key('style', $style)">
-                    <xsl:for-each select="key('style', $style)">
-                      <xsl:attribute name="s">
-                        <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
-                      </xsl:attribute>
-                    </xsl:for-each>
+                    <xsl:attribute name="style-number-change-post">
+                 	 <xsl:value-of select="$style"/>
+            	    </xsl:attribute>
                     </xsl:when>
                   <xsl:otherwise>
                     <xsl:variable name="TableStyleName">
                       <xsl:value-of select="@table:style-name"/>
                     </xsl:variable>
-                    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $TableStyleName ]">
-                        <xsl:variable name="CountTableCell">
-                          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
-                        </xsl:variable>
-                        <xsl:attribute name="s">
-                          <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
+                    <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $TableStyleName ]">
+                        <xsl:attribute name="style-number-change-post">
+                          <xsl:value-of select="$TableStyleName"/>
                         </xsl:attribute>
-                    </xsl:for-each>
+                    </xsl:if>
                   </xsl:otherwise>
-                </xsl:choose>
+                  </xsl:choose>
+                
               </xsl:when>
               <!-- when style is specified in cell -->
               <xsl:when
@@ -1526,7 +1522,7 @@
                   <xsl:value-of select="@style:apply-style-name"/>
                 </xsl:variable>
 
-                <xsl:choose>
+                <!--xsl:choose>
                   <xsl:when test="key('style',@table:style-name)">
                     <xsl:for-each select="key('style',@table:style-name)">
                       <xsl:attribute name="s">
@@ -1547,11 +1543,14 @@
                         </xsl:attribute>
                     </xsl:for-each>
                   </xsl:otherwise>
-                </xsl:choose>
+                  </xsl:choose-->
+                <xsl:attribute name="style-number-change-post">
+                  <xsl:value-of select="@table:style-name"/>
+                </xsl:attribute>
               </xsl:when>
               <!-- when style is specified in column -->
               <xsl:when test="$columnCellStyle != '' ">
-                <xsl:choose>
+                <!--xsl:choose>
                   <xsl:when test="key('style',$columnCellStyle)">
                     <xsl:for-each select="key('style',$columnCellStyle)">
                       <xsl:attribute name="s">
@@ -1569,9 +1568,12 @@
                         </xsl:attribute>
                     </xsl:for-each>
                   </xsl:otherwise>
-                </xsl:choose>
+                  </xsl:choose-->
+                <xsl:attribute name="style-number-change-post">
+                  <xsl:value-of select="$columnCellStyle"/>
+                </xsl:attribute>
               </xsl:when>
-            </xsl:choose>
+                  </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
         <!-- convert cell type -->

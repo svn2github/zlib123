@@ -621,6 +621,9 @@
         <xsl:with-param name="contentFillCount">
           <xsl:value-of select="$contentFillCount"/>
         </xsl:with-param>
+        <xsl:with-param name="postStyleName">
+          <xsl:text>true</xsl:text>
+        </xsl:with-param>
       </xsl:apply-templates>
 
       <!-- output cell formats from styles.xml -->
@@ -662,6 +665,9 @@
         </xsl:with-param>
         <xsl:with-param name="contentFillCount">
           <xsl:value-of select="$contentFillCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="postStyleName">
+          <xsl:text>true</xsl:text>
         </xsl:with-param>
       </xsl:apply-templates>
 
@@ -761,6 +767,7 @@
     <xsl:param name="AtributeName"/>
     <xsl:param name="contentFontsCount"/>
     <xsl:param name="contentFillCount"/>
+    <xsl:param name="postStyleName" select="false"/>
 
 
     <!-- number format id -->
@@ -781,6 +788,11 @@
 
     <xsl:if test="not($AtributeName = 'cellStyleXfs' and $FileName = '')">
       <xf numFmtId="{$numFormat}" fillId="0" borderId="0">
+        <xsl:if test="$postStyleName">
+        <xsl:attribute name="table:post-style-name">
+          <xsl:value-of select="@style:name"/>
+        </xsl:attribute>
+        </xsl:if>
         <xsl:if test="$AtributeName != 'cellStyleXfs'">
           <xsl:attribute name="xfId">
             <xsl:choose>
@@ -797,7 +809,7 @@
           <xsl:with-param name="FileName" select="$FileName"/>
           <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
           <xsl:with-param name="contentFillCount" select="$contentFillCount"/>
-        </xsl:call-template>
+        </xsl:call-template>       
       </xf>
     </xsl:if>
   </xsl:template>
