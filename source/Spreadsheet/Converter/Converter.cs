@@ -28,7 +28,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                    "CleverAge.OdfConverter.Spreadsheet.OoxCommentsPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.Spreadsheet.OoxDrawingsPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.Spreadsheet.OoxHeaderFooterPostProcessor,"+fullname,
-                   "CleverAge.OdfConverter.Spreadsheet.OoxMaximumCellTextPostProcessor,"+fullname
+                   "CleverAge.OdfConverter.Spreadsheet.OoxMaximumCellTextPostProcessor,"+fullname,
+                   "CleverAge.OdfConverter.Spreadsheet.OoxPhysicalPathPostProcessor,"+fullname
                 };
             }
         }

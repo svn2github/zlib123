@@ -57,10 +57,15 @@
           </Relationship>
         </xsl:if>
       </xsl:for-each>
-      
-      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
-        <Relationship Id="{generate-id(.)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionHeaders" Target="revisions/revisionHeaders.xml" />
-        <Relationship Id="{concat(generate-id(.), 1)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/usernames" Target="revisions/userNames.xml" /> 
+
+      <xsl:if
+        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+        <Relationship Id="{generate-id(.)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionHeaders"
+          Target="revisions/revisionHeaders.xml"/>
+        <Relationship Id="{concat(generate-id(.), 1)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/usernames"
+          Target="revisions/userNames.xml"/>
       </xsl:if>
 
       <!--  Static relationships -->
@@ -79,24 +84,33 @@
     </Relationships>
 
   </xsl:template>
- 
-  
+
+
   <xsl:template name="InsertRevisionsRels">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes/node()[name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">                
-        <Relationship Id="{generate-id()}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog" Target="{concat('revisionLog', generate-id(), '.xml')}" /> 
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes/node()[name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
+        <Relationship Id="{generate-id()}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog"
+          Target="{concat('revisionLog', generate-id(), '.xml')}"/>
       </xsl:for-each>
     </Relationships>
   </xsl:template>
-  
-  <xsl:template match="table:cell-content-change|table:deletion|table:deletion|table:movement" mode="revisionRels">
-    
-    <Relationship Id="{generate-id()}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog" Target="{concat('revisionLog', generate-id(), '.xml')}" /> 
-    
-    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']">
-      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']" mode="revisionRels"/>
+
+  <xsl:template match="table:cell-content-change|table:deletion|table:deletion|table:movement"
+    mode="revisionRels">
+
+    <Relationship Id="{generate-id()}"
+      Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog"
+      Target="{concat('revisionLog', generate-id(), '.xml')}"/>
+
+    <xsl:if
+      test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion']">
+      <xsl:apply-templates
+        select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement']"
+        mode="revisionRels"/>
     </xsl:if>
-    
+
   </xsl:template>
 
   <xsl:template name="TranslateIllegalChars">
@@ -193,7 +207,8 @@
 
       <!--hyperlink-->
       <xsl:if test="$hyperlink = 'true' ">
-        <xsl:for-each select="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+        <xsl:for-each
+          select="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
 
           <Relationship Id="{generate-id(.)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
@@ -269,34 +284,36 @@
 
   <xsl:template name="InsertChartRels">
     <xsl:param name="chartDirectory"/>
-    
+
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <!-- search for bitmap fills -->
       <xsl:for-each
         select="/office:document-content/office:automatic-styles/style:style/style:graphic-properties[@draw:fill = 'bitmap' ]">
-        
+
         <xsl:variable name="fillImage">
           <xsl:value-of select="@draw:fill-image-name"/>
         </xsl:variable>
-        
+
         <!-- id based on a style in content.xml -->
         <xsl:variable name="fillId">
           <xsl:value-of select="generate-id()"/>
         </xsl:variable>
-        
+
         <!-- go to bitmap-fill style -->
         <xsl:for-each
           select="document(concat($chartDirectory,'/styles.xml'))/office:document-styles/office:styles/draw:fill-image[@draw:name = $fillImage]">
-          
+
           <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
-          
-          <pzip:copy pzip:source="{concat($chartDirectory,'/',@xlink:href)}" pzip:target="xl/media/{concat($fillId,$imageName)}"/>
-          
-          <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+
+          <pzip:copy pzip:source="{concat($chartDirectory,'/',@xlink:href)}"
+            pzip:target="xl/media/{concat($fillId,$imageName)}"/>
+
+          <Relationship
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
             <xsl:attribute name="Id">
               <xsl:value-of select="$fillId"/>
             </xsl:attribute>
-            
+
             <xsl:attribute name="Target">
               <xsl:text>../media/</xsl:text>
               <!-- the same bitmap fill in two diferent charts has the same name so to distinct them it is preceded with generate-id() -->
@@ -304,11 +321,11 @@
             </xsl:attribute>
           </Relationship>
         </xsl:for-each>
-        
+
       </xsl:for-each>
-    </Relationships>    
+    </Relationships>
   </xsl:template>
-  
+
   <xsl:template name="InsertDrawingRels">
     <xsl:param name="sheetNum"/>
 
@@ -369,29 +386,46 @@
               </xsl:call-template>
             </xsl:variable>
 
-            <xsl:variable name="target">
-              <xsl:choose>
-                <!-- when starts with up folder sign -->
-                <xsl:when test="starts-with($translatedTarget,'../' )">
-                  <xsl:value-of select="translate(substring-after($translatedTarget,'../'),'/','\')"
-                  />
-                </xsl:when>
-                <!-- when file is in another disk -->
-                <xsl:when test="starts-with($translatedTarget,'/')">
-                  <xsl:value-of
-                    select="concat('file:///',translate(substring-after($translatedTarget,'/'),'/','\'))"
-                  />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="translate($translatedTarget,'/','\')"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
+            <xsl:choose>
+              <!-- picture is located in the same disk -->
+              <xsl:when test="starts-with($translatedTarget,'../')">                
+                <pxsi:physicalPath xmlns:pxsi="urn:cleverage:xmlns:post-processings:path">
+                  <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                    Id="{generate-id(parent::node())}"
+                    Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                    TargetMode="External">
+                    <xsl:attribute name="Target">
+                      <xsl:value-of
+                        select="translate(substring-after($translatedTarget,'../'),'/','\')"/>
+                    </xsl:attribute>
+                  </Relationship>
+                </pxsi:physicalPath>
+              </xsl:when>
+              
+              <!-- when file is on another disk -->
+              <xsl:otherwise>
+                
+                <xsl:variable name="target">
+                  <xsl:choose>
+                    <!-- when file is on local disk -->
+                    <xsl:when test="starts-with($translatedTarget,'/')">
+                      <xsl:value-of
+                        select="concat('file:///',translate(substring-after($translatedTarget,'/'),'/','\'))"
+                      />
+                    </xsl:when>
+                    <!-- when file is on network disk -->
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($translatedTarget,'/','\')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
 
-            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-              Id="{generate-id(parent::node())}"
-              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-              Target="{$target}" TargetMode="External"/>
+                <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                  Id="{generate-id(parent::node())}"
+                  Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                  Target="{$target}" TargetMode="External"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
 
@@ -462,14 +496,17 @@
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
-  
+
   <!-- Insert Revision Headers -->
   <xsl:template name="revisionHeaderProperties">
     <headers xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-      guid="{concat('{', '100', '}')}" diskRevisions="1" revisionId="2" version="3">          
-      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">         
-        <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="revisionHeaders">
+      guid="{concat('{', '100', '}')}" diskRevisions="1" revisionId="2" version="3">
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+        <xsl:apply-templates
+          select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']"
+          mode="revisionHeaders">
           <xsl:with-param name="num">
             <xsl:text>1</xsl:text>
           </xsl:with-param>
@@ -477,10 +514,11 @@
       </xsl:for-each>
     </headers>
   </xsl:template>
-  
-  <xsl:template match="table:cell-content-change|table:deletion|table:movement|table:insertion" mode="revisionHeaders">
+
+  <xsl:template match="table:cell-content-change|table:deletion|table:movement|table:insertion"
+    mode="revisionHeaders">
     <xsl:param name="num"/>
-    
+
     <header maxSheetId="4" r:id="{generate-id()}" guid="{concat('{', $num, '}')}">
       <xsl:attribute name="userName">
         <xsl:value-of select="office:change-info/dc:creator"/>
@@ -489,26 +527,30 @@
         <xsl:value-of select="office:change-info/dc:date"/>
       </xsl:attribute>
       <sheetIdMap>
-      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">         
-        <sheetId>
-          <xsl:attribute name="val">
-            <xsl:value-of select="position()"/>
-          </xsl:attribute>
-        </sheetId>
-      </xsl:for-each>
+        <xsl:for-each
+          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+          <sheetId>
+            <xsl:attribute name="val">
+              <xsl:value-of select="position()"/>
+            </xsl:attribute>
+          </sheetId>
+        </xsl:for-each>
       </sheetIdMap>
     </header>
-    
-    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
-      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="revisionHeaders">
+
+    <xsl:if
+      test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
+      <xsl:apply-templates
+        select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']"
+        mode="revisionHeaders">
         <xsl:with-param name="num">
           <xsl:value-of select="$num + 1"/>
         </xsl:with-param>
       </xsl:apply-templates>
     </xsl:if>
-    
+
   </xsl:template>
-  
-  
+
+
 
 </xsl:stylesheet>
