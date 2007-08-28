@@ -85,7 +85,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
 
-            if ("pxsi".Equals(localName))
+            if ("pxsi".Equals(localName)&& isInPhysicalPath)
             {
                 //Console.WriteLine("pxsi OPEN");
                 this.isPxsi = true;
