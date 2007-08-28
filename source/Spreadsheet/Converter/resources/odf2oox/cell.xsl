@@ -1489,7 +1489,7 @@
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when
-                test="name() = 'table:covered-table-cell' and substring-before(substring-after($MergeCellStyle, concat($cellNum, ':')), ';') != ''">
+                test="(name() = 'table:covered-table-cell'  or name() = 'table:table-cell' )and substring-before(substring-after($MergeCellStyle, concat($cellNum, ':')), ';') != ''">
                 <xsl:variable name="style">
                   <xsl:value-of
                     select="substring-before(substring-after($MergeCellStyle, concat($cellNum, ':')), ';')"
@@ -1520,7 +1520,7 @@
               </xsl:when>
               <!-- when style is specified in cell -->
               <xsl:when
-                test="@table:style-name and not(name() ='table:covered-table-cell') and not($CheckIfConditional = 'true')">
+                test="@table:style-name and not(name() ='table:covered-table-cell')">
 
                 <xsl:variable name="StyleApplyStyleName">
                   <xsl:value-of select="@style:apply-style-name"/>
@@ -1571,45 +1571,6 @@
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
-              <!-- when style is specified for conditional -->
-              <xsl:when
-                test="$CheckIfConditional='true'">
-
-                <xsl:variable name="StyleApplyStyleName">
-                  <xsl:value-of select="@style:apply-style-name"/>
-                </xsl:variable>
-
-                <!--xsl:variable name="CountConditionalStyle">
-                  <xsl:value-of
-                    select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:apply-style-name])"
-                  />
-                </xsl:variable-->
-                
-                <xsl:variable name="CountStyle">
-                  <xsl:value-of
-                    select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleApplyStyleName])"
-                  />
-                </xsl:variable>
-
-                <xsl:variable name="TableStyleName">
-                  <xsl:value-of select="@table:style-name"/>
-                </xsl:variable>
-
-                <xsl:choose>
-                  <xsl:when test="key('style',@table:style-name)">
-                    <xsl:for-each select="key('style',$TableStyleName)">
-                      <xsl:variable name="CountTableCell">
-                        <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
-                      </xsl:variable>
-                      <xsl:attribute name="s">
-                        <!--xsl:value-of select="$CountTableCell + $CountConditionalStyle"/-->
-                        <xsl:value-of select="$CountTableCell + $CountStyle"/>
-                      </xsl:attribute>
-                    </xsl:for-each>
-                  </xsl:when>
-                </xsl:choose>
-              </xsl:when>
-
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
