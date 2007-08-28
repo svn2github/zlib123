@@ -75,14 +75,14 @@
   <xsl:variable name="docprops-custom-file">
     <xsl:choose>
       <xsl:when test="document('meta.xml')/office:document-meta/office:meta/meta:user-defined != ''">
-        <xsl:text>1</xsl:text>      
+        <xsl:text>1</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>0</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
-    
+
 
   <xsl:key name="chart" match="office:chart" use="''"/>
 
@@ -106,7 +106,7 @@
       <pzip:entry pzip:target="xl/workbook.xml">
         <xsl:call-template name="InsertWorkbook"/>
       </pzip:entry>
-      
+
       <!-- main content -->
       <xsl:if
         test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
@@ -127,10 +127,11 @@
       <xsl:call-template name="InsertSheets"/>
       <!-- input: content.xml -->
       <!-- output:  xl/worksheets/sheet_N_.xml -->
-      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/draw:frame/draw:object">
-      <pzip:entry pzip:target="xl/media/image1.emf">
-        <empty/>
-      </pzip:entry>
+      <xsl:if
+        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/draw:frame/draw:object">
+        <pzip:entry pzip:target="xl/media/image1.emf">
+          <empty/>
+        </pzip:entry>
       </xsl:if>
 
       <xsl:for-each
@@ -161,7 +162,8 @@
 
         <xsl:variable name="hyperlink">
           <xsl:choose>
-            <xsl:when test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+            <xsl:when
+              test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -225,17 +227,14 @@
 
         <!-- create VmlDrawing.xml file for comment`s-->
         <xsl:if test="$comment = 'true'">
-        <xsl:call-template name="CreateVmlDrawing"/>
+          <xsl:call-template name="CreateVmlDrawing"/>
         </xsl:if>
 
         <!-- create VmlDrawing.xml file -->
         <xsl:if test="$oleObject = 'true'">
-            <xsl:call-template name="CreateVmlDrawing"/>
-          <pzip:entry pzip:target="xl/media/image1.emf">
-            <empty/>
-          </pzip:entry>       
+          <xsl:call-template name="CreateVmlDrawing"/>
         </xsl:if>
-     
+
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
           <xsl:call-template name="CreateDrawing"/>
 
@@ -338,9 +337,10 @@
       </pzip:entry>
 
       <xsl:call-template name="InsertLinkExternalRels"/>
-      
+
       <!-- Insert Change Tracking -->
-      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+      <xsl:if
+        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
         <xsl:call-template name="CreateRevisionHeadersRels"/>
         <xsl:call-template name="CreateRevisionFiles"/>
         <xsl:call-template name="revisionHeaders"/>
@@ -506,12 +506,12 @@
       <xsl:call-template name="InsertDrawing"/>
     </pzip:entry>
   </xsl:template>
-  
+
   <xsl:template name="CreateRevisionHeadersRels">
     <pzip:entry pzip:target="xl/revisions/_rels/revisionHeaders.xml.rels">
       <xsl:call-template name="InsertRevisionsRels"/>
     </pzip:entry>
   </xsl:template>
-  
-  
+
+
 </xsl:stylesheet>
