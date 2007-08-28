@@ -172,7 +172,7 @@
     
     <xsl:variable name="hyperlinkStyle">
       <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ]">
-          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell'])-1"/>
+          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
         </xsl:for-each>  
     </xsl:variable>
 

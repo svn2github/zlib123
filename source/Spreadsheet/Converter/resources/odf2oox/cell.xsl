@@ -122,7 +122,7 @@
           <xsl:if test="$checkColumnStyle = 'true' ">
             <xsl:for-each select="key('style',@table:default-cell-style-name)">
               <xsl:attribute name="style">
-                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) - 1"/>
+                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:attribute>
             </xsl:for-each>
           </xsl:if>
