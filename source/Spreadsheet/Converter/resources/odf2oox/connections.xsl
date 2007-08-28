@@ -82,7 +82,7 @@
                             <xsl:value-of select="@xlink:href"/>
                         </xsl:attribute>
                         
-                        <xsl:if test="@table:name != 'HTML_all' and @table:name != 'HTML_tables'">
+                        <xsl:if test="number(substring-after(@table:name,'HTML_' ))">
                             <xsl:attribute name="htmlTables">
                                 <xsl:text>1</xsl:text>
                             </xsl:attribute>
