@@ -886,9 +886,9 @@
 
     <xsl:variable name="numPoints">
       <!-- (number) maximum number of data point -->
-      <!--xsl:choose-->
+      <xsl:choose>
         <!-- for chart with swapped data sources -->
-        <!--xsl:when test="$seriesFrom='rows'">
+        <xsl:when test="$seriesFrom='rows'">
           <xsl:call-template name="MaxPointNumber">
             <xsl:with-param name="rowNumber">
               <xsl:value-of select="number(1)"/>
@@ -901,10 +901,10 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:otherwise-->
+        <xsl:otherwise>
           <xsl:value-of select="count(key('rows','')/table:table-row)"/>
-        <!--/xsl:otherwise>
-      </xsl:choose-->
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="reverseCategories">
@@ -2395,14 +2395,13 @@
 
     <xsl:variable name="numPoints">
       <!-- (number) maximum number of data point -->
-      <!--xsl:choose-->
+      <xsl:choose>
         <!-- for chart with swapped data sources -->
-        <!--xsl:when test="$seriesFrom='rows'">
+        <xsl:when test="$seriesFrom='rows'">
           <xsl:call-template name="MaxPointNumber">
             <xsl:with-param name="rowNumber">
               <xsl:value-of select="number(1)"/>
             </xsl:with-param>
-            <xsl:with-param name="CountCellsInRow"/>
             <xsl:with-param name="maxValue">
               <xsl:value-of select="number(0)"/>
             </xsl:with-param>
@@ -2411,10 +2410,10 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:otherwise-->
+        <xsl:otherwise>
           <xsl:value-of select="count(key('rows','')/table:table-row)"/>
-        <!--/xsl:otherwise>
-      </xsl:choose-->
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="reverseCategories">
@@ -2799,7 +2798,9 @@
             select="count(//table:table-row[$rowNumber]/table:table-cell[@office:value-type != 'string'])"
           />    
         </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
+        <xsl:when test="(count(//table:table-row[$rowNumber]/table:table-cell[@office:value-type != 'string'])) ='' ">
+          <xsl:text>0</xsl:text>
+        </xsl:when>
       </xsl:choose>
     </xsl:param>
 
@@ -2813,30 +2814,37 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="MaxPointNumber">
+          
           <xsl:with-param name="rowsQuantity">
             <xsl:value-of select="$rowsQuantity"/>
           </xsl:with-param>
+          
           <xsl:with-param name="maxValue">
-            <xsl:if test="$maxValue &lt; $CountCellsInRow">
-              <xsl:value-of select="$CountCellsInRow"/>
-            </xsl:if>
-            <xsl:if test="$maxValue &gt;= $CountCellsInRow">
-              <xsl:value-of select="$maxValue"/>
-            </xsl:if>
+            <xsl:choose>
+              <xsl:when test="$maxValue &lt; $CountCellsInRow">
+                <xsl:value-of select="$CountCellsInRow"/>
+              </xsl:when>
+              <xsl:when test="$maxValue &gt;= $CountCellsInRow">
+                <xsl:value-of select="$maxValue"/>
+              </xsl:when>
+            </xsl:choose>
           </xsl:with-param>
+          
           <xsl:with-param name="CountCellsInRow">
             <xsl:choose>
               <xsl:when test="(count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])) !='' ">
-                <xsl:value-of
-                  select="count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])"
-                />    
+                <xsl:value-of select="count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])"/>
               </xsl:when>
-              <xsl:otherwise>0</xsl:otherwise>
+              <xsl:when test="(count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])) ='' ">
+                <xsl:text>0</xsl:text>
+              </xsl:when>
             </xsl:choose>
           </xsl:with-param>
+          
           <xsl:with-param name="rowNumber">
             <xsl:value-of select="$rowNumber+1"/>
           </xsl:with-param>
+          
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
