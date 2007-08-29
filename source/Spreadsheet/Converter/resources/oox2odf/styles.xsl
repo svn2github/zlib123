@@ -984,11 +984,11 @@
         </style:page-layout-properties>
         <style:header-style>
           <style:header-footer-properties fo:min-height="0.751cm" fo:margin-left="0cm"
-            fo:margin-right="0cm" fo:margin-bottom="0.25cm"/>
+            fo:margin-right="0cm" fo:margin-bottom="0.25cm" fo:margin-top="0cm"/>
         </style:header-style>
         <style:footer-style>
           <style:header-footer-properties fo:min-height="0.751cm" fo:margin-left="0cm"
-            fo:margin-right="0cm" fo:margin-top="0.25cm"/>
+            fo:margin-right="0cm" fo:margin-top="0.25cm" fo:margin-bottom="0cm"/>
         </style:footer-style>
       </style:page-layout>
     </xsl:for-each>
@@ -996,17 +996,31 @@
 
   <xsl:template name="InsertPageMargins">
     <xsl:for-each select="e:pageMargins">
-      <xsl:if test="@top">
+      <xsl:if test="@top and not(@header)">
         <xsl:attribute name="fo:margin-top">
           <xsl:call-template name="ConvertToCentimeters">
             <xsl:with-param name="length" select="concat(@top,'in')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="@bottom">
+      <xsl:if test="@header">
+        <xsl:attribute name="fo:margin-top">
+          <xsl:call-template name="ConvertToCentimeters">
+            <xsl:with-param name="length" select="concat(@header,'in')"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@bottom and not(@footer)">
         <xsl:attribute name="fo:margin-bottom">
           <xsl:call-template name="ConvertToCentimeters">
             <xsl:with-param name="length" select="concat(@bottom,'in')"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@footer">
+        <xsl:attribute name="fo:margin-bottom">
+          <xsl:call-template name="ConvertToCentimeters">
+            <xsl:with-param name="length" select="concat(@footer,'in')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
