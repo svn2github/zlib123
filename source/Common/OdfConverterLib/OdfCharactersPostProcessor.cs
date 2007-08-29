@@ -29,6 +29,7 @@
 using System.Xml;
 using System.Collections;
 using System;
+using System.IO;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -136,6 +137,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.nextWriter.WriteString(EvalExpression(text));
 
             }
+            // added by vipul for Shape Rotation
+            //Start
+            else if (text.Contains("draw-transform"))
+            {
+
+                this.nextWriter.WriteString(EvalRotationExpression(text));
+
+            }
+            //End
+            //Shadow calculation
+            else if (text.Contains("shadow-offset-x") || text.Contains("shadow-offset-y"))
+            {
+
+                this.nextWriter.WriteString(EvalShadowExpression(text));
+            }
             else
             {
                 this.nextWriter.WriteString(text);
@@ -184,8 +200,171 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             return x.ToString().Replace(',','.') + "cm";
         }
-         
+        // added by vipul for Shape Rotation
+        //Start
+        private string EvalRotationExpression(string text)
+        {
+            string[] arrVal = new string[7];
+            string strRotate;
+            string strTranslate;
 
+            arrVal = text.Split(':');
+            
+            Double dblRadius = 0.0;
+            Double dblXf = 0.0;
+            Double dblYf = 0.0;
+            Double dblalpha = 0.0;
+            Double dblbeta= 0.0;
+            Double dblgammaDegree = 0.0;
+            Double dblgammaR = 0.0;
+            Double dblRotAngle = 0.0;
+            Double dblX2 = 0.0;
+            Double dblY2 = 0.0;
+            Double centreX = 0.0;
+            Double centreY = 0.0;
+            
+            if (arrVal.Length == 8)
+            {
+                double arrValueX = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueY = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueCx = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueCy = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueFlipH = Double.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueFlipV = Double.Parse(arrVal[6], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueRot = Double.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
+
+               
+
+                if (arrVal[0].Contains("draw-transform"))
+                {
+
+                    centreX = arrValueX + (arrValueCx /2);
+                    centreY = arrValueY + (arrValueCy / 2);
+
+                    if (arrValueFlipH == 1.0)
+                    {
+                        dblXf = arrValueX + ((centreX - arrValueX) * 2);
+                    }
+                    else
+                    {
+                        dblXf = arrValueX; 
+                    }
+
+                    if (arrValueFlipV == 1.0)
+                    {
+                        dblYf = arrValueY + ((centreY - arrValueY) * 2);
+                    }
+                    else
+                    {
+                        dblYf = arrValueY;
+                    }
+                    dblRadius = Math.Sqrt((arrValueCx * arrValueCx) + (arrValueCy * arrValueCy)) / 2.0;
+                    
+                    if ( (arrValueFlipH ==0.0 && arrValueFlipV == 1.0 ) || ( arrValueFlipH ==0.0 && arrValueFlipV ==1.0 ) )
+                    {
+                        dblalpha = 360.00 - ( (arrValueRot / 60000.00 ) % 360 ) ;
+                    }
+                    else
+                    {
+                         dblalpha =(arrValueRot / 60000.00 ) % 360 ;
+                    }
+                    if (dblalpha > 180.00)
+                    {
+                        dblRotAngle = (360.00 - dblalpha) / 180.00 * Math.PI;
+                    }
+                    else
+                    {
+                        dblRotAngle = (-1.00 * dblalpha) / 180.00 * Math.PI;
+                    }
+                    if (Math.Abs(centreY - dblYf) > 0)
+                    {
+                    dblbeta = Math.Atan(Math.Abs(centreX - dblXf) / Math.Abs(centreY - dblYf)) * (180.00 / Math.PI);
+                    }
+
+                    if (Math.Abs(dblbeta - dblalpha) > 0)
+                    {
+                        dblgammaDegree = ((dblbeta - dblalpha) % ((int)((dblbeta - dblalpha) / Math.Abs(dblbeta - dblalpha)) * 360)) + 90.00;
+                    }
+                    else
+                    {
+                        dblgammaDegree = 90.00;
+                    }
+                                       
+                    dblgammaR = (360.00 - dblgammaDegree) / 180.00 * Math.PI;
+                    dblX2 = Math.Round((centreX + (dblRadius * Math.Cos(dblgammaR))) / 360036.00, 3);
+                    dblY2 = Math.Round((centreY + (dblRadius * Math.Sin(dblgammaR))) / 360036.00, 3);
+             
+               } 
+
+            }
+                strRotate="rotate (" + dblRotAngle.ToString().Replace(',', '.') +")";
+                          
+                strTranslate = "translate (" + dblX2.ToString().Replace(',', '.') + "cm " + dblY2.ToString().Replace(',', '.') + "cm)";
+
+                 return strRotate+" "+strTranslate;
+        }
+        //End 
+
+        //Resolve relative path to absolute path
+        private string HyperLinkPath(string text)
+        {
+            string[] arrVal = new string[2];
+            arrVal = text.Split(':');
+            string source = arrVal[1].ToString();
+            string address = null;
+
+            if (arrVal.Length == 2)
+            {
+                string returnInputFilePath = "";
+
+                // for Commandline tool
+                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                {
+                    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                        returnInputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                }
+
+                //for addins
+                if (returnInputFilePath == "")
+                {
+                    returnInputFilePath = Environment.CurrentDirectory;
+                }
+                
+                string linkPathLocation = Path.GetFullPath(Path.Combine(returnInputFilePath, source)).Replace("\\", "/").Replace(" ","%20");
+                address = "/" + linkPathLocation;
+               
+            }
+            return address.ToString();
+           
+        }
+        //End
+
+        // added for Shadow calculation
+        private string EvalShadowExpression(string text)
+        {
+            string[] arrVal = new string[2];
+            arrVal = text.Split(':');
+            Double x = 0;
+            if (arrVal.Length == 3)
+            {
+                double arrDist = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+                double arrDir = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+
+                arrDir = (arrDir / 60000) * (Math.PI / 180.0);
+                if (arrVal[0].Contains("shadow-offset-x"))
+                {
+                    x = Math.Sin((arrDir)) * (arrDist / 360000);
+                }
+                else if (arrVal[0].Contains("shadow-offset-y"))
+                {
+                    x = Math.Cos((arrDir)) * (arrDist / 360000);
+                }
+
+            }
+
+            return x.ToString() + "cm";
+
+        }
         public void WriteStoredSpan()
         {
             Element e = (Element)this.store.Peek();
@@ -285,7 +464,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else
             {
                 Attribute attr = (Attribute)store.Peek();
+                // This condition is to check for hyperlink relative path 
+                if (text.Contains("hyperlink-path"))
+                {
+                    string hPath = HyperLinkPath(text);
+                    attr.Value += hPath;
+                }
+                else
+                {
                 attr.Value += text;
+            }
+                
             }
         }       
 

@@ -29,6 +29,7 @@
 using System.Xml;
 using System.Collections;
 using System;
+using System.IO;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -163,7 +164,29 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else if (text.Contains("cxnSp"))
             {
                this.nextWriter.WriteString(EvalExpression(text));
-            }    
+            }
+            // added by vipul for Shape Rotation
+            //Start
+            else if (text.Contains("draw-transform"))
+            {
+                this.nextWriter.WriteString(EvalRotationExpression(text));
+            }
+            else if (text.Contains("group-svgXYWidthHeight"))
+            {
+                this.nextWriter.WriteString(EvalGroupExpression(text));
+            }
+            //End 
+            //Shadow calculation
+            else if (text.Contains("a-outerShdw-dist") || text.Contains("a-outerShdw-dir"))
+            {
+
+                this.nextWriter.WriteString(EvalShadowExpression(text));
+            }
+            // This condition is to check for hyperlink relative path 
+            else if (text.Contains("hyperlink-path"))
+            {
+                this.nextWriter.WriteString(EvalHyperlinkPath(text));
+            }
             else
             {
                 this.nextWriter.WriteString(text);
@@ -283,6 +306,270 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             return attVal;
         }
+        // added by vipul for Shape Rotation
+        //Start
+        private string EvalRotationExpression(string text)
+        {
+            string[] arrVal = new string[7];
+           
+            string strReturn="";
+            arrVal = text.Split(':');
+            string strXY = arrVal[1];
+            Double dblRadius = 0.0;
+            Double dblXc = 0.0;
+            Double dblYc = 0.0;
+            Double dblalpha = 0.0;
+            Double dblbeta = 0.0;
+            Double dblgammaDegree = 0.0;
+            Double dblgammaR = 0.0;
+            Double dblX2 = 0.0;
+            Double dblY2 = 0.0;
+            Double centreX = 0.0;
+            Double centreY = 0.0;
+            Double dblRotation = 0.0;
+           
+
+            if (arrVal.Length == 7)
+            {
+                double arrValueWidth = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueHeight = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueX2 = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueY2 = Double.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValueAngle = Double.Parse(arrVal[6], System.Globalization.CultureInfo.InvariantCulture);
+
+                if (arrVal[0].Contains("draw-transform"))
+                {
+                    
+                    centreX = 360000.00 * arrValueWidth;
+                    centreY = 360000.00 * arrValueHeight;
+
+                    dblRadius = Math.Sqrt(centreX * centreX + centreY * centreY) / 2.0;
+
+                    if (Math.Abs(centreY / 2) > 0)
+                    {
+                    dblbeta =  Math.Atan( Math.Abs(centreX/2) / Math.Abs(centreY/2) )* 180.00 / Math.PI;
+                     }
+                    dblalpha = -180.00 * arrValueAngle / Math.PI;
+
+                    if (Math.Abs(dblbeta - dblalpha) > 0)
+                    {
+                    dblgammaDegree = (dblbeta - dblalpha) % ((int)((dblbeta - dblalpha) / Math.Abs(dblbeta - dblalpha)) * 360) + 90;
+                    }
+                    dblgammaR = (360.00 - dblgammaDegree) / 180.00 * Math.PI;
+                    dblXc = (arrValueX2 * 360036.00) - (dblRadius * Math.Cos(dblgammaR));
+                    dblYc = (arrValueY2 * 360036.00) - (dblRadius * Math.Sin(dblgammaR));
+
+                    dblX2 = dblXc - centreX / 2.0;
+                    dblY2 = dblYc - centreY / 2.0;
+                    dblRotation =(int) Math.Round ( -1 * (arrValueAngle * 180.00 / Math.PI ) * 60000.00 ) ;
+                  
+                        }
+
+            }
+            if (strXY.Contains("X"))
+            {
+                strReturn=( (int) Math.Round(dblX2)).ToString();
+
+            }
+            if (strXY.Contains("Y"))
+            {
+                strReturn = ((int)Math.Round(dblY2)).ToString();
+
+            }
+            if (strXY.Contains("ROT"))
+            {
+                strReturn = dblRotation.ToString();
+
+            }
+            return strReturn;
+        }
+        private string EvalGroupExpression(string text)
+        {
+            string[] arrVal = new string[2];
+
+            string strReturn = "";
+            arrVal = text.Split('@');
+            if (arrVal[1] == "" || arrVal[0] == "" || arrVal[0] == "$")
+                return "0";
+            string strXY = arrVal[0];
+
+            //string[] arrLst; //  = arrVal[1].Split(':');
+            //string[] arrLstCXCY;
+            //string[] arrLstXY;
+          
+            //ArrayList arrLst =new ArrayList();
+            //arrLst =(ArrayList) arrVal[1].Split(':');
+           
+            double maxVal = 0; // Location of largest item seen so far.
+            double minVal = 0; // Location of largest item seen so far.
+
+             if (strXY.Contains("onlyX") || strXY.Contains("onlyY"))
+             {
+               string[] arrLst = arrVal[1].Split(':');
+
+                minVal = Double.Parse(arrLst[0], System.Globalization.CultureInfo.InvariantCulture);
+
+               for (int intNextCnt = 1; intNextCnt <= arrLst.Length - 2; intNextCnt++)
+               {
+                   double arrValueNext = Double.Parse(arrLst[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
+
+                   if (arrValueNext <= minVal)
+                   {
+                       minVal = arrValueNext;
+                   }
+
+               }
+           
+                strReturn =((int)Math.Round(minVal * 360000)).ToString();
+
+            }
+            //if (strXY.Contains("onlyY"))
+            //{
+            //    for (int intNextCnt = 1; intNextCnt <= arrLst.Length - 2; intNextCnt++)
+            //    {
+
+            //        double arrValueNext = Double.Parse(arrLst[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
+
+            //        if (arrValueNext <= minVal)
+            //        {
+            //            minVal = arrValueNext;
+            //        }
+
+            //    }
+            //    strReturn = ((int)Math.Round(minVal * 360000)).ToString();
+
+            //}
+            if (strXY.Contains("CX") || strXY.Contains("CY"))
+            {
+                string[] arrLst = arrVal[1].Split('$');
+              
+                if (arrLst[0] == "")
+                    return "0";
+                string[] arrLstCXCY = arrLst[0].Split(':');
+                string[] arrLstXY = arrLst[1].Split(':');
+                double arrValueNext;
+                maxVal = Double.Parse(arrLstCXCY[0], System.Globalization.CultureInfo.InvariantCulture);
+                minVal = Double.Parse(arrLstXY[0], System.Globalization.CultureInfo.InvariantCulture);
+
+                for (int intNextCnt = 1; intNextCnt <= arrLstCXCY.Length - 2; intNextCnt++)
+                {
+
+                    arrValueNext = Double.Parse(arrLstCXCY[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
+
+                    if (arrValueNext >= maxVal)
+                    {
+                        maxVal = arrValueNext;
+                    }
+
+                }
+
+                for (int intNextCnt = 1; intNextCnt <= arrLstXY.Length - 2; intNextCnt++)
+                {
+
+                    arrValueNext = Double.Parse(arrLstXY[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
+
+                    if (arrValueNext <= minVal)
+                    {
+                        minVal = arrValueNext;
+                    }
+
+                }
+                strReturn = ((int)Math.Round(Math.Abs(maxVal - minVal) * 360000)).ToString();
+            }
+           
+            //     if (strXY.Contains("CY"))
+            //{
+            //    strReturn = ((int)Math.Round(maxVal * 360000)).ToString();
+
+            //}
+            return strReturn;
+        }
+            
+        //End 
+
+        // added for Shadow calculation
+        private string EvalShadowExpression(string text)
+        {
+            string[] arrVal = new string[2];
+            arrVal = text.Split(':');
+            Double x = 0;
+            if (arrVal.Length == 3)
+            {
+                double arrValue1 = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValue2 = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+
+                if (arrVal[0].Contains("a-outerShdw-dist"))
+                {
+                    x = Math.Sqrt(arrValue1 * arrValue1 + arrValue2 * arrValue2);
+                    x = Math.Round(x * 360000);
+                }
+                if (arrVal[0].Contains("a-outerShdw-dir"))
+                {
+                    x = Math.Atan(arrValue2 / arrValue1);
+                    x = x * (180.0 / Math.PI);
+                    x = Math.Abs(Math.Round(x * 60000));
+                    //0 - 90 degrees
+                    //if (arrValue1 > 0 && arrValue2 > 0)
+                    //{
+                    //    x = Math.Atan(arrValue2 / arrValue1);
+                    //    x = x * (180.0 / Math.PI);
+                    //    x = Math.Abs(Math.Round(x * 60000));
+                    //}
+                    //181 - 270 degrees
+                    if (arrValue1 < 0 && arrValue2 < 0)
+                    {
+                        x = Math.Abs(10800000 + x);
+                    }
+                    //271 - 359 degrees
+                    if (arrValue1 > 0 && arrValue2 < 0)
+                    {
+                        x = Math.Abs(21600000 - x);
+                    }
+                    //91 - 180 degrees
+                    if (arrValue1 < 0 && arrValue2 > 0)
+                    {
+                        x = Math.Abs(10800000 - x);
+                    }
+                }
+
+            }
+
+            return x.ToString();
+
+        }
+
+        //Resolve relative path to absolute path
+        private string EvalHyperlinkPath(string text)
+        {
+            string[] arrVal = new string[1];
+            arrVal = text.Split(':');
+            string source = arrVal[1].ToString();
+            string address=null;
+           
+           
+            if (arrVal.Length == 2)
+            {
+                string returnInputFilePath = "";
+
+                // for Commandline tool
+                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                {
+                    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                        returnInputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                }
+
+                //for addins
+                if (returnInputFilePath == "")
+                {
+                    returnInputFilePath = Environment.CurrentDirectory;
+                }
+
+                string linkPathLocation = Path.GetFullPath(Path.Combine(returnInputFilePath, source.Remove(0, 3))).Replace("/", "//").Replace(" ","%20");
+                address = "file:///" + linkPathLocation;
+            }
+            return address.ToString();
+        }
+        //end
         public void WriteStoredRun()
         {
             Element e = (Element)this.store.Peek();
