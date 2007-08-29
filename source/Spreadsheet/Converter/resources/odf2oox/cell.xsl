@@ -1300,7 +1300,7 @@
         not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> </xsl:when>
 
       <xsl:when
-        test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated">
+        test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p)">
 
         <xsl:call-template name="InsertConvertCell">
           <xsl:with-param name="colNumber">

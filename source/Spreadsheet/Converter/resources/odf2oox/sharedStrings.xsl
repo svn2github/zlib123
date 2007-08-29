@@ -70,7 +70,7 @@
       <si>
         <pxsi:maxlength xmlns:pxsi="urn:cleverage:xmlns:post-processings:cellText">        
           <xsl:choose>
-            <xsl:when test="text:span|text:p/text:span|text:p">
+            <xsl:when test="text:span|text:p/text:span">
               <xsl:apply-templates mode="run" select="text:p"/>
             </xsl:when>
             <xsl:otherwise>
