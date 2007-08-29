@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -204,6 +204,8 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:choose>
               </xsl:when>
               <xsl:when test="p:bgPr/a:gradFill">
+                <!-- warn if gradient -->
+                <xsl:message terminate="no">translation.oox2odf.slideTypeBackgroundGradient</xsl:message>
                 <xsl:for-each select="p:bgPr/a:gradFill/a:gsLst/child::node()[1]">
                   <xsl:if test="name()='a:gs'">
                     <xsl:choose>
@@ -237,7 +239,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:if>
                 </xsl:for-each>
             </xsl:when>
-              <xsl:when test="p:bgPr/a:blipFill or p:bgRef/a:blipFill">
+              <xsl:when test="(p:bgPr/a:blipFill or p:bgRef/a:blipFill) and p:bgPr/a:blipFill/a:blip/@r:embed ">
                 <xsl:attribute name="draw:fill-color">
                   <xsl:value-of select="'#FFFFFF'"/>
                 </xsl:attribute>
@@ -334,7 +336,14 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:for-each select ="document($var_Themefile)/a:theme/a:themeElements/a:fmtScheme/a:bgFillStyleLst/child::node()[$idx]">
                     <xsl:choose>
                       <xsl:when test="name()='a:blipFill'">
+                       <xsl:choose>
+                          <xsl:when test="./a:blip/@r:embed">
                         <xsl:value-of select="'1'"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="'0'"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                       </xsl:when>
                       <xsl:otherwise>
                         <xsl:value-of select="'0'"/>
@@ -506,6 +515,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:choose>
                 </xsl:when>
                 <xsl:when test="p:bgPr/a:gradFill">
+                  <xsl:message terminate="no">translation.oox2odf.slideLayoutTypeBackgroundGradient</xsl:message>
                   <xsl:for-each select="p:bgPr/a:gradFill/a:gsLst/child::node()[1]">
                     <xsl:if test="name()='a:gs'">
                       <xsl:choose>
@@ -539,7 +549,7 @@ exclude-result-prefixes="p a r xlink rels">
                     </xsl:if>
                   </xsl:for-each>
                 </xsl:when>
-                <xsl:when test="p:bgPr/a:blipFill or p:bgRef/a:blipFill">
+                <xsl:when test="p:bgPr/a:blipFill or p:bgRef/a:blipFill and p:bgPr/a:blipFill/a:blip/@r:embed">
                   <xsl:attribute name="draw:fill-color">
                     <xsl:value-of select="'#FFFFFF'"/>
                   </xsl:attribute>
@@ -550,7 +560,7 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:value-of select="concat(substring-before($Layout,'.xml'),'BackImg')"/>
                   </xsl:attribute>
                 </xsl:when>
-                <xsl:when test="p:bgRef and p:bgRef/@idx &gt; 1000">
+                <xsl:when test="p:bgRef/@idx &gt; 1000">
                   <xsl:variable name="idx" select="p:bgRef/@idx - 1000"/>
                   <xsl:variable name="var_Themefile">
                         <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$Layout,'.rels'))//node()/@Target[contains(.,'theme')]">
@@ -561,7 +571,14 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:for-each select ="document($var_Themefile)/a:theme/a:themeElements/a:fmtScheme/a:bgFillStyleLst/child::node()[$idx]">
                       <xsl:choose>
                         <xsl:when test="name()='a:blipFill'">
+                          <xsl:choose>
+                          <xsl:when test="./a:blip/@r:embed">
                           <xsl:value-of select="'1'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="'0'"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:value-of select="'0'"/>
@@ -619,7 +636,7 @@ exclude-result-prefixes="p a r xlink rels">
                     </xsl:if>
                   </xsl:if>
                 </xsl:when>
-                <xsl:when test="p:bgRef and p:bgRef/@idx &gt; 0  and p:bgRef/@idx &lt; 1000">
+                <xsl:when test="p:bgRef/@idx &gt; 0  and p:bgRef/@idx &lt; 1000">
                   <xsl:choose>
                     <xsl:when test="p:bgRef/a:srgbClr/@val">
                       <xsl:attribute name="draw:fill-color">
@@ -719,7 +736,9 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute >
               <xsl:variable name="footerText">
                 <xsl:for-each select="p:txBody/a:p">
-                  <xsl:value-of select ="./a:r/a:t"/>
+                  <xsl:for-each select="a:r">
+                  <xsl:value-of select ="a:t"/>
+                  </xsl:for-each>
                 </xsl:for-each>
               </xsl:variable>
 
@@ -815,9 +834,9 @@ exclude-result-prefixes="p a r xlink rels">
     </xsl:for-each>
   </xsl:template>
   <xsl:template name ="DrawFrames">
-	   <xsl:param name ="SlideFile"/>
-	  <xsl:param name ="slideId"/>
-    <xsl:for-each  select="document('ppt/_rels/presentation.xml.rels')">
+	 <xsl:param name ="SlideFile"/>
+	 <xsl:param name ="slideId"/>
+      <xsl:for-each  select="document('ppt/_rels/presentation.xml.rels')">
       <!-- added by vipul-->
       <!-- start-->
       <xsl:variable name="SlidePos" select="substring-after(substring-before($SlideFile,'.xml'),'slide')"/>
@@ -855,6 +874,8 @@ exclude-result-prefixes="p a r xlink rels">
          <xsl:for-each select="node()">
           <xsl:choose>
             <xsl:when test="name()='p:pic'">
+              <!-- warn, layouts to slide mapping-->
+              <xsl:message terminate="no">translation.oox2odf.layoutsToSlideMappingTypePicture</xsl:message>
               <xsl:for-each select=".">            
                 <xsl:call-template name="InsertPicture">
                   <xsl:with-param name ="slideRel" select ="concat('ppt/slideLayouts/_rels/',$lytFileName,'.rels')"/>
@@ -862,6 +883,8 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:sp'">
+              <!-- warn, layouts to slide mapping-->
+              <xsl:message terminate="no">translation.oox2odf.layoutsToSlideMappingTypeShapes</xsl:message>
               <xsl:variable name="var_pos" select="position()"/>
               <xsl:for-each select=".">
                 <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph)">
@@ -882,6 +905,8 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:cxnSp'">
+              <!-- warn, layouts to slide mapping-->
+              <xsl:message terminate="no">translation.oox2odf.layoutsToSlideMappingTypeLines</xsl:message>
               <xsl:variable name="var_pos" select="position()"/>
               <xsl:for-each select=".">
                 <xsl:variable  name ="GraphicId">
@@ -913,19 +938,22 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:if test="p:nvPicPr/p:nvPr/a:audioFile or p:nvPicPr/p:nvPr/a:wavAudioFile or p:nvPicPr/p:nvPr/a:videoFile">
                   <xsl:call-template name="InsertPicture">
                     <xsl:with-param name ="slideRel" select ="$slideRel"/>
-                    <xsl:with-param name="audio" select="'audio'"/>
+                    <xsl:with-param name="audio" select="'audio'"/>                   
+					<xsl:with-param name ="slideId" select ="$slideId"/>
                   </xsl:call-template>
                 </xsl:if>
                 <xsl:if test="not(p:nvPicPr/p:nvPr/a:audioFile or p:nvPicPr/p:nvPr/a:wavAudioFile or p:nvPicPr/p:nvPr/a:videoFile)">
                   <xsl:call-template name="InsertPicture">
                     <xsl:with-param name ="slideRel" select ="$slideRel"/>
+                    <xsl:with-param name="sourceName" select="'content'"/>
+				    <xsl:with-param name ="slideId" select ="$slideId"/>
                   </xsl:call-template>
                 </xsl:if>
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:sp'">
               <xsl:variable name="var_pos" select="position()"/>
-              <xsl:for-each select=".">
+              <!--<xsl:for-each select=".">-->
                 <xsl:choose>
                   <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph)">
                       <xsl:variable  name ="GraphicId">
@@ -940,6 +968,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:with-param name ="TypeId" select="$SlideID" />
                         <xsl:with-param name="SlideRelationId" select="$slideRel"/>
                         <xsl:with-param name="var_pos" select="$var_pos"/>
+						<xsl:with-param name ="slideId" select ="$slideId"/>
                       </xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
@@ -1047,9 +1076,9 @@ exclude-result-prefixes="p a r xlink rels">
                           <!--End-->
                           <draw:text-box>
                             <xsl:for-each select ="p:txBody/a:p">
-                              <xsl:if test ="$LayoutName != 'title'">
+                              <xsl:if test ="$LayoutName != 'title' and $LayoutName !='ctrTitle'">
                                 <!--Code Inserted by Vijayeta for Bullets And Numbering
-                  check for levels and then depending on the condition,insert bullets,Layout or Master properties-->
+                                      check for levels and then depending on the condition,insert bullets,Layout or Master properties-->
                                 <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
                                   <xsl:call-template name ="insertBulletsNumbersoox2odf">
                                     <xsl:with-param name ="listStyleName" select ="concat($listStyleName,position())"/>
@@ -1061,9 +1090,10 @@ exclude-result-prefixes="p a r xlink rels">
                                   </xsl:call-template>
                                 </xsl:if>
                                 <!-- If no bullets are present or default bullets-->
-                                <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum)and not(a:pPr/a:buBlip)">
-                                  <!-- If bullets are default-->
-                                  <xsl:if test ="$bulletTypeBool='true'">
+                                <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum)and not(a:pPr/a:buBlip) and $bulletTypeBool='true'">
+                                  <!--<xsl:for-each select ="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">-->
+                                  <xsl:if test ="$var_index!=''">
+                                    <!--<xsl:if test="not(./@type) or ./@type='body'">-->
                                     <xsl:call-template name ="insertBulletsNumbersoox2odf">
                                       <xsl:with-param name ="listStyleName" select ="concat($listStyleName,position())"/>
                                       <xsl:with-param name ="ParaId" select ="$ParaId"/>
@@ -1072,6 +1102,113 @@ exclude-result-prefixes="p a r xlink rels">
                                       <xsl:with-param name="slideRelationId" select="$slideRel" />
                                       <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
                                     </xsl:call-template>
+                                    <!--</xsl:if>-->
+                                  </xsl:if>
+                                  <!--</xsl:for-each>-->
+                                  <xsl:if test ="$var_index ='' ">
+                                    <text:p>
+                                      <xsl:attribute name ="text:style-name">
+                                        <xsl:value-of select ="concat($ParaId,position())"/>
+                                      </xsl:attribute>
+                                      <xsl:attribute name ="text:id" >
+                                        <xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+                                      </xsl:attribute>
+                                      <xsl:for-each select ="node()">
+                                        <xsl:if test ="name()='a:r'">
+                                          <text:span>
+                                            <xsl:attribute name="text:style-name">
+                                              <xsl:value-of select="concat($SlideID,generate-id())"/>
+                                            </xsl:attribute>
+                                            <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
+                                            <xsl:variable name="nodeTextSpan">
+                                              <!--<xsl:value-of select ="a:t"/>-->
+                                              <!--converts whitespaces sequence to text:s-->
+                                              <!-- 1699083 bug fix  -->
+                                              <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                                              <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                                              <xsl:choose >
+                                                <xsl:when test ="a:rPr[@cap='all'] or $layoutCap ='all'">
+                                                  <xsl:choose >
+                                                    <xsl:when test =".=''">
+                                                      <text:s/>
+                                                    </xsl:when>
+                                                    <xsl:when test ="not(contains(.,'  '))">
+                                                      <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                                                    </xsl:when>
+                                                    <xsl:when test =". =' '">
+                                                      <text:s/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise >
+                                                      <xsl:call-template name ="InsertWhiteSpaces">
+                                                        <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                                      </xsl:call-template>
+                                                    </xsl:otherwise>
+                                                  </xsl:choose>
+                                                </xsl:when>
+                                                <xsl:when test ="a:rPr[@cap='small'] or $layoutCap ='small' ">
+                                                  <xsl:choose >
+                                                    <xsl:when test =".=''">
+                                                      <text:s/>
+                                                    </xsl:when>
+                                                    <xsl:when test ="not(contains(.,'  '))">
+                                                      <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                                                    </xsl:when>
+                                                    <xsl:when test =".= ' '">
+                                                      <text:s/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise >
+                                                      <xsl:call-template name ="InsertWhiteSpaces">
+                                                        <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                                      </xsl:call-template>
+                                                    </xsl:otherwise>
+                                                  </xsl:choose >
+                                                </xsl:when>
+                                                <xsl:otherwise >
+                                                  <xsl:choose >
+                                                    <xsl:when test =".=''">
+                                                      <text:s/>
+                                                    </xsl:when>
+                                                    <xsl:when test ="not(contains(.,'  '))">
+                                                      <xsl:value-of select ="."/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise >
+                                                      <xsl:call-template name ="InsertWhiteSpaces">
+                                                        <xsl:with-param name ="string" select ="."/>
+                                                      </xsl:call-template>
+                                                    </xsl:otherwise >
+                                                  </xsl:choose>
+                                                </xsl:otherwise>
+                                              </xsl:choose>
+                                            </xsl:variable>
+                                            <!-- Added by lohith.ar - Code for text Hyperlinks -->
+                                            <xsl:if test="node()/a:hlinkClick">
+                                              <text:a>
+                                                <xsl:call-template name="AddTextHyperlinks">
+                                                  <xsl:with-param name="nodeAColonR" select="node()" />
+                                                  <xsl:with-param name="slideRelationId" select="$slideRel" />
+                                                  <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
+                                                </xsl:call-template>
+                                                <xsl:copy-of select="$nodeTextSpan"/>
+                                              </text:a>
+                                            </xsl:if>
+                                            <xsl:if test="not(node()/a:hlinkClick)">
+                                              <xsl:copy-of select="$nodeTextSpan"/>
+                                            </xsl:if>
+                                          </text:span>
+                                        </xsl:if >
+                                        <xsl:if test ="name()='a:br'">
+                                          <text:line-break/>
+                                        </xsl:if>
+                                        <!-- Added by lohith.ar for fix 1731885-->
+                                        <xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
+                                          <text:span>
+                                            <xsl:attribute name="text:style-name">
+                                              <xsl:value-of select="concat($SlideID,generate-id())"/>
+                                            </xsl:attribute>
+                                          </text:span>
+                                        </xsl:if>
+                                      </xsl:for-each>
+                                    </text:p>
                                   </xsl:if>
                                 </xsl:if>
                                 <!-- If no bullets present at all-->
@@ -1194,14 +1331,14 @@ exclude-result-prefixes="p a r xlink rels">
                                   </xsl:if>
                                 </xsl:if>
                               </xsl:if >
-                              <xsl:if test ="$LayoutName = 'title'">
+                              <xsl:if test ="$LayoutName = 'title' or $LayoutName ='ctrTitle'">
                                 <text:p >
                                   <xsl:attribute name ="text:style-name">
                                     <xsl:value-of select ="concat($ParaId,position())"/>
                                   </xsl:attribute>
-						<xsl:attribute name ="text:id" >
-							<xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
-						</xsl:attribute>
+                                  <xsl:attribute name ="text:id" >
+                                    <xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+                                  </xsl:attribute>
                                   <xsl:for-each select ="node()">
                                     <xsl:if test ="name()='a:r'">
                                       <text:span>
@@ -2106,7 +2243,7 @@ exclude-result-prefixes="p a r xlink rels">
                     </xsl:choose >
                   </xsl:otherwise>
                 </xsl:choose>
-              </xsl:for-each>
+              <!--</xsl:for-each>-->
             </xsl:when>
             <xsl:when test="name()='p:cxnSp'">
               <xsl:variable name="var_pos" select="position()"/>
@@ -2121,19 +2258,26 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                   <xsl:with-param name ="ParaId" select="$ParaId" />
                   <xsl:with-param name ="TypeId" select="$SlideID" />
+				  <xsl:with-param name ="slideId" select ="$slideId"/>
                   <xsl:with-param name ="SlideRelationId" select ="$slideRel" />
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
-            <!--<xsl:when test="name()='p:grpSp'">
+            <xsl:when test="name()='p:grpSp'">
+              <xsl:variable name ="drawAnimId">
+						  <xsl:value-of select ="concat('sl',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
+					    </xsl:variable>
+               <xsl:variable name="var_pos" select="position()"/>
               <xsl:call-template name ="tmpGroupedShapes">
                 <xsl:with-param name ="SlidePos"  select ="$SlidePos" />
                 <xsl:with-param name ="SlideID"  select ="$SlideID" />
+                <xsl:with-param name ="pos"  select ="$var_pos" />
+              <xsl:with-param name ="drawAnimId"  select ="$drawAnimId" />
                 <xsl:with-param name ="SlideRelationId" select="$slideRel" />
                 <xsl:with-param name ="grID" select ="concat('grp', generate-id())" />
                 <xsl:with-param name ="prID" select ="concat('prp', generate-id())" />
               </xsl:call-template>
-            </xsl:when>-->
+            </xsl:when>
           </xsl:choose>
         </xsl:for-each>
       </xsl:for-each>
@@ -2163,15 +2307,29 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="SlideRelationId" />
     <xsl:param name ="grID" />
     <xsl:param name ="prID" />
+    <xsl:param name ="pos" />
    <xsl:param name ="SlidePos" />
+   <xsl:param name ="drawAnimId" />
    <draw:g>
-     <xsl:for-each select=".">
-       <xsl:for-each select="node()">
+     <xsl:variable name="grpoffX">
+       <xsl:value-of select="./p:grpSpPr/a:xfrm/a:off/@x"/>
+     </xsl:variable>
+     <xsl:variable name="grpchOffX">
+       <xsl:value-of select="./p:grpSpPr/a:xfrm/a:chOff/@x"/>
+     </xsl:variable>
+     <xsl:if test="$grpoffX != $grpchOffX">
+       <xsl:message terminate="no">translation.oox2odf.groupingTypeExtensionChange</xsl:message>
+     </xsl:if>
+       <xsl:attribute name ="draw:id" >
+				<xsl:value-of  select ="$drawAnimId"/>
+			  </xsl:attribute>
+          <xsl:for-each select="node()">
            <xsl:choose>
             <xsl:when test="name()='p:pic'">
               <xsl:for-each select=".">
                 <xsl:call-template name="InsertPicture">
                   <xsl:with-param name ="slideRel" select ="$SlideRelationId"/>
+                <xsl:with-param name="grpBln" select="'true'"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -2181,40 +2339,53 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:choose>
                   <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph)">
                       <xsl:variable  name ="GraphicId">
-                        <xsl:value-of select ="concat('SL',$SlidePos,'gr',$var_pos)"/>
+                       <xsl:value-of select ="concat('SLgrp',$SlidePos,'gr',$pos,'-', $var_pos)"/>
                       </xsl:variable>
                       <xsl:variable name ="ParaId">
-                        <xsl:value-of select ="concat('SL',$SlidePos,'PARA',$var_pos)"/>
+                      <xsl:value-of select ="concat('SLgrp',$SlidePos,'PARA',$pos,'-', $var_pos)"/>
                       </xsl:variable>
                       <xsl:call-template name ="shapes">
                         <xsl:with-param name="GraphicId" select ="$GraphicId"/>
                         <xsl:with-param name ="ParaId" select="$ParaId" />
+                        <xsl:with-param name ="TypeId" select="$SlideID" />
+                        <xsl:with-param name="SlideRelationId" select="$SlideRelationId"/>
+                        <xsl:with-param name="var_pos" select="$var_pos"/>
+                       <xsl:with-param name="grpBln" select="'true'"/>
                       </xsl:call-template>
                   </xsl:when>
                 </xsl:choose>
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:cxnSp'">
+              <xsl:variable name="var_pos" select="position()"/>
               <xsl:for-each select=".">
-                <xsl:call-template name ="drawShapes">
-                  <xsl:with-param name ="SlideID" select ="$SlideID" />
+              <xsl:variable  name ="GraphicId">
+                <xsl:value-of select ="concat('SLgrp',$SlidePos,'grLine',$pos,'-', $var_pos)"/>
+              </xsl:variable>
+              <xsl:variable name ="ParaId">
+                <xsl:value-of select ="concat('SLgrp',$SlidePos,'PARA',$pos,'-', $var_pos)"/>
+              </xsl:variable>
+              <xsl:call-template name ="shapes">
+                <xsl:with-param name="GraphicId" select ="$GraphicId"/>
+                <xsl:with-param name ="ParaId" select="$ParaId" />
+                <xsl:with-param name ="TypeId" select="$SlideID" />
                   <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
-                  <xsl:with-param name ="grID" select ="'grLine'" />
+                <xsl:with-param name="grpBln" select="'true'"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
-            <!--<xsl:when test="name()='p:grpSp'">
+            <xsl:when test="name()='p:grpSp'">
+              <!--<xsl:variable name="var_pos" select="position()"/>
               <xsl:call-template name ="tmpGroupedShapes">
                 <xsl:with-param name ="SlideID"  select ="$SlideID" />
                 <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
-                <xsl:with-param name ="grID" select ="concat('grp', generate-id())" />
-                <xsl:with-param name ="prID" select ="concat('prp', generate-id())" />
-              </xsl:call-template>
-            </xsl:when>-->
+                <xsl:with-param name ="SlidePos" select="$SlidePos" />
+                <xsl:with-param name ="pos" select="$var_pos" />
+              </xsl:call-template>-->
+            </xsl:when>
           </xsl:choose>
       </xsl:for-each>
-     </xsl:for-each>
-   </draw:g>
+     </draw:g>
   </xsl:template>
   <xsl:template name ="processShapes">
     <xsl:param name ="SlideID" />
@@ -2294,6 +2465,7 @@ exclude-result-prefixes="p a r xlink rels">
     <!--@Modified font Names -->
 
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+        <xsl:variable name="SlidePos" select="position()"/>
       <xsl:variable name ="SlideNumber">
         <xsl:value-of  select ="concat('slide',position())" />
       </xsl:variable>
@@ -2537,7 +2709,7 @@ exclude-result-prefixes="p a r xlink rels">
                       <!--</xsl:if>-->
                       <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum) and not(a:pPr/a:buBlip) ">
                         <xsl:choose >
-                          <xsl:when test ="$bulletTypeBool='true'">
+                          <xsl:when test ="$bulletTypeBool='true' and $var_index != '' ">
                             <!-- Added by  vijayeta ,on 19th june-->
                             <xsl:choose >
                               <!--Bug fix 1739611,by vijayeta,June 21st-->
@@ -2873,6 +3045,99 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:for-each>
               </xsl:if>
             </xsl:when>
+            <xsl:when test="name()='p:grpSp'">
+            <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select="node()">
+                <xsl:choose>
+                  <xsl:when test="name()='p:sp'">
+                     <xsl:variable name="pos" select="position()"/>
+                    <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph)">
+                    <xsl:variable  name ="GraphicId">
+                      <xsl:value-of select ="concat('SLgrp',$SlidePos,'gr',$var_pos,'-', $pos)"/>
+                    </xsl:variable>
+                    <xsl:variable name ="ParaId">
+                      <xsl:value-of select ="concat('SLgrp',$SlidePos,'PARA',$var_pos,'-', $pos)"/>
+                    </xsl:variable>
+                    <style:style style:family="graphic" style:parent-style-name="standard">
+                      <xsl:attribute name ="style:name">
+                        <xsl:value-of select ="$GraphicId"/>
+                      </xsl:attribute >
+                      <style:graphic-properties draw:stroke="none">
+                        <!--FILL-->
+                        <xsl:call-template name ="Fill" />
+                        <!--LINE COLOR-->
+                        <xsl:call-template name ="LineColor" />
+                        <!--LINE STYLE-->
+                        <xsl:call-template name ="LineStyle"/>
+                        <!--TEXT ALIGNMENT-->
+                        <xsl:call-template name ="TextLayout" />
+                        <!-- SHADOW IMPLEMENTATION -->
+                        <xsl:if test="p:spPr/a:effectLst/a:outerShdw ">
+                          <xsl:call-template name ="ShapesShadow"/>
+                        </xsl:if>
+                      </style:graphic-properties >
+                      <xsl:if test ="p:txBody/a:bodyPr/@vert">
+                        <style:paragraph-properties>
+                          <xsl:attribute name ="style:writing-mode">
+                            <xsl:call-template name ="getTextDirection">
+                              <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
+                            </xsl:call-template>
+                          </xsl:attribute>
+                        </style:paragraph-properties>
+                      </xsl:if>
+                    </style:style>
+                    <xsl:call-template name="tmpShapeTextProcess">
+                      <xsl:with-param name="ParaId" select="$ParaId"/>
+                      <xsl:with-param name="TypeId" select="substring-before($SlideId,'.xml')"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </xsl:when>
+                  <xsl:when test="name()='p:cxnSp'">
+                      <xsl:variable name="pos" select="position()"/>
+                    <xsl:for-each select=".">
+                      <xsl:variable  name ="GraphicId">
+                        <xsl:value-of select ="concat('SLgrp',$SlidePos,'grLine',$var_pos,'-', $pos)"/>
+                      </xsl:variable>
+                      <xsl:variable name ="ParaId">
+                        <xsl:value-of select ="concat('SLgrp',$SlidePos,'PARA',$var_pos,'-', $pos)"/>
+                      </xsl:variable>
+                      <style:style style:family="graphic" style:parent-style-name="standard">
+                        <xsl:attribute name ="style:name">
+                          <xsl:value-of select ="$GraphicId"/>
+                        </xsl:attribute >
+                        <style:graphic-properties draw:stroke="none">
+                          <!--FILL-->
+                          <xsl:call-template name ="Fill" />
+                          <!--LINE COLOR-->
+                          <xsl:call-template name ="LineColor" />
+                          <!--LINE STYLE-->
+                          <xsl:call-template name ="LineStyle"/>
+                          <!--TEXT ALIGNMENT-->
+                          <xsl:call-template name ="TextLayout" />
+                          <!-- SHADOW IMPLEMENTATION -->
+                          <xsl:if test="p:spPr/a:effectLst/a:outerShdw ">
+                            <xsl:call-template name ="ShapesShadow"/>
+                          </xsl:if>
+                        </style:graphic-properties >
+                        <xsl:if test ="p:txBody/a:bodyPr/@vert">
+                          <style:paragraph-properties>
+                            <xsl:attribute name ="style:writing-mode">
+                              <xsl:call-template name ="getTextDirection">
+                                <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
+                              </xsl:call-template>
+                            </xsl:attribute>
+                          </style:paragraph-properties>
+                        </xsl:if>
+                      </style:style>
+                      <xsl:call-template name="tmpShapeTextProcess">
+                        <xsl:with-param name="ParaId" select="$ParaId"/>
+                        <xsl:with-param name="TypeId" select="substring-before($SlideId,'.xml')"/>
+                      </xsl:call-template>
+                    </xsl:for-each>
+                  </xsl:when>
+                </xsl:choose>           
+            </xsl:for-each>
+          </xsl:when>
            </xsl:choose>
         </xsl:for-each>
       </xsl:for-each>
@@ -2934,6 +3199,8 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:otherwise>
             <!-- Do nothing, no attribute to be added-->
+            <!-- warn if 'kiosk' -->
+            <xsl:message terminate="no">translation.oox2odf.slideShowSettingsKiosk</xsl:message>
             <xsl:attribute name ="presentation:full-screen">
               <xsl:value-of select ="'true'"/>
             </xsl:attribute>
@@ -2945,6 +3212,8 @@ exclude-result-prefixes="p a r xlink rels">
             <!-- Do nothing, As no attribute must be included-->
           </xsl:when>
           <xsl:when test ="./p:sldRg">
+            <!-- warn, feature Start and End Slide Show -->
+            <xsl:message terminate="no">translation.oox2odf.slideShowSettingsSlideStartEnd</xsl:message>
             <xsl:variable name ="pageName">
               <xsl:value-of select ="concat('page',./p:sldRg/@st)"/>
             </xsl:variable>
@@ -2980,6 +3249,14 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:attribute name ="presentation:pause">
             <xsl:value-of select ="'PT00H00M00S'"/>
           </xsl:attribute>
+        </xsl:if>
+        <xsl:if test ="not(./@showNarration)">
+          <!-- warn if option Narration set -->
+          <xsl:message terminate="no">translation.oox2odf.slideShowSettingsNarration</xsl:message>
+        </xsl:if>
+        <xsl:if test ="p:penClr">
+          <!-- warn if Pen colour can be set -->
+          <xsl:message terminate="no">translation.oox2odf.slideShowSettingsPenColor</xsl:message>
         </xsl:if>
       </xsl:for-each>
       <!-- End of code Added by vijayeta for Slide Show settings-->
@@ -3223,6 +3500,26 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
+            <!--Picture Border-->
+            <xsl:when test="name()='p:pic'">
+              <xsl:for-each select=".">
+                <xsl:if test="p:spPr/a:ln">
+                  <xsl:variable  name ="GraphicId">
+                    <xsl:value-of select ="concat('SLPicture',$SlidePos,'gr')"/>
+                  </xsl:variable>
+                  <style:style style:family="graphic" style:parent-style-name="standard">
+                    <xsl:attribute name ="style:name">
+                      <xsl:value-of select ="$GraphicId"/>
+                    </xsl:attribute >
+                    <style:graphic-properties>
+                      <!--LINE STYLE-->
+                      <xsl:call-template name ="LineStyle"/>
+                      <xsl:call-template name ="PictureBorderColor" />
+                    </style:graphic-properties >
+                  </style:style>
+                 </xsl:if>
+               </xsl:for-each>
+             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
       </xsl:for-each>
@@ -4681,6 +4978,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:call-template name="tmpSlideTextProperty">
       <xsl:with-param name="DefFont" select="$DefFont"/>
       <xsl:with-param name="fontscale" select="$fontscale"/>
+      <xsl:with-param name="index" select ="$index"/>
     </xsl:call-template>
     
     <xsl:if test ="not(a:rPr/@sz)">
@@ -4931,11 +5229,18 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="$spType='body'">
-          <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='body' and @idx=$index]">
-            <xsl:call-template name ="tmpTextProperty">
-              <xsl:with-param name ="AttrType" select ="'Fontweight'"/>
-            </xsl:call-template>
-          </xsl:for-each>
+          <xsl:if test="$index!=''" >
+            <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='body' and @idx=$index]">
+              <xsl:call-template name ="tmpTextProperty">
+                <xsl:with-param name ="AttrType" select ="'Fontweight'"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="$index=''" >
+            <xsl:attribute name ="fo:font-weight">
+              <xsl:value-of  select ="'normal'"/>
+            </xsl:attribute>
+          </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$spType and @idx=$index]">
@@ -5329,7 +5634,7 @@ exclude-result-prefixes="p a r xlink rels">
 			  <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 		  </xsl:variable>
 		  <xsl:choose>
-			  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+			  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 				  <xsl:variable name="superCont">
 					  <xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 				  </xsl:variable>
@@ -5337,14 +5642,14 @@ exclude-result-prefixes="p a r xlink rels">
 					  <xsl:value-of select="$superCont"/>
 				  </xsl:attribute>
 			  </xsl:when>
-			  <xsl:otherwise>
+			  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 				  <xsl:variable name="subCont">
 					  <xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 				  </xsl:variable>
 				  <xsl:attribute name="style:text-position">
 					  <xsl:value-of select="$subCont"/>
 				  </xsl:attribute>
-			  </xsl:otherwise>
+			  </xsl:when>
 		  </xsl:choose>
 	  </xsl:if>
       </xsl:when>
@@ -6338,7 +6643,7 @@ exclude-result-prefixes="p a r xlink rels">
 					  <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 				  </xsl:variable>
 				  <xsl:choose>
-					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 						  <xsl:variable name="superCont">
 							  <xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 						  </xsl:variable>
@@ -6346,14 +6651,14 @@ exclude-result-prefixes="p a r xlink rels">
 							  <xsl:value-of select="$superCont"/>
 						  </xsl:attribute>
 					  </xsl:when>
-					  <xsl:otherwise>
+					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 						  <xsl:variable name="subCont">
 							  <xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 						  </xsl:variable>
 						  <xsl:attribute name="style:text-position">
 							  <xsl:value-of select="$subCont"/>
 						  </xsl:attribute>
-					  </xsl:otherwise>
+					  </xsl:when>
 				  </xsl:choose>
 			  </xsl:if>
 		  </xsl:when>
@@ -6550,7 +6855,7 @@ exclude-result-prefixes="p a r xlink rels">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
 					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 							<xsl:variable name="superCont">
 								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 							</xsl:variable>
@@ -6558,14 +6863,14 @@ exclude-result-prefixes="p a r xlink rels">
 								<xsl:value-of select="$superCont"/>
 							</xsl:attribute>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 							<xsl:variable name="subCont">
 								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 							</xsl:variable>
 							<xsl:attribute name="style:text-position">
 								<xsl:value-of select="$subCont"/>
 							</xsl:attribute>
-						</xsl:otherwise>
+						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:when>
@@ -6762,7 +7067,7 @@ exclude-result-prefixes="p a r xlink rels">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
 					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 							<xsl:variable name="superCont">
 								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 							</xsl:variable>
@@ -6770,14 +7075,14 @@ exclude-result-prefixes="p a r xlink rels">
 								<xsl:value-of select="$superCont"/>
 							</xsl:attribute>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 							<xsl:variable name="subCont">
 								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 							</xsl:variable>
 							<xsl:attribute name="style:text-position">
 								<xsl:value-of select="$subCont"/>
 							</xsl:attribute>
-						</xsl:otherwise>
+						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:when>		
@@ -6974,7 +7279,7 @@ exclude-result-prefixes="p a r xlink rels">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
 					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 							<xsl:variable name="superCont">
 								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 							</xsl:variable>
@@ -6982,14 +7287,14 @@ exclude-result-prefixes="p a r xlink rels">
 								<xsl:value-of select="$superCont"/>
 							</xsl:attribute>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 							<xsl:variable name="subCont">
 								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 							</xsl:variable>
 							<xsl:attribute name="style:text-position">
 								<xsl:value-of select="$subCont"/>
 							</xsl:attribute>
-						</xsl:otherwise>
+						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:when>
@@ -7186,7 +7491,7 @@ exclude-result-prefixes="p a r xlink rels">
 					  <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 				  </xsl:variable>
 				  <xsl:choose>
-					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 						  <xsl:variable name="superCont">
 							  <xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 						  </xsl:variable>
@@ -7194,14 +7499,14 @@ exclude-result-prefixes="p a r xlink rels">
 							  <xsl:value-of select="$superCont"/>
 						  </xsl:attribute>
 					  </xsl:when>
-					  <xsl:otherwise>
+					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 						  <xsl:variable name="subCont">
 							  <xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 						  </xsl:variable>
 						  <xsl:attribute name="style:text-position">
 							  <xsl:value-of select="$subCont"/>
 						  </xsl:attribute>
-					  </xsl:otherwise>
+					  </xsl:when>
 				  </xsl:choose>
 			  </xsl:if>
 		  </xsl:when>	
@@ -7398,7 +7703,7 @@ exclude-result-prefixes="p a r xlink rels">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
 					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 							<xsl:variable name="superCont">
 								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 							</xsl:variable>
@@ -7406,14 +7711,14 @@ exclude-result-prefixes="p a r xlink rels">
 								<xsl:value-of select="$superCont"/>
 							</xsl:attribute>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 							<xsl:variable name="subCont">
 								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 							</xsl:variable>
 							<xsl:attribute name="style:text-position">
 								<xsl:value-of select="$subCont"/>
 							</xsl:attribute>
-						</xsl:otherwise>
+						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:when>
@@ -7610,7 +7915,7 @@ exclude-result-prefixes="p a r xlink rels">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
 					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 							<xsl:variable name="superCont">
 								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 							</xsl:variable>
@@ -7618,14 +7923,14 @@ exclude-result-prefixes="p a r xlink rels">
 								<xsl:value-of select="$superCont"/>
 							</xsl:attribute>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 							<xsl:variable name="subCont">
 								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 							</xsl:variable>
 							<xsl:attribute name="style:text-position">
 								<xsl:value-of select="$subCont"/>
 							</xsl:attribute>
-						</xsl:otherwise>
+						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:when>
@@ -7822,7 +8127,7 @@ exclude-result-prefixes="p a r xlink rels">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
 					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 							<xsl:variable name="superCont">
 								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 							</xsl:variable>
@@ -7830,14 +8135,14 @@ exclude-result-prefixes="p a r xlink rels">
 								<xsl:value-of select="$superCont"/>
 							</xsl:attribute>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 							<xsl:variable name="subCont">
 								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 							</xsl:variable>
 							<xsl:attribute name="style:text-position">
 								<xsl:value-of select="$subCont"/>
 							</xsl:attribute>
-						</xsl:otherwise>
+						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:when>
@@ -8034,7 +8339,7 @@ exclude-result-prefixes="p a r xlink rels">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
 					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline > 0)">
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
 							<xsl:variable name="superCont">
 								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
 							</xsl:variable>
@@ -8042,14 +8347,14 @@ exclude-result-prefixes="p a r xlink rels">
 								<xsl:value-of select="$superCont"/>
 							</xsl:attribute>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
 							<xsl:variable name="subCont">
 								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
 							</xsl:variable>
 							<xsl:attribute name="style:text-position">
 								<xsl:value-of select="$subCont"/>
 							</xsl:attribute>
-						</xsl:otherwise>
+						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
 			</xsl:when>
@@ -9288,34 +9593,48 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             </xsl:if>
-            <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:lnSpc)">             
-                <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl1pPr/a:lnSpc">
-                  <xsl:if test ="a:spcPct">
-                    <xsl:choose>
-                      <xsl:when test="$lnSpaceRed='0'">
-                        <xsl:if test ="./@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
-                            <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:if>
-                  <xsl:if test ="a:spcPts/@val">
-                    <xsl:attribute name="style:line-height-at-least">
-                      <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:if>           
+            <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:lnSpc)">
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl1pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl1pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
+                  </xsl:attribute>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
+            <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
           </xsl:when>
           <xsl:when test="$AttrType='Textdirection'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
@@ -9509,32 +9828,46 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:if>
 
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc)">
-              <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl2pPr/a:lnSpc">
-                <xsl:if test ="a:spcPct">
-                  <xsl:choose>
-                    <xsl:when test="$lnSpaceRed='0'">
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                          <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:if>
-                <xsl:if test ="a:spcPts/@val">
-                  <xsl:attribute name="style:line-height-at-least">
-                    <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl2pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl2pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
                   </xsl:attribute>
-                </xsl:if>
-              </xsl:for-each>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
             </xsl:if>
 
           </xsl:when>
@@ -9721,36 +10054,48 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             </xsl:if>
-           
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:lnSpc)">
-                <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl3pPr/a:lnSpc">
-                  <xsl:if test ="a:spcPct">
-                    <xsl:choose>
-                      <xsl:when test="$lnSpaceRed='0'">
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                            <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:lnSpc/a:spcPct/@val"/>-->
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:if>
-                  <xsl:if test ="a:spcPts/@val">
-                    <xsl:attribute name="style:line-height-at-least">
-                      <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:if>
-            
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl3pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl3pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
+                  </xsl:attribute>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
+            </xsl:if>
           </xsl:when>
         </xsl:choose>
       </xsl:when>
@@ -9937,32 +10282,46 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:if>
 
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:lnSpc)">
-              <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl4pPr/a:lnSpc">
-                <xsl:if test ="a:spcPct">
-                  <xsl:choose>
-                    <xsl:when test="$lnSpaceRed='0'">
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                          <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:lnSpc/a:spcPct/@val"/>-->
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:if>
-                <xsl:if test ="a:spcPts/@val">
-                  <xsl:attribute name="style:line-height-at-least">
-                    <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl4pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl4pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
                   </xsl:attribute>
-                </xsl:if>
-              </xsl:for-each>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
             </xsl:if>
           </xsl:when>
         </xsl:choose>
@@ -10149,33 +10508,47 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:if>
             </xsl:if>
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:lnSpc)">
-              <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl5pPr/a:lnSpc">
-                  <xsl:if test ="a:spcPct">
-                    <xsl:choose>
-                      <xsl:when test="$lnSpaceRed='0'">
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                          <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:lnSpc/a:spcPct/@val"/>-->
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:if>
-                  <xsl:if test ="a:spcPts/@val">
-                    <xsl:attribute name="style:line-height-at-least">
-                      <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:if>
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl5pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl5pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
+                  </xsl:attribute>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
+            </xsl:if>
                     </xsl:when>
         </xsl:choose>
       </xsl:when>
@@ -10361,32 +10734,46 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:if>
             </xsl:if>
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:lnSpc)">
-              <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl6pPr/a:lnSpc">
-                <xsl:if test ="a:spcPct">
-                  <xsl:choose>
-                    <xsl:when test="$lnSpaceRed='0'">
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                          <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:lnSpc/a:spcPct/@val"/>-->
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:if>
-                <xsl:if test ="a:spcPts/@val">
-                  <xsl:attribute name="style:line-height-at-least">
-                    <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl6pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl6pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
                   </xsl:attribute>
-                </xsl:if>
-              </xsl:for-each>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
             </xsl:if>
           </xsl:when>
         </xsl:choose>
@@ -10572,35 +10959,49 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             </xsl:if>
-            
+
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:lnSpc)">
-                <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl7pPr/a:lnSpc">
-                  <xsl:if test ="a:spcPct">
-                    <xsl:choose>
-                      <xsl:when test="$lnSpaceRed='0'">
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                            <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:lnSpc/a:spcPct/@val"/>-->
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:if>
-                  <xsl:if test ="a:spcPts/@val">
-                    <xsl:attribute name="style:line-height-at-least">
-                      <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:if>
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl7pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl7pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
+                  </xsl:attribute>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
+            </xsl:if>
             </xsl:when>
         </xsl:choose>
       </xsl:when>
@@ -10787,32 +11188,46 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:if>
 
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:lnSpc)">
-              <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl8pPr/a:lnSpc">
-                <xsl:if test ="a:spcPct">
-                  <xsl:choose>
-                    <xsl:when test="$lnSpaceRed='0'">
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                          <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:lnSpc/a:spcPct/@val"/>-->
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:if test ="a:spcPct/@val">
-                        <xsl:attribute name="fo:line-height">
-                          <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:if>
-                <xsl:if test ="a:spcPts/@val">
-                  <xsl:attribute name="style:line-height-at-least">
-                    <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl8pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl8pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
                   </xsl:attribute>
-                </xsl:if>
-              </xsl:for-each>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
             </xsl:if>
           </xsl:when>
         </xsl:choose>
@@ -10998,35 +11413,49 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             </xsl:if>
-            
+
             <xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:lnSpc)">
-                <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl9pPr/a:lnSpc">
-                  <xsl:if test ="a:spcPct">
-                    <xsl:choose>
-                      <xsl:when test="$lnSpaceRed='0'">
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number(a:spcPct/@val div 1000,'###'), '%')"/>
-                            <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:lnSpc/a:spcPct/@val"/>-->
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:if test ="a:spcPct/@val">
-                          <xsl:attribute name="fo:line-height">
-                            <xsl:value-of select="concat(format-number((a:spcPct/@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:if>
-                  <xsl:if test ="a:spcPts/@val">
-                    <xsl:attribute name="style:line-height-at-least">
-                      <xsl:value-of select="concat(format-number(a:spcPts/@val div 2835, '#.##'), 'cm')"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:if>
+              <!--Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07-->
+              <!--when line spacing is not present in slide, layout and master, and if linespace reduction is present then the total line spacing is calculated as 100000-lineSpaceReduction-->
+              <xsl:choose>
+                <xsl:when test="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl9pPr/a:lnSpc">
+                  <xsl:for-each select ="document($slideMasterName)//p:txStyles/p:bodyStyle/a:lvl9pPr/a:lnSpc">
+                    <xsl:if test ="a:spcPct">
+                      <xsl:choose>
+                        <xsl:when test="$lnSpaceRed='0'">
+                          <xsl:if test ="./@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number(./@val div 1000,'###'), '%')"/>
+                              <!--<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:lnSpc/a:spcPct/@val"/>-->
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:if test ="a:spcPct/@val">
+                            <xsl:attribute name="fo:line-height">
+                              <xsl:value-of select="concat(format-number((./@val - number($lnSpaceRed)) div 1000,'###'), '%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:if>
+                    <xsl:if test ="a:spcPts/@val">
+                      <xsl:attribute name="style:line-height-at-least">
+                        <xsl:value-of select="concat(format-number(./@val div 2835, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--<xsl:if test="lnSpaceRed &lt;'100000'">-->
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:value-of select="concat(format-number((100000 - number($lnSpaceRed)) div 1000,'###'), '%')" />
+                  </xsl:attribute>
+                  <!--</xsl:if>-->
+                </xsl:otherwise>
+              </xsl:choose>
+              <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
+            </xsl:if>
                 </xsl:when>
         </xsl:choose>
       </xsl:when>
@@ -11038,6 +11467,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name="index"/>
     <xsl:call-template name="tmpSlideGrahicProp"/>
     <xsl:if test ="not(p:spPr/a:noFill) and not(p:spPr/a:solidFill) and not(p:style/a:fillRef) and not(p:spPr/a:gradFill)">
+      <xsl:message terminate="no">translation.oox2odf.slideTypeGraphicGradient</xsl:message>
       <xsl:choose>
         <xsl:when test="$spType='title'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
@@ -11500,6 +11930,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <!-- gradient color-->
           <xsl:when test="parent::node()/parent::node()/parent::node()/p:spPr/a:gradFill">
+            <xsl:message terminate="no">translation.oox2odf.slideLayoutTypeGraphicGradient</xsl:message>
             <xsl:for-each select="parent::node()/parent::node()/parent::node()/p:spPr/a:gradFill/a:gsLst/child::node()[1]">
               <xsl:if test="name()='a:gs'">
                 <xsl:choose>
@@ -11799,7 +12230,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:call-template>
                 </xsl:attribute>
                 <xsl:attribute name ="presentation:name">
-                  <xsl:value-of select ="concat('dtd',$curPos)"/>
+                  <xsl:value-of select ="concat($handoutMasterName,'dtd',$curPos)"/>
                 </xsl:attribute>
                 <xsl:attribute name ="presentation:source">
                   <xsl:for-each select =".">
@@ -11831,7 +12262,7 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:variable>
               <presentation:footer-decl>
                 <xsl:attribute name ="presentation:name">
-                  <xsl:value-of select ="concat('ftr',$curPos)"/>
+                  <xsl:value-of select ="concat($handoutMasterName,'ftr',$curPos)"/>
                 </xsl:attribute>
                 <xsl:value-of select ="$footerText"/>
               </presentation:footer-decl>

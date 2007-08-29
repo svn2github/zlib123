@@ -36,7 +36,12 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					<xsl:value-of select ="concat($ParaId,position())"/>
 				</xsl:attribute>
 				<xsl:attribute name ="text:id" >
-					<xsl:value-of  select ="concat('sl',substring-after($slideId,'slide'),'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+					<xsl:if test ="contains($slideId,'slide')">
+						<xsl:value-of  select ="concat('sl',substring-after($slideId,'slide'),'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+					</xsl:if>
+					<xsl:if test ="not(contains($slideId,'slide'))">
+						<xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+					</xsl:if>
 				</xsl:attribute>
 				<!--<xsl:attribute name ="text:id" >
 			  <xsl:value-of  select ="concat('sl',substring-after($slideId,'slide'),'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
@@ -381,8 +386,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 									</text:list-level-style-number>
 								</text:list-style>
 							</xsl:when>
-							<xsl:when test ="a:pPr/a:buBlip">
-								<!--<xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
+              <xsl:when test ="a:pPr/a:buBlip">
+                <xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
                 <xsl:variable name="XlinkHref">
                   <xsl:variable name="pzipsource">
                     <xsl:value-of select="document($slideRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
@@ -401,129 +406,73 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   <xsl:attribute name ="style:name">
                     <xsl:value-of select ="$levelStyle"/>
                   </xsl:attribute >
-                  <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                  <text:list-level-style-image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select="$newTextLvl"/>
+                    </xsl:attribute>
                     <xsl:attribute name="xlink:href">
                       <xsl:value-of select="$XlinkHref"/>
                     </xsl:attribute>
                     <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
                   </text:list-level-style-image>
-                </text:list-style>-->
-								<text:list-style>
-									<xsl:attribute name ="style:name">
-										<xsl:value-of select ="$levelStyle"/>
-									</xsl:attribute >
-									<text:list-level-style-bullet>
-										<xsl:attribute name ="text:level">
-											<xsl:value-of select ="$textLevel + 1"/>
-										</xsl:attribute >
-										<xsl:attribute name ="text:bullet-char">
-											<xsl:call-template name ="insertBulletCharacter">
-												<xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-											</xsl:call-template>
-										</xsl:attribute >
-										<style:list-level-properties text:min-label-width="0.8cm">
-											<xsl:attribute name ="text:space-before">
-												<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-													<xsl:value-of select="concat(format-number(child::node()[$newTextLvl]/@marL div 360000,'#.##'),'cm')"/>
-												</xsl:for-each>
-											</xsl:attribute>
-										</style:list-level-properties>
-										<style:text-properties style:font-charset="x-symbol">
-											<xsl:if test ="a:pPr/a:buFont/@typeface">
-												<xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="'StarSymbol'"/>
-													</xsl:attribute>
-												</xsl:if>
-												<xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-											<xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-												<xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="'StarSymbol'"/>
-												</xsl:attribute>
-											</xsl:if>
-											<xsl:if test ="$textColor !='0'">
-												<xsl:attribute name ="fo:color">
-													<xsl:value-of select ="$textColor"/>
-												</xsl:attribute>
-											</xsl:if>
-											<xsl:if test ="$textColor='0'">
-												<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-													<xsl:variable name ="levelColor" >
-														<xsl:call-template name ="getLevelColor">
-															<xsl:with-param name ="levelNum" select ="$newTextLvl"/>
-														</xsl:call-template>
-													</xsl:variable>
-													<xsl:attribute name ="fo:color">
-														<xsl:value-of select ="$levelColor"/>
-													</xsl:attribute>
-												</xsl:for-each>
-											</xsl:if>
-											<!--End of Code added by vijayeta, bug fix 1746350-->
-										</style:text-properties >
-									</text:list-level-style-bullet>
-								</text:list-style>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:for-each select ="document(concat('ppt/slideLayouts/',$slideLayout))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
-									<xsl:if test ="./@idx=$var_index">
-										<xsl:if test="not(./@type) or ./@type='body'">
-											<xsl:call-template name ="getBulletForLevelsLayout">
-												<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
-												<xsl:with-param name ="newTextLvl" select ="$newTextLvl"/>
-												<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
-												<xsl:with-param name ="textColor" select ="$textColor"/>
-											</xsl:call-template>
-										</xsl:if>
-									</xsl:if>
-								</xsl:for-each>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:if>
-					<!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
-					<xsl:if test ="not(a:pPr/@lvl) or a:pPr/@lvl='0'">
-						<xsl:variable name ="levelStyle" select ="concat($listStyleName,position())"/>
-						<xsl:choose >
-							<xsl:when test ="a:pPr/a:buChar">
-								<text:list-style>
-									<xsl:attribute name ="style:name">
-										<xsl:value-of select ="concat($listStyleName,position())"/>
-									</xsl:attribute >
-									<text:list-level-style-bullet>
-										<xsl:attribute name ="text:level">
-											<xsl:value-of select ="1"/>
-										</xsl:attribute >
-										<xsl:attribute name ="text:bullet-char">
-											<xsl:call-template name ="insertBulletCharacter">
-												<xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-											</xsl:call-template>
-										</xsl:attribute >
-										<style:list-level-properties text:min-label-width="0.8cm">
-											<xsl:attribute name ="text:space-before">
-												<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-													<xsl:value-of select="concat(format-number(child::node()[1]/@marL div 360000,'#.##'),'cm')"/>
-												</xsl:for-each>
-											</xsl:attribute>
-										</style:list-level-properties>
-										<style:text-properties style:font-charset="x-symbol" >
-											<xsl:if test ="a:pPr/a:buFont/@typeface">
-												<xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="'StarSymbol'"/>
-													</xsl:attribute>
-												</xsl:if>
-												<xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-											<xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-												<xsl:attribute name ="fo:font-family">
+                </text:list-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:for-each select ="document(concat('ppt/slideLayouts/',$slideLayout))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
+                  <xsl:if test ="./@idx=$var_index">
+                    <xsl:if test="not(./@type) or ./@type='body'">
+                      <xsl:call-template name ="getBulletForLevelsLayout">
+                        <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                        <xsl:with-param name ="newTextLvl" select ="$newTextLvl"/>
+                        <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
+                        <xsl:with-param name ="textColor" select ="$textColor"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+          <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
+          <xsl:if test ="not(a:pPr/@lvl) or a:pPr/@lvl='0'">
+            <xsl:variable name ="levelStyle" select ="concat($listStyleName,position())"/>
+            <xsl:choose >
+              <xsl:when test ="a:pPr/a:buChar">
+                <text:list-style>
+                  <xsl:attribute name ="style:name">
+                    <xsl:value-of select ="concat($listStyleName,position())"/>
+                  </xsl:attribute >
+                  <text:list-level-style-bullet>
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select ="1"/>
+                    </xsl:attribute >
+                    <xsl:attribute name ="text:bullet-char">
+                      <xsl:call-template name ="insertBulletCharacter">
+                        <xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
+                      </xsl:call-template>
+                    </xsl:attribute >
+                    <style:list-level-properties text:min-label-width="0.8cm">
+                      <xsl:attribute name ="text:space-before">
+                        <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
+                          <xsl:value-of select="concat(format-number(child::node()[1]/@marL div 360000,'#.##'),'cm')"/>
+                        </xsl:for-each>
+                      </xsl:attribute>
+                    </style:list-level-properties>
+                    <style:text-properties style:font-charset="x-symbol" >
+                      <xsl:if test ="a:pPr/a:buFont/@typeface">
+                        <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="'StarSymbol'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
+                        <xsl:attribute name ="fo:font-family">
 													<xsl:value-of select ="'StarSymbol'"/>
 												</xsl:attribute>
 											</xsl:if>
@@ -664,100 +613,67 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 									</text:list-level-style-number>
 								</text:list-style>
 							</xsl:when>
-							<xsl:when test ="a:pPr/a:buBlip">
-								<text:list-style>
-									<xsl:attribute name ="style:name">
-										<xsl:value-of select ="concat($listStyleName,position())"/>
-									</xsl:attribute >
-									<text:list-level-style-bullet>
-										<xsl:attribute name ="text:level">
-											<xsl:value-of select ="1"/>
-										</xsl:attribute >
-										<xsl:attribute name ="text:bullet-char">
-											<xsl:call-template name ="insertBulletCharacter">
-												<xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-											</xsl:call-template>
-										</xsl:attribute >
-										<style:list-level-properties text:min-label-width="0.8cm">
-											<xsl:attribute name ="text:space-before">
-												<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-													<xsl:value-of select="concat(format-number(child::node()[1]/@marL div 360000,'#.##'),'cm')"/>
-												</xsl:for-each>
-											</xsl:attribute>
-										</style:list-level-properties>
-										<style:text-properties style:font-charset="x-symbol" >
-											<xsl:if test ="a:pPr/a:buFont/@typeface">
-												<xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="'StarSymbol'"/>
-													</xsl:attribute>
-												</xsl:if>
-												<xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-											<xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-												<xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="'StarSymbol'"/>
-												</xsl:attribute>
-											</xsl:if>
-											<xsl:if test ="$textColor !='0'">
-												<xsl:attribute name ="fo:color">
-													<xsl:value-of select ="$textColor"/>
-												</xsl:attribute>
-											</xsl:if>
-											<xsl:if test ="$textColor='0'">
-												<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-													<xsl:variable name ="levelColor" >
-														<xsl:call-template name ="getLevelColor">
-															<xsl:with-param name ="levelNum" select ="'1'"/>
-														</xsl:call-template>
-													</xsl:variable>
-													<xsl:attribute name ="fo:color">
-														<xsl:value-of select ="$levelColor"/>
-													</xsl:attribute>
-												</xsl:for-each>
-											</xsl:if>
-											<!--End of Code added by vijayeta, bug fix 1746350-->
-										</style:text-properties >
-									</text:list-level-style-bullet>
-								</text:list-style>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:for-each select ="document(concat('ppt/slideLayouts/',$slideLayout))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
-									<xsl:if test ="./@idx=$var_index">
-										<xsl:if test="not(./@type) or ./@type='body'">
-											<xsl:call-template name ="getBulletForLevelsLayout">
-												<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
-												<xsl:with-param name ="newTextLvl" select ="'1'"/>
-												<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
-												<xsl:with-param name ="textColor" select ="$textColor"/>
-											</xsl:call-template>
-										</xsl:if>
-									</xsl:if>
-								</xsl:for-each>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:if>
-					<!-- Addded by vijayeta on 18th june,to check for bunone-->
-				</xsl:if>
-				<!-- Addded by vijayeta on 18th june,to check for bunone-->
-			</xsl:for-each>
-		</xsl:if>
-		<!--End of Condition if levels are present-->
-		<!--Condition if levels are not present-->
-		<!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
-		<xsl:if test ="not(./a:p/a:pPr/@lvl)">
-			<xsl:for-each select ="./a:p">
-				<!-- Addded by vijayeta on 18th june,to check for bunone-->
-				<xsl:if test ="not(a:pPr/a:buNone)">
-					<!-- Addded by vijayeta on 18th june,to check for bunone-->
-					<xsl:variable name ="levelStyle" select ="concat($listStyleName,position())"/>
-					<xsl:variable name ="textColor">
-						<xsl:for-each select ="a:r">
-							<xsl:if test ="position()= '1'">
+              <xsl:when test ="a:pPr/a:buBlip">
+                <xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
+                <xsl:variable name="XlinkHref">
+                  <xsl:variable name="pzipsource">
+                    <xsl:value-of select="document($slideRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+                  </xsl:variable>
+                  <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+                </xsl:variable>
+                <xsl:call-template name="copyPictures">
+                  <xsl:with-param name="document">
+                    <xsl:value-of select="$slideRel"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="rId">
+                    <xsl:value-of select ="$rId"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <text:list-style>
+                  <xsl:attribute name ="style:name">
+                    <xsl:value-of select ="$levelStyle"/>
+                  </xsl:attribute >
+                  <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                    <xsl:attribute name="xlink:href">
+                      <xsl:value-of select="$XlinkHref"/>
+                    </xsl:attribute>
+                    <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+                  </text:list-level-style-image>
+                </text:list-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:for-each select ="document(concat('ppt/slideLayouts/',$slideLayout))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
+                  <xsl:if test ="./@idx=$var_index">
+                    <xsl:if test="not(./@type) or ./@type='body'">
+                      <xsl:call-template name ="getBulletForLevelsLayout">
+                        <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                        <xsl:with-param name ="newTextLvl" select ="'1'"/>
+                        <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
+                        <xsl:with-param name ="textColor" select ="$textColor"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+          <!-- Addded by vijayeta on 18th june,to check for bunone-->
+        </xsl:if>
+        <!-- Addded by vijayeta on 18th june,to check for bunone-->
+      </xsl:for-each>
+    </xsl:if>
+    <!--End of Condition if levels are present-->
+    <!--Condition if levels are not present-->
+    <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
+    <xsl:if test ="not(./a:p/a:pPr/@lvl)">
+      <xsl:for-each select ="./a:p">
+        <!-- Addded by vijayeta on 18th june,to check for bunone-->
+        <xsl:if test ="not(a:pPr/a:buNone)">
+          <!-- Addded by vijayeta on 18th june,to check for bunone-->
+          <xsl:variable name ="levelStyle" select ="concat($listStyleName,position())"/>
+          <xsl:variable name ="textColor">
+            <xsl:for-each select ="a:r">
+              <xsl:if test ="position()= '1'">
 								<xsl:if test ="a:rPr">
 									<xsl:if test ="./a:rPr/a:solidFill">
 										<xsl:if test ="./a:rPr/a:solidFill/a:srgbClr">
@@ -954,8 +870,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 								</text:list-level-style-number>
 							</text:list-style>
 						</xsl:when>
-						<xsl:when test ="a:pPr/a:buBlip">
-							<!--<xsl:variable name ="rId" select ="./a:p/a:pPr/a:buBlip/a:blip/@r:embed"/>
+            <xsl:when test ="a:pPr/a:buBlip">
+              <xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
               <xsl:variable name="XlinkHref">
                 <xsl:variable name="pzipsource">
                   <xsl:value-of select="document($slideRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
@@ -980,120 +896,64 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   </xsl:attribute>
                   <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
                 </text:list-level-style-image>
-              </text:list-style>-->
-							<text:list-style>
-								<xsl:attribute name ="style:name">
-									<xsl:value-of select ="$levelStyle"/>
-								</xsl:attribute >
-								<text:list-level-style-bullet>
-									<xsl:attribute name ="text:level">
-										<xsl:value-of select ="1"/>
-									</xsl:attribute >
-									<xsl:attribute name ="text:bullet-char">
-										<xsl:call-template name ="insertBulletCharacter">
-											<xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-										</xsl:call-template>
-									</xsl:attribute >
-									<style:list-level-properties text:min-label-width="0.952cm" />
-									<style:text-properties style:font-charset="x-symbol">
-										<xsl:if test ="a:pPr/a:buFont/@typeface">
-											<xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-												<xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="'StarSymbol'"/>
-												</xsl:attribute>
-											</xsl:if>
-											<xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-												<xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-												</xsl:attribute>
-											</xsl:if>
-										</xsl:if>
-										<xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-											<xsl:attribute name ="fo:font-family">
-												<xsl:value-of select ="'StarSymbol'"/>
-											</xsl:attribute>
-										</xsl:if>
-										<!-- Code added by vijayeta, bug fix 1746350-->
-										<!-- Vijayeta,Custom Bullet Colour-->
-										<xsl:if test ="$textColor !='0'">
-											<xsl:attribute name ="fo:color">
-												<xsl:value-of select ="$textColor"/>
-											</xsl:attribute>
-										</xsl:if>
-										<xsl:if test ="$textColor='0'">
-											<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-												<xsl:variable name ="levelColor" >
-													<xsl:call-template name ="getLevelColor">
-														<xsl:with-param name ="levelNum" select ="'1'"/>
-													</xsl:call-template>
-												</xsl:variable>
-												<xsl:attribute name ="fo:color">
-													<xsl:value-of select ="$levelColor"/>
-												</xsl:attribute>
-											</xsl:for-each>
-										</xsl:if>
-										<!-- Vijayeta,Custom Bullet Colour-->
-										<!--End of Code added by vijayeta, bug fix 1746350-->
-									</style:text-properties >
-								</text:list-level-style-bullet>
-							</text:list-style>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:for-each select ="document(concat('ppt/slideLayouts/',$slideLayout))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
-								<xsl:if test ="./@idx=$var_index">
-									<xsl:if test="not(./@type) or ./@type='body'">
-										<xsl:call-template name ="getBulletForLevelsLayout">
-											<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
-											<xsl:with-param name ="newTextLvl" select ="'1'"/>
-											<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
-											<xsl:with-param name ="textColor" select ="$textColor"/>
-										</xsl:call-template>
-									</xsl:if>
-								</xsl:if>
-							</xsl:for-each>
-						</xsl:otherwise>
-					</xsl:choose>
-					<!-- Addded by vijayeta on 18th june,to check for bunone-->
-				</xsl:if >
-				<!-- Addded by vijayeta on 18th june,to check for bunone-->
-			</xsl:for-each>
-		</xsl:if>
-		<!--End  of Condition if levels are not present-->
-	</xsl:template>
-	<xsl:template name ="insertDefaultBulletNumberStyle">
-		<xsl:param name ="listStyleName"/>
-		<xsl:param name ="slideLayout" />
-		<xsl:param name ="slideMaster" />
-		<xsl:param name ="var_TextBoxType"/>
-		<xsl:param name ="var_index"/>
-		<xsl:if test ="./a:p/a:pPr">
-			<xsl:if test ="./a:p/a:pPr/@lvl">
-				<xsl:for-each select ="./a:p">
-					<xsl:variable name ="position" select ="position()"/>
-					<xsl:if test ="not(a:pPr/a:buNone)">
-						<!--Condition if levels are present,and bullets are default-->
-						<xsl:choose>
-							<xsl:when test ="./child::node()[1] = a:r ">
-								<xsl:variable name ="levelStyle" select =" concat($listStyleName,$position)"/>
-								<xsl:variable name ="textColor">
-									<xsl:for-each select ="a:r">
-										<xsl:if test ="position()= '1'">
-											<xsl:if test ="a:rPr">
-												<xsl:if test ="./a:rPr/a:solidFill">
-													<xsl:if test ="./a:rPr/a:solidFill/a:srgbClr">
-														<xsl:value-of select ="concat('#',./a:rPr/a:solidFill/a:srgbClr/@val)"/>
-													</xsl:if>
-													<xsl:if test ="./a:rPr/a:solidFill/a:schemeClr">
-														<xsl:call-template name ="getColorCode">
-															<xsl:with-param name ="color">
-																<xsl:value-of select="./a:rPr/a:solidFill/a:schemeClr/@val"/>
-															</xsl:with-param>
-														</xsl:call-template >
-													</xsl:if>
-												</xsl:if>
-												<xsl:if test ="not(./a:rPr/a:solidFill)">
-													<xsl:value-of select ="'0'"/>
-												</xsl:if>
+              </text:list-style>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select ="document(concat('ppt/slideLayouts/',$slideLayout))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
+                <xsl:if test ="./@idx=$var_index">
+                  <xsl:if test="not(./@type) or ./@type='body'">
+                    <xsl:call-template name ="getBulletForLevelsLayout">
+                      <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                      <xsl:with-param name ="newTextLvl" select ="'1'"/>
+                      <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
+                      <xsl:with-param name ="textColor" select ="$textColor"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+          <!-- Addded by vijayeta on 18th june,to check for bunone-->
+        </xsl:if >
+        <!-- Addded by vijayeta on 18th june,to check for bunone-->
+      </xsl:for-each>
+    </xsl:if>
+    <!--End  of Condition if levels are not present-->
+  </xsl:template>
+  <xsl:template name ="insertDefaultBulletNumberStyle">
+    <xsl:param name ="listStyleName"/>
+    <xsl:param name ="slideLayout" />
+    <xsl:param name ="slideMaster" />
+    <xsl:param name ="var_TextBoxType"/>
+    <xsl:param name ="var_index"/>
+    <xsl:if test ="./a:p/a:pPr">
+      <xsl:if test ="./a:p/a:pPr/@lvl">
+        <xsl:for-each select ="./a:p">
+          <xsl:variable name ="position" select ="position()"/>
+          <xsl:if test ="not(a:pPr/a:buNone)">
+            <!--Condition if levels are present,and bullets are default-->
+            <xsl:choose>
+              <xsl:when test ="./child::node()[1] = a:r ">
+                <xsl:variable name ="levelStyle" select =" concat($listStyleName,$position)"/>
+                <xsl:variable name ="textColor">
+                  <xsl:for-each select ="a:r">
+                    <xsl:if test ="position()= '1'">
+                      <xsl:if test ="a:rPr">
+                        <xsl:if test ="./a:rPr/a:solidFill">
+                          <xsl:if test ="./a:rPr/a:solidFill/a:srgbClr">
+                            <xsl:value-of select ="concat('#',./a:rPr/a:solidFill/a:srgbClr/@val)"/>
+                          </xsl:if>
+                          <xsl:if test ="./a:rPr/a:solidFill/a:schemeClr">
+                            <xsl:call-template name ="getColorCode">
+                              <xsl:with-param name ="color">
+                                <xsl:value-of select="./a:rPr/a:solidFill/a:schemeClr/@val"/>
+                              </xsl:with-param>
+                            </xsl:call-template >
+                          </xsl:if>
+                        </xsl:if>
+                        <xsl:if test ="not(./a:rPr/a:solidFill)">
+                          <xsl:value-of select ="'0'"/>
+                        </xsl:if>
 											</xsl:if>
 											<xsl:if test ="not(./a:rPr)">
 												<xsl:value-of select ="'0'"/>
@@ -1108,6 +968,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 											<!--<xsl:value-of select ="'1'"/>-->
 											<xsl:call-template name ="getBulletForLevelsLayout">
 												<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                        <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 												<xsl:with-param name ="newTextLvl" select ="'1'"/>
 												<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 												<xsl:with-param name ="textColor" select ="$textColor"/>
@@ -1167,6 +1028,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 												<!--<xsl:value-of select ="'1'"/>-->
 												<xsl:call-template name ="getBulletForLevelsLayout">
 													<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 													<xsl:with-param name ="newTextLvl" select ="$textLevel+1"/>
 													<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 													<xsl:with-param name ="textColor" select ="$textColor"/>
@@ -1228,6 +1090,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 													<!--<xsl:value-of select ="'1'"/>-->
 													<xsl:call-template name ="getBulletForLevelsLayout">
 														<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                            <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 														<xsl:with-param name ="newTextLvl" select ="$newTextLvl"/>
 														<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 														<xsl:with-param name ="textColor" select ="$textColor"/>
@@ -1292,6 +1155,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 									<!--<xsl:value-of select ="'1'"/>-->
 									<xsl:call-template name ="getBulletForLevelsLayout">
 										<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                    <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 										<xsl:with-param name ="newTextLvl" select ="'1'"/>
 										<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 										<xsl:with-param name ="textColor" select ="$textColor"/>
@@ -1358,6 +1222,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							<!--<xsl:value-of select ="'1'"/>-->
 							<xsl:call-template name ="getBulletForLevelsLayout">
 								<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 								<xsl:with-param name ="newTextLvl" select ="$newTextLvl+1"/>
 								<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 								<xsl:with-param name ="textColor" select ="$textColor"/>
@@ -2244,41 +2109,63 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 		</xsl:choose>
 	</xsl:template>
 	<!-- Template insertBulletCharacter-->
-	<xsl:template name ="insertBulletCharacter">
-		<xsl:param name ="character"/>
-		<xsl:choose>
-			<xsl:when test="$character= '•'">
-				<xsl:value-of select ="'•'"/>
-			</xsl:when>
-			<xsl:when test="$character= 'Ø'">
-				<xsl:value-of select ="'➢'"/>
-			</xsl:when>
-			<xsl:when test="$character= 'o'">
-				<xsl:value-of select ="'○'"/>
-			</xsl:when>
-			<!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
+  <xsl:template name ="insertBulletCharacter">
+    <xsl:param name ="character"/>
+    <xsl:choose>
+      <xsl:when test="$character= '•'">
+        <!--<xsl:value-of select ="'•'"/>-->
+        <xsl:value-of select ="'•'"/>
+      </xsl:when>
+      <xsl:when test="$character= 'Ø'">
+        <!--<xsl:value-of select ="'➢'"/>-->
+        <xsl:value-of select ="''"/>
+      </xsl:when>
+      <xsl:when test="$character= 'o'">
+        <xsl:value-of select ="'○'"/>
+      </xsl:when>
+      <xsl:when test="$character= '§' or $character='' ">
+        <xsl:value-of select ="''"/>
+        <!--<xsl:value-of select ="'■'"/>-->
+      </xsl:when>
+      <!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
+        <xsl:value-of select ="''"/>
+      </xsl:when>-->
+      <!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
               <xsl:value-of select ="'■'"/>
           </xsl:when>
-          <xsl:when test="a:pPr/a:buChar/@char= 'q'">
+      <xsl:when test="a:pPr/a:buChar/@char= 'q'">
               <xsl:value-of select ="''"/>
           </xsl:when>-->
-			<xsl:when test="$character= 'ü'">
-				<xsl:value-of select ="'✔'"/>
-			</xsl:when>
-			<xsl:when test="$character = '–'">
-				<xsl:value-of select ="'–'"/>
-			</xsl:when>
-			<xsl:when test="$character = '»'">
-				<xsl:value-of select ="'»'"/>
-			</xsl:when>
-			<!-- Added by  vijayeta ,on 19th june-->
-			<xsl:when test="$character = 'è'">
-				<xsl:value-of select ="'➔'"/>
-			</xsl:when>
-			<!-- Added by  vijayeta ,on 19th june-->
-			<xsl:otherwise>•</xsl:otherwise>
-		</xsl:choose >
-	</xsl:template>
+      <xsl:when test="a:pPr/a:buChar/@char= 'q'">
+        <xsl:value-of select ="''"/>
+      </xsl:when>
+      <xsl:when test="$character= 'ü'">
+        <!--<xsl:value-of select ="'✔'"/>-->
+        <xsl:value-of select ="''"/>
+      </xsl:when>
+      <xsl:when test="$character = '–'">
+        <xsl:value-of select ="'–'"/>
+      </xsl:when>
+      <xsl:when test="$character = '»'">
+        <xsl:value-of select ="'»'"/>
+      </xsl:when>
+      <!-- Added by  vijayeta ,on 19th june-->
+      <xsl:when test="$character = 'è'">
+        <xsl:value-of select ="'➔'"/>
+      </xsl:when>
+      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
+      <xsl:when test ="$character=''">
+        <xsl:value-of select ="'●'"/>
+      </xsl:when>
+      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
+
+      <xsl:otherwise>
+        <!-- warn if Custom Bullet -->
+        <xsl:message terminate="no">translation.oox2odf.bulletTypeCustomBullet</xsl:message>
+        <xsl:value-of select ="'•'"/>
+      </xsl:otherwise>
+    </xsl:choose >
+  </xsl:template>
 	<xsl:template name ="insertNumber">
 		<xsl:param name ="number"/>
 		<xsl:param name ="startAt"/>
@@ -2386,6 +2273,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template>
 	<xsl:template name ="getBulletForLevelsLayout">
 		<xsl:param name ="slideMaster"/>
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl"/>
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -2423,43 +2311,45 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 				</xsl:variable>
 				<xsl:call-template name ="getBullet_Level1">
 					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
-					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
-					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
-					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:when test ="$newTextLvl='2'">
-				<xsl:variable name ="textColorLayout">
-					<xsl:if test ="$textColor='0'">
-						<xsl:choose >
-							<xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:p/a:pPr[@lvl='2']">
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill">
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:srgbClr">
-										<xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
-									</xsl:if>
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr">
-										<xsl:call-template name ="getColorCode">
-											<xsl:with-param name ="color">
-												<xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
-											</xsl:with-param>
-										</xsl:call-template >
-									</xsl:if>
-								</xsl:if>
-								<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill)">
-									<xsl:value-of select ="'0'"/>
-								</xsl:if>
-							</xsl:when >
-							<xsl:otherwise >
-								<xsl:value-of select ="$textColor"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:if>
-					<xsl:if test ="$textColor !='0'">
-						<xsl:value-of select ="$textColor"/>
-					</xsl:if>
-				</xsl:variable>
-				<xsl:call-template name ="getBullet_Level2">
-					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
+          <xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
+          <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
+          <xsl:with-param name ="textColor" select ="$textColorLayout"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$newTextLvl='2'">
+        <xsl:variable name ="textColorLayout">
+          <xsl:if test ="$textColor='0'">
+            <xsl:choose >
+              <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:p/a:pPr[@lvl='2']">
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill">
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:srgbClr">
+                    <xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
+                  </xsl:if>
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr">
+                    <xsl:call-template name ="getColorCode">
+                      <xsl:with-param name ="color">
+                        <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                      </xsl:with-param>
+                    </xsl:call-template >
+                  </xsl:if>
+                </xsl:if>
+                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:solidFill)">
+                  <xsl:value-of select ="'0'"/>
+                </xsl:if>
+              </xsl:when >
+              <xsl:otherwise >
+                <xsl:value-of select ="$textColor"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+          <xsl:if test ="$textColor !='0'">
+            <xsl:value-of select ="$textColor"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:call-template name ="getBullet_Level2">
+          <xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
 					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
@@ -2497,43 +2387,45 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 				</xsl:variable>
 				<xsl:call-template name ="getBullet_Level3">
 					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
-					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
-					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
-					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:when test ="$newTextLvl='4'">
-				<xsl:variable name ="textColorLayout">
-					<xsl:if test ="$textColor='0'">
-						<xsl:choose>
-							<xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:p/a:pPr[@lvl='4']">
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill">
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:srgbClr">
-										<xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
-									</xsl:if>
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr">
-										<xsl:call-template name ="getColorCode">
-											<xsl:with-param name ="color">
-												<xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
-											</xsl:with-param>
-										</xsl:call-template >
-									</xsl:if>
-								</xsl:if>
-								<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill)">
-									<xsl:value-of select ="'0'"/>
-								</xsl:if>
-							</xsl:when>
-							<xsl:otherwise >
-								<xsl:value-of select ="$textColor"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:if>
-					<xsl:if test ="$textColor !='0'">
-						<xsl:value-of select ="$textColor"/>
-					</xsl:if>
-				</xsl:variable>
-				<xsl:call-template name ="getBullet_Level4">
-					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
+          <xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
+          <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
+          <xsl:with-param name ="textColor" select ="$textColorLayout"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$newTextLvl='4'">
+        <xsl:variable name ="textColorLayout">
+          <xsl:if test ="$textColor='0'">
+            <xsl:choose>
+              <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:p/a:pPr[@lvl='4']">
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill">
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:srgbClr">
+                    <xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
+                  </xsl:if>
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr">
+                    <xsl:call-template name ="getColorCode">
+                      <xsl:with-param name ="color">
+                        <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                      </xsl:with-param>
+                    </xsl:call-template >
+                  </xsl:if>
+                </xsl:if>
+                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:solidFill)">
+                  <xsl:value-of select ="'0'"/>
+                </xsl:if>
+              </xsl:when>
+              <xsl:otherwise >
+                <xsl:value-of select ="$textColor"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+          <xsl:if test ="$textColor !='0'">
+            <xsl:value-of select ="$textColor"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:call-template name ="getBullet_Level4">
+          <xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
 					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
@@ -2571,43 +2463,45 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 				</xsl:variable>
 				<xsl:call-template name ="getBullet_Level5">
 					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
-					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
-					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
-					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:when test ="$newTextLvl='6'">
-				<xsl:variable name ="textColorLayout">
-					<xsl:if test ="$textColor='0'">
-						<xsl:choose>
-							<xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:p/a:pPr[@lvl='6']">
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill">
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:srgbClr">
-										<xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
-									</xsl:if>
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr">
-										<xsl:call-template name ="getColorCode">
-											<xsl:with-param name ="color">
-												<xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
-											</xsl:with-param>
-										</xsl:call-template >
-									</xsl:if>
-								</xsl:if>
-								<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill)">
-									<xsl:value-of select ="'0'"/>
-								</xsl:if>
-							</xsl:when>
-							<xsl:otherwise >
-								<xsl:value-of select ="$textColor"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:if>
-					<xsl:if test ="$textColor !='0'">
-						<xsl:value-of select ="$textColor"/>
-					</xsl:if>
-				</xsl:variable>
-				<xsl:call-template name ="getBullet_Level6">
-					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
+          <xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
+          <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
+          <xsl:with-param name ="textColor" select ="$textColorLayout"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="$newTextLvl='6'">
+        <xsl:variable name ="textColorLayout">
+          <xsl:if test ="$textColor='0'">
+            <xsl:choose>
+              <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:p/a:pPr[@lvl='6']">
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill">
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:srgbClr">
+                    <xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
+                  </xsl:if>
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr">
+                    <xsl:call-template name ="getColorCode">
+                      <xsl:with-param name ="color">
+                        <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                      </xsl:with-param>
+                    </xsl:call-template >
+                  </xsl:if>
+                </xsl:if>
+                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:solidFill)">
+                  <xsl:value-of select ="'0'"/>
+                </xsl:if>
+              </xsl:when>
+              <xsl:otherwise >
+                <xsl:value-of select ="$textColor"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+          <xsl:if test ="$textColor !='0'">
+            <xsl:value-of select ="$textColor"/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:call-template name ="getBullet_Level6">
+          <xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
 					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
@@ -2645,6 +2539,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 				</xsl:variable>
 				<xsl:call-template name ="getBullet_Level7">
 					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
 					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
@@ -2682,6 +2577,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 				</xsl:variable>
 				<xsl:call-template name ="getBullet_Level8">
 					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
 					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
@@ -2719,6 +2615,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 				</xsl:variable>
 				<xsl:call-template name ="getBullet_Level9">
 					<xsl:with-param name ="slideMaster"  select ="$slideMaster"/>
+          <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
 					<xsl:with-param name ="newTextLvl" select ="$newTextLvl"  />
 					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
 					<xsl:with-param name ="textColor" select ="$textColorLayout"/>
@@ -2993,151 +2890,94 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:if>
-			<xsl:if test ="a:buBlip">
-				<!--<xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
+      <xsl:if test ="a:buBlip">
+        <xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
         <xsl:variable name="XlinkHref">
           <xsl:variable name="pzipsource">
-            <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+            <xsl:value-of select="document(concat('ppt/slideMasters/_rels/',$slideMaster,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
           </xsl:variable>
           <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
         </xsl:variable>
         <xsl:call-template name="copyPictures">
           <xsl:with-param name="document">
-            <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')"/>
+            <xsl:value-of select="concat('ppt/slideMasters/_rels/',$slideMaster,'.rels')"/>
           </xsl:with-param>
           <xsl:with-param name="rId">
             <xsl:value-of select ="$rId"/>
           </xsl:with-param>
         </xsl:call-template>
-        <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-          <xsl:attribute name="xlink:href">
-            <xsl:value-of select="$XlinkHref"/>
-          </xsl:attribute>
-          <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
-        </text:list-level-style-image>-->
-				<text:list-style>
-					<xsl:attribute name ="style:name">
-						<xsl:value-of select ="$levelStyle"/>
-					</xsl:attribute >
-					<text:list-level-style-bullet>
-						<xsl:attribute name ="text:level">
-							<xsl:value-of select ="$newTextLvl"/>
-						</xsl:attribute >
-						<xsl:attribute name ="text:bullet-char">
-							<xsl:call-template name ="insertBulletCharacter">
-								<xsl:with-param name ="character" select ="a:buChar/@char" />
-							</xsl:call-template>
-						</xsl:attribute >
-						<style:list-level-properties>
-							<xsl:if test ="./@indent">
-								<xsl:choose>
-									<xsl:when test="./@indent &lt; 0">
-										<xsl:attribute name ="text:min-label-width">
-											<xsl:value-of select="concat(format-number((0 - ./@indent) div 360000, '#.##'), 'cm')"/>
-										</xsl:attribute>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:attribute name ="text:min-label-width">
-											<xsl:value-of select="concat(format-number(./@indent div 360000, '#.##'), 'cm')"/>
-										</xsl:attribute>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:if >
-							<xsl:if test ="./@marL">
-								<xsl:attribute name ="text:space-before">
-									<xsl:value-of select="concat((./@marL + ./@indent) div 360000, 'cm')"/>
-								</xsl:attribute>
-							</xsl:if>
-						</style:list-level-properties>
-						<style:text-properties style:font-charset="x-symbol">
-							<xsl:if test ="a:buFont/@typeface">
-								<xsl:if test ="a:buFont[@typeface='Arial']">
-									<xsl:attribute name ="fo:font-family">
-										<xsl:value-of select ="'StarSymbol'"/>
-									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="not(a:buFont[@typeface='Arial'])">
-									<xsl:attribute name ="fo:font-family">
-										<xsl:value-of select ="a:buFont/@typeface"/>
-									</xsl:attribute>
-								</xsl:if>
-							</xsl:if>
-							<xsl:if test ="not(a:buFont/@typeface)">
-								<xsl:attribute name ="fo:font-family">
-									<xsl:value-of select ="'StarSymbol'"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="a:buSzPct">
-								<xsl:attribute name ="fo:font-size">
-									<xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="not(a:buSzPct)">
-								<xsl:attribute name ="fo:font-size">
-									<xsl:value-of select ="'100%'"/>
-								</xsl:attribute>
-							</xsl:if>
-						</style:text-properties >
-					</text:list-level-style-bullet>
-				</text:list-style>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
-	<xsl:template name="getColorCode">
-		<xsl:param name="color"/>
-		<xsl:param name ="lumMod"/>
-		<xsl:param name ="lumOff"/>
-		<xsl:variable name ="ThemeColor">
-			<xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
-				<xsl:for-each select ="node()">
-					<xsl:if test ="name() =concat('a:',$color)">
-						<xsl:choose >
-							<xsl:when test ="contains(node()/@val,'window') ">
-								<xsl:value-of select ="node()/@lastClr"/>
-							</xsl:when>
-							<xsl:otherwise >
-								<xsl:value-of select ="node()/@val"/>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:for-each>
-		</xsl:variable>
-		<xsl:variable name ="BgTxColors">
-			<xsl:if test ="$color ='bg2'">
-				<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt2/a:srgbClr/@val"/>
-			</xsl:if>
-			<xsl:if test ="$color ='bg1'">
-				<!--<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt1/node()/@lastClr" />-->
-				<xsl:choose>
-					<xsl:when test ="document('ppt/theme/theme1.xml') //a:lt1/a:srgbClr/@val">
-						<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt1/a:srgbClr/@val" />
-					</xsl:when>
-					<xsl:when test="document('ppt/theme/theme1.xml') //a:lt1/node()/@lastClr">
-						<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt1/node()/@lastClr" />
-					</xsl:when>
-				</xsl:choose>
-			</xsl:if>
-			<!--<xsl:if test ="$color ='tx1'">
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="text:level">
+              <xsl:value-of select="$newTextLvl"/>
+            </xsl:attribute>
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="getColorCode">
+    <xsl:param name="color"/>
+    <xsl:param name ="lumMod"/>
+    <xsl:param name ="lumOff"/>
+    <xsl:variable name ="ThemeColor">
+      <xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
+        <xsl:for-each select ="node()">
+          <xsl:if test ="name() =concat('a:',$color)">
+            <xsl:choose >
+              <xsl:when test ="contains(node()/@val,'window') ">
+                <xsl:value-of select ="node()/@lastClr"/>
+              </xsl:when>
+              <xsl:otherwise >
+                <xsl:value-of select ="node()/@val"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name ="BgTxColors">
+      <xsl:if test ="$color ='bg2'">
+        <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt2/a:srgbClr/@val"/>
+      </xsl:if>
+      <xsl:if test ="$color ='bg1'">
+        <!--<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt1/node()/@lastClr" />-->
+        <xsl:choose>
+          <xsl:when test ="document('ppt/theme/theme1.xml') //a:lt1/a:srgbClr/@val">
+            <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt1/a:srgbClr/@val" />
+          </xsl:when>
+          <xsl:when test="document('ppt/theme/theme1.xml') //a:lt1/node()/@lastClr">
+            <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt1/node()/@lastClr" />
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      <!--<xsl:if test ="$color ='tx1'">
 				<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk1/node()/@lastClr"/>
 			</xsl:if>-->
-			<xsl:if test ="$color ='tx1'">
-				<xsl:choose>
-					<xsl:when test ="document('ppt/theme/theme1.xml') //a:dk1/node()/@lastClr">
-						<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk1/node()/@lastClr"/>
-					</xsl:when>
-					<xsl:when test ="document('ppt/theme/theme1.xml') //a:dk1/node()/@val">
-						<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk1/node()/@val"/>
-					</xsl:when>
-				</xsl:choose>
-			</xsl:if>
-			<xsl:if test ="$color ='tx2'">
-				<xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk2/a:srgbClr/@val"/>
-			</xsl:if>
-		</xsl:variable>
-		<xsl:variable name ="NewColor">
-			<xsl:if test ="$ThemeColor != ''">
-				<xsl:value-of select ="$ThemeColor"/>
+      <xsl:if test ="$color ='tx1'">
+        <xsl:choose>
+          <xsl:when test ="document('ppt/theme/theme1.xml') //a:dk1/node()/@lastClr">
+            <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk1/node()/@lastClr"/>
+          </xsl:when>
+          <xsl:when test ="document('ppt/theme/theme1.xml') //a:dk1/node()/@val">
+            <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk1/node()/@val"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      <xsl:if test ="$color ='tx2'">
+        <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk2/a:srgbClr/@val"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name ="NewColor">
+      <xsl:if test ="$ThemeColor != ''">
+        <xsl:value-of select ="$ThemeColor"/>
 			</xsl:if>
 			<xsl:if test ="$BgTxColors !=''">
 				<xsl:value-of select ="$BgTxColors"/>
@@ -3151,6 +2991,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template >
 	<xsl:template name ="getBullet_Level1">
 		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -3398,6 +3239,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
@@ -3410,6 +3279,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template>
 	<xsl:template name ="getBullet_Level2">
 		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -3657,6 +3527,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="2" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
@@ -3669,6 +3567,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template >
 	<xsl:template name ="getBullet_Level3">
 		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -3908,6 +3807,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="3" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
@@ -3920,6 +3847,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template >
 	<xsl:template name ="getBullet_Level4">
 		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -4167,6 +4095,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="4" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
@@ -4179,6 +4135,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template >
 	<xsl:template name ="getBullet_Level5">
 		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -4423,6 +4380,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="5" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
@@ -4435,6 +4420,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template >
 	<xsl:template name ="getBullet_Level6">
 		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -4676,6 +4662,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="6" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
@@ -4688,261 +4702,291 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template >
 	<xsl:template name ="getBullet_Level7">
 		<xsl:param name ="slideMaster" />
-		<xsl:param name ="newTextLvl" />
-		<xsl:param name ="levelStyle"/>
-		<xsl:param name ="textColor" />
-		<xsl:choose >
-			<xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar">
-				<text:list-style>
-					<xsl:attribute name ="style:name">
-						<xsl:value-of select ="$levelStyle"/>
-					</xsl:attribute >
-					<text:list-level-style-bullet>
-						<xsl:attribute name ="text:level">
-							<xsl:value-of select ="$newTextLvl"/>
-						</xsl:attribute >
-						<xsl:attribute name ="text:bullet-char">
-							<xsl:call-template name ="insertBulletCharacter">
-								<xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar/@char" />
-							</xsl:call-template>
-						</xsl:attribute >
-						<style:list-level-properties>
-							<xsl:if test ="./parent::node()/@indent">
-								<xsl:choose>
-									<xsl:when test="./parent::node()/@indent &lt; 0">
-										<xsl:attribute name ="text:min-label-width">
-											<xsl:value-of select="concat(format-number((0 - ./parent::node()/@indent) div 360000, '#.##'), 'cm')"/>
-										</xsl:attribute>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:attribute name ="text:min-label-width">
-											<xsl:value-of select="concat(format-number(./parent::node()/@indent div 360000, '#.##'), 'cm')"/>
-										</xsl:attribute>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:if >
-							<xsl:if test ="./parent::node()/@marL">
-								<xsl:attribute name ="text:space-before">
-									<xsl:value-of select="concat((./parent::node()/@marL + ./parent::node()/@indent) div 360000, 'cm')"/>
-								</xsl:attribute>
-							</xsl:if>
-						</style:list-level-properties>
-						<style:text-properties style:font-charset="x-symbol">
-							<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface">
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont[@typeface='Arial']">
-									<xsl:attribute name ="fo:font-family">
-										<xsl:value-of select ="'StarSymbol'"/>
-									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont[@typeface='Arial'])">
-									<xsl:attribute name ="fo:font-family">
-										<xsl:value-of select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface"/>
-									</xsl:attribute>
-								</xsl:if>
-							</xsl:if>
-							<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface)">
-								<xsl:attribute name ="fo:font-family">
-									<xsl:value-of select ="'StarSymbol'"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct">
-								<xsl:attribute name ="fo:font-size">
-									<xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct/@val div 1000),'%')"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct)">
-								<xsl:attribute name ="fo:font-size">
-									<xsl:value-of select ="'100%'"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr">
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr">
-									<xsl:variable name ="color" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr/@val"/>
-									<xsl:attribute name ="fo:color">
-										<xsl:value-of select ="concat('#',$color)"/>
-									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr">
-									<xsl:attribute name ="fo:color">
-										<xsl:call-template name ="getColorCode">
-											<xsl:with-param name ="color">
-												<xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr/@val"/>
-											</xsl:with-param>
-										</xsl:call-template >
-									</xsl:attribute >
-								</xsl:if>
-							</xsl:if>
-							<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr)">
-								<xsl:if test ="$textColor != '0'">
-									<xsl:attribute name ="fo:color">
-										<xsl:value-of select ="$textColor"/>
-									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="$textColor = '0'">
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill">
-										<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr">
-											<xsl:attribute name ="fo:color">
-												<xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
-											</xsl:attribute>
-										</xsl:if>
-										<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr">
-											<xsl:attribute name ="fo:color">
-												<xsl:call-template name ="getColorCode">
-													<xsl:with-param name ="color">
-														<xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
-													</xsl:with-param>
-												</xsl:call-template >
-											</xsl:attribute>
-										</xsl:if>
-									</xsl:if>
-									<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill)">
-										<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-											<xsl:variable name ="levelColor" >
-												<xsl:call-template name ="getLevelColor">
-													<xsl:with-param name ="levelNum" select ="$newTextLvl"/>
-													<xsl:with-param name ="textColor" select ="$textColor"/>
-												</xsl:call-template>
-											</xsl:variable>
-											<xsl:attribute name ="fo:color">
-												<xsl:value-of select ="$levelColor"/>
-											</xsl:attribute>
-										</xsl:for-each>
-									</xsl:if>
-								</xsl:if>
-							</xsl:if>
-						</style:text-properties >
-					</text:list-level-style-bullet>
-				</text:list-style>
-			</xsl:when>
-			<xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum">
-				<xsl:variable name ="Number" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum/@type"/>
-				<text:list-style>
-					<xsl:attribute name ="style:name">
-						<xsl:value-of select ="$levelStyle"/>
-					</xsl:attribute >
-					<text:list-level-style-number>
-						<xsl:attribute name ="text:level">
-							<xsl:value-of select ="$newTextLvl"/>
-						</xsl:attribute >
-						<xsl:variable name ="startAt">
-							<xsl:if test ="a:pPr/a:buAutoNum/@startAt">
-								<xsl:value-of select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum/@startAt" />
-							</xsl:if>
-							<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum/@startAt)">
-								<xsl:value-of select ="'1'" />
-							</xsl:if>
-						</xsl:variable>
-						<xsl:call-template name ="insertNumber">
-							<xsl:with-param name ="number" select ="$Number"/>
-							<xsl:with-param name ="startAt" select ="$startAt"/>
-						</xsl:call-template>
-						<style:list-level-properties>
-							<xsl:if test ="./parent::node()/@indent">
-								<xsl:choose>
-									<xsl:when test="./parent::node()/@indent &lt; 0">
-										<xsl:attribute name ="text:min-label-width">
-											<xsl:value-of select="concat(format-number((0 - ./parent::node()/@indent) div 360000, '#.##'), 'cm')"/>
-										</xsl:attribute>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:attribute name ="text:min-label-width">
-											<xsl:value-of select="concat(format-number(./parent::node()/@indent div 360000, '#.##'), 'cm')"/>
-										</xsl:attribute>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:if >
-							<xsl:if test ="./parent::node()/@marL">
-								<xsl:attribute name ="text:space-before">
-									<xsl:value-of select="concat((./parent::node()/@marL + ./parent::node()/@indent) div 360000, 'cm')"/>
-								</xsl:attribute>
-							</xsl:if>
-						</style:list-level-properties>
-						<style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
-							<xsl:if test ="a:pPr/a:buFont/@typeface">
-								<xsl:attribute name ="fo:font-family">
-									<xsl:value-of select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface)">
-								<xsl:attribute name ="fo:font-family">
-									<xsl:value-of select ="'Arial'"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct)">
-								<xsl:attribute name ="fo:font-size">
-									<xsl:value-of select ="'100%'"/>
-								</xsl:attribute>
-							</xsl:if>
-							<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr">
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr">
-									<xsl:attribute name ="fo:color">
-										<xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr/@val)"/>
-									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr">
-									<xsl:attribute name ="fo:color">
-										<xsl:call-template name ="getColorCode">
-											<xsl:with-param name ="color">
-												<xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr/@val"/>
-											</xsl:with-param>
-										</xsl:call-template >
-									</xsl:attribute >
-								</xsl:if>
-							</xsl:if>
-							<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr)">
-								<xsl:if test ="$textColor != '0'">
-									<xsl:attribute name ="fo:color">
-										<xsl:value-of select ="$textColor"/>
-									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="$textColor = '0'">
-									<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill">
-										<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr">
-											<xsl:attribute name ="fo:color">
-												<xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
-											</xsl:attribute>
-										</xsl:if>
-										<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr">
-											<xsl:attribute name ="fo:color">
-												<xsl:call-template name ="getColorCode">
-													<xsl:with-param name ="color">
-														<xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
-													</xsl:with-param>
-												</xsl:call-template >
-											</xsl:attribute>
-										</xsl:if>
-									</xsl:if>
-									<xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill)">
-										<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-											<xsl:variable name ="levelColor" >
-												<xsl:call-template name ="getLevelColor">
-													<xsl:with-param name ="levelNum" select ="$newTextLvl"/>
-													<xsl:with-param name ="textColor" select ="$textColor"/>
-												</xsl:call-template>
-											</xsl:variable>
-											<xsl:attribute name ="fo:color">
-												<xsl:value-of select ="$levelColor"/>
-											</xsl:attribute>
-										</xsl:for-each>
-									</xsl:if>
-								</xsl:if>
-							</xsl:if>
-						</style:text-properties>
-					</text:list-level-style-number>
-				</text:list-style>
-			</xsl:when>
-			<xsl:otherwise >
-				<xsl:call-template name ="getBulletsFromSlideMaster">
-					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
-					<xsl:with-param name ="newTextLvl" select ="$newTextLvl" />
-					<xsl:with-param name ="levelStyle" select ="$levelStyle"/>
-					<xsl:with-param name ="textColor" select ="$textColor"/>
-				</xsl:call-template>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template >
-	<xsl:template name ="getBullet_Level8">
-		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
+    <xsl:param name ="newTextLvl" />
+    <xsl:param name ="levelStyle"/>
+    <xsl:param name ="textColor" />
+    <xsl:choose >
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar">
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-bullet>
+            <xsl:attribute name ="text:level">
+              <xsl:value-of select ="$newTextLvl"/>
+            </xsl:attribute >
+            <xsl:attribute name ="text:bullet-char">
+              <xsl:call-template name ="insertBulletCharacter">
+                <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar/@char" />
+              </xsl:call-template>
+            </xsl:attribute >
+            <style:list-level-properties>
+              <xsl:if test ="./parent::node()/@indent">
+                <xsl:choose>
+                  <xsl:when test="./parent::node()/@indent &lt; 0">
+                    <xsl:attribute name ="text:min-label-width">
+                      <xsl:value-of select="concat(format-number((0 - ./parent::node()/@indent) div 360000, '#.##'), 'cm')"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name ="text:min-label-width">
+                      <xsl:value-of select="concat(format-number(./parent::node()/@indent div 360000, '#.##'), 'cm')"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if >
+              <xsl:if test ="./parent::node()/@marL">
+                <xsl:attribute name ="text:space-before">
+                  <xsl:value-of select="concat((./parent::node()/@marL + ./parent::node()/@indent) div 360000, 'cm')"/>
+                </xsl:attribute>
+              </xsl:if>
+            </style:list-level-properties>
+            <style:text-properties style:font-charset="x-symbol">
+              <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface">
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont[@typeface='Arial']">
+                  <xsl:attribute name ="fo:font-family">
+                    <xsl:value-of select ="'StarSymbol'"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont[@typeface='Arial'])">
+                  <xsl:attribute name ="fo:font-family">
+                    <xsl:value-of select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface"/>
+                  </xsl:attribute>
+                </xsl:if>
+              </xsl:if>
+              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface)">
+                <xsl:attribute name ="fo:font-family">
+                  <xsl:value-of select ="'StarSymbol'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct">
+                <xsl:attribute name ="fo:font-size">
+                  <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct/@val div 1000),'%')"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct)">
+                <xsl:attribute name ="fo:font-size">
+                  <xsl:value-of select ="'100%'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr">
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr">
+                  <xsl:variable name ="color" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr/@val"/>
+                  <xsl:attribute name ="fo:color">
+                    <xsl:value-of select ="concat('#',$color)"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr">
+                  <xsl:attribute name ="fo:color">
+                    <xsl:call-template name ="getColorCode">
+                      <xsl:with-param name ="color">
+                        <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr/@val"/>
+                      </xsl:with-param>
+                    </xsl:call-template >
+                  </xsl:attribute >
+                </xsl:if>
+              </xsl:if>
+              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr)">
+                <xsl:if test ="$textColor != '0'">
+                  <xsl:attribute name ="fo:color">
+                    <xsl:value-of select ="$textColor"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test ="$textColor = '0'">
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill">
+                    <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr">
+                      <xsl:attribute name ="fo:color">
+                        <xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr">
+                      <xsl:attribute name ="fo:color">
+                        <xsl:call-template name ="getColorCode">
+                          <xsl:with-param name ="color">
+                            <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                          </xsl:with-param>
+                        </xsl:call-template >
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:if>
+                  <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill)">
+                    <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
+                      <xsl:variable name ="levelColor" >
+                        <xsl:call-template name ="getLevelColor">
+                          <xsl:with-param name ="levelNum" select ="$newTextLvl"/>
+                          <xsl:with-param name ="textColor" select ="$textColor"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:attribute name ="fo:color">
+                        <xsl:value-of select ="$levelColor"/>
+                      </xsl:attribute>
+                    </xsl:for-each>
+                  </xsl:if>
+                </xsl:if>
+              </xsl:if>
+            </style:text-properties >
+          </text:list-level-style-bullet>
+        </text:list-style>
+      </xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum">
+        <xsl:variable name ="Number" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum/@type"/>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-number>
+            <xsl:attribute name ="text:level">
+              <xsl:value-of select ="$newTextLvl"/>
+            </xsl:attribute >
+            <xsl:variable name ="startAt">
+              <xsl:if test ="a:pPr/a:buAutoNum/@startAt">
+                <xsl:value-of select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum/@startAt" />
+              </xsl:if>
+              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buAutoNum/@startAt)">
+                <xsl:value-of select ="'1'" />
+              </xsl:if>
+            </xsl:variable>
+            <xsl:call-template name ="insertNumber">
+              <xsl:with-param name ="number" select ="$Number"/>
+              <xsl:with-param name ="startAt" select ="$startAt"/>
+            </xsl:call-template>
+            <style:list-level-properties>
+              <xsl:if test ="./parent::node()/@indent">
+                <xsl:choose>
+                  <xsl:when test="./parent::node()/@indent &lt; 0">
+                    <xsl:attribute name ="text:min-label-width">
+                      <xsl:value-of select="concat(format-number((0 - ./parent::node()/@indent) div 360000, '#.##'), 'cm')"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name ="text:min-label-width">
+                      <xsl:value-of select="concat(format-number(./parent::node()/@indent div 360000, '#.##'), 'cm')"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if >
+              <xsl:if test ="./parent::node()/@marL">
+                <xsl:attribute name ="text:space-before">
+                  <xsl:value-of select="concat((./parent::node()/@marL + ./parent::node()/@indent) div 360000, 'cm')"/>
+                </xsl:attribute>
+              </xsl:if>
+            </style:list-level-properties>
+            <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
+              <xsl:if test ="a:pPr/a:buFont/@typeface">
+                <xsl:attribute name ="fo:font-family">
+                  <xsl:value-of select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface)">
+                <xsl:attribute name ="fo:font-family">
+                  <xsl:value-of select ="'Arial'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct)">
+                <xsl:attribute name ="fo:font-size">
+                  <xsl:value-of select ="'100%'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr">
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr">
+                  <xsl:attribute name ="fo:color">
+                    <xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:srgbClr/@val)"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr">
+                  <xsl:attribute name ="fo:color">
+                    <xsl:call-template name ="getColorCode">
+                      <xsl:with-param name ="color">
+                        <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr/a:schemeClr/@val"/>
+                      </xsl:with-param>
+                    </xsl:call-template >
+                  </xsl:attribute >
+                </xsl:if>
+              </xsl:if>
+              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buClr)">
+                <xsl:if test ="$textColor != '0'">
+                  <xsl:attribute name ="fo:color">
+                    <xsl:value-of select ="$textColor"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test ="$textColor = '0'">
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill">
+                    <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr">
+                      <xsl:attribute name ="fo:color">
+                        <xsl:value-of select ="concat('#',./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:srgbClr/@val)"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr">
+                      <xsl:attribute name ="fo:color">
+                        <xsl:call-template name ="getColorCode">
+                          <xsl:with-param name ="color">
+                            <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                          </xsl:with-param>
+                        </xsl:call-template >
+                      </xsl:attribute>
+                    </xsl:if>
+                  </xsl:if>
+                  <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:solidFill)">
+                    <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
+                      <xsl:variable name ="levelColor" >
+                        <xsl:call-template name ="getLevelColor">
+                          <xsl:with-param name ="levelNum" select ="$newTextLvl"/>
+                          <xsl:with-param name ="textColor" select ="$textColor"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:attribute name ="fo:color">
+                        <xsl:value-of select ="$levelColor"/>
+                      </xsl:attribute>
+                    </xsl:for-each>
+                  </xsl:if>
+                </xsl:if>
+              </xsl:if>
+            </style:text-properties>
+          </text:list-level-style-number>
+        </text:list-style>
+      </xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="7" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
+      <xsl:otherwise >
+        <xsl:call-template name ="getBulletsFromSlideMaster">
+          <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+          <xsl:with-param name ="newTextLvl" select ="$newTextLvl" />
+          <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
+          <xsl:with-param name ="textColor" select ="$textColor"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template >
+  <xsl:template name ="getBullet_Level8">
+    <xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -5187,6 +5231,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="8" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>
@@ -5199,6 +5271,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 	</xsl:template >
 	<xsl:template name ="getBullet_Level9">
 		<xsl:param name ="slideMaster" />
+    <xsl:param name ="slideLayout"/>
 		<xsl:param name ="newTextLvl" />
 		<xsl:param name ="levelStyle"/>
 		<xsl:param name ="textColor"/>
@@ -5443,6 +5516,34 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 					</text:list-level-style-number>
 				</text:list-style>
 			</xsl:when>
+      <xsl:when test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buBlip">
+        <xsl:variable name ="rId" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buBlip/a:blip/@r:embed"/>
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="document(concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels'))//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+        </xsl:variable>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('ppt/slideLayouts/_rels/',$slideLayout,'.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select ="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <text:list-style>
+          <xsl:attribute name ="style:name">
+            <xsl:value-of select ="$levelStyle"/>
+          </xsl:attribute >
+          <text:list-level-style-image text:level="9" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:attribute>
+            <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+          </text:list-level-style-image>
+        </text:list-style>
+      </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="getBulletsFromSlideMaster">
 					<xsl:with-param name ="slideMaster" select ="$slideMaster"/>

@@ -51,7 +51,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
 xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" 
 xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"
-exclude-result-prefixes="p a r xlink ">
+exclude-result-prefixes="p a r xlink rels xmlns">
 	<xsl:import href ="common.xsl"/>
 	<xsl:template name ="customAnimation">
 		<xsl:param name ="slideId"/>
@@ -59,6 +59,7 @@ exclude-result-prefixes="p a r xlink ">
 		<anim:par smil:dur="indefinite" smil:restart="never" presentation:node-type="timing-root">
 			<anim:seq presentation:node-type="main-sequence">
 				<xsl:for-each select ="document($slideId)//p:timing/p:tnLst/p:par/p:cTn/p:childTnLst/p:seq/p:cTn/p:childTnLst/p:par">
+                                    <xsl:if test="./p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par/p:cTn/@presetClass != 'mediacall'">
 					<xsl:variable name ="animType">
 						<xsl:value-of select ="p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par/p:cTn/@presetID"/>
 					</xsl:variable>
@@ -66,6 +67,7 @@ exclude-result-prefixes="p a r xlink ">
 						<xsl:with-param name ="animType" select ="$animType"/>
 						<xsl:with-param name ="slideNo" select ="$slideNo"/>
 					</xsl:call-template>					
+                                    </xsl:if>
 				</xsl:for-each >
 			</anim:seq>
 		</anim:par>
@@ -81,7 +83,7 @@ exclude-result-prefixes="p a r xlink ">
 							<xsl:value-of select="concat('sl',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid ,p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg/@st +1 )" />
 						</xsl:if>
 						<xsl:if test ="not(p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg)">
-							<xsl:value-of select="concat('sl',$slideNo ,'an',.//p:set/p:cBhvr/p:tgtEl/p:spTgt/@spid)" />
+							<xsl:value-of select="concat('sl',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid)" />
 						</xsl:if>
 					</xsl:variable>
 					<!--anim:iterate-type="by-letter" anim:iterate-interval="0.05s"-->
@@ -198,6 +200,15 @@ exclude-result-prefixes="p a r xlink ">
 									</xsl:call-template>
 								</xsl:attribute>
 							</xsl:if>
+							<xsl:if test ="@by">
+								<xsl:attribute name ="smil:by">
+									<xsl:call-template name ="mapCoordinates">
+										<xsl:with-param name ="strVal">
+											<xsl:value-of select ="@by"/>
+										</xsl:with-param >
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if >
 							<xsl:call-template name ="addSmilbeginattr"/>
 							<xsl:call-template name ="addDuractionNode"/>
 							<xsl:if test ="./p:cBhvr/p:tgtEl/p:spTgt/p:txEl">
@@ -399,16 +410,28 @@ exclude-result-prefixes="p a r xlink ">
 								</xsl:choose>
 							</xsl:attribute>
 							<xsl:if test ="name()!='p:animRot'">
-								<xsl:if test ="./p:by">
-									<xsl:attribute name ="smil:to">
-										<xsl:value-of select ="concat(p:by/@x div 100000 ,',', p:by/@y div 100000)"/>
-									</xsl:attribute >
-								</xsl:if>
-								<xsl:if test ="not(./p:by)">
-									<xsl:attribute name ="smil:to">
-										<xsl:call-template name ="smilTo"/>
-									</xsl:attribute>
-								</xsl:if >
+								<xsl:choose >
+									<xsl:when test ="./p:by">
+										<xsl:attribute name ="smil:to">
+											<xsl:value-of select ="concat(p:by/@x div 100000 ,',', p:by/@y div 100000)"/>
+										</xsl:attribute >
+									</xsl:when>
+									<xsl:when test ="./p:from">
+										<xsl:attribute name ="smil:from">
+											<xsl:value-of select ="concat(p:from/@x div 100000 ,',', p:from/@y div 100000)"/>
+										</xsl:attribute>
+										<xsl:if test ="./p:to">
+											<xsl:attribute name ="smil:to">
+												<xsl:value-of select ="concat(p:to/@x div 100000,',', p:to/@y div 100000)"/>
+											</xsl:attribute>
+										</xsl:if>
+									</xsl:when>									
+									<xsl:when test ="not(./p:by)">
+										<xsl:attribute name ="smil:to">
+											<xsl:call-template name ="smilTo"/>
+										</xsl:attribute>
+									</xsl:when>
+								</xsl:choose>
 							</xsl:if >
 						</anim:animateTransform >
 					</xsl:when>
@@ -486,7 +509,15 @@ exclude-result-prefixes="p a r xlink ">
 				</xsl:variable>
 				<xsl:variable name ="newValue">
 					<xsl:call-template name ="mapCoordinates">
-						<xsl:with-param name ="strVal" select ="p:val/p:strVal/@val"/>
+
+						<xsl:with-param name ="strVal">
+							<xsl:if test="p:val/p:strVal/@val">
+								<xsl:value-of select ="p:val/p:strVal/@val"/>
+							</xsl:if>
+							<xsl:if test="p:val/p:fltVal/@val">
+								<xsl:value-of select ="p:val/p:fltVal/@val"/>
+							</xsl:if>
+						</xsl:with-param >
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:value-of select ="concat($varColon,$newValue)"/>				
@@ -574,7 +605,7 @@ exclude-result-prefixes="p a r xlink ">
 				<xsl:value-of select ="'opacity'"/>
 			</xsl:when>
 			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='style.rotation'">
-				<xsl:value-of select ="'font-family'"/>
+				<xsl:value-of select ="'rotate'"/>
 			</xsl:when>
 			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='style.textDecorationUnderline'">
 				<xsl:value-of select ="'text-underline'"/>
@@ -583,7 +614,7 @@ exclude-result-prefixes="p a r xlink ">
 				<xsl:value-of select ="'font-family'"/>
 			</xsl:when>
 			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='xshear'">
-				<xsl:value-of select ="'font-family'"/>
+				<xsl:value-of select ="'skewX'"/>
 			</xsl:when>
 			
 		</xsl:choose> 
