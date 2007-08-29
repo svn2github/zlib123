@@ -455,6 +455,37 @@
       </xsl:variable>
       <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
         <!-- for the current sheet -->
+        <xsl:if test="not(contains(self::node(),'#REF'))">
+          <!-- if print range with apostrophes -->
+          <xsl:if test="contains(./self::node(), concat($apostrof, $checkedName))">
+            <!-- one print range with apostrophes -->
+            <xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">
+              <xsl:attribute name="table:print-ranges">
+                <xsl:call-template name="recursive">
+                  <xsl:with-param name="oldString" select="':'"/>
+                  <xsl:with-param name="newString"
+                    select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
+                  <xsl:with-param name="wholeText" select="translate(./self::node(), '!', '.')"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+            <!-- multiple print ranges with apostrophes -->
+            <xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">
+              <xsl:attribute name="table:print-ranges">
+                <xsl:call-template name="recursive">
+                  <xsl:with-param name="oldString" select="':'"/>
+                  <xsl:with-param name="newString"
+                    select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
+                  <xsl:with-param name="wholeText"
+                    select="translate(translate(./self::node(), '!', '.'), ',', ' ')"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
+        <!-- for the current sheet -->
         <!-- if the print range is without apostrophes -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
         <xsl:if
@@ -491,34 +522,9 @@
             </xsl:attribute>
           </xsl:if>
         </xsl:if>
-        <!-- if print range with apostrophes -->
-        <xsl:if test="contains(./self::node(), concat($apostrof, $checkedName))">
-          <!-- one print range with apostrophes -->
-          <xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">
-            <xsl:attribute name="table:print-ranges">
-              <xsl:call-template name="recursive">
-                <xsl:with-param name="oldString" select="':'"/>
-                <xsl:with-param name="newString"
-                  select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
-                <xsl:with-param name="wholeText" select="translate(./self::node(), '!', '.')"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <!-- multiple print ranges with apostrophes -->
-          <xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">
-            <xsl:attribute name="table:print-ranges">
-              <xsl:call-template name="recursive">
-                <xsl:with-param name="oldString" select="':'"/>
-                <xsl:with-param name="newString"
-                  select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
-                <xsl:with-param name="wholeText"
-                  select="translate(translate(./self::node(), '!', '.'), ',', ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
         </xsl:if>
       </xsl:for-each>
+
 
 
       <xsl:variable name="GroupRowStart">
