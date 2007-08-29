@@ -19,12 +19,13 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page">
 
-  <xsl:variable name ="rId" select ="generate-id(.)"/>
+  
   <xsl:template name ="insertBulletsNumbers">
     <xsl:param name ="listId"/>
     <xsl:param name ="level" />
     <!-- parameter added by vijayeta, dated 11-7-07-->
     <xsl:param name ="masterPageName"/>
+    <xsl:param name ="pos"/>
     <!--<xsl:variable name ="newLevel" select ="$level+1"/>-->
     <xsl:for-each select ="document('content.xml')//text:list-style [@style:name=$listId]">
       <xsl:if test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color">
@@ -34,6 +35,11 @@
               <xsl:value-of select ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
             </xsl:attribute>
           </a:srgbClr>
+        </a:buClr>
+      </xsl:if>
+      <xsl:if test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true']">
+        <a:buClr>
+          <a:sysClr val="windowText"/>
         </a:buClr>
       </xsl:if>
       <xsl:if test ="(./child::node()[1]/style:text-properties[@fo:font-size] and not(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100)) ">
@@ -89,25 +95,18 @@
         <!--</xsl:for-each>-->
       </xsl:if>
       <xsl:if test ="text:list-level-style-image[@text:level=$level]">
-        <a:buChar>
-          <xsl:attribute name ="char">
-            <xsl:call-template name="insertBulletChar">
-              <xsl:with-param name ="character" select ="'.'"/>
-              <!--<xsl:with-param name="character" select="./child::node()[$level]/@text:bullet-char"/>-->
-            </xsl:call-template>
-          </xsl:attribute>
-        </a:buChar>
-        <!--<xsl:if test ="text:list-level-style-image[@text:level=$level]">-->
-        <!--<a:buBlip>
-            <a:blip>
-                <xsl:attribute name ="r:embed">
-                  <xsl:value-of select ="$rId"/>
-                </xsl:attribute>
-              </a:blip>
-            </a:buBlip>-->
+        <xsl:variable name ="rId" select ="concat('buImage',$listId,$level,$pos)"/>        
+        <a:buBlip>
+          <a:blip>
+            <xsl:attribute name ="r:embed">
+              <xsl:value-of select ="$rId"/>
+            </xsl:attribute>
+          </a:blip>
+        </a:buBlip>
       </xsl:if>
-      <!--<xsl:call-template name="copyPictures"/>-->
-      <!--</xsl:if>-->
+      <xsl:call-template name="copyPictures">
+        <xsl:with-param name ="level" select ="$level"/>
+      </xsl:call-template>      
     </xsl:for-each>
     <!--End of condition,If Levels Present-->
   </xsl:template>
@@ -116,35 +115,50 @@
     <xsl:param name ="character"/>
     <xsl:choose>
       <!--<xsl:when test="$character = '' "></xsl:when>-->
-      <!--<xsl:when test="$character = '' ">
+      <xsl:when test="$character = '' ">
         <xsl:value-of select ="'q'"/>
-      </xsl:when>-->
+      </xsl:when>
       <!--<xsl:when test="$character = '' "></xsl:when>-->
       <xsl:when test="$character = '☑' ">☑</xsl:when>
       <xsl:when test="$character = '•' ">•</xsl:when>
-      <xsl:when test="$character= '●' ">•</xsl:when>
-      <xsl:when test="$character = '➢' ">
+      <!--<xsl:when test="$character= '●' ">•</xsl:when>-->
+      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
+      <xsl:when test="$character= '●' ">
+        <xsl:value-of select ="''"/>
+      </xsl:when >
+      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
+      <!--<xsl:when test="$character = '➢' ">-->
+      <xsl:when test="$character = '' or $character = '➢'">
         <xsl:value-of select ="'Ø'"/>
       </xsl:when>
-      <xsl:when test="$character = '✔' ">
+      <xsl:when test="$character = '' or $character = '✔'">
+        <!--<xsl:when test="$character = '✔' ">-->
         <xsl:value-of select ="'ü'"/>
       </xsl:when>
-      <!--<xsl:when test="$character = '' ">
+      <xsl:when test="$character = ''  or $character ='■' ">
+        <xsl:value-of select ="''"/>
+      </xsl:when>
+      <!--<xsl:when test="$character = '' ">
         <xsl:value-of select ="'§'"/>
       </xsl:when>-->
       <xsl:when test="$character = '○' ">o</xsl:when>
       <xsl:when test="$character = '➔' ">è</xsl:when>
       <xsl:when test="$character = '✗' ">✗</xsl:when>
       <xsl:when test="$character = '–' ">–</xsl:when>
-      <xsl:otherwise>•</xsl:otherwise>
+      <xsl:otherwise>
+        <!-- warn if Custom Bullet -->
+        <xsl:message terminate="no">translation.odf2oox.bulletTypeCustomBullet</xsl:message>
+        <xsl:value-of select ="'•'"/>
+      </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
   <xsl:template name ="getBulletType">
     <xsl:param name ="character"/>
     <xsl:param name ="typeFace"/>
     <xsl:choose >
-      <xsl:when test="$character= '➢' or $character= '■' or $character= '✔' or $character= '➔'">
+      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
+      <xsl:when test="$character = '' or $character = '' or $character= '●' or $character= '➢' or $character= '' or $character= '✔' or $character = '' or $character= '■' or $character= '' or $character= '➔'">
+        <!--<xsl:when test="$character= '➢' or $character= '■' or $character= '✔' or $character= '➔'">-->
         <!-- or $character= ''  -->
         <xsl:value-of select ="'Wingdings'"/>
       </xsl:when>
@@ -180,11 +194,12 @@
   </xsl:template>
   <!-- If bullets are pictures-->
   <xsl:template name="copyPictures">
+    <xsl:param name ="level"/>
     <xsl:param name ="sourceFolder" select ="'Pictures'"/>
-    <xsl:param name="destFolder" select="'ppt/media/'"/>
+    <xsl:param name="destFolder" select="'ppt/media'"/>
     <!--  Copy Pictures Files to the picture catalog -->
     <xsl:for-each select="document('content.xml')//office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
-      <xsl:if test ="@text:level='1'">
+      <xsl:if test ="@text:level=$level">
         <xsl:variable name="pzipsource">
           <xsl:value-of select="substring-after(@xlink:href,'Pictures/')"/>
           <!-- image1.gif-->
@@ -226,6 +241,8 @@
 			is set to 9th level in pptx.
 			date:14th Aug, '07-->
       <xsl:when test ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <!-- warn if level 10 -->
+        <xsl:message terminate="no">translation.odf2oox.bulletTypeLevel10</xsl:message>
         <xsl:value-of select ="'8'"/>
       </xsl:when>
     </xsl:choose>

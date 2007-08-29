@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <!-- 
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -144,6 +144,28 @@ Copyright (c) 2007, Sonata Software Limited
                   </p:bgPr>
                 </p:bg>
               </xsl:when>
+               <xsl:when test="@draw:fill='gradient'">
+              <xsl:variable name="gradStyleName" select="@draw:fill-gradient-name"/>
+              <p:bg>
+                <p:bgPr>
+                  <a:solidFill>
+                    <a:srgbClr>
+                      <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
+                      <xsl:attribute name="val">
+                        <xsl:if test="@draw:start-color">
+                          <xsl:value-of select="substring-after(@draw:start-color,'#')" />
+                        </xsl:if>
+                        <xsl:if test="not(@draw:start-color)">
+                          <xsl:value-of select="'ffffff'" />
+                        </xsl:if>
+                      </xsl:attribute>
+                      </xsl:for-each>
+                    </a:srgbClr>
+                  </a:solidFill>
+                  <a:effectLst />
+                </p:bgPr>
+              </p:bg>
+            </xsl:when>
               <xsl:otherwise>
               <p:bg>
                 <p:bgPr>
@@ -188,11 +210,13 @@ Copyright (c) 2007, Sonata Software Limited
             or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
             or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
             or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+                            <xsl:if test="not(./@xlink:href[contains(.,'../')])">
                             <xsl:call-template name ="InsertPicture">
                               <xsl:with-param name ="imageNo" select ="$slideMasterName"/>
                               <xsl:with-param name ="master" select ="'1'"/>
                               <xsl:with-param name="picNo" select="$var_pos" />
                             </xsl:call-template>
+                          </xsl:if >
                           </xsl:if >
                         </xsl:for-each>
                       </xsl:when>
@@ -206,7 +230,7 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:when test ="@presentation:class[contains(.,'title')]">
                                 <p:cNvPr name="Title Placeholder 1">
                                   <xsl:attribute name="id">
-                                    <xsl:value-of select="'2'"/>
+                                    <xsl:value-of select="$var_pos +1"/>
                                   </xsl:attribute>
                                 </p:cNvPr>
                                 <p:cNvSpPr>
@@ -219,7 +243,7 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:when test ="@presentation:class[contains(.,'outline')]">
                                 <p:cNvPr name="Text Placeholder 2">
                                   <xsl:attribute name ="id">
-                                    <xsl:value-of select="'3'"/>
+                                    <xsl:value-of select="$var_pos +1"/>
                                   </xsl:attribute>
                                 </p:cNvPr>
                                 <p:cNvSpPr>
@@ -238,7 +262,7 @@ Copyright (c) 2007, Sonata Software Limited
                             <a:prstGeom prst="rect">
                               <a:avLst/>
                             </a:prstGeom>
-                            <!-- Solid fill color -->
+                         <!-- Solid fill color -->
                             <xsl:variable name="prId">
                               <xsl:value-of select="@presentation:style-name"/>
                             </xsl:variable>
@@ -274,10 +298,49 @@ Copyright (c) 2007, Sonata Software Limited
                                       </xsl:attribute>
                                     </a:srgbClr>
                                   </a:solidFill>
-                                </xsl:if>
-                             
+                                </xsl:if>                             
                               </xsl:when>
                             </xsl:choose>
+                            <!--Line Color-->
+                            <xsl:choose>
+                              <xsl:when test ="@presentation:class[contains(.,'title')]">
+                                <xsl:choose>
+                                  <xsl:when test="@presentation:style-name[contains(.,'title')]">
+                                    <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
+                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+                                      <xsl:call-template name ="getLineStyle"/>
+                                    </xsl:for-each>
+                                  </xsl:when>
+                                  <xsl:when test="not(@presentation:style-name[contains(.,'title')])">
+                                    <xsl:variable name="var_titleName">
+                                      <xsl:value-of select="concat($slideMasterName,'-title')"/>
+                                    </xsl:variable>
+                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_titleName]/style:graphic-properties">
+                                      <xsl:call-template name ="getLineStyle"/>
+                                    </xsl:for-each>
+                                  </xsl:when>
+                                </xsl:choose>
+                              </xsl:when>
+                              <xsl:when test ="@presentation:class[contains(.,'outline')]">
+                                <xsl:choose>
+                                  <xsl:when test="@presentation:style-name[contains(.,'outline')]">
+                                    <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
+                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+                                      <xsl:call-template name ="getLineStyle"/>
+                                    </xsl:for-each>
+                                  </xsl:when>
+                                  <xsl:when test="not(@presentation:style-name[contains(.,'outline')])">
+                                    <xsl:variable name="var_outlineName">
+                                      <xsl:value-of select="concat($slideMasterName,'-outline')"/>
+                                    </xsl:variable>
+                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_outlineName]/style:graphic-properties">
+                                      <xsl:call-template name ="getLineStyle"/>
+                                    </xsl:for-each>
+                                  </xsl:when>
+                                </xsl:choose>
+                              </xsl:when>
+                            </xsl:choose>
+                            <!--End-->
                           </p:spPr>
                             <p:txBody>
                               <xsl:call-template name ="SlideMasterTextAlignment" >
@@ -337,13 +400,25 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:choose>
                   </xsl:for-each>
                 </xsl:when>
-                <xsl:otherwise>
+                <xsl:when test="name()='draw:g'">
+                  <xsl:variable name="var_pos" select="position()"/>
+                  <!--<xsl:for-each select=".">-->
+                  <xsl:call-template name="tmpSMGroping">
+                    <xsl:with-param name="pageNo" select="$slideMasterName"/>
+                    <xsl:with-param name="pos" select="$var_pos"/>
+                  </xsl:call-template>
+                  <!--</xsl:for-each>-->
+                </xsl:when>
+                <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape'
+                     or name()='draw:line' or name()='draw:connector'">
+                  <xsl:variable name="var_pos" select="position()"/>
                   <!-- Code for shapes start-->
                   <xsl:call-template name ="shapes" >
                     <xsl:with-param name ="fileName" select ="'styles.xml'"/>
+                    <xsl:with-param name ="var_pos" select="$var_pos" />
                     <!-- Code for shapes End-->
                   </xsl:call-template >
-                </xsl:otherwise>
+                </xsl:when>
               </xsl:choose>
             </xsl:for-each>
 					</xsl:for-each >
@@ -451,13 +526,14 @@ Copyright (c) 2007, Sonata Software Limited
 							</xsl:if >
 							<a:buNone/>
 							<a:defRPr>
-								<xsl:attribute name="sz">
-									<!--<xsl:value-of select ="@fo:font-size"/>-->
+                                                          <xsl:if test="./style:text-properties/@fo:font-size">
+								<xsl:attribute name="sz">									
 									<xsl:call-template name ="convertToPoints">
 										<xsl:with-param name ="unit" select ="'pt'"/>
 										<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 									</xsl:call-template>
 								</xsl:attribute>
+                                                          </xsl:if>
 								<!--Font Bold attribute-->
 								<xsl:if test="./style:text-properties/@fo:font-weight='bold'">
 									<xsl:attribute name ="b">
@@ -502,35 +578,8 @@ Copyright (c) 2007, Sonata Software Limited
 								<!-- End -->
 								
 								<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-								<xsl:if test="./style:text-properties/@style:text-position">
-										<xsl:choose>
-											<xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-												  <xsl:variable name="blsuper">
-													  <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-												  </xsl:variable>
-												  <xsl:value-of select="($blsuper * 1000)"/>
-                          </xsl:attribute>
-											</xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-											<!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-												  <xsl:variable name="blsub">
-													  <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-												  </xsl:variable>
-												  <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-											</xsl:otherwise>-->
-										</xsl:choose>
-								</xsl:if>
-								
+								<xsl:call-template name="SuperAndSubscripts" />
+
 								<!--Character Spacing-->
 								<xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">
 									<xsl:attribute name ="spc">
@@ -761,12 +810,14 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute -->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -833,35 +884,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 									<xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">
 										<xsl:attribute name ="spc">
@@ -1066,12 +1090,14 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:if>
 								<!--End-->
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute -->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -1153,35 +1179,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -1403,12 +1402,15 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
+
 									<!--Font Bold attribute -->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -1490,35 +1492,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -1741,12 +1716,14 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute -->
 
 									<xsl:variable name ="boldStyle">
@@ -1828,35 +1805,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -2072,12 +2022,14 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute -->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -2159,34 +2111,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
+									<xsl:call-template name="SuperAndSubscripts" />
+									
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -2402,12 +2328,14 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute -->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -2489,35 +2417,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -2733,12 +2634,14 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute -->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -2820,35 +2723,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -3064,12 +2940,14 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute -->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -3151,35 +3029,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 									<xsl:variable name ="space">
 										<xsl:call-template name ="Spacing">
@@ -3395,12 +3246,14 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:if>
 								<a:defRPr>
+                  <xsl:if test="./style:text-properties/@fo:font-size">
 									<xsl:attribute name="sz">
 										<xsl:call-template name ="convertToPoints">
 											<xsl:with-param name ="unit" select ="'pt'"/>
 											<xsl:with-param name ="length" select ="./style:text-properties/@fo:font-size"/>
 										</xsl:call-template>
 									</xsl:attribute>
+                  </xsl:if>
 									<!--Font Bold attribute boldStyleitalicStyleunLine-->
 									<xsl:variable name ="boldStyle">
 										<xsl:call-template name ="BoldItalic">
@@ -3437,7 +3290,7 @@ Copyright (c) 2007, Sonata Software Limited
 													<xsl:with-param name ="paramName" select ="'u'"/>
 												</xsl:call-template>
 											</xsl:variable>
-											<xsl:if test ="$unLine !='none'">
+											<xsl:if test ="$unLine !=''">
 												<xsl:attribute name="u">
 													<xsl:value-of  select ="$unLine"/>
 												</xsl:attribute>
@@ -3456,7 +3309,7 @@ Copyright (c) 2007, Sonata Software Limited
 													<xsl:with-param name ="paramName" select ="'u'"/>
 												</xsl:call-template>
 											</xsl:variable>
-											<xsl:if test ="$unLine !='none'">
+											<xsl:if test ="$unLine !=''">
 												<xsl:attribute name="u">
 													<xsl:value-of  select ="$unLine"/>
 												</xsl:attribute>
@@ -3482,35 +3335,8 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:if>
 									<!-- End -->
 									<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-									<xsl:if test="./style:text-properties/@style:text-position">
-                    <xsl:choose>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsuper">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsuper * 1000)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--<xsl:otherwise>
-                        <xsl:attribute name="baseline">
-                          <xsl:variable name="blsub">
-                            <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                          </xsl:variable>
-                          <xsl:value-of select="($blsub * (-1000))"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>-->
-                    </xsl:choose>
-									</xsl:if>
-									
+									<xsl:call-template name="SuperAndSubscripts" />
+
 									<!--Character Spacing-->
 
 									<xsl:variable name ="space">
@@ -5780,7 +5606,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</a:prstGeom>
 				<!-- Solid fill color -->
 				<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
-					<xsl:if test ="style:graphic-properties/@draw:fill-color">
+          <xsl:if test ="style:graphic-properties/@draw:fill='solid'">
 						<a:solidFill>
 							<a:srgbClr>
 								<xsl:attribute name ="val">
@@ -5796,6 +5622,12 @@ Copyright (c) 2007, Sonata Software Limited
 						</a:solidFill>
 					</xsl:if>
 				</xsl:for-each>
+        <!--Line Color-->
+        <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
+        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+          <xsl:call-template name ="getLineStyle"/>
+        </xsl:for-each>
+        <!--End-->
 			</p:spPr>
 			<p:txBody>
 				<xsl:call-template name="SlideMasterTextAlignment">
@@ -5947,35 +5779,8 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:when>
 							</xsl:choose>
 							<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-							<xsl:if test="./style:text-properties/@style:text-position">
-                <xsl:choose>
-                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsuper">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsuper * 1000)"/>
-                    </xsl:attribute>
-                  </xsl:when>
-                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsub">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsub * (-1000))"/>
-                    </xsl:attribute>
-                  </xsl:when>
-                  <!--<xsl:otherwise>
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsub">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsub * (-1000))"/>
-                    </xsl:attribute>
-                  </xsl:otherwise>-->
-                </xsl:choose>
-							</xsl:if>
-							
+							<xsl:call-template name="SuperAndSubscripts" />
+
 							<!--Underline Color-->
 							<xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
 								<a:uFill>
@@ -6107,7 +5912,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</a:prstGeom>
 				<!-- Solid fill color -->
 				<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
-					<xsl:if test ="style:graphic-properties/@draw:fill-color">
+					<xsl:if test ="style:graphic-properties/@draw:fill='solid'">
 						<a:solidFill>
 							<a:srgbClr>
 								<xsl:attribute name ="val">
@@ -6123,6 +5928,12 @@ Copyright (c) 2007, Sonata Software Limited
 						</a:solidFill>
 					</xsl:if>
 				</xsl:for-each>
+        <!--Line Color-->
+        <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
+        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+          <xsl:call-template name ="getLineStyle"/>
+        </xsl:for-each>
+        <!--End-->
 			</p:spPr>
 			<p:txBody>
 				<xsl:call-template name="SlideMasterTextAlignment">
@@ -6277,35 +6088,8 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:when>
 							</xsl:choose>
 							<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-							<xsl:if test="./style:text-properties/@style:text-position">
-                <xsl:choose>
-                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsuper">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsuper * 1000)"/>
-                    </xsl:attribute>
-                  </xsl:when>
-                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsub">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsub * (-1000))"/>
-                    </xsl:attribute>
-                  </xsl:when>
-                  <!--<xsl:otherwise>
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsub">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsub * (-1000))"/>
-                    </xsl:attribute>
-                  </xsl:otherwise>-->
-                </xsl:choose>
-							</xsl:if>
-							
+							<xsl:call-template name="SuperAndSubscripts" />
+
 							<!--Underline Color-->
 							<xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
 								<a:uFill>
@@ -6375,14 +6159,25 @@ Copyright (c) 2007, Sonata Software Limited
             <a:endParaRPr lang="en-US"/>
           </xsl:if>
           <xsl:if test="./draw:text-box/text:p/text:span">
+
+            <xsl:for-each select="./draw:text-box/text:p/text:span">
             <a:r>
-              <a:rPr lang="en-US" dirty="0" smtClean="0"/>
+                <a:rPr lang="en-US" dirty="0" smtClean="0">
+                <!--Font Size--> 
+                <xsl:variable name ="textId">
+                  <xsl:value-of select ="@text:style-name"/>
+                </xsl:variable>
+                <xsl:if test ="not($textId ='')">
+                  <xsl:call-template name ="tmpSMfontStyles">
+                    <xsl:with-param name ="TextStyleID" select ="$textId" />
+                  </xsl:call-template>
+                </xsl:if>
+                  </a:rPr>
               <a:t>
-                <xsl:for-each select="draw:text-box/text:p/text:span">
-                  <xsl:value-of select="."/>
-                </xsl:for-each>
+                  <xsl:call-template name ="insertTab" />
               </a:t>
             </a:r>
+            </xsl:for-each>
             <a:endParaRPr lang="en-US" dirty="0"/>
           </xsl:if>
 				</a:p>
@@ -6411,7 +6206,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</a:prstGeom>
 				<!-- Solid fill color -->
 				<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
-					<xsl:if test ="style:graphic-properties/@draw:fill-color">
+					<xsl:if test ="style:graphic-properties/@draw:fill='solid'">
 						<a:solidFill>
 							<a:srgbClr>
 								<xsl:attribute name ="val">
@@ -6427,6 +6222,12 @@ Copyright (c) 2007, Sonata Software Limited
 						</a:solidFill>
 					</xsl:if>
 				</xsl:for-each>
+        <!--Line Color-->
+        <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
+        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+          <xsl:call-template name ="getLineStyle"/>
+        </xsl:for-each>
+        <!--End-->
 			</p:spPr>
 			<p:txBody>
 				<xsl:call-template name="SlideMasterTextAlignment">
@@ -6578,35 +6379,8 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:when>
 							</xsl:choose>
 							<!-- Superscript and SubScript for Text added by Mathi on 1st Aug 2007-->
-							<xsl:if test="./style:text-properties/@style:text-position">
-                <xsl:choose>
-                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsuper">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsuper * 1000)"/>
-                    </xsl:attribute>
-                  </xsl:when>
-                  <xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsub">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsub * (-1000))"/>
-                    </xsl:attribute>
-                  </xsl:when>
-                  <!--<xsl:otherwise>
-                    <xsl:attribute name="baseline">
-                      <xsl:variable name="blsub">
-                        <xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
-                      </xsl:variable>
-                      <xsl:value-of select="($blsub * (-1000))"/>
-                    </xsl:attribute>
-                  </xsl:otherwise>-->
-                </xsl:choose>
-							</xsl:if>
-							
+							<xsl:call-template name="SuperAndSubscripts" />
+
 							<!--Underline Color-->
 							<xsl:if test ="style:text-properties/@style:text-underline-color !='font-color'">
 								<a:uFill>
@@ -6754,8 +6528,8 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:for-each select ="document('styles.xml')//style:style[@style:name=$parentName]/style:graphic-properties">
 				<xsl:attribute name ="tIns">
 					<xsl:choose>
-					<xsl:when test ="style:paragraph-properties/@fo:padding-top and
-					substring-before(style:paragraph-properties/@fo:padding-top,'cm') &gt; 0">
+					<xsl:when test ="@fo:padding-top and
+					substring-before(@fo:padding-top,'cm') &gt; 0">
 					<!--<xsl:if test ="@fo:padding-top">-->
 						<xsl:value-of select ="format-number(substring-before(@fo:padding-top,'cm')  *   360000 ,'#.##')"/>
 					</xsl:when>
@@ -6770,8 +6544,8 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 				<xsl:attribute name ="bIns">
 					<xsl:choose>
-					<xsl:when test="style:paragraph-properties/@fo:padding-bottom and
-					substring-before(style:paragraph-properties/@fo:padding-bottom,'cm') &gt; 0">
+					<xsl:when test="@fo:padding-bottom and
+					substring-before(@fo:padding-bottom,'cm') &gt; 0">
 						<!--<xsl:if test ="@fo:padding-bottom">-->
 						<xsl:value-of select ="format-number(substring-before(@fo:padding-bottom,'cm')  *   360000 ,'#.##')"/>
 					</xsl:when>
@@ -6786,8 +6560,8 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 				<xsl:attribute name ="lIns">
 				<xsl:choose>
-					<xsl:when test="style:paragraph-properties/@fo:padding-left and
-					substring-before(style:paragraph-properties/@fo:padding-left,'cm') &gt; 0">
+					<xsl:when test="@fo:padding-left and
+					substring-before(@fo:padding-left,'cm') &gt; 0">
 						<!--<xsl:if test ="@fo:padding-left">-->
 						<xsl:value-of select ="format-number(substring-before(@fo:padding-left,'cm')  *   360000 ,'#.##')"/>
 					</xsl:when>
@@ -6802,8 +6576,8 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 				<xsl:attribute name ="rIns">
 				<xsl:choose>
-					<xsl:when test="style:paragraph-properties/@fo:padding-right and
-					substring-before(style:paragraph-properties/@fo:padding-right,'cm') &gt; 0">
+					<xsl:when test="@fo:padding-right and
+					substring-before(@fo:padding-right,'cm') &gt; 0">
 						<!--<xsl:if test ="@fo:padding-right">-->
 						<xsl:value-of select ="format-number(substring-before(@fo:padding-right,'cm')  *   360000 ,'#.##')"/>
 					</xsl:when>
@@ -7019,83 +6793,8 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:for-each>
 		</a:bodyPr>
 	</xsl:template>
-	<xsl:template name="Underline">
-		<!-- Font underline-->
-		<xsl:param name="uStyle"/>
-		<xsl:param name="uWidth"/>
-		<xsl:param name="uType"/>
-
-		<xsl:choose >
-			<xsl:when test="$uStyle='solid' and
-								$uType='double'">
-				<xsl:value-of select ="'dbl'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='solid' and	$uWidth='bold'">
-				<xsl:value-of select ="'heavy'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='solid' and $uWidth='auto'">
-				<xsl:value-of select ="'sng'"/>
-			</xsl:when>
-			<!-- Dotted lean and dotted bold under line -->
-			<xsl:when test="$uStyle='dotted' and	$uWidth='auto'">
-				<xsl:value-of select ="'dotted'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='dotted' and	$uWidth='bold'">
-				<xsl:value-of select ="'dottedHeavy'"/>
-			</xsl:when>
-			<!-- Dash lean and dash bold underline -->
-			<xsl:when test="$uStyle='dash' and
-								$uWidth='auto'">
-				<xsl:value-of select ="'dash'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='dash' and
-								$uWidth='bold'">
-				<xsl:value-of select ="'dashHeavy'"/>
-			</xsl:when>
-			<!-- Dash long and dash long bold -->
-			<xsl:when test="$uStyle='long-dash' and
-								$uWidth='auto'">
-				<xsl:value-of select ="'dashLong'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='long-dash' and
-								$uWidth='bold'">
-				<xsl:value-of select ="'dashLongHeavy'"/>
-			</xsl:when>
-			<!-- dot Dash and dot dash bold -->
-			<xsl:when test="$uStyle='dot-dash' and
-								$uWidth='auto'">
-				<xsl:value-of select ="'dotDashLong'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='dot-dash' and
-								$uWidth='bold'">
-				<xsl:value-of select ="'dotDashHeavy'"/>
-			</xsl:when>
-			<!-- dot-dot-dash-->
-			<xsl:when test="$uStyle='dot-dot-dash' and
-								$uWidth='auto'">
-				<xsl:value-of select ="'dotDotDash'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='dot-dot-dash' and
-								$uWidth='bold'">
-				<xsl:value-of select ="'dotDotDashHeavy'"/>
-			</xsl:when>
-			<!-- double Wavy -->
-			<xsl:when test="$uStyle='wave' and
-								$uType='double'">
-				<xsl:value-of select ="'wavyDbl'"/>
-			</xsl:when>
-			<!-- Wavy and Wavy Heavy-->
-			<xsl:when test="$uStyle='wave' and
-								$uWidth='auto'">
-				<xsl:value-of select ="'wavy'"/>
-			</xsl:when>
-			<xsl:when test="$uStyle='wave' and
-								$uWidth='bold'">
-				<xsl:value-of select ="'wavyHeavy'"/>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:template>
-	<!--Margin-->
+	
+		<!--Margin-->
 	<xsl:template name ="MarginTemplate">
 		<xsl:param name ="level"/>
 		<xsl:param name="masterName"/>
@@ -7599,7 +7298,45 @@ Copyright (c) 2007, Sonata Software Limited
 
 	<xsl:template name="bulletChar">
 		<xsl:param name ="character"/>
-		<xsl:choose>
+    <xsl:choose>
+      <!--<xsl:when test="$character = '' "></xsl:when>-->
+      <xsl:when test="$character = '' ">
+        <xsl:value-of select ="'q'"/>
+      </xsl:when>
+      <!--<xsl:when test="$character = '' "></xsl:when>-->
+      <xsl:when test="$character = '☑' ">☑</xsl:when>
+      <xsl:when test="$character = '•' ">•</xsl:when>
+      <!--<xsl:when test="$character= '●' ">•</xsl:when>-->
+      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
+      <xsl:when test="$character= '●' ">
+        <xsl:value-of select ="''"/>
+      </xsl:when >
+      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
+      <!--<xsl:when test="$character = '➢' ">-->
+      <xsl:when test="$character = '' or $character = '➢'">
+        <xsl:value-of select ="'Ø'"/>
+      </xsl:when>
+      <xsl:when test="$character = '' or $character = '✔'">
+        <!--<xsl:when test="$character = '✔' ">-->
+        <xsl:value-of select ="'ü'"/>
+      </xsl:when>
+      <!--<xsl:when test="$character = '' ">
+        <xsl:value-of select ="'§'"/>
+      </xsl:when>-->
+      <!--<xsl:when test="$character = '' ">
+        <xsl:value-of select ="'§'"/>
+      </xsl:when>-->
+      <xsl:when test="$character = '○' ">o</xsl:when>
+      <xsl:when test="$character = '➔' ">è</xsl:when>
+      <xsl:when test="$character = '✗' ">✗</xsl:when>
+      <xsl:when test="$character = '–' ">–</xsl:when>
+      <xsl:otherwise>
+        <!-- warn if Custom Bullet -->
+        <xsl:message terminate="no">translation.odf2oox.bulletTypeSlideMasterCustomBullet</xsl:message>
+        <xsl:value-of select ="'•'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+		<!--<xsl:choose>
 			<xsl:when test="$character = '☑' ">☑</xsl:when>
 			<xsl:when test="$character = '•' ">•</xsl:when>
 			<xsl:when test="$character= '●' ">•</xsl:when>
@@ -7616,8 +7353,12 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test="$character = '➔' ">è</xsl:when>
 			<xsl:when test="$character = '✗' ">✗</xsl:when>
 			<xsl:when test="$character = '–' ">–</xsl:when>
-			<xsl:otherwise>•</xsl:otherwise>
-		</xsl:choose>
+      <xsl:otherwise>
+        --><!-- warn if Custom Bullet --><!--
+        <xsl:message terminate="no">translation.odf2oox.bulletTypeSlideMasterCustomBullet</xsl:message>
+        <xsl:value-of select ="'•'"/>
+      </xsl:otherwise>
+		</xsl:choose>-->
 
 	</xsl:template>
 
@@ -7625,19 +7366,20 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name ="character"/>
 		<xsl:param name ="typeFace"/>
 		<xsl:choose >
-			<xsl:when test="$character= '➢'  or $character= '✔' or $character= '➔'">
-				<!-- or $character= ''  -->
-				<xsl:value-of select ="'Wingdings'"/>
-			</xsl:when>
-			<xsl:when test="$character= 'o'">
-				<xsl:value-of select ="'Courier New'"/>
-			</xsl:when>
-			<xsl:when test="$character= '•' or $character= '■'">
-				<xsl:value-of select ="'Arial'"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select ="''"/>
-			</xsl:otherwise>
+      <xsl:when test="$character = '' or $character= '●' or $character= '➢' or $character= '' or $character= '✔' or $character = '' or $character= '■' or $character= '' or $character= '➔'">
+        <!--<xsl:when test="$character= '➢' or $character= '■' or $character= '✔' or $character= '➔'">-->
+        <!-- or $character= ''  -->
+        <xsl:value-of select ="'Wingdings'"/>
+      </xsl:when>
+      <xsl:when test="$character= 'o'">
+        <xsl:value-of select ="'Courier New'"/>
+      </xsl:when>
+      <xsl:when test="$character= '•'">
+        <xsl:value-of select ="'Arial'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select ="''"/>
+      </xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 
@@ -7660,6 +7402,103 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:otherwise>arabicPeriod</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+  <xsl:template name="tmpSMGroping">
+    <xsl:param name="pos"/>
+    <xsl:param name="pageNo"/>
+    <p:grpSp>
+      <p:nvGrpSpPr>
+        <p:cNvPr name="Title 1">
+          <xsl:attribute name="name">
+            <xsl:value-of select="concat('Group ',$pos+1)"/>
+          </xsl:attribute>
+          <xsl:attribute name="id">
+            <xsl:value-of select="$pos+1"/>
+          </xsl:attribute>
+        </p:cNvPr>
+        <p:cNvGrpSpPr>
+          <a:grpSpLocks/>
+        </p:cNvGrpSpPr>
+        <p:nvPr/>
+      </p:nvGrpSpPr>
+      <xsl:call-template name="tmpgroupingCordinates"/>
+      <xsl:for-each select="node()">
+        <xsl:variable name="var_num_1">
+          <xsl:value-of select="position()"/>
+        </xsl:variable>
+        <xsl:variable name="var_num_2">
+          <xsl:number level="any"/>
+        </xsl:variable>
+        <xsl:variable name="NvPrId" select="number(concat($pos,$var_num_1,$var_num_2))"/>
+        <xsl:choose>
+          <!--<xsl:when test="name()='draw:g'">-->
+          <!--<xsl:for-each select=".">
+              <xsl:call-template name="tmpGroping">
+              <xsl:with-param name ="pos" select ="$pos"/>
+              <xsl:with-param name ="pageNo" select ="$pageNo"/>
+            </xsl:call-template>
+            </xsl:for-each>-->
+          <!--</xsl:when>-->
+          <xsl:when test="name()='draw:frame'">
+            <xsl:variable name="var_pos" select="position()"/>
+
+            <!--<xsl:for-each select=".">-->
+            <xsl:choose>
+              <xsl:when test="./draw:image">
+                <xsl:for-each select="./draw:image">
+                  <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
+            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
+            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
+            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
+            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
+            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
+            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
+            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+                    <xsl:call-template name="InsertPicture">
+                      <xsl:with-param name="imageNo" select="$pageNo" />
+                      <xsl:with-param name="picNo" select="$NvPrId" />
+                      <xsl:with-param name ="master" select ="'1'"/>
+                      <xsl:with-param name ="grpFlag" select="'true'" />
+                    </xsl:call-template>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:when test="@presentation:class[contains(.,'title')]
+                                  or @presentation:class[contains(.,'subtitle')]
+                                  or @presentation:class[contains(.,'outline')]">
+              </xsl:when>
+              <xsl:when test ="(draw:text-box) and not(@presentation:style-name) and not(@presentation:class)">
+                <xsl:call-template name ="CreateShape">
+                  <xsl:with-param name ="fileName" select ="'content.xml'"/>
+                  <xsl:with-param name ="shapeName" select="'TextBox '" />
+                  <xsl:with-param name ="shapeCount" select="$NvPrId" />
+                  <xsl:with-param name ="grpFlag" select="'true'" />
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="./draw:plugin">
+                <!--<xsl:for-each select="./draw:plugin">
+                    <xsl:call-template name="InsertAudio">
+                      <xsl:with-param name="imageNo" select="$pageNo" />
+                      <xsl:with-param name="AudNo" select="$var_pos" />
+                    <xsl:with-param name ="NvPrId" select="$pos + $NvPrId" />
+                    </xsl:call-template>
+                  </xsl:for-each>-->
+              </xsl:when>
+            </xsl:choose>
+            <!--</xsl:for-each>-->
+          </xsl:when>
+          <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape' 
+                or name()='draw:line' or name()='draw:connector'">
+            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:call-template name ="shapes" >
+              <xsl:with-param name ="fileName" select ="'styles.xml'"/>
+              <xsl:with-param name ="var_pos" select="$NvPrId" />
+              <xsl:with-param name ="grpFlag" select="'true'" />
+            </xsl:call-template >
+          </xsl:when>
+        </xsl:choose>
+      </xsl:for-each>
+    </p:grpSp>
+  </xsl:template>
 	<!--End-->
 	<!--Relationships-->
 	<xsl:template name ="slideMaster1Rel">
@@ -7749,6 +7588,7 @@ Copyright (c) 2007, Sonata Software Limited
             or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
             or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
             or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+                        <xsl:if test="not(./@xlink:href[contains(.,'../')])">
                         <Relationship>
                           <xsl:attribute name="Id">
                             <xsl:value-of select="concat('sl',$slideNo,'Image',$var_pos)" />
@@ -7761,6 +7601,7 @@ Copyright (c) 2007, Sonata Software Limited
                             <!-- <xsl:value-of select ="concat('../media/',substring-after(@xlink:href,'/'))"/>  -->
                           </xsl:attribute>
                         </Relationship>
+                      </xsl:if>
                       </xsl:if>
                     </xsl:for-each>
                   </xsl:when>
@@ -9358,6 +9199,55 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
               </xsl:for-each>
             </xsl:when>
+            <xsl:when test="name()='draw:g'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="pos" select="position()"/>
+              <xsl:for-each select ="node()">
+                <xsl:variable name="var_num_1">
+                  <xsl:value-of select="position()"/>
+                </xsl:variable>
+                <xsl:variable name="var_num_2">
+                  <xsl:number level="any"/>
+                </xsl:variable>
+                <xsl:variable name="NvPrId" select="number(concat($pos,$var_num_1,$var_num_2))"/>
+                <xsl:choose>
+                  <xsl:when test="name()='draw:frame'">
+                    <!--<xsl:variable name="var_pos" select="position()"/>-->
+                    <xsl:for-each select=".">
+                      <xsl:choose>
+                        <xsl:when test="./draw:image">
+                          <xsl:for-each select="./draw:image">
+                            <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
+            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
+            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
+            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
+            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
+            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
+            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
+            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+                              <Relationship>
+                                <xsl:attribute name="Id">
+                                  <xsl:value-of select="concat('sl',$slideNo,'Image',$NvPrId)" />
+                                </xsl:attribute>
+                                <xsl:attribute name="Type">
+                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
+                                </xsl:attribute>
+                                <xsl:attribute name="Target">
+                                  <xsl:value-of select="concat('../media/',substring-after(@xlink:href,'/'))" />
+                                  <!-- <xsl:value-of select ="concat('../media/',substring-after(@xlink:href,'/'))"/>  -->
+                                </xsl:attribute>
+                              </Relationship>
+                            </xsl:if>
+                          </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="./draw:plugin">
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:for-each>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
           </xsl:choose>
         </xsl:for-each>
 			</xsl:for-each>
@@ -9463,4 +9353,52 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:attribute>
 		</a:ext>
 	</xsl:template>
+	
+	<!-- Superscript and SubScript for Text modified by Mathi on 23rd Aug 2007-->
+	<xsl:template name="SuperAndSubscripts">
+		<xsl:if test="./style:text-properties/@style:text-position">
+			<xsl:choose>
+				<xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'super')">
+					<xsl:attribute name="baseline">
+						<xsl:variable name="blsuper">
+							<xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'super '),'%')"/>
+						</xsl:variable>
+						<xsl:value-of select="($blsuper * 1000)"/>
+					</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="(substring-before(./style:text-properties/@style:text-position,' ') = 'sub')">
+					<xsl:attribute name="baseline">
+						<xsl:variable name="blsub">
+							<xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,'sub '),'%')"/>
+						</xsl:variable>
+						<xsl:value-of select="($blsub * (-1000))"/>
+					</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="contains(substring-before(./style:text-properties/@style:text-position,' '),'%') = '%'">
+					<xsl:variable name="val">
+						<xsl:value-of select="substring-before(substring-before(./style:text-properties/@style:text-position,' '),'%')"/>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="($val &gt; 0)">
+							<xsl:attribute name="baseline">
+								<xsl:variable name="bspsb">
+									<xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,' '),'%')"/>
+								</xsl:variable>
+								<xsl:value-of select="($bspsb * 1000)"/>
+							</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="($val &lt; 0)">
+							<xsl:attribute name="baseline">
+								<xsl:variable name="bspsb">
+									<xsl:value-of select="substring-before(substring-after(./style:text-properties/@style:text-position,' '),'%')"/>
+								</xsl:variable>
+								<xsl:value-of select="($bspsb * (-1000))"/>
+							</xsl:attribute>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:if>
+	</xsl:template>
+	
 </xsl:stylesheet>

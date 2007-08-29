@@ -50,7 +50,94 @@ Copyright (c) 2007, Sonata Software Limited
 
 	<xsl:template name ="customAnimation">
 		<xsl:param name ="slideId"/>
-		<xsl:if test ="anim:par/anim:seq/anim:par">
+		<!--<xsl:if test ="anim:par/anim:seq/anim:par">-->
+
+		<xsl:variable name ="animationVal">
+			<xsl:for-each select ="anim:par/anim:seq/anim:par">
+				<xsl:variable name ="validateAnimation">
+					<xsl:call-template name ="validateAnimation"/>
+				</xsl:variable>
+				<xsl:variable name ="animationType">
+					<xsl:call-template name ="animationType"/>
+				</xsl:variable>
+				<xsl:variable name ="animationId">
+					<xsl:call-template name ="animationId">
+						<xsl:with-param name ="animationType" select ="$animationType"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test ="$validateAnimation!='false'">
+					<xsl:if test ="$animationId!=''">
+						<p:par>
+							<p:cTn id="3" fill="hold">
+								<p:stCondLst>
+									<p:cond delay="indefinite"/>
+								</p:stCondLst>
+								<p:childTnLst>
+									<p:par>
+										<p:cTn id="4" fill="hold">
+											<p:stCondLst>
+												<p:cond delay="0" />
+											</p:stCondLst>
+											<p:childTnLst>
+												<p:par>
+													<p:cTn id="5" fill="hold" nodeType="clickEffect">
+														<xsl:attribute name ="presetClass">
+															<xsl:value-of select ="$animationType"/>
+														</xsl:attribute>
+														<xsl:attribute name ="presetID">
+															<xsl:value-of select ="$animationId"/>
+														</xsl:attribute>
+														<xsl:variable name ="animationSubId">
+															<xsl:call-template name ="animationSubId">
+																<xsl:with-param name ="animationType" select="$animationType"/>
+																<xsl:with-param name ="animationId" select="$animationId"/>
+															</xsl:call-template>
+														</xsl:variable>
+														<xsl:attribute name ="presetSubtype">
+															<xsl:value-of select ="$animationSubId"/>
+														</xsl:attribute>
+														<p:stCondLst>
+															<p:cond delay="0"/>
+														</p:stCondLst>
+														<xsl:if test ="name(anim:par/child::node()[1])='anim:iterate'">
+															<p:iterate >
+																<xsl:attribute name ="type">
+																	<xsl:call-template name ="interateType" >
+																		<xsl:with-param name ="itType" select ="anim:par/child::node()[1]/@anim:iterate-type"/>
+																	</xsl:call-template>
+																</xsl:attribute>
+																<p:tmPct>
+																	<xsl:attribute name ="val">
+																		<xsl:choose >
+																			<xsl:when test ="substring-before(anim:par/child::node()[1]/@anim:iterate-interval,'s') &gt; 0 ">
+																				<xsl:value-of select ="substring-before(anim:par/child::node()[1]/@anim:iterate-interval,'s') * 100000"/>
+																			</xsl:when>
+																			<xsl:otherwise >
+																				<xsl:value-of select ="'0'"/>
+																			</xsl:otherwise>
+																		</xsl:choose>
+																	</xsl:attribute>
+																</p:tmPct >
+															</p:iterate>
+														</xsl:if>
+														<p:childTnLst>
+															<xsl:call-template name ="processAnim">
+															</xsl:call-template>
+														</p:childTnLst>
+													</p:cTn>
+												</p:par>
+											</p:childTnLst>
+										</p:cTn>
+									</p:par>
+								</p:childTnLst>
+							</p:cTn>
+						</p:par>
+					</xsl:if>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+
+		<xsl:if test ="$animationVal!=''">
 			<p:timing>
 				<p:tnLst>
 					<p:par>
@@ -59,83 +146,7 @@ Copyright (c) 2007, Sonata Software Limited
 								<p:seq concurrent="1" nextAc="seek">
 									<p:cTn id="2" dur="indefinite" nodeType="mainSeq">
 										<p:childTnLst>
-											<xsl:for-each select ="anim:par/anim:seq/anim:par" >
-												<xsl:variable name ="animationType">
-													<xsl:call-template name ="animationType"/>
-												</xsl:variable>
-												<xsl:variable name ="animationId">
-													<xsl:call-template name ="animationId">
-														<xsl:with-param name ="animationType" select ="$animationType"/>
-													</xsl:call-template>
-												</xsl:variable>
-												<xsl:if test ="$animationId!=''">
-													<p:par>
-														<p:cTn id="3" fill="hold">
-															<p:stCondLst>
-																<p:cond delay="indefinite"/>
-															</p:stCondLst>
-															<p:childTnLst>
-																<p:par>
-																	<p:cTn id="4" fill="hold">
-																		<p:stCondLst>
-																			<p:cond delay="0" />
-																		</p:stCondLst>
-																		<p:childTnLst>
-																			<p:par>
-																				<p:cTn id="5" fill="hold" nodeType="clickEffect">
-																					<xsl:attribute name ="presetClass">
-																						<xsl:value-of select ="$animationType"/>
-																					</xsl:attribute>
-																					<xsl:attribute name ="presetID">
-																						<xsl:value-of select ="$animationId"/>
-																					</xsl:attribute>
-																					<xsl:variable name ="animationSubId">
-																						<xsl:call-template name ="animationSubId">
-																							<xsl:with-param name ="animationType" select="$animationType"/>
-																							<xsl:with-param name ="animationId" select="$animationId"/>
-																						</xsl:call-template>
-																					</xsl:variable>
-																					<xsl:attribute name ="presetSubtype">
-																						<xsl:value-of select ="$animationSubId"/>
-																					</xsl:attribute>
-																					<p:stCondLst>
-																						<p:cond delay="0"/>
-																					</p:stCondLst>
-																					<xsl:if test ="name(anim:par/child::node()[1])='anim:iterate'">
-																						<p:iterate >
-																							<xsl:attribute name ="type">
-																								<xsl:call-template name ="interateType" >
-																									<xsl:with-param name ="itType" select ="anim:par/child::node()[1]/@anim:iterate-type"/>
-																								</xsl:call-template>
-																							</xsl:attribute>
-																							<p:tmPct>
-																								<xsl:attribute name ="val">
-																									<xsl:choose >
-																										<xsl:when test ="substring-before(anim:par/child::node()[1]/@anim:iterate-interval,'s') &gt; 0 ">
-																											<xsl:value-of select ="substring-before(anim:par/child::node()[1]/@anim:iterate-interval,'s') * 100000"/>
-																										</xsl:when>
-																										<xsl:otherwise >
-																											<xsl:value-of select ="'0'"/>
-																										</xsl:otherwise>
-																									</xsl:choose>
-																								</xsl:attribute>
-																							</p:tmPct >
-																						</p:iterate>
-																					</xsl:if>
-																					<p:childTnLst>
-																						<xsl:call-template name ="processAnim">
-																						</xsl:call-template>
-																					</p:childTnLst>
-																				</p:cTn>
-																			</p:par>
-																		</p:childTnLst>
-																	</p:cTn>
-																</p:par>
-															</p:childTnLst>
-														</p:cTn>
-													</p:par>
-												</xsl:if>
-											</xsl:for-each>
+											<xsl:copy-of select ="$animationVal"/>
 										</p:childTnLst>
 									</p:cTn >
 									<p:prevCondLst>
@@ -159,10 +170,11 @@ Copyright (c) 2007, Sonata Software Limited
 				</p:tnLst>
 			</p:timing>
 		</xsl:if>
+		<!--</xsl:if>-->
 	</xsl:template>
 	<xsl:template name ="processAnim">
 		<xsl:for-each select ="anim:par/child::node()[1]">
-			
+
 			<xsl:for-each select ="node()">
 				<xsl:choose >
 					<xsl:when test ="name()='anim:set'">
@@ -202,14 +214,14 @@ Copyright (c) 2007, Sonata Software Limited
 										</p:clrVal>
 									</xsl:when>
 									<xsl:otherwise >
-										<xsl:call-template name ="attributeNameValue"/>												
+										<xsl:call-template name ="attributeNameValue"/>
 									</xsl:otherwise>
-								</xsl:choose>								
+								</xsl:choose>
 							</p:to>
 						</p:set>
 					</xsl:when >
 					<xsl:when test ="name()='anim:animate'">
-						<p:anim valueType="num">							
+						<p:anim valueType="num">
 							<xsl:if test ="@smil:calcMode">
 								<xsl:attribute name ="calcmode">
 									<xsl:value-of select ="@smil:calcMode"/>
@@ -239,7 +251,7 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:call-template>
 								</xsl:attribute>
 							</xsl:if>
-							<p:cBhvr additive="base">								
+							<p:cBhvr additive="base">
 								<p:cTn id="31" fill="hold" >
 									<xsl:attribute name ="dur">
 										<xsl:choose >
@@ -280,9 +292,9 @@ Copyright (c) 2007, Sonata Software Limited
 									</p:attrName>
 								</p:attrNameLst>
 							</p:cBhvr>
-							
-							<xsl:if test ="@smil:values or @smil:to">								
-								
+
+							<xsl:if test ="@smil:values or @smil:to">
+
 								<xsl:if test =" @smil:attributeName!='font-size' ">
 									<xsl:if test ="not(@smil:from)">
 										<xsl:choose>
@@ -297,7 +309,7 @@ Copyright (c) 2007, Sonata Software Limited
 												</p:tavLst>
 											</xsl:otherwise>
 										</xsl:choose>
-								</xsl:if>
+									</xsl:if>
 								</xsl:if>
 							</xsl:if>
 						</p:anim>
@@ -311,7 +323,7 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:attribute name ="filter">
 									<xsl:value-of select ="$smilFilter"/>
 								</xsl:attribute>
-							</xsl:if>							
+							</xsl:if>
 							<p:cBhvr>
 								<p:cTn id="11" >
 									<xsl:attribute name ="dur">
@@ -411,44 +423,58 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:choose>
 										</xsl:attribute>
 										<xsl:call-template name ="smilBegin"/>
-								</p:cTn >
-								<p:tgtEl>
-									<p:spTgt>
-										<xsl:call-template name ="spTarget"/>
-									</p:spTgt>
-								</p:tgtEl>
-							</p:cBhvr>
-							<xsl:choose>
-								<xsl:when test ="@smil:from">
-									<p:from>
-										<xsl:attribute name ="x">
-											<xsl:value-of select ="round(substring-before(@smil:from,',') * 100000)"/>
-										</xsl:attribute>
-										<xsl:attribute name ="y">
-											<xsl:value-of select ="round(substring-after(@smil:from,',') * 100000)"/>
-										</xsl:attribute>
-									</p:from >
-									<p:to>
+									</p:cTn >
+									<p:tgtEl>
+										<p:spTgt>
+											<xsl:call-template name ="spTarget"/>
+										</p:spTgt>
+									</p:tgtEl>
+								</p:cBhvr>
+								<xsl:choose>
+									<xsl:when test ="@smil:from">
+										<p:from>
+											<xsl:attribute name ="x">
+												<xsl:value-of select ="round(substring-before(@smil:from,',') * 100000)"/>
+											</xsl:attribute>
+											<xsl:attribute name ="y">
+												<xsl:value-of select ="round(substring-after(@smil:from,',') * 100000)"/>
+											</xsl:attribute>
+										</p:from >
+										<p:to>
+											<xsl:attribute name ="x">
+												<xsl:value-of select ="round(substring-before(@smil:to,',') * 100000)"/>
+											</xsl:attribute>
+											<xsl:attribute name ="y">
+												<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
+											</xsl:attribute>
+										</p:to >
+									</xsl:when>
+									<xsl:otherwise >
+										<!--  Added by vijayeta, bug number 1775269,
+                        and the 'if' condition to test if '@smil:by' is present, is added, which is the bug fix for 1775523, 
+                        date: 20th Aug '07, flash bulb type , both the bugs were related to roundtrip crash in output pptx-->
+										<xsl:if test ="@smil:by">
+											<p:by>
+												<xsl:attribute name="x">
+													<xsl:value-of select="round(substring-before(@smil:by,',') * 100000)" />
+												</xsl:attribute>
+												<xsl:attribute name="y">
+													<xsl:value-of select="round(substring-after(@smil:by,',') * 100000)" />
+												</xsl:attribute>
+											</p:by>
+										</xsl:if>
+										<!--  Added by vijayeta, bug number 1775269, date: 20th Aug '07, flash bulb type -->
+										<!--<p:by>
 										<xsl:attribute name ="x">
 											<xsl:value-of select ="round(substring-before(@smil:to,',') * 100000)"/>
 										</xsl:attribute>
 										<xsl:attribute name ="y">
 											<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
 										</xsl:attribute>
-									</p:to >
-								</xsl:when>
-								<xsl:otherwise >
-									<p:by>
-										<xsl:attribute name ="x">
-											<xsl:value-of select ="round(substring-before(@smil:to,',') * 100000)"/>
-										</xsl:attribute>
-										<xsl:attribute name ="y">
-											<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
-										</xsl:attribute>
-									</p:by >
-								</xsl:otherwise>
-							</xsl:choose>
-						</p:animScale>
+									</p:by >-->
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:animScale>
 						</xsl:if>
 						<xsl:if test ="@svg:type='rotate'">
 							<p:animRot>
@@ -498,7 +524,7 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:otherwise>
 										</xsl:choose>
 									</xsl:attribute>
-									<xsl:attribute name ="decel">										
+									<xsl:attribute name ="decel">
 										<xsl:choose >
 											<xsl:when test ="@smil:decelerate &gt; 0 ">
 												<xsl:value-of select ="round(@smil:decelerate * 100000)"/>
@@ -591,29 +617,67 @@ Copyright (c) 2007, Sonata Software Limited
 			</p:stCondLst>
 		</xsl:if>
 	</xsl:template>
+	<xsl:template name ="validateAnimation">
+
+		<xsl:variable name ="nvPrId">
+			<xsl:call-template name ="getnvPrIdval">
+				<xsl:with-param name ="spId">
+					<xsl:choose >
+						<xsl:when test ="anim:par/child::node()[1]/child::node()[1]/@smil:targetElement">
+							<xsl:value-of select ="anim:par/child::node()[1]/child::node()[1]/@smil:targetElement"/>
+						</xsl:when>
+						<xsl:when test ="anim:par/child::node()[1]/@smil:targetElement">
+							<xsl:value-of select ="anim:par/child::node()[1]/@smil:targetElement"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:with-param >
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name ="nvPrIdPara">
+			<xsl:call-template name ="getParaIdval">
+				<xsl:with-param name ="spId">
+					<xsl:choose >
+						<xsl:when test ="anim:par/child::node()[1]/child::node()[1]/@smil:targetElement">
+							<xsl:value-of select ="anim:par/child::node()[1]/child::node()[1]/@smil:targetElement"/>
+						</xsl:when>
+						<xsl:when test ="anim:par/child::node()[1]/@smil:targetElement">
+							<xsl:value-of select ="anim:par/child::node()[1]/@smil:targetElement"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:if test ="$nvPrId='' and $nvPrIdPara=''">
+			<xsl:value-of select ="'false'"/>
+		</xsl:if>
+	</xsl:template>
 	<xsl:template name ="spTarget">
 		<xsl:attribute name ="spid">
 			<xsl:call-template name ="getnvPrId">
 				<xsl:with-param name ="spId">
-					<xsl:if test ="./@smil:targetElement">
-						<xsl:value-of select ="./@smil:targetElement"/>
-					</xsl:if>
-					<xsl:if test ="parent::node()/@smil:targetElement">
-						<xsl:value-of select ="parent::node()/@smil:targetElement"/>
-					</xsl:if>
+					<xsl:choose >
+						<xsl:when test ="./@smil:targetElement">
+							<xsl:value-of select ="./@smil:targetElement"/>
+						</xsl:when>
+						<xsl:when test ="parent::node()/@smil:targetElement">
+							<xsl:value-of select ="parent::node()/@smil:targetElement"/>
+						</xsl:when>
+					</xsl:choose>
 				</xsl:with-param >
 			</xsl:call-template>
 		</xsl:attribute>
 		<xsl:variable name ="spId">
 			<xsl:call-template name ="getParaId">
 				<xsl:with-param name ="spId">
-					<xsl:if test ="./@smil:targetElement">
-						<xsl:value-of select ="./@smil:targetElement"/>
-					</xsl:if>
-					<xsl:if test ="parent::node()/@smil:targetElement">
-						<xsl:value-of select ="parent::node()/@smil:targetElement"/>
-					</xsl:if>
-				</xsl:with-param >
+					<xsl:choose >
+						<xsl:when test ="./@smil:targetElement">
+							<xsl:value-of select ="./@smil:targetElement"/>
+						</xsl:when>
+						<xsl:when test ="parent::node()/@smil:targetElement">
+							<xsl:value-of select ="parent::node()/@smil:targetElement"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:if test ="$spId!=''">
@@ -693,7 +757,7 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:when>
 			<xsl:when test ="./@smil:attributeName='opacity'">
 				<xsl:value-of select ="'style.opacity'"/>
-			</xsl:when>			
+			</xsl:when>
 			<xsl:when test ="./@smil:attributeName='stroke-color'">
 				<xsl:value-of select ="'stroke.color'"/>
 			</xsl:when>
@@ -703,21 +767,21 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@smil:attributeName='font-size'">
 				<xsl:value-of select ="'style.fontSize'"/>
 			</xsl:when>
-			
+
 		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name ="attributeNameValue">
 		<xsl:choose >
 			<xsl:when test ="./@smil:to='hidden'">
-				<p:strVal val="hidden"/>			
+				<p:strVal val="hidden"/>
 			</xsl:when>
-			<xsl:when test ="./@smil:to='visible'">				
+			<xsl:when test ="./@smil:to='visible'">
 				<p:strVal val="visible"/>
 			</xsl:when>
 			<xsl:when  test ="@anim:color-interpolation='rgb'">
 				<a:srgbClr val="{substring-after(./@smil:to,'#')}" />
-			</xsl:when>			
+			</xsl:when>
 			<xsl:when  test ="./@smil:to='opacity'">
 				<p:strVal val="'./@smil:to'" />
 			</xsl:when>
@@ -739,68 +803,58 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:template name ="getnvPrId">
 		<xsl:param name ="spId"/>
 		<xsl:variable name ="varSpid">
-			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/draw:frame">
-				<xsl:variable name ="nvPrId">
-					<xsl:value-of select ="position()"/>
-				</xsl:variable>
-				<xsl:variable name ="drawId">
-					<xsl:if test ="$spId =@draw:id">
+			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/parent::node()">
+				<xsl:for-each select ="node()">
+					<xsl:variable name ="nvPrId">
 						<xsl:value-of select ="position()"/>
-					</xsl:if >
-				</xsl:variable >
-				<xsl:variable name ="paraId">
-					<xsl:for-each select =".//text:p">
-						<xsl:if test ="$spId =@text:id">
+					</xsl:variable>
+					<xsl:variable name ="drawId">
+						<xsl:if test ="$spId =@draw:id">
 							<xsl:value-of select ="position()"/>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:variable>
-				<xsl:choose>
-					<xsl:when test ="$paraId!=''">
-						<xsl:value-of select ="$nvPrId + 1"/>
-					</xsl:when>
-					<xsl:when test ="$paraId='' and $drawId !=''">
-						<xsl:value-of select ="$nvPrId +1 "/>
-					</xsl:when>
-				</xsl:choose>
+						</xsl:if >
+					</xsl:variable >
+					<xsl:variable name ="paraId">
+						<xsl:for-each select =".//text:p">
+							<xsl:if test ="$spId =@text:id">
+								<xsl:value-of select ="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="$paraId!=''">
+							<xsl:value-of select ="$nvPrId +1 "/>
+						</xsl:when>
+						<xsl:when test ="$paraId='' and $drawId !=''">
+							<xsl:value-of select ="$nvPrId +1 "/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:for-each>
 			</xsl:for-each >
 		</xsl:variable>
-		<xsl:choose >
-			<xsl:when test ="$varSpid=''">
-				<xsl:value-of select ="'2'"/>
-			</xsl:when>
-			<xsl:otherwise >
-				<xsl:value-of select ="$varSpid"/>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:value-of select ="$varSpid"/>
 	</xsl:template>
 	<xsl:template name ="getParaId">
 		<xsl:param name ="spId"/>
 		<xsl:variable name ="varSpid">
-			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/draw:frame">
-				<xsl:variable name ="nvPrId">
-					<xsl:value-of select ="position()"/>
-				</xsl:variable>
-				<xsl:variable name ="paraId">
-					<xsl:for-each select =".//text:p">
-						<xsl:if test ="$spId =@text:id">
-							<xsl:value-of select ="position()"/>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:variable>
-				<xsl:if test ="$paraId!=''">
-					<xsl:value-of select ="$paraId -1"/>
-				</xsl:if>
+			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/parent::node()">
+				<xsl:for-each select ="node()">
+					<xsl:variable name ="nvPrId">
+						<xsl:value-of select ="position()"/>
+					</xsl:variable>
+					<xsl:variable name ="paraId">
+						<xsl:for-each select =".//text:p">
+							<xsl:if test ="$spId =@text:id">
+								<xsl:value-of select ="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:if test ="$paraId!=''">
+						<xsl:value-of select ="$paraId -1"/>
+					</xsl:if>
+				</xsl:for-each>
 			</xsl:for-each>
 		</xsl:variable>
-		<xsl:choose >
-			<xsl:when test ="$varSpid=''">
-				<xsl:value-of select ="'2'"/>
-			</xsl:when>
-			<xsl:otherwise >
-				<xsl:value-of select ="$varSpid"/>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:value-of select ="$varSpid"/>
 	</xsl:template>
 
 	<xsl:template name="addTavListNode">
@@ -839,7 +893,7 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:with-param name ="strVal" select ="$first"/>
 							</xsl:call-template>
 						</xsl:attribute>
-					</p:strVal>					
+					</p:strVal>
 				</p:val>
 			</p:tav>
 		</xsl:if>
@@ -860,7 +914,7 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:value-of select ="'0'"/>
 						</xsl:otherwise>
 					</xsl:choose>
-				</xsl:attribute>				
+				</xsl:attribute>
 				<p:val>
 					<p:strVal>
 						<xsl:attribute name ="val">
@@ -868,7 +922,7 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:with-param name ="strVal" select ="$string"/>
 							</xsl:call-template>
 						</xsl:attribute >
-					</p:strVal>					
+					</p:strVal>
 				</p:val>
 			</p:tav>
 		</xsl:if>
@@ -884,7 +938,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./anim:par/anim:par/@presentation:preset-class='emphasis' or ./anim:par/anim:iterate/@presentation:preset-class='emphasis'">
 				<xsl:value-of select ="'emph'"/>
 			</xsl:when>
-			
+
 		</xsl:choose>
 	</xsl:template>
 
@@ -1265,6 +1319,21 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-color-blend'">
 						<xsl:value-of select ="'19'"/>
 					</xsl:when>
+					<!--  Added by vijayeta, bug number 1775269, date: 20th Aug '07-->
+					<!-- slide 1 of input file 'animation partial.odp' -->
+					<xsl:when test="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-color-blend'">
+						<xsl:value-of select="'19'" />
+					</xsl:when>
+					<!-- slide 2 of input file 'animation partial.odp' -->
+					<xsl:when test="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-color-over-by-letter'">
+						<xsl:value-of select="'20'" />
+					</xsl:when>
+					<!-- slide 10 of input file 'animation partial.odp'-->
+					<xsl:when test="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-reveal-underline'">
+						<xsl:value-of select="'18'" />
+					</xsl:when>
+					<!--  Added by vijayeta, bug number 1775269, date: 20th Aug '07 -->
+
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-color-over-by-letter'">
 						<xsl:value-of select ="'20'"/>
 					</xsl:when>
@@ -1640,5 +1709,62 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:value-of select ="'lt'"/>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name ="getnvPrIdval">
+		<xsl:param name ="spId"/>
+		<xsl:variable name ="varSpid">
+			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()">
+				<xsl:for-each select ="node()">
+					<xsl:variable name ="nvPrId">
+						<xsl:value-of select ="position()"/>
+					</xsl:variable>
+					<xsl:variable name ="drawId">
+						<xsl:if test ="$spId =@draw:id">
+							<xsl:value-of select ="position()"/>
+						</xsl:if >
+					</xsl:variable >
+					<xsl:variable name ="paraId">
+						<xsl:for-each select =".//text:p">
+							<xsl:if test ="$spId =@text:id">
+								<xsl:value-of select ="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="$paraId!=''">
+							<xsl:value-of select ="$nvPrId +1 "/>
+						</xsl:when>
+						<xsl:when test ="$paraId='' and $drawId !=''">
+							<xsl:value-of select ="$nvPrId +1 "/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:for-each>
+			</xsl:for-each >
+		</xsl:variable>
+		<xsl:value-of select ="$varSpid"/>
+	</xsl:template>
+	<xsl:template name ="getParaIdval">
+		<xsl:param name ="spId"/>
+		<xsl:variable name ="varSpid">
+			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()">
+				<xsl:for-each select ="node()">
+					<xsl:variable name ="nvPrId">
+						<xsl:value-of select ="position()"/>
+					</xsl:variable>
+					<xsl:variable name ="paraId">
+						<xsl:for-each select =".//text:p">
+							<xsl:if test ="$spId =@text:id">
+								<xsl:value-of select ="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:if test ="$paraId!=''">
+						<xsl:value-of select ="$paraId -1"/>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:value-of select ="$varSpid"/>
 	</xsl:template>
 </xsl:stylesheet >

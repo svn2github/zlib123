@@ -41,6 +41,8 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select ="document('content.xml')//office:body/office:presentation">
           <xsl:variable name ="noOfSlides" select ="count(./draw:page)"/>
           <xsl:if test ="./presentation:settings">
+            <!-- warn, fetaure change slides on click -->
+            <xsl:message terminate="no">translation.odf2oox.slideShowSettingsTransitionOnClick</xsl:message>
             <xsl:for-each select ="./presentation:settings">
               <!-- Animations-->
               <xsl:if test ="./@presentation:animations='disabled'">
@@ -55,6 +57,8 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:if>
               <!-- Loop until ESC-->
               <xsl:if test ="./@presentation:endless and ./@presentation:pause">
+                <!-- warn if Pause greater than 0s -->
+                <xsl:message terminate="no">translation.odf2oox.slideShowSettingsTypePauseGreaterThanZero</xsl:message>
                 <xsl:attribute name ="loop">
                   <xsl:value-of select ="'1'"/>
                 </xsl:attribute>
@@ -115,6 +119,18 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select ="$custPresentationId"/>
                   </xsl:attribute>
                 </p:custShow>
+              </xsl:if>
+              <xsl:if test ="./@presentation:stay-on-top='true'">
+                <!-- warn if Set presentation on top -->
+                <xsl:message terminate="no">translation.odf2oox.slideShowSettingsTypePresentationOnTop</xsl:message>
+              </xsl:if>
+              <xsl:if test ="./@presentation:start-with-navigator='true'">
+                <!-- warn if Display Navigator -->
+                <xsl:message terminate="no">translation.odf2oox.slideShowSettingsTypeNavigator</xsl:message>
+              </xsl:if>
+              <xsl:if test ="./@presentation:mouse-as-pen='true'">
+                <!-- warn if set mouse poinetr as pen -->
+                <xsl:message terminate="no">translation.odf2oox.slideShowSettingsTypeMouseAsPen</xsl:message>
               </xsl:if>
             </xsl:for-each>
           </xsl:if>

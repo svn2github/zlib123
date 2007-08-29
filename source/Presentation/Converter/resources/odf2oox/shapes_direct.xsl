@@ -44,7 +44,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="odf style text number draw page r">
+  exclude-result-prefixes="odf style text number draw page r presentation fo script xlink svg">
   <xsl:import href="common.xsl"/>
 
   <!-- Shape constants-->
@@ -88,11 +88,48 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:value-of select ="'0.4'" />
   </xsl:variable>
 
+   <!-- Generate nvPrId-->
+   <xsl:template name ="shapeGetnvPrId">
+		<xsl:param name ="spId"/>
+		<xsl:variable name ="varSpid">
+			<xsl:for-each select ="parent::node()">
+				<xsl:for-each select ="node()">
+					<xsl:variable name ="nvPrId">
+						<xsl:value-of select ="position()"/>
+					</xsl:variable>
+					<xsl:variable name ="drawId">
+						<xsl:if test ="$spId =@draw:id">
+							<xsl:value-of select ="position()"/>
+						</xsl:if >
+					</xsl:variable >
+					<xsl:variable name ="paraId">
+						<xsl:for-each select =".//text:p">
+							<xsl:if test ="$spId =@text:id">
+								<xsl:value-of select ="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test ="$paraId!=''">
+							<xsl:value-of select ="$nvPrId +1 "/>
+						</xsl:when>
+						<xsl:when test ="$paraId='' and $drawId !=''">
+							<xsl:value-of select ="$nvPrId +1 "/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:for-each>
+			</xsl:for-each >
+		</xsl:variable>
+		<xsl:value-of select ="$varSpid"/>
+	</xsl:template>
+	
   <!-- Template for Shapes in direct conversion -->
   <xsl:template name ="shapes">
     <xsl:param name ="fileName" />
     <xsl:param name ="styleName" />
     <xsl:param name ="var_pos" />
+    <xsl:param name ="NvPrId" />
+    <xsl:param name ="grpFlag" />
          <xsl:choose>
         <xsl:when test ="name()='draw:rect'">
           <xsl:variable name="shapeCount" select="position()"/>
@@ -100,7 +137,9 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:call-template name ="CreateShape">
               <xsl:with-param name ="fileName" select ="$fileName" />
               <xsl:with-param name ="shapeName" select="'Rectangle '" />
-              <xsl:with-param name ="shapeCount" select="$shapeCount" />
+              <xsl:with-param name ="shapeCount" select="$var_pos" />
+              <xsl:with-param name ="grpFlag" select="$grpFlag" />
+              <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
             </xsl:call-template>
           </xsl:for-each>
          </xsl:when>
@@ -111,7 +150,9 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:call-template name="CreateShape">
 				<xsl:with-param name ="fileName" select ="$fileName" />
                 <xsl:with-param name="shapeName" select="'Oval '" />
-                <xsl:with-param name ="shapeCount" select="$shapeCount" />
+                <xsl:with-param name ="shapeCount" select="$var_pos" />
+                <xsl:with-param name ="grpFlag" select="$grpFlag" />
+                <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
               </xsl:call-template>
             </xsl:for-each>
           </xsl:if>
@@ -443,7 +484,9 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="fileName" select ="$fileName" />
                 <xsl:with-param name ="shapeName" select="$shapeName" />
                 <xsl:with-param name ="customShape" select ="'true'" />
-                <xsl:with-param name ="shapeCount" select="$shapeCount" />
+                <xsl:with-param name ="shapeCount" select="$var_pos" />
+              <xsl:with-param name ="grpFlag" select="$grpFlag" />
+                <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
               </xsl:call-template>
             </xsl:if>
           <!--</xsl:for-each>-->
@@ -453,6 +496,9 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:call-template name ="drawLine">
             <xsl:with-param name ="fileName" select ="$fileName" />
             <xsl:with-param name ="connectorType" select ="'Straight Connector '" />
+            <xsl:with-param name ="shapeCount" select="$var_pos" />
+            <xsl:with-param name ="grpFlag" select="$grpFlag" />
+            <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
           </xsl:call-template>
         <!--</xsl:for-each>-->
         </xsl:when>
@@ -474,6 +520,9 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:call-template name ="drawLine">
               <xsl:with-param name ="fileName" select ="$fileName" />
               <xsl:with-param name ="connectorType" select ="$type" />
+            <xsl:with-param name ="shapeCount" select="$var_pos" />
+            <xsl:with-param name ="grpFlag" select="$grpFlag" />
+              <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
             </xsl:call-template>
           <!--</xsl:for-each>-->
         </xsl:when>
@@ -492,11 +541,13 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="shapeName" />
     <xsl:param name ="customShape" />
     <xsl:param name ="shapeCount" />
+    <xsl:param name ="NvPrId" />
+    <xsl:param name ="grpFlag" />
     <p:sp>
       <p:nvSpPr>
         <p:cNvPr>
           <xsl:attribute name ="id">
-            <xsl:value-of select ="1"/>
+            <xsl:value-of select ="$shapeCount+1"/>
           </xsl:attribute>
           <xsl:attribute name ="name">
             <xsl:value-of select ="concat($shapeName, position())"/>
@@ -518,6 +569,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:otherwise>
             </xsl:choose>
            </xsl:variable>
+          <xsl:if test="$grpFlag !='true'">
           <xsl:if test="count(office:event-listeners/presentation:event-listener) = 1">
             <xsl:if test="office:event-listeners">
               <xsl:for-each select ="office:event-listeners/presentation:event-listener">
@@ -653,6 +705,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:if>
           </xsl:if>
+          </xsl:if>        
          </p:cNvPr >
         <p:cNvSpPr />
         <p:nvPr />
@@ -779,6 +832,24 @@ Copyright (c) 2007, Sonata Software Limited
 																   $angle)"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal">
+        <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal='true'">
+          <xsl:attribute name ="flipH">
+            <xsl:value-of select="'1'"/>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:if>
+		
+		<xsl:if test="not(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
+			<xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical">
+				<xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical='true'">
+					<xsl:attribute name ="flipV">
+						<xsl:value-of select="'1'"/>
+					</xsl:attribute>
+				</xsl:if>
+			</xsl:if>
+		</xsl:if>
+		
       <a:off>
         <xsl:if test="@draw:transform">
           <xsl:attribute name ="x">
@@ -814,16 +885,30 @@ Copyright (c) 2007, Sonata Software Limited
       </a:off>
       <a:ext>
         <xsl:attribute name ="cx">
+          <xsl:choose>
+            <xsl:when test="number(substring-before(@svg:width,'cm')) &lt; 0">
+              <xsl:value-of select="'0'"/>
+            </xsl:when>
+            <xsl:otherwise>
           <xsl:call-template name ="convertToPoints">
             <xsl:with-param name ="unit" select ="'cm'"/>
             <xsl:with-param name ="length" select ="@svg:width"/>
           </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <xsl:attribute name ="cy">
+          <xsl:choose>
+            <xsl:when test="number(substring-before(@svg:height,'cm')) &lt; 0">
+              <xsl:value-of select="'0'"/>
+            </xsl:when>
+            <xsl:otherwise>
           <xsl:call-template name ="convertToPoints">
             <xsl:with-param name ="unit" select ="'cm'"/>
             <xsl:with-param name ="length" select ="@svg:height"/>
           </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </a:ext>
     </a:xfrm>
@@ -831,7 +916,12 @@ Copyright (c) 2007, Sonata Software Limited
   <!-- Draw line-->
   <xsl:template name ="drawLine">
     <xsl:param name ="fileName" />
+    <xsl:param name ="shapeCount" />
     <xsl:param name ="connectorType" />
+    <xsl:param name ="NvPrId" />
+    <xsl:param name ="grpFlag" />
+    
+
     <p:cxnSp>
       <p:nvCxnSpPr>
         <p:cNvPr>
@@ -845,6 +935,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:variable name="PostionCount">
             <xsl:value-of select="position()"/>
           </xsl:variable>
+          <xsl:if test="$grpFlag != 'true'">
           <xsl:if test="office:event-listeners">
             <xsl:for-each select ="office:event-listeners/presentation:event-listener">
               <xsl:if test="@script:event-name[contains(.,'dom:click')]">
@@ -976,8 +1067,104 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:for-each>
           </xsl:if>
           <!-- ADDED BY LOHITH - HYPER LINKS FOR SHAPES-->
+          </xsl:if>
         </p:cNvPr>
-        <p:cNvCxnSpPr/>
+		  <p:cNvCxnSpPr>
+			  <xsl:if test="@draw:start-glue-point">
+				  <xsl:variable name="startShape">
+					  <xsl:call-template name ="shapeGetnvPrId">
+						  <xsl:with-param name ="spId">
+							  <xsl:value-of select="@draw:start-shape"/>
+						  </xsl:with-param>
+					  </xsl:call-template>
+				  </xsl:variable>
+
+				  <xsl:variable name="stGluePoint">
+					  <xsl:value-of select="@draw:start-glue-point"/>
+				  </xsl:variable>
+				  
+				  <a:stCxn>
+					  <xsl:attribute name="id">
+						  <xsl:value-of  select="$startShape" />
+					  </xsl:attribute>
+
+					  <xsl:attribute name="idx">
+						  <xsl:choose>
+							  <xsl:when test="$stGluePoint = 0  or $stGluePoint = 4">
+								  <xsl:value-of select="'0'"/>
+							  </xsl:when>
+							  <xsl:when test="$stGluePoint = 1  or $stGluePoint = 5">
+								  <xsl:value-of select="'3'"/>
+							  </xsl:when>
+							  <xsl:when test="($stGluePoint = 2)  or ($stGluePoint = 6)">
+								  <xsl:value-of select="'2'"/>
+							  </xsl:when>
+							  <xsl:when test="($stGluePoint = 3) or ($stGluePoint = 7)">
+								  <xsl:value-of select="'1'"/>
+							  </xsl:when>
+							  <xsl:when test="$stGluePoint = 8">
+								  <xsl:value-of select="'4'"/>
+							  </xsl:when>
+							  <xsl:when test="$stGluePoint = 9">
+								  <xsl:value-of select="'5'"/>
+							  </xsl:when>
+							  <xsl:otherwise>
+								  <xsl:value-of select="'0'"/>
+							  </xsl:otherwise>
+							  
+							  
+						  </xsl:choose>
+					  </xsl:attribute>
+				  </a:stCxn>
+			  </xsl:if>
+			  
+			  <xsl:if test="@draw:end-glue-point">
+					<xsl:variable name="endShape">
+						  <xsl:call-template name ="shapeGetnvPrId">
+							  <xsl:with-param name ="spId">
+								  <xsl:value-of select="@draw:end-shape"/>
+							  </xsl:with-param>
+						  </xsl:call-template>
+					  </xsl:variable>
+
+				  <xsl:variable name="endGluePoint">
+					  <xsl:value-of select="@draw:end-glue-point"/>
+				  </xsl:variable>
+				  
+				  <a:endCxn>
+					  
+					  <xsl:attribute name="id">
+						  <xsl:value-of  select="$endShape" />
+					  </xsl:attribute>
+					  <xsl:attribute name="idx">
+						  <xsl:choose>
+							  <xsl:when test="$endGluePoint = 0 or $endGluePoint = 4">
+								  <xsl:value-of select="'0'"/>
+							  </xsl:when>
+							  <xsl:when test="$endGluePoint = 1  or $endGluePoint = 5">
+								  <xsl:value-of select="'3'"/>
+							  </xsl:when>
+							  <xsl:when test="$endGluePoint = 2  or $endGluePoint = 6">
+								  <xsl:value-of select="'2'"/>
+							  </xsl:when>
+							  <xsl:when test="$endGluePoint = 3  or $endGluePoint = 7">
+								  <xsl:value-of select="'1'"/>
+							  </xsl:when>
+							  <xsl:when test="$endGluePoint =8">
+								  <xsl:value-of select="'4'"/>
+							  </xsl:when>
+							  <xsl:when test="$endGluePoint =9">
+								  <xsl:value-of select="'5'"/>
+							  </xsl:when>
+							  <xsl:otherwise>
+								  <xsl:value-of select="'0'"/>
+							  </xsl:otherwise>
+
+						  </xsl:choose>
+					  </xsl:attribute>
+				  </a:endCxn>
+			  </xsl:if>
+		</p:cNvCxnSpPr>
         <p:nvPr/>
       </p:nvCxnSpPr>
       <p:spPr>
@@ -1741,6 +1928,18 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:when test ="@draw:stroke='none'">
           <a:noFill />
         </xsl:when>
+        <xsl:when test ="@draw:stroke='solid' and not(@svg:stroke-color)">
+          <a:solidFill>
+            <a:srgbClr val="000000">
+            </a:srgbClr>
+          </a:solidFill>
+        </xsl:when>
+        <xsl:when test ="@draw:stroke='dash' and not(@svg:stroke-color)">
+          <a:solidFill>
+            <a:srgbClr val="000000">
+            </a:srgbClr>
+          </a:solidFill>
+        </xsl:when>
         <!-- Solid color -->
         <xsl:when test ="@svg:stroke-color">
           <xsl:call-template name ="getFillColor">
@@ -2151,6 +2350,10 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="customShape" />
 
     <a:bodyPr>
+
+		<xsl:if test="./a:normAutofit">
+			<xsl:message terminate="no">translation.odf2oox.shapeTopBottomWrapping</xsl:message>
+		</xsl:if>
       <!-- Text direction-->
       <xsl:for-each select ="document($fileName)//office:automatic-styles/style:style[@style:name=$gr]/style:paragraph-properties">
         <xsl:if test ="@style:writing-mode">
@@ -2857,6 +3060,7 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
             <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
             <xsl:with-param name ="slideMaster" select ="$fileName"/>
+            <xsl:with-param name ="pos" select ="$forCount"/>
           </xsl:call-template >
           <!--End of Code inserted by Vijayets for Bullets and numbering-->
           <xsl:for-each select ="child::node()[position()]">

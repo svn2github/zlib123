@@ -92,6 +92,17 @@ Copyright (c) 2007, Sonata Software Limited
               </p:spPr>
             </p:sp>
           </xsl:for-each>
+          <xsl:variable name ="flagShapeNotes">
+            <xsl:for-each select ="draw:frame">
+              <xsl:if test ="not(./@presentation:class[contains(.,'notes')])">
+                <xsl:value-of  select ="'true'"/>
+              </xsl:if>              
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:if test ="$flagShapeNotes!=''">
+            <!-- warn if shapes in notes -->
+            <xsl:message terminate="no">translation.odf2oox.notesTypeShapesInNotes</xsl:message>
+          </xsl:if>
           <xsl:for-each select ="draw:frame[@presentation:class[contains(.,'notes')]]">
             <xsl:variable name ="masterPageName" select ="./parent::node()/@draw:master-page-name"/>
             <xsl:variable name="FrameCount" select="concat('Frame',position())"/>
@@ -141,19 +152,19 @@ Copyright (c) 2007, Sonata Software Limited
                 </p:txBody>
               </p:sp>
           </xsl:for-each >
-          <!-- Code for tmpNotesfooter , slide number and date time control -->
+          <!-- Code for footer , slide number and date time control -->
           <xsl:variable name ="pageStyle">
             <xsl:value-of select ="@draw:style-name"/>
           </xsl:variable>
           <xsl:variable name ="tmpNotesfooterId">
-            <xsl:value-of select ="@presentation:use-tmpNotesfooter-name"/>
+            <xsl:value-of select ="@presentation:use-footer-name"/>
           </xsl:variable>
           <xsl:variable name ="dateId">
             <xsl:value-of select ="@presentation:use-date-time-name"/>
           </xsl:variable>
           <xsl:for-each select ="document('content.xml')//style:style[@style:name=$pageStyle]">
-            <xsl:if test ="style:drawing-page-properties[@presentation:display-tmpNotesfooter='true']">
-              <xsl:if test ="document('content.xml')//presentation:tmpNotesfooter-decl[@presentation:name=$tmpNotesfooterId]">
+            <xsl:if test ="style:drawing-page-properties[@presentation:display-footer='true']">
+              <xsl:if test ="document('content.xml')//presentation:footer-decl[@presentation:name=$tmpNotesfooterId]">
                 <xsl:call-template name ="tmpNotesfooter" >
                   <xsl:with-param name ="tmpNotesfooterId" select ="$tmpNotesfooterId"/>
                 </xsl:call-template >
@@ -534,7 +545,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="tmpNotesfooterId"></xsl:param>
     <p:sp>
       <p:nvSpPr>
-        <p:cNvPr id="6" name="tmpNotesfooter Placeholder 5" />
+        <p:cNvPr id="6" name="footer Placeholder 5" />
         <p:cNvSpPr>
           <a:spLocks noGrp="1" />
         </p:cNvSpPr>
@@ -543,9 +554,9 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr >
-        <!-- tmpNotesfooter date layout details style:master-page style:name -->
+        <!-- footer date layout details style:master-page style:name -->
         <xsl:call-template name ="tmpNotesGetFrameDetails">
-          <xsl:with-param name ="LayoutName" select ="'tmpNotesfooter'"/>
+          <xsl:with-param name ="LayoutName" select ="'footer'"/>
         </xsl:call-template>
       </p:spPr >
       <p:txBody>
@@ -555,7 +566,7 @@ Copyright (c) 2007, Sonata Software Limited
           <a:r>
             <a:rPr lang="en-US" smtClean="0" />
             <a:t>
-              <xsl:for-each select ="document('content.xml') //presentation:tmpNotesfooter-decl[@presentation:name=$tmpNotesfooterId] ">
+              <xsl:for-each select ="document('content.xml') //presentation:footer-decl[@presentation:name=$tmpNotesfooterId] ">
                 <xsl:value-of select ="."/>
               </xsl:for-each >
             </a:t>
@@ -578,7 +589,7 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr >
-        <!-- tmpNotesfooter slide number layout details style:master-page style:name -->
+        <!-- footer slide number layout details style:master-page style:name -->
         <xsl:call-template name ="tmpNotesGetFrameDetails">
           <xsl:with-param name ="LayoutName" select ="'page-number'"/>
         </xsl:call-template>
@@ -615,7 +626,7 @@ Copyright (c) 2007, Sonata Software Limited
         </p:nvPr>
       </p:nvSpPr>
       <p:spPr >
-        <!-- tmpNotesfooter layout details style:master-page style:name -->
+        <!-- footer layout details style:master-page style:name -->
         <xsl:call-template name ="tmpNotesGetFrameDetails">
           <xsl:with-param name ="LayoutName" select ="'date-time'"/>
         </xsl:call-template>

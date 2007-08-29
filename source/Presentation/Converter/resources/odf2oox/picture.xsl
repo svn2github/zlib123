@@ -46,10 +46,14 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page svg presentation fo script xlink">
   <xsl:import href ="common.xsl"/>
-  <xsl:template name ="InsertPicture">
+  <xsl:import href ="shapes_direct.xsl"/>
+  <xsl:template name ="InsertPicture">    
     <xsl:param name ="imageNo" />
     <xsl:param name ="picNo" />
     <xsl:param name ="master" />
+ <xsl:param name ="NvPrId" />
+    <!-- warn if Audio or Video -->
+    <xsl:message terminate="no">translation.odf2oox.audioVideoTypeImage</xsl:message>
     <xsl:variable name ="imageSerialNo">
       <xsl:value-of select ="concat('sl',$imageNo,'Image' ,$picNo)"/>
     </xsl:variable>
@@ -153,19 +157,31 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:call-template>
             </xsl:attribute>
           </a:ext >
-        </a:xfrm>
+        </a:xfrm>        
         <!--Sateesh-->
         <a:prstGeom prst="rect">
           <a:avLst/>
-        </a:prstGeom>
-        <!--End-->
-        <xsl:call-template name ="pictureBorderLine"/>
+        </a:prstGeom>        
+        <xsl:variable name="varFileName">
+          <xsl:choose>
+            <xsl:when test="$master">
+              <xsl:value-of select="'styles.xml'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'content.xml'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:call-template name ="pictureBorderLine">
+          <xsl:with-param name="FileName" select="$varFileName"/>
+        </xsl:call-template>
       </p:spPr>
     </p:pic>
   </xsl:template>
   <xsl:template name="InsertAudio">
     <xsl:param name ="imageNo" />
     <xsl:param name ="AudNo" />
+    <xsl:param name ="NvPrId" />
     <xsl:variable name="PostionCount">
       <xsl:value-of select="$AudNo"/>
     </xsl:variable>
@@ -324,33 +340,13 @@ Copyright (c) 2007, Sonata Software Limited
     </p:pic>
   </xsl:template>
   <xsl:template name ="pictureBorderLine">
+    <xsl:param name="FileName"/>
     <xsl:param name ="grProp">
       <xsl:value-of select ="parent::node()/@draw:style-name"/>
     </xsl:param>
-    <xsl:for-each select ="document('content.xml')//style:style[@style:name=$grProp]/style:graphic-properties">
-      <xsl:if test ="@draw:stroke">
-        <a:ln cmpd="sng">
-          <xsl:if test ="@svg:stroke-width">
-            <xsl:attribute name ="w">
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="length" select ="@svg:stroke-width"/>
-                <xsl:with-param name ="unit" select ="'cm'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test ="@svg:stroke-color">
-            <a:solidFill>
-              <a:srgbClr>
-                <xsl:attribute name ="val">
-                  <xsl:value-of select ="substring-after(@svg:stroke-color,'#')"/>
-                </xsl:attribute>
-              </a:srgbClr >
-            </a:solidFill>
-          </xsl:if>
-          <a:prstDash val="sysDash" />
-        </a:ln>
-      </xsl:if>
-    </xsl:for-each>
+    <xsl:for-each select ="document($FileName)//style:style[@style:name=$grProp]/style:graphic-properties">
+        <xsl:call-template name ="getLineStyle"/>
+    </xsl:for-each>    
 
   </xsl:template>
   <xsl:template name ="tmpInsertBackImage">
@@ -360,7 +356,18 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:value-of select ="concat($FileName,'BackImg')"/>
     </xsl:variable>
     <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$imageName]">
-      <pzip:copy pzip:source="{@xlink:href}"
+      <xsl:variable name="Source">
+        <xsl:choose>
+          <xsl:when test="contains(@xlink:href,'#')">
+            <xsl:value-of select="substring-after(@xlink:href,'#')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="@xlink:href"/>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:variable>
+      <pzip:copy pzip:source="{$Source}"
           pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
     </xsl:for-each>
 

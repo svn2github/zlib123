@@ -53,6 +53,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="headerName"/>
     <xsl:param name ="footerName"/>
     <xsl:param name ="dateTimeName"/>
+    <!-- warn no resizing thumbnails representing slides -->
+    <xsl:message terminate="no">translation.odf2oox.handOutMasterTypeThumbNail</xsl:message>
     <p:handoutMaster
      xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
