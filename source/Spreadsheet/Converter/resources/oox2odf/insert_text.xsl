@@ -263,15 +263,16 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
+        
         <xsl:choose>
-
           <xsl:when
             test="(contains($numStyle,'y') or (contains($numStyle,'m') and not(contains($numStyle,'h') or contains($numStyle,'s'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
             <xsl:attribute name="office:date-value">
               <xsl:call-template name="NumberToDate">
                 <xsl:with-param name="value">
                   <xsl:choose>
-                    <xsl:when test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
+                    <xsl:when
+                      test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
                       <xsl:value-of select="(e:v) + (1462)"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -285,7 +286,7 @@
 
           <!--'and' at the end is for Latvian currency -->
           <xsl:when
-            test="(contains($numStyle,'h') or contains($numStyle,'s') or $numId = 18 or $numId = 20 and not(contains($numStyle,'[$Ls-426]')))">
+            test="not(contains($numStyle,'[$Ls-426]')) and (contains($numStyle,'h') or contains($numStyle,'s') or $numId = 18 or $numId = 20)">
             <xsl:attribute name="office:time-value">
               <xsl:call-template name="NumberToTime">
                 <xsl:with-param name="value">
