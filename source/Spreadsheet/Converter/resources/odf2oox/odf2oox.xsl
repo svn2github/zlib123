@@ -208,7 +208,7 @@
 
         <xsl:variable name="oleObject">
           <xsl:choose>
-            <xsl:when test="descendant::draw:frame/draw:object">
+            <xsl:when test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
