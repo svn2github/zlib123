@@ -891,10 +891,15 @@
         <xsl:when test="$seriesFrom='rows'">
           <xsl:call-template name="MaxPointNumber">
             <xsl:with-param name="rowNumber">
-              <xsl:value-of select="number(1)"/>
+              <xsl:value-of select="1"/>
+            </xsl:with-param>
+            <xsl:with-param name="CountCellsInRow">
+              <xsl:value-of
+                select="count(key('rows','')/table:table-row[1]/table:table-cell[@office:value-type != 'string'])"
+              />
             </xsl:with-param>
             <xsl:with-param name="maxValue">
-              <xsl:value-of select="number(0)"/>
+              <xsl:value-of select="1"/>
             </xsl:with-param>
             <xsl:with-param name="rowsQuantity">
               <xsl:value-of select="count(key('rows','')/table:table-row)"/>
@@ -2400,10 +2405,15 @@
         <xsl:when test="$seriesFrom='rows'">
           <xsl:call-template name="MaxPointNumber">
             <xsl:with-param name="rowNumber">
-              <xsl:value-of select="number(1)"/>
+              <xsl:value-of select="1"/>
+            </xsl:with-param>
+            <xsl:with-param name="CountCellsInRow">
+              <xsl:value-of
+                select="count(key('rows','')/table:table-row[1]/table:table-cell[@office:value-type != 'string'])"
+              />
             </xsl:with-param>
             <xsl:with-param name="maxValue">
-              <xsl:value-of select="number(0)"/>
+              <xsl:value-of select="1"/>
             </xsl:with-param>
             <xsl:with-param name="rowsQuantity">
               <xsl:value-of select="count(key('rows','')/table:table-row)"/>
@@ -2791,60 +2801,38 @@
     <!-- max value until now -->
     <xsl:param name="maxValue"/>
     <!-- cells amount in the current row -->
-    <xsl:param name="CountCellsInRow">
-      <xsl:choose>
-        <xsl:when test="(count(//table:table-row[$rowNumber]/table:table-cell[@office:value-type != 'string'])) !='' ">
-          <xsl:value-of
-            select="count(//table:table-row[$rowNumber]/table:table-cell[@office:value-type != 'string'])"
-          />    
-        </xsl:when>
-        <xsl:when test="(count(//table:table-row[$rowNumber]/table:table-cell[@office:value-type != 'string'])) ='' ">
-          <xsl:text>0</xsl:text>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:param>
+    <xsl:param name="CountCellsInRow"/>
 
     <xsl:choose>
       <xsl:when test="$maxValue &lt; $CountCellsInRow and $rowNumber = $rowsQuantity">
         <xsl:value-of select="$CountCellsInRow"/>
       </xsl:when>
-      <xsl:when
-        test="($maxValue = $CountCellsInRow or $maxValue &gt; $CountCellsInRow) and $rowNumber = $rowsQuantity">
+      <xsl:when test="$maxValue &gt;= $CountCellsInRow and $rowNumber = $rowsQuantity">
         <xsl:value-of select="$maxValue"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="MaxPointNumber">
-          
           <xsl:with-param name="rowsQuantity">
             <xsl:value-of select="$rowsQuantity"/>
           </xsl:with-param>
-          
           <xsl:with-param name="maxValue">
             <xsl:choose>
               <xsl:when test="$maxValue &lt; $CountCellsInRow">
                 <xsl:value-of select="$CountCellsInRow"/>
               </xsl:when>
-              <xsl:when test="$maxValue &gt;= $CountCellsInRow">
+              <xsl:otherwise>
                 <xsl:value-of select="$maxValue"/>
-              </xsl:when>
+              </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
-          
           <xsl:with-param name="CountCellsInRow">
-            <xsl:choose>
-              <xsl:when test="(count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])) !='' ">
-                <xsl:value-of select="count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])"/>
-              </xsl:when>
-              <xsl:when test="(count(//table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])) ='' ">
-                <xsl:text>0</xsl:text>
-              </xsl:when>
-            </xsl:choose>
+            <xsl:value-of
+              select="count(key('rows','')/table:table-row[$rowNumber+1]/table:table-cell[@office:value-type != 'string'])"
+            />
           </xsl:with-param>
-          
           <xsl:with-param name="rowNumber">
             <xsl:value-of select="$rowNumber+1"/>
           </xsl:with-param>
-          
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
