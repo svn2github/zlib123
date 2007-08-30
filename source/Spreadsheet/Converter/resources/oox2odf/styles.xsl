@@ -646,6 +646,9 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- ignore text -->
+  <xsl:template match="text()" mode="style"/>
+  
   <!-- convert font name-->
   <xsl:template match="e:rFont" mode="style">
     <xsl:attribute name="style:font-name">
