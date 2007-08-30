@@ -405,7 +405,7 @@
 
       <xsl:variable name="textBox">
         <xsl:choose>
-          <xsl:when test="descendant::draw:frame/draw:text-box">
+          <xsl:when test="descendant::draw:frame/draw:text-box[not(name(parent::node()/parent::node()) = 'draw:g' )]">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
