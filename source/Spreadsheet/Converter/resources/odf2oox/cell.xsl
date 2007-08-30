@@ -892,8 +892,9 @@
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
 
+    <!-- first 'or' is for empty cells with formatting, e.g. background -->
     <xsl:if
-      test="table:table-cell/text:p or table:table-cell/@table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
+      test="(@table:number-rows-repeated and @table:style-name) or table:table-cell/text:p or table:table-cell/@table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
 
       <xsl:choose>
         <xsl:when test="$numberRowsRepeated &gt; 1">
@@ -1296,8 +1297,52 @@
                   So if inside cell range defined by table:table-cell with repeated columns attribute there is column that has changed default-cell-style-name then before ';'col_number 
                   in $TableColumnTagNum there should be 'K' ($TableColumnTagNum contains listed default-cell-style-name from backward) -->
       <xsl:when
-        test="@table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:style-name) and 
-        not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> </xsl:when>
+        test="not(parent::node()/@table:number-rows-repeated) and not(parent::node()/@table:style-name) and @table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:style-name) and 
+        not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> 
+      </xsl:when>
+
+      <!-- empty cells but with formatting, e.g. background-->
+      <xsl:when test="parent::node()/@table:style-name and number(@table:number-columns-repeated) &gt; $ColumnRepeated and not(child::text:p) and not(child::text:span)">
+        <xsl:call-template name="InsertConvertCell">
+          <xsl:with-param name="colNumber">
+            <xsl:value-of select="$colNumber + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNumber" select="$rowNumber"/>
+          <xsl:with-param name="cellNumber">
+            <xsl:value-of select="$cellNumber"/>
+          </xsl:with-param>
+          <xsl:with-param name="ColumnRepeated">
+            <xsl:value-of select="$ColumnRepeated + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="TableColumnTagNum">
+            <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="CountStyleTableCell">
+            <xsl:value-of select="$CountStyleTableCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
 
       <xsl:when
         test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p)">
@@ -1445,7 +1490,7 @@
 
 
     <xsl:if
-      test="child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
+      test="parent::node()/@table:number-rows-repeated or child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
 
       <c>
         <xsl:attribute name="r">        
