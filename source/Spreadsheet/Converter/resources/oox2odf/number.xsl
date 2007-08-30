@@ -465,6 +465,7 @@
 
     <xsl:param name="formatCode"/>
     <!-- (string) The format code which is converted  -->
+
     <!-- '*' is not converted -->
     <xsl:variable name="realFormatCode">
       <xsl:choose>
@@ -476,6 +477,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+
     <!-- adding '\' -->
     <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
       <xsl:call-template name="AddNumberText">
@@ -485,9 +487,33 @@
       </xsl:call-template>
     </xsl:if>
 
-    <!-- handle red negative numbers -->
+    <!-- handle red numbers -->
     <xsl:if test="contains($formatCode,'Red')">
       <style:text-properties fo:color="#ff0000"/>
+    </xsl:if>
+    <!-- handle green numbers -->
+    <xsl:if test="contains($formatCode,'Green')">
+      <style:text-properties fo:color="#00ff00"/>
+    </xsl:if>
+    <!-- handle blue numbers -->
+    <xsl:if test="contains($formatCode,'Blue')">
+      <style:text-properties fo:color="#0000ff"/>
+    </xsl:if>
+    <!-- handle cyan numbers -->
+    <xsl:if test="contains($formatCode,'Cyan')">
+      <style:text-properties fo:color="#00ffff"/>
+    </xsl:if>
+    <!-- handle magenta numbers -->
+    <xsl:if test="contains($formatCode,'Magenta')">
+      <style:text-properties fo:color="#ff00ff"/>
+    </xsl:if>
+    <!-- handle yellow numbers -->
+    <xsl:if test="contains($formatCode,'Yellow')">
+      <style:text-properties fo:color="#ffff00"/>
+    </xsl:if>
+    <!-- handle white numbers -->
+    <xsl:if test="contains($formatCode,'White')">
+      <style:text-properties fo:color="#ffffff"/>
     </xsl:if>
 
     <xsl:variable name="currencyFormat">
@@ -504,7 +530,6 @@
         <xsl:when test="contains($realFormatCode,'$')">$</xsl:when>
         <xsl:when test="contains($realFormatCode,'€')">€</xsl:when>
         <xsl:when test="contains($realFormatCode,'£')">£</xsl:when>
-        <xsl:when test="contains($formatCode, '[$Ls-426]')">$Ls-426</xsl:when>
       </xsl:choose>
     </xsl:variable>
 
@@ -1195,7 +1220,7 @@
         <number:currency-symbol number:language="lt" number:country="LT">Lt</number:currency-symbol>
       </xsl:when>
       <xsl:when test="$value = '$Ls-426' ">
-        <number:currency-symbol number:language="lv" number:country="LVL">Ls</number:currency-symbol>
+        <number:currency-symbol number:language="lv" number:country="LV">Ls</number:currency-symbol>
       </xsl:when>
       <xsl:when test="$value = '$lei-418' ">
         <number:currency-symbol number:language="ro" number:country="RO"
