@@ -687,7 +687,27 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-
+        <xsl:when test="style:text-properties/@fo:color='#ff00ff'">
+          <xsl:choose>
+            <xsl:when test="style:text-properties/following-sibling::number:text ='-'">
+              <xsl:value-of select="concat('[Magenta]-',$endValue)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat('[Magenta]',$endValue)"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="style:text-properties/@fo:color='#ffffff'">
+          <xsl:choose>
+            <xsl:when test="style:text-properties/following-sibling::number:text ='-'">
+              <xsl:value-of select="concat('[White]-',$endValue)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat('[White]',$endValue)"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        
         <xsl:otherwise>
           <xsl:value-of select="$endValue"/>
         </xsl:otherwise>
