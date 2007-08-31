@@ -1696,6 +1696,14 @@
 
           </c:spPr>
         </xsl:when>
+        <!-- without line between points in series in stockChart4 -->
+        <xsl:when test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
+        <c:spPr>
+          <a:ln w="28575">
+            <a:noFill/>
+          </a:ln>
+        </c:spPr>
+        </xsl:when>
         <xsl:when test="$chartType = 'chart:ring'"/>
         <xsl:otherwise>
           <xsl:for-each select="key('series','')[position() = $number]">
@@ -1954,8 +1962,8 @@
                 </c:marker>
               </xsl:for-each>
             </xsl:when>
-            <!-- default marker type for 'close' series in stockChart1 -->
-            <xsl:when test="$chartType = 'chart:stock' and $numSeries = 3 and $number = 3">
+            <!-- default marker type for 'close' series in stockChart 1&3 -->
+            <xsl:when test="$chartType = 'chart:stock' and ($numSeries = 3 and $number = 3 or $numSeries = 3 and $number = 4)">
               <c:marker>
                 <c:symbol val="dot"/>
                 <c:size val="6"/>
@@ -1971,10 +1979,16 @@
                 </c:spPr>
               </c:marker>
             </xsl:when>
+            <!-- default "none" marker type for series in stockChart 4 -->
+            <xsl:when test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
+              <c:marker>
+                <c:symbol val="none"/>
+              </c:marker>
+            </xsl:when>
           </xsl:choose>
         </xsl:for-each>
       </xsl:if>
-
+      
       <xsl:choose>
         <!-- insert X and Y values-->
         <xsl:when test="$chartType = 'chart:scatter' ">
@@ -2428,7 +2442,14 @@
     </xsl:variable>
 
     <xsl:variable name="chartType">
-      <xsl:value-of select="key('series','')[@chart:class][1]"/>
+      <xsl:choose>
+        <xsl:when test="key('chart','')/@chart:class = 'chart:stock' ">
+          <xsl:text>chart:stock</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="key('series','')[@chart:class][1]"/>    
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="numPoints">
@@ -2501,6 +2522,7 @@
         <xsl:with-param name="primarySeries" select="$primarySeries"/>
         <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
         <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+        <xsl:with-param name="chartType" select="$chartType"/>
       </xsl:call-template>
     </xsl:for-each>
 
