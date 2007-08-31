@@ -58,7 +58,7 @@
 
       <!-- select filter combinations wchich will be converted -->
       <xsl:choose>
-        
+
         <!-- single condition filter (first 'or' when filter has no conditions)-->
         <xsl:when
           test="(@table:display-filter-buttons = 'true' and not (child::node())) or count(table:filter/child::node()) = 1 and table:filter/table:filter-condition">
@@ -129,7 +129,7 @@
 
     </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template name="SingleConditionFilter">
 
     <autoFilter>
@@ -152,7 +152,16 @@
             <xsl:when
               test="@table:operator = 'top values' or @table:operator = 'bottom values'  or @table:operator = 'top percent' or @table:operator = 'bottom percent' ">
               <top10>
-                <xsl:call-template name="InsertFilterConditions"/>
+                <xsl:choose>
+                  <xsl:when test="@table:value &lt;= 500">
+                    <xsl:call-template name="InsertFilterConditions"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="val">
+                      <xsl:text>500</xsl:text>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
               </top10>
             </xsl:when>
             <xsl:when test="@table:operator = '=' ">
@@ -477,7 +486,7 @@
       <!-- sort range -->
       <xsl:attribute name="ref">
         <xsl:value-of select="concat($col1,$startRow,':', $col2, $row2)"/>
-      <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
+        <!--xsl:value-of select="concat(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),0,2),number(substring(substring-after(substring-after(@table:target-range-address,':'),'.'),2))-1)"/-->
       </xsl:attribute>
 
       <xsl:for-each
