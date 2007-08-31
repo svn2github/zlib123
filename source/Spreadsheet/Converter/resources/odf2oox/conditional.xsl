@@ -149,8 +149,15 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
+    <xsl:variable name="quot">
+      <xsl:text>&quot;</xsl:text>
+    </xsl:variable>
 
-    <xsl:if test="key('style',$styleName)/style:map/@style:condition != '' ">
+    <!-- if cell style has condition -->
+    <!-- there was a case where condition was "cell-content()=#NAME?G$45" and it caused a crash (but there can be #NAME condition as text occurence) -->
+    <xsl:if test="key('style',$styleName)/style:map[@style:condition != '' and not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
+      
       <conditionalFormatting>
         <xsl:variable name="ColChar">
           <xsl:call-template name="NumbersToChars">
@@ -174,7 +181,7 @@
           </xsl:choose>
         </xsl:attribute>
 
-        <xsl:for-each select="key('style', $styleName)/style:map">
+        <xsl:for-each select="key('style', $styleName)/style:map[not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
           <cfRule type="cellIs" priority="{position()}">
             <xsl:if test="contains(@style:condition,'is-true-formula')">
               <xsl:attribute name="type">
