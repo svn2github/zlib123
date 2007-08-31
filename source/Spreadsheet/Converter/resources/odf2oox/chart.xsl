@@ -1057,15 +1057,33 @@
       </xsl:if>
     </c:scaling>
 
-    <xsl:choose>
-      <xsl:when test="$priority = 'primary'">
-        <c:axPos val="b"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <c:axPos val="t"/>
-      </xsl:otherwise>
-    </xsl:choose>
-
+    <!-- axis position -->
+    <xsl:for-each select="key('chart','')[1]">
+      <xsl:choose>
+        <xsl:when
+          test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'false' ">
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary'">
+              <c:axPos val="b"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <c:axPos val="t"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!-- for bar charts -->
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$priority = 'primary'">
+              <c:axPos val="l"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <c:axPos val="r"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
 
     <!-- grid lines -->
     <xsl:choose>
