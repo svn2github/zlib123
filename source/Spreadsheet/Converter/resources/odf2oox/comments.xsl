@@ -75,9 +75,6 @@
 
 
   <xsl:template name="InsertTextBox">
-    <xsl:if
-      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/office:annotation">
-
 
       <xsl:variable name="VisibleOrHidden">
 
@@ -153,7 +150,6 @@
 
         </x:ClientData>
       </v:shape>
-    </xsl:if>
   </xsl:template>
 
   <xsl:template match="dc:date"/>
