@@ -33,16 +33,18 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r pxsi">
 
   <xsl:template name="InsertText">
     <xsl:param name="position"/>
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="sheetNr"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:choose>
       <xsl:when test="@t='s' ">
@@ -140,18 +142,46 @@
                 </xsl:attribute>
 
                 <!-- a postprocessor puts here strings from sharedstrings -->
-                <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
-                  <xsl:value-of select="e:v"/>
-                </pxsi:v>
-
+                <xsl:variable name="eV">
+                  <xsl:value-of select="e:v + 1"/>
+                </xsl:variable>
+                <!-- a postprocessor puts here strings from sharedstrings -->
+                <xsl:choose>
+                  <xsl:when test="contains($rSheredStrings, e:v) ">
+                    <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
+                      <xsl:apply-templates/>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <pxsi:v>
+                      <xsl:value-of select="e:v"/>
+                    </pxsi:v>    
+                  </xsl:otherwise>
+                </xsl:choose>
+                
               </text:a>
             </xsl:when>
 
             <xsl:otherwise>
+              <xsl:variable name="eV">
+                <xsl:value-of select="e:v + 1"/>
+              </xsl:variable>
               <!-- a postprocessor puts here strings from sharedstrings -->
-              <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
-                <xsl:value-of select="e:v"/>
-              </pxsi:v>
+              <xsl:choose>
+                <xsl:when test="contains($rSheredStrings, e:v) ">
+                  <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
+                    <xsl:apply-templates/>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <pxsi:v>
+                    <xsl:value-of select="e:v"/>
+                  </pxsi:v>    
+                </xsl:otherwise>
+              </xsl:choose>
+              
+              
+              
             </xsl:otherwise>
           </xsl:choose>
         </text:p>

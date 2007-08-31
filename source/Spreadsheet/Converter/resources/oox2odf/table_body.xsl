@@ -199,6 +199,7 @@
     <xsl:param name="ConnectionsCell"/>
     <xsl:param name="outlineLevel"/>
     <xsl:param name="AllRowBreakes"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="GetMinRowWithElements">
       <xsl:call-template name="GetMinRowWithPicture">
@@ -321,6 +322,9 @@
               </xsl:with-param>
               <xsl:with-param name="AllRowBreakes">
                 <xsl:value-of select="$AllRowBreakes"/>
+              </xsl:with-param>
+              <xsl:with-param name="rSheredStrings">
+                <xsl:value-of select="$rSheredStrings"/>
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:if>
@@ -785,6 +789,7 @@
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:message terminate="no">progress:c</xsl:message>
 
@@ -998,6 +1003,9 @@
               <xsl:with-param name="colNum" select="$colNum"/>
               <xsl:with-param name="rowNum" select="$rowNum"/>
               <xsl:with-param name="sheetNr" select="$sheetNr"/>
+              <xsl:with-param name="rSheredStrings">
+                <xsl:value-of select="$rSheredStrings"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
 
@@ -1203,6 +1211,7 @@
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ValidationColl"/>
+    <xsl:param name="rSheredStrings"/>
 
 
     <xsl:variable name="CheckIfBigMergeBefore">
@@ -1339,6 +1348,9 @@
               <xsl:with-param name="ValidationCellStyle">
                 <xsl:value-of select="$ValidationCellStyle"/>
               </xsl:with-param>
+              <xsl:with-param name="rSheredStrings">
+                <xsl:value-of select="$rSheredStrings"/>
+              </xsl:with-param>
             </xsl:apply-templates>
           </xsl:when>
           <!-- if this cell is inside row of merged cells ($CheckIfMerged is true:number_of_cols_spaned) -->
@@ -1392,6 +1404,9 @@
                 </xsl:with-param>
                 <xsl:with-param name="ValidationCellStyle">
                   <xsl:value-of select="$ValidationCellStyle"/>
+                </xsl:with-param>
+                <xsl:with-param name="rSheredStrings">
+                  <xsl:value-of select="$rSheredStrings"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
@@ -1448,6 +1463,9 @@
                 </xsl:with-param>
                 <xsl:with-param name="ValidationCellStyle">
                   <xsl:value-of select="$ValidationCellStyle"/>
+                </xsl:with-param>
+                <xsl:with-param name="rSheredStrings">
+                  <xsl:value-of select="$rSheredStrings"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
@@ -1516,6 +1534,9 @@
             </xsl:with-param>
             <xsl:with-param name="ValidationCellStyle">
               <xsl:value-of select="$ValidationCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="rSheredStrings">
+              <xsl:value-of select="$rSheredStrings"/>
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
@@ -1628,6 +1649,9 @@
             </xsl:with-param>
             <xsl:with-param name="ValidationCellStyle">
               <xsl:value-of select="$ValidationCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="rSheredStrings">
+              <xsl:value-of select="$rSheredStrings"/>
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>

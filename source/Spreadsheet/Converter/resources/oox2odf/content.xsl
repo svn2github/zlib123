@@ -31,6 +31,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -47,7 +48,7 @@
   xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events"
   xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" office:version="1.0"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r pxsi">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="database-ranges.xsl"/>
@@ -141,26 +142,41 @@
         <!--Insert Change Tracking -->
         <xsl:call-template name="InsertChangeTracking"/>
         
+        <xsl:variable name="rSheredStrings">
+          <xsl:call-template name="rSheredStrings"/>
+        </xsl:variable>
+        
         <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
           mode="Validation">
           <xsl:with-param name="number">1</xsl:with-param>
+          <xsl:with-param name="rSheredStrings">
+            <xsl:value-of select="$rSheredStrings"/>
+          </xsl:with-param>
         </xsl:apply-templates>
 
         <!-- insert strings from sharedStrings to be moved later by post-processor-->
         <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst">
           <pxsi:sst xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
-            <xsl:apply-templates select="e:si"/>
+            <xsl:for-each select="e:si">
+              <xsl:call-template name="e:si"/>
+           </xsl:for-each>
           </pxsi:sst>
         </xsl:for-each>
 
         <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
           <xsl:with-param name="number">1</xsl:with-param>
+          <xsl:with-param name="rSheredStrings">
+            <xsl:value-of select="$rSheredStrings"/>
+          </xsl:with-param>
         </xsl:apply-templates>
 
         <table:database-ranges>
           <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
             <xsl:with-param name="number">1</xsl:with-param>
             <xsl:with-param name="mode" select="'database'"/>
+            <xsl:with-param name="rSheredStrings">
+              <xsl:value-of select="$rSheredStrings"/>
+            </xsl:with-param>
           </xsl:apply-templates>
         </table:database-ranges>
 
@@ -171,6 +187,7 @@
   <xsl:template match="e:sheet">
     <xsl:param name="number"/>
     <xsl:param name="mode"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="target">
       <xsl:call-template name="GetTarget">
@@ -197,6 +214,9 @@
           <xsl:otherwise>
             <xsl:call-template name="InsertWorksheet">
               <xsl:with-param name="number" select="$number"/>
+              <xsl:with-param name="rSheredStrings">
+                <xsl:value-of select="$rSheredStrings"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -242,6 +262,9 @@
             <xsl:value-of select="$number + 1"/>
           </xsl:with-param>
           <xsl:with-param name="mode" select="$mode"/>
+          <xsl:with-param name="rSheredStrings">
+            <xsl:value-of select="$rSheredStrings"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
@@ -250,6 +273,7 @@
 
   <xsl:template name="InsertWorksheet">
     <xsl:param name="number"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="Id">
       <xsl:call-template name="GetTarget">
@@ -616,6 +640,9 @@
         <xsl:with-param name="AllRowBreakes">
           <xsl:value-of select="$AllRowBreakes"/>
         </xsl:with-param>
+        <xsl:with-param name="rSheredStrings">
+          <xsl:value-of select="$rSheredStrings"/>
+        </xsl:with-param>
       </xsl:call-template>
 
     </table:table>
@@ -875,11 +902,13 @@
 
 
   <!-- insert string -->
-  <xsl:template match="e:si">
-    <pxsi:si pxsi:number="{count(preceding-sibling::e:si)}"
-      xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
-      <xsl:apply-templates/>
+  <xsl:template name="e:si">
+    <xsl:if test="not(e:r)">
+    <pxsi:si pxsi:number="{position() - 1}">     
+        <xsl:apply-templates/>
     </pxsi:si>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="InsertSheetContent">
@@ -904,6 +933,7 @@
     <xsl:param name="GroupRowStart"/>
     <xsl:param name="GroupRowEnd"/>
     <xsl:param name="AllRowBreakes"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:oleObjects">
       <xsl:call-template name="InsertOLEObjects"/>
@@ -1040,6 +1070,9 @@
             <xsl:with-param name="headerRowsEnd" select="$headerRowsEnd"/>
             <xsl:with-param name="sheetNr" select="$sheetNr"/>
             <xsl:with-param name="removeFilter" select="$removeFilter"/>
+            <xsl:with-param name="rSheredStrings">
+              <xsl:value-of select="$rSheredStrings"/>
+            </xsl:with-param>
           </xsl:apply-templates>
 
           <!-- insert empty rows before header -->
@@ -1082,6 +1115,9 @@
               <xsl:with-param name="headerRowsEnd" select="$headerRowsEnd"/>
               <xsl:with-param name="sheetNr" select="$sheetNr"/>
               <xsl:with-param name="removeFilter" select="$removeFilter"/>
+              <xsl:with-param name="rSheredStrings">
+                <xsl:value-of select="$rSheredStrings"/>
+              </xsl:with-param>
             </xsl:apply-templates>
 
             <!-- if header is empty -->
@@ -1174,6 +1210,9 @@
             <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
             <xsl:with-param name="headerRowsEnd" select="$headerRowsEnd"/>
             <xsl:with-param name="removeFilter" select="$removeFilter"/>
+            <xsl:with-param name="rSheredStrings">
+              <xsl:value-of select="$rSheredStrings"/>
+            </xsl:with-param>
           </xsl:apply-templates>
         </xsl:when>
 
@@ -1238,6 +1277,9 @@
                 </xsl:with-param>
                 <xsl:with-param name="AllRowBreakes">
                   <xsl:value-of select="$AllRowBreakes"/>
+                </xsl:with-param>
+                <xsl:with-param name="rSheredStrings">
+                  <xsl:value-of select="$rSheredStrings"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:when>
@@ -1332,6 +1374,7 @@
     <xsl:param name="GroupRowStart"/>
     <xsl:param name="GroupRowEnd"/>
     <xsl:param name="AllRowBreakes"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -1615,6 +1658,9 @@
       <xsl:with-param name="AllRowBreakes">
         <xsl:value-of select="$AllRowBreakes"/>
       </xsl:with-param>
+      <xsl:with-param name="rSheredStrings">
+        <xsl:value-of select="$rSheredStrings"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <xsl:if test="contains(concat(':', $GroupRowEnd), concat(':', @r, ':'))">
@@ -1698,6 +1744,7 @@
     <xsl:param name="PictureRow"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="removeFilter"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -1837,6 +1884,9 @@
       <xsl:with-param name="CheckIfBigMerge">
         <xsl:value-of select="$CheckIfBigMerge"/>
       </xsl:with-param>
+      <xsl:with-param name="rSheredStrings">
+        <xsl:value-of select="$rSheredStrings"/>
+      </xsl:with-param>
 
       <xsl:with-param name="this" select="$this"/>
       <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
@@ -1863,6 +1913,7 @@
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
+    <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -2088,6 +2139,9 @@
       <xsl:with-param name="ConnectionsCell">
         <xsl:value-of select="$ConnectionsCell"/>
       </xsl:with-param>
+      <xsl:with-param name="rSheredStrings">
+        <xsl:value-of select="$rSheredStrings"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <!-- Insert next coll -->
@@ -2160,6 +2214,9 @@
       <xsl:with-param name="ValidationColl">
         <xsl:value-of select="$ValidationColl"/>
       </xsl:with-param>
+      <xsl:with-param name="rSheredStrings">
+        <xsl:value-of select="$rSheredStrings"/>
+      </xsl:with-param>
     </xsl:call-template>
 
   </xsl:template>
@@ -2225,5 +2282,66 @@
     </xsl:choose>
   </xsl:template>
   
+  <xsl:template name="rSheredStrings">
+    <xsl:param name="result"/>
+    
+    <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst">
+     
+          <xsl:apply-templates select="e:si[1]" mode="r">
+            <xsl:with-param name="result">
+              <xsl:choose>
+                <xsl:when test="e:r">
+                  <xsl:value-of select="concat($result, '0', ';')"/>    
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$result"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="position">
+              <xsl:text>0</xsl:text>
+            </xsl:with-param>
+          </xsl:apply-templates>
+
+    </xsl:for-each>
+    
+  </xsl:template>
+  
+  
+  <xsl:template match="e:si" mode="r">
+    <xsl:param name="result"/>
+    <xsl:param name="position"/>
+    
+    <xsl:choose>
+      <xsl:when test="following-sibling::e:si/e:r">
+        <xsl:apply-templates select="following-sibling::e:si[1]" mode="r">
+          <xsl:with-param name="result">
+            <xsl:choose>
+              <xsl:when test="e:r">
+                <xsl:value-of select="concat($result, $position, ';')"/>    
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$result"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="position">
+            <xsl:value-of select="$position + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="e:r">
+            <xsl:value-of select="concat($result, $position, ';')"/>    
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$result"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+  </xsl:template>
   
 </xsl:stylesheet>
