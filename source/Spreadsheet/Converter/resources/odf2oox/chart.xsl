@@ -834,6 +834,20 @@
         </c:scatterChart>
       </xsl:when>
 
+      <!-- Stock Chart 3&4 (volume series) -->
+      <xsl:when
+        test="@chart:class='chart:stock'  and key('series','')[1][@chart:class = 'chart:bar'] and $priority = 'primary' ">
+        <c:barChart>
+          <c:barDir val="col"/>
+          <c:grouping val="clustered"/>
+
+          <xsl:call-template name="InsertChartContent">
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          </xsl:call-template>
+
+        </c:barChart>
+      </xsl:when>
+
       <xsl:when test="@chart:class='chart:stock' ">
         <c:stockChart>
 
@@ -969,7 +983,8 @@
       </c:dLbls>
     </xsl:if>
 
-    <xsl:if test="$chartType = 'chart:stock' ">
+    <!-- only for stock chart 1&2 -->
+    <xsl:if test="$chartType = 'chart:stock' and not(key('series','')/@chart:class)">
       <c:hiLowLines>
         <xsl:for-each select="chart:plot-area/chart:stock-range-line">
           <xsl:call-template name="InsertSpPr">
@@ -2489,6 +2504,40 @@
       </xsl:call-template>
     </xsl:for-each>
 
+    <!-- for stock chart 3&4 -->
+    <xsl:if test="@chart:class = 'chart:stock' and key('series','')/@chart:class = 'chart:bar' ">
+      <c:hiLowLines>
+        <xsl:for-each select="chart:plot-area/chart:stock-range-line">
+          <xsl:call-template name="InsertSpPr">
+            <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </c:hiLowLines>
+
+      <!-- stock gain/loss bars -->
+      <xsl:if test="$numSeries = 4">
+        <c:upDownBars>
+          <c:gapWidth val="150"/>
+
+          <c:upBars>
+            <xsl:for-each select="chart:plot-area/chart:stock-gain-marker">
+              <xsl:call-template name="InsertSpPr">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </c:upBars>
+
+          <c:downBars>
+            <xsl:for-each select="chart:plot-area/chart:stock-loss-marker">
+              <xsl:call-template name="InsertSpPr">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </c:downBars>
+
+        </c:upDownBars>
+      </xsl:if>
+    </xsl:if>
     <xsl:choose>
       <!-- primary axes -->
       <xsl:when test="not(chart:plot-area/chart:axis/@chart:name = 'secondary-y')">
@@ -2532,54 +2581,31 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:choose>
-      <xsl:when test="$count &lt; $numSeries">
-        <xsl:choose>
-          <!-- if there is secondary axis ommit its series for now -->
-          <xsl:when test="key('series','')[position() = $number and @chart:attached-axis]">
-            <xsl:if
-              test="key('series','')[position() = $number and @chart:attached-axis = 'primary-y']">
-              <xsl:call-template name="Series">
-                <xsl:with-param name="numSeries" select="$numSeries"/>
-                <xsl:with-param name="primarySeries" select="$primarySeries"/>
-                <xsl:with-param name="numPoints" select="$numPoints"/>
-                <xsl:with-param name="count" select="$count"/>
-                <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
-                <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-                <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
-                <xsl:with-param name="chartType" select="$chartType"/>
-              </xsl:call-template>
-            </xsl:if>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="Series">
-              <xsl:with-param name="numSeries" select="$numSeries"/>
-              <xsl:with-param name="primarySeries" select="$primarySeries"/>
-              <xsl:with-param name="numPoints" select="$numPoints"/>
-              <xsl:with-param name="count" select="$count"/>
-              <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
-              <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
-              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
-              <xsl:with-param name="chartType" select="$chartType"/>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
+    <xsl:if test="$count &lt; $numSeries">
+      <xsl:call-template name="Series">
+        <xsl:with-param name="numSeries" select="$numSeries"/>
+        <xsl:with-param name="primarySeries" select="$primarySeries"/>
+        <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="count" select="$count"/>
+        <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+        <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+        <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+        <xsl:with-param name="chartType" select="$chartType"/>
+      </xsl:call-template>
 
-        <xsl:call-template name="InsertSecondaryChartSeries">
-          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          <xsl:with-param name="numSeries" select="$numSeries"/>
-          <xsl:with-param name="numPoints" select="$numPoints"/>
-          <xsl:with-param name="primarySeries" select="$primarySeries"/>
-          <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
-          <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
-          <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
-          <xsl:with-param name="count" select="$count + 1"/>
-          <xsl:with-param name="chartType" select="$chartType"/>
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
+      <xsl:call-template name="InsertSecondaryChartSeries">
+        <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+        <xsl:with-param name="numSeries" select="$numSeries"/>
+        <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="primarySeries" select="$primarySeries"/>
+        <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+        <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+        <xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+        <xsl:with-param name="count" select="$count + 1"/>
+        <xsl:with-param name="chartType" select="$chartType"/>
+      </xsl:call-template>
+    </xsl:if>
 
   </xsl:template>
 
