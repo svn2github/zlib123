@@ -50,7 +50,7 @@
 
       <!-- separate format or last part of partly format -->
       <xsl:when
-        test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
+        test="(not(substring(@style:name,string-length(@style:name)-1) = 'P0') or (substring(@style:name,string-length(@style:name)-1) = 'P1') or (substring(@style:name,string-length(@style:name)-1) = 'P2'))">
         <numFmt numFmtId="{$numId}">
           <xsl:attribute name="formatCode">
             <xsl:variable name="thisFormat">
@@ -135,7 +135,7 @@
 
       <!-- separate format or last part of partly format -->
       <xsl:when
-        test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
+        test="(not(substring(@style:name,string-length(@style:name)-1) = 'P0') or (substring(@style:name,string-length(@style:name)-1) = 'P1') or (substring(@style:name,string-length(@style:name)-1) = 'P2'))">
         <numFmt numFmtId="{$numId}">
           <xsl:attribute name="formatCode">
             <xsl:variable name="thisFormat">
@@ -233,7 +233,7 @@
 
       <!-- separate format or last part of partly format -->
       <xsl:when
-        test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
+        test="(not(substring(@style:name,string-length(@style:name)-1) = 'P0') or (substring(@style:name,string-length(@style:name)-1) = 'P1') or (substring(@style:name,string-length(@style:name)-1) = 'P2'))">
         <numFmt numFmtId="{$numId}">
           <xsl:attribute name="formatCode">
             <xsl:variable name="thisFormat">
@@ -707,7 +707,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        
+
         <xsl:otherwise>
           <xsl:value-of select="$endValue"/>
         </xsl:otherwise>
