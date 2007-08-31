@@ -704,6 +704,7 @@
       </xsl:when>
       <xsl:when test="@chart:class='chart:line' ">
         <c:lineChart>
+          
 
           <c:grouping val="standard">
             <xsl:call-template name="SetDataGroupingAtribute"/>
@@ -2102,6 +2103,9 @@
             select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
             <xsl:if test="@chart:interpolation != 'none' ">
               <c:smooth val="1"/>
+              <xsl:if test="@chart:interpolation = 'b-spline' ">
+                <xsl:message terminate="no">translation.odf2oox.LineChartSmoothingBSpline</xsl:message>
+              </xsl:if>
             </xsl:if>
           </xsl:for-each>
         </xsl:if>

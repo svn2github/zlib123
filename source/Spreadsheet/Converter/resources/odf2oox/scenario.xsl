@@ -136,7 +136,9 @@
             </xsl:variable>
 
             <xsl:if test="@table:scenario-ranges"/>
-
+            <xsl:if test="@table:border-color">
+                <xsl:message terminate="no">translation.odf2oox.ScenarioTableBorderColor</xsl:message>                
+            </xsl:if>
             <xsl:apply-templates select="table:table-row[1]" mode="scenario">
                 <xsl:with-param name="rowNumber">
                     <xsl:text>1</xsl:text>
