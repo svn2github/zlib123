@@ -742,7 +742,7 @@
         </xsl:when>
       </xsl:choose>
 
-      <xsl:if test="c:majorGridlines/c:spPr and $type = 'valAx' ">
+      <xsl:if test="c:majorGridlines">
         <chart:grid chart:style-name="majorGridX" chart:class="major"/>
       </xsl:if>
 
