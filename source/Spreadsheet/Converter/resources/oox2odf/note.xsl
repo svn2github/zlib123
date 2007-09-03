@@ -161,6 +161,30 @@
     </xsl:variable>
 
     <office:annotation>
+     
+      <xsl:variable name="widthInPt">
+        <xsl:value-of select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('width', ':')), ';')"/>
+      </xsl:variable>
+      
+      <xsl:variable name="heightInPt">
+        <xsl:value-of select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('height', ':')), ';')"/>
+      </xsl:variable>
+            
+      <xsl:attribute name="svg:width">
+        <xsl:call-template name="pt2cm">
+          <xsl:with-param name="pt">
+            <xsl:value-of select="$widthInPt"/>
+          </xsl:with-param>
+        </xsl:call-template>  
+      </xsl:attribute>
+      
+      <xsl:attribute name="svg:height">
+        <xsl:call-template name="pt2cm">
+          <xsl:with-param name="pt">
+            <xsl:value-of select="$heightInPt"/>
+          </xsl:with-param>
+        </xsl:call-template>  
+      </xsl:attribute>
 
       <xsl:for-each
         select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
@@ -268,6 +292,24 @@
       </style:style>
     </xsl:for-each>
 
+  </xsl:template>
+  
+ <!-- converts pt to centimeters -->
+  <xsl:template name="pt2cm">
+    <xsl:param name="pt"/>
+    <xsl:variable name="ptValue">
+      <xsl:if test="contains($pt, 'pt')">
+        <xsl:value-of select="number(substring-before($pt, 'pt'))"/>
+      </xsl:if>  
+      <xsl:if test="not(contains($pt, 'pt'))">
+        <xsl:value-of select="number($pt)"/>
+      </xsl:if>
+    </xsl:variable>
+    
+    <xsl:variable name="factor">
+      <xsl:value-of select="127 div 3600"/>
+    </xsl:variable>
+    <xsl:value-of select="concat(string($ptValue * $factor), 'cm')"/>
   </xsl:template>
 
 </xsl:stylesheet>

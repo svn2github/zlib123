@@ -88,7 +88,20 @@
       <xsl:value-of select="."/>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$tekst != '' or text:s">
+      <xsl:when test="($tekst != '' or text:s) and (not(name(parent::node()/parent::node()) = 'office:annotation') and not(name(parent::node()) = 'office:annotation'))">
+        <r>
+          <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
+            <xsl:with-param name="parentCellStyleName">
+              <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
+            </xsl:with-param>
+            <xsl:with-param name="defaultCellStyleName">
+              <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+          <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
+        </r>
+      </xsl:when>
+      <xsl:when test="$tekst != '' and (name(parent::node()/parent::node()) = 'office:annotation' or name(parent::node()) = 'office:annotation')">
         <r>
           <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
             <xsl:with-param name="parentCellStyleName">
