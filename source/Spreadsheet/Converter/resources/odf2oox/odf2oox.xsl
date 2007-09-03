@@ -127,12 +127,12 @@
       <xsl:call-template name="InsertSheets"/>
       <!-- input: content.xml -->
       <!-- output:  xl/worksheets/sheet_N_.xml -->
-      <xsl:if
+      <!--xsl:if
         test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/draw:frame/draw:object">
         <pzip:entry pzip:target="xl/media/image1.emf">
           <empty/>
         </pzip:entry>
-      </xsl:if>
+      </xsl:if-->
 
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
@@ -174,7 +174,8 @@
 
         <xsl:variable name="textBox">
           <xsl:choose>
-            <xsl:when test="descendant::draw:frame/draw:text-box[not(name(parent::node()/parent::node()) = 'draw:g' )]">
+            <xsl:when
+              test="descendant::draw:frame/draw:text-box[not(name(parent::node()/parent::node()) = 'draw:g' )]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -206,9 +207,10 @@
           </xsl:for-each>
         </xsl:variable>
 
-        <xsl:variable name="oleObject">
+        <xsl:variable name="sheetOleObject">
           <xsl:choose>
-            <xsl:when test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+            <xsl:when
+              test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -217,6 +219,9 @@
           </xsl:choose>
         </xsl:variable>
 
+        <xsl:variable name="sheetNum">
+          <xsl:value-of select="position()"/>
+        </xsl:variable>
 
         <!-- insert comments -->
         <xsl:if test="$comment = 'true' ">
@@ -225,20 +230,32 @@
           </xsl:call-template>
         </xsl:if>
 
-        <!-- create VmlDrawing.xml file for comment`s-->
-        <xsl:if test="$comment = 'true'">
-          <xsl:call-template name="CreateVmlDrawing"/>
-        </xsl:if>
+        <!-- create VmlDrawing.xml file for comment`s or OLE object -->
+        <xsl:if test="$comment = 'true' or $sheetOleObject = 'true' ">
 
-        <!-- create VmlDrawing.xml file -->
-        <xsl:if test="$oleObject = 'true'">
           <xsl:call-template name="CreateVmlDrawing"/>
+
+          <xsl:if test="$sheetOleObject = 'true'">
+
+            <xsl:call-template name="CreateVmlDrawingRelationships">
+              <xsl:with-param name="sheetNum" select="$sheetNum"/>
+            </xsl:call-template>
+
+            <!--  create emf dummy images -->
+            <xsl:for-each
+              select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+              <pzip:entry pzip:target="{concat('xl/media/image',$sheetNum,'_',position(),'.emf')}">
+                <empty/>
+              </pzip:entry>
+            </xsl:for-each>
+
+          </xsl:if>
         </xsl:if>
 
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
           <xsl:call-template name="CreateDrawing"/>
 
-          <xsl:if test="contains($chart,'true') or $picture='true' or $oleObject='true'">
+          <xsl:if test="contains($chart,'true') or $picture='true'">
             <xsl:call-template name="CreateDrawingRelationships"/>
           </xsl:if>
 
@@ -336,6 +353,23 @@
         <xsl:call-template name="package-relationships"/>
       </pzip:entry>
 
+      <xsl:variable name="oleObject">
+        <xsl:choose>
+          <xsl:when
+            test="document('content.xml')/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:if test="$oleObject = 'true'">
+        <xsl:call-template name="InsertOLEexternalLinks"/>
+        <xsl:call-template name="OLEexternalLinks_rels"/>
+      </xsl:if>
+
       <xsl:call-template name="InsertLinkExternalRels"/>
 
       <!-- Insert Change Tracking -->
@@ -385,7 +419,7 @@
     <xsl:variable name="OLEObject">
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame/draw:object">
+          test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -412,11 +446,6 @@
       </pzip:entry>
 
     </xsl:if>
-    <xsl:if test="$OLEObject = 'true'">
-      <xsl:call-template name="InsertOLE_rels"/>
-      <xsl:call-template name="InsertOLEexternalLinks"/>
-      <xsl:call-template name="OLEexternalLinks_rels"/>
-    </xsl:if>
 
   </xsl:template>
 
@@ -429,10 +458,22 @@
     </pzip:entry>
   </xsl:template>
 
+  <xsl:template name="CreateVmlDrawingRelationships">
+    <xsl:param name="sheetNum"/>
+
+    <!-- package relationship item -->
+    <pzip:entry pzip:target="{concat('xl/drawings/_rels/vmlDrawing',position(),'.vml.rels')}">
+      <xsl:call-template name="InsertVmlDrawingRels">
+        <xsl:with-param name="sheetNum" select="$sheetNum"/>
+      </xsl:call-template>
+    </pzip:entry>
+  </xsl:template>
+
   <xsl:template name="CreateVmlDrawing">
 
     <xsl:variable name="sheetId" select="position()"/>
     <pzip:entry pzip:target="{concat('xl/drawings/vmlDrawing',position(),'.vml')}">
+
       <pxsi:dummyContainer xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments">
         <o:shapelayout v:ext="edit">
           <o:idmap v:ext="edit" data="1"/>
@@ -442,62 +483,69 @@
           <v:stroke joinstyle="miter"/>
           <v:path gradientshapeok="t" o:connecttype="rect"/>
         </v:shapetype>
+
+        <!--For each comment-->
         <xsl:for-each
           select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/descendant::table:table-row/table:table-cell/office:annotation">
           <xsl:call-template name="InsertTextBox"/>
         </xsl:for-each>
 
-        <xsl:for-each
-          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
 
-          <xsl:variable name="width">
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="@svg:width"/>
-            </xsl:call-template>
-          </xsl:variable>
+          <!-- For each OLE object -->
+   
+          <xsl:for-each
+            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:shapes/draw:frame">
 
-          <xsl:variable name="height">
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="@svg:height"/>
-            </xsl:call-template>
-          </xsl:variable>
+            <xsl:variable name="width">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="@svg:width"/>
+              </xsl:call-template>
+            </xsl:variable>
 
-          <xsl:variable name="z-index">
-            <xsl:value-of select="position()"/>
-          </xsl:variable>
+            <xsl:variable name="height">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="@svg:height"/>
+              </xsl:call-template>
+            </xsl:variable>
 
-          <xsl:variable name="margin-left">
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="@svg:x"/>
-            </xsl:call-template>
-          </xsl:variable>
+            <xsl:variable name="z-index">
+              <xsl:value-of select="position()"/>
+            </xsl:variable>
 
-          <xsl:variable name="margin-top">
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length" select="@svg:y"/>
-            </xsl:call-template>
-          </xsl:variable>
+            <xsl:variable name="margin-left">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="@svg:x"/>
+              </xsl:call-template>
+            </xsl:variable>
 
-          <v:shape type="#_x0000_t75"
-            style="position:absolute;
-            margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
-            filled="t" fillcolor="window [65]" stroked="t" strokecolor="windowText [64]"
-            o:insetmode="auto">
+            <xsl:variable name="margin-top">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="@svg:y"/>
+              </xsl:call-template>
+            </xsl:variable>
 
-            <xsl:attribute name="id">
-              <xsl:value-of select="concat('_x0000_s', 1025 + position())"/>
-            </xsl:attribute>
-            <v:fill color2="window [65]"/>
-            <v:imagedata o:relid="rId1" o:title=""/>
-            <x:ClientData ObjectType="Pict">
-              <x:SizeWithCells/>
-              <x:CF>Pict</x:CF>
-              <x:AutoPict/>
-              <x:DDE/>
-            </x:ClientData>
-          </v:shape>
-        </xsl:for-each>
+            <v:shape type="#_x0000_t75"
+              style="position:absolute;margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
+              filled="t" fillcolor="window [65]" stroked="t" strokecolor="windowText [64]"
+              o:insetmode="auto">
+
+              <xsl:attribute name="id">
+                <xsl:value-of select="concat('_x0000_s', $sheetId * 1024 + position())"/>
+              </xsl:attribute>
+              <v:fill color2="window [65]"/>
+              <v:imagedata o:relid="{concat('rId',position())}" o:title=""/>
+              <x:ClientData ObjectType="Pict">
+                <x:SizeWithCells/>
+                <x:CF>Pict</x:CF>
+                <x:AutoPict/>
+                <x:DDE/>
+              </x:ClientData>
+            </v:shape>
+          </xsl:for-each>
+
+
       </pxsi:dummyContainer>
+
     </pzip:entry>
   </xsl:template>
 

@@ -141,12 +141,8 @@
       </xsl:for-each>
     </sheets>
     
-    <xsl:if test="table:table/table:shapes/draw:frame">
- 
-    <xsl:for-each select="table:table">
+    <xsl:if test="table:table/table:shapes/draw:frame/draw:object">
       <xsl:call-template name="ExternalReference"/>
-    </xsl:for-each>
-
     </xsl:if>
     
     <definedNames>

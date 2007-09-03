@@ -440,17 +440,16 @@
         <drawing r:id="{concat('d_rId',$sheetId)}"/>
       </xsl:if>
 
-      <xsl:if test="descendant::office:annotation">
-        <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
+      <xsl:if test="descendant::office:annotation or descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        <legacyDrawing r:id="v_rId1"/>
       </xsl:if>
 
-      <xsl:if test="table:shapes/draw:frame/draw:object">
-        <legacyDrawing r:id="{concat('rId',$sheetId)}"/>
-      </xsl:if>
 
       <!-- Insert OLEObject -->
-      <xsl:if test="table:shapes/draw:frame/draw:object">
-        <xsl:call-template name="InsertOLE_Object"/>
+      <xsl:if test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        <xsl:call-template name="InsertOLE_Object">
+            <xsl:with-param name="sheetId" select="$sheetId"/>          
+        </xsl:call-template>
       </xsl:if>
 
     </worksheet>

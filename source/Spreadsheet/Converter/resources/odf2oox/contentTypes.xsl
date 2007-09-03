@@ -82,9 +82,11 @@
   <!-- OLE object types -->
   <xsl:template name="InsertExternalLinkTypes">
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
+      select="document('content.xml')">
+      <xsl:for-each select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
       <Override PartName="{concat(concat('/xl/externalLinks/externalLink', position()),'.xml')}"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml"/>
+      </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
 

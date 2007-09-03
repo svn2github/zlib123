@@ -37,7 +37,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-  exclude-result-prefixes="w r xlink office draw text style">
+  exclude-result-prefixes="w r xlink office draw text style dc">
 
   <xsl:template name="InsertPartRelationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -78,8 +78,26 @@
       <Relationship Id="rId3"
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections"
         Target="connections.xml"/>
-      <xsl:call-template name="InsertWorkobookExternalRels"/>
 
+      <!--Insert OLE relationships -->
+      <xsl:for-each select="document('content.xml')">
+        <xsl:for-each
+          select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink">
+            <xsl:attribute name="Id">
+              <xsl:value-of select="generate-id()"/>
+            </xsl:attribute>
+
+            <xsl:attribute name="Target">
+              <!--xsl:if test="draw:object|draw:object-ole"-->
+              <xsl:value-of
+                select="concat(concat('externalLinks/externalLink', position()), '.xml')"/>
+              <!--/xsl:if-->
+            </xsl:attribute>
+          </Relationship>
+        </xsl:for-each>
+      </xsl:for-each>
 
     </Relationships>
 
@@ -199,11 +217,11 @@
       </xsl:if>
 
       <!-- vmlDrawing.vml file -->
-      <xsl:if test="$comment = 'true' ">
+      <!--xsl:if test="$comment = 'true' ">
         <Relationship Id="{concat('v_rId',$sheetNum)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"
           Target="{concat('../drawings/vmlDrawing',$sheetNum,'.vml')}"/>
-      </xsl:if>
+      </xsl:if-->
 
       <!--hyperlink-->
       <xsl:if test="$hyperlink = 'true' ">
@@ -257,6 +275,7 @@
         </xsl:for-each>
       </xsl:if>
 
+      <!-- Extrnal Link -->
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
 
@@ -273,8 +292,8 @@
           Target="{concat('../drawings/drawing',$sheetNum,'.xml')}"/>
       </xsl:if>
 
-      <xsl:if test="$OLEObject = 'true'">
-        <Relationship Id="rId1"
+      <xsl:if test="$OLEObject = 'true' or $comment = 'true'">
+        <Relationship Id="v_rId1"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"
           Target="{concat('../drawings/vmlDrawing', $sheetNum,'.vml')}"/>
       </xsl:if>
@@ -388,7 +407,7 @@
 
             <xsl:choose>
               <!-- picture is located in the same disk -->
-              <xsl:when test="starts-with($translatedTarget,'../')">                
+              <xsl:when test="starts-with($translatedTarget,'../')">
                 <pxsi:physicalPath xmlns:pxsi="urn:cleverage:xmlns:post-processings:path">
                   <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                     Id="{generate-id(parent::node())}"
@@ -401,10 +420,10 @@
                   </Relationship>
                 </pxsi:physicalPath>
               </xsl:when>
-              
+
               <!-- when file is on another disk -->
               <xsl:otherwise>
-                
+
                 <xsl:variable name="target">
                   <xsl:choose>
                     <!-- when file is on local disk -->
@@ -431,6 +450,49 @@
 
       </xsl:for-each>
 
+      <xsl:for-each
+        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+
+        <Relationship
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+
+          <xsl:attribute name="Id">
+            <xsl:value-of select="concat('rId',position())"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="Target">
+            <xsl:value-of select="concat('../media/image',position(),'.emf')"/>
+          </xsl:attribute>
+        </Relationship>
+
+      </xsl:for-each>
+
+    </Relationships>
+  </xsl:template>
+
+  <xsl:template name="InsertVmlDrawingRels">
+    <xsl:param name="sheetNum"/>
+    
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+
+        <xsl:for-each
+          select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          
+          <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+            <xsl:attribute name="Id">
+          <xsl:value-of select="concat('rId',position())"/>
+        </xsl:attribute>
+
+          <xsl:variable name="ObjectNumber">
+            <xsl:value-of select="substring-after(@xlink:href, './ObjectReplacements/Object ')"/>                
+          </xsl:variable>
+          
+          <xsl:attribute name="Target">
+            <xsl:value-of select="concat('../media/image',$sheetNum,'_',position(),'.emf')"/>
+        </xsl:attribute>
+        
+          </Relationship>
+        </xsl:for-each>        
     </Relationships>
   </xsl:template>
 
@@ -471,31 +533,6 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template name="InsertWorkobookExternalRels">
-    <xsl:if
-      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame/draw:object">
-      <xsl:for-each
-        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:shapes/draw:frame">
-        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink">
-          <xsl:attribute name="Id">
-            <xsl:value-of select="generate-id()"/>
-          </xsl:attribute>
-
-          <xsl:variable name="NumberFile">
-            <xsl:value-of select="position()"/>
-          </xsl:variable>
-
-          <xsl:attribute name="Target">
-            <xsl:for-each select="draw:object">
-              <xsl:value-of
-                select="concat(concat('externalLinks/externalLink', $NumberFile), '.xml')"/>
-            </xsl:for-each>
-          </xsl:attribute>
-        </Relationship>
-      </xsl:for-each>
-    </xsl:if>
-  </xsl:template>
 
   <!-- Insert Revision Headers -->
   <xsl:template name="revisionHeaderProperties">
