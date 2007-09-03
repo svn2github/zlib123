@@ -54,11 +54,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships" 
-  exclude-result-prefixes="a style fo r rels xmlns">
-  <xsl:import href="common.xsl"/>
-  <xsl:import href="content.xsl"/>
-  <xsl:import href="pictures.xsl"/>
-
+  exclude-result-prefixes="a style fo r rels xmlns">  
   <xsl:template name="NotesMaster">
     <xsl:param name="smName"/>
     <!-- warn,notes master-->

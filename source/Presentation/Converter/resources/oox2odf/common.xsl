@@ -1755,6 +1755,8 @@ exclude-result-prefixes="p a r xlink ">
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="contains($type,'hyperlink') and not(contains($Target,'http:'))">
+          <!-- warn if hyperlink Path  -->
+          <xsl:message terminate="no">translation.oox2odf.hyperlinkTypeRelativePath</xsl:message>
           <xsl:attribute name="xlink:href">
             <!--Link Absolute Path-->
             <xsl:value-of select ="concat('hyperlink-path:',$Target)"/>
@@ -1952,6 +1954,7 @@ exclude-result-prefixes="p a r xlink ">
   <xsl:template name ="tmpShapeTextProcess">
     <xsl:param name="ParaId"/>
     <xsl:param name="TypeId"/>
+    <xsl:variable name ="slideRel" select ="concat('ppt/slides/_rels/',$TypeId,'.xml.rels')"/>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
     <!--@ Default Font Name from PPTX -->
     <xsl:variable name ="DefFont">
@@ -1993,7 +1996,8 @@ exclude-result-prefixes="p a r xlink ">
       <xsl:if test ="(a:p/a:pPr/a:buChar) or (a:p/a:pPr/a:buAutoNum) or (a:p/a:pPr/a:buBlip) ">
         <xsl:call-template name ="insertBulletStyle">          
           <xsl:with-param name ="ParaId" select ="$ParaId"/>
-          <xsl:with-param name ="listStyleName" select ="$listStyleName"/>          
+          <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+          <xsl:with-param name ="slideRel" select ="$slideRel"/>
         </xsl:call-template>
       </xsl:if>
       <xsl:for-each select ="a:p">

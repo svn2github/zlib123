@@ -54,10 +54,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships" 
-  exclude-result-prefixes="p a style fo r rels xlink">
-  <xsl:import href="shapes_reverse.xsl"/>
-  <xsl:import href="notesMaster.xsl"/>
-  <xsl:import href="pictures.xsl"/>
+  exclude-result-prefixes="p a style fo r rels xlink">  
   <xsl:template name="SlideMaster" >
     <xsl:call-template name="tmpSMCommonStyle"/>
     <xsl:call-template name="InsertContentStyle"/>
@@ -7383,16 +7380,18 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:attribute>
     </xsl:if>
     <xsl:if test ="not(a:rPr/@sz)">
-      <xsl:for-each select ="parent::node()/parent::node()/a:lstStyle/a:lvl1pPr/a:defRPr/@sz">
-        <xsl:choose>
-          <xsl:when test="$fontscale ='100000'">
-            <xsl:value-of  select ="concat(format-number(. div 100,'#.##'),'pt')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of  select ="concat(format-number(round((. *($fontscale div 1000) )div 10000),'#.##'),'pt')"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
+      <xsl:attribute name ="fo:font-size">
+        <xsl:for-each select ="parent::node()/parent::node()/a:lstStyle/a:lvl1pPr/a:defRPr/@sz">
+          <xsl:choose>
+            <xsl:when test="$fontscale ='100000'">
+              <xsl:value-of  select ="concat(format-number(. div 100,'#.##'),'pt')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of  select ="concat(format-number(round((. *($fontscale div 1000) )div 10000),'#.##'),'pt')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:attribute>
     </xsl:if>
     <xsl:if test ="a:rPr/a:latin/@typeface">
       <xsl:attribute name ="fo:font-family">

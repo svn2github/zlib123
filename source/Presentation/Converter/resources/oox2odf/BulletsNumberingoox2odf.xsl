@@ -20,7 +20,7 @@ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
   exclude-result-prefixes="odf style text number draw page p a r xlink">
 
-	<xsl:import href="common.xsl"/>
+	
 	<xsl:template name ="insertBulletsNumbersoox2odf">
 		<xsl:param name ="listStyleName" />
 		<xsl:param  name ="ParaId"/>

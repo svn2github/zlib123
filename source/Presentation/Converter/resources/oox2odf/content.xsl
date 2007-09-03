@@ -51,15 +51,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
 xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" 
 xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"	
-exclude-result-prefixes="p a r xlink rels">
-  <xsl:import href="common.xsl"/>
-  <xsl:import href="pictures.xsl"/>
-  <xsl:import href="shapes_reverse.xsl"/>
-  <xsl:import href="customAnim.xsl"/>
-
-  <xsl:import href="notesOox2Odf.xsl"/>
-  <!-- Import Bullets and numbering-->
-  <xsl:import href ="BulletsNumberingoox2odf.xsl"/>
+exclude-result-prefixes="p a r xlink rels">  
   <xsl:strip-space elements="*"/>
   <!--main document-->
   <xsl:template name="content">
@@ -1655,7 +1647,7 @@ exclude-result-prefixes="p a r xlink rels">
                           <xsl:for-each select ="p:txBody/a:p">
                             <!--Code Inserted by Vijayeta for Bullets And Numbering
                   check for levels and then depending on the condition,insert bullets,If properties are defined in corresponding layouts-->
-                            <xsl:if test ="$LayoutName != 'title'">
+                            <xsl:if test ="$LayoutName != 'title' and $LayoutName !='ctrTitle'">
                               <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
                                 <xsl:call-template name ="insertBulletsNumbersoox2odf">
                                   <xsl:with-param name ="listStyleName" select ="concat($listStyleName,position())"/>
@@ -1681,113 +1673,9 @@ exclude-result-prefixes="p a r xlink rels">
                                 </xsl:if>
                               </xsl:if>
                               <!-- If no bullets present at all-->
-                              <xsl:if test ="not($bulletTypeBool='true')and not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum)and not(a:pPr/a:buBlip)">
-                                <text:p >
-                                  <xsl:attribute name ="text:style-name">
-                                    <xsl:value-of select ="concat($ParaId,position())"/>
-                                  </xsl:attribute>
-						<xsl:attribute name ="text:id" >
-							<xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
-						</xsl:attribute>
-                                  <xsl:for-each select ="node()">
-                                    <xsl:if test ="name()='a:r'">
-                                      <text:span>
-                                        <xsl:attribute name="text:style-name">
-                                          <xsl:value-of select="concat($SlideID,generate-id())"/>
-                                        </xsl:attribute>
-                                        <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
-                                        <xsl:variable name="nodeTextSpan">
-                                          <!--<xsl:value-of select ="a:t"/>-->
-                                          <!--converts whitespaces sequence to text:s-->
-                                          <!-- 1699083 bug fix  -->
-                                          <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-                                          <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-                                          <xsl:choose >
-                                            <xsl:when test ="a:rPr[@cap='all'] or $layoutCap ='all' ">
-                                              <xsl:choose >
-                                                <xsl:when test =".=''">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:when test ="not(contains(.,'  '))">
-                                                  <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-                                                </xsl:when>
-                                                <xsl:when test =". =' '">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:otherwise >
-                                                  <xsl:call-template name ="InsertWhiteSpaces">
-                                                    <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                                                  </xsl:call-template>
-                                                </xsl:otherwise>
-                                              </xsl:choose>
-                                            </xsl:when>
-                                            <xsl:when test ="a:rPr[@cap='small'] or $layoutCap ='small'">
-                                              <xsl:choose >
-                                                <xsl:when test =".=''">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:when test ="not(contains(.,'  '))">
-                                                  <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
-                                                </xsl:when>
-                                                <xsl:when test =".= ' '">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:otherwise >
-                                                  <xsl:call-template name ="InsertWhiteSpaces">
-                                                    <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                                                  </xsl:call-template>
-                                                </xsl:otherwise>
-                                              </xsl:choose >
-                                            </xsl:when>
-                                            <xsl:otherwise >
-                                              <xsl:choose >
-                                                <xsl:when test =".=''">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:when test ="not(contains(.,'  '))">
-                                                  <xsl:value-of select ="."/>
-                                                </xsl:when>
-                                                <xsl:otherwise >
-                                                  <xsl:call-template name ="InsertWhiteSpaces">
-                                                    <xsl:with-param name ="string" select ="."/>
-                                                  </xsl:call-template>
-                                                </xsl:otherwise >
-                                              </xsl:choose>
-                                            </xsl:otherwise>
-                                          </xsl:choose>
-                                        </xsl:variable>
-                                        <!-- Added by lohith.ar - Code for text Hyperlinks -->
-                                        <xsl:if test="node()/a:hlinkClick">
-                                          <text:a>
-                                            <xsl:call-template name="AddTextHyperlinks">
-                                              <xsl:with-param name="nodeAColonR" select="node()" />
-                                              <xsl:with-param name="slideRelationId" select="$slideRel" />
-                                              <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
-                                            </xsl:call-template>
-                                            <xsl:copy-of select="$nodeTextSpan"/>
-                                          </text:a>
-                                        </xsl:if>
-                                        <xsl:if test="not(node()/a:hlinkClick)">
-                                          <xsl:copy-of select="$nodeTextSpan"/>
-                                        </xsl:if>
-                                      </text:span>
-                                    </xsl:if >
-                                    <xsl:if test ="name()='a:br'">
-                                      <text:line-break/>
-                                    </xsl:if>
-                                    <!-- Added by lohith.ar for fix 1731885-->
-                                    <xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
-                                      <text:span>
-                                        <xsl:attribute name="text:style-name">
-                                          <xsl:value-of select="concat($SlideID,generate-id())"/>
-                                        </xsl:attribute>
-                                      </text:span>
-                                    </xsl:if>
-                                  </xsl:for-each>
-                                </text:p>
-                              </xsl:if>
+                              
                             </xsl:if>
-                            <xsl:if test ="$LayoutName = 'title'">
+                            <xsl:if test ="$LayoutName = 'title' or $LayoutName ='ctrTitle'">
                               <text:p >
                                 <xsl:attribute name ="text:style-name">
                                   <xsl:value-of select ="concat($ParaId,position())"/>
@@ -2638,16 +2526,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:with-param name ="var_index" select ="$var_index"/>
                       </xsl:call-template>
                     </xsl:if>
-                  </xsl:if>
-                  <xsl:if test ="$bulletTypeBool!='true' and $var_TextBoxType='outline' "  >
-                    <xsl:call-template name ="insertDefaultBulletNumberStyle">
-                      <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
-                      <xsl:with-param name ="slideLayout" select ="$layout"/>
-                      <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
-                      <xsl:with-param name ="var_TextBoxType" select ="$var_TextBoxType"/>
-                      <xsl:with-param name ="var_index" select ="$var_index"/>
-                    </xsl:call-template>
-                  </xsl:if>
+                  </xsl:if>                  
                 </xsl:if>
                 <!--End of code if bullets are default-->
                 <!--End of code inserted by Vijayeta,InsertStyle For Bullets and Numbering-->
@@ -2746,18 +2625,7 @@ exclude-result-prefixes="p a r xlink rels">
                               </xsl:otherwise>
                             </xsl:choose>
                           </xsl:when>
-                          <xsl:when test ="$bulletTypeBool!='true' and $var_TextBoxType='outline'">
-                            <xsl:if test ="a:pPr/a:buNone">
-                              <xsl:attribute name="text:enable-numbering">
-                                <xsl:value-of select ="'false'"/>
-                              </xsl:attribute>
-                            </xsl:if>
-                            <xsl:if test ="not(a:pPr/a:buNone)">
-                              <xsl:attribute name="text:enable-numbering">
-                                <xsl:value-of select ="'true'"/>
-                              </xsl:attribute>
-                            </xsl:if>
-                          </xsl:when>
+                          
                           <xsl:otherwise>
                             <xsl:attribute name="text:enable-numbering">
                               <xsl:value-of select ="'false'"/>
@@ -3232,7 +3100,7 @@ exclude-result-prefixes="p a r xlink rels">
         <xsl:if test ="./@showAnimation='1' or not(./@showAnimation)">
           <!-- Do nothing, no attribute to be added-->
         </xsl:if>
-        <xsl:if test ="/@useTimings='0'">
+        <!--<xsl:if test ="/@useTimings='0'">
           <xsl:attribute name ="presentation:force-manual">
             <xsl:value-of select ="'true'"/>
           </xsl:attribute>
@@ -3241,7 +3109,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:attribute name ="presentation:transition-on-click">
             <xsl:value-of select ="'disabled'"/>
           </xsl:attribute>
-        </xsl:if>
+        </xsl:if>-->
         <xsl:if test ="./@loop='1'">
           <xsl:attribute name ="presentation:endless">
             <xsl:value-of select ="'true'"/>

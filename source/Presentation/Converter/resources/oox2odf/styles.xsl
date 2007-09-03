@@ -54,13 +54,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships" >
-  <xsl:import href="SlideMaster.xsl"/>
-   <xsl:import href="notesMaster.xsl"/>
-  
 
-	<!--<xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
-  <xsl:key name="default-styles"
-    match="w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on']" use="@w:type"/>-->
 
 	<!-- Shape constants-->
 	<xsl:variable name ="dot">

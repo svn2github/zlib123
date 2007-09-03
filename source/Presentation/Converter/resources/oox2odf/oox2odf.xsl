@@ -31,12 +31,21 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="oox rels">
+
 	<xsl:import href="content.xsl"/>
 	<xsl:import href="styles.xsl"/>
 	<xsl:import href="settings.xsl"/>
 	<xsl:import href="meta.xsl"/>
+	<xsl:import href="common.xsl"/>
+	<xsl:import href="pictures.xsl"/>
+	<xsl:import href="shapes_reverse.xsl"/>
+	<xsl:import href="customAnim.xsl"/>
+	<xsl:import href="notesOox2Odf.xsl"/>
+	<!-- Import Bullets and numbering-->
+	<xsl:import href ="BulletsNumberingoox2odf.xsl"/>
+	<xsl:import href="SlideMaster.xsl"/>
+	<xsl:import href="notesMaster.xsl"/>
 	
-
 	<xsl:param name="outputFile"/>
 	<xsl:output method="xml" encoding="UTF-8"/>
 

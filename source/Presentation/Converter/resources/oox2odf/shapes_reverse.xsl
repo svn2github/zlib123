@@ -46,11 +46,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
   xmlns:dcterms="http://purl.org/dc/terms/"
   exclude-result-prefixes="p a r dc xlink draw rels">
-  <!-- Import Bullets and numbering-->
-  <xsl:import href ="BulletsNumberingoox2odf.xsl"/>
-  <xsl:import href="common.xsl"/>
-  <!--<xsl:import href ="trignm.xsl"/>-->
-  <!-- Shape constants-->
+    <!-- Shape constants-->
 	<!-- Arrow size -->
 	<xsl:variable name="sm-sm">
 		<xsl:value-of select ="'0.14'"/>
@@ -3098,6 +3094,7 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- warn if inner Shadow -->
             <xsl:message terminate="no">translation.oox2odf.shapesTypeInnerShadow</xsl:message>
           </xsl:if>
+          <xsl:message terminate="no">translation.oox2odf.shapesTypeOuterShadow</xsl:message>
         </style:graphic-properties >
         <xsl:if test ="p:txBody/a:bodyPr/@vert">
           <style:paragraph-properties>
@@ -3919,17 +3916,19 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:choose>
 
 		<xsl:choose>
-			<xsl:when test ="(( (a:bodyPr/a:spAutoFit) or (a:bodyPr/@wrap='square') ) and ((parent::node()/p:spPr/a:prstGeom/@prst='rect') or  (parent::node()/p:spPr/a:prstGeom/@prst='ellipse'))  ) ">
+			<xsl:when test ="(( (a:bodyPr/a:spAutoFit) or (a:bodyPr/@wrap='square') ) and ((parent::node()/p:spPr/a:prstGeom/@prst='rect') or (parent::node()/p:spPr/a:prstGeom/@prst='ellipse')) )">
 				<xsl:attribute name="draw:auto-grow-height">
 					<xsl:value-of select ="'false'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="( (a:bodyPr/a:spAutoFit) or (a:bodyPr/@wrap='square') )">
+			<!--Code Added for bug fix of text wrap inside the custom shapes by Mathi on 31st Aug2007-->
+			<xsl:when test ="( (a:bodyPr/a:spAutoFit) )">   <!--or (a:bodyPr/@wrap='square') )">-->
 				<xsl:attribute name="draw:auto-grow-height">
 					<xsl:value-of select ="'true'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="not(a:bodyPr/a:spAutoFit)">
+
+			<xsl:when test ="(not(a:bodyPr/a:spAutoFit) and not(a:bodyPr/@wrap='square')) or (a:bodyPr/@wrap='none')">  <!--<xsl:when test ="(not(a:bodyPr/a:spAutoFit)">-->
 				<xsl:attribute name="draw:auto-grow-height">
 					<xsl:value-of select ="'false'"/>
 				</xsl:attribute>
@@ -3937,6 +3936,13 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:value-of select ="'false'"/>
 				</xsl:attribute>
 			</xsl:when>
+
+			<xsl:when test="(not(a:bodyPr/a:spAutoFit) and (a:bodyPr/@wrap='square'))">
+				<xsl:attribute name="draw:auto-grow-height">
+					<xsl:value-of select ="'false'"/>
+				</xsl:attribute>
+			</xsl:when>
+			<!--end of bug fix code-->
 		</xsl:choose>
     </xsl:for-each>
   </xsl:template>

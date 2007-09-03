@@ -50,7 +50,7 @@ xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-propertie
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
 exclude-result-prefixes="p a r xlink rels xmlns">
-  <xsl:import href="common.xsl"/>
+  
   <xsl:template name ="tmpNotesStyle">
     <xsl:param name="slideRel"/>
     <xsl:variable name ="DefFont">
