@@ -88,6 +88,7 @@
       <xsl:value-of select="."/>
     </xsl:variable>
     <xsl:choose>
+      <!-- when text:span is not inside a comment -->
       <xsl:when test="($tekst != '' or text:s) and (not(name(parent::node()/parent::node()) = 'office:annotation') and not(name(parent::node()) = 'office:annotation'))">
         <r>
           <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
@@ -101,6 +102,7 @@
           <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
         </r>
       </xsl:when>
+      <!-- when text:span is inside a comment -->
       <xsl:when test="$tekst != '' and (name(parent::node()/parent::node()) = 'office:annotation' or name(parent::node()) = 'office:annotation')">
         <r>
           <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
