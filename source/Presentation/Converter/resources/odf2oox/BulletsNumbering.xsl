@@ -26,6 +26,8 @@
     <!-- parameter added by vijayeta, dated 11-7-07-->
     <xsl:param name ="masterPageName"/>
     <xsl:param name ="pos"/>
+    <xsl:param name ="shapeCount"/>
+    <xsl:param name ="FrameCount"/>
     <!--<xsl:variable name ="newLevel" select ="$level+1"/>-->
     <xsl:for-each select ="document('content.xml')//text:list-style [@style:name=$listId]">
       <xsl:if test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color">
@@ -95,7 +97,7 @@
         <!--</xsl:for-each>-->
       </xsl:if>
       <xsl:if test ="text:list-level-style-image[@text:level=$level]">
-        <xsl:variable name ="rId" select ="concat('buImage',$listId,$level,$pos)"/>        
+        <xsl:variable name ="rId" select ="concat('buImage',$listId,$level,$pos,$shapeCount,$FrameCount)"/>       
         <a:buBlip>
           <a:blip>
             <xsl:attribute name ="r:embed">

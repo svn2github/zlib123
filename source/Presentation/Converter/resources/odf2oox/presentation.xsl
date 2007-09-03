@@ -43,7 +43,7 @@ Copyright (c) 2007, Sonata Software Limited
 	xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
 	xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
 	exclude-result-prefixes="xlink number">
-  <xsl:import href ="common.xsl"/>
+ 
   <xsl:template name ="presentation">
     <p:presentation>
       <p:sldMasterIdLst>

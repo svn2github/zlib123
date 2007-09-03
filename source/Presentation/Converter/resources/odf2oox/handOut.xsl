@@ -45,8 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page p fo script presentation xlink svg">
-  <xsl:import href ="common.xsl"/>
-  <xsl:import href ="shapes_direct.xsl"/>
+  
   <xsl:template name ="handOutMasters">
     <xsl:param name="handOutMasterName"/>
     <xsl:param name ="hoId" />

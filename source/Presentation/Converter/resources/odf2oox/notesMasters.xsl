@@ -45,9 +45,6 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page p fo script presentation xlink svg">
-  <xsl:import href ="common.xsl"/>
-  <xsl:import href ="shapes_direct.xsl"/>
-  <xsl:import href ="picture.xsl"/>
   <xsl:template name ="NotesMasters">
     <!-- warn,notes master -->
     <xsl:message terminate="no">translation.odf2oox.notesMasterMultipleToSingle</xsl:message>

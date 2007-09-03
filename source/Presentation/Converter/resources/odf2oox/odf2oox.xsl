@@ -38,18 +38,23 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:page="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
   exclude-result-prefixes="odf style text number draw page presentation">
-
 	<xsl:import href="docprops.xsl"/>
 	<xsl:import href ="slides.xsl"/>
 	<xsl:import href="presentation.xsl"/>
 	<xsl:import href ="theme.xsl"/>
 	<xsl:import href ="slideMasters.xsl"/>
 	<xsl:import href="slideLayouts.xsl"/>
-         <xsl:import href="handOut.xsl"/>
-          <xsl:import href="presProps.xsl"/>
-       <xsl:import href ="NotesOdp2Oox.xsl"/>
-      <xsl:import href ="notesMasters.xsl"/>
-
+	<xsl:import href="handOut.xsl"/>
+	<xsl:import href="presProps.xsl"/>
+	<xsl:import href ="NotesOdp2Oox.xsl"/>
+	<xsl:import href ="notesMasters.xsl"/>
+	<xsl:import href ="common.xsl"/>
+	<xsl:import href ="shapes_direct.xsl"/>
+	<xsl:import href ="BulletsNumbering.xsl"/>
+	<xsl:import href ="picture.xsl"/>
+	<xsl:import href ="customAnimation.xsl"/>
+	<xsl:import href ="shapes_direct.xsl"/>
+	
 	<xsl:strip-space elements="*"/>
 	<xsl:preserve-space elements="text:p text:span number:text"/>
 

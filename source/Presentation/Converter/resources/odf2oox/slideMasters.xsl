@@ -45,10 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page p fo script presentation xlink svg">
-	<xsl:import href ="common.xsl"/>
-	<xsl:import href ="shapes_direct.xsl"/>
-	<xsl:import href ="picture.xsl"/>
-  <xsl:import href ="slides.xsl"/>
+	
 	<xsl:template name ="slideMasters">
 		<xsl:param name="slideMasterName"/>
 		<xsl:param name ="smId" />
@@ -5480,7 +5477,12 @@ Copyright (c) 2007, Sonata Software Limited
 						<a:p>
 							<a:pPr >
 								<xsl:attribute name ="lvl" >
+                    <xsl:if test="position() &lt; 10">
 									<xsl:value-of  select ="position()-1"/>
+                    </xsl:if>
+                    <xsl:if test="position() &gt; 9">
+                      <xsl:value-of  select ="0"/>
+                    </xsl:if>
 								</xsl:attribute>
 							</a:pPr >
 							<a:r>

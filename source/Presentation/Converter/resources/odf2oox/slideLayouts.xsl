@@ -45,8 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page svg presentation fo script xlink">
-  <xsl:import href ="common.xsl"/>
-  <xsl:import href ="shapes_direct.xsl"/>
+  
   <!-- Templated for Slide Layouts - Added by lohith.ar -->
   <xsl:template name="InsertSlideLayout1">
     <xsl:param name ="MasterName" />

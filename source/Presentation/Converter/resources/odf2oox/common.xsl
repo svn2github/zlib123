@@ -45,7 +45,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page r presentation fo script xlink svg">
-	<xsl:import href ="BulletsNumbering.xsl"/>
+	
 	<xsl:template name ="convertToPoints">
 		<xsl:param name ="unit"/>
 		<xsl:param name ="length"/>
@@ -576,6 +576,8 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name ="masterPageName"/>
 		<xsl:param name="slideMaster" />
     <xsl:param name="pos" />
+    <xsl:param name ="shapeCount" />
+    <xsl:param name ="FrameCount"/>
 		<xsl:message terminate="no">progress:text:p</xsl:message>
 		<xsl:variable name ="fileName">
 			<xsl:if test ="$slideMaster !=''">
@@ -787,6 +789,8 @@ Copyright (c) 2007, Sonata Software Limited
 							<!-- parameter added by vijayeta, dated 13-7-07-->
 							<xsl:with-param name ="masterPageName" select ="$masterPageName"/>
               <xsl:with-param name ="pos" select ="$pos"/>
+              <xsl:with-param name ="shapeCount" select ="$shapeCount" />
+              <xsl:with-param name ="FrameCount" select ="$FrameCount"/>
 						</xsl:call-template>
 					</xsl:if>
 				</xsl:if>
@@ -2349,6 +2353,321 @@ Copyright (c) 2007, Sonata Software Limited
       </a:xfrm>
     </p:grpSpPr>
 
+  </xsl:template>
+  <xsl:template name="tmpgetCustShapeType">
+    <xsl:choose>
+      <!-- Text Box -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt202') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
+        <xsl:value-of select ="'TextBox Custom '"/>
+      </xsl:when>
+      <!-- Oval -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='ellipse')">
+        <xsl:value-of select ="'Oval Custom '"/>
+      </xsl:when>
+      <!-- Isosceles Triangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='isosceles-triangle')">
+        <xsl:value-of select ="'Isosceles Triangle '"/>
+      </xsl:when>
+      <!-- Right Arrow (Added by Mathi as on 4/7/2007 -->
+      <xsl:when test = "(draw:enhanced-geometry/@draw:type='right-arrow')">
+        <xsl:value-of select ="'Right Arrow '"/>
+      </xsl:when>
+      <!-- Left Arrow (Added by Mathi as on 5/7/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-arrow')">
+        <xsl:value-of select ="'Left Arrow '"/>
+      </xsl:when>
+      <!-- Up Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='up-arrow')">
+        <xsl:value-of select ="'Up Arrow '"/>
+      </xsl:when>
+      <!-- Down Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='down-arrow')">
+        <xsl:value-of select ="'Down Arrow '"/>
+      </xsl:when>
+      <!-- Left-Right Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-right-arrow')">
+        <xsl:value-of select ="'Left-Right Arrow '"/>
+      </xsl:when>
+      <!-- Up-Down Arrow (Added by Mathi as on 19/7/2007)-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='up-down-arrow')">
+        <xsl:value-of select ="'Up-Down Arrow '"/>
+      </xsl:when>
+      <!-- Right Triangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='right-triangle')">
+        <xsl:value-of select ="'Right Triangle '"/>
+      </xsl:when>
+      <!-- Parallelogram -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='parallelogram')">
+        <xsl:value-of select ="'Parallelogram '"/>
+      </xsl:when>
+      <!-- Trapezoid (Added by A.Mathi as on 24/07/2007) -->
+      <xsl:when test="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
+									(draw:enhanced-geometry/@draw:enhanced-path='M 0 1216152 L 228600 0 L 685800 0 L 914400 1216152 Z N')">
+        <xsl:value-of select ="'Trapezoid '"/>
+      </xsl:when>
+      <xsl:when test="(draw:enhanced-geometry/@draw:type='trapezoid')">
+        <xsl:value-of select ="'flowchart-manual-operation '"/>
+      </xsl:when>
+      <!-- Diamond -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='diamond')and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N')">
+        <xsl:value-of select ="'Diamond '"/>
+      </xsl:when>
+      <!-- Regular Pentagon -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='pentagon') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N')">
+        <xsl:value-of select ="'Regular Pentagon '"/>
+      </xsl:when>
+      <!-- Hexagon -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='hexagon')">
+        <xsl:value-of select ="'Hexagon '"/>
+      </xsl:when>
+      <!-- Octagon -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='octagon')">
+        <xsl:value-of select ="'Octagon '"/>
+      </xsl:when>
+      <!-- Cube -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='cube')">
+        <xsl:value-of select ="'Cube '"/>
+      </xsl:when>
+      <!-- Can -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='can')">
+        <xsl:value-of select ="'Can '"/>
+      </xsl:when>
+      <!-- Circular Arrow -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='circular-arrow')">
+        <xsl:value-of select ="'circular-arrow'"/>
+      </xsl:when>
+      <!-- LeftUp Arrow -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt89') and
+								 (draw:enhanced-geometry/@draw:enhanced-path='M 0 ?f5 L ?f2 ?f0 ?f2 ?f7 ?f7 ?f7 ?f7 ?f2 ?f0 ?f2 ?f5 0 21600 ?f2 ?f1 ?f2 ?f1 ?f1 ?f2 ?f1 ?f2 21600 Z N')">
+        <xsl:value-of select ="'leftUpArrow'"/>
+      </xsl:when>
+      <!-- BentUp Arrow -->
+      <!-- Fix for the bug 24, Internal Defects.xls, date 9th Aug '07, by vijayeta-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+								 (draw:enhanced-geometry/@draw:enhanced-path='M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N')">
+        <xsl:value-of select ="'bentUpArrow'"/>
+      </xsl:when>
+      <!--End of Fix for the bug 24, Internal Defects.xls, date 9th Aug '07, by vijayeta-->
+      <!-- Cross (Added by Mathi on 19/7/2007)-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='cross')">
+        <xsl:value-of select ="'plus '"/>
+      </xsl:when>
+      <!-- "No Symbol" (Added by A.Mathi as on 19/07/2007)-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='forbidden')">
+        <xsl:value-of select ="'noSmoking '"/>
+      </xsl:when>
+      <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
+        <xsl:value-of select ="'bentArrow '"/>
+      </xsl:when>
+      <!--  Folded Corner (Added by A.Mathi as on 19/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='paper')">
+        <xsl:value-of select ="'foldedCorner '"/>
+      </xsl:when>
+      <!--  Lightning Bolt (Added by A.Mathi as on 20/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N')">
+        <xsl:value-of select ="'lightningBolt '"/>
+      </xsl:when>
+      <!--  Explosion 1 (Added by A.Mathi as on 20/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='bang')">
+        <xsl:value-of select ="'irregularSeal1 '"/>
+      </xsl:when>
+      <!-- Left Bracket (Added by A.Mathi as on 20/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-bracket')">
+        <xsl:value-of select ="'Left Bracket '"/>
+      </xsl:when>
+      <!-- Right Bracket (Added by A.Mathi as on 20/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='right-bracket')">
+        <xsl:value-of select ="'Right Bracket '"/>
+      </xsl:when>
+      <!-- Left Brace (Added by A.Mathi as on 20/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-brace')">
+        <xsl:value-of select ="'Left Brace '"/>
+      </xsl:when>
+      <!-- Right Brace (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='right-brace')">
+        <xsl:value-of select ="'Right Brace '"/>
+      </xsl:when>
+      <!-- Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangular-callout')">
+        <xsl:value-of select ="'Rectangular Callout '"/>
+      </xsl:when>
+      <!-- Rounded Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='round-rectangular-callout')">
+        <xsl:value-of select ="'wedgeRoundRectCallout '"/>
+      </xsl:when>
+      <!-- Oval Callout (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='round-callout')">
+        <xsl:value-of select ="'wedgeEllipseCallout '"/>
+      </xsl:when>
+      <!-- Cloud Callout (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='cloud-callout')">
+        <xsl:value-of select ="'Cloud Callout '"/>
+      </xsl:when>
+      <!-- U-Turn Arrow (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='circular-arrow')">
+        <xsl:value-of select ="'U-Turn Arrow '"/>
+      </xsl:when>
+      <!-- Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangle') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
+        <xsl:value-of select ="'Rectangle Custom '"/>
+      </xsl:when>
+      <!-- Rounded Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='round-rectangle')">
+        <xsl:value-of select ="'Rounded Rectangle '"/>
+      </xsl:when>
+      <!-- Snip Single Corner Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-card') and 
+									 (draw:enhanced-geometry/@draw:mirror-horizontal='true') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N')">
+        <xsl:value-of select ="'Snip Single Corner Rectangle '"/>
+      </xsl:when>
+      <!-- Snip Same Side Corner Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 50801 0 L 863599 0 L 914400 50801 L 914400 304800 L 914400 304800 L 0 304800 L 0 304800 L 0 50801 Z N')">
+        <xsl:value-of select ="'Snip Same Side Corner Rectangle '"/>
+      </xsl:when>
+      <!-- Snip Diagonal Corner Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 876299 0 L 914400 38101 L 914400 228600 L 914400 228600 L 38101 228600 L 0 190499 L 0 0 Z N')">
+        <xsl:value-of select ="'Snip Diagonal Corner Rectangle '"/>
+      </xsl:when>
+      <!-- Snip and Round Single Corner Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 38101 0 L 876299 0 L 914400 38101 L 914400 228600 L 0 228600 L 0 38101 W 0 0 76202 76202 0 38101 38101 0 Z N')">
+        <xsl:value-of select ="'Snip and Round Single Corner Rectangle '"/>
+      </xsl:when>
+      <!-- Round Single Corner Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 876299 0 W 838198 0 914400 76202 876299 0 914400 38101 L 914400 228600 L 0 228600 Z N')">
+        <xsl:value-of select ="'Round Single Corner Rectangle '"/>
+      </xsl:when>
+      <!-- Round Same Side Corner Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 152403 0 L 761997 0 W 609594 0 914400 304806 761997 0 914400 152403 L 914400 914400 L 0 914400 L 0 152403 W 0 0 304806 304806 0 152403 152403 0 Z N')">
+        <xsl:value-of select ="'Round Same Side Corner Rectangle '"/>
+      </xsl:when>
+      <!-- Round Diagonal Corner Rectangle -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 254005 0 L 2286000 0 L 2286000 1269995 W 1777990 1015990 2286000 1524000 2286000 1269995 2031995 1524000 L 0 1524000 L 0 254005 W 0 0 508010 508010 0 254005 254005 0 Z N')">
+        <xsl:value-of select ="'Round Diagonal Corner Rectangle '"/>
+      </xsl:when>
+
+      <!-- Flow Chart: Process -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-process')">
+        <xsl:value-of select ="'Flowchart: Process '"/>
+      </xsl:when>
+      <!-- Flow Chart: Alternate Process -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-alternate-process')">
+        <xsl:value-of select ="'Flowchart: Alternate Process '"/>
+      </xsl:when>
+      <!-- Flow Chart: Decision -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-decision')">
+        <xsl:value-of select ="'Flowchart: Decision '"/>
+      </xsl:when>
+      <!-- Flow Chart: Data -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-data')">
+        <xsl:value-of select ="'Flowchart: Data '"/>
+      </xsl:when>
+      <!-- Flow Chart: Predefined-process -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-predefined-process')">
+        <xsl:value-of select ="'Flowchart: Predefined Process '"/>
+      </xsl:when>
+      <!-- Flow Chart: Internal-storage -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-internal-storage')">
+        <xsl:value-of select ="'Flowchart: Internal Storage '"/>
+      </xsl:when>
+      <!-- Flow Chart: Document -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-document')">
+        <xsl:value-of select ="'Flowchart: Document '"/>
+      </xsl:when>
+      <!-- Flow Chart: Multidocument -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-multidocument')">
+        <xsl:value-of select ="'Flowchart: Multi document '"/>
+      </xsl:when>
+      <!-- Flow Chart: Terminator -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-terminator')">
+        <xsl:value-of select ="'Flowchart: Terminator '"/>
+      </xsl:when>
+      <!-- Flow Chart: Preparation -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-preparation')">
+        <xsl:value-of select ="'Flowchart: Preparation '"/>
+      </xsl:when>
+      <!-- Flow Chart: Manual-input -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-manual-input')">
+        <xsl:value-of select ="'Flowchart: Manual Input '"/>
+      </xsl:when>
+      <!-- Flow Chart: Manual-operation -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-manual-operation')">
+        <xsl:value-of select ="'Flowchart: Manual Operation '"/>
+      </xsl:when>
+      <!-- Flow Chart: Connector -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-connector')">
+        <xsl:value-of select ="'Flowchart: Connector '"/>
+      </xsl:when>
+      <!-- Flow Chart: Off-page-connector -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-off-page-connector')">
+        <xsl:value-of select ="'Flowchart: Off-page Connector '"/>
+      </xsl:when>
+      <!-- Flow Chart: Card -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-card')">
+        <xsl:value-of select ="'Flowchart: Card '"/>
+      </xsl:when>
+      <!-- Flow Chart: Punched-tape -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-punched-tape')">
+        <xsl:value-of select ="'Flowchart: Punched Tape '"/>
+      </xsl:when>
+      <!-- Flow Chart: Summing-junction -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-summing-junction')">
+        <xsl:value-of select ="'Flowchart: Summing Junction '"/>
+      </xsl:when>
+      <!-- Flow Chart: Or -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-or')">
+        <xsl:value-of select ="'Flowchart: Or '"/>
+      </xsl:when>
+      <!-- Flow Chart: Collate -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-collate')">
+        <xsl:value-of select ="'Flowchart: Collate '"/>
+      </xsl:when>
+      <!-- Flow Chart: Sort -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-sort')">
+        <xsl:value-of select ="'Flowchart: Sort '"/>
+      </xsl:when>
+      <!-- Flow Chart: Extract -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-extract')">
+        <xsl:value-of select ="'Flowchart: Extract '"/>
+      </xsl:when>
+      <!-- Flow Chart: Merge -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-merge')">
+        <xsl:value-of select ="'Flowchart: Merge '"/>
+      </xsl:when>
+      <!-- Flow Chart: Stored-data -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-stored-data')">
+        <xsl:value-of select ="'Flowchart: Stored Data '"/>
+      </xsl:when>
+      <!-- Flow Chart: Delay-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-delay')">
+        <xsl:value-of select ="'Flowchart: Delay '"/>
+      </xsl:when>
+      <!-- Flow Chart: Sequential-access -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-sequential-access')">
+        <xsl:value-of select ="'Flowchart: Sequential Access Storage '"/>
+      </xsl:when>
+      <!-- Flow Chart: Direct-access-storage -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-direct-access-storage')">
+        <xsl:value-of select ="'Flowchart: Direct Access Storage'"/>
+      </xsl:when>
+      <!-- Flow Chart: Magnetic-disk -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-magnetic-disk')">
+        <xsl:value-of select ="'Flowchart: Magnetic Disk '"/>
+      </xsl:when>
+      <!-- Flow Chart: Display -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-display')">
+        <xsl:value-of select ="'Flowchart: Display '"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

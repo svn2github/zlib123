@@ -45,10 +45,8 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page">
-	<xsl:import href ="common.xsl"/>
-	<xsl:import href ="shapes_direct.xsl"/>
-	<xsl:import href ="picture.xsl"/>
-	<xsl:import href ="customAnimation.xsl"/>
+	
+	
 	<xsl:template name ="slides" match ="/office:document-content/office:body/office:presentation/draw:page" mode="slide">
 		<xsl:param name ="pageNo"/>
 		<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
@@ -815,7 +813,7 @@ Copyright (c) 2007, Sonata Software Limited
 									<xsl:variable name ="styleNameFromStyles" >
 										<xsl:choose >
 											<xsl:when test ="$prClsName='subtitle' or $prClsName='title'">
-												<xsl:value-of select ="concat($prClsName,'-',$masterPageName)"/>
+                        <xsl:value-of select ="concat($masterPageName,'-',$prClsName)"/>
 											</xsl:when>
 											<xsl:when test ="$prClsName='outline'">
 												<xsl:value-of select ="concat($masterPageName,'-outline',$lvl+1)"/>
@@ -826,9 +824,9 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:when test ="document('styles.xml')//office:styles/style:style[@style:name=$styleNameFromStyles]/style:paragraph-properties/@text:enable-numbering">
 											<xsl:value-of select ="document('styles.xml')//office:styles/style:style[@style:name=$styleNameFromStyles]/style:paragraph-properties/@text:enable-numbering"/>
 										</xsl:when>
-                    <!--<xsl:when test ="not(document('styles.xml')//office:styles/style:style[@style:name=$styleNameFromStyles]/style:paragraph-properties/@text:enable-numbering)">
+                    <xsl:when test ="not(document('styles.xml')//office:styles/style:style[@style:name=$styleNameFromStyles]/style:paragraph-properties/@text:enable-numbering)">
                       <xsl:value-of select ="'true'"/>
-                    </xsl:when>-->
+                    </xsl:when>
 										<!--<xsl:otherwise>
                       <xsl:value-of select ="'true'"/>
                     </xsl:otherwise>-->
@@ -851,6 +849,7 @@ Copyright (c) 2007, Sonata Software Limited
 							<!-- parameter added by vijayeta, dated 13-7-07-->
 							<xsl:with-param name ="masterPageName" select ="$masterPageName"/>
               <xsl:with-param name ="pos" select ="$forCount"/>
+              <xsl:with-param name ="FrameCount" select ="substring-after($FrameCount,'Frame')"/>
 						</xsl:call-template >
 						<!--End of Code inserted by Vijayets for Bullets and numbering-->
 						<xsl:for-each select ="child::node()[position()]">
@@ -1465,8 +1464,9 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="PostionCount"/>
     <xsl:param name="nodeType"/>
     <xsl:param name="linkCount"/>
-    <xsl:if test="text:a">
-      <xsl:for-each select="text:a">
+ 
+      <xsl:for-each select="./text:a">
+        <xsl:if test="position()=1">
         <a:hlinkClick>
           <xsl:if test="@xlink:href[ contains(.,'#Slide')]">
             <xsl:attribute name="action">
@@ -1487,8 +1487,9 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </xsl:if>
         </a:hlinkClick>
+        </xsl:if>
       </xsl:for-each>
-    </xsl:if>
+  
   </xsl:template>
   
 	<!--<xsl:template name ="getDefaultFontSize">
@@ -1843,6 +1844,21 @@ Copyright (c) 2007, Sonata Software Limited
 														<xsl:with-param name ="blvl" select="$blvl"/>
 													</xsl:call-template>
 												</xsl:variable>
+                        <xsl:variable name="paragraphId" >
+                          <xsl:call-template name ="getParaStyleName">
+                            <xsl:with-param name ="lvl" select ="$blvl"/>
+                          </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:variable name ="isNumberingEnabled">
+                          <xsl:choose >
+                            <xsl:when test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                              <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select ="'true'"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:variable>
 												<xsl:if test="string-length($xhrefValue) > 0">
 													<Relationship>
 														<xsl:attribute name="Id">
@@ -1900,8 +1916,8 @@ Copyright (c) 2007, Sonata Software Limited
 													</Relationship>
 												</xsl:if>
                         <xsl:for-each select ="document('content.xml')//text:list-style[@style:name=$listId]">
-                          <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1]">
-                            <xsl:variable name ="rId" select ="concat('buImage',$listId,$blvl+1,$forCount)"/>
+                          <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1] and $isNumberingEnabled='true'">
+                            <xsl:variable name ="rId" select ="concat('buImage',$listId,$blvl+1,$forCount,$PostionCount)"/>
                             <xsl:variable name ="imageName" select ="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'Pictures/')"/>
                             <Relationship >
                               <xsl:attribute name ="Id">
@@ -2059,6 +2075,21 @@ Copyright (c) 2007, Sonata Software Limited
 													</xsl:call-template>
 												</xsl:variable>
                         <xsl:variable name ="listId" select ="./@text:style-name"/>
+                        <xsl:variable name="paragraphId" >
+                          <xsl:call-template name ="getParaStyleName">
+                            <xsl:with-param name ="lvl" select ="$blvl"/>
+                          </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:variable name ="isNumberingEnabled">
+                          <xsl:choose >
+                            <xsl:when test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                              <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select ="'true'"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:variable>
 												<xsl:if test="string-length($xhrefValue) > 0">
 													<Relationship>
 														<xsl:attribute name="Id">
@@ -2116,8 +2147,8 @@ Copyright (c) 2007, Sonata Software Limited
 													</Relationship>
 												</xsl:if>
                         <xsl:for-each select ="document('content.xml')//text:list-style[@style:name=$listId]">
-                          <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1]">
-                            <xsl:variable name ="rId" select ="concat('buImage',$listId,$blvl+1,$forCount)"/>
+                          <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1] and $isNumberingEnabled='true'">
+                            <xsl:variable name ="rId" select ="concat('buImage',$listId,$blvl+1,$forCount,$var_pos)"/>
                             <xsl:variable name ="imageName" select ="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'Pictures/')"/>
                             <Relationship >
                               <xsl:attribute name ="Id">
@@ -2159,7 +2190,7 @@ Copyright (c) 2007, Sonata Software Limited
 																		</xsl:variable>
 																		<xsl:if test="$pageID > 0">
 																			<xsl:attribute name="Id">
-																				<xsl:value-of select="concat('ShapeFileId',$PostionCount)"/>
+																				<xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
 																				<!--<xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>-->
 																			</xsl:attribute>
 																			<xsl:attribute name="Type">
@@ -2581,6 +2612,22 @@ Copyright (c) 2007, Sonata Software Limited
 												<xsl:with-param name ="blvl" select="$blvl"/>
 											</xsl:call-template>
 										</xsl:variable>
+                    <xsl:variable name ="listId" select ="./@text:style-name"/>
+                    <xsl:variable name="paragraphId" >
+                      <xsl:call-template name ="getParaStyleName">
+                        <xsl:with-param name ="lvl" select ="$blvl"/>
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name ="isNumberingEnabled">
+                      <xsl:choose >
+                        <xsl:when test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                          <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="'true'"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:variable>
 										<xsl:if test="string-length($xhrefValue) > 0">
 											<Relationship>
 												<xsl:attribute name="Id">
@@ -2637,6 +2684,23 @@ Copyright (c) 2007, Sonata Software Limited
 												</xsl:choose>
 											</Relationship>
 										</xsl:if>
+                    <xsl:for-each select ="document('content.xml')//text:list-style[@style:name=$listId]">
+                      <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1] and $isNumberingEnabled='true'">
+                        <xsl:variable name ="rId" select ="concat('buImage',$listId,$blvl+1,$forCount,$var_pos)"/>
+                        <xsl:variable name ="imageName" select ="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'Pictures/')"/>
+                        <Relationship >
+                          <xsl:attribute name ="Id">
+                            <xsl:value-of  select ="$rId"/>
+                          </xsl:attribute>
+                          <xsl:attribute name ="Type" >
+                            <xsl:value-of select ="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name ="Target">
+                            <xsl:value-of select ="concat('../media/',$imageName)"/>
+                          </xsl:attribute>
+                        </Relationship >
+                      </xsl:if>
+                    </xsl:for-each>
 									</xsl:for-each>
 								</xsl:otherwise>
 							</xsl:choose>
@@ -2888,6 +2952,22 @@ Copyright (c) 2007, Sonata Software Limited
 												<xsl:with-param name ="blvl" select="$blvl"/>
 											</xsl:call-template>
 										</xsl:variable>
+                    <xsl:variable name ="listId" select ="./@text:style-name"/>
+                    <xsl:variable name="paragraphId" >
+                      <xsl:call-template name ="getParaStyleName">
+                        <xsl:with-param name ="lvl" select ="$blvl"/>
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name ="isNumberingEnabled">
+                      <xsl:choose >
+                        <xsl:when test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                          <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select ="'true'"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:variable>
 										<xsl:if test="string-length($xhrefValue) > 0">
 											<Relationship>
 												<xsl:attribute name="Id">
@@ -2944,6 +3024,23 @@ Copyright (c) 2007, Sonata Software Limited
 												</xsl:choose>
 											</Relationship>
 										</xsl:if>
+                    <xsl:for-each select ="document('content.xml')//text:list-style[@style:name=$listId]">
+                      <xsl:if test ="text:list-level-style-image[@text:level=$blvl+1] and $isNumberingEnabled='true'">
+                        <xsl:variable name ="rId" select ="concat('buImage',$listId,$blvl+1,$forCount,$var_pos)"/>
+                        <xsl:variable name ="imageName" select ="substring-after(text:list-level-style-image[@text:level=$blvl+1]/@xlink:href,'Pictures/')"/>
+                        <Relationship >
+                          <xsl:attribute name ="Id">
+                            <xsl:value-of  select ="$rId"/>
+                          </xsl:attribute>
+                          <xsl:attribute name ="Type" >
+                            <xsl:value-of select ="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name ="Target">
+                            <xsl:value-of select ="concat('../media/',$imageName)"/>
+                          </xsl:attribute>
+                        </Relationship >
+                      </xsl:if>
+                    </xsl:for-each>
 									</xsl:for-each>
 								</xsl:otherwise>
 							</xsl:choose>

@@ -176,9 +176,13 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:for-each select ="anim:par/child::node()[1]">
 
 			<xsl:for-each select ="node()">
-				<xsl:choose >
-					<xsl:when test ="name()='anim:set'">
-						<p:set>
+        <xsl:variable name ="varspid">
+          <xsl:call-template name ="tmpspTarget"/>
+        </xsl:variable >
+        <xsl:if test ="$varspid!=''">
+          <xsl:choose >
+            <xsl:when test ="name()='anim:set'">
+              <p:set>
 							<p:cBhvr>
 								<p:cTn id="6" fill="hold">
 									<xsl:attribute name ="dur">
@@ -549,6 +553,7 @@ Copyright (c) 2007, Sonata Software Limited
 						</p:animMotion>
 					</xsl:when>
 				</xsl:choose >
+        </xsl:if>
 			</xsl:for-each >
 		</xsl:for-each >
 	</xsl:template>
@@ -693,7 +698,22 @@ Copyright (c) 2007, Sonata Software Limited
 			</p:txEl>
 		</xsl:if>
 	</xsl:template>
-
+  <xsl:template name ="tmpspTarget">
+    <xsl:variable name ="spId">
+      <xsl:call-template name ="getnvPrId">
+        <xsl:with-param name ="spId">
+          <xsl:choose >
+            <xsl:when test ="./@smil:targetElement">
+              <xsl:value-of select ="./@smil:targetElement"/>
+            </xsl:when>
+            <xsl:when test ="parent::node()/@smil:targetElement">
+              <xsl:value-of select ="parent::node()/@smil:targetElement"/>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:with-param >
+      </xsl:call-template>
+    </xsl:variable>
+  </xsl:template>
 	<xsl:template name ="tavListValues">
 		<xsl:call-template name ="addTavListNode">
 			<xsl:with-param name ="string" select ="./@smil:values"/>
@@ -804,30 +824,74 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name ="spId"/>
 		<xsl:variable name ="varSpid">
 			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/parent::node()">
+        <xsl:for-each select ="node()">
+          <xsl:if test ="name()='draw:rect' or name()='draw:ellipse'
+                  or name()='draw:custom-shape' 
+                  or name()='draw:g' or name()='draw:frame'">
+            <xsl:choose>
+              <xsl:when test="name()='draw:frame'">
+                <xsl:choose>
+                  <xsl:when test="./draw:image">
+                    <xsl:if test ="contains(./draw:image/@xlink:href,'.png') or contains(./draw:image/@xlink:href,'.emf') 
+                      or contains(./draw:image/@xlink:href,'.wmf') or contains(./draw:image/@xlink:href,'.jfif') or contains(./draw:image/@xlink:href,'.jpe') 
+            or contains(./draw:image/@xlink:href,'.bmp') or contains(./draw:image/@xlink:href,'.dib')
+            or contains(./draw:image/@xlink:href,'.rle')
+            or contains(./draw:image/@xlink:href,'.bmz') or contains(./draw:image/@xlink:href,'.gfa') 
+            or contains(./draw:image/@xlink:href,'.emz') or contains(./draw:image/@xlink:href,'.wmz') 
+            or contains(./draw:image/@xlink:href,'.pcz')
+            or contains(./draw:image/@xlink:href,'.tif') or contains(./draw:image/@xlink:href,'.tiff') 
+            or contains(./draw:image/@xlink:href,'.cdr') or contains(./draw:image/@xlink:href,'.cgm')
+            or contains(./draw:image/@xlink:href,'.eps') 
+            or contains(./draw:image/@xlink:href,'.pct') or contains(./draw:image/@xlink:href,'.pict') 
+            or contains(./draw:image/@xlink:href,'.wpg') 
+            or contains(./draw:image/@xlink:href,'.jpeg') or contains(./draw:image/@xlink:href,'.gif') 
+            or contains(./draw:image/@xlink:href,'.png') or contains(./draw:image/@xlink:href,'.jpg')">
+                      <xsl:if test="not(./draw:image/@xlink:href[contains(.,'../')])">
+                        <xsl:call-template name="tmpgetNvPrID">
+                          <xsl:with-param name="spId" select="$spId"/>
+                        </xsl:call-template>
+                      </xsl:if>
+                    </xsl:if>
+                  </xsl:when>
+                  <xsl:when test="@presentation:class[contains(.,'title')]
+                                  or @presentation:class[contains(.,'subtitle')]
+                                  or @presentation:class[contains(.,'outline')]">
+                    <xsl:call-template name="tmpgetNvPrID">
+                      <xsl:with-param name="spId" select="$spId"/>
+                    </xsl:call-template>
+
+                  </xsl:when>
+                  <xsl:when test ="(draw:text-box) and not(@presentation:class)">
+                    <xsl:call-template name="tmpgetNvPrID">
+                      <xsl:with-param name="spId" select="$spId"/>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:when test="./draw:plugin">
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:when test="name()='draw:custom-shape'">
+                <xsl:variable name ="shapeName">
+                  <xsl:call-template name="tmpgetCustShapeType"/>
+                </xsl:variable>
+                <xsl:if test="$shapeName != ''">
+                  <xsl:call-template name="tmpgetNvPrID">
+                    <xsl:with-param name="spId" select="$spId"/>
+                  </xsl:call-template>
+                </xsl:if>
+              </xsl:when>
+              <xsl:when test="name()='draw:rect' or name()='draw:ellipse'
+                          or name()='draw:line' or name()='draw:connector'">
+                <xsl:call-template name="tmpgetNvPrID">
+                  <xsl:with-param name="spId" select="$spId"/>
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
 				<xsl:for-each select ="node()">
-					<xsl:variable name ="nvPrId">
-						<xsl:value-of select ="position()"/>
-					</xsl:variable>
-					<xsl:variable name ="drawId">
-						<xsl:if test ="$spId =@draw:id">
-							<xsl:value-of select ="position()"/>
-						</xsl:if >
-					</xsl:variable >
-					<xsl:variable name ="paraId">
-						<xsl:for-each select =".//text:p">
-							<xsl:if test ="$spId =@text:id">
-								<xsl:value-of select ="position()"/>
-							</xsl:if>
-						</xsl:for-each>
-					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test ="$paraId!=''">
-							<xsl:value-of select ="$nvPrId +1 "/>
-						</xsl:when>
-						<xsl:when test ="$paraId='' and $drawId !=''">
-							<xsl:value-of select ="$nvPrId +1 "/>
-						</xsl:when>
-					</xsl:choose>
+          
+			
 				</xsl:for-each>
 			</xsl:for-each >
 		</xsl:variable>
@@ -1715,49 +1779,91 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name ="spId"/>
 		<xsl:variable name ="varSpid">
 			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()">
+        
 				<xsl:for-each select ="node()">
-					<xsl:variable name ="nvPrId">
-						<xsl:value-of select ="position()"/>
-					</xsl:variable>
-					<xsl:variable name ="drawId">
-						<xsl:if test ="$spId =@draw:id">
-							<xsl:value-of select ="position()"/>
-						</xsl:if >
-					</xsl:variable >
-					<xsl:variable name ="paraId">
-						<xsl:for-each select =".//text:p">
-							<xsl:if test ="$spId =@text:id">
-								<xsl:value-of select ="position()"/>
-							</xsl:if>
-						</xsl:for-each>
-					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test ="$paraId!=''">
-							<xsl:value-of select ="$nvPrId +1 "/>
-						</xsl:when>
-						<xsl:when test ="$paraId='' and $drawId !=''">
-							<xsl:value-of select ="$nvPrId +1 "/>
-						</xsl:when>
-					</xsl:choose>
-				</xsl:for-each>
-			</xsl:for-each >
-		</xsl:variable>
-		<xsl:value-of select ="$varSpid"/>
-	</xsl:template>
-	<xsl:template name ="getParaIdval">
-		<xsl:param name ="spId"/>
-		<xsl:variable name ="varSpid">
-			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()">
-				<xsl:for-each select ="node()">
-					<xsl:variable name ="nvPrId">
-						<xsl:value-of select ="position()"/>
-					</xsl:variable>
-					<xsl:variable name ="paraId">
-						<xsl:for-each select =".//text:p">
-							<xsl:if test ="$spId =@text:id">
-								<xsl:value-of select ="position()"/>
-							</xsl:if>
-						</xsl:for-each>
+          <xsl:if test ="name()='draw:rect' or name()='draw:ellipse'
+                  or name()='draw:custom-shape' 
+                  or name()='draw:g' or name()='draw:frame'">
+            <xsl:choose>
+              <xsl:when test="name()='draw:frame'">
+                <xsl:choose>
+                  <xsl:when test="./draw:image">
+                      <xsl:if test ="contains(./draw:image/@xlink:href,'.png') or contains(./draw:image/@xlink:href,'.emf') 
+                      or contains(./draw:image/@xlink:href,'.wmf') or contains(./draw:image/@xlink:href,'.jfif') or contains(./draw:image/@xlink:href,'.jpe') 
+            or contains(./draw:image/@xlink:href,'.bmp') or contains(./draw:image/@xlink:href,'.dib')
+            or contains(./draw:image/@xlink:href,'.rle')
+            or contains(./draw:image/@xlink:href,'.bmz') or contains(./draw:image/@xlink:href,'.gfa') 
+            or contains(./draw:image/@xlink:href,'.emz') or contains(./draw:image/@xlink:href,'.wmz') 
+            or contains(./draw:image/@xlink:href,'.pcz')
+            or contains(./draw:image/@xlink:href,'.tif') or contains(./draw:image/@xlink:href,'.tiff') 
+            or contains(./draw:image/@xlink:href,'.cdr') or contains(./draw:image/@xlink:href,'.cgm')
+            or contains(./draw:image/@xlink:href,'.eps') 
+            or contains(./draw:image/@xlink:href,'.pct') or contains(./draw:image/@xlink:href,'.pict') 
+            or contains(./draw:image/@xlink:href,'.wpg') 
+            or contains(./draw:image/@xlink:href,'.jpeg') or contains(./draw:image/@xlink:href,'.gif') 
+            or contains(./draw:image/@xlink:href,'.png') or contains(./draw:image/@xlink:href,'.jpg')">
+                        <xsl:if test="not(./draw:image/@xlink:href[contains(.,'../')])">
+                          <xsl:call-template name="tmpgetNvPrID">
+                            <xsl:with-param name="spId" select="$spId"/>
+                          </xsl:call-template>
+                        </xsl:if>
+                      </xsl:if>
+                    </xsl:when>
+                    <xsl:when test="@presentation:class[contains(.,'title')]
+                                  or @presentation:class[contains(.,'subtitle')]
+                                  or @presentation:class[contains(.,'outline')]">
+                      <xsl:call-template name="tmpgetNvPrID">
+                        <xsl:with-param name="spId" select="$spId"/>
+                      </xsl:call-template>
+
+                    </xsl:when>
+                    <xsl:when test ="(draw:text-box) and not(@presentation:class)">
+                      <xsl:call-template name="tmpgetNvPrID">
+                        <xsl:with-param name="spId" select="$spId"/>
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="./draw:plugin">
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:when>
+               <xsl:when test="name()='draw:custom-shape'">
+                  <xsl:variable name ="shapeName">
+                    <xsl:call-template name="tmpgetCustShapeType"/>
+                  </xsl:variable>
+                  <xsl:if test="$shapeName != ''">
+                    <xsl:call-template name="tmpgetNvPrID">
+                      <xsl:with-param name="spId" select="$spId"/>
+                    </xsl:call-template>
+                </xsl:if>
+              </xsl:when>
+              <xsl:when test="name()='draw:rect' or name()='draw:ellipse'
+                          or name()='draw:line' or name()='draw:connector'">
+                <xsl:call-template name="tmpgetNvPrID">
+                  <xsl:with-param name="spId" select="$spId"/>
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+
+      </xsl:for-each >
+    </xsl:variable>
+    <xsl:value-of select ="$varSpid"/>
+  </xsl:template>
+  <xsl:template name ="getParaIdval">
+    <xsl:param name ="spId"/>
+    <xsl:variable name ="varSpid">
+      <xsl:for-each select ="./parent::node()/parent::node()/parent::node()">
+        <xsl:for-each select ="node()">
+          <xsl:variable name ="nvPrId">
+            <xsl:value-of select ="position()"/>
+          </xsl:variable>
+          <xsl:variable name ="paraId">
+            <xsl:for-each select =".//text:p">
+              <xsl:if test ="$spId =@text:id">
+                <xsl:value-of select ="position()"/>
+              </xsl:if>
+            </xsl:for-each>
 					</xsl:variable>
 					<xsl:if test ="$paraId!=''">
 						<xsl:value-of select ="$paraId -1"/>
@@ -1767,4 +1873,30 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:variable>
 		<xsl:value-of select ="$varSpid"/>
 	</xsl:template>
+  <xsl:template name="tmpgetNvPrID">
+    <xsl:param name ="spId"/>
+    <xsl:variable name ="nvPrId">
+      <xsl:value-of select ="position()"/>
+    </xsl:variable>
+    <xsl:variable name ="drawId">
+      <xsl:if test ="$spId =@draw:id">
+        <xsl:value-of select ="position()"/>
+      </xsl:if >
+    </xsl:variable >
+    <xsl:variable name ="paraId">
+      <xsl:for-each select =".//text:p">
+        <xsl:if test ="$spId =@text:id">
+          <xsl:value-of select ="position()"/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test ="$paraId!=''">
+        <xsl:value-of select ="$nvPrId +1 "/>
+      </xsl:when>
+      <xsl:when test ="$paraId='' and $drawId !=''">
+        <xsl:value-of select ="$nvPrId +1 "/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet >

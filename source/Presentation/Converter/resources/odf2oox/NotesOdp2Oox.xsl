@@ -44,10 +44,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="odf style text number draw page">
-  <xsl:import href ="common.xsl"/>
-  <xsl:import href ="shapes_direct.xsl"/>
-  <xsl:import href ="picture.xsl"/>
+  exclude-result-prefixes="odf style text number draw page"> 
   <xsl:template name ="Notes" match ="/office:document-content/office:body/office:presentation/draw:page/presentation:notes" mode="Notes">
     <xsl:param name ="pageNo"/>
     <p:notes xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
