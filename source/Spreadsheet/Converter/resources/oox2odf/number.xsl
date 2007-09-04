@@ -677,13 +677,97 @@
     <!-- add text at the end -->
     <xsl:if
       test="contains(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;') and not($currencyFormat and $currencyFormat != '' and contains(substring-before(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;'),$currencyFormat))">
-      <number:text>
-        <xsl:value-of
-          select="substring-before(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;')"
-        />
-      </number:text>
+      <xsl:call-template name="CheckEndText">
+        <xsl:with-param name="realFormatCode" select="$realFormatCode"/>
+      </xsl:call-template>
     </xsl:if>
   </xsl:template>
+
+  <xsl:template name="CheckEndText">
+    <xsl:param name="realFormatCode"/>
+
+    <xsl:variable name="quot">
+      <xsl:text>&quot;</xsl:text>
+    </xsl:variable>
+    
+    <!-- checked if there is " -->
+    <xsl:if test="contains($realFormatCode, $quot)">
+      <xsl:choose>
+        <xsl:when
+          test="contains(substring-after(substring-after($realFormatCode, $quot), $quot), '#')">
+          <xsl:call-template name="CheckEndText">
+            <xsl:with-param name="realFormatCode"
+              select="substring-after(substring-after($realFormatCode, $quot), $quot)"
+            />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="InsertEndText">
+            <xsl:with-param name="endText">
+              <xsl:text>&quot;</xsl:text>
+              <xsl:value-of select="substring-after($realFormatCode, $quot)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:template name="InsertEndText">
+    <xsl:param name="endText"/>
+   
+    <xsl:choose>
+      
+      <!-- if there are currency at the beginning of string -->
+      <xsl:when
+        test="substring-before(substring-after($endText, '&quot;'), '&quot;') = 'zł' or 
+        substring-before(substring-after($endText, '&quot;'), '&quot;') =  '$' or 
+        substring-before(substring-after($endText, '&quot;'), '&quot;') =  '€' or 
+        substring-before(substring-after($endText, '&quot;'), '&quot;') = '£' ">
+        <xsl:call-template name="InsertEndText">
+          <xsl:with-param name="endText"
+            select="substring-after(substring-after($endText, '&quot;'), '&quot;')"/>
+        </xsl:call-template>
+      </xsl:when> 
+
+      <!-- if there is " at the beginning of string -->
+      <xsl:when test="substring($endText,1,1) = '&quot;' ">
+        <number:text>
+          <xsl:value-of
+            select="substring-before(substring-after($endText, '&quot;'), '&quot;')"/>
+        </number:text>
+        <xsl:call-template name="InsertEndText">
+          <xsl:with-param name="endText"
+            select="substring-after(substring-after($endText, '&quot;'), '&quot;')"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <!-- if there is \  at the beginning of string -->
+      <xsl:when test="substring($endText,1,1) = '\' ">
+        <number:text>
+          <xsl:value-of
+            select="substring($endText,2,1)"/>
+        </number:text>
+        <xsl:call-template name="InsertEndText">
+          <xsl:with-param name="endText" select="substring($endText,2)"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <!-- if string contains " -->
+      <xsl:when test="contains($endText, '&quot;')">
+        <number:text>
+          <xsl:value-of
+            select="substring-before(substring-after($endText, '&quot;'), '&quot;')"/>
+        </number:text>
+        <xsl:call-template name="InsertEndText">
+          <xsl:with-param name="endText"
+            select="substring-after(substring-after($endText, '&quot;'), '&quot;')"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
 
   <xsl:template name="InsertNumberFormattingContent">
 
@@ -1724,24 +1808,28 @@
     <xsl:param name="preserveCurency"/>
 
     <xsl:choose>
-      <xsl:when test="$preserveCurency = 'true' and contains($formatCode,'&quot;') and substring-before(substring-after($formatCode,'&quot;'),'&quot;') = 'zł' or 
+      <xsl:when
+        test="$preserveCurency = 'true' and contains($formatCode,'&quot;') and substring-before(substring-after($formatCode,'&quot;'),'&quot;') = 'zł' or 
         substring-before(substring-after($formatCode,'&quot;'),'&quot;') = '$' or substring-before(substring-after($formatCode,'&quot;'),'&quot;') = '€'  or
         substring-before(substring-after($formatCode,'&quot;'),'&quot;') = '£' ">
-        
+
         <xsl:variable name="beforeText">
           <xsl:value-of select="substring-before($formatCode,'&quot;')"/>
         </xsl:variable>
-        
+
         <xsl:variable name="currency">
-          <xsl:value-of select="substring-before(substring-after($formatCode,'&quot;'),'&quot;')"/>
+          <xsl:value-of
+            select="substring-before(substring-after($formatCode,'&quot;'),'&quot;')"/>
         </xsl:variable>
-        
+
         <xsl:call-template name="StripText">
-          <xsl:with-param name="formatCode" select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
-          <xsl:with-param name="result" select="concat($result,$beforeText,'&quot;',$currency,'&quot;')"/>
+          <xsl:with-param name="formatCode"
+            select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
+          <xsl:with-param name="result"
+            select="concat($result,$beforeText,'&quot;',$currency,'&quot;')"/>
           <xsl:with-param name="preserveCurency" select="$preserveCurency"/>
         </xsl:call-template>
-        
+
       </xsl:when>
       <xsl:when test="contains($formatCode,'&quot;')">
         <xsl:variable name="beforeText">
@@ -1754,7 +1842,8 @@
         </xsl:variable-->
 
         <xsl:call-template name="StripText">
-          <xsl:with-param name="formatCode" select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
+          <xsl:with-param name="formatCode"
+            select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
           <xsl:with-param name="result" select="concat($result,$beforeText)"/>
           <xsl:with-param name="preserveCurency" select="$preserveCurency"/>
         </xsl:call-template>
