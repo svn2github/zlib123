@@ -1245,9 +1245,19 @@
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
 
-
     <!-- do not show covered cells content -->
 
+    <xsl:variable name="columnCellStyle">
+      <xsl:call-template name="GetColumnCellStyle">
+        <xsl:with-param name="colNum">
+          <xsl:value-of select="$colNumber + 1"/>
+        </xsl:with-param>
+        <xsl:with-param name="TableColumnTagNum">
+          <xsl:value-of select="$TableColumnTagNum"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <xsl:call-template name="InsertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -1298,54 +1308,10 @@
                   in $TableColumnTagNum there should be 'K' ($TableColumnTagNum contains listed default-cell-style-name from backward) -->
       <xsl:when
         test="not(parent::node()/@table:number-rows-repeated) and not(parent::node()/@table:style-name) and @table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:style-name) and 
-        not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> 
-      </xsl:when>
-
-      <!-- empty cells but with formatting, e.g. background-->
-      <xsl:when test="parent::node()/@table:style-name and number(@table:number-columns-repeated) &gt; $ColumnRepeated and not(child::text:p) and not(child::text:span)">
-        <xsl:call-template name="InsertConvertCell">
-          <xsl:with-param name="colNumber">
-            <xsl:value-of select="$colNumber + 1"/>
-          </xsl:with-param>
-          <xsl:with-param name="rowNumber" select="$rowNumber"/>
-          <xsl:with-param name="cellNumber">
-            <xsl:value-of select="$cellNumber"/>
-          </xsl:with-param>
-          <xsl:with-param name="ColumnRepeated">
-            <xsl:value-of select="$ColumnRepeated + 1"/>
-          </xsl:with-param>
-          <xsl:with-param name="TableColumnTagNum">
-            <xsl:value-of select="$TableColumnTagNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="MergeCell">
-            <xsl:value-of select="$MergeCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="MergeCellStyle">
-            <xsl:value-of select="$MergeCellStyle"/>
-          </xsl:with-param>
-          <xsl:with-param name="CountStyleTableCell">
-            <xsl:value-of select="$CountStyleTableCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="multilines">
-            <xsl:value-of select="$multilines"/>
-          </xsl:with-param>
-          <xsl:with-param name="hyperlinkStyle">
-            <xsl:value-of select="$hyperlinkStyle"/>
-          </xsl:with-param>
-          <xsl:with-param name="cellFormats">
-            <xsl:value-of select="$cellFormats"/>
-          </xsl:with-param>
-          <xsl:with-param name="cellStyles">
-            <xsl:value-of select="$cellStyles"/>
-          </xsl:with-param>
-          <xsl:with-param name="CheckIfConditional">
-            <xsl:value-of select="$CheckIfConditional"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
+        not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> </xsl:when>
 
       <xsl:when
-        test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p)">
+        test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p or $columnCellStyle != '')">
 
         <xsl:call-template name="InsertConvertCell">
           <xsl:with-param name="colNumber">
