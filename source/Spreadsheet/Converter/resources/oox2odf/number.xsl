@@ -478,6 +478,13 @@
       </xsl:choose>
     </xsl:variable>
 
+    <xsl:variable name="strippedFormat">
+      <xsl:call-template name="StripText">
+        <xsl:with-param name="formatCode" select="$formatCode"/>
+        <xsl:with-param name="preserveCurrency" select="'true'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <!-- adding '\' -->
     <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
       <xsl:call-template name="AddNumberText">
@@ -488,31 +495,31 @@
     </xsl:if>
 
     <!-- handle red numbers -->
-    <xsl:if test="contains($formatCode,'Red')">
+    <xsl:if test="contains($strippedFormat,'Red')">
       <style:text-properties fo:color="#ff0000"/>
     </xsl:if>
     <!-- handle green numbers -->
-    <xsl:if test="contains($formatCode,'Green')">
+    <xsl:if test="contains($strippedFormat,'Green')">
       <style:text-properties fo:color="#00ff00"/>
     </xsl:if>
     <!-- handle blue numbers -->
-    <xsl:if test="contains($formatCode,'Blue')">
+    <xsl:if test="contains($strippedFormat,'Blue')">
       <style:text-properties fo:color="#0000ff"/>
     </xsl:if>
     <!-- handle cyan numbers -->
-    <xsl:if test="contains($formatCode,'Cyan')">
+    <xsl:if test="contains($strippedFormat,'Cyan')">
       <style:text-properties fo:color="#00ffff"/>
     </xsl:if>
     <!-- handle magenta numbers -->
-    <xsl:if test="contains($formatCode,'Magenta')">
+    <xsl:if test="contains($strippedFormat,'Magenta')">
       <style:text-properties fo:color="#ff00ff"/>
     </xsl:if>
     <!-- handle yellow numbers -->
-    <xsl:if test="contains($formatCode,'Yellow')">
+    <xsl:if test="contains($strippedFormat,'Yellow')">
       <style:text-properties fo:color="#ffff00"/>
     </xsl:if>
     <!-- handle white numbers -->
-    <xsl:if test="contains($formatCode,'White')">
+    <xsl:if test="contains($strippedFormat,'White')">
       <style:text-properties fo:color="#ffffff"/>
     </xsl:if>
 
@@ -694,7 +701,7 @@
     <xsl:if test="contains($realFormatCode, $quot)">
       <xsl:choose>
         <xsl:when
-          test="contains(substring-after(substring-after($realFormatCode, $quot), $quot), '#')">
+          test="contains(substring-after(substring-after(translate($realFormatCode, 0, '#'), $quot), $quot), '#')">
           <xsl:call-template name="CheckEndText">
             <xsl:with-param name="realFormatCode"
               select="substring-after(substring-after($realFormatCode, $quot), $quot)"
@@ -716,7 +723,7 @@
 
   <xsl:template name="InsertEndText">
     <xsl:param name="endText"/>
-   
+
     <xsl:choose>
       
       <!-- if there are currency at the beginning of string -->
