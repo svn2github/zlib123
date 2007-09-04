@@ -37,7 +37,8 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r pxsi">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  exclude-result-prefixes="e r pxsi">
 
   <xsl:template name="InsertText">
     <xsl:param name="position"/>
@@ -148,17 +149,18 @@
                 <!-- a postprocessor puts here strings from sharedstrings -->
                 <xsl:choose>
                   <xsl:when test="contains($rSheredStrings, e:v) ">
-                    <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
+                    <xsl:for-each
+                      select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
                       <xsl:apply-templates/>
                     </xsl:for-each>
                   </xsl:when>
                   <xsl:otherwise>
                     <pxsi:v>
                       <xsl:value-of select="e:v"/>
-                    </pxsi:v>    
+                    </pxsi:v>
                   </xsl:otherwise>
                 </xsl:choose>
-                
+
               </text:a>
             </xsl:when>
 
@@ -169,19 +171,20 @@
               <!-- a postprocessor puts here strings from sharedstrings -->
               <xsl:choose>
                 <xsl:when test="contains($rSheredStrings, e:v) ">
-                  <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
+                  <xsl:for-each
+                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
                     <xsl:apply-templates/>
                   </xsl:for-each>
                 </xsl:when>
                 <xsl:otherwise>
                   <pxsi:v>
                     <xsl:value-of select="e:v"/>
-                  </pxsi:v>    
+                  </pxsi:v>
                 </xsl:otherwise>
               </xsl:choose>
-              
-              
-              
+
+
+
             </xsl:otherwise>
           </xsl:choose>
         </text:p>
@@ -261,6 +264,14 @@
             <xsl:value-of select="key('Xf','')[position()=$position]/@numFmtId"/>
           </xsl:for-each>
         </xsl:variable>
+        
+        <xsl:variable name="strippedFormat">
+          <xsl:call-template name="StripText">
+            <xsl:with-param name="formatCode" select="$numStyle"/>
+            <xsl:with-param name="preserveCurrency" select="'true'"/>
+          </xsl:call-template>
+        </xsl:variable>
+        
         <xsl:attribute name="office:value-type">
           <xsl:choose>
             <xsl:when
@@ -268,13 +279,13 @@
               <xsl:text>percentage</xsl:text>
             </xsl:when>
             <xsl:when
-              test="(contains($numStyle,'y') or (contains($numStyle,'m') and not(contains($numStyle,'h') or contains($numStyle,'s'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
+              test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
               <xsl:text>date</xsl:text>
             </xsl:when>
 
             <!--'and' at the end is for Latvian currency -->
             <xsl:when
-              test="contains($numStyle,'h') or contains($numStyle,'s') and not(contains($numStyle,'[$Ls-426]'))">
+              test="contains($strippedFormat,'h') or contains($strippedFormat,'s') and not(contains($numStyle,'[$Ls-426]'))">
               <xsl:text>time</xsl:text>
             </xsl:when>
 
@@ -293,10 +304,10 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        
+
         <xsl:choose>
           <xsl:when
-            test="(contains($numStyle,'y') or (contains($numStyle,'m') and not(contains($numStyle,'h') or contains($numStyle,'s'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
+            test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
             <xsl:attribute name="office:date-value">
               <xsl:call-template name="NumberToDate">
                 <xsl:with-param name="value">
@@ -316,7 +327,7 @@
 
           <!--'and' at the end is for Latvian currency -->
           <xsl:when
-            test="not(contains($numStyle,'[$Ls-426]')) and (contains($numStyle,'h') or contains($numStyle,'s') or $numId = 18 or $numId = 20)">
+            test="not(contains($numStyle,'[$Ls-426]')) and (contains($strippedFormat,'h') or contains($strippedFormat,'s') or $numId = 18 or $numId = 20)">
             <xsl:attribute name="office:time-value">
               <xsl:call-template name="NumberToTime">
                 <xsl:with-param name="value">
@@ -335,7 +346,7 @@
           <xsl:choose>
 
             <xsl:when
-              test="(contains($numStyle,'y') or (contains($numStyle,'m') and not(contains($numStyle,'h') or contains($numStyle,'s'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
+              test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
               <xsl:call-template name="FormatDate">
                 <xsl:with-param name="value">
                   <xsl:call-template name="NumberToDate">
@@ -375,7 +386,7 @@
 
             <!--'and' at the end is for Latvian currency -->
             <xsl:when
-              test="contains($numStyle,'h') or contains($numStyle,'s') and not(contains($numStyle,'[$Ls-426]'))">
+              test="contains($strippedFormat,'h') or contains($strippedFormat,'s') and not(contains($strippedFormat,'[$Ls-426]'))">
               <xsl:call-template name="FormatTime">
                 <xsl:with-param name="value">
                   <xsl:call-template name="NumberToTime">

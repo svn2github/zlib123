@@ -465,8 +465,8 @@
 
     <xsl:param name="formatCode"/>
     <!-- (string) The format code which is converted  -->
-
     <!-- '*' is not converted -->
+
     <xsl:variable name="realFormatCode">
       <xsl:choose>
         <xsl:when test="contains($formatCode,'*')">
@@ -518,7 +518,7 @@
 
     <xsl:variable name="currencyFormat">
       <xsl:choose>
-        <xsl:when test="contains($realFormatCode,'zł')">zł</xsl:when>
+        <xsl:when test="contains($realFormatCode,'&quot;zł&quot;')">zł</xsl:when>
         <xsl:when test="contains($realFormatCode,'Red')">
           <xsl:value-of
             select="substring-after(substring-before(substring-after($realFormatCode,'Red]'),']'),'[')"
@@ -527,9 +527,9 @@
         <xsl:when test="contains($realFormatCode,'[$')">
           <xsl:value-of select="substring-after(substring-before($realFormatCode,']'),'[')"/>
         </xsl:when>
-        <xsl:when test="contains($realFormatCode,'$')">$</xsl:when>
-        <xsl:when test="contains($realFormatCode,'€')">€</xsl:when>
-        <xsl:when test="contains($realFormatCode,'£')">£</xsl:when>
+        <xsl:when test="contains($realFormatCode,'&quot;$&quot;')">$</xsl:when>
+        <xsl:when test="contains($realFormatCode,'&quot;€&quot;')">€</xsl:when>
+        <xsl:when test="contains($realFormatCode,'&quot;£&quot;')">£</xsl:when>
       </xsl:choose>
     </xsl:variable>
 
@@ -538,8 +538,7 @@
       test="contains(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;') and not($currencyFormat and $currencyFormat != '' and contains(substring-before(substring-after(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;'),$currencyFormat))">
       <number:text>
         <xsl:value-of
-          select="substring-before(substring-after(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;')"
-        />
+          select="substring-before(substring-after($realFormatCode,'&quot;'),'&quot;')"/>
       </number:text>
     </xsl:if>
 
@@ -1721,25 +1720,48 @@
 
   <xsl:template name="StripText">
     <xsl:param name="formatCode"/>
+    <xsl:param name="result"/>
+    <xsl:param name="preserveCurency"/>
 
     <xsl:choose>
+      <xsl:when test="$preserveCurency = 'true' and contains($formatCode,'&quot;') and substring-before(substring-after($formatCode,'&quot;'),'&quot;') = 'zł' or 
+        substring-before(substring-after($formatCode,'&quot;'),'&quot;') = '$' or substring-before(substring-after($formatCode,'&quot;'),'&quot;') = '€'  or
+        substring-before(substring-after($formatCode,'&quot;'),'&quot;') = '£' ">
+        
+        <xsl:variable name="beforeText">
+          <xsl:value-of select="substring-before($formatCode,'&quot;')"/>
+        </xsl:variable>
+        
+        <xsl:variable name="currency">
+          <xsl:value-of select="substring-before(substring-after($formatCode,'&quot;'),'&quot;')"/>
+        </xsl:variable>
+        
+        <xsl:call-template name="StripText">
+          <xsl:with-param name="formatCode" select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
+          <xsl:with-param name="result" select="concat($result,$beforeText,'&quot;',$currency,'&quot;')"/>
+          <xsl:with-param name="preserveCurency" select="$preserveCurency"/>
+        </xsl:call-template>
+        
+      </xsl:when>
       <xsl:when test="contains($formatCode,'&quot;')">
         <xsl:variable name="beforeText">
           <xsl:value-of select="substring-before($formatCode,'&quot;')"/>
         </xsl:variable>
 
-        <xsl:variable name="afterText">
+        <!--xsl:variable name="afterText">
           <xsl:value-of
             select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
-        </xsl:variable>
+        </xsl:variable-->
 
         <xsl:call-template name="StripText">
-          <xsl:with-param name="formatCode" select="concat($beforeText,$afterText)"/>
+          <xsl:with-param name="formatCode" select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
+          <xsl:with-param name="result" select="concat($result,$beforeText)"/>
+          <xsl:with-param name="preserveCurency" select="$preserveCurency"/>
         </xsl:call-template>
       </xsl:when>
 
       <xsl:otherwise>
-        <xsl:value-of select="$formatCode"/>
+        <xsl:value-of select="concat($result,$formatCode)"/>
       </xsl:otherwise>
     </xsl:choose>
 
