@@ -232,7 +232,7 @@
             <!-- scatter chart has two value axes -->
             <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
               <xsl:for-each
-                select="key('plotArea','')/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
+                select="key('plotArea','')/c:valAx[1]/c:axPos">
                 <xsl:call-template name="InsertAxisXProperties">
                   <xsl:with-param name="type">
                     <xsl:text>valAx</xsl:text>
@@ -877,7 +877,7 @@
           <!-- scatter chart has two value axes -->
           <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
             <xsl:for-each
-              select="key('plotArea','')/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
+              select="key('plotArea','')/c:valAx[1]/c:axPos">
               <xsl:call-template name="InsertXAxis"/>
             </xsl:for-each>
             <xsl:for-each
