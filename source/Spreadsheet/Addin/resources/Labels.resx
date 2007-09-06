@@ -153,6 +153,9 @@
   <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
     <value>Excel does not support error macro allerts in data validation.</value>
   </data>
+  <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
+    <value>Excel doesn't supports quarter date format. Format will be change to year.</value>
+  </data>
   <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
     <value>Excel doesn't allow sheet names with more than 31 characters. Forbidden characters *\/[]:";? and characters above 31 will be lost.</value>
   </data>

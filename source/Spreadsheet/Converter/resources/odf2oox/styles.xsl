@@ -66,8 +66,22 @@
   <!-- insert all number formats -->
 
   <xsl:template name="InsertNumFormats">
+    
+    <!-- message about  not supported quarter date format-->
+    
+    <xsl:choose>
+      <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:quarter">
+        <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
+      </xsl:when>
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:date-style/number:quarter">
+        <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
+      </xsl:when>
+    </xsl:choose>
+    
+    
+    
     <numFmts>
-
+      
       <!-- number of all number styles in content.xml -->
       <xsl:variable name="countNumber">
         <xsl:value-of
