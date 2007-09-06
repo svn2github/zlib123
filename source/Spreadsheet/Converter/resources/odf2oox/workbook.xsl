@@ -106,6 +106,15 @@
 
   <!-- insert references to all sheets -->
   <xsl:template match="office:spreadsheet">
+    
+    <!-- Add-in message about sheet name length -->
+    <xsl:variable name="SheetNameLength">
+      <xsl:value-of select="string-length(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;)])"/>
+    </xsl:variable>
+    <xsl:if test="$SheetNameLength &gt;= 32">
+      <xsl:message terminate="no">translation.odf2oox.SheetNameLength</xsl:message>
+    </xsl:if>
+    
     <sheets>
       <xsl:for-each select="table:table">
         <xsl:if test="not(table:scenario)">
@@ -224,7 +233,7 @@
   <xsl:template name="CheckSheetName">
     <xsl:param name="name"/>
     <xsl:param name="sheetNumber"/>
-
+    
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
       <xsl:when
