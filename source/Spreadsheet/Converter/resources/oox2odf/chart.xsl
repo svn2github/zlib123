@@ -248,7 +248,29 @@
                 <xsl:call-template name="InsertMajorGridYProperties"/>
               </xsl:for-each>
             </xsl:when>
-
+            <!-- insert axis X properties for stock chart -->
+            <xsl:when test="key('plotArea','')/c:stockChart">
+              <!-- stock chart may contain catAx or dateAx as X axis -->
+              <xsl:if test="key('plotArea', '')/c:catAx">
+                <xsl:for-each select="key('plotArea','')/c:catAx">
+                  <xsl:call-template name="InsertAxisXProperties"/>
+                  <xsl:call-template name="InsertAxisXTitleProperties"/>
+                  <xsl:call-template name="InsertMajorGridXProperties"/>
+                </xsl:for-each>
+              </xsl:if>
+              <xsl:if test="key('plotArea','')/c:dateAx">
+                <xsl:for-each select="key('plotArea','')/c:dateAx">
+                  <xsl:call-template name="InsertAxisXProperties"/>
+                  <xsl:call-template name="InsertAxisXTitleProperties"/>
+                  <xsl:call-template name="InsertMajorGridXProperties"/>
+                </xsl:for-each>
+              </xsl:if>
+              <xsl:for-each select="key('plotArea','')/c:valAx[1]">
+                <xsl:call-template name="InsertAxisYProperties"/>
+                <xsl:call-template name="InsertAxisYTitleProperties"/>
+                <xsl:call-template name="InsertMajorGridYProperties"/>
+              </xsl:for-each>
+            </xsl:when>
             <xsl:otherwise>
               <xsl:for-each select="key('plotArea','')/c:catAx[1]">
                 <xsl:call-template name="InsertAxisXProperties">
@@ -490,9 +512,6 @@
     <xsl:choose>
       <xsl:when test="$count &lt; $points">
         <table:table-row>
-          <!--          <xsl:attribute name="zzzzz">
-            <xsl:value-of select="concat('count: ',$count,'#points: ',$points,'#catNumber: ',$categoryNumber)"/>
-          </xsl:attribute>-->
           <!-- category name -->
           <table:table-cell office:value-type="string">
             <text:p>
@@ -836,14 +855,12 @@
           <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
             <xsl:text>chart:scatter</xsl:text>
           </xsl:when>
-          <!--
-            
-            <xsl:when test="key('plotArea','')/c:stockChart">
-            <xsl:text>chart:stock<xsl:text>
-            </xsl:when>
-            
-            SURFACE ???
--->
+
+
+          <xsl:when test="key('plotArea','')/c:stockChart">
+            <xsl:text>chart:stock</xsl:text>
+          </xsl:when>
+
           <xsl:otherwise>
             <xsl:text>chart:bar</xsl:text>
           </xsl:otherwise>
@@ -853,16 +870,23 @@
       <xsl:call-template name="InsertTitle"/>
       <xsl:call-template name="InsertLegend"/>
 
-      <chart:plot-area chart:style-name="plot_area" table:cell-range-address="Sheet1.$D$3:.$F$3"
-        chart:table-number-list="0" svg:x="0.26cm" svg:y="2.087cm" svg:width="10.472cm"
-        svg:height="7.008cm">
-
+      <chart:plot-area chart:style-name="plot_area" chart:table-number-list="0" svg:x="0.26cm"
+        svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">
         <!-- Axes -->
         <xsl:choose>
           <!-- scatter chart has two value axes -->
           <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
             <xsl:for-each
               select="key('plotArea','')/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
+              <xsl:call-template name="InsertXAxis"/>
+            </xsl:for-each>
+            <xsl:for-each
+              select="key('plotArea','')/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
+              <xsl:call-template name="InsertYAxis"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:when test="key('plotArea','')/c:stockChart">
+            <xsl:for-each select="key('plotArea','')/c:dateAx">
               <xsl:call-template name="InsertXAxis"/>
             </xsl:for-each>
             <xsl:for-each
@@ -1157,6 +1181,12 @@
           chart:error-upper-limit="0" chart:error-category="none" chart:error-percentage="0"
           chart:regression-type="none" chart:data-label-number="none" chart:data-label-text="false"
           chart:data-label-symbol="false">
+          <!-- insert markers for Stock Chart if necessary -->
+          <xsl:if test="descendant::node()/c:marker and key('plotArea','')/c:stockChart">
+            <xsl:attribute name="chart:symbol-type">
+              <xsl:text>automatic</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
           <!-- data grouping-->
           <xsl:choose>
             <xsl:when test="key('grouping','')[1]/@val = 'stacked' ">
@@ -1297,8 +1327,7 @@
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
         chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
-        style:direction="ltr" chart:origin="0">
-
+        style:direction="ltr">
         <xsl:call-template name="SetAxisChartProperties"/>
 
       </style:chart-properties>
