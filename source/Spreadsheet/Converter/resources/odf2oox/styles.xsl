@@ -67,8 +67,7 @@
 
   <xsl:template name="InsertNumFormats">
     
-    <!-- message about  not supported quarter date format-->
-    
+    <!-- message about  not supported quarter and week date format-->
     <xsl:choose>
       <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:quarter">
         <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
@@ -77,7 +76,15 @@
         <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
       </xsl:when>
     </xsl:choose>
-    
+    <!-- this message is currently not supported because is questionable -->
+    <xsl:choose>
+      <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:week-of-year">
+        <xsl:message terminate="no">translation.odf2oox.WeekDateFormat</xsl:message>
+      </xsl:when>
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:date-style/number:week-of-year">
+        <xsl:message terminate="no">translation.odf2oox.WeekDateFormat</xsl:message>
+      </xsl:when>
+    </xsl:choose>
     
     
     <numFmts>

@@ -1255,6 +1255,12 @@
                 <xsl:value-of select="$LastBreakInsideHeader"/>
                 <xsl:text>;</xsl:text>
               </xsl:variable>
+              
+              <!--message will be displayed if there is more than one manual column breake inside header -->
+              <xsl:if test="string-length($breakes) - string-length(translate($breakes,';','')) &gt; 1">
+                <xsl:message terminate="no">translation.oox2odf.ManualColBreakeInsideHeader</xsl:message>
+              </xsl:if>
+ 
 
               <xsl:call-template name="InsertFirstColBreaksWhenThereAreNotCols">
                 <xsl:with-param name="ManualColBreaks" select="$breakes"/>

@@ -148,15 +148,18 @@
     <value>Data consolidation cannot be conversed</value>
   </data>
   <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
-    <value>Excel does not support cell range criteria in data validation.</value>
+    <value>Excel doesn't support cell range criteria in data validation.</value>
   </data>
   <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
-    <value>Excel does not support error macro allerts in data validation.</value>
+    <value>Excel doesn't support error macro allerts in data validation.</value>
   </data>
   <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
-    <value>Excel doesn't supports quarter date format. Format will be change to year.</value>
+    <value>Excel doesn't supports quarter date format. Date format will be changed to year.</value>
   </data>
   <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
     <value>Excel doesn't allow sheet names with more than 31 characters. Forbidden characters *\/[]:";? and characters above 31 will be lost.</value>
+  </data>
+  <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
+    <value>There is more than one manual column break inside header columns to repeat. Only one will be visible.</value>
   </data>
 </root>
