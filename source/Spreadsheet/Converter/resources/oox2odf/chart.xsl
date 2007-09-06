@@ -1187,6 +1187,12 @@
               <xsl:text>automatic</xsl:text>
             </xsl:attribute>
           </xsl:if>
+		  <!-- japanese candle-stick can be true only for stockChart or lineChart -->
+          <xsl:if test="key('plotArea','')/c:stockChart/c:upDownBars or key('plotArea','')/c:lineChart/c:upDownBars">
+            <xsl:attribute name="chart:japanese-candle-stick">
+              <xsl:text>true</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
           <!-- data grouping-->
           <xsl:choose>
             <xsl:when test="key('grouping','')[1]/@val = 'stacked' ">
