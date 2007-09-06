@@ -176,7 +176,7 @@
                     <xsl:when test="contains(@table:condition, 'is-time')">
                         <xsl:text>time</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains(@table:condition, 'is-in-list')">
+                    <xsl:when test="contains(@table:condition, 'is-in-list(&quot;')">
                         <xsl:text>list</xsl:text>
                     </xsl:when>
                     <xsl:when test="contains(@table:condition, 'cell-content-text-length')">
@@ -204,6 +204,14 @@
                     </xsl:choose>
                 </xsl:attribute>
             </xsl:for-each>
+            
+            <xsl:if test="table:error-macro">
+                <xsl:message terminate="no">translation.odf2oox.DataValidErrorMacro</xsl:message>
+            </xsl:if>
+            <xsl:if test="contains(@table:condition, 'is-in-list(') and not(contains(@table:condition, 'is-in-list(&quot;'))">
+                <xsl:message terminate="no">translation.odf2oox.DataValidCellRange</xsl:message>
+            </xsl:if>
+            
 
             <!-- Criteria Data -->
             <xsl:attribute name="operator">
@@ -246,12 +254,12 @@
 
             <!-- Input Help - Show input help when cell is selected -->
             <xsl:for-each select="table:help-message">
-                    <xsl:if test="contains(@table:display, 'true')">
-                        <xsl:attribute name="showInputMessage">
-                            <xsl:text>1</xsl:text>
-                        </xsl:attribute>
-                    </xsl:if>
-                
+                <xsl:if test="contains(@table:display, 'true')">
+                    <xsl:attribute name="showInputMessage">
+                        <xsl:text>1</xsl:text>
+                    </xsl:attribute>
+                </xsl:if>
+
                 <!-- Input Help Title -->
                 <xsl:if test="@table:title !='' ">
                     <xsl:attribute name="promptTitle">

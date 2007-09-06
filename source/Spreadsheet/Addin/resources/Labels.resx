@@ -127,9 +127,6 @@
     <value>Too many scenario cells. Excel support only 32 scenario cells</value>
   </data>
   <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
-    <value>Excel supports only cubic interpolation for chart plotting</value>
-  </data>
-  <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
     <value>Excel does not support border colors for scenarios </value>
   </data>
   <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
@@ -149,5 +146,11 @@
   </data>
   <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
     <value>Data consolidation cannot be conversed</value>
+  </data>
+  <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
+    <value>Excel does not support cell range criteria in data validation.</value>
+  </data>
+  <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
+    <value>Excel does not support error macro allerts in data validation.</value>
   </data>
 </root>
