@@ -106,15 +106,43 @@
 
   <!-- insert references to all sheets -->
   <xsl:template match="office:spreadsheet">
-    
+
     <!-- Add-in message about sheet name length -->
-    <xsl:variable name="SheetNameLength">
-      <xsl:value-of select="string-length(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;)])"/>
-    </xsl:variable>
-    <xsl:if test="$SheetNameLength &gt;= 32">
-      <xsl:message terminate="no">translation.odf2oox.SheetNameLength</xsl:message>
-    </xsl:if>
+
+    <xsl:for-each select="table:table">
+
+      <xsl:variable name="SheetName">
+        <xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="position()"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of
+              select="translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;)"
+            />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="SheetNameWithForbiddenChars">
+        <xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="position()"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of select="@table:name"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:if test="(string-length($SheetNameWithForbiddenChars) - string-length($SheetName) &gt; 0) or (string-length($SheetName) &gt; 31)">
+        <xsl:message terminate="no">translation.odf2oox.SheetNameLength</xsl:message>
+      </xsl:if>
     
+    </xsl:for-each>
+
+
+
     <sheets>
       <xsl:for-each select="table:table">
         <xsl:if test="not(table:scenario)">

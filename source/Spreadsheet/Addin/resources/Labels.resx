@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
-    <value>Excel supports only 256 chars in header/footer strings(with formatting). Any chars above 256 will be lost</value>
+    <value>Excel supports only 256 chars in header/footer strings(with formatting). Any characters above 256 will be lost</value>
   </data>
   <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
     <value>Some data filters had to be removed because Excel doesn't support them</value>
