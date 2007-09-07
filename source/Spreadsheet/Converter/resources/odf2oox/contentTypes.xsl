@@ -76,6 +76,7 @@
       <xsl:call-template name="InsertSheetContentTypes"/>
       <xsl:call-template name="InsertExternalLinkTypes"/>
       <xsl:call-template name="InsertChangeTrackingTypes"/>
+      <xsl:call-template name="InsertPivotTableTypes"/>
 
     </Types>
   </xsl:template>
@@ -228,6 +229,43 @@
     </xsl:if>
     
   </xsl:template>
-  
-  
+
+
+  <xsl:template name="InsertPivotTableTypes">
+
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+
+      <xsl:variable name="tableName">
+        <xsl:value-of select="@table:name"/>
+      </xsl:variable>
+      
+      <xsl:variable name="sheetNum">
+        <xsl:value-of select="position()"/>
+      </xsl:variable>
+
+      <xsl:for-each
+        select="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+
+        <!-- pivotTable -->
+        <Override PartName="{concat('/xl/pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}"
+          ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotTable+xml"/>
+
+        <xsl:variable name="pivotSource">
+          <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+        </xsl:variable>
+
+        <xsl:if
+          test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+          <Override PartName="{concat('/xl/pivotCache/pivotCacheDefinition_',generate-id(),'.xml')}"
+            ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheDefinition+xml"/>
+          <Override PartName="{concat('/xl/pivotCache/pivotCacheRecords_',generate-id(),'.xml')}"
+            ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheRecords+xml"
+          />
+        </xsl:if>
+
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+
 </xsl:stylesheet>

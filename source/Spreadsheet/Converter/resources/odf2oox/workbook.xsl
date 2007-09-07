@@ -163,6 +163,22 @@
       <!--definedName name="praca" localSheetId="0">Sheet1!$C$11:$D$11</definedName-->
     </definedNames>
 
+    <xsl:if test="table:data-pilot-tables">
+      <pivotCaches>
+        <xsl:for-each select="key('pivot','')">
+
+          <xsl:variable name="pivotSource">
+            <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+          </xsl:variable>
+
+          <!-- do not duplicate the same source range cache -->
+          <xsl:if
+            test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+            <pivotCache cacheId="{count(preceding-sibling::table:data-pilot-table)}" r:id="{generate-id()}"/>
+          </xsl:if>
+        </xsl:for-each>
+      </pivotCaches>
+    </xsl:if>
   </xsl:template>
 
   <!-- insert all sheets -->

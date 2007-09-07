@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  * Copyright (c) 2007, Clever Age
+  * All rights reserved.
+  * 
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are met:
+  *
+  *     * Redistributions of source code must retain the above copyright
+  *       notice, this list of conditions and the following disclaimer.
+  *     * Redistributions in binary form must reproduce the above copyright
+  *       notice, this list of conditions and the following disclaimer in the
+  *       documentation and/or other materials provided with the distribution.
+  *     * Neither the name of Clever Age nor the names of its contributors 
+  *       may be used to endorse or promote products derived from this software
+  *       without specific prior written permission.
+  *
+  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  * DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+
+  <xsl:template name="InsertPivotTable">
+    <!-- @Context: table:data-pilot-table -->
+
+    <pivotTableDefinition applyNumberFormats="0" applyBorderFormats="0" applyFontFormats="0"
+      applyPatternFormats="0" applyAlignmentFormats="0" applyWidthHeightFormats="1"
+      dataCaption="Data" updatedVersion="3" minRefreshableVersion="3" showCalcMbrs="0"
+      useAutoFormatting="1" itemPrintTitles="1" createdVersion="3" indent="0" outline="1"
+      outlineData="1" multipleFieldFilters="0">
+
+      <xsl:attribute name="name">
+        <xsl:value-of select="@table:name"/>
+      </xsl:attribute>
+
+      <xsl:if test="@table:grand-total = 'none' or @table:grand-total = 'column' ">
+        <xsl:attribute name="rowGrandTotals">
+          <xsl:text>0</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <xsl:if test="@table:grand-total = 'none' or @table:grand-total = 'row' ">
+        <xsl:attribute name="colGrandTotals">
+          <xsl:text>0</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <xsl:variable name="source">
+        <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+      </xsl:variable>
+
+      <xsl:attribute name="cacheId">
+        <!-- first pilot table on this source id -->
+        <xsl:variable name="pivotSource">
+          <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+        </xsl:variable>
+
+        <xsl:for-each select="key('pivot','')">
+          <!-- do not duplicate the same source range cache -->
+          <xsl:if
+            test="table:source-cell-range/@table:cell-range-address = $pivotSource and 
+            not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+            <xsl:value-of select="count(preceding-sibling::table:data-pilot-table)"/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:attribute>
+
+      <location firstHeaderRow="1" firstDataRow="2" firstDataCol="1">
+
+        <xsl:choose>
+          <xsl:when test="@table:show-filter-button = 'false' ">
+            <xsl:attribute name="ref">
+              <xsl:value-of
+                select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+              <xsl:text>:</xsl:text>
+              <xsl:value-of
+                select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+
+            <xsl:variable name="startRow">
+              <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="substring-after(substring-before(@table:target-range-address,':'),'.')"
+                  />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <xsl:attribute name="ref">
+              <!-- column-->
+              <xsl:value-of
+                select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$startRow)"/>
+              <xsl:value-of select="$startRow + 2"/>
+              <xsl:text>:</xsl:text>
+              <xsl:value-of
+                select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </location>
+
+      <pivotFields>
+
+        <xsl:attribute name="count">
+
+          <xsl:variable name="startCol">
+            <xsl:call-template name="GetColNum">
+              <xsl:with-param name="cell">
+                <xsl:value-of
+                  select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <xsl:variable name="endCol">
+            <xsl:call-template name="GetColNum">
+              <xsl:with-param name="cell">
+                <xsl:value-of
+                  select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <xsl:value-of select="$endCol - $startCol + 1"/>
+        </xsl:attribute>
+
+        <!-- pivotFields have names, the one field without name (definition?) can occur not only on the first place -->
+        <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+
+          <pivotField>
+
+            <!-- field orientation -->
+            <xsl:choose>
+              <xsl:when test="@table:orientation = 'page' ">
+                <xsl:attribute name="axis">
+                  <xsl:text>axisPage</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="@table:orientation = 'column' ">
+                <xsl:attribute name="axis">
+                  <xsl:text>axisCol</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="@table:orientation = 'row' ">
+                <xsl:attribute name="axis">
+                  <xsl:text>axisRow</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="@table:orientation = 'data' ">
+                <xsl:attribute name="dataField">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+
+          </pivotField>
+        </xsl:for-each>
+      </pivotFields>
+
+      <xsl:if
+        test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row' ]">
+        <rowFields
+          count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row'])}">
+          <xsl:for-each
+            select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row']">
+            <field>
+              <xsl:attribute name="x">
+                <xsl:value-of
+                  select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
+                />
+              </xsl:attribute>
+            </field>
+          </xsl:for-each>
+        </rowFields>
+      </xsl:if>
+
+      <!-- TO DO <rowItems> -->
+
+      <xsl:choose>
+        <xsl:when
+          test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column' ]">
+          <colFields
+            count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column'])}">
+            <xsl:for-each
+              select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column']">
+              <field>
+                <xsl:attribute name="x">
+                  <xsl:value-of
+                    select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
+                  />
+                </xsl:attribute>
+              </field>
+            </xsl:for-each>
+          </colFields>
+        </xsl:when>
+        <xsl:otherwise>
+          <colFields count="1">
+            <field x="-2"/>
+          </colFields>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <!-- TO DO <colItems> -->
+
+      <xsl:if
+        test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data' ]">
+        <dataFields
+          count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data'])}">
+          <xsl:for-each
+            select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data']">
+            <dataField>
+              <xsl:attribute name="name">
+                <xsl:value-of select="@table:source-field-name"/>
+              </xsl:attribute>
+
+              <xsl:attribute name="fld">
+                <xsl:value-of
+                  select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
+                />
+              </xsl:attribute>
+
+              <xsl:if test="@table:function != 'sum' ">
+
+                <xsl:attribute name="subtotal">
+                  <xsl:choose>
+                    <xsl:when test="@table:function = 'countnums' ">
+                      <xsl:text>countNums</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@table:function = 'stdev' ">
+                      <xsl:text>stdDev</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@table:function = 'stdevp' ">
+                      <xsl:text>stdDevp</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@table:function != 'sum' ">
+                      <xsl:value-of select="@table:function"/>
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:attribute>
+
+              </xsl:if>
+
+            </dataField>
+          </xsl:for-each>
+        </dataFields>
+      </xsl:if>
+
+      <pivotTableStyleInfo name="PivotStyleLight16" showRowHeaders="1" showColHeaders="1"
+        showRowStripes="0" showColStripes="0" showLastColumn="1"/>
+    </pivotTableDefinition>
+  </xsl:template>
+
+  <xsl:template name="InsertCacheDefinition">
+    <!-- @Context: table:data-pilot-table -->
+    <pivotCacheDefinition r:id="{generate-id(.)}" refreshedBy="Author"
+      refreshedDate="39328.480206134256" createdVersion="3" refreshedVersion="3"
+      minRefreshableVersion="3" recordCount="32">
+
+      <cacheSource type="worksheet">
+        <worksheetSource ref="E1:G33" sheet="Sheet2">
+          <xsl:attribute name="ref">
+            <xsl:value-of
+              select="substring-after(substring-before(table:source-cell-range/@table:cell-range-address,':'),'.')"/>
+            <xsl:text>:</xsl:text>
+            <xsl:value-of
+              select="substring-after(substring-after(table:source-cell-range/@table:cell-range-address,':'),'.')"
+            />
+          </xsl:attribute>
+
+          <xsl:attribute name="sheet">
+            <xsl:value-of
+              select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+          </xsl:attribute>
+        </worksheetSource>
+      </cacheSource>
+
+      <cacheFields count="{count(table:data-pilot-field[@table:source-field-name != ''])}">
+        <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+          <cacheField>
+            <xsl:attribute name="name">
+              <xsl:value-of select="@table:source-field-name"/>
+            </xsl:attribute>
+
+            <!--xsl:attribute name="pxsi:fieldType">
+              <xsl:choose>
+              <xsl:when test="@table:orientation = 'data'">
+              <xsl:text>data</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+              <xsl:text>axis</xsl:text>
+              </xsl:otherwise>
+              </xsl:choose>
+              </xsl:attribute-->
+
+            <!-- temporary shared items -->
+            <!--xsl:if test="position()= 1">
+              <sharedItems xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable">
+                <s v="digestion"/>
+                <s v="muscles"/>
+                <s v="circulation"/>
+              </sharedItems>
+            </xsl:if>
+            <xsl:if test="position()= 2">
+              <sharedItems containsSemiMixedTypes="0" containsString="0" containsNumber="1"
+                containsInteger="1" minValue="2" maxValue="10"/>
+            </xsl:if>
+            <xsl:if test="position()= 3">
+              <sharedItems containsSemiMixedTypes="0" containsString="0" containsNumber="1"
+                minValue="0.16666666666666699" maxValue="0.90909090909090895"/>
+            </xsl:if-->
+
+          </cacheField>
+        </xsl:for-each>
+      </cacheFields>
+
+    </pivotCacheDefinition>
+  </xsl:template>
+
+  <xsl:template name="InsertCacheRecords">
+    <!-- @Context: table:data-pilot-table -->
+    <pivotCacheRecords>
+
+      <xsl:variable name="sheetName">
+        <xsl:value-of
+          select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+      </xsl:variable>
+
+      <xsl:variable name="rowStart">
+        <xsl:for-each select="table:source-cell-range">
+          <xsl:call-template name="GetRowNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of
+                select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <xsl:variable name="colStart">
+        <xsl:for-each select="table:source-cell-range">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of
+                select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <xsl:variable name="rowEnd">
+        <xsl:for-each select="table:source-cell-range">
+          <xsl:call-template name="GetRowNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of
+                select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <xsl:variable name="colEnd">
+        <xsl:for-each select="table:source-cell-range">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of
+                select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <!-- go to table where source comes from -->
+      <xsl:for-each
+        select="parent::node()/parent::node()/table:table[@table:name = $sheetName]/descendant::table:table-row[1]">
+        <xsl:call-template name="GetCacheRows">
+          <xsl:with-param name="rowStart" select="$rowStart"/>
+          <xsl:with-param name="rowEnd" select="$rowEnd"/>
+          <xsl:with-param name="colStart" select="$colStart"/>
+          <xsl:with-param name="colEnd" select="$colEnd"/>
+          <xsl:with-param name="sheetName" select="$sheetName"/>
+        </xsl:call-template>
+      </xsl:for-each>
+    </pivotCacheRecords>
+  </xsl:template>
+
+  <xsl:template name="GetCacheRows">
+    <xsl:param name="rowStart"/>
+    <xsl:param name="rowEnd"/>
+    <xsl:param name="colStart"/>
+    <xsl:param name="colEnd"/>
+    <xsl:param name="rowNum" select="1"/>
+    <xsl:param name="sheetName"/>
+
+    <xsl:variable name="rows">
+      <xsl:choose>
+        <xsl:when test="@table:number-rows-repeated">
+          <xsl:value-of select="@table:number-rows-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <!-- skip rows before start of the source -->
+      <xsl:when test="$rowNum + $rows &lt;= $rowStart">
+        <xsl:for-each
+          select="following::table:table-row[ancestor::table:table/@table:name = $sheetName][1]">
+          <xsl:call-template name="GetCacheRows">
+            <xsl:with-param name="rowStart" select="$rowStart"/>
+            <xsl:with-param name="rowEnd" select="$rowEnd"/>
+            <xsl:with-param name="colStart" select="$colStart"/>
+            <xsl:with-param name="colEnd" select="$colEnd"/>
+            <xsl:with-param name="rowNum" select="$rowNum + $rows"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="$rowNum &lt;= $rowEnd">
+
+        <xsl:choose>
+          <xsl:when test="@table:number-rows-repeated &gt; 1">
+            <xsl:call-template name="InsertRepeatedCacheRow">
+              <xsl:with-param name="colStart" select="$colStart"/>
+              <xsl:with-param name="colEnd" select="$colEnd"/>
+              <xsl:with-param name="repeat" select="$rows"/>
+              <xsl:with-param name="rowNum" select="$rowNum"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertCacheRow">
+              <xsl:with-param name="colStart" select="$colStart"/>
+              <xsl:with-param name="colEnd" select="$colEnd"/>
+              <xsl:with-param name="rowNum" select="$rowNum"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+
+        <xsl:for-each
+          select="following::table:table-row[ancestor::table:table/@table:name = $sheetName][1]">
+          <xsl:call-template name="GetCacheRows">
+            <xsl:with-param name="rowStart" select="$rowStart"/>
+            <xsl:with-param name="rowEnd" select="$rowEnd"/>
+            <xsl:with-param name="colStart" select="$colStart"/>
+            <xsl:with-param name="colEnd" select="$colEnd"/>
+            <xsl:with-param name="sheetName" select="$sheetName"/>
+            <xsl:with-param name="rowNum" select="$rowNum + $rows"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertRepeatedCacheRow">
+    <xsl:param name="colStart"/>
+    <xsl:param name="colEnd"/>
+    <xsl:param name="repeat"/>
+    <xsl:param name="count" select="1"/>
+    <!-- temporary parameter -->
+    <xsl:param name="rowNum"/>
+
+    <xsl:if test="$count &lt;= $repeat">
+      <xsl:call-template name="InsertCacheRow">
+        <xsl:with-param name="colStart" select="$colStart"/>
+        <xsl:with-param name="colEnd" select="$colEnd"/>
+        <xsl:with-param name="rowNum" select="$rowNum"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertRepeatedCacheRow">
+        <xsl:with-param name="colStart" select="$colStart"/>
+        <xsl:with-param name="colEnd" select="$colEnd"/>
+        <xsl:with-param name="repeat" select="$repeat"/>
+        <xsl:with-param name="count" select="$count + 1"/>
+        <xsl:with-param name="rowNum" select="$rowNum + 1"/>
+      </xsl:call-template>
+    </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertCacheRow">
+    <xsl:param name="colStart"/>
+    <xsl:param name="colEnd"/>
+    <!-- temporary parameter -->
+    <xsl:param name="rowNum"/>
+
+    <r>
+      <xsl:attribute name="c">
+        <xsl:value-of select="$rowNum"/>
+      </xsl:attribute>
+      <xsl:call-template name="InsertCacheRowFields">
+        <xsl:with-param name="colStart" select="$colStart"/>
+        <xsl:with-param name="colEnd" select="$colEnd"/>
+      </xsl:call-template>
+    </r>
+
+  </xsl:template>
+
+  <xsl:template name="InsertCacheRowFields">
+    <xsl:param name="colStart"/>
+    <xsl:param name="colEnd"/>
+    <xsl:param name="colNum" select="1"/>
+
+    <xsl:variable name="columns">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+          <xsl:value-of select="@table:number-columns-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <!-- skip cells before start of the source -->
+      <xsl:when test="$colNum &lt; $colStart and $colNum + $columns - 1 &lt; $colStart">
+        <xsl:for-each select="following-sibling::node()[1]">
+          <xsl:call-template name="InsertCacheRowFields">
+            <xsl:with-param name="colStart" select="$colStart"/>
+            <xsl:with-param name="colEnd" select="$colEnd"/>
+            <xsl:with-param name="colNum" select="$colNum + $columns"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+
+      <!-- when single column is inside source -->
+      <xsl:when test="$columns = 1 and $colNum &lt;= $colEnd">
+
+        <xsl:call-template name="InsertCacheRowField">
+          <xsl:with-param name="colNum" select="$colNum"/>
+        </xsl:call-template>
+
+        <xsl:for-each select="following-sibling::node()[1]">
+          <xsl:call-template name="InsertCacheRowFields">
+            <xsl:with-param name="colStart" select="$colStart"/>
+            <xsl:with-param name="colEnd" select="$colEnd"/>
+            <xsl:with-param name="colNum" select="$colNum + $columns"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+
+      <!-- when whole repeated column is inside source -->
+      <xsl:when
+        test="$columns &gt; 1 and $colNum &gt;= $colStart and $colNum + $columns - 1 &lt;= $colEnd">
+
+        <xsl:call-template name="InsertRepeatedCacheRowFields">
+          <xsl:with-param name="repeat" select="$columns"/>
+          <xsl:with-param name="colNum" select="$colNum"/>
+        </xsl:call-template>
+
+        <xsl:for-each select="following-sibling::node()[1]">
+          <xsl:call-template name="InsertCacheRowFields">
+            <xsl:with-param name="colStart" select="$colStart"/>
+            <xsl:with-param name="colEnd" select="$colEnd"/>
+            <xsl:with-param name="colNum" select="$colNum + $columns"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+
+      <!-- when whole source is inside repeated columns -->
+      <xsl:when test="$colNum &lt;= $colStart and $colNum + $columns - 1 &gt;= $colEnd">
+
+        <xsl:call-template name="InsertRepeatedCacheRowFields">
+          <xsl:with-param name="repeat" select="$colEnd - $colStart + 1"/>
+          <xsl:with-param name="colNum" select="$colNum"/>
+        </xsl:call-template>
+
+      </xsl:when>
+
+      <!-- when source starts inside repeated columns 
+        (if $colNum + $columns - 1 is also lower than $colEnd than it will be covered by the first when )-->
+      <xsl:when test="$colNum &lt; $colStart and $colNum + $columns - 1 &lt;= $colEnd">
+
+        <xsl:call-template name="InsertRepeatedCacheRowFields">
+          <xsl:with-param name="repeat" select="$columns - ($colStart - $colNum)"/>
+          <xsl:with-param name="colNum" select="$colNum"/>
+        </xsl:call-template>
+
+        <xsl:for-each select="following-sibling::node()[1]">
+          <xsl:call-template name="InsertCacheRowFields">
+            <xsl:with-param name="colStart" select="$colStart"/>
+            <xsl:with-param name="colEnd" select="$colEnd"/>
+            <xsl:with-param name="colNum" select="$colNum + $columns"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+
+      <!-- when source ends inside repeated columns -->
+      <xsl:when test="$colNum &lt;= $colEnd and $colNum + $columns - 1 &gt; $colEnd">
+
+        <xsl:call-template name="InsertRepeatedCacheRowFields">
+          <xsl:with-param name="repeat" select="$colEnd - $colNum + 1"/>
+          <xsl:with-param name="colNum" select="$colNum"/>
+        </xsl:call-template>
+
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertRepeatedCacheRowFields">
+    <xsl:param name="repeat"/>
+    <xsl:param name="count" select="1"/>
+    <!-- temporary parameter -->
+    <xsl:param name="colNum"/>
+
+    <xsl:if test="$count &lt;= $repeat">
+      <xsl:call-template name="InsertCacheRowField">
+        <xsl:with-param name="colNum" select="$colNum"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertRepeatedCacheRowFields">
+        <xsl:with-param name="repeat" select="$repeat"/>
+        <xsl:with-param name="count" select="$count + 1"/>
+        <xsl:with-param name="colNum" select="$colNum + 1"/>
+      </xsl:call-template>
+    </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertCacheRowField">
+    <!-- temporary parameter -->
+    <xsl:param name="colNum"/>
+
+    <c>
+      <xsl:value-of select="$colNum"/>
+    </c>
+  </xsl:template>
+
+</xsl:stylesheet>

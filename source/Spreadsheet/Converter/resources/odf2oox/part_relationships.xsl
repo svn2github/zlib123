@@ -79,8 +79,9 @@
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections"
         Target="connections.xml"/>
 
-      <!--Insert OLE relationships -->
       <xsl:for-each select="document('content.xml')">
+
+        <!--Insert OLE relationships -->
         <xsl:for-each
           select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
@@ -96,6 +97,20 @@
               <!--/xsl:if-->
             </xsl:attribute>
           </Relationship>
+        </xsl:for-each>
+
+        <xsl:for-each select="key('pivot','')">
+          <xsl:variable name="pivotSource">
+            <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+          </xsl:variable>
+
+          <!-- do not duplicate the same source range cache -->
+          <xsl:if
+            test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+            <Relationship Id="{generate-id()}"
+              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition"
+              Target="{concat('pivotCache/pivotCacheDefinition_',generate-id(),'.xml')}"/>
+          </xsl:if>
         </xsl:for-each>
       </xsl:for-each>
 
@@ -200,6 +215,7 @@
 
 
   <xsl:template name="InsertWorksheetsRels">
+    <!-- @Context: table:table -->
     <xsl:param name="sheetNum"/>
     <xsl:param name="comment"/>
     <xsl:param name="picture"/>
@@ -207,6 +223,11 @@
     <xsl:param name="chart"/>
     <xsl:param name="textBox"/>
     <xsl:param name="OLEObject"/>
+    <xsl:param name="pivot"/>
+
+    <xsl:variable name="tableName">
+      <xsl:value-of select="@table:name"/>
+    </xsl:variable>
 
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <!-- comments.xml file -->
@@ -296,6 +317,15 @@
         <Relationship Id="v_rId1"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"
           Target="{concat('../drawings/vmlDrawing', $sheetNum,'.vml')}"/>
+      </xsl:if>
+
+      <xsl:if test="$pivot = 'true' ">
+        <xsl:for-each
+          select="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+          <Relationship Id="{generate-id(.)}"
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotTable"
+            Target="{concat('../pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}"/>
+        </xsl:for-each>
       </xsl:if>
     </Relationships>
   </xsl:template>
@@ -472,27 +502,28 @@
 
   <xsl:template name="InsertVmlDrawingRels">
     <xsl:param name="sheetNum"/>
-    
+
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 
-        <xsl:for-each
-          select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
-          
-          <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
-            <xsl:attribute name="Id">
-          <xsl:value-of select="concat('rId',position())"/>
-        </xsl:attribute>
+      <xsl:for-each
+        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+
+        <Relationship
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+          <xsl:attribute name="Id">
+            <xsl:value-of select="concat('rId',position())"/>
+          </xsl:attribute>
 
           <xsl:variable name="ObjectNumber">
-            <xsl:value-of select="substring-after(@xlink:href, './ObjectReplacements/Object ')"/>                
+            <xsl:value-of select="substring-after(@xlink:href, './ObjectReplacements/Object ')"/>
           </xsl:variable>
-          
+
           <xsl:attribute name="Target">
             <xsl:value-of select="concat('../media/image',$sheetNum,'_',position(),'.emf')"/>
-        </xsl:attribute>
-        
-          </Relationship>
-        </xsl:for-each>        
+          </xsl:attribute>
+
+        </Relationship>
+      </xsl:for-each>
     </Relationships>
   </xsl:template>
 
@@ -588,6 +619,35 @@
 
   </xsl:template>
 
+  <xsl:template name="InsertPivotTableRels">
+    <!-- @Context: table:data-pilot-table -->
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <Relationship Id="{generate-id(.)}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition">
 
+        <xsl:variable name="pivotSource">
+          <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+        </xsl:variable>
+
+        <!-- go to the first pivotTable on that source range -->
+        <xsl:for-each
+          select="key('pivot','')[table:source-cell-range/@table:cell-range-address = $pivotSource][1]">
+          <xsl:attribute name="Target">
+            <xsl:value-of
+              select="concat('../pivotCache/pivotCacheDefinition_',generate-id(.),'.xml')"/>
+          </xsl:attribute>
+        </xsl:for-each>
+      </Relationship>
+    </Relationships>
+  </xsl:template>
+
+  <xsl:template name="InsertCacheDefinitionRels">
+    <!-- @Context: table:data-pilot-table -->
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <Relationship Id="{generate-id(.)}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheRecords"
+        Target="{concat('pivotCacheRecords_',generate-id(.),'.xml')}"/>
+    </Relationships>
+  </xsl:template>
 
 </xsl:stylesheet>

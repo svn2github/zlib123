@@ -50,6 +50,7 @@
   <xsl:import href="package_relationships.xsl"/>
   <xsl:import href="common-meta.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
+  <xsl:import href="pivotTable.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="merge_cell.xsl"/>
   <xsl:import href="styles.xsl"/>
@@ -85,6 +86,7 @@
 
 
   <xsl:key name="chart" match="office:chart" use="''"/>
+  <xsl:key name="pivot" match="table:data-pilot-table" use="''"/>
 
   <xsl:template match="/odf:source">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
@@ -223,6 +225,22 @@
           <xsl:value-of select="position()"/>
         </xsl:variable>
 
+        <xsl:variable name="tableName">
+          <xsl:value-of select="@table:name"/>
+        </xsl:variable>
+
+        <xsl:variable name="pivot">
+          <xsl:choose>
+            <xsl:when
+              test="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
         <!-- insert comments -->
         <xsl:if test="$comment = 'true' ">
           <xsl:call-template name="InsertComments">
@@ -264,7 +282,33 @@
               <xsl:with-param name="sheetNum" select="position()"/>
             </xsl:call-template>
           </xsl:if>
+        </xsl:if>
 
+        <xsl:if test="$pivot = 'true'">
+          
+          <xsl:for-each
+            select="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+            
+            <xsl:call-template name="CreatePivotTable">
+              <xsl:with-param name="sheetNum" select="$sheetNum"/>
+            </xsl:call-template>
+            
+            <xsl:call-template name="CreatePivotTableRels">
+              <xsl:with-param name="sheetNum" select="$sheetNum"/>
+            </xsl:call-template>
+
+            <xsl:variable name="pivotSource">
+              <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+            </xsl:variable>
+
+            <!-- do not duplicate the same source range cache -->
+            <xsl:if
+              test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+              <xsl:call-template name="CreateCacheDefinition"/>
+              <xsl:call-template name="CreateCacheDefinitionRels"/>
+              <xsl:call-template name="CreateCacheRecords"/>
+            </xsl:if>
+          </xsl:for-each>
         </xsl:if>
 
         <!-- insert relationships -->
@@ -275,6 +319,7 @@
           <xsl:with-param name="picture" select="$picture"/>
           <xsl:with-param name="hyperlink" select="$hyperlink"/>
           <xsl:with-param name="textBox" select="$textBox"/>
+          <xsl:with-param name="pivot" select="$pivot"/>
         </xsl:call-template>
       </xsl:for-each>
 
@@ -407,11 +452,13 @@
   </xsl:template>
 
   <xsl:template name="CreateSheetRelationships">
+    <!-- @Context: table:table -->
     <xsl:param name="comment"/>
     <xsl:param name="picture"/>
     <xsl:param name="hyperlink"/>
     <xsl:param name="chart"/>
     <xsl:param name="textBox"/>
+    <xsl:param name="pivot"/>
 
     <!--      <xsl:if
       test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
@@ -429,7 +476,8 @@
 
     </xsl:variable>
     <xsl:if
-      test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true' or $textBox = 'true' or table:table-row/table:table-cell/table:cell-range-source or $OLEObject = 'true'">
+      test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true' or $textBox = 'true' or table:table-row/table:table-cell/table:cell-range-source or $OLEObject = 'true'
+      or $pivot = 'true' ">
       <!-- package relationship item -->
       <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
         <xsl:call-template name="InsertWorksheetsRels">
@@ -442,6 +490,7 @@
             <xsl:value-of select="$OLEObject"/>
           </xsl:with-param>
           <xsl:with-param name="textBox" select="$textBox"/>
+          <xsl:with-param name="pivot" select="$pivot"/>
         </xsl:call-template>
       </pzip:entry>
 
@@ -561,5 +610,43 @@
     </pzip:entry>
   </xsl:template>
 
+  <xsl:template name="CreatePivotTable">
+    <!-- @Context: table:data-pilot-table -->
+    <xsl:param name="sheetNum"/>
+    
+    <pzip:entry pzip:target="{concat('xl/pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}">
+      <xsl:call-template name="InsertPivotTable"/>
+    </pzip:entry>
+  </xsl:template>
+  
+  <xsl:template name="CreatePivotTableRels">
+    <!-- @Context: table:data-pilot-table -->
+    <xsl:param name="sheetNum"/>
+    
+    <pzip:entry pzip:target="{concat('xl/pivotTables/_rels/pivotTable',$sheetNum,'_',position(),'.xml.rels')}">
+      <xsl:call-template name="InsertPivotTableRels"/>
+    </pzip:entry>
+  </xsl:template>
+  
+  <xsl:template name="CreateCacheDefinition">
+    <!-- @Context: table:data-pilot-table -->
+    <pzip:entry pzip:target="{concat('xl/pivotCache/pivotCacheDefinition_',generate-id(.),'.xml')}">
+      <xsl:call-template name="InsertCacheDefinition"/>
+    </pzip:entry>
+  </xsl:template>
+  
+  <xsl:template name="CreateCacheDefinitionRels">
+    <!-- @Context: table:data-pilot-table -->
+    <pzip:entry pzip:target="{concat('xl/pivotCache/_rels/pivotCacheDefinition_',generate-id(.),'.xml.rels')}">
+      <xsl:call-template name="InsertCacheDefinitionRels"/>
+    </pzip:entry>
+  </xsl:template>
+
+  <xsl:template name="CreateCacheRecords">
+    <!-- @Context: table:data-pilot-table -->
+    <pzip:entry pzip:target="{concat('xl/pivotCache/pivotCacheRecords_',generate-id(.),'.xml')}">
+      <xsl:call-template name="InsertCacheRecords"/>
+    </pzip:entry>
+  </xsl:template>
 
 </xsl:stylesheet>
