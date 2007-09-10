@@ -36,63 +36,77 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="a e r number">
-  
-  
+
+
   <xsl:template name="InsertBorder">
     <xsl:param name="mergedcellborder"/>
-     <xsl:variable name="BorderId">
+    <xsl:variable name="BorderId">
       <xsl:choose>
         <xsl:when test="@borderId != ''">
-          <xsl:value-of select="@borderId"/>    
+          <xsl:value-of select="@borderId"/>
         </xsl:when>
         <xsl:otherwise/>
       </xsl:choose>
     </xsl:variable>
-   
+
     <xsl:choose>
       <xsl:when test="$BorderId != 0 and $BorderId != ''">
         <xsl:for-each select="key('Border', '')/e:border[position() = $BorderId + 1]">
           <xsl:call-template name="InsertBorderProperties">
-            <xsl:with-param name="mergedcellborder"><xsl:value-of select="$mergedcellborder"/></xsl:with-param>
-            <xsl:with-param name="thisborderId"><xsl:value-of select="$BorderId"/></xsl:with-param>
+            <xsl:with-param name="mergedcellborder">
+              <xsl:value-of select="$mergedcellborder"/>
+            </xsl:with-param>
+            <xsl:with-param name="thisborderId">
+              <xsl:value-of select="$BorderId"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each select="e:border">
-            <xsl:call-template name="InsertBorderProperties">
-              <xsl:with-param name="mergedcellborder"><xsl:value-of select="$mergedcellborder"/></xsl:with-param>
-              <xsl:with-param name="thisborderId"><xsl:value-of select="$BorderId"/></xsl:with-param>
-            </xsl:call-template>
+          <xsl:call-template name="InsertBorderProperties">
+            <xsl:with-param name="mergedcellborder">
+              <xsl:value-of select="$mergedcellborder"/>
+            </xsl:with-param>
+            <xsl:with-param name="thisborderId">
+              <xsl:value-of select="$BorderId"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
-  
-  
+
+
+
+
   <xsl:template name="PreprocessMergedCellsForBorders">
     <xsl:text>,</xsl:text>
     <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-       <xsl:variable name="workingpath">
+      <xsl:variable name="workingpath">
         <xsl:value-of select="concat('xl/worksheets/sheet', @sheetId,'.xml')"/>
-      </xsl:variable>     
-        <xsl:for-each select="document(concat('xl/worksheets/sheet', @sheetId,'.xml'))/e:worksheet/e:mergeCells/e:mergeCell">          
-          <xsl:variable name="range">
-            <xsl:value-of select="@ref"/>
-          </xsl:variable>        
-          <xsl:value-of select="string(number(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[number(document($workingpath)/e:worksheet/e:sheetData/e:row/e:c[@r= substring-before($range,':')]/@s)+1]/@borderId))"/>
-          <xsl:text>:</xsl:text>
-          <xsl:value-of select="string(number(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[number(document($workingpath)/e:worksheet/e:sheetData/e:row/e:c[@r= substring-after($range,':')]/@s)+1]/@borderId))"/>
-          <xsl:text>,</xsl:text>          
-        </xsl:for-each>      
+      </xsl:variable>
+      <xsl:for-each select="document(concat('xl/worksheets/sheet', @sheetId,'.xml'))/e:worksheet/e:mergeCells/e:mergeCell">
+        <xsl:variable name="range">
+          <xsl:value-of select="@ref"/>
+        </xsl:variable>
+        <xsl:variable name="strBef">
+          <xsl:value-of select="number(document($workingpath)/e:worksheet/e:sheetData/e:row/e:c[@r= substring-before($range,':')]/@s)+1"/>
+        </xsl:variable>
+        <xsl:variable name="strAft">
+          <xsl:value-of select="number(document($workingpath)/e:worksheet/e:sheetData/e:row/e:c[@r= substring-after($range,':')]/@s)+1"/>
+        </xsl:variable>
+        <xsl:value-of select="string(number(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[$strBef]/@borderId))"/>
+        <xsl:text>:</xsl:text>
+        <xsl:value-of select="string(number(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[$strAft]/@borderId))"/>
+        <xsl:text>,</xsl:text>
+      </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
-  
-  
+
+
   <xsl:template name="InsertBottomAndRightBorderProperties">
-     <xsl:attribute name="fo:border-bottom">       
+    <xsl:attribute name="fo:border-bottom">
       <xsl:variable name="BorderStyleBottom">
         <xsl:call-template name="GetBorderStyle">
           <xsl:with-param name="style">
@@ -114,7 +128,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-    
+
     <xsl:attribute name="fo:border-right">
       <xsl:variable name="BorderStyleRight">
         <xsl:call-template name="GetBorderStyle">
@@ -136,24 +150,13 @@
           <xsl:value-of select="$BorderStyleRight"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:attribute>           
+    </xsl:attribute>
   </xsl:template>
-  
+
   <xsl:template name="InsertBorderProperties">
-    <xsl:param name="mergedcellborder"/>
-    <xsl:param name="thisborderId"/>
     
-    <xsl:choose> <!-- If cell is merged, bottom and right border is processed based on it's bottom-right corner -->
-    <xsl:when test="contains($mergedcellborder,concat(',',$thisborderId,':'))">
-      <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:borders/e:border[number(substring-before(substring-after($mergedcellborder,concat(',',$thisborderId,':')),',')  )+1]">
-        <xsl:call-template name="InsertBottomAndRightBorderProperties"/>
-      </xsl:for-each>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:call-template name="InsertBottomAndRightBorderProperties"/>
-    </xsl:otherwise>
-    </xsl:choose>
-    
+    <xsl:call-template name="InsertBottomAndRightBorderProperties"/>
+     
     <xsl:attribute name="fo:border-left">
       <xsl:variable name="BorderStyleLeft">
         <xsl:call-template name="GetBorderStyle">
@@ -176,8 +179,8 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-     
-    
+
+
     <xsl:attribute name="fo:border-top">
       <xsl:variable name="BorderStyleTop">
         <xsl:call-template name="GetBorderStyle">
@@ -200,9 +203,9 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-    
+
     <xsl:if test="@diagonalUp = '1'">
-      <xsl:attribute name="style:diagonal-bl-tr">          
+      <xsl:attribute name="style:diagonal-bl-tr">
         <xsl:variable name="BorderStyleTop">
           <xsl:call-template name="GetBorderStyle">
             <xsl:with-param name="style">
@@ -225,9 +228,9 @@
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
-    
+
     <xsl:if test="@diagonalDown = '1'">
-      <xsl:attribute name="style:diagonal-tl-br">          
+      <xsl:attribute name="style:diagonal-tl-br">
         <xsl:variable name="BorderStyleTop">
           <xsl:call-template name="GetBorderStyle">
             <xsl:with-param name="style">
@@ -249,20 +252,21 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-    </xsl:if>    
-    
+    </xsl:if>
+
   </xsl:template>
-  
+
   <xsl:template name="GetBorderStyle">
     <xsl:param name="style"/>
-    
+
     <xsl:choose>
       <xsl:when test="$style = ''">
         <xsl:text>none</xsl:text>
       </xsl:when>
-      <xsl:when test="$style = 'thin' or $style = 'hair' or $style = 'dotted' and $style = 'dashed' and $style = 'dashDot' and $style = 'dashDotDot'">
+      <xsl:when
+        test="$style = 'thin' or $style = 'hair' or $style = 'dotted' and $style = 'dashed' and $style = 'dashDot' and $style = 'dashDotDot'">
         <xsl:text>0.002cm solid</xsl:text>
-      </xsl:when>      
+      </xsl:when>
       <xsl:when test="$style = 'double'">
         <xsl:text>0.039cm double</xsl:text>
       </xsl:when>
@@ -276,8 +280,8 @@
         <xsl:text>0.002cm solid</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
-  
+
+
 </xsl:stylesheet>
