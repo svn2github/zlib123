@@ -39,7 +39,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table r">
 
   <xsl:import href="measures.xsl"/>
-  
+
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
     <xsl:param name="colNumber"/>
@@ -99,9 +99,9 @@
         </xsl:for-each>
 
         <xsl:if test="ancestor::table:table-column-group != 0">
-        <xsl:attribute name="outlineLevel">
-          <xsl:value-of select="count(ancestor::table:table-column-group)"/>
-        </xsl:attribute>
+          <xsl:attribute name="outlineLevel">
+            <xsl:value-of select="count(ancestor::table:table-column-group)"/>
+          </xsl:attribute>
         </xsl:if>
 
         <xsl:if test="@table:visibility = 'collapse'">
@@ -122,7 +122,8 @@
           <xsl:if test="$checkColumnStyle = 'true' ">
             <xsl:for-each select="key('style',@table:default-cell-style-name)">
               <xsl:attribute name="style">
-                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
+                <xsl:value-of
+                  select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:attribute>
             </xsl:for-each>
           </xsl:if>
@@ -487,7 +488,8 @@
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:when>
-          <xsl:when test="name(following-sibling::node()[1]) = 'table:table-header-rows' or name(following-sibling::node()[1]) = 'table:table-row-group'">
+          <xsl:when
+            test="name(following-sibling::node()[1]) = 'table:table-header-rows' or name(following-sibling::node()[1]) = 'table:table-row-group'">
             <xsl:apply-templates
               select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
               mode="zeroHeight">
@@ -572,7 +574,7 @@
           </xsl:if>
         </xsl:if>
 
-       
+
         <!--get parent table:table-row id-->
         <xsl:variable name="rowId">
           <xsl:value-of select="generate-id(.)"/>
@@ -589,9 +591,9 @@
         </xsl:for-each>
 
         <xsl:if test="ancestor::table:table-row-group">
-        <xsl:attribute name="outlineLevel">
-          <xsl:value-of select="count(ancestor::table:table-row-group)"/>
-        </xsl:attribute>
+          <xsl:attribute name="outlineLevel">
+            <xsl:value-of select="count(ancestor::table:table-row-group)"/>
+          </xsl:attribute>
         </xsl:if>
 
         <xsl:if
@@ -620,17 +622,17 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		<xsl:with-param name="cellFormats">
-        	<xsl:value-of select="$cellFormats"/>
-      	</xsl:with-param>
-        <xsl:with-param name="cellStyles">
-       	 <xsl:value-of select="$cellStyles"/>
-        </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
         </xsl:apply-templates>
-    </row>
+      </row>
 
 
       <!-- insert repeated rows -->
@@ -693,7 +695,7 @@
 
     </xsl:if>
 
-   
+
     <!-- insert next row -->
     <xsl:choose>
       <!-- next row is a sibling -->
@@ -743,20 +745,22 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		  <xsl:with-param name="cellFormats">
-        	<xsl:value-of select="$cellFormats"/>
-      	  </xsl:with-param>
-      	  <xsl:with-param name="cellStyles">
-        	<xsl:value-of select="$cellStyles"/>
-      	  </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ]">
-        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
+      <xsl:when
+        test="following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ]">
+        <xsl:apply-templates
+          select="following-sibling::table:table-header-rows/table:table-row[1]|following-sibling::table:table-row-group/table:table-row[1]"
           mode="sheet">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
@@ -800,12 +804,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		  <xsl:with-param name="cellFormats">
-        	<xsl:value-of select="$cellFormats"/>
-      	  </xsl:with-param>
-      	  <xsl:with-param name="cellStyles">
-        	<xsl:value-of select="$cellStyles"/>
-      	  </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
@@ -858,12 +862,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		  <xsl:with-param name="cellFormats">
-        	<xsl:value-of select="$cellFormats"/>
-      	  </xsl:with-param>
-      	  <xsl:with-param name="cellStyles">
-        	<xsl:value-of select="$cellStyles"/>
-      	  </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
@@ -1034,11 +1038,11 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
-	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
     <xsl:message terminate="no">progress:table:table-cell</xsl:message>
-    
+
 
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
@@ -1069,7 +1073,7 @@
       <xsl:with-param name="hyperlinkStyle">
         <xsl:value-of select="$hyperlinkStyle"/>
       </xsl:with-param>
-	  <xsl:with-param name="cellFormats">
+      <xsl:with-param name="cellFormats">
         <xsl:value-of select="$cellFormats"/>
       </xsl:with-param>
       <xsl:with-param name="cellStyles">
@@ -1106,8 +1110,7 @@
       ref="{concat($colChar,$rowNumber)}" noteId="{$noteId}"/>
 
     <pxsi:commentDrawingMark xmlns:x="urn:schemas-microsoft-com:office:excel"
-      xmlns:pxsi="urn:cleverage:xmlns:post-processings:drawings"
-      noteId="{$noteId}">
+      xmlns:pxsi="urn:cleverage:xmlns:post-processings:drawings" noteId="{$noteId}">
       <x:Row>
         <xsl:value-of select="$rowNumber - 1"/>
       </x:Row>
@@ -1128,7 +1131,7 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
-	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
 
@@ -1167,12 +1170,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		  <xsl:with-param name="cellFormats">
-       		 <xsl:value-of select="$cellFormats"/>
-      	  </xsl:with-param>
-      	  <xsl:with-param name="cellStyles">
-        	<xsl:value-of select="$cellStyles"/>
-      	  </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
@@ -1213,12 +1216,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		<xsl:with-param name="cellFormats">
-        <xsl:value-of select="$cellFormats"/>
-      </xsl:with-param>
-      <xsl:with-param name="cellStyles">
-        <xsl:value-of select="$cellStyles"/>
-      </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
@@ -1241,7 +1244,7 @@
     <xsl:param name="CountStyleTableCell"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
-	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
 
@@ -1257,7 +1260,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:call-template name="InsertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -1286,7 +1289,7 @@
       <xsl:with-param name="hyperlinkStyle">
         <xsl:value-of select="$hyperlinkStyle"/>
       </xsl:with-param>
-	  <xsl:with-param name="cellFormats">
+      <xsl:with-param name="cellFormats">
         <xsl:value-of select="$cellFormats"/>
       </xsl:with-param>
       <xsl:with-param name="cellStyles">
@@ -1342,12 +1345,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		  <xsl:with-param name="cellFormats">
-        	<xsl:value-of select="$cellFormats"/>
-      	  </xsl:with-param>
-      	  <xsl:with-param name="cellStyles">
-        	<xsl:value-of select="$cellStyles"/>
-      	  </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
@@ -1382,12 +1385,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		  <xsl:with-param name="cellFormats">
-        	<xsl:value-of select="$cellFormats"/>
-      	  </xsl:with-param>
-      	  <xsl:with-param name="cellStyles">
-        	<xsl:value-of select="$cellStyles"/>
-      	  </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
@@ -1412,7 +1415,7 @@
     <xsl:param name="CountStyleTableCell"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
-     <xsl:param name="cellFormats"/>
+    <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
 
@@ -1449,7 +1452,7 @@
         <xsl:with-param name="num" select="$colNumber"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="cellNum">
       <xsl:value-of select="concat($colChar, $rowNumber)"/>
     </xsl:variable>
@@ -1459,7 +1462,8 @@
       test="parent::node()/@table:number-rows-repeated or child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
 
       <c>
-        <xsl:attribute name="r">        
+
+        <xsl:attribute name="r">
           <xsl:value-of select="$cellNum"/>
         </xsl:attribute>
 
@@ -1509,25 +1513,25 @@
                 <xsl:choose>
                   <xsl:when test="key('style', $style)">
                     <xsl:attribute name="style-number-change-post">
-                 	 <xsl:value-of select="$style"/>
-            	    </xsl:attribute>
-                    </xsl:when>
+                      <xsl:value-of select="$style"/>
+                    </xsl:attribute>
+                  </xsl:when>
                   <xsl:otherwise>
                     <xsl:variable name="TableStyleName">
                       <xsl:value-of select="@table:style-name"/>
                     </xsl:variable>
-                    <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $TableStyleName ]">
-                        <xsl:attribute name="style-number-change-post">
-                          <xsl:value-of select="$TableStyleName"/>
-                        </xsl:attribute>
+                    <xsl:if
+                      test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $TableStyleName ]">
+                      <xsl:attribute name="style-number-change-post">
+                        <xsl:value-of select="$TableStyleName"/>
+                      </xsl:attribute>
                     </xsl:if>
                   </xsl:otherwise>
-                  </xsl:choose>
-                
+                </xsl:choose>
+
               </xsl:when>
               <!-- when style is specified in cell -->
-              <xsl:when
-                test="@table:style-name and not(name() ='table:covered-table-cell')">
+              <xsl:when test="@table:style-name and not(name() ='table:covered-table-cell')">
 
                 <xsl:variable name="StyleApplyStyleName">
                   <xsl:value-of select="@style:apply-style-name"/>
@@ -1584,7 +1588,7 @@
                   <xsl:value-of select="$columnCellStyle"/>
                 </xsl:attribute>
               </xsl:when>
-                  </xsl:choose>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
         <!-- convert cell type -->
@@ -1676,6 +1680,17 @@
             </xsl:when>
           </xsl:choose>
         </xsl:if>
+
+        <!-- row and column number info for postprocessor -->
+        <!--pxsi:cell>
+          <xsl:attribute name="pxsi:col">
+            <xsl:value-of select="$colNumber"/>
+          </xsl:attribute>
+          <xsl:attribute name="pxsi:row">
+            <xsl:value-of select="$rowNumber"/>
+          </xsl:attribute>
+        </pxsi:cell-->
+
       </c>
     </xsl:if>
   </xsl:template>

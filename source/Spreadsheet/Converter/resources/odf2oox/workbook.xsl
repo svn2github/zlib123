@@ -35,7 +35,8 @@
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  exclude-result-prefixes="office style table config text">
+  xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
+  exclude-result-prefixes="office style table config text pxsi">
 
   <xsl:import href="worksheets.xsl"/>
   <xsl:import href="cell.xsl"/>
@@ -141,59 +142,66 @@
     
     </xsl:for-each>
 
-
-
     <sheets>
       <xsl:for-each select="table:table">
         <xsl:if test="not(table:scenario)">
-        <sheet>
-          <!-- characters "*\/[];'?" can not occur in sheet name -->
-          <xsl:attribute name="name">
-            <!-- if there is a sheet with the same name modify name -->
-            <xsl:call-template name="CheckSheetName">
-              <xsl:with-param name="sheetNumber">
-                <xsl:value-of select="position()"/>
-              </xsl:with-param>
-              <xsl:with-param name="name">
-                <xsl:value-of
-                  select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
-                />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:attribute name="sheetId">
-            <xsl:value-of select="position()"/>
-          </xsl:attribute>
-          <xsl:attribute name="r:id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-          <xsl:if
-            test="key('style',@table:style-name)/style:table-properties/@table:display = 'false'">
-            <xsl:attribute name="state">
-              <xsl:text>hidden</xsl:text>
+          <sheet>
+            <!-- characters "*\/[];'?" can not occur in sheet name -->
+            <xsl:attribute name="name">
+              <!-- if there is a sheet with the same name modify name -->
+              <xsl:call-template name="CheckSheetName">
+                <xsl:with-param name="sheetNumber">
+                  <xsl:value-of select="position()"/>
+                </xsl:with-param>
+                <xsl:with-param name="name">
+                  <xsl:value-of
+                    select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
+                  />
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:attribute>
-          </xsl:if>
-        </sheet>
-       </xsl:if>
+            <xsl:attribute name="sheetId">
+              <xsl:value-of select="position()"/>
+            </xsl:attribute>
+            <xsl:attribute name="r:id">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+            <xsl:if
+              test="key('style',@table:style-name)/style:table-properties/@table:display = 'false'">
+              <xsl:attribute name="state">
+                <xsl:text>hidden</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+          </sheet>
+        </xsl:if>
       </xsl:for-each>
     </sheets>
-    
+
     <xsl:if test="table:table/table:shapes/draw:frame/draw:object">
       <xsl:call-template name="ExternalReference"/>
     </xsl:if>
-    
+
     <definedNames>
       <xsl:call-template name="InsertPrintRanges"/>
       <xsl:call-template name="InsertHeaders"/>
       <xsl:for-each select="table:table">
         <xsl:call-template name="InsertDefineConnection"/>
-     </xsl:for-each>
+      </xsl:for-each>
       <!--definedName name="praca" localSheetId="0">Sheet1!$C$11:$D$11</definedName-->
     </definedNames>
 
-    <xsl:if test="table:data-pilot-tables">
+    <xsl:for-each select="table:data-pilot-tables">
+
+      <pxsi:pivotsNum>
+        <xsl:attribute name="pxsi:val">
+          <!-- count only first ocurences of diferent source ranges -->
+          <xsl:value-of select="count(table:data-pilot-table[not(preceding-sibling::table:data-pilot-table/table:source-cell-range/@table:cell-range-address = table:source-cell-range/@table:cell-range-address)])"/>
+        </xsl:attribute>
+      </pxsi:pivotsNum>
+
       <pivotCaches>
-        <xsl:for-each select="key('pivot','')">
+
+        <xsl:for-each select="table:data-pilot-table">
 
           <xsl:variable name="pivotSource">
             <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
@@ -202,27 +210,79 @@
           <!-- do not duplicate the same source range cache -->
           <xsl:if
             test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
-            <pivotCache cacheId="{count(preceding-sibling::table:data-pilot-table)}" r:id="{generate-id()}"/>
+            
+            <pivotCache cacheId="{count(preceding-sibling::table:data-pilot-table)}"
+              r:id="{generate-id()}"/>
+
+            <xsl:for-each select="table:source-cell-range">
+            <pxsi:pivotCache>
+              <xsl:attribute name="pxsi:sheetName">
+                <xsl:value-of select="substring-before(@table:cell-range-address,'.')"/>
+              </xsl:attribute>
+
+              <xsl:attribute name="pxsi:colStart">
+                <xsl:call-template name="GetColNum">
+                  <xsl:with-param name="cell">
+                    <xsl:value-of
+                      select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+
+              <xsl:attribute name="pxsi:colEnd">
+                <xsl:call-template name="GetColNum">
+                  <xsl:with-param name="cell">
+                    <xsl:value-of
+                      select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+              
+              <xsl:attribute name="pxsi:rowStart">
+                <xsl:call-template name="GetRowNum">
+                  <xsl:with-param name="cell">
+                    <xsl:value-of
+                      select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+
+              <xsl:attribute name="pxsi:rowEnd">
+                <xsl:call-template name="GetRowNum">
+                  <xsl:with-param name="cell">
+                    <xsl:value-of
+                      select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </pxsi:pivotCache>
+            </xsl:for-each>
           </xsl:if>
         </xsl:for-each>
       </pivotCaches>
-    </xsl:if>
+
+    </xsl:for-each>
+
   </xsl:template>
 
   <!-- insert all sheets -->
   <xsl:template name="InsertSheets">
-    
+
     <xsl:variable name="multilines">
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
         <xsl:value-of select="count(descendant::table:table-cell/text:p[2])"/>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xsl:variable name="hyperlinkStyle">
-      <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ]">
-          <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
-        </xsl:for-each>  
+      <xsl:for-each
+        select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ]">
+        <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"
+        />
+      </xsl:for-each>
     </xsl:variable>
 
 
@@ -237,19 +297,20 @@
         select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
       />
     </xsl:variable>
-    
+
     <xsl:variable name="CheckIfConditional">
       <xsl:choose>
-        <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+        <xsl:when
+          test="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
-      
+
     </xsl:variable>
-    
+
     <!-- convert first table -->
     <xsl:apply-templates
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[1]"
@@ -262,7 +323,7 @@
       <xsl:with-param name="hyperlinkStyle">
         <xsl:value-of select="$hyperlinkStyle"/>
       </xsl:with-param>
-	  <xsl:with-param name="cellFormats">
+      <xsl:with-param name="cellFormats">
         <xsl:value-of select="$cellFormats"/>
       </xsl:with-param>
       <xsl:with-param name="cellStyles">
@@ -277,7 +338,7 @@
   <xsl:template name="CheckSheetName">
     <xsl:param name="name"/>
     <xsl:param name="sheetNumber"/>
-    
+
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
       <xsl:when
@@ -367,13 +428,13 @@
             select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
           />
         </xsl:with-param>
-      </xsl:call-template>      
+      </xsl:call-template>
       <xsl:text>'</xsl:text>
     </xsl:variable>
-<xsl:if test="not(contains($range, '$'))">
-    <xsl:value-of
-      select="concat($sheetName,'!$',substring-before(substring-after($range,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"/>
- 
+    <xsl:if test="not(contains($range, '$'))">
+      <xsl:value-of
+        select="concat($sheetName,'!$',substring-before(substring-after($range,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"/>
+
     </xsl:if>
     <xsl:if test="contains($range, '$')">
       <xsl:value-of
@@ -431,7 +492,7 @@
           <xsl:call-template name="CountHeaderRowsStart"/>
         </xsl:for-each>
       </xsl:variable>
-      
+
       <xsl:choose>
         <xsl:when test="$count = '' ">
           <xsl:text>1</xsl:text>

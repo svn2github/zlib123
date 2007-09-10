@@ -67,10 +67,10 @@
     <xsl:param name="tableId" select="generate-id()"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
-	<xsl:param name="cellFormats"/>
+    <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
-    
+
 
     <xsl:if test="not(table:scenario)">
       <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
@@ -86,12 +86,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
-		 <xsl:with-param name="cellFormats">
-        	<xsl:value-of select="$cellFormats"/>
-      	</xsl:with-param>
-        <xsl:with-param name="cellStyles">
-        	<xsl:value-of select="$cellStyles"/>
-        </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
           </xsl:with-param>
@@ -118,7 +118,7 @@
       <xsl:with-param name="hyperlinkStyle">
         <xsl:value-of select="$hyperlinkStyle"/>
       </xsl:with-param>
-	  <xsl:with-param name="cellFormats">
+      <xsl:with-param name="cellFormats">
         <xsl:value-of select="$cellFormats"/>
       </xsl:with-param>
       <xsl:with-param name="cellStyles">
@@ -139,7 +139,7 @@
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
     <xsl:param name="cellFormats"/>
-   <xsl:param name="cellStyles"/>
+    <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
 
     <worksheet>
@@ -251,12 +251,12 @@
         <xsl:with-param name="hyperlinkStyle">
           <xsl:value-of select="$hyperlinkStyle"/>
         </xsl:with-param>
-	  <xsl:with-param name="cellFormats">
-        <xsl:value-of select="$cellFormats"/>
-      </xsl:with-param>
-      <xsl:with-param name="cellStyles">
-        <xsl:value-of select="$cellStyles"/>
-      </xsl:with-param>
+        <xsl:with-param name="cellFormats">
+          <xsl:value-of select="$cellFormats"/>
+        </xsl:with-param>
+        <xsl:with-param name="cellStyles">
+          <xsl:value-of select="$cellStyles"/>
+        </xsl:with-param>
         <xsl:with-param name="CheckIfConditional">
           <xsl:value-of select="$CheckIfConditional"/>
         </xsl:with-param>
@@ -405,7 +405,8 @@
 
       <xsl:variable name="textBox">
         <xsl:choose>
-          <xsl:when test="descendant::draw:frame/draw:text-box[not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          <xsl:when
+            test="descendant::draw:frame/draw:text-box[not(name(parent::node()/parent::node()) = 'draw:g' )]">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -440,15 +441,17 @@
         <drawing r:id="{concat('d_rId',$sheetId)}"/>
       </xsl:if>
 
-      <xsl:if test="descendant::office:annotation or descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+      <xsl:if
+        test="descendant::office:annotation or descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
         <legacyDrawing r:id="v_rId1"/>
       </xsl:if>
 
 
       <!-- Insert OLEObject -->
-      <xsl:if test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+      <xsl:if
+        test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
         <xsl:call-template name="InsertOLE_Object">
-            <xsl:with-param name="sheetId" select="$sheetId"/>          
+          <xsl:with-param name="sheetId" select="$sheetId"/>
         </xsl:call-template>
       </xsl:if>
 
@@ -641,7 +644,7 @@
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
-    
+
     <!-- baseFontSize -->
 
     <!-- compute default row height -->
@@ -747,47 +750,53 @@
       </cols>
     </xsl:if>
     <sheetData>
-      <!-- insert first row -->
-      <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
-        <xsl:with-param name="rowNumber">1</xsl:with-param>
-        <xsl:with-param name="cellNumber" select="$cellNumber"/>
-        <xsl:with-param name="sheetId" select="$sheetId"/>
-        <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-        <xsl:with-param name="TableColumnTagNum">
-          <xsl:value-of select="$ColumnTagNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCellStyle">
-          <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckRowHidden">
-          <xsl:value-of select="$CheckRowHidden"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckIfDefaultBorder">
-          <xsl:value-of select="$CheckIfDefaultBorder"/>
-        </xsl:with-param>
-        <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
-        <xsl:with-param name="tableId">
-          <xsl:value-of select="$tableId"/>
-        </xsl:with-param>
-        <xsl:with-param name="multilines">
-          <xsl:value-of select="$multilines"/>
-        </xsl:with-param>
-        <xsl:with-param name="hyperlinkStyle">
-          <xsl:value-of select="$hyperlinkStyle"/>
-        </xsl:with-param>
-	  <xsl:with-param name="cellFormats">
-        <xsl:value-of select="$cellFormats"/>
-      </xsl:with-param>
-      <xsl:with-param name="cellStyles">
-        <xsl:value-of select="$cellStyles"/>
-      </xsl:with-param>
-        <xsl:with-param name="CheckIfConditional">
-          <xsl:value-of select="$CheckIfConditional"/>
-        </xsl:with-param>
-      </xsl:apply-templates>
+
+        <xsl:variable name="tableName">
+          <xsl:value-of select="@table:name"/>
+        </xsl:variable>
+
+        <!-- insert first row -->
+        <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
+          <xsl:with-param name="rowNumber">1</xsl:with-param>
+          <xsl:with-param name="cellNumber" select="$cellNumber"/>
+          <xsl:with-param name="sheetId" select="$sheetId"/>
+          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+          <xsl:with-param name="TableColumnTagNum">
+            <xsl:value-of select="$ColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckRowHidden">
+            <xsl:value-of select="$CheckRowHidden"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfDefaultBorder">
+            <xsl:value-of select="$CheckIfDefaultBorder"/>
+          </xsl:with-param>
+          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+          <xsl:with-param name="tableId">
+            <xsl:value-of select="$tableId"/>
+          </xsl:with-param>
+          <xsl:with-param name="multilines">
+            <xsl:value-of select="$multilines"/>
+          </xsl:with-param>
+          <xsl:with-param name="hyperlinkStyle">
+            <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellFormats">
+            <xsl:value-of select="$cellFormats"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellStyles">
+            <xsl:value-of select="$cellStyles"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfConditional">
+            <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+
     </sheetData>
 
     <!-- insert sort -->
