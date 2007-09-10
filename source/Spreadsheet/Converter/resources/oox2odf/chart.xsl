@@ -229,6 +229,25 @@
           <xsl:call-template name="InsertPlotAreaProperties"/>
 
           <xsl:choose>
+            <!-- for stock chart type 3 and 4 -->
+            <xsl:when test="key('plotArea','')/c:stockChart and key('plotArea','')/c:barChart">
+              <xsl:if test="key('plotArea','')/c:dateAx[2]">
+                <xsl:for-each select="key('plotArea','')/c:dateAx[1]">
+                  <xsl:call-template name="InsertAxisXProperties"/>
+                </xsl:for-each>
+              </xsl:if>
+              <xsl:if test="key('plotArea','')/c:catAx[2]">
+                <xsl:for-each select="key('plotArea','')/c:catAx[1]">
+                  <xsl:call-template name="InsertAxisXProperties"/>
+                </xsl:for-each>
+              </xsl:if>
+              <xsl:for-each select="key('plotArea','')/c:valAx[1]">
+                <xsl:call-template name="InsertSecondaryAxisYProperties"/>
+              </xsl:for-each>
+              <xsl:for-each select="key('plotArea','')/c:valAx[2]">
+                <xsl:call-template name="InsertAxisYProperties"/>
+              </xsl:for-each>
+            </xsl:when>
             <!-- scatter chart has two value axes -->
             <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
               <xsl:for-each
@@ -335,6 +354,25 @@
         <xsl:if
           test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart and position() = 1">
           <chart:domain/>
+        </xsl:if>
+        <!-- for stock chart type 3 and type 4 -->
+        <xsl:if test="key('plotArea','')/c:stockChart and key('plotArea','')/c:barChart">
+          <xsl:attribute name="chart:attached-axis">
+            <!-- first series belong to primary y -->
+            <xsl:choose>
+              <xsl:when test="position() = 1">
+                <xsl:text>secondary-y</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>primary-y</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:if test="position()=1">
+            <xsl:attribute name="chart:class">
+              <xsl:text>chart:bar</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
         </xsl:if>
 
         <!-- error indicator -->
@@ -775,11 +813,21 @@
   </xsl:template>
 
   <xsl:template name="InsertYAxis">
+    <xsl:param name="primaryOrSecondary">
+      <xsl:text>primary-y</xsl:text>
+    </xsl:param>
     <!-- @Description: Outputs chart X Axis -->
     <!-- @Context: inside input chart file -->
 
     <chart:axis chart:dimension="y" chart:name="primary-y" chart:style-name="axis-y">
-
+      <xsl:if test="$primaryOrSecondary = 'secondary-y'">
+        <xsl:attribute name="chart:name">
+          <xsl:text>secondary-y</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="chart:style-name">
+          <xsl:text>secondary_axis-y</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:choose>
         <!-- title is set by user -->
         <xsl:when test="c:title/c:tx">
@@ -826,6 +874,11 @@
 
       <xsl:attribute name="chart:class">
         <xsl:choose>
+          <!-- for Stock Chart type 3 and type 4-->
+          <xsl:when test="key('plotArea','')/c:stockChart and key('plotArea','')/c:barChart">
+            <xsl:text>chart:stock</xsl:text>
+          </xsl:when>
+
           <xsl:when test="key('plotArea','')/c:barChart or key('plotArea','')/c:bar3DChart">
             <xsl:text>chart:bar</xsl:text>
           </xsl:when>
@@ -874,10 +927,47 @@
         svg:y="2.087cm" svg:width="10.472cm" svg:height="7.008cm">
         <!-- Axes -->
         <xsl:choose>
+          <!-- stock chart type 3 and stock chart type 4 -->
+          <xsl:when test="key('plotArea','')/c:stockChart and key('plotArea','')/c:barChart">
+            <!-- if both category axes are date axis-->
+            <xsl:choose>
+              <xsl:when test="key('plotArea','')/c:dateAx[2]">
+                <!-- insert the one that corresponds to stock chart -->
+                <xsl:for-each select="key('plotArea','')/c:dateAx[2]">
+                  <xsl:call-template name="InsertXAxis"/>
+                </xsl:for-each>
+              </xsl:when>
+              <!-- if both are cat axes -->
+              <xsl:when test="key('plotArea','')/c:catAx[2]">
+                <!-- insert the one that corresponds to stock chart -->
+                <xsl:for-each select="key('plotArea','')/c:catAx[2]">
+                  <xsl:call-template name="InsertXAxis"/>
+                </xsl:for-each>
+              </xsl:when>
+            </xsl:choose>
+            <xsl:for-each select="key('plotArea','')/c:valAx[1]">
+              <xsl:call-template name="InsertYAxis"/>
+            </xsl:for-each>
+            <xsl:for-each select="key('plotArea','')/c:valAx[2]">
+              <xsl:call-template name="InsertYAxis">
+                <xsl:with-param name="primaryOrSecondary">
+                  <xsl:text>secondary-y</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
           <!-- scatter chart has two value axes -->
           <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
+            <xsl:for-each select="key('plotArea','')/c:valAx[1]/c:axPos">
+              <xsl:call-template name="InsertXAxis"/>
+            </xsl:for-each>
             <xsl:for-each
-              select="key('plotArea','')/c:valAx[1]/c:axPos">
+              select="key('plotArea','')/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
+              <xsl:call-template name="InsertYAxis"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:when test="key('plotArea','')/c:stockChart">
+            <xsl:for-each select="key('plotArea','')/c:dateAx">
               <xsl:call-template name="InsertXAxis"/>
             </xsl:for-each>
             <xsl:for-each
@@ -1181,6 +1271,21 @@
           chart:error-upper-limit="0" chart:error-category="none" chart:error-percentage="0"
           chart:regression-type="none" chart:data-label-number="none" chart:data-label-text="false"
           chart:data-label-symbol="false">
+
+          <!-- insert markers for Stock Chart if necessary -->
+          <xsl:if test="descendant::node()/c:marker and key('plotArea','')/c:stockChart">
+            <xsl:attribute name="chart:symbol-type">
+              <xsl:text>automatic</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          <!-- japanese candle-stick can be true for stockChart or lineChart -->
+          <xsl:if
+            test="key('plotArea','')/c:stockChart/c:upDownBars or key('plotArea','')/c:lineChart/c:upDownBars">
+            <xsl:attribute name="chart:japanese-candle-stick">
+              <xsl:text>true</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
           <!-- insert markers for Stock Chart if necessary -->
           <xsl:if test="descendant::node()/c:marker and key('plotArea','')/c:stockChart">
             <xsl:attribute name="chart:symbol-type">
@@ -1330,6 +1435,36 @@
 
   <xsl:template name="InsertAxisYProperties">
     <style:style style:name="axis-y" style:family="chart" style:data-style-name="N0">
+      <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
+        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
+        text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
+        style:direction="ltr">
+        <xsl:call-template name="SetAxisChartProperties"/>
+
+      </style:chart-properties>
+      <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
+        svg:stroke-color="#000000">
+        <xsl:for-each select="c:spPr">
+          <xsl:call-template name="InsertLineColor"/>
+          <xsl:call-template name="InsertLineStyle"/>
+        </xsl:for-each>
+      </style:graphic-properties>
+      <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
+        style:font-pitch="variable" fo:font-size="7pt"
+        style:font-family-asian="&apos;MS Gothic&apos;"
+        style:font-family-generic-asian="system" style:font-pitch-asian="variable"
+        style:font-size-asian="7pt" style:font-family-complex="Tahoma"
+        style:font-family-generic-complex="system" style:font-pitch-complex="variable"
+        style:font-size-complex="7pt">
+        <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
+          <xsl:call-template name="TextBoxRunProperties"/>
+        </xsl:for-each>
+      </style:text-properties>
+    </style:style>
+  </xsl:template>
+
+  <xsl:template name="InsertSecondaryAxisYProperties">
+    <style:style style:name="secondary_axis-y" style:family="chart" style:data-style-name="N0">
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
         chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
@@ -1693,11 +1828,21 @@
         <xsl:value-of select="c:scaling/c:max/@val"/>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test="c:scaling/c:min">
-      <xsl:attribute name="chart:minimum">
-        <xsl:value-of select="c:scaling/c:min/@val"/>
-      </xsl:attribute>
-    </xsl:if>
+    <xsl:choose>
+      <!-- for stock chart type 3 or type 4 -->
+      <xsl:when
+        test="c:scaling/c:min and key('plotArea','')/c:valAx[2]/c:scaling[1]/c:min/@val and name(self::node()) = 'valAx[2]'">
+        <xsl:attribute name="chart:minimum">
+          <xsl:value-of select="key('plotArea','')/c:valAx[2]/c:scaling[1]/c:min/@val"/>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- other charts -->
+      <xsl:when test="c:scaling/c:min">
+        <xsl:attribute name="chart:minimum">
+          <xsl:value-of select="c:scaling/c:min/@val"/>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
 
     <!-- major interval marks-->
     <xsl:if test="c:majorTickMark">
@@ -1776,11 +1921,20 @@
 
     <!-- axis at -->
     <xsl:for-each select="parent::node()/c:valAx[generate-id(.) != $id][1]">
-      <xsl:if test="c:crossesAt">
-        <xsl:attribute name="chart:origin">
-          <xsl:value-of select="c:crossesAt/@val"/>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:choose>
+        <!-- for stock chart type 3 and 4 -->
+         <xsl:when test="key('plotArea','')/c:stockChart and key('plotArea','')/c:barChart">
+           <xsl:attribute name="chart:origin">
+             <xsl:value-of select="key('plotArea','')/c:valAx[2]/c:scaling[1]/c:min/@val"/>
+           </xsl:attribute>
+         </xsl:when> 
+        <xsl:when test="c:crossesAt">
+          <xsl:attribute name="chart:origin">
+            <xsl:value-of select="c:crossesAt/@val"/>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+      
     </xsl:for-each>
 
     <!-- major unit -->
