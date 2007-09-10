@@ -66,6 +66,7 @@
   <xsl:import href="groups.xsl"/>
   <xsl:import href="scenario.xsl"/>
   <xsl:import href="change_tracking.xsl"/>
+  <xsl:import href="pivot_tables.xsl"/>
 
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
@@ -179,6 +180,10 @@
             </xsl:with-param>
           </xsl:apply-templates>
         </table:database-ranges>
+        
+        <!--xsl:variable name="pivotTables"-->
+          <xsl:call-template name="InsertPilotTables"/>
+        <!--/xsl:variable-->
 
       </office:spreadsheet>
     </office:body>
