@@ -40,21 +40,37 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private Stack pivotContext;
         private const string PXSI_NAMESPACE = "urn:cleverage:xmlns:post-processings:pivotTable";
         private const string REL_NAMESPACE = "http://schemas.openxmlformats.org/package/2006/relationships";
+        private const string EXCEL_NAMESPACE = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         private bool isPxsi;
         private bool isInPivotsNum;
         private bool isInPivotCache;
+        private bool isInCacheRecords;
+        private bool isInCacheCell;
+        
         private bool isVal;
         private bool isSheetName;
         private bool isColStart;
         private bool isColEnd;
         private bool isRowStart;
         private bool isRowEnd;
+        private bool isCacheCellCol;
+        private bool isCacheCellRow;
         private string[,] pivotTables; 
         //table of pivot source definitions containing {sheetName, colStart, colEnd, rowStart, rowEnd}
 
         private int cacheNum;
+        private string cacheSheetName;
+        private string cacheColStart;
+        private string cacheColEnd;
+        private string cacheRowStart;
+        private string cacheRowEnd;
+        
+        private string cacheCellRow;
+        private string cacheCellCol;
+        private string cacheCellVal;
+        private Hashtable pivotCells;
 
-
+        
         public OoxPivotCachePostProcessor (XmlWriter nextWriter)
             : base(nextWriter)
         {
@@ -62,6 +78,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.isPxsi = false;
             this.isInPivotsNum = false;
             this.isInPivotCache = false;
+            this.isInCacheRecords = false;
+            this.isInCacheCell = false;
             this.isVal = false;
             this.isSheetName = false;
             this.isColStart = false;
@@ -69,11 +87,34 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.isRowStart = false;
             this.isRowEnd = false;
             this.cacheNum = 0;
+            this.cacheSheetName = "";
+            this.cacheColStart = "";
+            this.cacheColEnd = "";
+            this.cacheRowStart = "";
+            this.cacheRowEnd = "";
+            this.cacheCellCol = "";
+            this.cacheCellRow = "";
+            this.cacheCellVal = "";
+            pivotCells = new Hashtable();
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
-            if (PXSI_NAMESPACE.Equals(ns) && "pivotsNum".Equals(localName))
+
+            if (EXCEL_NAMESPACE.Equals(ns) && "worksheet".Equals(localName))
+            {
+                this.pivotCells.Clear();
+                this.nextWriter.WriteStartElement(prefix, localName, ns);
+            }
+            else if (PXSI_NAMESPACE.Equals(ns) && "cacheCell".Equals(localName))
+            {
+                this.pivotContext = new Stack();
+                this.pivotContext.Push(new Element(prefix, localName, ns));
+                this.isInCacheCell = true;
+                this.isPxsi = true;
+                Console.WriteLine("<cacheCell>");
+            }
+            else if (PXSI_NAMESPACE.Equals(ns) && "pivotsNum".Equals(localName))
             {
                 this.pivotContext = new Stack();
                 this.pivotContext.Push(new Element(prefix, localName, ns));
@@ -88,6 +129,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.isInPivotCache = true;
                 this.isPxsi = true;
                 Console.WriteLine("<pivotCache>");
+            }
+            else if (PXSI_NAMESPACE.Equals(ns) && "cacheRecords".Equals(localName))
+            {
+                this.pivotContext = new Stack();
+                this.pivotContext.Push(new Element(prefix, localName, ns));
+                this.isInCacheRecords = true;
+                this.isPxsi = true;
+                Console.WriteLine("<cacheRecords>");
             }
             else
             {
@@ -115,6 +164,26 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else if (PXSI_NAMESPACE.Equals(ns) && "rowEnd".Equals(localName))
                     this.isRowEnd = true;
             }
+            else if (isInCacheRecords)
+            {
+                if (PXSI_NAMESPACE.Equals(ns) && "sheetName".Equals(localName))
+                    this.isSheetName = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "colStart".Equals(localName))
+                    this.isColStart = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "colEnd".Equals(localName))
+                    this.isColEnd = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "rowStart".Equals(localName))
+                    this.isRowStart = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "rowEnd".Equals(localName))
+                    this.isRowEnd = true;
+            }
+            else if (isInCacheCell)
+            {
+                if (PXSI_NAMESPACE.Equals(ns) && "col".Equals(localName))
+                    this.isCacheCellCol = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "row".Equals(localName))
+                    this.isCacheCellRow = true;
+            }
             else
             {
                 this.nextWriter.WriteStartAttribute(prefix, localName, ns);
@@ -138,33 +207,86 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 if (isSheetName)
                 {
-                    this.pivotTables[this.cacheNum,0] = text;
+                    this.pivotTables[this.cacheNum, 0] = text;
                     Console.WriteLine("sheetName: " + pivotTables[cacheNum, 0]);
                     this.isSheetName = false;
                 }
                 else if (isColStart)
                 {
-                    this.pivotTables[this.cacheNum,1] = text;
+                    this.pivotTables[this.cacheNum, 1] = text;
                     Console.WriteLine("colStart: " + pivotTables[cacheNum, 1]);
                     this.isColStart = false;
                 }
                 else if (isColEnd)
                 {
-                    this.pivotTables[this.cacheNum,2] = text;
+                    this.pivotTables[this.cacheNum, 2] = text;
                     Console.WriteLine("colEnd: " + pivotTables[cacheNum, 2]);
                     this.isColEnd = false;
                 }
                 else if (isRowStart)
                 {
-                    this.pivotTables[this.cacheNum,3] = text;
+                    this.pivotTables[this.cacheNum, 3] = text;
                     Console.WriteLine("RowStart: " + pivotTables[cacheNum, 3]);
                     this.isRowStart = false;
                 }
                 else if (isRowEnd)
                 {
-                    this.pivotTables[this.cacheNum,4] = text;
+                    this.pivotTables[this.cacheNum, 4] = text;
                     Console.WriteLine("rowEnd: " + pivotTables[cacheNum, 4]);
                     this.isRowEnd = false;
+                }
+            }
+            else if (isInCacheRecords)
+            {
+                if (isSheetName)
+                {
+                    this.cacheSheetName = text;
+                    Console.WriteLine("cacheSheetName: " + this.cacheSheetName);
+                    this.isSheetName = false;
+                }
+                else if (isColStart)
+                {
+                    this.cacheColStart = text;
+                    Console.WriteLine("cacheColStart: " + this.cacheColStart);
+                    this.isColStart = false;
+                }
+                else if (isColEnd)
+                {
+                    this.cacheColEnd = text;
+                    Console.WriteLine("cacheColEnd: " + this.cacheColEnd);
+                    this.isColEnd = false;
+                }
+                else if (isRowStart)
+                {
+                    this.cacheRowStart = text;
+                    Console.WriteLine("cacheRowStart: " + this.cacheRowStart);
+                    this.isRowStart = false;
+                }
+                else if (isRowEnd)
+                {
+                    this.cacheRowEnd = text;
+                    Console.WriteLine("cacheRowStart: " + this.cacheRowEnd);
+                    this.isRowEnd = false;
+                }
+            }
+            else if (isInCacheCell)
+            {
+                if (isCacheCellCol)
+                {
+                    this.cacheCellCol = text;
+                    Console.WriteLine("cacheCellCol: " + this.cacheCellCol);
+                    this.isCacheCellCol = false;
+                }
+                else if (isCacheCellRow)
+                {
+                    this.cacheCellRow = text;
+                    Console.WriteLine("cacheCellRow: " + this.cacheCellRow);
+                    this.isCacheCellRow = false;
+                }
+                else
+                {
+                    this.cacheCellVal = text;
+                    Console.WriteLine("cacheCellRow: " + this.cacheCellVal);
                 }
             }
             else
@@ -195,6 +317,26 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     this.isInPivotCache = false;
                     this.cacheNum++;
+                    this.isPxsi = false;
+                }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "cacheRecords".Equals(element.Name))
+                {                    
+                    this.isInCacheRecords = false;
+                    this.cacheSheetName = "";
+                    this.cacheColStart = "";
+                    this.cacheColEnd = "";
+                    this.cacheRowStart = "";
+                    this.cacheRowEnd = "";
+                    this.isPxsi = false;
+                }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "cacheCell".Equals(element.Name))
+                {
+                    pivotCells.Add(cacheCellCol + ":" + cacheCellRow, cacheCellVal);
+
+                    this.isInCacheCell = false;
+                    this.cacheCellCol = "";
+                    this.cacheCellRow = "";
+                    this.cacheCellVal = "";
                     this.isPxsi = false;
                 }
                 else

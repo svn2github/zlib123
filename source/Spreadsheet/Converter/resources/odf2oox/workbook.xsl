@@ -136,10 +136,11 @@
         </xsl:call-template>
       </xsl:variable>
 
-      <xsl:if test="(string-length($SheetNameWithForbiddenChars) - string-length($SheetName) &gt; 0) or (string-length($SheetName) &gt; 31)">
+      <xsl:if
+        test="(string-length($SheetNameWithForbiddenChars) - string-length($SheetName) &gt; 0) or (string-length($SheetName) &gt; 31)">
         <xsl:message terminate="no">translation.odf2oox.SheetNameLength</xsl:message>
       </xsl:if>
-    
+
     </xsl:for-each>
 
     <sheets>
@@ -195,7 +196,9 @@
       <pxsi:pivotsNum>
         <xsl:attribute name="pxsi:val">
           <!-- count only first ocurences of diferent source ranges -->
-          <xsl:value-of select="count(table:data-pilot-table[not(preceding-sibling::table:data-pilot-table/table:source-cell-range/@table:cell-range-address = table:source-cell-range/@table:cell-range-address)])"/>
+          <xsl:value-of
+            select="count(table:data-pilot-table[not(preceding-sibling::table:data-pilot-table/table:source-cell-range/@table:cell-range-address = table:source-cell-range/@table:cell-range-address)])"
+          />
         </xsl:attribute>
       </pxsi:pivotsNum>
 
@@ -210,54 +213,56 @@
           <!-- do not duplicate the same source range cache -->
           <xsl:if
             test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
-            
+
             <pivotCache cacheId="{count(preceding-sibling::table:data-pilot-table)}"
               r:id="{generate-id()}"/>
 
             <xsl:for-each select="table:source-cell-range">
-            <pxsi:pivotCache>
-              <xsl:attribute name="pxsi:sheetName">
-                <xsl:value-of select="substring-before(@table:cell-range-address,'.')"/>
-              </xsl:attribute>
+              <pxsi:pivotCache>
+                <xsl:attribute name="pxsi:sheetName">
+                  <xsl:value-of select="substring-before(@table:cell-range-address,'.')"/>
+                </xsl:attribute>
 
-              <xsl:attribute name="pxsi:colStart">
-                <xsl:call-template name="GetColNum">
-                  <xsl:with-param name="cell">
-                    <xsl:value-of
-                      select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
-                    />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
+                <xsl:attribute name="pxsi:colStart">
+                  <xsl:call-template name="GetColNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:attribute>
 
-              <xsl:attribute name="pxsi:colEnd">
-                <xsl:call-template name="GetColNum">
-                  <xsl:with-param name="cell">
-                    <xsl:value-of
-                      select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
-              
-              <xsl:attribute name="pxsi:rowStart">
-                <xsl:call-template name="GetRowNum">
-                  <xsl:with-param name="cell">
-                    <xsl:value-of
-                      select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
-                    />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
+                <xsl:attribute name="pxsi:colEnd">
+                  <xsl:call-template name="GetColNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:attribute>
 
-              <xsl:attribute name="pxsi:rowEnd">
-                <xsl:call-template name="GetRowNum">
-                  <xsl:with-param name="cell">
-                    <xsl:value-of
-                      select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
-            </pxsi:pivotCache>
+                <xsl:attribute name="pxsi:rowStart">
+                  <xsl:call-template name="GetRowNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:attribute>
+
+                <xsl:attribute name="pxsi:rowEnd">
+                  <xsl:call-template name="GetRowNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:attribute>
+              </pxsi:pivotCache>
             </xsl:for-each>
           </xsl:if>
         </xsl:for-each>

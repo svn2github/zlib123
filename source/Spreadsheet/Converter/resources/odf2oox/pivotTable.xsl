@@ -29,7 +29,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 
   <xsl:template name="InsertPivotTable">
@@ -50,13 +52,13 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:if test="@table:grand-total = 'none' or @table:grand-total = 'row' ">
         <xsl:attribute name="colGrandTotals">
           <xsl:text>0</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:variable name="source">
         <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
       </xsl:variable>
@@ -385,8 +387,30 @@
         </xsl:for-each>
       </xsl:variable>
 
+      <pxsi:cacheRecords>
+        <xsl:attribute name="pxsi:sheetName">
+          <xsl:value-of select="$sheetName"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="pxsi:colStart">
+          <xsl:value-of select="$colStart"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="pxsi:colEnd">
+          <xsl:value-of select="$colEnd"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="pxsi:rowStart">
+          <xsl:value-of select="$rowStart"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="pxsi:rowEnd">
+          <xsl:value-of select="$rowEnd"/>
+        </xsl:attribute>
+      </pxsi:cacheRecords>
+
       <!-- go to table where source comes from -->
-      <xsl:for-each
+      <!--xsl:for-each
         select="parent::node()/parent::node()/table:table[@table:name = $sheetName]/descendant::table:table-row[1]">
         <xsl:call-template name="GetCacheRows">
           <xsl:with-param name="rowStart" select="$rowStart"/>
@@ -395,7 +419,7 @@
           <xsl:with-param name="colEnd" select="$colEnd"/>
           <xsl:with-param name="sheetName" select="$sheetName"/>
         </xsl:call-template>
-      </xsl:for-each>
+      </xsl:for-each-->
     </pivotCacheRecords>
   </xsl:template>
 
@@ -642,6 +666,155 @@
     <c>
       <xsl:value-of select="$colNum"/>
     </c>
+  </xsl:template>
+
+  <xsl:template name="WritePivotCells">
+
+    <xsl:variable name="sheetName">
+      <xsl:value-of select="@table:name"/>
+    </xsl:variable>
+    <xsl:text>;</xsl:text>
+
+    <!-- do not process twice duplicated pivot source-->
+    <xsl:for-each
+      select="key('pivot','')[not(preceding-sibling::table:data-pilot-table/table:source-cell-range/@table:cell-range-address = table:source-cell-range/@table:cell-range-address)]">
+
+      <!-- check only pivot sources on this sheet -->
+      <xsl:if
+        test="substring-before(table:source-cell-range/@table:cell-range-address, '.') = $sheetName ">
+
+        <xsl:variable name="rowStart">
+          <xsl:for-each select="table:source-cell-range">
+            <xsl:call-template name="GetRowNum">
+              <xsl:with-param name="cell">
+                <xsl:value-of
+                  select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="colStart">
+          <xsl:for-each select="table:source-cell-range">
+            <xsl:call-template name="GetColNum">
+              <xsl:with-param name="cell">
+                <xsl:value-of
+                  select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="rowEnd">
+          <xsl:for-each select="table:source-cell-range">
+            <xsl:call-template name="GetRowNum">
+              <xsl:with-param name="cell">
+                <xsl:value-of
+                  select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="colEnd">
+          <xsl:for-each select="table:source-cell-range">
+            <xsl:call-template name="GetColNum">
+              <xsl:with-param name="cell">
+                <xsl:value-of
+                  select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:call-template name="ListOutCellsInRange">
+          <xsl:with-param name="rowStart" select="$rowStart"/>
+          <xsl:with-param name="rowEnd" select="$rowEnd"/>
+          <xsl:with-param name="colStart" select="$colStart"/>
+          <xsl:with-param name="colEnd" select="$colEnd"/>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:for-each>
+
+  </xsl:template>
+
+  <xsl:template name="ListOutCellsInRange">
+    <xsl:param name="rowStart"/>
+    <xsl:param name="rowEnd"/>
+    <xsl:param name="colStart"/>
+    <xsl:param name="colEnd"/>
+    <xsl:param name="row" select="$rowStart"/>
+
+    <xsl:call-template name="ListOutCellsInRow">
+      <xsl:with-param name="row" select="$row"/>
+      <xsl:with-param name="colStart" select="$colStart"/>
+      <xsl:with-param name="colEnd" select="$colEnd"/>
+    </xsl:call-template>
+
+    <xsl:if test="$row != $rowEnd">
+      <xsl:call-template name="ListOutCellsInRange">
+        <xsl:with-param name="rowStart" select="$rowStart"/>
+        <xsl:with-param name="rowEnd" select="$rowEnd"/>
+        <xsl:with-param name="colStart" select="$colStart"/>
+        <xsl:with-param name="colEnd" select="$colEnd"/>
+        <xsl:with-param name="row" select="$row + 1"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="ListOutCellsInRow">
+    <xsl:param name="row"/>
+    <xsl:param name="colStart"/>
+    <xsl:param name="colEnd"/>
+    <xsl:param name="column" select="$colStart"/>
+
+    <xsl:value-of select="$column"/>
+    <xsl:text>:</xsl:text>
+    <xsl:value-of select="$row"/>
+    <xsl:text>;</xsl:text>
+
+    <xsl:if test="$column != $colEnd">
+      <xsl:call-template name="ListOutCellsInRow">
+        <xsl:with-param name="colStart" select="$colStart"/>
+        <xsl:with-param name="colEnd" select="$colEnd"/>
+        <xsl:with-param name="row" select="$row"/>
+        <xsl:with-param name="column" select="$column + 1"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="text:p" mode="pivot">
+    <xsl:if test="preceding-sibling::text:p[1]">
+      <xsl:text> </xsl:text>
+    </xsl:if>
+    <xsl:apply-templates mode="pivot" xml:space="preserve"/>
+  </xsl:template>
+
+  <xsl:template match="text:span" mode="pivot">
+    <xsl:apply-templates mode="pivot" xml:space="preserve"/>
+  </xsl:template>
+
+  <xsl:template match="text:a" mode="pivot">
+    <xsl:apply-templates mode="pivot" xml:space="preserve"/>
+  </xsl:template>
+
+  <xsl:template match="text:s" mode="pivot">
+    <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
+      <xsl:attribute name="pxs:c">
+        <xsl:choose>
+          <xsl:when test="@text:c">
+            <xsl:value-of select="@text:c"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>1</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </pxs:s>
+  </xsl:template>
+
+  <xsl:template match="text()" mode="pivot">
+    <xsl:value-of select="."/>
   </xsl:template>
 
 </xsl:stylesheet>

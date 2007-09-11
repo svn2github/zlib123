@@ -146,11 +146,15 @@
 
       <xsl:variable name="MergeCell">
         <xsl:call-template name="WriteMergeCell"/>
-
       </xsl:variable>
 
       <xsl:variable name="MergeCellStyle">
         <xsl:call-template name="WriteMergeStyle"/>
+      </xsl:variable>
+
+      <!-- single pivot cell can appear more than once in this variable -->
+      <xsl:variable name="pivotCells">
+        <xsl:call-template name="WritePivotCells"/>
       </xsl:variable>
 
       <xsl:variable name="masterPage">
@@ -259,6 +263,9 @@
         </xsl:with-param>
         <xsl:with-param name="CheckIfConditional">
           <xsl:value-of select="$CheckIfConditional"/>
+        </xsl:with-param>
+        <xsl:with-param name="pivotCells">
+          <xsl:value-of select="$pivotCells"/>
         </xsl:with-param>
       </xsl:call-template>
 
@@ -644,6 +651,7 @@
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
+    <xsl:param name="pivotCells"/>
 
     <!-- baseFontSize -->
 
@@ -751,51 +759,54 @@
     </xsl:if>
     <sheetData>
 
-        <xsl:variable name="tableName">
-          <xsl:value-of select="@table:name"/>
-        </xsl:variable>
+      <xsl:variable name="tableName">
+        <xsl:value-of select="@table:name"/>
+      </xsl:variable>
 
-        <!-- insert first row -->
-        <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
-          <xsl:with-param name="rowNumber">1</xsl:with-param>
-          <xsl:with-param name="cellNumber" select="$cellNumber"/>
-          <xsl:with-param name="sheetId" select="$sheetId"/>
-          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-          <xsl:with-param name="TableColumnTagNum">
-            <xsl:value-of select="$ColumnTagNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="MergeCell">
-            <xsl:value-of select="$MergeCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="MergeCellStyle">
-            <xsl:value-of select="$MergeCellStyle"/>
-          </xsl:with-param>
-          <xsl:with-param name="CheckRowHidden">
-            <xsl:value-of select="$CheckRowHidden"/>
-          </xsl:with-param>
-          <xsl:with-param name="CheckIfDefaultBorder">
-            <xsl:value-of select="$CheckIfDefaultBorder"/>
-          </xsl:with-param>
-          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
-          <xsl:with-param name="tableId">
-            <xsl:value-of select="$tableId"/>
-          </xsl:with-param>
-          <xsl:with-param name="multilines">
-            <xsl:value-of select="$multilines"/>
-          </xsl:with-param>
-          <xsl:with-param name="hyperlinkStyle">
-            <xsl:value-of select="$hyperlinkStyle"/>
-          </xsl:with-param>
-          <xsl:with-param name="cellFormats">
-            <xsl:value-of select="$cellFormats"/>
-          </xsl:with-param>
-          <xsl:with-param name="cellStyles">
-            <xsl:value-of select="$cellStyles"/>
-          </xsl:with-param>
-          <xsl:with-param name="CheckIfConditional">
-            <xsl:value-of select="$CheckIfConditional"/>
-          </xsl:with-param>
-        </xsl:apply-templates>
+      <!-- insert first row -->
+      <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
+        <xsl:with-param name="rowNumber">1</xsl:with-param>
+        <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        <xsl:with-param name="sheetId" select="$sheetId"/>
+        <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+        <xsl:with-param name="TableColumnTagNum">
+          <xsl:value-of select="$ColumnTagNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="CheckRowHidden">
+          <xsl:value-of select="$CheckRowHidden"/>
+        </xsl:with-param>
+        <xsl:with-param name="CheckIfDefaultBorder">
+          <xsl:value-of select="$CheckIfDefaultBorder"/>
+        </xsl:with-param>
+        <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
+        <xsl:with-param name="tableId">
+          <xsl:value-of select="$tableId"/>
+        </xsl:with-param>
+        <xsl:with-param name="multilines">
+          <xsl:value-of select="$multilines"/>
+        </xsl:with-param>
+        <xsl:with-param name="hyperlinkStyle">
+          <xsl:value-of select="$hyperlinkStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="cellFormats">
+          <xsl:value-of select="$cellFormats"/>
+        </xsl:with-param>
+        <xsl:with-param name="cellStyles">
+          <xsl:value-of select="$cellStyles"/>
+        </xsl:with-param>
+        <xsl:with-param name="CheckIfConditional">
+          <xsl:value-of select="$CheckIfConditional"/>
+        </xsl:with-param>
+        <xsl:with-param name="pivotCells">
+          <xsl:value-of select="$pivotCells"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
 
     </sheetData>
 
