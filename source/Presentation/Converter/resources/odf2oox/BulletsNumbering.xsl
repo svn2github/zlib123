@@ -147,6 +147,7 @@
       <xsl:when test="$character = '➔' ">è</xsl:when>
       <xsl:when test="$character = '✗' ">✗</xsl:when>
       <xsl:when test="$character = '–' ">–</xsl:when>
+      <xsl:when test="$character = '»' ">»</xsl:when>
       <xsl:otherwise>
         <!-- warn if Custom Bullet -->
         <xsl:message terminate="no">translation.odf2oox.bulletTypeCustomBullet</xsl:message>
