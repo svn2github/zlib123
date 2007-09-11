@@ -485,28 +485,49 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Basic shapes start-->
 
       <!--Custom shape - Rectangle -->
-		<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')]) and (p:spPr/a:prstGeom/@prst='rect') 
-			or (p:nvSpPr/p:cNvPr/@name[contains(., 'Content')]) and (p:spPr/a:prstGeom/@prst='rect')">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-            <xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-            <xsl:with-param name ="prID" select="$ParaId" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-										 draw:type="rectangle" 
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
+		  <xsl:when test ="p:spPr/a:prstGeom/@prst='rect'">
+      <xsl:choose>
+        <xsl:when test="p:style">
+          <draw:custom-shape draw:layer="layout" >
+            <xsl:call-template name ="CreateShape">
+              <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+              <xsl:with-param name="sldId" select="$slideId" />
+              <xsl:with-param name="grID" select ="$GraphicId"/>
+              <xsl:with-param name ="prID" select="$ParaId" />
+              <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+              <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+              <xsl:with-param name="TypeId" select ="$TypeId" />
+              <xsl:with-param name="grpBln" select ="$grpBln" />
+              <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            </xsl:call-template>
+            <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+                       draw:type="rectangle" 
+                       draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+            <xsl:copy-of select="$varHyperLinksForShapes" />
+          </draw:custom-shape>
+        </xsl:when>
+        <xsl:otherwise>
+          <draw:frame draw:layer="layout">
+
+            <xsl:call-template name ="CreateShape">
+
+              <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+              <xsl:with-param name="flagTextBox" select="'true'" />
+              <xsl:with-param name="sldId" select="$slideId" />
+              <xsl:with-param name="grID" select ="$GraphicId"/>
+              <xsl:with-param name ="prID" select="$ParaId" />
+              <xsl:with-param name="TypeId" select ="$TypeId" />
+              <xsl:with-param name="grpBln" select ="$grpBln" />
+              <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+              <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+              <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            </xsl:call-template>
+            <xsl:copy-of select="$varHyperLinksForShapes" />
+          </draw:frame>
+        </xsl:otherwise>
+      </xsl:choose>
+      
       </xsl:when>		
-     
-		
       <!-- Oval(Custom shape) -->
       <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')">
         <draw:custom-shape draw:layer="layout" >
@@ -517,7 +538,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-			<xsl:with-param name="TypeId" select ="$TypeId" />
+		     	<xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
@@ -1404,8 +1425,8 @@ Copyright (c) 2007, Sonata Software Limited
 		  <xsl:copy-of select="$varHyperLinksForShapes" />
 	  </draw:custom-shape>
   </xsl:when>
-  <!-- Right Brace (Added by A.Mathi as on 23/07/2007) -->
-  <xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBrace')">
+      <!-- Right Brace (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='rightBrace')">
 	  <draw:custom-shape draw:layer="layout" >
 		  <xsl:call-template name ="CreateShape">
 			<xsl:with-param name="sldId" select="$slideId" />
@@ -1750,71 +1771,8 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
-      <!--Text Box-->
-      <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')]  
-                     or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]">
-        <xsl:choose>
-          <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')]">
-            <draw:custom-shape draw:layer="layout">
-              <xsl:call-template name ="CreateShape">
-                <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-                <xsl:with-param name="sldId" select="$slideId" />
-                <xsl:with-param name="grID" select ="$GraphicId"/>
-                <xsl:with-param name ="prID" select="$ParaId" />
-                <xsl:with-param name="TypeId" select ="$TypeId" />
-                <xsl:with-param name="grpBln" select ="$grpBln" />
-                <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-                <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-                <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-              </xsl:call-template>
-              <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-													draw:type="mso-spt202" 
-													draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-              <xsl:copy-of select="$varHyperLinksForShapes" />
-            </draw:custom-shape>
-          </xsl:when>
-          <xsl:otherwise>
-            <draw:frame draw:layer="layout">
-
-              <xsl:call-template name ="CreateShape">
-                <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-                <xsl:with-param name="sldId" select="$slideId" />
-                <xsl:with-param name="grID" select ="$GraphicId"/>
-                <xsl:with-param name ="prID" select="$ParaId" />
-                <xsl:with-param name="TypeId" select ="$TypeId" />
-                <xsl:with-param name="grpBln" select ="$grpBln" />
-                <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-                <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-                <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-              </xsl:call-template>
-
-              <xsl:copy-of select="$varHyperLinksForShapes" />
-            </draw:frame>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <!--added by vipul for Word Art-->
-      <!--Start-->
-      <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'WordArt')]">
-        <draw:frame draw:layer="layout">
-          <draw:text-box>
-            <xsl:call-template name ="CreateShape">
-		      <xsl:with-param name="sldId" select="$slideId" />
-              <xsl:with-param name="grID" select ="$GraphicId"/>
-              <xsl:with-param name ="prID" select="$ParaId" />
-              <xsl:with-param name="TypeId" select ="$TypeId" />
-              <xsl:with-param name="grpBln" select ="$grpBln" />
-              <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-              <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-              <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            </xsl:call-template>
-          </draw:text-box>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:frame>
-      </xsl:when>
+     
       <!--End-->
-      <!-- Basic shapes end-->
-
       <!-- Connectors -->
       <!-- Line -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst = 'line'">
@@ -1861,26 +1819,6 @@ Copyright (c) 2007, Sonata Software Limited
         </draw:connector >
       </xsl:when>
       <!-- Custom shapes: -->
-      <!--Rectangle -->
-      <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle Custom')]">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter inserted by lohith,requierd for template AddTextHyperlinks -->
-            <xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-            <xsl:with-param name ="prID" select="$ParaId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-										 draw:type="rectangle" 
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-      </xsl:when>
       <!-- Rounded  Rectangle -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='roundRect'">
         <draw:custom-shape draw:layer="layout" >
@@ -2654,6 +2592,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="prID" />
     <xsl:param name ="TypeId" />
     <xsl:param name ="grpBln" />
+    <xsl:param name ="flagTextBox" />
     
     <!-- Addition of a parameter,by Vijayets ,for bullets and numbering in shapes-->
     <xsl:param name="SlideRelationId"/>
@@ -2680,7 +2619,7 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:choose>
 
     <xsl:choose>
-      <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')])">
+      <xsl:when test ="$flagTextBox='true'">
         <draw:text-box>
           <xsl:call-template name ="AddShapeText">
             <xsl:with-param name ="prID" select ="$prID" />
@@ -3439,7 +3378,7 @@ Copyright (c) 2007, Sonata Software Limited
 									(p:spPr/a:prstGeom/@prst='snip1Rect') )">
 
 
-			  <xsl:if test ="p:style/a:lnRef">
+		    	  <xsl:if test ="p:style/a:lnRef">
             <xsl:attribute name ="draw:stroke">
               <xsl:value-of select="'solid'" />
             </xsl:attribute>
@@ -3518,7 +3457,8 @@ Copyright (c) 2007, Sonata Software Limited
 		
 		<!--Bug fix for default BlueBorder in textbox by Mathi on 26thAug 2007-->
 		<xsl:if test="(not(a:ln) and not(parent::node()/p:nvSpPr/p:cNvSpPr/@txBox) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style)) or 
-		              (not(a:ln/@w) and (parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Content Placeholder')]) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style))">
+		              (not(a:ln/@w) and (parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Content Placeholder')]) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style)) or 
+					  ((parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Title ')]) and (parent::node()/p:nvSpPr/p:cNvSpPr/@txBox) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style))">
 			<xsl:attribute name ="draw:stroke">
 				<xsl:value-of select ="'none'"/>
 			</xsl:attribute>

@@ -49,6 +49,7 @@ xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
 xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" 
 exclude-result-prefixes="p a r xlink rels xmlns">
   
   <xsl:template name ="tmpNotesStyle">
@@ -274,7 +275,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
           </xsl:attribute>
           <xsl:attribute name ="presentation:display-footer">
             <xsl:choose>
-              <xsl:when test ="document($NoteMasterFile)/p:sld/p:cSld/p:spTree/p:sp
+              <xsl:when test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
                                           /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'ftr')]">
 
                 <xsl:value-of select ="'true'"/>             
@@ -286,7 +287,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
           </xsl:attribute>
           <xsl:attribute name ="presentation:display-page-number" >
             <xsl:choose>
-              <xsl:when test ="document($NoteMasterFile)/p:sld/p:cSld/p:spTree/p:sp
+              <xsl:when test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
                                           /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'sldNum')]">
 
                 <xsl:value-of select ="'true'"/>
@@ -298,7 +299,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
           </xsl:attribute>
           <xsl:attribute name ="presentation:display-date-time" >
             <xsl:choose>
-              <xsl:when test ="document($NoteMasterFile)/p:sld/p:cSld/p:spTree/p:sp
+              <xsl:when test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
                                           /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt')]">
 
                 <xsl:value-of select ="'true'"/>
@@ -335,6 +336,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
         <xsl:attribute name ="presentation:use-date-time-name">
           <xsl:value-of select ="concat($NotesNumber,'dtd')"/>
         </xsl:attribute>
+        <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
         <xsl:for-each select ="document($NotesFile)/p:notes/p:cSld/p:spTree/p:sp">
           <xsl:variable name ="spType">
             <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">

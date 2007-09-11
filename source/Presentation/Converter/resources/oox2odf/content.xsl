@@ -1671,10 +1671,113 @@ exclude-result-prefixes="p a r xlink rels">
                                     <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
                                   </xsl:call-template>
                                 </xsl:if>
+                                <xsl:if test ="$bulletTypeBool!='true'">
+                                  <text:p >
+                                    <xsl:attribute name ="text:style-name">
+                                      <xsl:value-of select ="concat($ParaId,position())"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name ="text:id" >
+                                      <xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+                                    </xsl:attribute>
+                                    <xsl:for-each select ="node()">
+                                      <xsl:if test ="name()='a:r'">
+                                        <text:span>
+                                          <xsl:attribute name="text:style-name">
+                                            <xsl:value-of select="concat($SlideID,generate-id())"/>
+                                          </xsl:attribute>
+                                          <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
+                                          <xsl:variable name="nodeTextSpan">
+                                            <!--<xsl:value-of select ="a:t"/>-->
+                                            <!--converts whitespaces sequence to text:s-->
+                                            <!-- 1699083 bug fix  -->
+                                            <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                                            <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                                            <xsl:choose >
+                                              <xsl:when test ="a:rPr[@cap='all'] or $layoutCap ='all'">
+                                                <xsl:choose >
+                                                  <xsl:when test =".=''">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:when test ="not(contains(.,'  '))">
+                                                    <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                                                  </xsl:when>
+                                                  <xsl:when test =". =' '">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:otherwise >
+                                                    <xsl:call-template name ="InsertWhiteSpaces">
+                                                      <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                                    </xsl:call-template>
+                                                  </xsl:otherwise>
+                                                </xsl:choose>
+                                              </xsl:when>
+                                              <xsl:when test ="a:rPr[@cap='small'] or $layoutCap ='small'">
+                                                <xsl:choose >
+                                                  <xsl:when test =".=''">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:when test ="not(contains(.,'  '))">
+                                                    <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                                                  </xsl:when>
+                                                  <xsl:when test =".= ' '">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:otherwise >
+                                                    <xsl:call-template name ="InsertWhiteSpaces">
+                                                      <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                                    </xsl:call-template>
+                                                  </xsl:otherwise>
+                                                </xsl:choose >
+                                              </xsl:when>
+                                              <xsl:otherwise >
+                                                <xsl:choose >
+                                                  <xsl:when test =".=''">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:when test ="not(contains(.,'  '))">
+                                                    <xsl:value-of select ="."/>
+                                                  </xsl:when>
+                                                  <xsl:otherwise >
+                                                    <xsl:call-template name ="InsertWhiteSpaces">
+                                                      <xsl:with-param name ="string" select ="."/>
+                                                    </xsl:call-template>
+                                                  </xsl:otherwise >
+                                                </xsl:choose>
+                                              </xsl:otherwise>
+                                            </xsl:choose>
+                                          </xsl:variable>
+                                          <!-- Added by lohith.ar - Code for text Hyperlinks -->
+                                          <xsl:if test="node()/a:hlinkClick">
+                                            <text:a>
+                                              <xsl:call-template name="AddTextHyperlinks">
+                                                <xsl:with-param name="nodeAColonR" select="node()" />
+                                                <xsl:with-param name="slideRelationId" select="$slideRel" />
+                                                <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
+                                              </xsl:call-template>
+                                              <xsl:copy-of select="$nodeTextSpan"/>
+                                            </text:a>
+                                          </xsl:if>
+                                          <xsl:if test="not(node()/a:hlinkClick)">
+                                            <xsl:copy-of select="$nodeTextSpan"/>
+                                          </xsl:if>
+                                        </text:span>
+                                      </xsl:if >
+                                      <xsl:if test ="name()='a:br'">
+                                        <text:line-break/>
+                                      </xsl:if>
+                                      <!-- Added by lohith.ar for fix 1731885-->
+                                      <xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
+                                        <text:span>
+                                          <xsl:attribute name="text:style-name">
+                                            <xsl:value-of select="concat($SlideID,generate-id())"/>
+                                          </xsl:attribute>
+                                        </text:span>
+                                      </xsl:if>
+                                    </xsl:for-each>
+                                  </text:p>
+                                </xsl:if>
                               </xsl:if>
-                              <!-- If no bullets present at all-->
-                              
-                            </xsl:if>
+                                 </xsl:if>
                             <xsl:if test ="$LayoutName = 'title' or $LayoutName ='ctrTitle'">
                               <text:p >
                                 <xsl:attribute name ="text:style-name">
@@ -2686,42 +2789,37 @@ exclude-result-prefixes="p a r xlink rels">
                         <style:text-properties>
                           <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
                           <!-- Bug 1744106 fixed by vijayeta, date 16th Aug '07, font size and family from endPara-->
-                          <xsl:variable name="fontFamily">
-                            <xsl:choose>
-                              <xsl:when test="a:endParaRPr/a:latin/@typeface">
-                                <xsl:variable name="typeFaceVal" select="a:rPr/a:latin/@typeface" />
-                                <xsl:for-each select="a:endParaRPr/a:latin/@typeface">
-                                  <xsl:if test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
-                                    <xsl:value-of select="$DefFont" />
+                          <xsl:choose>
+                            <xsl:when test ="a:latin/@typeface">
+                              <xsl:attribute name ="fo:font-family">
+                                <xsl:variable name ="typeFaceVal" select ="a:latin/@typeface"/>
+                                <xsl:for-each select ="a:latin/@typeface">
+                                  <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+                                    <xsl:value-of select ="$DefFont"/>
                                   </xsl:if>
-                                  <!--  Bug 1711910 Fixed,On date 2-06-07,by Vijayeta -->
-                                  <xsl:if test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
-                                    <xsl:value-of select="." />
-                                  </xsl:if>
-                                </xsl:for-each>
-                              </xsl:when>
-                              <xsl:when test="a:latin/@typeface">
-                                <xsl:variable name="typeFaceVal" select="a:latin/@typeface" />
-                                <xsl:for-each select="a:latin/@typeface">
-                                  <xsl:if test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
-                                    <xsl:value-of select="$DefFont" />
-                                  </xsl:if>
-                                  <!--  Bug 1711910 Fixed,On date 2-06-07,by Vijayeta -->
-                                  <xsl:if test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
-                                    <xsl:value-of select="." />
+                                  <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
+                                  <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                                    <xsl:value-of select ="."/>
                                   </xsl:if>
                                 </xsl:for-each>
-                              </xsl:when>
-                              <!--<xsl:when test ="not(a:endParaRPr/a:latin/@typeface)">
-                                  <xsl:value-of select ="$DefFont"/>
-                             </xsl:when>-->
-                            </xsl:choose>
-                          </xsl:variable>
-                          <xsl:if test="$fontFamily!=''">
-                            <xsl:attribute name="fo:font-family">
-                              <xsl:value-of select="$fontFamily" />
-                            </xsl:attribute>
-                          </xsl:if>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test ="a:cs/@typeface">
+                              <xsl:attribute name ="fo:font-family">
+                                <xsl:value-of select ="a:cs/@typeface"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test ="a:sym/@typeface">
+                              <xsl:attribute name ="fo:font-family">
+                                <xsl:value-of select ="a:sym/@typeface"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test ="not(a:latin/@typeface) and not(a:cs/@typeface) and not(a:sym/@typeface) ">
+                              <xsl:attribute name ="fo:font-family">
+                                <xsl:value-of select ="$DefFont"/>
+                              </xsl:attribute>
+                            </xsl:when>
+                          </xsl:choose>
                           <!--End, Bug 1744106 fixed by vijayeta, date 16th Aug '07, font size and family from endPara
                               if font size or family not present, slidemaster to stles mappin will set the values, hence 'DefFont' removed-->
                           <xsl:attribute name ="style:font-family-generic"	>
@@ -3126,12 +3224,22 @@ exclude-result-prefixes="p a r xlink rels">
           <!-- warn if Pen colour can be set -->
           <xsl:message terminate="no">translation.oox2odf.slideShowSettingsPenColor</xsl:message>
         </xsl:if>
+        <xsl:if test ="./p:custShow">
+          <xsl:variable name ="custId">
+            <xsl:value-of select ="./p:custShow/@id"/>
+          </xsl:variable>
+          <xsl:variable name ="custShowInPresProps">
+            <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:custShowLst/p:custShow[@id=$custId]">
+              <xsl:value-of select="./@name"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:attribute name ="presentation:show">
+            <xsl:value-of select="$custShowInPresProps"/>
+          </xsl:attribute>          
+        </xsl:if>
       </xsl:for-each>
       <!-- End of code Added by vijayeta for Slide Show settings-->
-      <xsl:if test ="./p:custShow">
-      <xsl:attribute name ="presentation:show">
-        <xsl:value-of select="document('ppt/presentation.xml')/p:presentation/p:custShowLst/p:custShow/@name"/>
-      </xsl:attribute>
+      
       <xsl:for-each select="document('ppt/presentation.xml')/p:presentation/p:custShowLst/p:custShow">
         <presentation:show>
           <xsl:attribute name ="presentation:name"	>
@@ -3156,7 +3264,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:attribute>
         </presentation:show>
       </xsl:for-each>
-      </xsl:if>
+     
     </presentation:settings>
   </xsl:template>
   <!-- Added by Lohith A R : Custom Slide Show -->
@@ -6476,6 +6584,11 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:when>
               </xsl:choose>
             </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
+            </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@strike">
@@ -6687,6 +6800,11 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
@@ -6900,6 +7018,11 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:when>
               </xsl:choose>
             </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
+            </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/a:defRPr/@strike">
@@ -7111,6 +7234,11 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
@@ -7324,6 +7452,11 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:when>
               </xsl:choose>
             </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
+            </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/a:defRPr/@strike">
@@ -7535,6 +7668,11 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
@@ -7748,6 +7886,11 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:when>
               </xsl:choose>
             </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
+            </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/a:defRPr/@strike">
@@ -7960,6 +8103,11 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:when>
               </xsl:choose>
             </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
+            </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/a:defRPr/@strike">
@@ -8171,6 +8319,11 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
+              <xsl:attribute name ="fo:color">
+                <xsl:value-of select="'#898989'"/>
+              </xsl:attribute>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
