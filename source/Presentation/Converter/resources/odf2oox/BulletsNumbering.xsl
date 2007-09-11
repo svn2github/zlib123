@@ -249,6 +249,47 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  <xsl:template name ="getListLevelForTextBox">
+    <xsl:param name ="levelCount"/>
+    <xsl:choose>
+      <xsl:when test ="text:p">
+        <xsl:value-of select ="'0'"/>
+      </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:p">
+        <xsl:value-of select ="'1'"/>
+      </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:value-of select ="'2'"/>
+      </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:value-of select ="'3'"/>
+      </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:value-of select ="'4'"/>
+      </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:value-of select ="'5'"/>
+      </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:value-of select ="'6'"/>
+      </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:value-of select ="'7'"/>
+      </xsl:when>
+      <!-- DRM.odp File Crash in roundtrip
+			Since pptx does not support 10th level, any text that is of 10th level in odp, 
+			is set to 9th level in pptx.
+			date:14th Aug, '07-->
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <!-- warn if level 10 -->
+        <xsl:message terminate="no">translation.odf2oox.bulletTypeLevel10</xsl:message>
+        <xsl:value-of select ="'7'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select ="'0'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   <xsl:template name ="getFontStyleFromStyles">
     <xsl:param name ="lvl"/>
     <xsl:variable name ="outlineName" select ="concat('Default-outline',$lvl+1)"/>
@@ -322,6 +363,83 @@
         </xsl:if>
         <xsl:if test="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a">
           <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <!--<xsl:when test ="$blvl='8'">
+        <xsl:if test="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$blvl='9'">
+        <xsl:if test="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>-->
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name ="getTextHyperlinksForBulltesForTextBox">
+    <xsl:param name ="blvl"/>
+    <xsl:choose>
+      <xsl:when test="$blvl = 0">
+        <xsl:if test="text:p/text:span/text:a">
+          <xsl:value-of select ="text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="text:p/text:a">
+          <xsl:value-of select ="text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$blvl='1'">
+        <xsl:if test="text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$blvl='2'">
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$blvl='3'">
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$blvl='4'">
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$blvl='5'">
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test ="$blvl='6'">
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
+        </xsl:if>
+        <xsl:if test="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a">
+          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
         </xsl:if>
       </xsl:when>
       <!--<xsl:when test ="$blvl='8'">

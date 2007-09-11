@@ -98,18 +98,13 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:if test ="not(./@presentation:start-page or ./@presentation:show)">
                 <p:sldAll />
               </xsl:if>
-              <xsl:if test ="not(./@presentation:full-screen or ./@presentation:full-screen='true')">
-                <p:penClr>
-                  <a:srgbClr val="FF0000" />
-                </p:penClr>
-              </xsl:if>
               <xsl:if test ="./@presentation:show">
                 <xsl:variable name ="custPresentationName">
                   <xsl:value-of select ="./@presentation:show"/>
                 </xsl:variable>
                 <xsl:variable name ="custPresentationId" >
                   <xsl:for-each select ="presentation:show">
-                    <xsl:if test ="@presentation:name=$custPresentationName">
+                    <xsl:if test ="./@presentation:name=$custPresentationName">
                       <xsl:value-of select ="position()"/>
                     </xsl:if>
                   </xsl:for-each>
@@ -119,6 +114,11 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select ="$custPresentationId"/>
                   </xsl:attribute>
                 </p:custShow>
+              </xsl:if>
+              <xsl:if test ="not(./@presentation:full-screen or ./@presentation:full-screen='true')">
+                <p:penClr>
+                  <a:srgbClr val="FF0000" />
+                </p:penClr>
               </xsl:if>
               <xsl:if test ="./@presentation:stay-on-top='true'">
                 <!-- warn if Set presentation on top -->

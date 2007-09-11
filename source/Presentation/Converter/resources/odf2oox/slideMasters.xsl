@@ -328,7 +328,7 @@ Copyright (c) 2007, Sonata Software Limited
                                   </xsl:when>
                                   <xsl:when test="not(@presentation:style-name[contains(.,'outline')])">
                                     <xsl:variable name="var_outlineName">
-                                      <xsl:value-of select="concat($slideMasterName,'-outline')"/>
+                                      <xsl:value-of select="concat($slideMasterName,'-outline1')"/>
                                     </xsl:variable>
                                     <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_outlineName]/style:graphic-properties">
                                       <xsl:call-template name ="getLineStyle"/>

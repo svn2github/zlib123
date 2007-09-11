@@ -194,7 +194,12 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:when test ="@draw:type='line'">
                 <xsl:value-of select ="'Straight Arrow Connector '"/>
               </xsl:when>
-              <xsl:when test ="@draw:type='curve'">
+		<!-- Bug Fix for StraightLine Connector by Mathi on 6thSep 2007-->
+			  <xsl:when test ="@draw:type='lines' and not(@draw:line-skew)">
+				  <xsl:value-of select="'Straight Arrow Connector '"/>		
+			  </xsl:when>
+			  <!--End of Bug Fix Code-->
+	       <xsl:when test ="@draw:type='curve'">
                 <xsl:value-of select ="'Curved Connector '"/>
               </xsl:when>
               <xsl:otherwise>
@@ -260,43 +265,77 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:if test="office:event-listeners">
               <xsl:for-each select ="office:event-listeners/presentation:event-listener">
                 <xsl:if test="@script:event-name[contains(.,'dom:click')]">
-                  <a:hlinkClick>
+                 
                     <xsl:choose>
                       <!--Go to previous slide-->
                       <xsl:when test="@presentation:action[ contains(.,'previous-page')]">
+                        <a:hlinkClick>
                         <xsl:attribute name="action">
                           <xsl:value-of select="'ppaction://hlinkshowjump?jump=previousslide'"/>
                         </xsl:attribute>
+                          <xsl:call-template name="tmpSetRid">
+                            <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                            <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                          </xsl:call-template>
+                        </a:hlinkClick>
                       </xsl:when>
                       <!--Go to Next slide-->
                       <xsl:when test="@presentation:action[ contains(.,'next-page')]">
-                        <xsl:attribute name="action">
-                          <xsl:value-of select="'ppaction://hlinkshowjump?jump=nextslide'"/>
-                        </xsl:attribute>
-                      </xsl:when>
+                        <a:hlinkClick>
+                          <xsl:attribute name="action">
+                            <xsl:value-of select="'ppaction://hlinkshowjump?jump=nextslide'"/>
+                          </xsl:attribute>
+                          <xsl:call-template name="tmpSetRid">
+                            <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                            <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                          </xsl:call-template>
+                        </a:hlinkClick>
+                        </xsl:when>
                       <!--Go to First slide-->
                       <xsl:when test="@presentation:action[ contains(.,'first-page')]">
-                        <xsl:attribute name="action">
-                          <xsl:value-of select="'ppaction://hlinkshowjump?jump=firstslide'"/>
-                        </xsl:attribute>
-                      </xsl:when>
+                        <a:hlinkClick>
+                          <xsl:attribute name="action">
+                            <xsl:value-of select="'ppaction://hlinkshowjump?jump=firstslide'"/>
+                          </xsl:attribute>
+                          <xsl:call-template name="tmpSetRid">
+                            <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                            <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                          </xsl:call-template>
+                          </a:hlinkClick>
+                        </xsl:when>
                       <!--Go to Last slide-->
                       <xsl:when test="@presentation:action[ contains(.,'last-page')]">
                         <xsl:attribute name="action">
                           <xsl:value-of select="'ppaction://hlinkshowjump?jump=lastslide'"/>
                         </xsl:attribute>
+                        <xsl:call-template name="tmpSetRid">
+                          <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                          <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                        </xsl:call-template>
                       </xsl:when>
                       <!--End Presentation-->
                       <xsl:when test="@presentation:action[ contains(.,'stop')]">
-                        <xsl:attribute name="action">
-                          <xsl:value-of select="'ppaction://hlinkshowjump?jump=endshow'"/>
-                        </xsl:attribute>
+                        <a:hlinkClick>
+                          <xsl:attribute name="action">
+                            <xsl:value-of select="'ppaction://hlinkshowjump?jump=endshow'"/>
+                          </xsl:attribute>
+                          <xsl:call-template name="tmpSetRid">
+                            <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                            <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                          </xsl:call-template>
+                          </a:hlinkClick>
                       </xsl:when>
                       <!--Run program-->
                       <xsl:when test="@xlink:href and @presentation:action[ contains(.,'execute')]">
+                        <a:hlinkClick>
                         <xsl:attribute name="action">
                           <xsl:value-of select="'ppaction://program'"/>
                         </xsl:attribute>
+                          <xsl:call-template name="tmpSetRid">
+                            <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                            <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                          </xsl:call-template>
+                        </a:hlinkClick>
                       </xsl:when>
                       <!--Go to slide-->
                       <!--<xsl:when test="@xlink:href[ contains(.,'#page')]">
@@ -311,83 +350,65 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:call-template>
                         </xsl:variable>
                         <xsl:if test="$pageID > 0">
-                          <xsl:attribute name="action">
-                            <xsl:value-of select="'ppaction://hlinksldjump'"/>
-                          </xsl:attribute>
-                          <xsl:attribute name="r:id">
-                            <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
-                          </xsl:attribute>
+                          <a:hlinkClick>
+                            <xsl:attribute name="action">
+                              <xsl:value-of select="'ppaction://hlinksldjump'"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="r:id">
+                              <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+                            </xsl:attribute>
+                            </a:hlinkClick>
                         </xsl:if>
                       </xsl:when>
 
                       <!--Go to document-->
                       <xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
+                        <a:hlinkClick>
                         <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
                           <xsl:attribute name="action">
                             <xsl:value-of select="'ppaction://hlinkfile'"/>
                           </xsl:attribute>
                         </xsl:if>
+                          <xsl:call-template name="tmpSetRid">
+                            <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                            <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                          </xsl:call-template>
+                          </a:hlinkClick>
                       </xsl:when>
+                    
                     </xsl:choose>
                     <!--set value for attribute r:id-->
-                    <xsl:choose>
-                      <!--For jump to next,previous,first,last-->
-                      <xsl:when test="@presentation:action[ contains(.,'page') or contains(.,'stop')]">
-                        <xsl:attribute name="r:id">
-                          <xsl:value-of select="''"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!--For Run program & got to slide-->
-                      <!--
-                    <xsl:when test="@xlink:href[contains(.,'#page')]">
-                      <xsl:attribute name="r:id">
-                        <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
-                      </xsl:attribute>-->
-                      <!--
-                    </xsl:when>-->
-                      <!--For Go to document-->
-                      <xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
-                        <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
-                          <xsl:attribute name="r:id">
-                            <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:when>
-                      <!--For Go to Run Programs-->
-                      <xsl:when test="@xlink:href and @presentation:action[ contains(.,'execute')]">
-                        <xsl:attribute name="r:id">
-                          <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                    </xsl:choose>
+                  
                     <!-- Play Sound -->
                     <xsl:if test="@presentation:action[ contains(.,'sound')]">
-                      <a:snd>
-                        <xsl:variable name="varMediaFilePath">
-                          <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
-                            <xsl:value-of select="presentation:sound/@xlink:href" />
-                          </xsl:if>
-                          <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
-                            <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
-                          </xsl:if>
-                        </xsl:variable>
-                        <xsl:variable name="varFileRelId">
-                          <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
-                        </xsl:variable>
-                        <xsl:attribute name="r:embed">
-                          <xsl:value-of select="$varFileRelId"/>
-                        </xsl:attribute>
-                        <xsl:attribute name="name">
-                          <xsl:value-of select="concat('SoundFileForShape',$PostionCount)"/>
-                        </xsl:attribute>
-                        <xsl:attribute name="builtIn">
-                          <xsl:value-of select='1'/>
-                        </xsl:attribute>
-                        <pzip:import pzip:source="{$varMediaFilePath}" pzip:target="{concat('ppt/media/',$varFileRelId,'.wav')}" />
-                      </a:snd>
+                      <a:hlinkClick>
+                        <a:snd>
+                          <xsl:variable name="varMediaFilePath">
+                            <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                              <xsl:value-of select="presentation:sound/@xlink:href" />
+                            </xsl:if>
+                            <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                              <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                            </xsl:if>
+                          </xsl:variable>
+                          <xsl:variable name="varFileRelId">
+                            <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                          </xsl:variable>
+                          <xsl:attribute name="r:embed">
+                            <xsl:value-of select="$varFileRelId"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="name">
+                            <xsl:value-of select="concat('SoundFileForShape',$PostionCount)"/>
+                          </xsl:attribute>
+                          <xsl:attribute name="builtIn">
+                            <xsl:value-of select='1'/>
+                          </xsl:attribute>
+                          <pzip:import pzip:source="{$varMediaFilePath}" pzip:target="{concat('ppt/media/',$varFileRelId,'.wav')}" />
+                        </a:snd>
+                      </a:hlinkClick>
                     </xsl:if>
-                  </a:hlinkClick>
-                </xsl:if>
+
+                  </xsl:if>
               </xsl:for-each>
             </xsl:if>
           </xsl:if>
@@ -499,6 +520,42 @@ Copyright (c) 2007, Sonata Software Limited
       </p:txBody>
     </p:sp>
   </xsl:template>
+  <xsl:template name="tmpSetRid">
+    <xsl:param name="ShapeType"/>
+    <xsl:param name="PostionCount"/>
+    <xsl:choose>
+      <!--For jump to next,previous,first,last-->
+      <xsl:when test="@presentation:action[ contains(.,'page') or contains(.,'stop')]">
+        <xsl:attribute name="r:id">
+          <xsl:value-of select="''"/>
+        </xsl:attribute>
+      </xsl:when>
+      <!--For Run program & got to slide-->
+      <!--
+                    <xsl:when test="@xlink:href[contains(.,'#page')]">
+                      <xsl:attribute name="r:id">
+                        <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+                      </xsl:attribute>-->
+      <!--
+                    </xsl:when>-->
+      <!--For Go to document-->
+      <xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
+        <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
+          <xsl:attribute name="r:id">
+            <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:when>
+      <!--For Go to Run Programs-->
+      <xsl:when test="@xlink:href and @presentation:action[ contains(.,'execute')]">
+        <xsl:attribute name="r:id">
+          <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+ 
   <!-- Draw shape -->
   <xsl:template name ="drawShape">
     <a:xfrm>
