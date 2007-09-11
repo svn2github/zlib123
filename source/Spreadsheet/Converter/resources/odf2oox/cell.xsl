@@ -1505,7 +1505,7 @@
 
 
     <xsl:if
-      test="parent::node()/@table:number-rows-repeated or child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
+      test="parent::node()/@table:number-rows-repeated or child::text:p or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
 
       <c>
 
