@@ -1454,11 +1454,11 @@
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
           <xsl:choose>
-            <xsl:when test="preceding::e:row[1]/@r = ''">
+            <xsl:when test="preceding-sibling::e:row[1]/@r = ''">
               <xsl:text>0</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="preceding::e:row[1]/@r"/>
+              <xsl:value-of select="preceding-sibling::e:row[1]/@r"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:with-param>
@@ -1569,7 +1569,7 @@
 
       <!-- when this row is not first one and there were pictures rows after previous non-empty row-->
       <xsl:when
-        test="preceding::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding::e:row[1]/@r and $GetMinRowWithElement &lt; @r - 1">
+        test="preceding-sibling::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding-sibling::e:row[1]/@r and $GetMinRowWithElement &lt; @r - 1">
 
         <xsl:call-template name="InsertElementsBetwenTwoRows">
           <xsl:with-param name="sheet">
@@ -1604,7 +1604,7 @@
             <xsl:value-of select="@r - 1"/>
           </xsl:with-param>
           <xsl:with-param name="prevRow">
-            <xsl:value-of select="preceding::e:row[1]/@r"/>
+            <xsl:value-of select="preceding-sibling::e:row[1]/@r"/>
           </xsl:with-param>
           <xsl:with-param name="ValidationCell">
             <xsl:value-of select="$ValidationCell"/>
@@ -1625,9 +1625,9 @@
       <xsl:otherwise>
 
         <!-- when this row is not first one and there were empty rows after previous non-empty row -->
-        <xsl:if test="preceding::e:row[1]/@r &lt;  @r - 1">
+        <xsl:if test="preceding-sibling::e:row[1]/@r &lt;  @r - 1">
           <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-            table:number-rows-repeated="{@r -1 - preceding::e:row[1]/@r}">
+            table:number-rows-repeated="{@r -1 - preceding-sibling::e:row[1]/@r}">
             <table:table-cell table:number-columns-repeated="256"/>
           </table:table-row>
         </xsl:if>
@@ -1920,7 +1920,7 @@
       <!-- when this row is not first one and there were empty rows after previous non-empty row -->
       <xsl:when test="position() != 1 and @r != preceding-sibling::e:row[1]/@r + 1">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-          table:number-rows-repeated="{@r -1 - preceding::e:row[1]/@r}">
+          table:number-rows-repeated="{@r -1 - preceding-sibling::e:row[1]/@r}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>

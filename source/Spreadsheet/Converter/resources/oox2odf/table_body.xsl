@@ -212,12 +212,13 @@
           <xsl:value-of select="concat($PictureRow, $NoteRow)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-          <xsl:value-of select="preceding::e:row[1]/@r"/>
+          <xsl:value-of select="preceding-sibling::e:row[1]/@r"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
     <xsl:variable name="currentRowNumber">
-      <xsl:value-of select="preceding::e:row[1]/@r"/>
+      <xsl:value-of select="preceding-sibling::e:row[1]/@r"/>
     </xsl:variable>
       
     <xsl:variable name="PictureColl">
