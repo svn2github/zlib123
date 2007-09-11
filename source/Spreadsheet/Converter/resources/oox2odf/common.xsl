@@ -90,7 +90,7 @@
         <xsl:with-param name="character" select="$lastCharacter"/>
       </xsl:call-template>
     </xsl:variable>
-
+    
     <xsl:variable name="power">
       <xsl:call-template name="Power">
         <xsl:with-param name="base" select="26"/>
@@ -99,9 +99,9 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="string-length($literal)>1">
+      <xsl:when test="string-length($literal) &gt; 1">
         <xsl:call-template name="GetAlphabeticPosition">
-          <xsl:with-param name="literal" select="substring($literal,0,string-length($literal))"/>
+          <xsl:with-param name="literal" select="substring($literal,1,string-length($literal) - 1)"/>
           <xsl:with-param name="level" select="$level+1"/>
           <xsl:with-param name="number">
             <xsl:value-of select="$lastCharacterPosition*$power + $number"/>
@@ -189,39 +189,6 @@
             <xsl:value-of select="$num - 26*floor($num div 26)"/>
           </xsl:with-param>
         </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- calculates power function -->
-  <xsl:template name="Power">
-    <xsl:param name="base"/>
-    <xsl:param name="exponent"/>
-    <xsl:param name="value1" select="$base"/>
-
-    <xsl:choose>
-      <xsl:when test="$exponent = 0">
-        <xsl:text>1</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:choose>
-          <xsl:when test="$exponent &gt; 1">
-            <xsl:call-template name="Power">
-              <xsl:with-param name="base">
-                <xsl:value-of select="$base"/>
-              </xsl:with-param>
-              <xsl:with-param name="exponent">
-                <xsl:value-of select="$exponent -1"/>
-              </xsl:with-param>
-              <xsl:with-param name="value1">
-                <xsl:value-of select="$value1 * $base"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$value1"/>
-          </xsl:otherwise>
-        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -596,7 +563,7 @@
     <xsl:value-of select="concat($red,$green,$blue)"/>
 
   </xsl:template>
- 
+
   <xsl:template name="ConvertScientific">
     <xsl:param name="value"/>
 
@@ -1492,7 +1459,7 @@
         <xsl:otherwise>
           <xsl:for-each select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
             <xsl:for-each select="node()[name() = concat('a:',$color)]">
-              
+
               <xsl:choose>
                 <xsl:when test="contains(node()/@val,'window' ) ">
                   <xsl:value-of select="node()/@lastClr"/>
@@ -1501,7 +1468,7 @@
                   <xsl:value-of select="node()/@val"/>
                 </xsl:otherwise>
               </xsl:choose>
-              
+
             </xsl:for-each>
           </xsl:for-each>
         </xsl:otherwise>
