@@ -311,7 +311,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string[] arrVal = new string[2];
             arrVal = text.Split(':');
             string source = arrVal[1].ToString();
-            string address = null;
+            string address = "";
 
             if (arrVal.Length == 2)
             {

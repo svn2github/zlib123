@@ -544,7 +544,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string[] arrVal = new string[1];
             arrVal = text.Split(':');
             string source = arrVal[1].ToString();
-            string address=null;
+            string address="";
            
            
             if (arrVal.Length == 2)
@@ -563,9 +563,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     returnInputFilePath = Environment.CurrentDirectory;
                 }
-
+                if (source != "")
+                {
                 string linkPathLocation = Path.GetFullPath(Path.Combine(returnInputFilePath, source.Remove(0, 3))).Replace("/", "//").Replace(" ","%20");
                 address = "file:///" + linkPathLocation;
+            }
             }
             return address.ToString();
         }
