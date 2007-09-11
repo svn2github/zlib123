@@ -40,26 +40,117 @@
   <xsl:template name="CheckIfMerge">
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
+    <xsl:param name="MergeCell"/>
 
-    <xsl:for-each select="ancestor::e:worksheet">
+  
 
       <!-- Checks if Merge Cells exist  in the document-->
       <xsl:choose>
-        <xsl:when test="e:mergeCells/e:mergeCell">
-          <xsl:apply-templates select="e:mergeCells/e:mergeCell[1]" mode="merge">
+        <xsl:when test="$MergeCell != ''">
+          <xsl:call-template name="SearchmergeCell">
             <xsl:with-param name="colNum">
               <xsl:value-of select="$colNum"/>
             </xsl:with-param>
             <xsl:with-param name="rowNum">
               <xsl:value-of select="$rowNum"/>
             </xsl:with-param>
-          </xsl:apply-templates>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:for-each>
+  
+  </xsl:template>
+  
+  <xsl:template name="SearchmergeCell">
+    <xsl:param name="colNum"/>
+    <xsl:param name="rowNum"/>
+    <xsl:param name="MergeCell"/>
+    
+    <xsl:variable name="ThisCell">
+      <xsl:value-of select="substring-before($MergeCell, ';')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="StartMergeCell">
+      <xsl:value-of select="substring-before($ThisCell, ':')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="EndMergeCell">
+      <xsl:value-of select="substring-after($ThisCell, ':')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="StartColNum">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$StartMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="StartRowNum">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$StartMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="EndColNum">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$EndMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="EndRowNum">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$EndMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:choose>
+      
+      <!-- Checks if "Merge Cell" is starting in this cell -->
+      <xsl:when test="$colNum = $StartColNum and $rowNum = $StartRowNum">
+        <xsl:value-of
+          select="concat(number($EndRowNum - $StartRowNum + 1), concat(':',number($EndColNum - $StartColNum+1)))"
+        />
+      </xsl:when>
+      
+      <!-- Checks if this cell is in "Merge Cell" -->
+      <xsl:when
+        test="$colNum = $StartColNum and $EndColNum &gt;= $colNum and $rowNum &gt;= $StartRowNum and $EndRowNum &gt;= $rowNum">
+        <xsl:value-of select="concat('true:', number($EndColNum - $StartColNum +1 ))"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="substring-after($MergeCell, ';') != ''">
+            <xsl:call-template name="SearchmergeCell">
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="substring-after($MergeCell, ';')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
 
   <xsl:template name="CheckIfBigMerge">
@@ -330,81 +421,19 @@
 
   </xsl:template>
 
-
-  <xsl:template match="e:mergeCell" mode="merge">
-    <xsl:param name="colNum"/>
-    <xsl:param name="rowNum"/>
-
-    <xsl:variable name="StartMergeCell">
-      <xsl:value-of select="substring-before(@ref, ':')"/>
-    </xsl:variable>
-
-    <xsl:variable name="EndMergeCell">
-      <xsl:value-of select="substring-after(@ref, ':')"/>
-    </xsl:variable>
-
-    <xsl:variable name="StartColNum">
-      <xsl:call-template name="GetColNum">
-        <xsl:with-param name="cell">
-          <xsl:value-of select="$StartMergeCell"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="StartRowNum">
-      <xsl:call-template name="GetRowNum">
-        <xsl:with-param name="cell">
-          <xsl:value-of select="$StartMergeCell"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="EndColNum">
-      <xsl:call-template name="GetColNum">
-        <xsl:with-param name="cell">
-          <xsl:value-of select="$EndMergeCell"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="EndRowNum">
-      <xsl:call-template name="GetRowNum">
-        <xsl:with-param name="cell">
-          <xsl:value-of select="$EndMergeCell"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
+  <xsl:template match="e:mergeCell" mode="merge">    
+    <xsl:param name="result"/>
 
     <xsl:choose>
-
-      <!-- Checks if "Merge Cell" is starting in this cell -->
-      <xsl:when test="$colNum = $StartColNum and $rowNum = $StartRowNum">
-        <xsl:value-of
-          select="concat(number($EndRowNum - $StartRowNum + 1), concat(':',number($EndColNum - $StartColNum+1)))"
-        />
-      </xsl:when>
-
-      <!-- Checks if this cell is in "Merge Cell" -->
-      <xsl:when
-        test="$colNum = $StartColNum and $EndColNum &gt;= $colNum and $rowNum &gt;= $StartRowNum and $EndRowNum &gt;= $rowNum">
-        <xsl:value-of select="concat('true:', number($EndColNum - $StartColNum +1 ))"/>
+      <xsl:when test="following-sibling::e:mergeCell">
+        <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="merge">        
+          <xsl:with-param name="result">
+            <xsl:value-of select="concat($result, @ref, ';')"/>
+          </xsl:with-param>
+        </xsl:apply-templates>    
       </xsl:when>
       <xsl:otherwise>
-        <xsl:choose>
-          <xsl:when test="following-sibling::e:mergeCell">
-            <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="merge">
-              <xsl:with-param name="colNum">
-                <xsl:value-of select="$colNum"/>
-              </xsl:with-param>
-              <xsl:with-param name="rowNum">
-                <xsl:value-of select="$rowNum"/>
-              </xsl:with-param>
-            </xsl:apply-templates>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="concat($result, @ref, ';')"/>
       </xsl:otherwise>
     </xsl:choose>
 
@@ -1387,9 +1416,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Insert table:covered-table-cell -->
-  
+
   <xsl:template name="InsertCoveredTableCell">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
@@ -1410,7 +1439,7 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConvertRepeat" select="0"/>
-    
+
     <xsl:variable name="GetMinColWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -1421,10 +1450,11 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-   
+
     <xsl:choose>
-      <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + number(substring-after($CheckIfMerge, ':')))">
-       
+      <xsl:when
+        test="number(substring-after($CheckIfMerge, ':')) &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + number(substring-after($CheckIfMerge, ':')))">
+
         <xsl:call-template name="InsertPictureInMergeCell">
           <xsl:with-param name="BeforeMerge">
             <xsl:value-of select="$BeforeMerge"/>
@@ -1484,7 +1514,7 @@
             <xsl:value-of select="number(substring-after($CheckIfMerge, ':'))"/>
           </xsl:with-param>
         </xsl:call-template>
-        
+
         <!--xsl:if test="$GetMinColWithElement - $colNum &gt; 0">
           <table:covered-table-cell>
             <xsl:attribute name="table:number-columns-repeated">
@@ -1595,7 +1625,7 @@
       </xsl:when>
       <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1">
         <table:covered-table-cell>
-          
+
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:choose>
               <xsl:when test="$colNum + number(substring-after($CheckIfMerge, ':')) &gt; 256">
@@ -1610,10 +1640,10 @@
         </table:covered-table-cell>
       </xsl:when>
       <xsl:otherwise>
-      <table:covered-table-cell/>
+        <table:covered-table-cell/>
       </xsl:otherwise>
-      </xsl:choose>
-    
+    </xsl:choose>
+
     <!--xsl:choose>
       <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1">
       <table:covered-table-cell>
@@ -1634,9 +1664,9 @@
       <table:covered-table-cell/>
       </xsl:otherwise>
       </xsl:choose-->
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertPictureInMergeCell">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
@@ -1657,9 +1687,9 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="EndColl"/>
-    
-    
-    
+
+
+
     <xsl:variable name="GetMinColWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -1670,9 +1700,10 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
-      <xsl:when test="$EndColl &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + $EndColl)">
+      <xsl:when
+        test="$EndColl &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + $EndColl)">
         <xsl:if test="$GetMinColWithElement - $colNum &gt; 0">
           <table:covered-table-cell>
             <xsl:attribute name="table:number-columns-repeated">
@@ -1680,9 +1711,9 @@
             </xsl:attribute>
           </table:covered-table-cell>
         </xsl:if>
-        
+
         <table:covered-table-cell>
-          
+
           <xsl:variable name="Target">
             <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
               <xsl:call-template name="GetTargetPicture">
@@ -1695,11 +1726,12 @@
               </xsl:call-template>
             </xsl:for-each>
           </xsl:variable>
-          
-          
-          
-          <xsl:if test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
-            
+
+
+
+          <xsl:if
+            test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+
             <xsl:call-template name="InsertPictureInThisCell">
               <xsl:with-param name="sheet">
                 <xsl:value-of select="$sheet"/>
@@ -1717,11 +1749,11 @@
                 <xsl:value-of select="$Target"/>
               </xsl:with-param>
             </xsl:call-template>
-            
+
           </xsl:if>
-          
+
         </table:covered-table-cell>
-        
+
         <xsl:call-template name="InsertPictureInMergeCell">
           <xsl:with-param name="BeforeMerge">
             <xsl:value-of select="$BeforeMerge"/>
@@ -1792,7 +1824,7 @@
     </xsl:choose>
 
   </xsl:template>
-  
-  
+
+
 
 </xsl:stylesheet>

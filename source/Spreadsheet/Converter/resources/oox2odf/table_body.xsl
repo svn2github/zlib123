@@ -55,6 +55,7 @@
     <xsl:param name="NameSheet"/>
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
+    <xsl:param name="MergeCell"/>
     <xsl:param name="RowNumber"/>
     <xsl:param name="PictureCell"/>
     <xsl:param name="PictureRow"/>
@@ -162,6 +163,9 @@
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
                 </xsl:with-param>
+                <xsl:with-param name="MergeCell">
+                  <xsl:value-of select="$MergeCell"/>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -180,6 +184,7 @@
   <xsl:template name="InsertThisRow">
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
+    <xsl:param name="MergeCell"/>
     <xsl:param name="lastCellColumnNumber"/>
     <xsl:param name="CheckIfBigMerge"/>
     <xsl:param name="this"/>
@@ -283,6 +288,9 @@
               <xsl:with-param name="BigMergeCell">
                 <xsl:value-of select="$BigMergeCell"/>
               </xsl:with-param>
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="$MergeCell"/>
+              </xsl:with-param>
               <xsl:with-param name="PictureRow">
                 <xsl:value-of select="$PictureRow"/>
               </xsl:with-param>
@@ -337,6 +345,9 @@
               <xsl:with-param name="rowNum">1</xsl:with-param>
               <xsl:with-param name="BigMergeCell">
                 <xsl:value-of select="$BigMergeCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="$MergeCell"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
@@ -450,6 +461,9 @@
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
                 </xsl:with-param>
+                <xsl:with-param name="MergeCell">
+                  <xsl:value-of select="$MergeCell"/>
+                </xsl:with-param>
               </xsl:apply-templates>
             </xsl:when>
             <xsl:otherwise>
@@ -468,6 +482,7 @@
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>
+    <xsl:param name="MergeCell"/>
     <xsl:param name="this"/>
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
@@ -499,6 +514,9 @@
         </xsl:with-param>
         <xsl:with-param name="BigMergeCell">
           <xsl:value-of select="$BigMergeCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -699,6 +717,9 @@
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
                 </xsl:with-param>
+                <xsl:with-param name="MergeCell">
+                  <xsl:value-of select="$MergeCell"/>
+                </xsl:with-param>
                 <xsl:with-param name="prevCellCol">
                   <xsl:value-of select="$prevCellCol"/>
                 </xsl:with-param>
@@ -750,6 +771,9 @@
           <xsl:with-param name="BigMergeCell">
             <xsl:value-of select="$BigMergeCell"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
           <xsl:with-param name="prevCellCol">
             <xsl:value-of select="$prevCellCol"/>
           </xsl:with-param>
@@ -770,6 +794,7 @@
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>
+    <xsl:param name="MergeCell"/>
     <xsl:param name="this"/>
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
@@ -807,6 +832,9 @@
           </xsl:with-param>
           <xsl:with-param name="BigMergeCell">
             <xsl:value-of select="$BigMergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
           <xsl:with-param name="this">
             <xsl:value-of select="$this"/>
@@ -1095,6 +1123,9 @@
               <xsl:with-param name="BigMergeCell">
                 <xsl:value-of select="$BigMergeCell"/>
               </xsl:with-param>
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="$MergeCell"/>
+              </xsl:with-param>
               <xsl:with-param name="this">
                 <xsl:value-of select="$this"/>
               </xsl:with-param>
@@ -1190,6 +1221,7 @@
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>
+    <xsl:param name="MergeCell"/>
     <xsl:param name="this"/>
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
@@ -1228,6 +1260,9 @@
         <xsl:with-param name="BigMergeCell">
           <xsl:value-of select="$BigMergeCell"/>
         </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
@@ -1241,6 +1276,9 @@
         </xsl:with-param>
         <xsl:with-param name="BigMergeCell">
           <xsl:value-of select="$BigMergeCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1311,6 +1349,9 @@
               <xsl:with-param name="BigMergeCell">
                 <xsl:value-of select="$BigMergeCell"/>
               </xsl:with-param>
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="$MergeCell"/>
+              </xsl:with-param>
               <xsl:with-param name="PictureRow">
                 <xsl:value-of select="$PictureRow"/>
               </xsl:with-param>
@@ -1367,6 +1408,9 @@
                 </xsl:with-param>
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="MergeCell">
+                  <xsl:value-of select="$MergeCell"/>
                 </xsl:with-param>
                 <xsl:with-param name="PictureRow">
                   <xsl:value-of select="$PictureRow"/>
@@ -1427,6 +1471,9 @@
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
                 </xsl:with-param>
+                <xsl:with-param name="MergeCell">
+                  <xsl:value-of select="$MergeCell"/>
+                </xsl:with-param>
                 <xsl:with-param name="PictureRow">
                   <xsl:value-of select="$PictureRow"/>
                 </xsl:with-param>
@@ -1478,6 +1525,9 @@
           <xsl:with-param name="BigMergeCell">
             <xsl:value-of select="$BigMergeCell"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
           <xsl:with-param name="prevCellCol">
             <xsl:value-of select="$colNum"/>
           </xsl:with-param>
@@ -1497,6 +1547,9 @@
             </xsl:with-param>
             <xsl:with-param name="prevCellCol">
               <xsl:value-of select="$colNum + $countContinuous - 1"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
             <xsl:with-param name="PictureRow">
               <xsl:value-of select="$PictureRow"/>
@@ -1610,6 +1663,9 @@
             </xsl:with-param>
             <xsl:with-param name="BigMergeCell">
               <xsl:value-of select="$BigMergeCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
             <xsl:with-param name="PictureRow">
               <xsl:value-of select="$PictureRow"/>
