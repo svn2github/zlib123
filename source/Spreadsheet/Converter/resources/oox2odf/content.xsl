@@ -2307,32 +2307,6 @@
     </text:span>
   </xsl:template>
 
-  <xsl:template match="e:t">
-    <xsl:choose>
-      <!--check whether string contains  whitespace sequence-->
-      <xsl:when test="not(contains(., '  '))">
-        <xsl:choose>
-          <!-- single space before case -->
-          <xsl:when test="substring(text(),1,1) = ' ' ">
-            <text:s/>
-            <xsl:value-of select="substring-after(text(),' ')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="."/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <!--converts whitespaces sequence to text:s -->
-        <!-- inside "if" when text starts with a single space -->
-        <xsl:if test="substring(text(),1,1) = ' ' and substring(text(),2,1) != ' ' ">
-          <text:s/>
-        </xsl:if>
-        <xsl:call-template name="InsertWhiteSpaces"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
   <xsl:template name="CheckSheetName">
     <xsl:param name="name"/>
     <xsl:param name="sheetNumber"/>
