@@ -154,6 +154,8 @@
 
       <!-- single pivot cell can appear more than once in this variable -->
       <xsl:variable name="pivotCells">
+        <xsl:value-of select="$sheetId"/>
+        <xsl:text>#</xsl:text>
         <xsl:call-template name="WritePivotCells"/>
       </xsl:variable>
 

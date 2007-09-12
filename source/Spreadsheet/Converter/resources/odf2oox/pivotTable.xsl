@@ -336,91 +336,9 @@
 
   <xsl:template name="InsertCacheRecords">
     <!-- @Context: table:data-pilot-table -->
-    <pivotCacheRecords>
+    
+    <pivotCacheRecords/>
 
-      <xsl:variable name="sheetName">
-        <xsl:value-of
-          select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
-      </xsl:variable>
-
-      <xsl:variable name="rowStart">
-        <xsl:for-each select="table:source-cell-range">
-          <xsl:call-template name="GetRowNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of
-                select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:variable>
-
-      <xsl:variable name="colStart">
-        <xsl:for-each select="table:source-cell-range">
-          <xsl:call-template name="GetColNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of
-                select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:variable>
-
-      <xsl:variable name="rowEnd">
-        <xsl:for-each select="table:source-cell-range">
-          <xsl:call-template name="GetRowNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of
-                select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:variable>
-
-      <xsl:variable name="colEnd">
-        <xsl:for-each select="table:source-cell-range">
-          <xsl:call-template name="GetColNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of
-                select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:variable>
-
-      <pxsi:cacheRecords>
-        <xsl:attribute name="pxsi:sheetName">
-          <xsl:value-of select="$sheetName"/>
-        </xsl:attribute>
-
-        <xsl:attribute name="pxsi:colStart">
-          <xsl:value-of select="$colStart"/>
-        </xsl:attribute>
-
-        <xsl:attribute name="pxsi:colEnd">
-          <xsl:value-of select="$colEnd"/>
-        </xsl:attribute>
-
-        <xsl:attribute name="pxsi:rowStart">
-          <xsl:value-of select="$rowStart"/>
-        </xsl:attribute>
-
-        <xsl:attribute name="pxsi:rowEnd">
-          <xsl:value-of select="$rowEnd"/>
-        </xsl:attribute>
-      </pxsi:cacheRecords>
-
-      <!-- go to table where source comes from -->
-      <!--xsl:for-each
-        select="parent::node()/parent::node()/table:table[@table:name = $sheetName]/descendant::table:table-row[1]">
-        <xsl:call-template name="GetCacheRows">
-          <xsl:with-param name="rowStart" select="$rowStart"/>
-          <xsl:with-param name="rowEnd" select="$rowEnd"/>
-          <xsl:with-param name="colStart" select="$colStart"/>
-          <xsl:with-param name="colEnd" select="$colEnd"/>
-          <xsl:with-param name="sheetName" select="$sheetName"/>
-        </xsl:call-template>
-      </xsl:for-each-->
-    </pivotCacheRecords>
   </xsl:template>
 
   <xsl:template name="GetCacheRows">

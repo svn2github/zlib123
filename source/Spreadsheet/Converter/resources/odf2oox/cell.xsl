@@ -1730,12 +1730,15 @@
 
         <!-- cell info for pivotTable postprocessor -->
         <xsl:if test="contains($pivotCells,concat(';',$colNumber + 1,':',$rowNumber,';'))">
-          <pxsi:cacheCell>
+          <pxsi:pivotCell>
             <xsl:attribute name="pxsi:col">            
               <xsl:value-of select="$colNumber + 1"/>
             </xsl:attribute>
             <xsl:attribute name="pxsi:row">
               <xsl:value-of select="$rowNumber"/>
+            </xsl:attribute>
+            <xsl:attribute name="pxsi:sheetNum">
+              <xsl:value-of select="substring-before($pivotCells,'#')"/>
             </xsl:attribute>
 
             <!-- text content -->
@@ -1793,7 +1796,7 @@
                 <xsl:apply-templates mode="pivot" xml:space="preserve"/>
               </xsl:when>
             </xsl:choose>
-          </pxsi:cacheCell>
+          </pxsi:pivotCell>
         </xsl:if>
 
       </c>

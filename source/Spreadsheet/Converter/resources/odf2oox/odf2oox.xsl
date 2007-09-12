@@ -40,6 +40,7 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:x="urn:schemas-microsoft-com:office:excel" exclude-result-prefixes="odf style text number">
 
@@ -285,14 +286,82 @@
         </xsl:if>
 
         <xsl:if test="$pivot = 'true'">
-          
+
           <xsl:for-each
             select="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
-            
+
+            <!-- create pivot table array in postprocessor -->
+            <pxsi:pivotTable>
+
+              <xsl:for-each select="table:source-cell-range">
+
+                <xsl:variable name="rowStart">
+                  <xsl:call-template name="GetRowNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:variable name="colStart">
+                  <xsl:call-template name="GetColNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:variable name="rowEnd">
+                  <xsl:call-template name="GetRowNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:variable name="colEnd">
+                  <xsl:call-template name="GetColNum">
+                    <xsl:with-param name="cell">
+                      <xsl:value-of
+                        select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:attribute name="pxsi:sheetNum">
+                  <xsl:value-of select="$sheetNum"/>
+                </xsl:attribute>
+
+                <xsl:attribute name="pxsi:colStart">
+                  <xsl:value-of select="$colStart"/>
+                </xsl:attribute>
+
+                <xsl:attribute name="pxsi:colEnd">
+                  <xsl:value-of select="$colEnd"/>
+                </xsl:attribute>
+
+                <xsl:attribute name="pxsi:rowStart">
+                  <xsl:value-of select="$rowStart"/>
+                </xsl:attribute>
+
+                <xsl:attribute name="pxsi:rowEnd">
+                  <xsl:value-of select="$rowEnd"/>
+                </xsl:attribute>
+
+              </xsl:for-each>
+            </pxsi:pivotTable>
+
             <xsl:call-template name="CreatePivotTable">
               <xsl:with-param name="sheetNum" select="$sheetNum"/>
             </xsl:call-template>
-            
+
             <xsl:call-template name="CreatePivotTableRels">
               <xsl:with-param name="sheetNum" select="$sheetNum"/>
             </xsl:call-template>
@@ -308,6 +377,7 @@
               <xsl:call-template name="CreateCacheDefinitionRels"/>
               <xsl:call-template name="CreateCacheRecords"/>
             </xsl:if>
+
           </xsl:for-each>
         </xsl:if>
 
@@ -540,57 +610,57 @@
         </xsl:for-each>
 
 
-          <!-- For each OLE object -->
-   
-          <xsl:for-each
-            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:shapes/draw:frame">
+        <!-- For each OLE object -->
 
-            <xsl:variable name="width">
-              <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="@svg:width"/>
-              </xsl:call-template>
-            </xsl:variable>
+        <xsl:for-each
+          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:shapes/draw:frame">
 
-            <xsl:variable name="height">
-              <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="@svg:height"/>
-              </xsl:call-template>
-            </xsl:variable>
+          <xsl:variable name="width">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:width"/>
+            </xsl:call-template>
+          </xsl:variable>
 
-            <xsl:variable name="z-index">
-              <xsl:value-of select="position()"/>
-            </xsl:variable>
+          <xsl:variable name="height">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:height"/>
+            </xsl:call-template>
+          </xsl:variable>
 
-            <xsl:variable name="margin-left">
-              <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="@svg:x"/>
-              </xsl:call-template>
-            </xsl:variable>
+          <xsl:variable name="z-index">
+            <xsl:value-of select="position()"/>
+          </xsl:variable>
 
-            <xsl:variable name="margin-top">
-              <xsl:call-template name="point-measure">
-                <xsl:with-param name="length" select="@svg:y"/>
-              </xsl:call-template>
-            </xsl:variable>
+          <xsl:variable name="margin-left">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:x"/>
+            </xsl:call-template>
+          </xsl:variable>
 
-            <v:shape type="#_x0000_t75"
-              style="position:absolute;margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
-              filled="t" fillcolor="window [65]" stroked="t" strokecolor="windowText [64]"
-              o:insetmode="auto">
+          <xsl:variable name="margin-top">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="@svg:y"/>
+            </xsl:call-template>
+          </xsl:variable>
 
-              <xsl:attribute name="id">
-                <xsl:value-of select="concat('_x0000_s', $sheetId * 1024 + position())"/>
-              </xsl:attribute>
-              <v:fill color2="window [65]"/>
-              <v:imagedata o:relid="{concat('rId',position())}" o:title=""/>
-              <x:ClientData ObjectType="Pict">
-                <x:SizeWithCells/>
-                <x:CF>Pict</x:CF>
-                <x:AutoPict/>
-                <x:DDE/>
-              </x:ClientData>
-            </v:shape>
-          </xsl:for-each>
+          <v:shape type="#_x0000_t75"
+            style="position:absolute;margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
+            filled="t" fillcolor="window [65]" stroked="t" strokecolor="windowText [64]"
+            o:insetmode="auto">
+
+            <xsl:attribute name="id">
+              <xsl:value-of select="concat('_x0000_s', $sheetId * 1024 + position())"/>
+            </xsl:attribute>
+            <v:fill color2="window [65]"/>
+            <v:imagedata o:relid="{concat('rId',position())}" o:title=""/>
+            <x:ClientData ObjectType="Pict">
+              <x:SizeWithCells/>
+              <x:CF>Pict</x:CF>
+              <x:AutoPict/>
+              <x:DDE/>
+            </x:ClientData>
+          </v:shape>
+        </xsl:for-each>
 
 
       </pxsi:dummyContainer>
@@ -613,31 +683,33 @@
   <xsl:template name="CreatePivotTable">
     <!-- @Context: table:data-pilot-table -->
     <xsl:param name="sheetNum"/>
-    
+
     <pzip:entry pzip:target="{concat('xl/pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}">
       <xsl:call-template name="InsertPivotTable"/>
     </pzip:entry>
   </xsl:template>
-  
+
   <xsl:template name="CreatePivotTableRels">
     <!-- @Context: table:data-pilot-table -->
     <xsl:param name="sheetNum"/>
-    
-    <pzip:entry pzip:target="{concat('xl/pivotTables/_rels/pivotTable',$sheetNum,'_',position(),'.xml.rels')}">
+
+    <pzip:entry
+      pzip:target="{concat('xl/pivotTables/_rels/pivotTable',$sheetNum,'_',position(),'.xml.rels')}">
       <xsl:call-template name="InsertPivotTableRels"/>
     </pzip:entry>
   </xsl:template>
-  
+
   <xsl:template name="CreateCacheDefinition">
     <!-- @Context: table:data-pilot-table -->
     <pzip:entry pzip:target="{concat('xl/pivotCache/pivotCacheDefinition_',generate-id(.),'.xml')}">
       <xsl:call-template name="InsertCacheDefinition"/>
     </pzip:entry>
   </xsl:template>
-  
+
   <xsl:template name="CreateCacheDefinitionRels">
     <!-- @Context: table:data-pilot-table -->
-    <pzip:entry pzip:target="{concat('xl/pivotCache/_rels/pivotCacheDefinition_',generate-id(.),'.xml.rels')}">
+    <pzip:entry
+      pzip:target="{concat('xl/pivotCache/_rels/pivotCacheDefinition_',generate-id(.),'.xml.rels')}">
       <xsl:call-template name="InsertCacheDefinitionRels"/>
     </pzip:entry>
   </xsl:template>
