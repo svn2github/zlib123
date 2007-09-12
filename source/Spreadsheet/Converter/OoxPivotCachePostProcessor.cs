@@ -54,6 +54,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private string cacheRowStart;
         private bool isRowEnd;
         private string cacheRowEnd;
+        private string[,] pivotTable;
+        private Hashtable[] fieldItems;
 
         private bool isInPivotCell;
         private Hashtable pivotCells;
@@ -233,7 +235,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotTable".Equals(element.Name))
                 {
                     Console.WriteLine("<SHEET " + cacheSheetNum + ">");
-                    ListOutSheetRecords(Convert.ToInt32(cacheSheetNum),Convert.ToInt32(cacheRowStart),Convert.ToInt32(cacheRowEnd),Convert.ToInt32(cacheColStart),Convert.ToInt32(cacheColEnd));
+
+                    this.pivotTable = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
+                    CreatePivotTable(Convert.ToInt32(cacheSheetNum),Convert.ToInt32(cacheRowStart),Convert.ToInt32(cacheRowEnd),Convert.ToInt32(cacheColStart),Convert.ToInt32(cacheColEnd));
 
                     this.isInPivotTable = false;
                     this.cacheSheetNum = "";
@@ -242,8 +246,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.cacheRowStart = "";
                     this.cacheRowEnd = "";
                     this.isPxsi = false;
-
                 }
+
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotCell".Equals(element.Name))
                 {
                     pivotCells.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellVal);
@@ -265,20 +269,52 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
         }
 
-        private void ListOutSheetRecords(int sheetNum, int rowStart, int rowEnd, int colStart, int colEnd)
+        private void CreatePivotTable(int sheetNum, int rowStart, int rowEnd, int colStart, int colEnd)
         {
 
-            for (int row = rowStart; row <= rowEnd; row++ )
-                for (int col = colStart; col <= colEnd; col++)
+            int rows = rowEnd - rowStart + 1;
+            int cols = colEnd - colStart + 1;
+            int[] index = new int[cols];
+
+            this.fieldItems = new Hashtable[cols];
+
+            for (int field = 0; field < colEnd - colStart + 1; field++)
+                fieldItems[field] = new Hashtable();
+            
+            for (int row = 0; row < rows; row++)
+                for (int col = 0; col < cols; col++)
                 {
-                    Console.WriteLine(col + ":" + row);
+                    int keyCol = Convert.ToInt32(colStart) + col;
+                    int keyRow = Convert.ToInt32(rowStart) + row;
+
+                    string key = sheetNum + "#" + keyCol.ToString() + ":" + keyRow.ToString();
+
+                    if (pivotCells.ContainsKey(key))
+                    {                        
+                        this.pivotTable[row, col] = (string)pivotCells[key];
+
+                        if (!fieldItems[col].ContainsKey((string)pivotCells[key]))
+                        {
+                            fieldItems[col].Add((string)pivotCells[key], index[col]);
+                            index[col]++;
+                        }
+                    }
+                    else
+                    {
+                        this.pivotTable[row, col] = "";
+                        if (!fieldItems[col].ContainsKey(""))
+                        {
+                            fieldItems[col].Add("", index[col]);
+                            index[col]++;
+                        }
+                    }
                 }
 
-                /*foreach (string cell in pivotCells.Keys)
+            //Console.WriteLine(indeces[1].Count);
+                foreach (string key in this.fieldItems[0].Keys)
                 {
-                    if (cell.StartsWith(sheetNum + "#"))
-                        Console.WriteLine((string)pivotCells[cell]);
-                }*/
+                    Console.WriteLine("-" + fieldItems[0][key] + ":" + key);
+                }
 
         }
     }
