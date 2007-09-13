@@ -165,4 +165,7 @@
   <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
    <value>One of the scenarios is too big. Excel supports only scenarios with no more than 32 changing cells.</value> 
   </data>
+  <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
+    <value>Hyperlink in textbox cannot be conversed and will be changed to plain text.</value>
+  </data>
 </root>
