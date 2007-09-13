@@ -348,7 +348,8 @@
                 </xsl:attribute>
 
                 <xsl:attribute name="pxsi:rowStart">
-                  <xsl:value-of select="$rowStart"/>
+                  <!-- first row is always a header row -->
+                  <xsl:value-of select="$rowStart + 1"/>
                 </xsl:attribute>
 
                 <xsl:attribute name="pxsi:rowEnd">

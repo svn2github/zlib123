@@ -32,7 +32,8 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
-  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  exclude-result-prefixes="text">
 
   <xsl:template name="InsertPivotTable">
     <!-- @Context: table:data-pilot-table -->
@@ -299,16 +300,21 @@
               <xsl:value-of select="@table:source-field-name"/>
             </xsl:attribute>
 
-            <!--xsl:attribute name="pxsi:fieldType">
-              <xsl:choose>
-              <xsl:when test="@table:orientation = 'data'">
-              <xsl:text>data</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-              <xsl:text>axis</xsl:text>
-              </xsl:otherwise>
-              </xsl:choose>
-              </xsl:attribute-->
+            <pxsi:sharedItems>
+              <xsl:attribute name="pxsi:fieldType">
+                <xsl:choose>
+                  <xsl:when test="@table:orientation = 'data'">
+                    <xsl:text>data</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>axis</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <xsl:attribute name="pxsi:fieldNum">
+                <xsl:value-of select="position() - 1"/>
+              </xsl:attribute>
+            </pxsi:sharedItems>
 
             <!-- temporary shared items -->
             <!--xsl:if test="position()= 1">
@@ -336,8 +342,10 @@
 
   <xsl:template name="InsertCacheRecords">
     <!-- @Context: table:data-pilot-table -->
-    
-    <pivotCacheRecords/>
+
+    <pivotCacheRecords>
+      <pxsi:cacheRecords/>
+    </pivotCacheRecords>
 
   </xsl:template>
 
@@ -646,7 +654,8 @@
         </xsl:variable>
 
         <xsl:call-template name="ListOutCellsInRange">
-          <xsl:with-param name="rowStart" select="$rowStart"/>
+          <!-- first row is always a header row -->
+          <xsl:with-param name="rowStart" select="$rowStart + 1"/>
           <xsl:with-param name="rowEnd" select="$rowEnd"/>
           <xsl:with-param name="colStart" select="$colStart"/>
           <xsl:with-param name="colEnd" select="$colEnd"/>
