@@ -58,89 +58,16 @@
         <text:p>
           <xsl:choose>
             <xsl:when test="key('ref',@r)">
-              <text:a>
-                <xsl:attribute name="xlink:href">
-                  <xsl:variable name="target">
-                    <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
-                    <xsl:for-each select="key('ref',@r)">
-                      <xsl:call-template name="GetTarget">
-                        <xsl:with-param name="id">
-                          <xsl:value-of select="@r:id"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="document">
-                          <xsl:value-of select="concat('xl/worksheets/sheet', $sheetNr, '.xml')"/>
-                        </xsl:with-param>
-                      </xsl:call-template>
-                    </xsl:for-each>
-                  </xsl:variable>
-                  <xsl:choose>
-                    <!-- when hyperlink leads to a file in network -->
-                    <xsl:when test="starts-with($target,'file:///\\')">
-                      <xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"
-                      />
-                    </xsl:when>
-                    <!--when hyperlink leads to www or mailto -->
-                    <xsl:when test="contains($target,':')">
-                      <xsl:value-of select="$target"/>
-                    </xsl:when>
-                    <!-- when hyperlink leads to another place in workbook -->
-                    <xsl:when test="key('ref',@r)/@location != '' ">
-                      <xsl:for-each select="key('ref',@r)">
-
-                        <xsl:variable name="apos">
-                          <xsl:text>&apos;</xsl:text>
-                        </xsl:variable>
-
-                        <xsl:variable name="sheetName">
-                          <xsl:choose>
-                            <xsl:when test="starts-with(@location,$apos)">
-                              <xsl:value-of select="$apos"/>
-                              <xsl:value-of
-                                select="substring-before(substring-after(@location,$apos),$apos)"/>
-                              <xsl:value-of select="$apos"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                              <xsl:value-of select="substring-before(@location,'!')"/>
-                            </xsl:otherwise>
-                          </xsl:choose>
-                        </xsl:variable>
-
-                        <xsl:variable name="invalidChars">
-                          <xsl:text>&apos;!,.+$-()</xsl:text>
-                        </xsl:variable>
-
-                        <xsl:variable name="checkedName">
-                          <xsl:for-each
-                            select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
-                            <xsl:call-template name="CheckSheetName">
-                              <xsl:with-param name="sheetNumber">
-                                <xsl:for-each
-                                  select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
-                                  <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
-                                </xsl:for-each>
-                              </xsl:with-param>
-                              <xsl:with-param name="name">
-                                <xsl:value-of select="translate($sheetName,$invalidChars,'')"/>
-                              </xsl:with-param>
-                            </xsl:call-template>
-                          </xsl:for-each>
-                        </xsl:variable>
-
-                        <xsl:text>#</xsl:text>
-                        <xsl:value-of select="$checkedName"/>
-                        <xsl:text>.</xsl:text>
-                        <xsl:value-of select="substring-after(@location,concat($sheetName,'!'))"/>
-
-                      </xsl:for-each>
-                    </xsl:when>
-                    <!--when hyperlink leads to a document -->
-                    <xsl:otherwise>
-                      <xsl:call-template name="Change20PercentToSpace">
-                        <xsl:with-param name="string" select="$target"/>
-                      </xsl:call-template>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
+              
+              <xsl:variable name="XlinkHref">
+                <xsl:call-template name="XlinkHref">
+                  <xsl:with-param name="sheetNr">
+                    <xsl:value-of select="$sheetNr"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              
+              
 
                 <!-- a postprocessor puts here strings from sharedstrings -->
                 <xsl:variable name="eV">
@@ -151,17 +78,32 @@
                   <xsl:when test="contains($rSheredStrings, e:v) ">
                     <xsl:for-each
                       select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
-                      <xsl:apply-templates/>
+                      
+                      <xsl:apply-templates select="e:r[1]" mode="hyperlink">
+                        <xsl:with-param name="XlinkHref">
+                          <xsl:value-of select="$XlinkHref"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="position">
+                          <xsl:text>1</xsl:text>
+                        </xsl:with-param>
+                      </xsl:apply-templates>
+                      
                     </xsl:for-each>
                   </xsl:when>
                   <xsl:otherwise>
+                    <text:a>
+                      <xsl:attribute name="xlink:href">
+                        <xsl:value-of select="$XlinkHref"/>  
+                      </xsl:attribute>
                     <pxsi:v>
                       <xsl:value-of select="e:v"/>
                     </pxsi:v>
+                    </text:a>
                   </xsl:otherwise>
+                 
                 </xsl:choose>
 
-              </text:a>
+              
             </xsl:when>
 
             <xsl:otherwise>
@@ -441,6 +383,93 @@
         </text:p>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="XlinkHref">
+    <xsl:param name="sheetNr"/>
+    
+    <xsl:variable name="target">
+      <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
+      <xsl:for-each select="key('ref',@r)">
+        <xsl:call-template name="GetTarget">
+          <xsl:with-param name="id">
+            <xsl:value-of select="@r:id"/>
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('xl/worksheets/sheet', $sheetNr, '.xml')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <!-- when hyperlink leads to a file in network -->
+      <xsl:when test="starts-with($target,'file:///\\')">
+        <xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"
+        />
+      </xsl:when>
+      <!--when hyperlink leads to www or mailto -->
+      <xsl:when test="contains($target,':')">
+        <xsl:value-of select="$target"/>
+      </xsl:when>
+      <!-- when hyperlink leads to another place in workbook -->
+      <xsl:when test="key('ref',@r)/@location != '' ">
+        <xsl:for-each select="key('ref',@r)">
+          
+          <xsl:variable name="apos">
+            <xsl:text>&apos;</xsl:text>
+          </xsl:variable>
+          
+          <xsl:variable name="sheetName">
+            <xsl:choose>
+              <xsl:when test="starts-with(@location,$apos)">
+                <xsl:value-of select="$apos"/>
+                <xsl:value-of
+                  select="substring-before(substring-after(@location,$apos),$apos)"/>
+                <xsl:value-of select="$apos"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-before(@location,'!')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          
+          <xsl:variable name="invalidChars">
+            <xsl:text>&apos;!,.+$-()</xsl:text>
+          </xsl:variable>
+          
+          <xsl:variable name="checkedName">
+            <xsl:for-each
+              select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+              <xsl:call-template name="CheckSheetName">
+                <xsl:with-param name="sheetNumber">
+                  <xsl:for-each
+                    select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+                    <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
+                  </xsl:for-each>
+                </xsl:with-param>
+                <xsl:with-param name="name">
+                  <xsl:value-of select="translate($sheetName,$invalidChars,'')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:text>#</xsl:text>
+          <xsl:value-of select="$checkedName"/>
+          <xsl:text>.</xsl:text>
+          <xsl:value-of select="substring-after(@location,concat($sheetName,'!'))"/>
+          
+        </xsl:for-each>
+      </xsl:when>
+      <!--when hyperlink leads to a document -->
+      <xsl:otherwise>
+        <xsl:call-template name="Change20PercentToSpace">
+          <xsl:with-param name="string" select="$target"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
 
   <!-- change  '%20' to space  after conversion-->

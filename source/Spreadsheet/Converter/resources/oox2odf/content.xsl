@@ -2306,6 +2306,55 @@
       <xsl:apply-templates/>
     </text:span>
   </xsl:template>
+  
+  <!-- convert run into span in hyperlink-->
+  <xsl:template match="e:r" mode="hyperlink">
+    <xsl:param name="XlinkHref"/>
+    <xsl:param name="position"/>
+    
+    <xsl:choose>
+      <xsl:when test="$position = '1'">
+        <text:span>
+          <xsl:if test="e:rPr">
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+          </xsl:if>
+          <text:a>
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="$XlinkHref"/>  
+            </xsl:attribute>
+          <xsl:apply-templates/>
+          <xsl:if test="following-sibling::e:r">
+          <xsl:apply-templates select="following-sibling::e:r[1]" mode="hyperlink">
+            <xsl:with-param name="XlinkHref">
+              <xsl:value-of select="$XlinkHref"/>
+            </xsl:with-param>
+            <xsl:with-param name="position">
+              <xsl:value-of select="$position+1"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+          </xsl:if>
+          </text:a>
+        </text:span>    
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+        <xsl:if test="following-sibling::e:r">
+        <xsl:apply-templates select="following-sibling::e:r[1]" mode="hyperlink">
+          <xsl:with-param name="XlinkHref">
+            <xsl:value-of select="$XlinkHref"/>
+          </xsl:with-param>
+          <xsl:with-param name="position">
+            <xsl:value-of select="$position+1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    
+  </xsl:template>
 
   <xsl:template name="CheckSheetName">
     <xsl:param name="name"/>
