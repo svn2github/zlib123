@@ -737,7 +737,7 @@
     <!-- @Context: input chart file root -->
 
     <xsl:for-each select="c:chartSpace/c:chart/c:legend">
-      <chart:legend chart:legend-position="end" svg:x="11.251cm" svg:y="4.188cm"
+      <chart:legend chart:legend-position="end" 
         chart:style-name="legend">
         <!-- legend position -->
         <xsl:if test="c:legendPos/@val != '' ">
