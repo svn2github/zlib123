@@ -162,4 +162,7 @@
   <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
     <value>There is more than one manual column break inside header columns to repeat. Only one will be visible.</value>
   </data>
+  <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
+   <value>One of the scenarios is too big. Excel supports only scenarios with no more than 32 changing cells.</value> 
+  </data>
 </root>
