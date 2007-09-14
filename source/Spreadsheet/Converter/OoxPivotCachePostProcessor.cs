@@ -132,11 +132,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.isInCacheRecords = false;
 
             //<pxsi:items> variables
-            bool isInItems = false;
-            bool isItemsFieldNum = false;
-            string itemsFieldNum = "";
-            bool isItemsHide = false;
-            string itemsHide = "";
+            this.isInItems = false;
+            this.isItemsFieldNum = false;
+            this.itemsFieldNum = "";
+            this.isItemsHide = false;
+            this.itemsHide = "";
 
         }
 
@@ -280,7 +280,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
         {
 
             if (isSheetNum)
-                this.isSheetNum = false;                
+                this.isSheetNum = false;
             else if (isColStart)
                 this.isColStart = false;
             else if (isColEnd)
@@ -302,11 +302,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             else if (isItemsFieldNum)
                 this.isItemsFieldNum = false;
             else if (isItemsHide)
-            {
                 this.isItemsHide = false;
-                Console.WriteLine(itemsHide);
-            }
-            else
+            else if (!isPxsi)
                 this.nextWriter.WriteEndAttribute();
         }
 
@@ -335,6 +332,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     pivotCells.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellVal);
 
                     this.isInPivotCell = false;
+                    this.pivotCellSheet = "";
                     this.pivotCellCol = "";
                     this.pivotCellRow = "";
                     this.pivotCellVal = "";
@@ -440,16 +438,22 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.nextWriter.WriteString((items + 1).ToString());
                     this.nextWriter.WriteEndAttribute();
 
-                    //Console.WriteLine(itemsHide.ToString());
-
-                    //for (int i = 0; i < items; i++)
                     foreach (string key in fieldItems[Convert.ToInt32(itemsFieldNum), 0].Keys)
                     {
                         this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
+                        
+                        //if this item is hidden
+                        if (itemsHide.Contains(";" + key + ";"))
+                        {
+                            this.nextWriter.WriteStartAttribute("h");
+                            this.nextWriter.WriteString("1");
+                            this.nextWriter.WriteEndAttribute();
+                        }
                         this.nextWriter.WriteStartAttribute("x");
                         this.nextWriter.WriteString(fieldItems[Convert.ToInt32(itemsFieldNum), 0][key].ToString());
                         this.nextWriter.WriteEndAttribute();
                         this.nextWriter.WriteEndElement();
+
                     }
 
                     this.isInItems = false;
