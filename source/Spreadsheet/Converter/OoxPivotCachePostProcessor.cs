@@ -438,23 +438,61 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.nextWriter.WriteString((items + 1).ToString());
                     this.nextWriter.WriteEndAttribute();
 
+                    Hashtable numbers = new Hashtable();
+                    Hashtable strings = new Hashtable();
+
+                    bool isBlank = false;
+
                     foreach (string key in fieldItems[Convert.ToInt32(itemsFieldNum), 0].Keys)
                     {
-                        this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
-                        
-                        //if this item is hidden
-                        if (itemsHide.Contains(";" + key + ";"))
+                        try
                         {
-                            this.nextWriter.WriteStartAttribute("h");
-                            this.nextWriter.WriteString("1");
-                            this.nextWriter.WriteEndAttribute();
+                            Convert.ToDouble(key.ToString().Replace('.',','));
+                            numbers.Add(key.ToString().Replace('.', ','),key);
                         }
-                        this.nextWriter.WriteStartAttribute("x");
-                        this.nextWriter.WriteString(fieldItems[Convert.ToInt32(itemsFieldNum), 0][key].ToString());
-                        this.nextWriter.WriteEndAttribute();
-                        this.nextWriter.WriteEndElement();
+                        catch
+                        {
+                            if (key.Length == 0)
+                                isBlank = true;
+                            else
+                                strings.Add(key,key);
+                        }
 
                     }
+
+                    double[] sortedNumbers = new double[numbers.Count];
+                    string[] sortedStrings = new string[strings.Count];
+
+                    //sort numbers and strings
+                    int count = 0;
+                    foreach (string key in numbers.Keys)
+                    {
+                        sortedNumbers[count] = Convert.ToDouble(key);
+                        count++;
+                    }
+                    Array.Sort(sortedNumbers);
+                    count = 0;
+                    foreach (string key in strings.Keys)
+                    {
+                        sortedStrings[count] = key;
+                        count++;
+                    }
+                    Array.Sort(sortedStrings);
+
+                    //output sorted item types in order: numbers, strings, blank
+                    for (int i = 0; i < sortedNumbers.Length; i++)
+                    {
+                        OutputItem(sortedNumbers[i].ToString().Replace(',', '.'));
+                    }
+
+                    for (int i = 0; i < sortedStrings.Length; i++)
+                    //foreach (string text in sortedStrings)
+                    {
+                        OutputItem(sortedStrings[i]);
+                    }
+
+                    if (isBlank)
+                        OutputItem("");
 
                     this.isInItems = false;
                     this.itemsFieldNum = "";
@@ -622,6 +660,23 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.nextWriter.WriteString("0");
                     this.nextWriter.WriteEndAttribute();
                 }
+        }
+
+        private void OutputItem(string key)
+        {
+            this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
+
+            //if this item is hidden
+            if (itemsHide.Contains(";" + key + ";"))
+            {
+                this.nextWriter.WriteStartAttribute("h");
+                this.nextWriter.WriteString("1");
+                this.nextWriter.WriteEndAttribute();
+            }
+            this.nextWriter.WriteStartAttribute("x");
+            this.nextWriter.WriteString(fieldItems[Convert.ToInt32(itemsFieldNum), 0][key].ToString());
+            this.nextWriter.WriteEndAttribute();
+            this.nextWriter.WriteEndElement();
         }
 
     }
