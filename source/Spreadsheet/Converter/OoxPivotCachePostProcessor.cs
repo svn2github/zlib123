@@ -235,87 +235,40 @@ namespace CleverAge.OdfConverter.Spreadsheet
             if (isInPivotTable)
             {
                 if (isSheetNum)
-                {
-                    this.cacheSheetNum = text;
-                    //Console.WriteLine("cacheSheetNum: " + this.cacheSheetNum);
-                    this.isSheetNum = false;
-                }
+                    this.cacheSheetNum += text;
                 else if (isColStart)
-                {
-                    this.cacheColStart = text;
-                    //Console.WriteLine("cacheColStart: " + this.cacheColStart);
-                    this.isColStart = false;
-                }
+                    this.cacheColStart += text;
                 else if (isColEnd)
-                {
-                    this.cacheColEnd = text;
-                    //Console.WriteLine("cacheColEnd: " + this.cacheColEnd);
-                    this.isColEnd = false;
-                }
+                    this.cacheColEnd += text;
                 else if (isRowStart)
-                {
-                    this.cacheRowStart = text;
-                    //Console.WriteLine("cacheRowStart: " + this.cacheRowStart);
-                    this.isRowStart = false;
-                }
+                    this.cacheRowStart += text;
                 else if (isRowEnd)
-                {
-                    this.cacheRowEnd = text;
-                    //Console.WriteLine("cacheRowStart: " + this.cacheRowEnd);
-                    this.isRowEnd = false;
-                }
+                    this.cacheRowEnd += text;
             }
             else if (isInPivotCell)
             {
                 if (isPivotCellCol)
-                {
-                    this.pivotCellCol = text;
-                    //Console.WriteLine("PivotCellCol: " + this.PivotCellCol);
-                    this.isPivotCellCol = false;
-                }
+                    this.pivotCellCol += text;
                 else if (isPivotCellRow)
-                {
-                    this.pivotCellRow = text;
-                    //Console.WriteLine("PivotCellRow: " + this.PivotCellRow);
-                    this.isPivotCellRow = false;
-                }
+                    this.pivotCellRow += text;
                 else if (isPivotCellSheet)
-                {
-                    this.pivotCellSheet = text;
-                    ////Console.WriteLine("PivotCellSheet: " + this.PivotCellSheet);
-                    this.isPivotCellSheet = false;
-                }
+                    this.pivotCellSheet += text;
                 else
-                {
-                    this.pivotCellVal = text;
-                    //Console.WriteLine("PivotCellRow: " + this.PivotCellVal);
-                }
+                    this.pivotCellVal += text;
             }
             else if (isInSharedItems)
             {
                 if (isFieldType)
-                {
-                    this.fieldType = text;
-                    this.isFieldType = false;
-                }
+                    this.fieldType += text;
                 else if (isFieldNum)
-                {
-                    this.fieldNum = text;
-                    this.isFieldNum = false;
-                }
+                    this.fieldNum += text;
             }
             else if (isInItems)
             {
                 if (isItemsFieldNum)
-                {
-                    this.itemsFieldNum = text;
-                    this.isItemsFieldNum = false;
-                }
+                    this.itemsFieldNum += text;
                 else if (isItemsHide)
-                {
-                    this.itemsHide = text;
-                    this.isItemsHide = false;
-                }
+                    this.itemsHide += text;
             }
             else
             {
@@ -325,7 +278,35 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         public override void WriteEndAttribute()
         {
-            if(!isPxsi)
+
+            if (isSheetNum)
+                this.isSheetNum = false;                
+            else if (isColStart)
+                this.isColStart = false;
+            else if (isColEnd)
+                this.isColEnd = false;
+            else if (isRowStart)
+                this.isRowStart = false;
+            else if (isRowEnd)
+                this.isRowEnd = false;
+            else if (isPivotCellCol)
+                this.isPivotCellCol = false;
+            else if (isPivotCellRow)
+                this.isPivotCellRow = false;
+            else if (isPivotCellSheet)
+                this.isPivotCellSheet = false;
+            else if (isFieldType)
+                this.isFieldType = false;
+            else if (isFieldNum)
+                this.isFieldNum = false;
+            else if (isItemsFieldNum)
+                this.isItemsFieldNum = false;
+            else if (isItemsHide)
+            {
+                this.isItemsHide = false;
+                Console.WriteLine(itemsHide);
+            }
+            else
                 this.nextWriter.WriteEndAttribute();
         }
 
@@ -458,7 +439,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.nextWriter.WriteStartAttribute("count");
                     this.nextWriter.WriteString((items + 1).ToString());
                     this.nextWriter.WriteEndAttribute();
-                    
+
+                    //Console.WriteLine(itemsHide.ToString());
+
                     //for (int i = 0; i < items; i++)
                     foreach (string key in fieldItems[Convert.ToInt32(itemsFieldNum), 0].Keys)
                     {
@@ -470,6 +453,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     }
 
                     this.isInItems = false;
+                    this.itemsFieldNum = "";
+                    this.itemsHide = "";
                     this.isPxsi = false;
                 }
 
