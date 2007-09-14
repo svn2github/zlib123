@@ -467,6 +467,18 @@
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:when>
+            <xsl:when
+              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = '' and $CheckIfBigMergeAfter != 'true' and $ConditionalCell = '' and $NoteCell = ''">
+              <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
+                <xsl:if test="@s">
+                  <xsl:attribute name="table:style-name">
+                    <xsl:for-each select="document('xl/styles.xml')">
+                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
+                    </xsl:for-each>
+                  </xsl:attribute>
+                </xsl:if>
+              </table:table-cell>
+            </xsl:when>
             <xsl:otherwise>
               <xsl:message terminate="no">translation.oox2odf.ColNumber</xsl:message>
             </xsl:otherwise>
