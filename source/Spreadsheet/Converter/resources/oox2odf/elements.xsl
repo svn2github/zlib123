@@ -702,7 +702,16 @@
 
           <table:table-cell>
 
-
+            <!-- check if conditional -->
+            <xsl:if
+              test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+                  <xsl:attribute name="table:style-name">
+                    <xsl:value-of
+                      select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';') + 1])"
+                    />
+                  </xsl:attribute>
+            </xsl:if>
+            
             <xsl:if
               test="contains(concat(';', $ValidationCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
               <xsl:variable name="ValidationStyle">
@@ -735,6 +744,7 @@
                   <xsl:value-of select="$Target"/>
                 </xsl:with-param>
               </xsl:call-template>
+              
             </xsl:if>
 
             <xsl:if

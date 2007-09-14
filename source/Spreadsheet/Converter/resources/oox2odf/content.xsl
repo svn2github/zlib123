@@ -2055,7 +2055,7 @@
     <xsl:variable name="GetMinCollWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
-          <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl)"/>
+          <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl, $ConditionalColl)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
           <xsl:choose>
@@ -2119,12 +2119,15 @@
         <xsl:value-of select="$NoteColl"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
-      <!--xsl:with-param name="ConditionalCell">
+      <xsl:with-param name="ConditionalCell">
         <xsl:value-of select="$ConditionalCell"/>
       </xsl:with-param>
       <xsl:with-param name="ConditionalCellStyle">
         <xsl:value-of select="$ConditionalCellStyle"/>
-      </xsl:with-param-->
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCol">
+        <xsl:value-of select="$ConditionalColl"/>
+      </xsl:with-param>
       <xsl:with-param name="ValidationCell">
         <xsl:value-of select="$ValidationCell"/>
       </xsl:with-param>
