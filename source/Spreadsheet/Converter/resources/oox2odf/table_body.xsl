@@ -495,6 +495,9 @@
     <xsl:param name="PictureColl"/>
     <xsl:param name="NoteColl"/>
     <xsl:param name="sheet"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConditionalCol"/>
     <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
@@ -523,7 +526,7 @@
     </xsl:variable>
 
     <xsl:variable name="ElementsColl">
-      <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl)"/>
+      <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl, $ConditionalCol)"/>
     </xsl:variable>
 
     <xsl:variable name="GetMinCollWithElement">
@@ -595,6 +598,12 @@
           <xsl:with-param name="EndColl">
             <xsl:value-of select="$colNum"/>
           </xsl:with-param>
+          <xsl:with-param name="ConditionalCell">
+            <xsl:value-of select="$ConditionalCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
+          </xsl:with-param>
           <xsl:with-param name="ValidationCell">
             <xsl:value-of select="$ValidationCell"/>
           </xsl:with-param>
@@ -643,6 +652,12 @@
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
           <xsl:with-param name="EndColl">
             <xsl:value-of select="$colNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCell">
+            <xsl:value-of select="$ConditionalCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
           </xsl:with-param>
           <xsl:with-param name="ValidationCell">
             <xsl:value-of select="$ValidationCell"/>
