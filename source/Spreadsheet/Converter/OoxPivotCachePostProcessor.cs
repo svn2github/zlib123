@@ -83,6 +83,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
         //<pxsi:cacheRecords> variables
         private bool isInCacheRecords;
 
+        //<pxsi:items> variables
+        private bool isInItems;
+        private bool isItemsFieldNum;
+        private string itemsFieldNum;
+        private bool isItemsHide;
+        private string itemsHide;
+
+
         public OoxPivotCachePostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
@@ -123,7 +131,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
             //<pxsi:cacheRecords> variables
             this.isInCacheRecords = false;
 
-            Console.WriteLine("PROCESS");
+            //<pxsi:items> variables
+            bool isInItems = false;
+            bool isItemsFieldNum = false;
+            string itemsFieldNum = "";
+            bool isItemsHide = false;
+            string itemsHide = "";
 
         }
 
@@ -158,6 +171,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.pivotContext = new Stack();
                 this.pivotContext.Push(new Element(prefix, localName, ns)); 
                 this.isInCacheRecords = true;
+                this.isPxsi = true;
+            }
+            else if (PXSI_NAMESPACE.Equals(ns) && "items".Equals(localName))
+            {
+                this.pivotContext = new Stack();
+                this.pivotContext.Push(new Element(prefix, localName, ns));
+                this.isInItems = true;
                 this.isPxsi = true;
             }
             else
@@ -196,6 +216,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isFieldType = true;
                 else if (PXSI_NAMESPACE.Equals(ns) && "fieldNum".Equals(localName))
                     this.isFieldNum = true;
+            }
+            else if (isInItems)
+            {
+                if (PXSI_NAMESPACE.Equals(ns) && "field".Equals(localName))
+                    this.isItemsFieldNum = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "hide".Equals(localName))
+                    this.isItemsHide = true;
             }
             else
             {
@@ -277,6 +304,19 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isFieldNum = false;
                 }
             }
+            else if (isInItems)
+            {
+                if (isItemsFieldNum)
+                {
+                    this.itemsFieldNum = text;
+                    this.isItemsFieldNum = false;
+                }
+                else if (isItemsHide)
+                {
+                    this.itemsHide = text;
+                    this.isItemsHide = false;
+                }
+            }
             else
             {
                 this.nextWriter.WriteString(text);
@@ -298,8 +338,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                 if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotTable".Equals(element.Name))
                 {
-                    Console.WriteLine("<SHEET " + cacheSheetNum + ">");
-
                     this.pivotTable = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
                     CreatePivotTable(Convert.ToInt32(cacheSheetNum),Convert.ToInt32(cacheRowStart),Convert.ToInt32(cacheRowEnd),Convert.ToInt32(cacheColStart),Convert.ToInt32(cacheColEnd));
 
@@ -323,55 +361,58 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "sharedItems".Equals(element.Name))
                 {
-                    this.nextWriter.WriteStartElement("sharedItems", EXCEL_NAMESPACE);
 
                     int field = Convert.ToInt32(fieldNum);
-                   
-                    //insert "count" attribute
-                    this.nextWriter.WriteStartAttribute("count");
-                    this.nextWriter.WriteString((string) this.fieldItems[field,0].Count.ToString());
-                    this.nextWriter.WriteEndAttribute();
-                    
-                    //SORTOWANIE
-                    //string[] uniqueValues = new string[this.fieldItems[field, 0].Count];
-                    //for (int i = 0; i < this.fieldItems[field, 1].Count; i++)
-                    //    uniqueValues[i] = this.fieldItems[field, 1][i].ToString();
-                    //Array.Sort(uniqueValues);
-                    //Console.WriteLine("FIELD");
-                    //for (int i = 0; i < uniqueValues.Length; i++)
-                    //    Console.WriteLine(uniqueValues[i]);
-                    
 
+                    InsertSharedItemAttributes(field);
+                    
                     //write item elements
                     if ("axis".Equals(this.fieldType))
-                        for (int i = 0; i < this.fieldItems[field, 1].Count; i++ )
-                            //foreach (string key in this.fieldItems[Convert.ToInt32(fieldNum), 0].Keys)
-                            {
-                                try
-                                {
-                                    //if field value is a number
-                                    Convert.ToDouble(this.fieldItems[field, 1][i]);
-                                    this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
-                                }
-                                catch
-                                {
-                                    //if field value is a string
-                                    this.nextWriter.WriteStartElement("s", EXCEL_NAMESPACE);
-                                }
-                             
-                                this.nextWriter.WriteStartAttribute("v");
-                                this.nextWriter.WriteString(this.fieldItems[field,1][i].ToString());
-                                this.nextWriter.WriteEndAttribute();
-                                this.nextWriter.WriteEndElement();
-                            }
+                    {
+                        //insert "count" attribute
+                        this.nextWriter.WriteStartAttribute("count");
+                        this.nextWriter.WriteString((string)this.fieldItems[field, 0].Count.ToString());
+                        this.nextWriter.WriteEndAttribute();
 
-                    this.nextWriter.WriteEndElement();
+                        for (int i = 0; i < this.fieldItems[field, 1].Count; i++)
+                        {
+                            
+                            // <e> - error, <d> - date and <b> - bool not handled for now
+
+                            try
+                            {
+                                //if field value is a number
+                                Convert.ToDouble(this.fieldItems[field, 1][i].ToString().Replace('.', ','));
+                                this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
+                                this.nextWriter.WriteStartAttribute("v");
+                                this.nextWriter.WriteString(this.fieldItems[field, 1][i].ToString());
+                                this.nextWriter.WriteEndAttribute();
+                            }
+                            catch
+                            {
+                                //if field value is a string
+                                if (this.fieldItems[field, 1][i].ToString().Length == 0)
+                                    //blank value
+                                    this.nextWriter.WriteStartElement("m", EXCEL_NAMESPACE);
+                                else
+                                {
+                                    this.nextWriter.WriteStartElement("s", EXCEL_NAMESPACE);
+                                    this.nextWriter.WriteStartAttribute("v");
+                                    this.nextWriter.WriteString(this.fieldItems[field, 1][i].ToString());
+                                    this.nextWriter.WriteEndAttribute();
+                                }
+                            }
+                            
+                            this.nextWriter.WriteEndElement();
+                        }
+                    }
+
                     this.isInSharedItems = false;
                     this.fieldNum = "";
                     this.fieldType = "";
                     this.isPxsi = false;
                 }
-                else if (isInCacheRecords)
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "cacheRecords".Equals(element.Name))
                 {
                     string value;
 
@@ -410,6 +451,28 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isPxsi = false;
                     
                 }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "items".Equals(element.Name))
+                {
+                    int items = fieldItems[Convert.ToInt32(itemsFieldNum), 0].Count;
+
+                    this.nextWriter.WriteStartAttribute("count");
+                    this.nextWriter.WriteString((items + 1).ToString());
+                    this.nextWriter.WriteEndAttribute();
+                    
+                    //for (int i = 0; i < items; i++)
+                    foreach (string key in fieldItems[Convert.ToInt32(itemsFieldNum), 0].Keys)
+                    {
+                        this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
+                        this.nextWriter.WriteStartAttribute("x");
+                        this.nextWriter.WriteString(fieldItems[Convert.ToInt32(itemsFieldNum), 0][key].ToString());
+                        this.nextWriter.WriteEndAttribute();
+                        this.nextWriter.WriteEndElement();
+                    }
+
+                    this.isInItems = false;
+                    this.isPxsi = false;
+                }
+
                 else
                 {
                     this.nextWriter.WriteEndElement();
@@ -473,5 +536,104 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 //}
 
         }
+
+        private void InsertSharedItemAttributes(int field)
+        {
+            bool containsDouble = false;
+
+            //attributes
+            bool containsBlank = false;
+            //bool containsDate;        //not checked for now but it is in specification
+            bool containsInteger = false;
+            //bool containsNonDate;     //can be omitted without loss of functionality
+            bool containsNumber = false;
+            bool containsString = false;
+            bool longText = false;      //not checked for now but it is in specification
+            //double minValue;
+            //double maxValue;
+            //minDate                   //not checked for now but it is in specification
+            //maxDate                   //not checked for now but it is in specification
+
+            //analize items
+//            Console.WriteLine("FIELD" + field.ToString());
+            for (int i = 0; i < this.fieldItems[field, 1].Count; i++)
+            {
+                //check weather an item is an integer
+                try
+                {
+                    Convert.ToDouble(this.fieldItems[field, 1][i].ToString().Replace('.', ','));
+                    if (this.fieldItems[field, 1][i].ToString().Contains("."))
+                    {
+                        containsNumber = true;
+                        containsDouble = true;
+
+                    }
+
+                    //check weather an item is an integer
+                    try
+                    {
+                        Convert.ToInt32(this.fieldItems[field, 1][i]);
+                        containsNumber = true;
+                        containsInteger = true;
+                    }
+                    catch
+                    {
+                    }
+                }
+                catch
+                {
+                    string text = this.fieldItems[field, 1][i].ToString();
+
+//                    Console.WriteLine(text.Length + "(" + text +")");
+                    if (text.Length == 0)
+                    {
+                        containsBlank = true;
+//                        Console.WriteLine("-----BLANK-----");
+                    }
+                    else if (text.Length > 255)
+                        longText = true;
+                    else
+                        containsString = true;
+                }
+            }
+
+                if (containsBlank)
+                {
+                    this.nextWriter.WriteStartAttribute("containsBlank");
+                    this.nextWriter.WriteString("1");
+                    this.nextWriter.WriteEndAttribute();
+                }
+                if (containsInteger && !containsDouble)
+                {
+                    this.nextWriter.WriteStartAttribute("containsInteger");
+                    this.nextWriter.WriteString("1");
+                    this.nextWriter.WriteEndAttribute();
+                }
+                if (containsNumber)
+                {
+                    this.nextWriter.WriteStartAttribute("containsNumber");
+                    this.nextWriter.WriteString("1");
+                    this.nextWriter.WriteEndAttribute();
+                }
+                if (containsNumber && containsString)
+                {
+                    this.nextWriter.WriteStartAttribute("containsMixedTypes");
+                    this.nextWriter.WriteString("1");
+                    this.nextWriter.WriteEndAttribute();
+                }
+                if (containsNumber && !containsString && !containsBlank)
+                {
+                    this.nextWriter.WriteStartAttribute("containsSemiMixedTypes");
+                    this.nextWriter.WriteString("0");
+                    this.nextWriter.WriteEndAttribute();
+                }
+                if (!containsString)
+                {
+                    this.nextWriter.WriteStartAttribute("containsString");
+                    this.nextWriter.WriteString("0");
+                    this.nextWriter.WriteEndAttribute();
+                }
+        }
+
     }
 }

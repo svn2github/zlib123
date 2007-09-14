@@ -172,6 +172,40 @@
               </xsl:when>
             </xsl:choose>
 
+            <xsl:choose>
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-sort-info/@table:order = 'descending' ">
+                <xsl:attribute name="sortType">
+                  <xsl:text>descending</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-sort-info/@table:order = 'ascending' ">
+                <xsl:attribute name="sortType">
+                  <xsl:text>ascending</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+
+            <xsl:if test="not(@table:orientation = 'data')">
+              <items>
+                <pxsi:items pxsi:field="{position() - 1}">
+                  <xsl:if
+                    test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
+                    <xsl:attribute name="pxsi:hide">
+                      <xsl:text>;</xsl:text>
+                      <xsl:for-each
+                        select="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
+                        <xsl:value-of select="@table:name"/>
+                        <xsl:text>;</xsl:text>
+                      </xsl:for-each>
+                    </xsl:attribute>
+                  </xsl:if>
+                </pxsi:items>
+                <item t="default"/>
+              </items>
+            </xsl:if>
+
           </pivotField>
         </xsl:for-each>
       </pivotFields>
@@ -300,21 +334,25 @@
               <xsl:value-of select="@table:source-field-name"/>
             </xsl:attribute>
 
-            <pxsi:sharedItems>
-              <xsl:attribute name="pxsi:fieldType">
-                <xsl:choose>
-                  <xsl:when test="@table:orientation = 'data'">
-                    <xsl:text>data</xsl:text>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:text>axis</xsl:text>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-              <xsl:attribute name="pxsi:fieldNum">
-                <xsl:value-of select="position() - 1"/>
-              </xsl:attribute>
-            </pxsi:sharedItems>
+            <sharedItems>
+              <pxsi:sharedItems>
+                <xsl:attribute name="pxsi:fieldType">
+                  <xsl:choose>
+                    <xsl:when test="@table:orientation = 'data'">
+                      <xsl:text>data</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>axis</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+
+                <xsl:attribute name="pxsi:fieldNum">
+                  <xsl:value-of select="position() - 1"/>
+                </xsl:attribute>
+
+              </pxsi:sharedItems>
+            </sharedItems>
 
             <!-- temporary shared items -->
             <!--xsl:if test="position()= 1">
