@@ -430,5 +430,79 @@
     </xsl:variable>
     <xsl:value-of select="$numberOfDays + $extraDay"/>
   </xsl:template>
-
+  
+  
+  <!-- template to convert relative cell address into absolute address -->
+  <xsl:template name="rel2Abs">
+    <xsl:param name="relatCellAddress"/>
+    <xsl:text>$</xsl:text>
+    <xsl:call-template name="auxiliary">
+      <xsl:with-param name="cellAddressRelative">
+        <xsl:value-of select="$relatCellAddress"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>  
+  
+  <!-- auxiliary template for absoluteCellAddress template -->
+  <xsl:template name="auxiliary">
+    <xsl:param name="cellAddressRelative"/>
+    <xsl:choose>
+      <xsl:when test="substring($cellAddressRelative, 1, 1) != '0' and substring($cellAddressRelative, 1, 1) != '1' and substring($cellAddressRelative, 1, 1) != '2' and substring($cellAddressRelative, 1, 1) != '3' and substring($cellAddressRelative, 1, 1) != '4' and substring($cellAddressRelative, 1, 1) != '5' and substring($cellAddressRelative, 1, 1) != '6' and substring($cellAddressRelative, 1, 1) != '7' and substring($cellAddressRelative, 1, 1) != '8' and substring($cellAddressRelative, 1, 1) != '9'">
+        <xsl:value-of select="substring($cellAddressRelative, 1, 1)"/>
+        <xsl:call-template name="auxiliary">
+          <xsl:with-param name="cellAddressRelative">
+            <xsl:value-of select="substring($cellAddressRelative, 2)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>$</xsl:text>
+        <xsl:value-of select="$cellAddressRelative"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template which takes column name and returns columns number, e.g. column EJ is 140th column -->
+<xsl:template name="returnColumnNumber">
+  <xsl:param name="columnName"/>
+  <xsl:param name="currentValue">
+    <xsl:value-of select="number(0)"/>
+  </xsl:param>
+  <xsl:choose>
+    <xsl:when test="string-length($columnName) &gt; 0">
+      <xsl:variable name="charValue">
+        <xsl:call-template name="CharacterToPosition">
+          <xsl:with-param name="character">
+            <xsl:value-of select="substring($columnName, 1, 1)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="poweredValue">
+        <xsl:call-template name="Power">
+          <xsl:with-param name="base">
+            <xsl:value-of select="number(26)"/>
+          </xsl:with-param>
+          <xsl:with-param name="exponent">
+            <xsl:value-of select="string-length($columnName) -1 "/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="temporary">
+        <xsl:value-of select="$poweredValue * $charValue + $currentValue"/>
+      </xsl:variable>
+      <xsl:call-template name="returnColumnNumber">
+        <xsl:with-param name="columnName">
+          <xsl:value-of select="substring($columnName, 2)"/>
+        </xsl:with-param>
+        <xsl:with-param name="currentValue">
+          <xsl:value-of select="$temporary"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="number($currentValue)"/>
+    </xsl:otherwise>
+  </xsl:choose>
+  
+</xsl:template>
 </xsl:stylesheet>
