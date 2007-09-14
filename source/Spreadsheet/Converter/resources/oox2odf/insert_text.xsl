@@ -58,7 +58,7 @@
         <text:p>
           <xsl:choose>
             <xsl:when test="key('ref',@r)">
-              
+
               <xsl:variable name="XlinkHref">
                 <xsl:call-template name="XlinkHref">
                   <xsl:with-param name="sheetNr">
@@ -66,44 +66,44 @@
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
-              
-              
 
-                <!-- a postprocessor puts here strings from sharedstrings -->
-                <xsl:variable name="eV">
-                  <xsl:value-of select="e:v + 1"/>
-                </xsl:variable>
-                <!-- a postprocessor puts here strings from sharedstrings -->
-                <xsl:choose>
-                  <xsl:when test="contains($rSheredStrings, e:v) ">
-                    <xsl:for-each
-                      select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
-                      
-                      <xsl:apply-templates select="e:r[1]" mode="hyperlink">
-                        <xsl:with-param name="XlinkHref">
-                          <xsl:value-of select="$XlinkHref"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="position">
-                          <xsl:text>1</xsl:text>
-                        </xsl:with-param>
-                      </xsl:apply-templates>
-                      
-                    </xsl:for-each>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <text:a>
-                      <xsl:attribute name="xlink:href">
-                        <xsl:value-of select="$XlinkHref"/>  
-                      </xsl:attribute>
+
+
+              <!-- a postprocessor puts here strings from sharedstrings -->
+              <xsl:variable name="eV">
+                <xsl:value-of select="e:v + 1"/>
+              </xsl:variable>
+              <!-- a postprocessor puts here strings from sharedstrings -->
+              <xsl:choose>
+                <xsl:when test="contains($rSheredStrings, e:v) ">
+                  <xsl:for-each
+                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
+
+                    <xsl:apply-templates select="e:r[1]" mode="hyperlink">
+                      <xsl:with-param name="XlinkHref">
+                        <xsl:value-of select="$XlinkHref"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="position">
+                        <xsl:text>1</xsl:text>
+                      </xsl:with-param>
+                    </xsl:apply-templates>
+
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <text:a>
+                    <xsl:attribute name="xlink:href">
+                      <xsl:value-of select="$XlinkHref"/>
+                    </xsl:attribute>
                     <pxsi:v>
                       <xsl:value-of select="e:v"/>
                     </pxsi:v>
-                    </text:a>
-                  </xsl:otherwise>
-                 
-                </xsl:choose>
+                  </text:a>
+                </xsl:otherwise>
 
-              
+              </xsl:choose>
+
+
             </xsl:when>
 
             <xsl:otherwise>
@@ -206,14 +206,14 @@
             <xsl:value-of select="key('Xf','')[position()=$position]/@numFmtId"/>
           </xsl:for-each>
         </xsl:variable>
-        
+
         <xsl:variable name="strippedFormat">
           <xsl:call-template name="StripText">
             <xsl:with-param name="formatCode" select="$numStyle"/>
             <xsl:with-param name="preserveCurrency" select="'true'"/>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:attribute name="office:value-type">
           <xsl:choose>
             <xsl:when
@@ -222,7 +222,15 @@
             </xsl:when>
             <xsl:when
               test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
-              <xsl:text>date</xsl:text>
+              <xsl:choose>
+                <xsl:when
+                  test="contains($numStyle, '[$$-409]') or contains($numStyle, '[$Sk-41B]') or contains($numStyle, '[$Din.-81A]') or contains($numStyle, '[$€-180C]') or contains($numStyle, '[$€-1007]')">
+                  <xsl:text>currency</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>date</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
 
             <!--'and' at the end is for Latvian currency -->
@@ -247,43 +255,43 @@
           </xsl:choose>
         </xsl:attribute>
 
-        <xsl:choose>
-          <xsl:when
-            test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
-            <xsl:attribute name="office:date-value">
-              <xsl:call-template name="NumberToDate">
-                <xsl:with-param name="value">
-                  <xsl:choose>
-                    <xsl:when
-                      test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
-                      <xsl:value-of select="(e:v) + (1462)"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="e:v"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:when>
+          <xsl:choose>
+            <xsl:when
+              test="((contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)) and not(contains($numStyle, '[$$-409]') or contains($numStyle, '[$Sk-41B]') or contains($numStyle, '[$Din.-81A]') or contains($numStyle, '[$€-180C]') or contains($numStyle, '[$€-1007]'))">
+              <xsl:attribute name="office:date-value">
+                <xsl:call-template name="NumberToDate">
+                  <xsl:with-param name="value">
+                    <xsl:choose>
+                      <xsl:when
+                        test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
+                        <xsl:value-of select="(e:v) + (1462)"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="e:v"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:when>
 
-          <!--'and' at the end is for Latvian currency -->
-          <xsl:when
-            test="not(contains($numStyle,'[$Ls-426]')) and (contains($strippedFormat,'h') or contains($strippedFormat,'s') or $numId = 18 or $numId = 20)">
-            <xsl:attribute name="office:time-value">
-              <xsl:call-template name="NumberToTime">
-                <xsl:with-param name="value">
-                  <xsl:value-of select="e:v"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="office:value">
-              <xsl:value-of select="e:v"/>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
+            <!--'and' at the end is for Latvian currency -->
+            <xsl:when
+              test="not(contains($numStyle,'[$Ls-426]') or contains($numStyle,'[$kr-425]') or contains($numStyle,'[$€-813]')) and (contains($strippedFormat,'h') or contains($strippedFormat,'s') or $numId = 18 or $numId = 20)">
+              <xsl:attribute name="office:time-value">
+                <xsl:call-template name="NumberToTime">
+                  <xsl:with-param name="value">
+                    <xsl:value-of select="e:v"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="office:value">
+                <xsl:value-of select="e:v"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
         <text:p>
           <xsl:choose>
 
@@ -384,10 +392,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="XlinkHref">
     <xsl:param name="sheetNr"/>
-    
+
     <xsl:variable name="target">
       <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
       <xsl:for-each select="key('ref',@r)">
@@ -401,12 +409,11 @@
         </xsl:call-template>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xsl:choose>
       <!-- when hyperlink leads to a file in network -->
       <xsl:when test="starts-with($target,'file:///\\')">
-        <xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"
-        />
+        <xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"/>
       </xsl:when>
       <!--when hyperlink leads to www or mailto -->
       <xsl:when test="contains($target,':')">
@@ -415,17 +422,16 @@
       <!-- when hyperlink leads to another place in workbook -->
       <xsl:when test="key('ref',@r)/@location != '' ">
         <xsl:for-each select="key('ref',@r)">
-          
+
           <xsl:variable name="apos">
             <xsl:text>&apos;</xsl:text>
           </xsl:variable>
-          
+
           <xsl:variable name="sheetName">
             <xsl:choose>
               <xsl:when test="starts-with(@location,$apos)">
                 <xsl:value-of select="$apos"/>
-                <xsl:value-of
-                  select="substring-before(substring-after(@location,$apos),$apos)"/>
+                <xsl:value-of select="substring-before(substring-after(@location,$apos),$apos)"/>
                 <xsl:value-of select="$apos"/>
               </xsl:when>
               <xsl:otherwise>
@@ -433,11 +439,11 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:variable name="invalidChars">
             <xsl:text>&apos;!,.+$-()</xsl:text>
           </xsl:variable>
-          
+
           <xsl:variable name="checkedName">
             <xsl:for-each
               select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
@@ -454,12 +460,12 @@
               </xsl:call-template>
             </xsl:for-each>
           </xsl:variable>
-          
+
           <xsl:text>#</xsl:text>
           <xsl:value-of select="$checkedName"/>
           <xsl:text>.</xsl:text>
           <xsl:value-of select="substring-after(@location,concat($sheetName,'!'))"/>
-          
+
         </xsl:for-each>
       </xsl:when>
       <!--when hyperlink leads to a document -->
@@ -469,7 +475,7 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <!-- change  '%20' to space  after conversion-->
