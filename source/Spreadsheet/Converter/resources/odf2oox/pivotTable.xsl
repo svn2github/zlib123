@@ -59,8 +59,9 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      
-      <xsl:if test="table:data-pilot-field[@table:source-field-name = '' and @table:orientation = 'row' ]">
+
+      <xsl:if
+        test="table:data-pilot-field[@table:source-field-name = '' and @table:orientation = 'row' ]">
         <xsl:attribute name="dataOnRows">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
@@ -87,11 +88,11 @@
       </xsl:attribute>
 
       <location firstHeaderRow="1" firstDataRow="2" firstDataCol="1">
-        
+
         <xsl:variable name="pageFields">
           <xsl:value-of select="count(table:data-pilot-field[@table:orientation = 'page' ])"/>
         </xsl:variable>
-        
+
         <xsl:if test="table:data-pilot-field[@table:orientation = 'page' ]">
           <xsl:attribute name="rowPageCount">
             <xsl:value-of select="$pageFields"/>
@@ -105,12 +106,11 @@
           <xsl:call-template name="GetRowNum">
             <xsl:with-param name="cell">
               <xsl:value-of
-                select="substring-after(substring-before(@table:target-range-address,':'),'.')"
-              />
+                select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:choose>
           <xsl:when test="@table:show-filter-button = 'false' ">
             <xsl:attribute name="ref">
@@ -242,7 +242,8 @@
         />
       </xsl:variable>
 
-      <xsl:if test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row' ] or $dataFields &gt;= 2">
+      <xsl:if
+        test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row' ] or $dataFields &gt;= 2">
         <rowFields count="{count(table:data-pilot-field[@table:orientation = 'row'])}">
           <xsl:for-each select="table:data-pilot-field[@table:orientation = 'row']">
 
@@ -330,7 +331,9 @@
           <xsl:for-each select="table:data-pilot-field[@table:orientation = 'page' ]">
             <pageField hier="-1">
               <xsl:variable name="field">
-                <xsl:value-of select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"/>
+                <xsl:value-of
+                  select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
+                />
               </xsl:variable>
 
               <xsl:attribute name="fld">
@@ -392,6 +395,48 @@
 
               </xsl:if>
 
+              <!-- show data format as -->
+              <xsl:for-each select="table:data-pilot-field-reference[@table:type]">
+              
+                  <xsl:attribute name="showDataAs">
+                    
+                    <xsl:choose>
+                      <xsl:when test="@table:type= 'member-difference' ">
+                        <xsl:text>difference</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:type= 'member-percentage' ">
+                        <xsl:text>percent</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:type= 'member-percentage-difference' ">
+                        <xsl:text>percentDiff</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:type= 'running-total' ">
+                        <xsl:text>runTotal</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:type= 'row-percentage' ">
+                        <xsl:text>percentOfRow</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:type= 'column-percentage' ">
+                        <xsl:text>percentOfColumn</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:type= 'total-percentage' ">
+                        <xsl:text>percentOfTotal</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:type= 'index' ">
+                        <xsl:text>index</xsl:text>
+                      </xsl:when>
+                      
+                    </xsl:choose>
+                  </xsl:attribute>
+                </xsl:for-each>
+           
             </dataField>
           </xsl:for-each>
         </dataFields>
