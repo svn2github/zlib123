@@ -228,6 +228,38 @@
 
           </pivotField>
         </xsl:for-each>
+
+        <xsl:variable name="sourceStartCol">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of
+                select="substring-after(substring-before(table:source-cell-range/@table:cell-range-address,':'),'.')"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="sourceEndCol">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of
+                select="substring-after(substring-after(table:source-cell-range/@table:cell-range-address,':'),'.')"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:if
+          test="$sourceStartCol + count(table:data-pilot-field[@table:source-field-name != '' ]) != $sourceEndCol">
+          <xsl:call-template name="InsertNotUsedFields">
+            <xsl:with-param name="count">
+              <xsl:value-of
+                select="$sourceEndCol - $sourceStartCol + 1 - count(table:data-pilot-field[@table:source-field-name != '' ])"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+
       </pivotFields>
 
       <xsl:variable name="axedFields">
@@ -269,8 +301,7 @@
 
       <!-- TO DO <rowItems> -->
 
-      <xsl:if
-        test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column' ] or $dataFields &gt;= 2">
+      <xsl:if test="table:data-pilot-field[@table:orientation = 'column' ]">
         <colFields
           count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column'])}">
 
@@ -278,7 +309,7 @@
 
             <xsl:choose>
               <!-- "Values" field -->
-              <xsl:when test="@table:source-field-name = '' and $dataFields &gt;= 2">
+              <xsl:when test="@table:source-field-name = '' ">
                 <field x="-2"/>
               </xsl:when>
               <xsl:when test="@table:source-field-name != '' ">
@@ -294,36 +325,6 @@
           </xsl:for-each>
         </colFields>
       </xsl:if>
-
-      <!-- TO DO <colItems> -->
-      <!--colItems>
-        <pxsi:colItems/>
-        <xsl:attribute name="pxsi:colFields">
-          <xsl:text>,</xsl:text>
-          <xsl:for-each select="table:data-pilot-field">
-            <xsl:if test="@table:orientation = 'column' ">
-              <xsl:choose>
-                <xsl:when test="@table:source-field-name = '' ">
-                  <xsl:text>,-2</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat(',',position())"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:attribute>
-        
-        <xsl:attribute name="dateFields">
-          <xsl:value-of select="$dataFields"/>
-        </xsl:attribute>
-        
-        <xsl:if test="table:data-pilot-field[@table:orientation = 'page' ]">
-          <xsl:attribute name="pxsi:pageItems">
-            <xsl:text>djf</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
-      </colItems-->
 
       <!-- page fields -->
       <xsl:if test="table:data-pilot-field[@table:orientation = 'page' ]">
@@ -498,25 +499,15 @@
               </pxsi:sharedItems>
             </sharedItems>
 
-            <!-- temporary shared items -->
-            <!--xsl:if test="position()= 1">
-              <sharedItems xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable">
-                <s v="digestion"/>
-                <s v="muscles"/>
-                <s v="circulation"/>
-              </sharedItems>
-            </xsl:if>
-            <xsl:if test="position()= 2">
-              <sharedItems containsSemiMixedTypes="0" containsString="0" containsNumber="1"
-                containsInteger="1" minValue="2" maxValue="10"/>
-            </xsl:if>
-            <xsl:if test="position()= 3">
-              <sharedItems containsSemiMixedTypes="0" containsString="0" containsNumber="1"
-                minValue="0.16666666666666699" maxValue="0.90909090909090895"/>
-            </xsl:if-->
-
           </cacheField>
         </xsl:for-each>
+
+        <pxsi:sharedItems>
+          <xsl:attribute name="pxsi:fieldType">
+            <xsl:text>empty</xsl:text>
+          </xsl:attribute>
+        </pxsi:sharedItems>
+
       </cacheFields>
 
     </pivotCacheDefinition>
@@ -923,6 +914,21 @@
 
   <xsl:template match="text()" mode="pivot">
     <xsl:value-of select="."/>
+  </xsl:template>
+
+  <xsl:template name="InsertNotUsedFields">
+    <xsl:param name="count"/>
+    <xsl:param name="loop" select="0"/>
+
+    <xsl:if test="$loop != $count">
+      <pivotField showAll="0"/>
+
+      <xsl:call-template name="InsertNotUsedFields">
+        <xsl:with-param name="count" select="$count"/>
+        <xsl:with-param name="loop" select="$loop + 1"/>
+      </xsl:call-template>
+    </xsl:if>
+
   </xsl:template>
 
 </xsl:stylesheet>

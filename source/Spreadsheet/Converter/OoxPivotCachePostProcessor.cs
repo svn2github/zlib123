@@ -77,9 +77,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
         //<pxsi:sharedItems> variables
         private bool isInSharedItems;
         private bool isFieldType;
-        private string fieldType; //{"axis" or "data"}
+        private string fieldType; //{"axis", "data" or "empty"}
         private bool isFieldName;
         private string fieldName;
+        private string cacheFields;
 
         //<pxsi:cacheRecords> variables
         private bool isInCacheRecords;
@@ -134,6 +135,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.fieldType = "";
             this.isFieldName = false;
             this.fieldName = "";
+            this.cacheFields = ",";
 
             //<pxsi:cacheRecords> variables
             this.isInCacheRecords = false;
@@ -381,14 +383,24 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "sharedItems".Equals(element.Name))
                 {
 
-                    int field = Convert.ToInt32(fieldNames[0][fieldName]);
-                    //Console.WriteLine(fieldName + ": " + field.ToString());
+                    //store in cacheFields variable processed field names
+                    if (!"empty".Equals(fieldType))
+                        this.cacheFields += fieldName + ",";
 
-                    InsertSharedItemAttributes(field);
-                    
-                    //write item elements
-                    if ("axis".Equals(this.fieldType))
+                    if("date".Equals(fieldType))
                     {
+                        int field = Convert.ToInt32(fieldNames[0][fieldName]);
+                        //Console.WriteLine(fieldName + ": " + field.ToString());
+
+                        InsertSharedItemAttributes(field);
+                    }
+                    else if ("axis".Equals(fieldType))
+                    {
+                        int field = Convert.ToInt32(fieldNames[0][fieldName]);
+                        //Console.WriteLine(fieldName + ": " + field.ToString());
+
+                        InsertSharedItemAttributes(field);
+
                         //insert "count" attribute
                         this.nextWriter.WriteStartAttribute("count");
                         this.nextWriter.WriteString((string)this.fieldItems[field, 0].Count.ToString());
@@ -396,7 +408,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                         for (int i = 0; i < this.fieldItems[field, 1].Count; i++)
                         {
-                            
+
                             // <e> - error, <d> - date and <b> - bool not handled for now
 
                             try
@@ -422,8 +434,31 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                     this.nextWriter.WriteEndAttribute();
                                 }
                             }
-                            
+
                             this.nextWriter.WriteEndElement();
+                        }
+                    }
+                    else if ("empty".Equals(fieldType))
+                    {
+                        Console.WriteLine(cacheFields);
+
+                        foreach (string key in fieldNames[0].Keys)
+                        {
+                            if (!cacheFields.Contains("," + key + ","))
+                            {
+                                int field = Convert.ToInt32(fieldNames[0][key]);
+
+                                this.nextWriter.WriteStartElement("cacheField", EXCEL_NAMESPACE);
+                                    this.nextWriter.WriteStartAttribute("name");
+                                    this.nextWriter.WriteString(key);
+                                    this.nextWriter.WriteEndAttribute();
+                                
+                                    this.nextWriter.WriteStartElement("sharedItems", EXCEL_NAMESPACE);
+                                    InsertSharedItemAttributes(field);
+                                    this.nextWriter.WriteEndElement();
+
+                                this.nextWriter.WriteEndElement();
+                            }
                         }
                     }
 
