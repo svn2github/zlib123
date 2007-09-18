@@ -59,6 +59,12 @@
           <xsl:text>0</xsl:text>
         </xsl:attribute>
       </xsl:if>
+      
+      <xsl:if test="table:data-pilot-field[@table:source-field-name = '' and @table:orientation = 'row' ]">
+        <xsl:attribute name="dataOnRows">
+          <xsl:text>1</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
 
       <xsl:variable name="source">
         <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
@@ -81,12 +87,36 @@
       </xsl:attribute>
 
       <location firstHeaderRow="1" firstDataRow="2" firstDataCol="1">
+        
+        <xsl:variable name="pageFields">
+          <xsl:value-of select="count(table:data-pilot-field[@table:orientation = 'page' ])"/>
+        </xsl:variable>
+        
+        <xsl:if test="table:data-pilot-field[@table:orientation = 'page' ]">
+          <xsl:attribute name="rowPageCount">
+            <xsl:value-of select="$pageFields"/>
+          </xsl:attribute>
+          <xsl:attribute name="colPageCount">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
 
+        <xsl:variable name="startRow">
+          <xsl:call-template name="GetRowNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of
+                select="substring-after(substring-before(@table:target-range-address,':'),'.')"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
         <xsl:choose>
           <xsl:when test="@table:show-filter-button = 'false' ">
             <xsl:attribute name="ref">
               <xsl:value-of
-                select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+                select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$startRow)"/>
+              <xsl:value-of select="$startRow + 1 + $pageFields"/>
               <xsl:text>:</xsl:text>
               <xsl:value-of
                 select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
@@ -94,21 +124,11 @@
           </xsl:when>
           <xsl:otherwise>
 
-            <xsl:variable name="startRow">
-              <xsl:call-template name="GetRowNum">
-                <xsl:with-param name="cell">
-                  <xsl:value-of
-                    select="substring-after(substring-before(@table:target-range-address,':'),'.')"
-                  />
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-
             <xsl:attribute name="ref">
               <!-- column-->
               <xsl:value-of
                 select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$startRow)"/>
-              <xsl:value-of select="$startRow + 2"/>
+              <xsl:value-of select="$startRow + 2 + $pageFields"/>
               <xsl:text>:</xsl:text>
               <xsl:value-of
                 select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
@@ -120,7 +140,7 @@
 
       <pivotFields>
 
-        <xsl:attribute name="count">
+        <!--xsl:attribute name="count">
 
           <xsl:variable name="startCol">
             <xsl:call-template name="GetColNum">
@@ -141,12 +161,12 @@
           </xsl:variable>
 
           <xsl:value-of select="$endCol - $startCol + 1"/>
-        </xsl:attribute>
+        </xsl:attribute-->
 
         <!-- pivotFields have names, the one field without name (definition?) can occur not only on the first place -->
         <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
 
-          <pivotField>
+          <pivotField showAll="0">
 
             <!-- field orientation -->
             <xsl:choose>
@@ -174,13 +194,13 @@
 
             <xsl:choose>
               <xsl:when
-                test="table:data-pilot-level/table:data-pilot-sort-info/@table:order = 'descending' ">
+                test="table:data-pilot-level/table:data-pilot-sort-info[@table:order = 'descending' and @table:sort-mode != 'manual' and @table:sort-mode != 'none']">
                 <xsl:attribute name="sortType">
                   <xsl:text>descending</xsl:text>
                 </xsl:attribute>
               </xsl:when>
               <xsl:when
-                test="table:data-pilot-level/table:data-pilot-sort-info/@table:order = 'ascending' ">
+                test="table:data-pilot-level/table:data-pilot-sort-info[@table:order = 'ascending' and @table:sort-mode != 'manual' and @table:sort-mode != 'none'] ">
                 <xsl:attribute name="sortType">
                   <xsl:text>ascending</xsl:text>
                 </xsl:attribute>
@@ -189,7 +209,7 @@
 
             <xsl:if test="not(@table:orientation = 'data')">
               <items>
-                <pxsi:items pxsi:field="{position() - 1}">
+                <pxsi:items pxsi:field="{@table:source-field-name}">
                   <xsl:if
                     test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
                     <xsl:attribute name="pxsi:hide">
@@ -210,51 +230,130 @@
         </xsl:for-each>
       </pivotFields>
 
-      <xsl:if
-        test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row' ]">
-        <rowFields
-          count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row'])}">
-          <xsl:for-each
-            select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row']">
-            <field>
-              <xsl:attribute name="x">
-                <xsl:value-of
-                  select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
-                />
-              </xsl:attribute>
-            </field>
+      <xsl:variable name="axedFields">
+        <xsl:value-of
+          select="count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation != 'data' ])"
+        />
+      </xsl:variable>
+
+      <xsl:variable name="dataFields">
+        <xsl:value-of
+          select="count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data' ])"
+        />
+      </xsl:variable>
+
+      <xsl:if test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'row' ] or $dataFields &gt;= 2">
+        <rowFields count="{count(table:data-pilot-field[@table:orientation = 'row'])}">
+          <xsl:for-each select="table:data-pilot-field[@table:orientation = 'row']">
+
+            <xsl:choose>
+              <!-- "Values" field -->
+              <xsl:when test="@table:source-field-name = '' and $dataFields &gt;= 2">
+                <field x="-2"/>
+              </xsl:when>
+              <xsl:when test="@table:source-field-name != '' ">
+                <field>
+                  <xsl:attribute name="x">
+                    <xsl:value-of
+                      select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
+                    />
+                  </xsl:attribute>
+                </field>
+              </xsl:when>
+            </xsl:choose>
           </xsl:for-each>
+
         </rowFields>
       </xsl:if>
 
       <!-- TO DO <rowItems> -->
 
-      <xsl:choose>
-        <xsl:when
-          test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column' ]">
-          <colFields
-            count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column'])}">
-            <xsl:for-each
-              select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column']">
-              <field>
-                <xsl:attribute name="x">
-                  <xsl:value-of
-                    select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
-                  />
-                </xsl:attribute>
-              </field>
-            </xsl:for-each>
-          </colFields>
-        </xsl:when>
-        <xsl:otherwise>
-          <colFields count="1">
-            <field x="-2"/>
-          </colFields>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:if
+        test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column' ] or $dataFields &gt;= 2">
+        <colFields
+          count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'column'])}">
+
+          <xsl:for-each select="table:data-pilot-field[@table:orientation = 'column']">
+
+            <xsl:choose>
+              <!-- "Values" field -->
+              <xsl:when test="@table:source-field-name = '' and $dataFields &gt;= 2">
+                <field x="-2"/>
+              </xsl:when>
+              <xsl:when test="@table:source-field-name != '' ">
+                <field>
+                  <xsl:attribute name="x">
+                    <xsl:value-of
+                      select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
+                    />
+                  </xsl:attribute>
+                </field>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
+        </colFields>
+      </xsl:if>
 
       <!-- TO DO <colItems> -->
+      <!--colItems>
+        <pxsi:colItems/>
+        <xsl:attribute name="pxsi:colFields">
+          <xsl:text>,</xsl:text>
+          <xsl:for-each select="table:data-pilot-field">
+            <xsl:if test="@table:orientation = 'column' ">
+              <xsl:choose>
+                <xsl:when test="@table:source-field-name = '' ">
+                  <xsl:text>,-2</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat(',',position())"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:attribute>
+        
+        <xsl:attribute name="dateFields">
+          <xsl:value-of select="$dataFields"/>
+        </xsl:attribute>
+        
+        <xsl:if test="table:data-pilot-field[@table:orientation = 'page' ]">
+          <xsl:attribute name="pxsi:pageItems">
+            <xsl:text>djf</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </colItems-->
 
+      <!-- page fields -->
+      <xsl:if test="table:data-pilot-field[@table:orientation = 'page' ]">
+        <pageFields>
+          <xsl:for-each select="table:data-pilot-field[@table:orientation = 'page' ]">
+            <pageField hier="-1">
+              <xsl:variable name="field">
+                <xsl:value-of select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"/>
+              </xsl:variable>
+
+              <xsl:attribute name="fld">
+                <xsl:value-of select="$field"/>
+              </xsl:attribute>
+
+              <xsl:if test="@table:selected-page">
+                <pxsi:pageItem>
+                  <xsl:attribute name="pxsi:pageField">
+                    <xsl:value-of select="@table:source-field-name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="pxsi:pageItem">
+                    <xsl:value-of select="@table:selected-page"/>
+                  </xsl:attribute>
+                </pxsi:pageItem>
+              </xsl:if>
+
+            </pageField>
+          </xsl:for-each>
+        </pageFields>
+      </xsl:if>
+
+      <!-- date fields -->
       <xsl:if
         test="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data' ]">
         <dataFields
@@ -347,8 +446,8 @@
                   </xsl:choose>
                 </xsl:attribute>
 
-                <xsl:attribute name="pxsi:fieldNum">
-                  <xsl:value-of select="position() - 1"/>
+                <xsl:attribute name="pxsi:fieldName">
+                  <xsl:value-of select="@table:source-field-name"/>
                 </xsl:attribute>
 
               </pxsi:sharedItems>
@@ -692,8 +791,7 @@
         </xsl:variable>
 
         <xsl:call-template name="ListOutCellsInRange">
-          <!-- first row is always a header row -->
-          <xsl:with-param name="rowStart" select="$rowStart + 1"/>
+          <xsl:with-param name="rowStart" select="$rowStart"/>
           <xsl:with-param name="rowEnd" select="$rowEnd"/>
           <xsl:with-param name="colStart" select="$colStart"/>
           <xsl:with-param name="colEnd" select="$colEnd"/>
