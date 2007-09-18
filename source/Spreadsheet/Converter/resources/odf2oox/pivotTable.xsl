@@ -360,7 +360,7 @@
           count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data'])}">
           <xsl:for-each
             select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data']">
-            <dataField>
+            <dataField baseField="0" baseItem="0">
               <xsl:attribute name="name">
                 <xsl:value-of select="@table:source-field-name"/>
               </xsl:attribute>
