@@ -147,6 +147,9 @@
   <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
     <value>Data consolidation cannot be conversed</value>
   </data>
+  <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
+   <value>Some Pivot filters had to be removed because Calc doesn't support them</value>
+  </data>
   <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
     <value>Excel doesn't support cell range criteria in data validation.</value>
   </data>
