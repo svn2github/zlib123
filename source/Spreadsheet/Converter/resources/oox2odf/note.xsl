@@ -42,7 +42,8 @@
 
   <xsl:import href="common.xsl"/>
   <xsl:import href="measures.xsl"/>
-  
+  <xsl:key name="Stroke" match="v:stroke" use="''"/>
+
   <!-- Get cell with note -->
 
   <xsl:template name="NoteCell">
@@ -163,13 +164,17 @@
     </xsl:variable>
 
     <office:annotation>
-     
+
       <xsl:variable name="widthInPt">
-        <xsl:value-of select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('width', ':')), ';')"/>
+        <xsl:value-of
+          select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('width', ':')), ';')"
+        />
       </xsl:variable>
-      
+
       <xsl:variable name="heightInPt">
-        <xsl:value-of select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('height', ':')), ';')"/>
+        <xsl:value-of
+          select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('height', ':')), ';')"
+        />
       </xsl:variable>
 
       <xsl:attribute name="svg:width">
@@ -185,7 +190,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-      
+
       <xsl:attribute name="svg:height">
         <xsl:call-template name="ConvertMeasure">
           <xsl:with-param name="length">
@@ -297,17 +302,94 @@
             <xsl:choose>
               <xsl:when test="@fillcolor">
                 <xsl:call-template name="InsertColor"/>
-                <xsl:value-of select="@fillcolor"/>
+
               </xsl:when>
             </xsl:choose>
           </xsl:attribute>
+
+          <!-- border color -->
+          <xsl:attribute name="svg:stroke-color">
+            <xsl:choose>
+              <xsl:when test="key('Stroke','')/@color!=''">
+                <xsl:for-each select="./v:stroke">
+                  <xsl:call-template name="InsertStrokeColor">
+                    <xsl:with-param name="insideVStrokeNode" select="1"/>
+                  </xsl:call-template>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="InsertStrokeColor">
+                  <xsl:with-param name="insideVStrokeNode" select="0"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+
+          </xsl:attribute>
+
+          <xsl:variable name="strokePattern">
+            <xsl:value-of select="./v:stroke/@dashstyle"/>
+          </xsl:variable>
+
+          <xsl:variable name="dotShape">
+            <xsl:value-of select="./v:stroke/@endcap"/>
+          </xsl:variable>
+
+          <!-- border solid, dash or dotted -->
+          <xsl:if test="$strokePattern != ''">
+            <xsl:attribute name="draw:stroke">
+              <xsl:text>dash</xsl:text>
+            </xsl:attribute>
+
+            <xsl:attribute name="draw:stroke-dash">
+              <xsl:choose>
+                <xsl:when test="./v:stroke/@dashstyle">
+                  <!-- translation of predefined stroke pattern -->
+                  <xsl:choose>
+                    <!-- Round Dot -->
+                    <xsl:when test="$strokePattern = '1 1' and $dotShape = 'round'">
+                      <xsl:text>round_20_dotted</xsl:text>
+                    </xsl:when>
+                    <!-- Square Dot -->
+                    <xsl:when test="$strokePattern = '1 1'">
+                      <xsl:text>square_20_dotted</xsl:text>
+                    </xsl:when>
+                    <!-- Dash -->
+                    <xsl:when test="$strokePattern = 'dash'">
+                      <xsl:text>dashed</xsl:text>
+                    </xsl:when>
+                    <!-- Dash Dot  -->
+                    <xsl:when test="$strokePattern = 'dashDot'">
+                      <xsl:text>dash_20_dot</xsl:text>
+                    </xsl:when>
+                    <!-- Long Dash -->
+                    <xsl:when test="$strokePattern = 'longDash'">
+                      <xsl:text>long_20_dash</xsl:text>
+                    </xsl:when>
+                    <!-- Long Dash Dot -->
+                    <xsl:when test="$strokePattern = 'longDashDot'">
+                      <xsl:text>long_20_dash_20_dot</xsl:text>
+                    </xsl:when>
+                    <!-- Long Dash Dot Dot -->
+                    <xsl:when test="$strokePattern = 'longDashDotDot'">
+                      <xsl:text>long_20_dash_20_dot_20_dot</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>solid</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>solid</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+
+            </xsl:attribute>
+          </xsl:if>
 
         </style:graphic-properties>
       </style:style>
     </xsl:for-each>
 
   </xsl:template>
-  
- 
+
+
 
 </xsl:stylesheet>

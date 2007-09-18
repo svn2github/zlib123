@@ -848,8 +848,9 @@
   </xsl:template>
 
   <xsl:template name="InsertColor">
-
     <xsl:variable name="this" select="."/>
+    <xsl:variable name="colorDefinition" select="./@fillcolor"/>
+
     <xsl:choose>
       <xsl:when test="@rgb">
         <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
@@ -946,8 +947,165 @@
 
         <xsl:value-of select="concat('#',$color)"/>
       </xsl:when>
+      <xsl:when test="@fillcolor">
+
+        <xsl:choose>
+          <!-- named color, not hexadecimal value -->
+          <!-- must be translated to hexadecimal value -->
+          <xsl:when test="not(starts-with($colorDefinition, '#'))">
+            <xsl:choose>
+              <xsl:when test="starts-with($colorDefinition, 'black')">
+                <xsl:value-of select="'#000000'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'silver')">
+                <xsl:value-of select="'#C0C0C0'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'gray')">
+                <xsl:value-of select="'#808080'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'white')">
+                <xsl:value-of select="'#FFFFFF'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'maroon')">
+                <xsl:value-of select="'#800000'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'red')">
+                <xsl:value-of select="'#FF0000'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'purple')">
+                <xsl:value-of select="'#800080'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'fuchsia')">
+                <xsl:value-of select="'#FF00FF'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'green')">
+                <xsl:value-of select="'#008000'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'lime')">
+                <xsl:value-of select="'#00FF00'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'olive')">
+                <xsl:value-of select="'#808000'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'yellow')">
+                <xsl:value-of select="'#FFFF00'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'navy')">
+                <xsl:value-of select="'#000080'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'blue')">
+                <xsl:value-of select="'#0000FF'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'teal')">
+                <xsl:value-of select="'#008080'"/>
+              </xsl:when>
+              <xsl:when test="starts-with($colorDefinition, 'aqua')">
+                <xsl:value-of select="'#00FFFF'"/>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:when>
+          <!-- color given in a shortened hexadecimal value, e.g. #9cf instead of #99ccff -->
+          <xsl:when test="string-length(substring-before($colorDefinition, ' ')) = 4">
+            <xsl:variable name="r" select="substring($colorDefinition, 2, 1)"/>
+            <xsl:variable name="g" select="substring($colorDefinition, 3, 1)"/>
+            <xsl:variable name="b" select="substring($colorDefinition, 4, 1)"/>
+            <xsl:text>#</xsl:text>
+            <xsl:value-of select="concat($r, $r, $g, $g, $b, $b)"/>
+          </xsl:when>
+          <!-- color given in a proper hexadecimal value -->
+          <xsl:otherwise>
+            <xsl:value-of select="substring($colorDefinition, 1, 7)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
     </xsl:choose>
 
+  </xsl:template>
+  
+  <xsl:template name="InsertStrokeColor">
+    <xsl:param name="insideVStrokeNode"/>
+    <xsl:variable name="colorDefinition">
+  
+    <xsl:choose>
+      <xsl:when test="$insideVStrokeNode = 1">
+        <xsl:value-of select="@color"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@strokecolor"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable>   
+    
+    <xsl:choose>
+      <!-- named color, not hexadecimal value -->
+      <!-- must be translated to hexadecimal value -->
+      <xsl:when test="not(starts-with($colorDefinition, '#'))">
+        <xsl:choose>
+          <xsl:when test="starts-with($colorDefinition, 'black')">
+            <xsl:value-of select="'#000000'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'silver')">
+            <xsl:value-of select="'#C0C0C0'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'gray')">
+            <xsl:value-of select="'#808080'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'white')">
+            <xsl:value-of select="'#FFFFFF'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'maroon')">
+            <xsl:value-of select="'#800000'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'red')">
+            <xsl:value-of select="'#FF0000'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'purple')">
+            <xsl:value-of select="'#800080'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'fuchsia')">
+            <xsl:value-of select="'#FF00FF'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'green')">
+            <xsl:value-of select="'#008000'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'lime')">
+            <xsl:value-of select="'#00FF00'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'olive')">
+            <xsl:value-of select="'#808000'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'yellow')">
+            <xsl:value-of select="'#FFFF00'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'navy')">
+            <xsl:value-of select="'#000080'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'blue')">
+            <xsl:value-of select="'#0000FF'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'teal')">
+            <xsl:value-of select="'#008080'"/>
+          </xsl:when>
+          <xsl:when test="starts-with($colorDefinition, 'aqua')">
+            <xsl:value-of select="'#00FFFF'"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <!-- color given in a shortened hexadecimal value, e.g. #9cf instead of #99ccff -->
+      <xsl:when test="string-length(substring-before($colorDefinition, ' ')) = 4">
+        <xsl:variable name="r" select="substring($colorDefinition, 2, 1)"/>
+        <xsl:variable name="g" select="substring($colorDefinition, 3, 1)"/>
+        <xsl:variable name="b" select="substring($colorDefinition, 4, 1)"/>
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="concat($r, $r, $g, $g, $b, $b)"/>
+      </xsl:when>
+      <!-- color given in a proper hexadecimal value -->
+      <xsl:otherwise>
+        <xsl:value-of select="substring($colorDefinition, 1, 7)"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
 
   <xsl:template name="InsertPaperSize">

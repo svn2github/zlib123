@@ -71,6 +71,10 @@
       <office:styles>
         <xsl:call-template name="InsertDefaultTableCellStyle"/>
         <xsl:call-template name="InsertCellStyle"/>
+        <!-- if there is at least one comment with border style defined -->
+        <xsl:if test="document('xl/drawings/vmlDrawing1.vml')/xml[1]/v:shape/v:stroke">
+          <xsl:call-template name="InsertCommentsBorderStyles"/>
+        </xsl:if>
         <!-- Insert Conditional Styles-->
         <xsl:call-template name="InsertConditionalStyles"/>
       </office:styles>
@@ -1067,6 +1071,28 @@
         <xsl:call-template name="InsertCellFormat"/>
       </style:style>
     </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertCommentsBorderStyles">
+    <draw:stroke-dash draw:name="round_20_dotted" draw:display-name="round dotted" draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    
+    <draw:stroke-dash draw:name="square_20_dotted" draw:display-name="square dotted"
+      draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    
+    <draw:stroke-dash draw:name="dashed" draw:style="rect" draw:dots1="1" draw:dots1-length="0.15cm" draw:dots2="1" draw:dots2-length="0.15cm" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    
+    <draw:stroke-dash draw:name="dash_20_dot" draw:display-name="dash dot" draw:style="rect"
+      draw:dots1="1" draw:dots1-length="0.1cm" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    
+    <draw:stroke-dash draw:name="long_20_dash" draw:display-name="long dash" draw:style="rect"
+      draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="1" draw:dots2-length="0.2cm"
+      draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    
+    <draw:stroke-dash draw:name="long_20_dash_20_dot" draw:display-name="long dash dot"
+      draw:style="rect" draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    
+    <draw:stroke-dash draw:name="long_20_dash_20_dot_20_dot" draw:display-name="long dash dot dot" draw:style="rect" draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="2"
+      draw:distance="0.1cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
   </xsl:template>
 
 </xsl:stylesheet>
