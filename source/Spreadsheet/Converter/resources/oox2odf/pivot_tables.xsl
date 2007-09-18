@@ -50,7 +50,6 @@
       <xsl:call-template name="PivotSheets"/>
     </xsl:variable>
 
-
     <xsl:if test="$pivotSheets !=''">
       <table:data-pilot-tables>
         <xsl:call-template name="CreatePilotTables">
@@ -62,7 +61,6 @@
   </xsl:template>
 
   <xsl:template name="PivotSheets">
-
     <!-- @Description: Searches for all Pivot tables  within workbook and starts conversion. -->
     <!-- @Context: None -->
 
@@ -106,6 +104,7 @@
 
   </xsl:template>
 
+  <!-- search  target Pivot file-->
   <xsl:template name="InsertSheetPilotTables">
     <xsl:param name="sheetNum"/>
 
@@ -126,7 +125,6 @@
 
       <xsl:if
         test="document(concat('xl/',substring-after($TargetPilotFile,'../')))/e:pivotTableDefinition">
-
         <xsl:for-each
           select="document(concat('xl/',substring-after($TargetPilotFile,'../')))/e:pivotTableDefinition">
 
@@ -213,7 +211,6 @@
 
             <!-- insert pilot table source range -->
             <xsl:for-each select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition">
-
               <xsl:for-each select="e:cacheSource/e:worksheetSource">
 
                 <xsl:variable name="firstSourceAdress">
@@ -232,8 +229,102 @@
                     />
                   </xsl:attribute>
 
-                </table:source-cell-range>
+                  <!-- Insert Filters-->
+                  <xsl:for-each
+                    select="document(concat('xl/',substring-after($TargetPilotFile,'../')))/e:pivotTableDefinition/e:filters">
 
+                    <table:filter table:condition-source-range-address="">
+                      <table:filter-or>
+
+                        <xsl:for-each
+                          select="document(concat('xl/',substring-after($TargetPilotFile,'../')))/e:pivotTableDefinition/e:filters/e:filter">
+                          <xsl:variable name="labelFilterNum">
+                            <xsl:value-of select="@fld"/>
+                          </xsl:variable>
+
+                          <xsl:choose>
+                            <xsl:when
+                              test="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                              <xsl:for-each
+                                select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                                <table:filter-condition>
+                                  <xsl:attribute name="table:operator">
+                                    <xsl:call-template name="TranslateFilterOperator"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="table:field-number">
+                                    <xsl:value-of select="$labelFilterNum"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="table:value">
+                                    <xsl:call-template name="TranslateFilterValue"/>
+                                  </xsl:attribute>
+                                </table:filter-condition>
+                              </xsl:for-each>
+                            </xsl:when>
+
+                            <xsl:when test="e:autoFilter/e:filterColumn/e:top10">
+                              <xsl:message terminate="no">translation.oox2odf.PivotFilter</xsl:message>
+                            </xsl:when>
+
+                            <xsl:when test="count(e:filters/e:filter) &gt; 1">
+                              <table:filter-or>
+                                <xsl:for-each select="e:filters/e:filter">
+                                  <table:filter-condition table:operator="=">
+                                    <xsl:attribute name="table:field-number">
+                                      <xsl:value-of select="$labelFilterNum"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="table:value">
+                                      <xsl:value-of select="@val"/>
+                                    </xsl:attribute>
+                                  </table:filter-condition>
+                                </xsl:for-each>
+                              </table:filter-or>
+                            </xsl:when>
+
+                            <xsl:when test="e:autoFilter/e:filterColumn/e:customFilters/@and = 1">
+                              <table:filter-and>
+                                <xsl:for-each
+                                  select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                                  <table:filter-condition>
+                                    <xsl:attribute name="table:operator">
+                                      <xsl:call-template name="TranslateFilterOperator"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="table:field-number">
+                                      <xsl:value-of select="$labelFilterNum"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="table:value">
+                                      <xsl:call-template name="TranslateFilterValue"/>
+                                    </xsl:attribute>
+                                  </table:filter-condition>
+                                </xsl:for-each>
+                              </table:filter-and>
+                            </xsl:when>
+
+                            <xsl:when
+                              test="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                              <xsl:for-each
+                                select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                                <table:filter-condition>
+                                  <xsl:attribute name="table:operator">
+                                    <xsl:call-template name="TranslateFilterOperator"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="table:field-number">
+                                    <xsl:value-of select="$labelFilterNum"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="table:value">
+                                    <xsl:call-template name="TranslateFilterValue"/>
+                                  </xsl:attribute>
+                                </table:filter-condition>
+                              </xsl:for-each>
+                            </xsl:when>
+
+                          </xsl:choose>
+                        </xsl:for-each>
+
+                      </table:filter-or>
+                    </table:filter>
+                  </xsl:for-each>
+
+                </table:source-cell-range>
               </xsl:for-each>
             </xsl:for-each>
 
@@ -255,19 +346,18 @@
                       <xsl:when test="number(translate(@name, ',' , '.' ))">
 
                         <xsl:variable name="replaceDecimal">
-                          <xsl:value-of select="format-number(translate(@name, ',' , '.' ),'0.##')"
-                          />
+                          <xsl:value-of select="format-number(translate(@name, ',' , '.' ),'0.##')"/>
                         </xsl:variable>
 
                         <xsl:value-of select="translate($replaceDecimal, '.' , ',' )"/>
                       </xsl:when>
+                      
                       <xsl:otherwise>
                         <xsl:value-of select="@name"/>
                       </xsl:otherwise>
                     </xsl:choose>
 
                   </xsl:attribute>
-
                 </xsl:for-each>
 
                 <xsl:attribute name="table:used-hierarchy">
@@ -296,7 +386,6 @@
                     </xsl:when>
 
                     <xsl:otherwise>
-
                       <xsl:for-each
                         select="parent::node()/parent::node()/e:dataFields/e:dataField[@fld=$fieldNum - 1]">
 
@@ -344,10 +433,10 @@
                           <xsl:otherwise>
                             <xsl:text>sum</xsl:text>
                           </xsl:otherwise>
+                          
                         </xsl:choose>
 
                       </xsl:for-each>
-
                     </xsl:otherwise>
 
                   </xsl:choose>
@@ -451,6 +540,143 @@
                     <xsl:text>false</xsl:text>
                   </xsl:attribute>
 
+
+                  <xsl:if test="e:items/child::node()/@h">
+
+                    <table:data-pilot-members>
+
+                      <xsl:for-each select="e:items/e:item[@x and @h='1']">
+
+                        <xsl:variable name="hiddenFieldNum">
+                          <xsl:value-of select="@x"/>
+                        </xsl:variable>
+
+                        <xsl:variable name="hiddenCacheValue">
+                          <xsl:for-each
+                            select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum]/e:sharedItems">
+                            <xsl:value-of
+                              select="child::node()[position() = $hiddenFieldNum + 1]/@v"/>
+                          </xsl:for-each>
+                        </xsl:variable>
+
+                        <table:data-pilot-member>
+
+                          <xsl:attribute name="table:name">
+                            <xsl:value-of select="$hiddenCacheValue"/>
+                          </xsl:attribute>
+
+                          <xsl:attribute name="table:display">
+                            <xsl:text>false</xsl:text>
+                          </xsl:attribute>
+
+                          <xsl:attribute name="table:show-details">
+                            <xsl:text>true</xsl:text>
+                          </xsl:attribute>
+
+                        </table:data-pilot-member>
+                      
+                      </xsl:for-each>
+
+                    </table:data-pilot-members>
+
+                  </xsl:if>
+
+                  <xsl:if
+                    test="@axis and(@sumSubtotal or @countSubtotal or @avgSubtotal or @maxSubtotal or @minSubtotal or @productSubtotal or @countSubtotal or @stdDevSubtotal or @stdDevPSubtotal or @varSubtotal or @varPSubtotal)">
+                    
+                    <table:data-pilot-subtotals>
+
+                      <xsl:if test="@sumSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>sum</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@countASubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>count</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@avgSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>average</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@maxSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>max</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@minSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>min</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@productSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>product</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@countSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>countnums</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@stdDevSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>stdev</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@stdDevPSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>stdevp</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@varSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>var</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                      <xsl:if test="@varPSubtotal">
+                        <table:data-pilot-subtotal>
+                          <xsl:attribute name="table:function">
+                            <xsl:text>varp</xsl:text>
+                          </xsl:attribute>
+                        </table:data-pilot-subtotal>
+                      </xsl:if>
+
+                    </table:data-pilot-subtotals>
+                  </xsl:if>
+                  
                   <table:data-pilot-display-info>
 
                     <xsl:attribute name="table:enabled">
@@ -460,25 +686,29 @@
                     <xsl:attribute name="table:display-member-mode">
                       <xsl:text>from-top</xsl:text>
                     </xsl:attribute>
-
-                    <!--xsl:attribute name="table:member-count">
-                         </xsl:attribute>
-                                            
-                         <xsl:attribute name="table:data-field">
-                          </xsl:attribute-->
-
+                
                   </table:data-pilot-display-info>
 
                   <table:data-pilot-sort-info>
 
-                    <xsl:if test="parent::node()/e:pivotField[1]/@sortType">
+                    <xsl:if test="parent::node()/e:pivotField[@axis][1]/@sortType">
                       <xsl:attribute name="table:order">
-                        <xsl:value-of select="parent::node()/e:pivotField[1]/@sortType"/>
+                        <xsl:value-of select="parent::node()/e:pivotField[@axis][1]/@sortType"/>
                       </xsl:attribute>
                     </xsl:if>
 
                     <xsl:attribute name="table:sort-mode">
-                      <xsl:text>manual</xsl:text>
+                      <xsl:choose>
+                        <xsl:when test="e:pivotField/@sortType|@axis">
+                          <xsl:text>name</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="e:pivotField/@axis">
+                          <xsl:text>manual</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:text>none</xsl:text>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:attribute>
 
                   </table:data-pilot-sort-info>
@@ -498,7 +728,8 @@
                 </table:data-pilot-level>
 
               </table:data-pilot-field>
-
+                
+              <!-- put empty field after Row Label or Column Label-->
               <xsl:if test="@axis and not (following-sibling::e:pivotField/@axis)">
                 <table:data-pilot-field table:source-field-name="">
 
@@ -538,6 +769,63 @@
         </xsl:for-each>
       </xsl:if>
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="TranslateFilterOperator">
+
+    <xsl:choose>
+      <xsl:when test="substring(@val,1,1) = '*' or substring(@val,string-length(@val),1) = '*' ">
+        <xsl:if test="@operator = 'notEqual' ">
+          <xsl:text>!</xsl:text>
+        </xsl:if>
+        <xsl:text>match</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'notEqual' ">
+        <xsl:text>!=</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'greaterThan' ">
+        <xsl:text>&gt;</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'greaterThanOrEqual' ">
+        <xsl:text>&gt;=</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'lessThan' ">
+        <xsl:text>&lt;</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'lessThanOrEqual' ">
+        <xsl:text>&lt;=</xsl:text>
+      </xsl:when>
+      <xsl:when test="not(@operator)">
+        <xsl:text>=</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="TranslateFilterValue">
+    <xsl:choose>
+      <!-- contains -->
+      <xsl:when test="substring(@val,1,1) = '*' and substring(@val,string-length(@val),1) = '*' ">
+        <xsl:text>.</xsl:text>
+        <xsl:value-of select="substring(@val,1,string-length(@val)-1)"/>
+        <xsl:text>.*</xsl:text>
+      </xsl:when>
+      <!-- begins with -->
+      <xsl:when test="substring(@val,string-length(@val),1) = '*' ">
+        <xsl:text>^</xsl:text>
+        <xsl:value-of select="substring(@val,1,string-length(@val)-1)"/>
+        <xsl:text>.*</xsl:text>
+      </xsl:when>
+      <!-- ends with -->
+      <xsl:when test="substring(@val,1,1) = '*' ">
+        <xsl:text>.</xsl:text>
+        <xsl:value-of select="@val"/>
+        <xsl:text>$</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@val"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>
