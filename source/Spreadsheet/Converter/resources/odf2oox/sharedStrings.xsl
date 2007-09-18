@@ -176,19 +176,50 @@
   </xsl:template>
 
   <xsl:template match="text:s" mode="text">
-    <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
-      <xsl:attribute name="pxs:c">
-        <xsl:choose>
-          <xsl:when test="@text:c">
-            <xsl:value-of select="@text:c"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>1</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </pxs:s>
+
+    <xsl:call-template name="InsertRepeatSpaces">
+      <xsl:with-param name="nr">
+        <xsl:text>1</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="repeat">
+        <xsl:value-of select="@text:c"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    
   </xsl:template>
+  
+  <xsl:template match="text:s" mode="run">
+    
+    <xsl:call-template name="InsertRepeatSpaces">
+      <xsl:with-param name="nr">
+        <xsl:text>1</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="repeat">
+        <xsl:value-of select="@text:c"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    
+  </xsl:template>
+  
+  <xsl:template name="InsertRepeatSpaces">
+    <xsl:param name="nr"/>
+    <xsl:param name="repeat"/>
+    
+    <xsl:text> </xsl:text>
+    
+    <xsl:if test="$nr &lt; $repeat">
+      <xsl:call-template name="InsertRepeatSpaces">
+        <xsl:with-param name="nr">
+          <xsl:value-of select="$nr+1"/>
+        </xsl:with-param>
+        <xsl:with-param name="repeat">
+          <xsl:value-of select="$repeat"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
+  </xsl:template>
+  
 
   <!-- when there are more than one line of text, enter must be added -->
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="run">
