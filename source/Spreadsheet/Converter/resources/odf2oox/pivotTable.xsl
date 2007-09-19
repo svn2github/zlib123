@@ -163,13 +163,153 @@
           <xsl:value-of select="$endCol - $startCol + 1"/>
         </xsl:attribute-->
 
-        <!-- pivotFields have names, the one field without name (definition?) can occur not only on the first place -->
-        <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+        <xsl:variable name="names">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
+            <xsl:value-of select="@table:source-field-name"/>
+          </xsl:for-each>
+        </xsl:variable>
 
-          <pivotField showAll="0">
-
-            <!-- field orientation -->
+        <xsl:variable name="axes">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
             <xsl:choose>
+              <xsl:when test="@table:orientation = 'page' ">
+                <xsl:text>axisPage</xsl:text>
+              </xsl:when>
+              <xsl:when test="@table:orientation = 'column' ">
+                <xsl:text>axisCol</xsl:text>
+              </xsl:when>
+              <xsl:when test="@table:orientation = 'row' ">
+                <xsl:text>axisRow</xsl:text>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="sort">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
+            <xsl:choose>
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-sort-info[@table:order = 'descending' and @table:sort-mode != 'manual' and @table:sort-mode != 'none']">
+                <xsl:text>descending</xsl:text>
+              </xsl:when>
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-sort-info[@table:order = 'ascending' and @table:sort-mode != 'manual' and @table:sort-mode != 'none'] ">
+                <xsl:text>ascending</xsl:text>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="hide">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
+            <xsl:if
+              test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
+              <xsl:text>;</xsl:text>
+              <xsl:for-each
+                select="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
+                <xsl:value-of select="@table:name"/>
+                <xsl:text>;</xsl:text>
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="subtotals">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
+
+            <xsl:if
+              test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
+              <xsl:text>;</xsl:text>
+
+              <xsl:for-each
+                select="table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]">
+
+                <xsl:choose>
+                  <xsl:when test="@table:function = 'sum' ">
+                    <xsl:text>sum</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'count' ">
+                    <xsl:text>count</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'average' ">
+                    <xsl:text>average</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'max' ">
+                    <xsl:text>max</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'min' ">
+                    <xsl:text>min</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'product' ">
+                    <xsl:text>productSubtotal</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'countnums' ">
+                    <xsl:text>countnums</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'stdev' ">
+                    <xsl:text>stdev</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'stdevp' ">
+                    <xsl:text>stdevp</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'var' ">
+                    <xsl:text>var</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'varp' ">
+                    <xsl:text>varp</xsl:text>
+                  </xsl:when>
+                </xsl:choose>
+                <xsl:text>;</xsl:text>
+
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <pxsi:pivotFields>
+          <xsl:attribute name="pxsi:names">
+            <xsl:value-of select="$names"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="pxsi:axes">
+            <xsl:value-of select="$axes"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="pxsi:sort">
+            <xsl:value-of select="$sort"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="pxsi:hide">
+            <xsl:value-of select="$hide"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="pxsi:subtotals">
+            <xsl:value-of select="$subtotals"/>
+          </xsl:attribute>
+        </pxsi:pivotFields>
+
+        <!-- pivotFields have names, the one field without name (definition?) can occur not only on the first place -->
+        <!--xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+
+          <pivotField showAll="0"-->
+
+        <!-- field orientation -->
+        <!--xsl:choose>
               <xsl:when test="@table:orientation = 'page' ">
                 <xsl:attribute name="axis">
                   <xsl:text>axisPage</xsl:text>
@@ -281,11 +421,11 @@
             </xsl:choose>
 
             <xsl:if test="not(@table:orientation = 'data')">
-              <items>
-                <!-- w tym miejscu trzeba dodać do postprocesora, ze jesli wystepuje 
+              <items-->
+        <!-- w tym miejscu trzeba dodać do postprocesora, ze jesli wystepuje 
                         table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]
                   to dla każdego @table:function stworzyć <item t='wartosc_funkcji'>-->
-                <!-- 
+        <!-- 
                   z   'sum'             na     'sum'
                   z   'count'           na     'countA'
                   z   'average'      na     'avg'
@@ -298,7 +438,7 @@
                   z   'var'             na     'var'
                   z   'varp'           na     'varP'
                 -->
-                <pxsi:items pxsi:field="{@table:source-field-name}">
+        <!--pxsi:items pxsi:field="{@table:source-field-name}">
                   <xsl:if
                     test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
                     <xsl:attribute name="pxsi:hide">
@@ -316,7 +456,7 @@
             </xsl:if>
 
           </pivotField>
-        </xsl:for-each>
+        </xsl:for-each-->
 
         <xsl:variable name="sourceStartCol">
           <xsl:call-template name="GetColNum">
@@ -337,17 +477,6 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-
-        <xsl:if
-          test="$sourceStartCol + count(table:data-pilot-field[@table:source-field-name != '' ]) != $sourceEndCol">
-          <xsl:call-template name="InsertNotUsedFields">
-            <xsl:with-param name="count">
-              <xsl:value-of
-                select="$sourceEndCol - $sourceStartCol + 1 - count(table:data-pilot-field[@table:source-field-name != '' ])"
-              />
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
 
       </pivotFields>
 
@@ -375,11 +504,7 @@
               </xsl:when>
               <xsl:when test="@table:source-field-name != '' ">
                 <field>
-                  <xsl:attribute name="x">
-                    <xsl:value-of
-                      select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
-                    />
-                  </xsl:attribute>
+                  <pxsi:fieldPos pxsi:name="{@table:source-field-name}" pxsi:attribute="x"/>
                 </field>
               </xsl:when>
             </xsl:choose>
@@ -403,11 +528,7 @@
               </xsl:when>
               <xsl:when test="@table:source-field-name != '' ">
                 <field>
-                  <xsl:attribute name="x">
-                    <xsl:value-of
-                      select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
-                    />
-                  </xsl:attribute>
+                  <pxsi:fieldPos pxsi:name="{@table:source-field-name}" pxsi:attribute="x"/>
                 </field>
               </xsl:when>
             </xsl:choose>
@@ -420,15 +541,8 @@
         <pageFields>
           <xsl:for-each select="table:data-pilot-field[@table:orientation = 'page' ]">
             <pageField hier="-1">
-              <xsl:variable name="field">
-                <xsl:value-of
-                  select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
-                />
-              </xsl:variable>
 
-              <xsl:attribute name="fld">
-                <xsl:value-of select="$field"/>
-              </xsl:attribute>
+              <pxsi:fieldPos pxsi:name="{@table:source-field-name}" pxsi:attribute="fld"/>
 
               <xsl:if test="@table:selected-page">
                 <pxsi:pageItem>
@@ -456,12 +570,6 @@
             <dataField>
               <xsl:attribute name="name">
                 <xsl:value-of select="@table:source-field-name"/>
-              </xsl:attribute>
-
-              <xsl:attribute name="fld">
-                <xsl:value-of
-                  select="count(preceding-sibling::table:data-pilot-field[@table:source-field-name != '' ])"
-                />
               </xsl:attribute>
 
               <xsl:if test="@table:function != 'sum' ">
@@ -534,7 +642,9 @@
               <xsl:attribute name="baseItem">
                 <xsl:text>0</xsl:text>
               </xsl:attribute>
-
+              
+              <pxsi:fieldPos pxsi:name="{@table:source-field-name}" pxsi:attribute="fld"/>
+              
             </dataField>
           </xsl:for-each>
         </dataFields>
@@ -569,41 +679,9 @@
         </worksheetSource>
       </cacheSource>
 
-      <cacheFields count="{count(table:data-pilot-field[@table:source-field-name != ''])}">
-        <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
-          <cacheField>
-            <xsl:attribute name="name">
-              <xsl:value-of select="@table:source-field-name"/>
-            </xsl:attribute>
+      <cacheFields>
 
-            <sharedItems>
-              <pxsi:sharedItems>
-                <xsl:attribute name="pxsi:fieldType">
-                  <xsl:choose>
-                    <xsl:when test="@table:orientation = 'data'">
-                      <xsl:text>data</xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:text>axis</xsl:text>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
-
-                <xsl:attribute name="pxsi:fieldName">
-                  <xsl:value-of select="@table:source-field-name"/>
-                </xsl:attribute>
-
-              </pxsi:sharedItems>
-            </sharedItems>
-
-          </cacheField>
-        </xsl:for-each>
-
-        <pxsi:sharedItems>
-          <xsl:attribute name="pxsi:fieldType">
-            <xsl:text>empty</xsl:text>
-          </xsl:attribute>
-        </pxsi:sharedItems>
+        <pxsi:cacheFields/>
 
       </cacheFields>
 
@@ -614,7 +692,9 @@
     <!-- @Context: table:data-pilot-table -->
 
     <pivotCacheRecords>
+
       <pxsi:cacheRecords/>
+
     </pivotCacheRecords>
 
   </xsl:template>
@@ -1011,21 +1091,6 @@
 
   <xsl:template match="text()" mode="pivot">
     <xsl:value-of select="."/>
-  </xsl:template>
-
-  <xsl:template name="InsertNotUsedFields">
-    <xsl:param name="count"/>
-    <xsl:param name="loop" select="0"/>
-
-    <xsl:if test="$loop != $count">
-      <pivotField showAll="0"/>
-
-      <xsl:call-template name="InsertNotUsedFields">
-        <xsl:with-param name="count" select="$count"/>
-        <xsl:with-param name="loop" select="$loop + 1"/>
-      </xsl:call-template>
-    </xsl:if>
-
   </xsl:template>
 
 </xsl:stylesheet>

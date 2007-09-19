@@ -478,6 +478,7 @@
             </xsl:variable>
 
             <!-- do not duplicate the same source range cache -->
+            <!-- due to postprocessor requirements cache definition must be created after pivot table -->
             <xsl:if
               test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
               <xsl:call-template name="CreateCacheDefinition"/>

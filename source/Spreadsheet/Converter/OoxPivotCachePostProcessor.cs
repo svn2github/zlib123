@@ -56,8 +56,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private bool isRowEnd;
         private string cacheRowEnd;
         private string[,] pivotTable;
-        private Hashtable[,] fieldItems;
         private Hashtable[] fieldNames;
+        private Hashtable[,] fieldItems;
         //fieldItems[i,j] (dimesion i equals number of pivotFields, dimesion j equals 2) 
         //fieldItems variable for each pivotField contains hashtable with unique values of this pivotField and a sequential number
         //at fieldItems[i,0] pivotField[i] values are the key and sequential number are the key values
@@ -66,32 +66,44 @@ namespace CleverAge.OdfConverter.Spreadsheet
         //<pxsi:pivotCell> variables
         private bool isInPivotCell;
         private Hashtable pivotCells;
+        private Hashtable pivotCellsText;
         private bool isPivotCellSheet;
         private string pivotCellSheet;
         private bool isPivotCellCol;
         private string pivotCellCol;
         private bool isPivotCellRow;
         private string pivotCellRow;
+        private bool isInPivotCellVal;
         private string pivotCellVal;
-
-        //<pxsi:sharedItems> variables
-        private bool isInSharedItems;
-        private bool isFieldType;
-        private string fieldType; //{"axis", "data" or "empty"}
-        private bool isFieldName;
-        private string fieldName;
-        private string cacheFields;
+        private bool isInPivotCellText;
+        private string pivotCellText;
 
         //<pxsi:cacheRecords> variables
         private bool isInCacheRecords;
 
-        //<pxsi:items> variables
-        private bool isInItems;
-        private bool isItemsFieldName;
-        private string itemsFieldName;
-        private bool isItemsHide;
-        private string itemsHide;
+        //<pxsi:pivotFields> variables
+        private bool isInPivotFields;
+        private bool isPivotNames;
+        private string pivotNames;
+        private bool isPivotAxes;
+        private string pivotAxes;
+        private bool isPivotSort;
+        private string pivotSort;
+        private bool isPivotHide;
+        private string pivotHide;
+        private bool isPivotSubtotals;
+        private string pivotSubtotals;
 
+        //<pxsi:cacheFields> variables
+        private bool isInCacheFields;
+        
+        //<pxsi:fieldPos> variables
+        private bool isInFieldPos;
+        private bool isFieldPosName;
+        private string fieldPosName;
+        private bool isFieldPosAttribute;
+        private string fieldPosAttribute;
+        
         //<pxsi:pageItem> variables
         private bool isInPageItem;
         private bool isPageField;
@@ -126,26 +138,38 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.pivotCellCol = "";
             this.isPivotCellRow = false;
             this.pivotCellRow = "";
+            this.isInPivotCellVal = false;
             this.pivotCellVal = "";
+            this.isInPivotCellText = false;
+            this.pivotCellText = "";
             this.pivotCells = new Hashtable();
-
-            //<pxsi:sharedItems> variables
-            this.isInSharedItems = false; ;
-            this.isFieldType = false; ;
-            this.fieldType = "";
-            this.isFieldName = false;
-            this.fieldName = "";
-            this.cacheFields = ",";
+            this.pivotCellsText = new Hashtable();
 
             //<pxsi:cacheRecords> variables
             this.isInCacheRecords = false;
 
-            //<pxsi:items> variables
-            this.isInItems = false;
-            this.isItemsFieldName = false;
-            this.itemsFieldName = "";
-            this.isItemsHide = false;
-            this.itemsHide = "";
+            //<pxsi:pivotFields> variables
+            this.isInPivotFields = false;
+            this.isPivotNames = false;
+            this.pivotNames = "";
+            this.isPivotAxes = false;
+            this.pivotAxes = "";
+            this.isPivotSort = false;
+            this.pivotSort = "";
+            this.isPivotHide = false;
+            this.pivotHide = "";
+            this.isPivotSubtotals = false;
+            this.pivotSubtotals = "";
+
+            //<pxsi:cacheFields> variables
+            this.isInCacheFields = false;
+
+            //<pxsi:fieldPos> variables
+            this.isInFieldPos = false;
+            this.isFieldPosName = false;
+            this.fieldPosName = "";
+            this.isFieldPosAttribute = false;
+            this.fieldPosAttribute = "";
 
             //<pxsi:pageItem> variables
             this.isInPageItem = false;
@@ -164,7 +188,18 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.pivotContext.Push(new Element(prefix, localName, ns));
                 this.isInPivotCell = true;
                 this.isPxsi = true;
-                //Console.WriteLine("<PivotCell>");
+            }
+            else if (PXSI_NAMESPACE.Equals(ns) && "val".Equals(localName))
+            {
+                this.pivotContext.Push(new Element(prefix, localName, ns));
+                this.isInPivotCellVal = true;
+                //this is a child element of <pxsi:pivotCell> so do not modify isPxsi variable
+            }
+            else if (PXSI_NAMESPACE.Equals(ns) && "text".Equals(localName))
+            {
+                this.pivotContext.Push(new Element(prefix, localName, ns));
+                this.isInPivotCellText = true;
+                //this is child element of <pxsi:pivotCell> so do not modify isPxsi variable
             }
             else if (PXSI_NAMESPACE.Equals(ns) && "pivotTable".Equals(localName))
             {
@@ -172,32 +207,47 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.pivotContext.Push(new Element(prefix, localName, ns));
                 this.isInPivotTable = true;
                 this.isPxsi = true;
+
+                //reset <pxsi:pivotTable> variables
                 this.cacheSheetNum = "";
                 this.cacheColStart = "";
                 this.cacheColEnd = "";
                 this.cacheRowStart = "";
                 this.cacheRowEnd = "";
-                //Console.WriteLine("<PivotTable>");
+
+                //reset <pxsi:pivotFields> variables
+                this.pivotNames = "";
+                this.pivotAxes = "";
+                this.pivotSort = "";
+                this.pivotHide = "";
+                this.pivotSubtotals = "";
             }
-            else if (PXSI_NAMESPACE.Equals(ns) && "sharedItems".Equals(localName))
+            else if (PXSI_NAMESPACE.Equals(ns) && "pivotFields".Equals(localName))
             {
                 this.pivotContext = new Stack();
                 this.pivotContext.Push(new Element(prefix, localName, ns));
-                this.isInSharedItems = true;
+                this.isInPivotFields = true;
+                this.isPxsi = true;
+            }
+            else if (PXSI_NAMESPACE.Equals(ns) && "fieldPos".Equals(localName))
+            {
+                this.pivotContext = new Stack();
+                this.pivotContext.Push(new Element(prefix, localName, ns));
+                this.isInFieldPos = true;
                 this.isPxsi = true;
             }
             else if (PXSI_NAMESPACE.Equals(ns) && "cacheRecords".Equals(localName))
             {
                 this.pivotContext = new Stack();
-                this.pivotContext.Push(new Element(prefix, localName, ns)); 
+                this.pivotContext.Push(new Element(prefix, localName, ns));
                 this.isInCacheRecords = true;
                 this.isPxsi = true;
             }
-            else if (PXSI_NAMESPACE.Equals(ns) && "items".Equals(localName))
+            else if (PXSI_NAMESPACE.Equals(ns) && "cacheFields".Equals(localName))
             {
                 this.pivotContext = new Stack();
                 this.pivotContext.Push(new Element(prefix, localName, ns));
-                this.isInItems = true;
+                this.isInCacheFields = true;
                 this.isPxsi = true;
             }
             else if (PXSI_NAMESPACE.Equals(ns) && "pageItem".Equals(localName))
@@ -237,19 +287,28 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else if (PXSI_NAMESPACE.Equals(ns) && "sheetNum".Equals(localName))
                     this.isPivotCellSheet = true;
             }
-            else if (isInSharedItems)
+            else if (isInPivotFields)
             {
-                if (PXSI_NAMESPACE.Equals(ns) && "fieldType".Equals(localName))
-                    this.isFieldType = true;
-                else if (PXSI_NAMESPACE.Equals(ns) && "fieldName".Equals(localName))
-                    this.isFieldName = true;
-            }
-            else if (isInItems)
-            {
-                if (PXSI_NAMESPACE.Equals(ns) && "field".Equals(localName))
-                    this.isItemsFieldName = true;
+                if (PXSI_NAMESPACE.Equals(ns) && "names".Equals(localName))
+                    this.isPivotNames = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "axes".Equals(localName))
+                    this.isPivotAxes = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "sort".Equals(localName))
+                    this.isPivotSort = true;
                 else if (PXSI_NAMESPACE.Equals(ns) && "hide".Equals(localName))
-                    this.isItemsHide = true;
+                    this.isPivotHide = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "subtotals".Equals(localName))
+                    this.isPivotSubtotals = true;
+            }
+            else if (isInCacheFields)
+            {
+            }
+            else if (isInFieldPos)
+            {
+                if (PXSI_NAMESPACE.Equals(ns) && "name".Equals(localName))
+                    this.isFieldPosName = true;
+                if (PXSI_NAMESPACE.Equals(ns) && "attribute".Equals(localName))
+                    this.isFieldPosAttribute = true;
             }
             else if (isInPageItem)
             {
@@ -287,22 +346,33 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.pivotCellRow += text;
                 else if (isPivotCellSheet)
                     this.pivotCellSheet += text;
-                else
+                else if (isInPivotCellVal)
                     this.pivotCellVal += text;
+                else if (isInPivotCellText)
+                    this.pivotCellText += text;
             }
-            else if (isInSharedItems)
+            else if (isInPivotFields)
             {
-                if (isFieldType)
-                    this.fieldType += text;
-                else if (isFieldName)
-                    this.fieldName += text;
+                if (isPivotNames)
+                    this.pivotNames += text;
+                else if (isPivotAxes)
+                    this.pivotAxes += text;
+                else if (isPivotSort)
+                    this.pivotSort += text;
+                else if (isPivotHide)
+                    this.pivotHide += text;
+                else if (isPivotSubtotals)
+                    this.pivotSubtotals += text;
             }
-            else if (isInItems)
+            else if (isInCacheFields)
             {
-                if (isItemsFieldName)
-                    this.itemsFieldName += text;
-                else if (isItemsHide)
-                    this.itemsHide += text;
+            }
+            else if (isInFieldPos)
+            {
+                if (isFieldPosName)
+                    this.fieldPosName += text;
+                if (isFieldPosAttribute)
+                    this.fieldPosAttribute += text;
             }
             else if (isInPageItem)
             {
@@ -336,14 +406,23 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.isPivotCellRow = false;
             else if (isPivotCellSheet)
                 this.isPivotCellSheet = false;
-            else if (isFieldType)
-                this.isFieldType = false;
-            else if (isFieldName)
-                this.isFieldName = false;
-            else if (isItemsFieldName)
-                this.isItemsFieldName = false;
-            else if (isItemsHide)
-                this.isItemsHide = false;
+            else if (isPivotNames)
+                this.isPivotNames = false;
+            else if (isPivotAxes)
+                this.isPivotAxes = false;
+            else if (isPivotSort)
+                this.isPivotSort = false;
+            else if (isPivotHide)
+                this.isPivotHide = false;
+            else if (isPivotSubtotals)
+                this.isPivotSubtotals = false;
+            else if (isInCacheFields)
+            {
+            }
+            else if (isFieldPosName)
+                this.isFieldPosName = false;
+            else if (isFieldPosAttribute)
+                this.isFieldPosAttribute = false;
             else if (isPageField)
                 this.isPageField = false;
             else if (isPageItem)
@@ -364,7 +443,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.pivotTable = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
                     CreatePivotTable(Convert.ToInt32(cacheSheetNum),Convert.ToInt32(cacheRowStart),Convert.ToInt32(cacheRowEnd),Convert.ToInt32(cacheColStart),Convert.ToInt32(cacheColEnd));
 
-                    foreach (string key in fieldNames[0].Keys)
+                    //foreach (string key in fieldNames[0].Keys)
                         //Console.WriteLine("\t - " + key + ":" + fieldNames[0][key].ToString()); 
                     
                     this.isInPivotTable = false;
@@ -377,99 +456,210 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotCell".Equals(element.Name))
                 {
                     pivotCells.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellVal);
+                    pivotCellsText.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellText);
 
                     this.isInPivotCell = false;
                     this.pivotCellSheet = "";
                     this.pivotCellCol = "";
                     this.pivotCellRow = "";
                     this.pivotCellVal = "";
+                    this.pivotCellText = "";
                     this.isPxsi = false;
                 }
-                else if (PXSI_NAMESPACE.Equals(element.Ns) && "sharedItems".Equals(element.Name))
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "val".Equals(element.Name))
                 {
+                    this.isInPivotCellVal = false;
+                    //this is a child element of <pxsi:pivotCell> so do not modify isPxsi variable
+                    //pivotCellVal variable is handled by <pxsi:pivotCell> end element method
+                }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "text".Equals(element.Name))
+                {
+                    this.isInPivotCellText = false;
+                    //this is a child element of <pxsi:pivotCell> so do not modify isPxsi variable
+                    //pivotCellText variable is handled by <pxsi:pivotCell> end element method
+                }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotFields".Equals(element.Name))
+                {
+                    int nameNum;
 
-                    //store in cacheFields variable processed field names
-                    if (!"empty".Equals(fieldType))
-                        this.cacheFields += fieldName + ",";
+                    //Console.WriteLine(pivotNames);
+                    //Console.WriteLine(pivotAxes);
+                    //Console.WriteLine(pivotSort);
+                    //Console.WriteLine(pivotHide);
+                    //Console.WriteLine(pivotSubtotals);
 
-                    if("date".Equals(fieldType))
+                    string[] names = pivotNames.Split('~');
+                    string[] axes = pivotAxes.Split('~');
+                    string[] sort = pivotSort.Split('~');
+                    string[] hide = pivotHide.Split('~');
+                    string[] subtotals = pivotSubtotals.Split('~');
+
+                    //Console.WriteLine("names: " + fieldNames[1].Count);
+                    //for each cache column output <pivotField> element
+                    for (int col = 0; col < fieldNames[1].Count; col++)
                     {
-                        int field = Convert.ToInt32(fieldNames[0][fieldName]);
-                        //Console.WriteLine(fieldName + ": " + field.ToString());
+                        //get field name
+                        string name = fieldNames[1][col].ToString();
 
-                        InsertSharedItemAttributes(field);
-                    }
-                    else if ("axis".Equals(fieldType))
-                    {
-                        int field = Convert.ToInt32(fieldNames[0][fieldName]);
-                        //Console.WriteLine(fieldName + ": " + field.ToString());
+                        //search position of field with this name inside <table:data-pilot-table>
+                        //field with empty name is not counted
+                        nameNum = -1;
+                        for (int i = 0; i < names.Length; i++)
+                        {
+                            if (name == names[i])
+                                nameNum = i;
+                        }
 
-                        InsertSharedItemAttributes(field);
+                        this.nextWriter.WriteStartElement("pivotField", EXCEL_NAMESPACE);
 
-                        //insert "count" attribute
-                        this.nextWriter.WriteStartAttribute("count");
-                        this.nextWriter.WriteString((string)this.fieldItems[field, 0].Count.ToString());
+                        //insert showAll attribute
+                        this.nextWriter.WriteStartAttribute("showAll");
+                        this.nextWriter.WriteString("0");
                         this.nextWriter.WriteEndAttribute();
 
-                        for (int i = 0; i < this.fieldItems[field, 1].Count; i++)
+                        //if field is in use insert dateField or axis attribute
+                        if (nameNum != -1)
                         {
-
-                            // <e> - error, <d> - date and <b> - bool not handled for now
-
-                            try
+                            if (!"".Equals(axes[nameNum]))
                             {
-                                //if field value is a number
-                                Convert.ToDouble(this.fieldItems[field, 1][i].ToString().Replace('.', ','));
-                                this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
-                                this.nextWriter.WriteStartAttribute("v");
-                                this.nextWriter.WriteString(this.fieldItems[field, 1][i].ToString());
+                                this.nextWriter.WriteStartAttribute("axis");
+                                this.nextWriter.WriteString(axes[nameNum]);
                                 this.nextWriter.WriteEndAttribute();
                             }
-                            catch
+                            else
                             {
-                                //if field value is a string
-                                if (this.fieldItems[field, 1][i].ToString().Length == 0)
-                                    //blank value
-                                    this.nextWriter.WriteStartElement("m", EXCEL_NAMESPACE);
-                                else
-                                {
-                                    this.nextWriter.WriteStartElement("s", EXCEL_NAMESPACE);
-                                    this.nextWriter.WriteStartAttribute("v");
-                                    this.nextWriter.WriteString(this.fieldItems[field, 1][i].ToString());
-                                    this.nextWriter.WriteEndAttribute();
-                                }
+                                this.nextWriter.WriteStartAttribute("dataField");
+                                this.nextWriter.WriteString("1");
+                                this.nextWriter.WriteEndAttribute();
                             }
-
-                            this.nextWriter.WriteEndElement();
                         }
-                    }
-                    else if ("empty".Equals(fieldType))
-                    {
-                        Console.WriteLine(cacheFields);
 
-                        foreach (string key in fieldNames[0].Keys)
+                        //if field is in axis location then output <item> elements
+                        if (nameNum != -1)
                         {
-                            if (!cacheFields.Contains("," + key + ","))
+                            if (!"".Equals(axes[nameNum]))
                             {
-                                int field = Convert.ToInt32(fieldNames[0][key]);
+                                this.nextWriter.WriteStartElement("items", EXCEL_NAMESPACE);
+                                OutputItems(name);
 
-                                this.nextWriter.WriteStartElement("cacheField", EXCEL_NAMESPACE);
-                                    this.nextWriter.WriteStartAttribute("name");
-                                    this.nextWriter.WriteString(key);
-                                    this.nextWriter.WriteEndAttribute();
-                                
-                                    this.nextWriter.WriteStartElement("sharedItems", EXCEL_NAMESPACE);
-                                    InsertSharedItemAttributes(field);
-                                    this.nextWriter.WriteEndElement();
+                                this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
+                                this.nextWriter.WriteStartAttribute("t");
+                                this.nextWriter.WriteString("default");
+                                this.nextWriter.WriteEndAttribute();
+                                this.nextWriter.WriteEndElement();
 
                                 this.nextWriter.WriteEndElement();
                             }
                         }
+
+                        this.nextWriter.WriteEndElement();
+
                     }
 
-                    this.isInSharedItems = false;
-                    this.fieldName = "";
-                    this.fieldType = "";
+                    this.isInPivotFields = false;
+                    //do not reset <pxsi:pivotFields> variables as they are being used further
+                    this.isPxsi = false;
+                }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "cacheFields".Equals(element.Name))
+                {
+                    int nameNum;
+                    string[] names = pivotNames.Split('~');
+                    string[] axes = pivotAxes.Split('~');
+
+                    Console.WriteLine(pivotNames);
+                    Console.WriteLine(pivotAxes);
+
+                    Console.WriteLine("names: " + fieldNames[1].Count);
+
+                    for (int col = 0; col < fieldNames[1].Count; col++)
+                    {
+                        //get field name
+                        string name = fieldNames[1][col].ToString();
+                        Console.WriteLine(name);
+
+                        //search position of field with this name inside <table:data-pilot-table>
+                        //field with empty name is not counted
+                        nameNum = -1;
+                        for (int i = 0; i < names.Length; i++)
+                        {
+                            if (name == names[i])
+                                nameNum = i;
+                        }
+
+                        this.nextWriter.WriteStartElement("cacheField", EXCEL_NAMESPACE);
+
+                        //insert showAll attribute
+                        this.nextWriter.WriteStartAttribute("name");
+                        this.nextWriter.WriteString(name);
+                        this.nextWriter.WriteEndAttribute();
+
+                            this.nextWriter.WriteStartElement("sharedItems", EXCEL_NAMESPACE);
+                            InsertSharedItemAttributes(col);
+                            
+                            //if field is in and this is axis field type insert <items>
+                            if (nameNum != -1)
+                            {
+                                if (!"".Equals(axes[nameNum]))
+                                {
+                                    //insert "count" attribute
+                                    this.nextWriter.WriteStartAttribute("count");
+                                    this.nextWriter.WriteString((string)this.fieldItems[nameNum, 0].Count.ToString());
+                                    this.nextWriter.WriteEndAttribute();
+
+                                    for (int i = 0; i < this.fieldItems[nameNum, 1].Count; i++)
+                                    {
+
+                                        // <e> - error, <d> - date and <b> - bool not handled for now
+
+                                        try
+                                        {
+                                            //if field value is a number
+                                            Convert.ToDouble(this.fieldItems[nameNum, 1][i].ToString().Replace('.', ','));
+                                            this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
+                                            this.nextWriter.WriteStartAttribute("v");
+                                            this.nextWriter.WriteString(this.fieldItems[nameNum, 1][i].ToString());
+                                            this.nextWriter.WriteEndAttribute();
+                                        }
+                                        catch
+                                        {
+                                            //if field value is a string
+                                            if (this.fieldItems[nameNum, 1][i].ToString().Length == 0)
+                                                //blank value
+                                                this.nextWriter.WriteStartElement("m", EXCEL_NAMESPACE);
+                                            else
+                                            {
+                                                this.nextWriter.WriteStartElement("s", EXCEL_NAMESPACE);
+                                                this.nextWriter.WriteStartAttribute("v");
+                                                this.nextWriter.WriteString(this.fieldItems[nameNum, 1][i].ToString());
+                                                this.nextWriter.WriteEndAttribute();
+                                            }
+                                        }
+
+                                        this.nextWriter.WriteEndElement();
+                                    }
+                                }
+                            }
+                            this.nextWriter.WriteEndElement();
+
+
+                        this.nextWriter.WriteEndElement();
+
+                    }
+                    this.isInCacheFields = false;
+                    this.isPxsi = false;
+                }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "fieldPos".Equals(element.Name))
+                {
+                    Console.WriteLine(fieldPosName);
+                    string fieldNum = fieldNames[0][this.fieldPosName].ToString();
+
+                    this.nextWriter.WriteStartAttribute(this.fieldPosAttribute);
+                    this.nextWriter.WriteString(fieldNum);
+                    this.nextWriter.WriteEndAttribute();
+
+                    this.fieldPosName = "";
+                    this.fieldPosAttribute = "";
+                    this.isInFieldPos = false;
                     this.isPxsi = false;
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "cacheRecords".Equals(element.Name))
@@ -481,14 +671,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                     for (int row = 0; row < rows; row++)
                     {
-                        this.nextWriter.WriteStartElement("r",EXCEL_NAMESPACE);
+                        this.nextWriter.WriteStartElement("r", EXCEL_NAMESPACE);
                         for (int col = 0; col < cols; col++)
                         {
                             try
                             {
                                 //if this is number value
-                                Convert.ToDouble(pivotTable[row, col].Replace('.',','));
-                                this.nextWriter.WriteStartElement("n",EXCEL_NAMESPACE);
+                                Convert.ToDouble(pivotTable[row, col].Replace('.', ','));
+                                this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
                                 this.nextWriter.WriteStartAttribute("v");
                                 this.nextWriter.WriteString(pivotTable[row, col]);
                                 this.nextWriter.WriteEndAttribute();
@@ -497,97 +687,26 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             catch
                             {
                                 //if this is string value
-                                this.nextWriter.WriteStartElement("x",EXCEL_NAMESPACE);
+                                this.nextWriter.WriteStartElement("x", EXCEL_NAMESPACE);
                                 this.nextWriter.WriteStartAttribute("v");
                                 value = pivotTable[row, col];
                                 this.nextWriter.WriteString(this.fieldItems[col, 0][value].ToString());
                                 this.nextWriter.WriteEndAttribute();
                                 this.nextWriter.WriteEndElement();
                             }
-                        }                         
+                        }
                         this.nextWriter.WriteEndElement();
                     }
                     this.isInCacheRecords = false;
                     this.isPxsi = false;
-                    
-                }
-                else if (PXSI_NAMESPACE.Equals(element.Ns) && "items".Equals(element.Name))
-                {
-                    int fieldNum = Convert.ToInt32(fieldNames[0][itemsFieldName]);
 
-                    int items = fieldItems[fieldNum, 0].Count;
-
-                    this.nextWriter.WriteStartAttribute("count");
-                    this.nextWriter.WriteString((items + 1).ToString());
-                    this.nextWriter.WriteEndAttribute();
-
-                    Hashtable numbers = new Hashtable();
-                    Hashtable strings = new Hashtable();
-
-                    bool isBlank = false;
-
-                    foreach (string key in fieldItems[fieldNum, 0].Keys)
-                    {
-                        try
-                        {
-                            Convert.ToDouble(key.ToString().Replace('.',','));
-                            numbers.Add(key.ToString().Replace('.', ','),key);
-                        }
-                        catch
-                        {
-                            if (key.Length == 0)
-                                isBlank = true;
-                            else
-                                strings.Add(key,key);
-                        }
-
-                    }
-
-                    double[] sortedNumbers = new double[numbers.Count];
-                    string[] sortedStrings = new string[strings.Count];
-
-                    //sort numbers and strings
-                    int count = 0;
-                    foreach (string key in numbers.Keys)
-                    {
-                        sortedNumbers[count] = Convert.ToDouble(key);
-                        count++;
-                    }
-                    Array.Sort(sortedNumbers);
-                    count = 0;
-                    foreach (string key in strings.Keys)
-                    {
-                        sortedStrings[count] = key;
-                        count++;
-                    }
-                    Array.Sort(sortedStrings);
-
-                    //output sorted item types in order: numbers, strings, blank
-                    for (int i = 0; i < sortedNumbers.Length; i++)
-                    {
-                        OutputItem(sortedNumbers[i].ToString().Replace(',', '.'));
-                    }
-
-                    for (int i = 0; i < sortedStrings.Length; i++)
-                    //foreach (string text in sortedStrings)
-                    {
-                        OutputItem(sortedStrings[i]);
-                    }
-
-                    if (isBlank)
-                        OutputItem("");
-
-                    this.isInItems = false;
-                    this.itemsFieldName = "";
-                    this.itemsHide = "";
-                    this.isPxsi = false;
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "pageItem".Equals(element.Name))
                 {
                     int fieldNum = Convert.ToInt32(fieldNames[0][pageField]);
                     this.nextWriter.WriteStartAttribute("item");
                     //output value increased by 1
-                    this.nextWriter.WriteString((Convert.ToInt32(fieldItems[fieldNum,0][pageItem]) + 1).ToString());
+                    this.nextWriter.WriteString((Convert.ToInt32(fieldItems[fieldNum, 0][pageItem]) + 1).ToString());
                     this.nextWriter.WriteEndAttribute();
 
                     this.isInPageItem = false;
@@ -624,7 +743,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     fieldItems[field, i] = new Hashtable();
             }
             
-            //fill fieldNames
+            //fill fieldNames (from cells text value)
             for (int col = 0; col < cols; col++)
             {
                 int keyCol = Convert.ToInt32(colStart) + col;
@@ -632,14 +751,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                 string key = sheetNum + "#" + keyCol.ToString() + ":" + keyRow.ToString();
                 
-                if (!fieldNames[0].ContainsKey((string)pivotCells[key]))
+                if (!fieldNames[0].ContainsKey((string)pivotCellsText[key]))
                 {
-                    fieldNames[0].Add((string)pivotCells[key], col);
-                    fieldNames[1].Add(col, (string)pivotCells[key]);
+                    fieldNames[0].Add((string)pivotCellsText[key], col);
+                    fieldNames[1].Add(col, (string)pivotCellsText[key]);
                 }
             }
 
-            //fill pivotTable and fieldItems
+            //fill pivotTable and fieldItems (from cells value)
             for (int row = 0; row < rows; row++)
                 for (int col = 0; col < cols; col++)
                 {
@@ -778,22 +897,93 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
         }
 
-        private void OutputItem(string key)
+        private void OutputItems(string name)
+        {
+            int fieldNum = Convert.ToInt32(fieldNames[0][name]);
+
+            int items = fieldItems[fieldNum, 0].Count;
+
+            this.nextWriter.WriteStartAttribute("count");
+            this.nextWriter.WriteString((items + 1).ToString());
+            this.nextWriter.WriteEndAttribute();
+
+            Hashtable numbers = new Hashtable();
+            Hashtable strings = new Hashtable();
+
+            bool isBlank = false;
+
+            foreach (string key in fieldItems[fieldNum, 0].Keys)
+            {
+                //Console.WriteLine("-" + key + "(" + fieldItems[fieldNum, 0][key] + ")");
+                try
+                {
+                    Convert.ToDouble(key.ToString().Replace('.',','));
+                    numbers.Add(key.ToString().Replace('.', ','),key);
+                }
+                catch
+                {
+                    if (key.Length == 0)
+                        isBlank = true;
+                    else
+                        strings.Add(key,key);
+                }
+
+            }
+
+            double[] sortedNumbers = new double[numbers.Count];
+            string[] sortedStrings = new string[strings.Count];
+
+            //sort numbers and strings
+            int count = 0;
+            foreach (string key in numbers.Keys)
+            {
+                sortedNumbers[count] = Convert.ToDouble(key);
+                count++;
+            }
+            Array.Sort(sortedNumbers);
+            count = 0;
+            foreach (string key in strings.Keys)
+            {
+                sortedStrings[count] = key;
+                count++;
+            }
+            Array.Sort(sortedStrings);
+
+            //output sorted item types in order: numbers, strings, blank
+            for (int i = 0; i < sortedNumbers.Length; i++)
+            {
+                //Console.WriteLine("item: " + sortedNumbers[i].ToString().Replace(',', '.'));
+                OutputItem(name, sortedNumbers[i].ToString().Replace(',', '.'));
+            }
+
+            for (int i = 0; i < sortedStrings.Length; i++)
+            //foreach (string text in sortedStrings)
+            {
+                //Console.WriteLine("item: " + sortedStrings[i]);
+                OutputItem(name, sortedStrings[i]);
+            }
+
+            if (isBlank)
+                OutputItem(name,"");
+        }
+
+        private void OutputItem(string name, string item)
         {
             //Console.WriteLine(itemsFieldName);
-            int fieldNum = Convert.ToInt32(fieldNames[0][itemsFieldName]); 
+            int fieldNum = Convert.ToInt32(fieldNames[0][name]); 
             
             this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
 
             //if this item is hidden
-            if (itemsHide.Contains(";" + key + ";"))
+            /*if (itemsHide.Contains(";" + item + ";"))
             {
                 this.nextWriter.WriteStartAttribute("h");
                 this.nextWriter.WriteString("1");
                 this.nextWriter.WriteEndAttribute();
-            }
+            }*/
+            
             this.nextWriter.WriteStartAttribute("x");
-            this.nextWriter.WriteString(fieldItems[fieldNum, 0][key].ToString());
+            this.nextWriter.WriteString(fieldItems[fieldNum, 0][item].ToString());
             this.nextWriter.WriteEndAttribute();
             this.nextWriter.WriteEndElement();
         }
