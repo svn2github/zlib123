@@ -24,6 +24,35 @@ Kliknij dwukrotnie na plik instalacyjny<br/>
 <br/>
 Uwaga:  Plik ODF otwierany za pomoc&#261; wtyczki jest importowany jako plik .xlsx tylko do odczytu .  Je&#380;eli chcesz zapisa&#263; go jako ODF musisz najpierw utworzy&#263; kopie dokumentu (Menu Plik &gt; Zapisz jako), nast&#281;pnie u&#380;y&#263; opcji &#8222;Eksportuj do ODF&#8221;. <br/>
 <br/>
+<h2>Instalacja w tle</h2>
+1. Pobierz i zainstaluj pakiet redystrybucyjny Microsoft .NET Framework wersja 2.0 (x86)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=0856EACB-4362-4B0D-8EDD-AAB15C5E04F5&displaylang=pl">http://www.microsoft.com/downloads/details.aspx?FamilyID=0856EACB-4362-4B0D-8EDD-AAB15C5E04F5&displaylang=pl</a>)<br/>
+2. Je¿eli instalujesz wtyczkê ODF dla Microsoft Excel 2003, pobierz i zainstaluj pakiet Microsoft Office 2003 Primary Interop Assemblies<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad&displaylang=en">http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad&displaylang=en</a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;w przeciwnym razie przejd¼ do kroku 3<br/>
+3. Je¿eli instalujesz wtyczkê ODF dla Microsoft Excel XP lub 2003, pobierz i zainstaluj pakiet zgodno&#347;ci formatu plików pakietu Microsoft Office dla programów Word, Excel i PowerPoint 2007<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?displaylang=pl&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">http://www.microsoft.com/downloads/details.aspx?displaylang=pl&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466</a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;w przeciwnym razie przejd¼ do kroku 4.<br/>
+4. Pobierz wtyczkê ODF dla Excela<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a href="https://sourceforge.net/project/showfiles.php?group_id=169337&package_id=226811">https://sourceforge.net/project/showfiles.php?group_id=169337&package_id=226811</a>)<br/>
+5. Rozpakuj archiwum zip do wybranego katalogu za pomoca dowolnego narzêdzia</br>
+6. Je¿eli instalujesz wtyczkê ODF dla Microsoft Excel XP lub 2003 z rozpakowanego archiwum zip zainstaluj pakiet shared add-in extensibility update for Microsoft .NET Framework 2.0 (KB908002) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\extensibilityMSM.msi</code><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;w przeciwnym razie przejd¼ do kroku 8.<br/>
+7. Z rozpakowanego archiwum zip zainstaluj pakiet shared add-in support update for Microsoft .NET Framework 2.0 (KB908002) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\lockbackRegKey.msi</code><br/>
+8. Zainstaluj wtyczkê ODF:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dla Office'a 2007:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcel2007AddinSetup.msi /q EXCELVERSION=12 ALLUSERS=1</code><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;dla Office'a 2003:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcel2003AddinSetup.msi /q EXCELVERSION=11 ALLUSERS=1</code><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;dla Office'a XP:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcelXPAddinSetup.msi /q EXCELVERSION=10 ALLUSERS=1</code><br/>
+9. Je¿eli instalujesz wtyczkê ODF dla Microsoft Excel 2003 zaintaluj pakiet office2003-kb907417sfxcab-ENU executable for Office 2003:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\office2003-kb907417sfxcab-ENU.exe /quiet</code><br/>
+10. Na koñcu, upewnij siê ¿e instalacja zosta³a ukoñczona przed uruchomieniem Excela.
+<br/>
+<br/>
 <h2>Rozwi&#261;zywanie problem&oacute;w </h2>
 Je&#347;li w menu &#8220;Plik&#8221; nie pojawi&#322; si&#281; nowy wpis &#8220;Otw&oacute;rz ODF&#8221; mo&#380;e by&#263; to zwi&#261;zane z niespe&#322;nionymu wymaganiami systemowymi Excela (przeczytaj <a href="#hRequirements">Wymagania systemowe</a> powy&#380;ej). Niezb&#281;dne b&#281;dzie wtedy aktywowanie wtyczki w nast&#281;puj&#261;cy spos&oacute;b:<br/>
 <ol>
@@ -41,55 +70,7 @@ Pe&#322;na lista nieobs&#322;ugiwanych funkcji jest dostepna na sourceForge (htt
 <h2>Uwagi</h2>
 (1) Wtyczka nie dzia³a prawid³owo gdy jednocze¶nie s± zainstalowane Office 2003 i Office 2007<br/>
 <br/>
-<h2>Bugi nie rozwi±zane w M3</h2>
-[ 1736396 ] XLSX: Conversion failed<br />
-[ 1740752 ] Negative test –Tag handling.<br />
-[ 1740145 ] Header & footers-Page number are retained as # after convers<br />
-[ 1739928 ] Group-conditional formatting not retained after conversion<br />
-[ 1739924 ] Group-hyperlink not retained after conversion<br />
-[ 1739915 ] Multiple groups after conversion<br />
-[ 1739904 ] Group-Note not retained after conversion<br />
-[ 1738257 ] Space lost after hyperlink.<br />
-[ 1738256 ] Hyperlink -Cell protection is not properly retained after co<br />
-[ 1736971 ] ODS: Cell format: text alignment not retained<br />
-[ 1736952 ] ODS: Cell format: Color not retained properly (Excel 2003)<br />
-[ 1736424 ] ODS: Cell format: date formatwith time not retained<br />
-[ 1736421 ] ODS: Cell format: time format AM/PM not retained correctly<br />
-[ 1736372 ] ODS: Cell format: blanks are not retained<br />
-[ 1735726 ] ODS: Charts: swap of axis values<br />
-[ 1735657 ]  Number format not properly retained<br />
-[ 1735547 ] ODS: Number Format \"Standard\" not retained properly<br />
-[ 1733369 ] Conditional formatting not retained for empty cells<br />
-[ 1726732 ] Add-in crash- Dragged image in ods file.<br />
-[ 1707249 ] Text conversion not proper (Ctrl + Return)<br />
-[ 1706146 ] Columns too wide (ODF -> OOX)<br />
-[ 1705827 ] Performance: Conversion times between 5 and 34minutes<br />
-[ 1701990 ] Round Trip Conversion- Unexpected message while conversion<br />
-[ 1693462 ] File converter failed to open the file<br />
-[ 1677077 ] Grouped content lost<br />
-[ 1675771 ] Conversion increases file size<br />
-[ 1740901 ] XLSX: Conditional Formatting: completly lost<br />
-[ 1740406 ] Sheet name is not properly retained.<br />
-[ 1740161 ] Content of cell misplaced after conversion (ods –xlsx<br />
-[ 1740139 ] Custom header and footer not properly retained (unexp txt)<br />
-[ 1739971 ] Reverse-Conditional formatting not retained for blank cells<br />
-[ 1737798 ] XLSX: Header: Formatting and margins not retained correctly<br />
-[ 1737696 ] XLSX: Content moved inside sheet<br />
-[ 1737693 ] XLSX: Window Orientation not retained<br />
-[ 1737691 ] XLSX: Pictures and Chart problems<br />
-[ 1737689 ] XLSX: Cell format: format custom converted to number<br />
-[ 1737683 ] XLSX: Cell format: border problems<br />
-[ 1735668 ] Number format not properly retained ( text & Number).<br />
-[ 1735659 ] Number format converted to date format<br />
-[ 1735531 ] Multiple comments after conversion<br />
-[ 1718525 ] Roundtrip: Linebrake lost<br />
-[ 1707213 ] Roundtrip Conversion Bug: border/background color<br />
-[ 1707205 ] Roundtrip Conversion Bug: line break<br />
-[ 1705914 ] Character position not retained<br />
-[ 1705905 ] Comment not retained<br />
-[ 1705806 ] Performance: 061031_-_Pilotage_ADELE.CONFIDENTIAL.xlsx<br />
-[ 1686766 ] Roundtrip Conversion Crash: Diagrammtypen.xlsx<br />
-[ 1673978 ] Columns not wide enough (OOX -> ODT)<br /></body>
+</body>
 </html>
 
 
