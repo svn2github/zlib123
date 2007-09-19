@@ -1740,61 +1740,7 @@
               <xsl:value-of select="substring-before($pivotCells,'#')"/>
             </xsl:attribute>
 
-            <!-- text content -->
-            <!-- number-->
-            <xsl:choose>
-              <xsl:when test="@office:value-type='float' ">
-                <xsl:choose>
-                  <xsl:when test="@office:value != ''">
-                    <xsl:value-of select="@office:value"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="translate(text:p,',','.')"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:when>
-
-              <!-- percentage -->
-              <xsl:when test="@office:value-type = 'percentage'">
-                <xsl:choose>
-                  <xsl:when test="@office:value">
-                    <xsl:value-of select="@office:value"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="translate(substring-before(text:p, '%'), ',', '.')"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:when>
-
-              <!-- currency -->
-              <xsl:when test="@office:value-type = 'currency'">
-                <xsl:value-of select="@office:value"/>
-              </xsl:when>
-
-              <!-- date -->
-              <xsl:when test="@office:value-type='date'">
-                <xsl:call-template name="DateToNumber">
-                  <xsl:with-param name="value">
-                    <xsl:value-of select="@office:date-value"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-
-              <!-- time-->
-              <xsl:when test="@office:value-type = 'time'">
-                <xsl:call-template name="TimeToNumber">
-                  <xsl:with-param name="value">
-                    <xsl:value-of select="@office:time-value"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-
-              <!-- text -->
-              <xsl:when
-                test="not(@office:value-type='float') and @office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">
-                <xsl:apply-templates mode="pivot" xml:space="preserve"/>
-              </xsl:when>
-            </xsl:choose>
+            <xsl:apply-templates mode="pivot" xml:space="preserve"/>
           </pxsi:pivotCell>
         </xsl:if>
 

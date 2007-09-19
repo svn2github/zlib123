@@ -172,6 +172,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.pivotContext.Push(new Element(prefix, localName, ns));
                 this.isInPivotTable = true;
                 this.isPxsi = true;
+                this.cacheSheetNum = "";
+                this.cacheColStart = "";
+                this.cacheColEnd = "";
+                this.cacheRowStart = "";
+                this.cacheRowEnd = "";
                 //Console.WriteLine("<PivotTable>");
             }
             else if (PXSI_NAMESPACE.Equals(ns) && "sharedItems".Equals(localName))
