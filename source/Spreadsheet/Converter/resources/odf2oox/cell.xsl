@@ -1348,9 +1348,8 @@
                   If column has got changed default-cell-style-name then in $TableColumnTagNum string there is entry 'K' col_number ':' default-cell-style-name ';' if not there is no 'K'. 
                   So if inside cell range defined by table:table-cell with repeated columns attribute there is column that has changed default-cell-style-name then before ';'col_number 
                   in $TableColumnTagNum there should be 'K' ($TableColumnTagNum contains listed default-cell-style-name from backward) -->
-      <xsl:when
-        test="not(parent::node()/@table:number-rows-repeated) and not(parent::node()/@table:style-name) and @table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:style-name) and 
-        not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> </xsl:when>
+      <xsl:when test="not(@table:style-name) and not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') 
+        or contains($TableColumnTagNum,concat('K',$colNumber))) and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p)"> </xsl:when>
 
       <xsl:when
         test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p or $columnCellStyle != '')">
