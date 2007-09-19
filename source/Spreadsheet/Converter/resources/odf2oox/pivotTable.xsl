@@ -192,6 +192,79 @@
               </xsl:when>
             </xsl:choose>
 
+
+            <xsl:for-each
+              select="table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]">
+
+              <xsl:if test="@table:function = 'sum' ">
+                <xsl:attribute name="sumSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'count' ">
+                <xsl:attribute name="countASubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'average' ">
+                <xsl:attribute name="avgSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'max' ">
+                <xsl:attribute name="maxSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'min' ">
+                <xsl:attribute name="minSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'product' ">
+                <xsl:attribute name="productSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+
+              <xsl:if test="@table:function = 'countnums' ">
+                <xsl:attribute name="countSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'stdev' ">
+                <xsl:attribute name="stdDevSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'stdevp' ">
+                <xsl:attribute name="stdDevPSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'var' ">
+                <xsl:attribute name="varSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+              <xsl:if test="@table:function = 'varp' ">
+                <xsl:attribute name="varPSubtotal">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
+
+            </xsl:for-each>
+
             <xsl:choose>
               <xsl:when
                 test="table:data-pilot-level/table:data-pilot-sort-info[@table:order = 'descending' and @table:sort-mode != 'manual' and @table:sort-mode != 'none']">
@@ -209,6 +282,22 @@
 
             <xsl:if test="not(@table:orientation = 'data')">
               <items>
+                <!-- w tym miejscu trzeba dodać do postprocesora, ze jesli wystepuje 
+                        table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]
+                  to dla każdego @table:function stworzyć <item t='wartosc_funkcji'>-->
+                <!-- 
+                  z   'sum'             na     'sum'
+                  z   'count'           na     'countA'
+                  z   'average'      na     'avg'
+                  z   'max'             na     'max'
+                  z   'min'              na     'min'
+                  z   'product'       na     'product'
+                  z   'countnums'    na     'count'
+                  z   'stdev'           na     'stdDev'
+                  z   'stdevp'       na   'stdDevP'
+                  z   'var'             na     'var'
+                  z   'varp'           na     'varP'
+                -->
                 <pxsi:items pxsi:field="{@table:source-field-name}">
                   <xsl:if
                     test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
@@ -364,7 +453,7 @@
           count="{count(table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data'])}">
           <xsl:for-each
             select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data']">
-            <dataField baseField="0" baseItem="0">
+            <dataField>
               <xsl:attribute name="name">
                 <xsl:value-of select="@table:source-field-name"/>
               </xsl:attribute>
@@ -398,46 +487,54 @@
 
               <!-- show data format as -->
               <xsl:for-each select="table:data-pilot-field-reference[@table:type]">
-              
-                  <xsl:attribute name="showDataAs">
-                    
-                    <xsl:choose>
-                      <xsl:when test="@table:type= 'member-difference' ">
-                        <xsl:text>difference</xsl:text>
-                      </xsl:when>
 
-                      <xsl:when test="@table:type= 'member-percentage' ">
-                        <xsl:text>percent</xsl:text>
-                      </xsl:when>
+                <xsl:attribute name="showDataAs">
 
-                      <xsl:when test="@table:type= 'member-percentage-difference' ">
-                        <xsl:text>percentDiff</xsl:text>
-                      </xsl:when>
+                  <xsl:choose>
+                    <xsl:when test="@table:type= 'member-difference' ">
+                      <xsl:text>difference</xsl:text>
+                    </xsl:when>
 
-                      <xsl:when test="@table:type= 'running-total' ">
-                        <xsl:text>runTotal</xsl:text>
-                      </xsl:when>
+                    <xsl:when test="@table:type= 'member-percentage' ">
+                      <xsl:text>percent</xsl:text>
+                    </xsl:when>
 
-                      <xsl:when test="@table:type= 'row-percentage' ">
-                        <xsl:text>percentOfRow</xsl:text>
-                      </xsl:when>
+                    <xsl:when test="@table:type= 'member-percentage-difference' ">
+                      <xsl:text>percentDiff</xsl:text>
+                    </xsl:when>
 
-                      <xsl:when test="@table:type= 'column-percentage' ">
-                        <xsl:text>percentOfColumn</xsl:text>
-                      </xsl:when>
+                    <xsl:when test="@table:type= 'running-total' ">
+                      <xsl:text>runTotal</xsl:text>
+                    </xsl:when>
 
-                      <xsl:when test="@table:type= 'total-percentage' ">
-                        <xsl:text>percentOfTotal</xsl:text>
-                      </xsl:when>
+                    <xsl:when test="@table:type= 'row-percentage' ">
+                      <xsl:text>percentOfRow</xsl:text>
+                    </xsl:when>
 
-                      <xsl:when test="@table:type= 'index' ">
-                        <xsl:text>index</xsl:text>
-                      </xsl:when>
-                      
-                    </xsl:choose>
-                  </xsl:attribute>
-                </xsl:for-each>
-           
+                    <xsl:when test="@table:type= 'column-percentage' ">
+                      <xsl:text>percentOfColumn</xsl:text>
+                    </xsl:when>
+
+                    <xsl:when test="@table:type= 'total-percentage' ">
+                      <xsl:text>percentOfTotal</xsl:text>
+                    </xsl:when>
+
+                    <xsl:when test="@table:type= 'index' ">
+                      <xsl:text>index</xsl:text>
+                    </xsl:when>
+
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:for-each>
+
+              <xsl:attribute name="baseField">
+                <xsl:text>0</xsl:text>
+              </xsl:attribute>
+
+              <xsl:attribute name="baseItem">
+                <xsl:text>0</xsl:text>
+              </xsl:attribute>
+
             </dataField>
           </xsl:for-each>
         </dataFields>
