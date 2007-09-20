@@ -506,11 +506,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                         //search position of field with this name inside <table:data-pilot-table>
                         //field with empty name is not counted
+                        //if field with the same name occurs more than once, then get first occurence position
                         nameNum = -1;
                         for (int i = 0; i < names.Length; i++)
                         {
-                            if (name == names[i])
+                            if (name.Equals(names[i]))
+                            {
                                 nameNum = i;
+                                break;
+                            }
                         }
 
                         this.nextWriter.WriteStartElement("pivotField", EXCEL_NAMESPACE);
@@ -523,14 +527,16 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         //if field is in use
                         if (nameNum != -1)
                         {
-                            //insert field type attribute
-                            if (!"".Equals(axes[nameNum]))
+                            Console.WriteLine(name + "(" + nameNum.ToString() + ")" + ":" + axes[nameNum]);
+                            //insert field type attributes
+                            if (axes[nameNum].Contains("axis"))
                             {
                                 this.nextWriter.WriteStartAttribute("axis");
-                                this.nextWriter.WriteString(axes[nameNum]);
+                                //remove ",data" after axis type if occurs
+                                this.nextWriter.WriteString(axes[nameNum].Replace(",data", ""));
                                 this.nextWriter.WriteEndAttribute();
                             }
-                            else
+                            if (axes[nameNum].Contains("data"))
                             {
                                 this.nextWriter.WriteStartAttribute("dataField");
                                 this.nextWriter.WriteString("1");
@@ -566,13 +572,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                 this.nextWriter.WriteEndAttribute();
                             }
                         
-                            //if field is in axis location then output <item> elements
-                            if (!"".Equals(axes[nameNum]))
-                            {
-                                this.nextWriter.WriteStartElement("items", EXCEL_NAMESPACE);
-                                OutputItems(name, hide[nameNum], subtotals[nameNum]);
-                                this.nextWriter.WriteEndElement();
-                            }
+                            //output items for all fields being used because even data field
+                            //has to got listet items when used twice
+                            this.nextWriter.WriteStartElement("items", EXCEL_NAMESPACE);
+                            OutputItems(name, hide[nameNum], subtotals[nameNum]);
+                            this.nextWriter.WriteEndElement();
                         }
 
                         this.nextWriter.WriteEndElement();
@@ -617,44 +621,41 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             //if field is in and this is axis field type insert <items>
                             if (nameNum != -1)
                             {
-                                if (!"".Equals(axes[nameNum]))
+                                //insert "count" attribute
+                                this.nextWriter.WriteStartAttribute("count");
+                                this.nextWriter.WriteString((string)this.fieldItems[col, 0].Count.ToString());
+                                this.nextWriter.WriteEndAttribute();
+
+                                for (int i = 0; i < this.fieldItems[col, 1].Count; i++)
                                 {
-                                    //insert "count" attribute
-                                    this.nextWriter.WriteStartAttribute("count");
-                                    this.nextWriter.WriteString((string)this.fieldItems[col, 0].Count.ToString());
-                                    this.nextWriter.WriteEndAttribute();
 
-                                    for (int i = 0; i < this.fieldItems[col, 1].Count; i++)
+                                    // <e> - error, <d> - date and <b> - bool not handled for now
+
+                                    try
                                     {
-
-                                        // <e> - error, <d> - date and <b> - bool not handled for now
-
-                                        try
+                                        //if field value is a number
+                                        Convert.ToDouble(this.fieldItems[col, 1][i].ToString().Replace('.', ','));
+                                        this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
+                                        this.nextWriter.WriteStartAttribute("v");
+                                        this.nextWriter.WriteString(this.fieldItems[col, 1][i].ToString());
+                                        this.nextWriter.WriteEndAttribute();
+                                    }
+                                    catch
+                                    {
+                                        //if field value is a string
+                                        if (this.fieldItems[col, 1][i].ToString().Length == 0)
+                                            //blank value
+                                            this.nextWriter.WriteStartElement("m", EXCEL_NAMESPACE);
+                                        else
                                         {
-                                            //if field value is a number
-                                            Convert.ToDouble(this.fieldItems[col, 1][i].ToString().Replace('.', ','));
-                                            this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
+                                            this.nextWriter.WriteStartElement("s", EXCEL_NAMESPACE);
                                             this.nextWriter.WriteStartAttribute("v");
                                             this.nextWriter.WriteString(this.fieldItems[col, 1][i].ToString());
                                             this.nextWriter.WriteEndAttribute();
                                         }
-                                        catch
-                                        {
-                                            //if field value is a string
-                                            if (this.fieldItems[col, 1][i].ToString().Length == 0)
-                                                //blank value
-                                                this.nextWriter.WriteStartElement("m", EXCEL_NAMESPACE);
-                                            else
-                                            {
-                                                this.nextWriter.WriteStartElement("s", EXCEL_NAMESPACE);
-                                                this.nextWriter.WriteStartAttribute("v");
-                                                this.nextWriter.WriteString(this.fieldItems[col, 1][i].ToString());
-                                                this.nextWriter.WriteEndAttribute();
-                                            }
-                                        }
-
-                                        this.nextWriter.WriteEndElement();
                                     }
+
+                                    this.nextWriter.WriteEndElement();
                                 }
                             }
                             this.nextWriter.WriteEndElement();

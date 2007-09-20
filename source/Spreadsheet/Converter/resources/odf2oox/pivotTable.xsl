@@ -174,19 +174,54 @@
 
         <xsl:variable name="axes">
           <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+
+            <xsl:variable name="name">
+              <xsl:value-of select="@table:source-field-name"/>
+            </xsl:variable>
+
             <xsl:if test="position() &gt; 1 ">
               <xsl:text>~</xsl:text>
             </xsl:if>
+
             <xsl:choose>
-              <xsl:when test="@table:orientation = 'page' ">
-                <xsl:text>axisPage</xsl:text>
+              <xsl:when test="@table:orientation = 'data' ">
+                <xsl:text>data</xsl:text>
+
+                <xsl:choose>
+                  <xsl:when
+                    test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'page']">
+                    <xsl:text>,axisPage</xsl:text>
+                  </xsl:when>
+                  <xsl:when
+                    test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'column']">
+                    <xsl:text>,axisColumn</xsl:text>
+                  </xsl:when>
+                  <xsl:when
+                    test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'row']">
+                    <xsl:text>,axisRow</xsl:text>
+                  </xsl:when>
+                </xsl:choose>
+
               </xsl:when>
-              <xsl:when test="@table:orientation = 'column' ">
-                <xsl:text>axisCol</xsl:text>
-              </xsl:when>
-              <xsl:when test="@table:orientation = 'row' ">
-                <xsl:text>axisRow</xsl:text>
-              </xsl:when>
+              <xsl:otherwise>
+
+                <xsl:choose>
+                  <xsl:when test="@table:orientation = 'page' ">
+                    <xsl:text>axisPage</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:orientation = 'column' ">
+                    <xsl:text>axisCol</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:orientation = 'row' ">
+                    <xsl:text>axisRow</xsl:text>
+                  </xsl:when>
+                </xsl:choose>
+                
+                <xsl:if test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'data']">
+                  <xsl:text>,data</xsl:text>
+                </xsl:if>
+
+              </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
@@ -241,7 +276,7 @@
                 <xsl:if test="position() &gt; 1 ">
                   <xsl:text>;</xsl:text>
                 </xsl:if>
-                
+
                 <xsl:choose>
                   <xsl:when test="@table:function = 'sum' ">
                     <xsl:text>sum</xsl:text>
@@ -491,9 +526,9 @@
               <xsl:attribute name="baseItem">
                 <xsl:text>0</xsl:text>
               </xsl:attribute>
-              
+
               <pxsi:fieldPos pxsi:name="{@table:source-field-name}" pxsi:attribute="fld"/>
-              
+
             </dataField>
           </xsl:for-each>
         </dataFields>
