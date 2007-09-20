@@ -233,7 +233,7 @@
             </xsl:if>
 
             <xsl:if
-              test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
+              test="table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]">
               <xsl:text>;</xsl:text>
 
               <xsl:for-each

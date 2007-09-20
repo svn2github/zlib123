@@ -443,9 +443,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.pivotTable = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
                     CreatePivotTable(Convert.ToInt32(cacheSheetNum),Convert.ToInt32(cacheRowStart),Convert.ToInt32(cacheRowEnd),Convert.ToInt32(cacheColStart),Convert.ToInt32(cacheColEnd));
 
-                    //foreach (string key in fieldNames[0].Keys)
-                        //Console.WriteLine("\t - " + key + ":" + fieldNames[0][key].ToString()); 
-                    
                     this.isInPivotTable = false;
                     
                     //other <pivotTable> variables are being used in other postprocessor commands
@@ -482,11 +479,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     int nameNum;
 
-                    //Console.WriteLine(pivotNames);
-                    //Console.WriteLine(pivotAxes);
-                    //Console.WriteLine(pivotSort);
-                    //Console.WriteLine(pivotHide);
-                    //Console.WriteLine(pivotSubtotals);
+                    Console.WriteLine(pivotNames);
+                    Console.WriteLine(pivotAxes);
+                    Console.WriteLine(pivotSort);
+                    Console.WriteLine(pivotHide);
+                    Console.WriteLine(pivotSubtotals);
 
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
@@ -494,7 +491,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     string[] hide = pivotHide.Split('~');
                     string[] subtotals = pivotSubtotals.Split('~');
 
-                    //Console.WriteLine("names: " + fieldNames[1].Count);
                     //for each cache column output <pivotField> element
                     for (int col = 0; col < fieldNames[1].Count; col++)
                     {
@@ -534,6 +530,18 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             }
                         }
 
+                        //if field is sorted insert sortType attribute
+                        if (nameNum != -1)
+                        {
+                            if (sort[nameNum] != "")
+                            {
+                                this.nextWriter.WriteStartAttribute("sortType");
+                                this.nextWriter.WriteString(sort[nameNum]);
+                                this.nextWriter.WriteEndAttribute();
+                            }
+                        }
+
+
                         //if field is in axis location then output <item> elements
                         if (nameNum != -1)
                         {
@@ -566,16 +574,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
 
-                    Console.WriteLine(pivotNames);
-                    Console.WriteLine(pivotAxes);
-
-                    Console.WriteLine("names: " + fieldNames[1].Count);
-
                     for (int col = 0; col < fieldNames[1].Count; col++)
                     {
                         //get field name
                         string name = fieldNames[1][col].ToString();
-                        Console.WriteLine(name);
 
                         //search position of field with this name inside <table:data-pilot-table>
                         //field with empty name is not counted
@@ -650,7 +652,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "fieldPos".Equals(element.Name))
                 {
-                    Console.WriteLine(fieldPosName);
                     string fieldNum = fieldNames[0][this.fieldPosName].ToString();
 
                     this.nextWriter.WriteStartAttribute(this.fieldPosAttribute);
@@ -790,13 +791,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         }
                     }
                 }
-
-            //Console.WriteLine(indeces[0].Count);
-                //foreach (string key in this.fieldItems[0].Keys)
-                //{
-                //    Console.WriteLine("-" + fieldItems[0][key] + ":" + key);
-                //}
-
         }
 
         private void InsertSharedItemAttributes(int field)
@@ -817,7 +811,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
             //maxDate                   //not checked for now but it is in specification
 
             //analize items
-//            Console.WriteLine("FIELD" + field.ToString());
             for (int i = 0; i < this.fieldItems[field, 1].Count; i++)
             {
                 //check weather an item is an integer
@@ -846,11 +839,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     string text = this.fieldItems[field, 1][i].ToString();
 
-//                    Console.WriteLine(text.Length + "(" + text +")");
                     if (text.Length == 0)
                     {
                         containsBlank = true;
-//                        Console.WriteLine("-----BLANK-----");
                     }
                     else if (text.Length > 255)
                         longText = true;
@@ -914,7 +905,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
             foreach (string key in fieldItems[fieldNum, 0].Keys)
             {
-                //Console.WriteLine("-" + key + "(" + fieldItems[fieldNum, 0][key] + ")");
                 try
                 {
                     Convert.ToDouble(key.ToString().Replace('.',','));
@@ -952,14 +942,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
             //output sorted item types in order: numbers, strings, blank
             for (int i = 0; i < sortedNumbers.Length; i++)
             {
-                //Console.WriteLine("item: " + sortedNumbers[i].ToString().Replace(',', '.'));
                 OutputItem(name, sortedNumbers[i].ToString().Replace(',', '.'));
             }
 
             for (int i = 0; i < sortedStrings.Length; i++)
-            //foreach (string text in sortedStrings)
             {
-                //Console.WriteLine("item: " + sortedStrings[i]);
                 OutputItem(name, sortedStrings[i]);
             }
 
@@ -969,7 +956,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         private void OutputItem(string name, string item)
         {
-            //Console.WriteLine(itemsFieldName);
             int fieldNum = Convert.ToInt32(fieldNames[0][name]); 
             
             this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
