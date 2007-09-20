@@ -188,9 +188,9 @@
     </xsl:if>
 
   </xsl:template>
-  
+
   <!-- Insert Conditional in Cell -->
-  
+
   <xsl:template name="InsertConditionalCol">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
@@ -199,7 +199,7 @@
     <xsl:param name="tableName"/>
     <xsl:param name="RepetedRow"/>
     <xsl:param name="RepetedCol"/>
-    
+
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
         <xsl:with-param name="colNum">
@@ -210,7 +210,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="styleName">
       <xsl:choose>
         <xsl:when test="@table:style-name != '' ">
@@ -221,16 +221,16 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="quot">
       <xsl:text>&quot;</xsl:text>
     </xsl:variable>
-    
+
     <!-- if cell style has condition -->
     <!-- there was a case where condition was "cell-content()=#NAME?G$45" and it caused a crash (but there can be #NAME condition as text occurence) -->
     <xsl:if
       test="key('style',$styleName)/style:map[@style:condition != '' and not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
-      
+
       <conditionalFormatting>
         <xsl:variable name="ColChar">
           <xsl:call-template name="NumbersToChars">
@@ -239,7 +239,7 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:attribute name="sqref">
           <xsl:choose>
             <!-- if condition is applied to merged cell then enter merged cell range -->
@@ -254,13 +254,13 @@
                   <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColChar, $rowNumber + $RepetedRow)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="concat($ColChar, $rowNumber)"/>    
+                  <xsl:value-of select="concat($ColChar, $rowNumber)"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        
+
         <xsl:for-each
           select="key('style', $styleName)/style:map[not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
           <cfRule type="cellIs" priority="{position()}">
@@ -304,7 +304,7 @@
                 </xsl:choose>
               </xsl:attribute>
             </xsl:if>
-            
+
             <xsl:call-template name="InsertCoditionalFormula">
               <xsl:with-param name="tableName" select="$tableName"/>
             </xsl:call-template>
@@ -312,7 +312,7 @@
         </xsl:for-each>
       </conditionalFormatting>
     </xsl:if>
-    
+
     <xsl:if test="@table:number-columns-repeated!= '' and @table:number-columns-repeated &gt; $RepetedCol">
       <xsl:call-template name="InsertConditionalCol">
         <xsl:with-param name="colNumber">
@@ -338,7 +338,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    
+
   </xsl:template>
 
   <!-- Coditional Format -->
@@ -496,30 +496,43 @@
       <!-- Condition: Cell content is between -->
       <!-- Condition: Cell content is not between -->
       <xsl:when test="contains(@style:condition, 'between')">
-        <formula>
-          <xsl:if
-            test="substring-after(@style:condition, 'between') ='&quot;'
-            or substring-after(@style:condition, 'between') ='['
+        <xsl:choose>
+          <!-- two delimiting values are date values -->
+          <xsl:when test="contains(@style:condition, 'DATE')">
+            <formula>
+              <xsl:value-of select="translate(substring-before(substring-after(@style:condition, '('), ','),';',',')"/>
+            </formula>
+            <formula>
+              <xsl:value-of select="concat(translate(substring-before(substring-after(@style:condition,','), ')'), ';',','), ')')"/>
+            </formula>
+          </xsl:when>
+          <xsl:otherwise>
+            <formula>
+              <xsl:if
+                test="substring-after(@style:condition, 'between') ='&quot;'
+                or substring-after(@style:condition, 'between') ='['
             or number(substring-after(@style:condition, 'between'))">
-            <xsl:call-template name="TranslateFormula">
-              <xsl:with-param name="formula"
-                select="substring-before(substring-after(@style:condition,'('),',')"/>
-              <xsl:with-param name="tableName" select="$tableName"/>
-            </xsl:call-template>
-          </xsl:if>
-        </formula>
-        <formula>
-          <xsl:if
-            test="substring-after(@style:condition, 'between') ='&quot;'
-            or substring-after(@style:condition, 'between') ='['
-            or number(substring-after(@style:condition, 'between'))">
-            <xsl:call-template name="TranslateFormula">
-              <xsl:with-param name="formula"
-                select="substring-before(substring-after(@style:condition,','),')')"/>
-              <xsl:with-param name="tableName" select="$tableName"/>
-            </xsl:call-template>
-          </xsl:if>
-        </formula>
+                <xsl:call-template name="TranslateFormula">
+                  <xsl:with-param name="formula"
+                    select="substring-before(substring-after(@style:condition,'('),',')"/>
+                  <xsl:with-param name="tableName" select="$tableName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </formula>
+            <formula>
+              <xsl:if
+                test="substring-after(@style:condition, 'between') ='&quot;'
+                or substring-after(@style:condition, 'between') ='['
+                or number(substring-after(@style:condition, 'between'))">
+                <xsl:call-template name="TranslateFormula">
+                  <xsl:with-param name="formula"
+                    select="substring-before(substring-after(@style:condition,','),')')"/>
+                  <xsl:with-param name="tableName" select="$tableName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </formula>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
 
       <xsl:otherwise>
