@@ -491,9 +491,18 @@
           <xsl:variable name="PositionStyle">
             <xsl:value-of select="@dxfId"/>
           </xsl:variable>
+          <xsl:choose>
+            <!-- if there is a specified style for cells fullfilling certain condition -->
+            <xsl:when test="$PositionStyle != ''">
           <xsl:for-each select="document('xl/styles.xml')">
             <xsl:value-of select="generate-id(key('Dxf', '')[position() = $PositionStyle + 1])"/>
           </xsl:for-each>
+            </xsl:when>
+            <!-- default style -->
+            <xsl:otherwise>
+              <xsl:text>Default</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <xsl:choose>
           <xsl:when test="@operator='equal'">
