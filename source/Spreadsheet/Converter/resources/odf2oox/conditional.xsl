@@ -451,15 +451,19 @@
       <!-- Condition: Cell content is greater than -->
       <xsl:when test="contains(@style:condition, '&gt;')">
         <formula>
-          <xsl:if
-            test="substring-after(@style:condition, '&gt;') ='&quot;'
+        <xsl:choose>
+          <xsl:when test="substring-after(@style:condition, '&gt;') ='&quot;'
             or substring-after(@style:condition, '&gt;') ='['
             or number(substring-after(@style:condition, '&gt;'))">
             <xsl:call-template name="TranslateFormula">
               <xsl:with-param name="formula" select="substring-after(@style:condition,'&gt;')"/>
               <xsl:with-param name="tableName" select="$tableName"/>
             </xsl:call-template>
-          </xsl:if>
+          </xsl:when>
+          <xsl:when test="number(substring-after(@style:condition, '&gt;')) != ''">
+            <xsl:value-of select="number(substring-after(@style:condition, '&gt;'))"/>            
+          </xsl:when>
+        </xsl:choose>
         </formula>
       </xsl:when>
 
