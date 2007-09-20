@@ -66,29 +66,33 @@
   <!-- insert all number formats -->
 
   <xsl:template name="InsertNumFormats">
-    
+
     <!-- message about  not supported quarter and week date format-->
     <xsl:choose>
-      <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:quarter">
+      <xsl:when
+        test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:quarter">
         <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
       </xsl:when>
-      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:date-style/number:quarter">
+      <xsl:when
+        test="document('styles.xml')/office:document-styles/office:styles/number:date-style/number:quarter">
         <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
       </xsl:when>
     </xsl:choose>
     <!-- this message is currently not supported because is questionable -->
     <xsl:choose>
-      <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:week-of-year">
+      <xsl:when
+        test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:week-of-year">
         <xsl:message terminate="no">translation.odf2oox.WeekDateFormat</xsl:message>
       </xsl:when>
-      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:date-style/number:week-of-year">
+      <xsl:when
+        test="document('styles.xml')/office:document-styles/office:styles/number:date-style/number:week-of-year">
         <xsl:message terminate="no">translation.odf2oox.WeekDateFormat</xsl:message>
       </xsl:when>
     </xsl:choose>
-    
-    
+
+
     <numFmts>
-      
+
       <!-- number of all number styles in content.xml -->
       <xsl:variable name="countNumber">
         <xsl:value-of
@@ -810,9 +814,9 @@
     <xsl:if test="not($AtributeName = 'cellStyleXfs' and $FileName = '')">
       <xf numFmtId="{$numFormat}" fillId="0" borderId="0">
         <xsl:if test="$postStyleName">
-        <xsl:attribute name="table:post-style-name">
-          <xsl:value-of select="@style:name"/>
-        </xsl:attribute>
+          <xsl:attribute name="table:post-style-name">
+            <xsl:value-of select="@style:name"/>
+          </xsl:attribute>
         </xsl:if>
         <xsl:if test="$AtributeName != 'cellStyleXfs'">
           <xsl:attribute name="xfId">
@@ -830,7 +834,7 @@
           <xsl:with-param name="FileName" select="$FileName"/>
           <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
           <xsl:with-param name="contentFillCount" select="$contentFillCount"/>
-        </xsl:call-template>       
+        </xsl:call-template>
       </xf>
     </xsl:if>
   </xsl:template>
@@ -1225,7 +1229,8 @@
             test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
             <xsl:for-each
               select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
-              <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
+              <xsl:value-of
+                select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
             </xsl:for-each>
           </xsl:when>
           <!-- search parent style in content.xml -->
@@ -1301,7 +1306,7 @@
             </xsl:if>
           </xsl:if>
 
-          
+
         </xsl:if>
         <xsl:apply-templates select="style:text-properties" mode="textstyles">
           <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
@@ -1731,15 +1736,18 @@
           <xsl:choose>
             <xsl:when test="key('style',@table:style-name)">
               <xsl:for-each select="key('style',@table:style-name)">
-                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
+                <xsl:value-of
+                  select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="TableStyleName">
                 <xsl:value-of select="@table:style-name"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$TableStyleName]">
-                <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
+              <xsl:for-each
+                select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$TableStyleName]">
+                <xsl:value-of
+                  select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
@@ -1788,8 +1796,9 @@
                     <xsl:variable name="cellStyleName">
                       <xsl:value-of select="@table:style-name"/>
                     </xsl:variable>
-                    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$cellStyleName]">
-                        <xsl:call-template name="XfId"/>
+                    <xsl:for-each
+                      select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$cellStyleName]">
+                      <xsl:call-template name="XfId"/>
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
@@ -1886,18 +1895,21 @@
                     </xsl:when>
                     <!-- when style is in styles.xml -->
                     <xsl:otherwise>
-                      <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$columnCellStyle]">
+                      <xsl:for-each
+                        select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$columnCellStyle]">
 
 
-                          <xsl:attribute name="xfId">
-                            <xsl:value-of select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
-                          </xsl:attribute>
-                      
-                          <xsl:call-template name="SetFormatProperties">
-                            <xsl:with-param name="multiline">
-                              <xsl:text>true</xsl:text>
-                            </xsl:with-param>
-                          </xsl:call-template>
+                        <xsl:attribute name="xfId">
+                          <xsl:value-of
+                            select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"
+                          />
+                        </xsl:attribute>
+
+                        <xsl:call-template name="SetFormatProperties">
+                          <xsl:with-param name="multiline">
+                            <xsl:text>true</xsl:text>
+                          </xsl:with-param>
+                        </xsl:call-template>
 
 
                       </xsl:for-each>
@@ -1927,7 +1939,7 @@
                   </xsl:variable>
 
                   <xsl:attribute name="fontId">
-                    <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
+                    <xsl:value-of select="$contentFontCount + $styleFontCount +$styleFontCount"/>
                   </xsl:attribute>
 
                   <alignment wrapText="1"/>
@@ -2455,13 +2467,14 @@
           <xsl:when
             test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' and @style:family = 'table-cell']">
             <xsl:value-of select="$contentFontCount + $styleFontCount"/>
+            
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
+            <xsl:value-of select="$contentFontCount + $styleFontCount + $styleFontCount"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
+      
       <xf numFmtId="0" fillId="0" borderId="0" xfId="{$xfId}" fontId="{$fontId}"/>
 
     </xsl:if>
