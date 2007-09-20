@@ -43,6 +43,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private const string EXCEL_NAMESPACE = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         private bool isPxsi;
 
+        //if there are 2 variables with simillar names but one ends with "Text" (i.e. pivotTable and pivotTableText)
+        //one contains cell values other (ending with Text) cell text as it is displayed
+        
         //<pxsi:pivotTable> variables
         private bool isInPivotTable;        
         private bool isSheetNum;
@@ -56,8 +59,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private bool isRowEnd;
         private string cacheRowEnd;
         private string[,] pivotTable;
+        private string[,] pivotTableText;
         private Hashtable[] fieldNames;
         private Hashtable[,] fieldItems;
+        private Hashtable[,] fieldItemsText;
         //fieldItems[i,j] (dimesion i equals number of pivotFields, dimesion j equals 2) 
         //fieldItems variable for each pivotField contains hashtable with unique values of this pivotField and a sequential number
         //at fieldItems[i,0] pivotField[i] values are the key and sequential number are the key values
@@ -441,6 +446,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotTable".Equals(element.Name))
                 {
                     this.pivotTable = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
+                    this.pivotTableText = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
+
                     CreatePivotTable(Convert.ToInt32(cacheSheetNum),Convert.ToInt32(cacheRowStart),Convert.ToInt32(cacheRowEnd),Convert.ToInt32(cacheColStart),Convert.ToInt32(cacheColEnd));
 
                     this.isInPivotTable = false;
@@ -513,9 +520,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         this.nextWriter.WriteString("0");
                         this.nextWriter.WriteEndAttribute();
 
-                        //if field is in use insert dateField or axis attribute
+                        //if field is in use
                         if (nameNum != -1)
                         {
+                            //insert field type attribute
                             if (!"".Equals(axes[nameNum]))
                             {
                                 this.nextWriter.WriteStartAttribute("axis");
@@ -528,34 +536,41 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                 this.nextWriter.WriteString("1");
                                 this.nextWriter.WriteEndAttribute();
                             }
-                        }
+                        
 
-                        //if field is sorted insert sortType attribute
-                        if (nameNum != -1)
-                        {
+                            //if field is sorted insert sortType attribute
                             if (sort[nameNum] != "")
                             {
                                 this.nextWriter.WriteStartAttribute("sortType");
                                 this.nextWriter.WriteString(sort[nameNum]);
                                 this.nextWriter.WriteEndAttribute();
                             }
-                        }
+                        
 
+                            //if field has subtotals insert appropriate attributes                        
+                            if (subtotals[nameNum] != "")
+                            {
+                                string[] totals = subtotals[nameNum].Split(';');
 
-                        //if field is in axis location then output <item> elements
-                        if (nameNum != -1)
-                        {
+                                for (int total = 0; total < totals.Length; total++)
+                                {
+                                    this.nextWriter.WriteStartAttribute(totals[total] + "Subtotal");
+                                    this.nextWriter.WriteString("1");
+                                    this.nextWriter.WriteEndAttribute();
+                                }
+                            }
+                            else
+                            {
+                                this.nextWriter.WriteStartAttribute("defaultSubtotal");
+                                this.nextWriter.WriteString("0");
+                                this.nextWriter.WriteEndAttribute();
+                            }
+                        
+                            //if field is in axis location then output <item> elements
                             if (!"".Equals(axes[nameNum]))
                             {
                                 this.nextWriter.WriteStartElement("items", EXCEL_NAMESPACE);
-                                OutputItems(name);
-
-                                this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
-                                this.nextWriter.WriteStartAttribute("t");
-                                this.nextWriter.WriteString("default");
-                                this.nextWriter.WriteEndAttribute();
-                                this.nextWriter.WriteEndElement();
-
+                                OutputItems(name, hide[nameNum], subtotals[nameNum]);
                                 this.nextWriter.WriteEndElement();
                             }
                         }
@@ -578,6 +593,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     {
                         //get field name
                         string name = fieldNames[1][col].ToString();
+
 
                         //search position of field with this name inside <table:data-pilot-table>
                         //field with empty name is not counted
@@ -605,10 +621,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                 {
                                     //insert "count" attribute
                                     this.nextWriter.WriteStartAttribute("count");
-                                    this.nextWriter.WriteString((string)this.fieldItems[nameNum, 0].Count.ToString());
+                                    this.nextWriter.WriteString((string)this.fieldItems[col, 0].Count.ToString());
                                     this.nextWriter.WriteEndAttribute();
 
-                                    for (int i = 0; i < this.fieldItems[nameNum, 1].Count; i++)
+                                    for (int i = 0; i < this.fieldItems[col, 1].Count; i++)
                                     {
 
                                         // <e> - error, <d> - date and <b> - bool not handled for now
@@ -616,23 +632,23 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                         try
                                         {
                                             //if field value is a number
-                                            Convert.ToDouble(this.fieldItems[nameNum, 1][i].ToString().Replace('.', ','));
+                                            Convert.ToDouble(this.fieldItems[col, 1][i].ToString().Replace('.', ','));
                                             this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
                                             this.nextWriter.WriteStartAttribute("v");
-                                            this.nextWriter.WriteString(this.fieldItems[nameNum, 1][i].ToString());
+                                            this.nextWriter.WriteString(this.fieldItems[col, 1][i].ToString());
                                             this.nextWriter.WriteEndAttribute();
                                         }
                                         catch
                                         {
                                             //if field value is a string
-                                            if (this.fieldItems[nameNum, 1][i].ToString().Length == 0)
+                                            if (this.fieldItems[col, 1][i].ToString().Length == 0)
                                                 //blank value
                                                 this.nextWriter.WriteStartElement("m", EXCEL_NAMESPACE);
                                             else
                                             {
                                                 this.nextWriter.WriteStartElement("s", EXCEL_NAMESPACE);
                                                 this.nextWriter.WriteStartAttribute("v");
-                                                this.nextWriter.WriteString(this.fieldItems[nameNum, 1][i].ToString());
+                                                this.nextWriter.WriteString(this.fieldItems[col, 1][i].ToString());
                                                 this.nextWriter.WriteEndAttribute();
                                             }
                                         }
@@ -735,13 +751,17 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
             this.fieldNames = new Hashtable[2];
             this.fieldItems = new Hashtable[cols, 2];
+            this.fieldItemsText = new Hashtable[cols, 2];
 
             //initialize Hashtables
             for (int i = 0; i < 2; i++)
             {
                 fieldNames[i] = new Hashtable();
                 for (int field = 0; field < cols; field++)
+                {
                     fieldItems[field, i] = new Hashtable();
+                    fieldItemsText[field, i] = new Hashtable();
+                }
             }
             
             //fill fieldNames (from cells text value)
@@ -771,22 +791,31 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     if (pivotCells.ContainsKey(key))
                     {                        
                         this.pivotTable[row, col] = (string)pivotCells[key];
+                        this.pivotTableText[row, col] = (string)pivotCellsText[key];
 
                         if (!fieldItems[col,0].ContainsKey((string)pivotCells[key]))
                         {
                             fieldItems[col,0].Add((string)pivotCells[key], index[col]);
                             fieldItems[col,1].Add(index[col],(string)pivotCells[key]);
+
+                            fieldItemsText[col, 0].Add((string)pivotCellsText[key], index[col]);
+                            fieldItemsText[col, 1].Add(index[col], (string)pivotCellsText[key]);
                             index[col]++;
                         }
                     }
                     else
                     {
                         this.pivotTable[row, col] = "";
+                        this.pivotTableText[row, col] = "";
+
                         if (!fieldItems[col,0].ContainsKey(""))
                         {
                             //fieldItems[col].Add("", index[col]);
                             fieldItems[col,0].Add("", index[col]);
                             fieldItems[col,1].Add(index[col],"");
+
+                            fieldItemsText[col, 0].Add("", index[col]);
+                            fieldItemsText[col, 1].Add(index[col], "");
                             index[col]++;
                         }
                     }
@@ -888,7 +917,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
         }
 
-        private void OutputItems(string name)
+        private void OutputItems(string name, string hide, string subtotals)
         {
             int fieldNum = Convert.ToInt32(fieldNames[0][name]);
 
@@ -940,33 +969,73 @@ namespace CleverAge.OdfConverter.Spreadsheet
             Array.Sort(sortedStrings);
 
             //output sorted item types in order: numbers, strings, blank
+            int itemNum;
+            string itemText;
             for (int i = 0; i < sortedNumbers.Length; i++)
             {
-                OutputItem(name, sortedNumbers[i].ToString().Replace(',', '.'));
-            }
+                //find number of this item and take textItem under this number
+                itemNum = Convert.ToInt32(fieldItems[fieldNum, 0][sortedNumbers[i].ToString().Replace(',', '.')]);
+                itemText = fieldItemsText[fieldNum, 1][itemNum].ToString();
 
+                //check if this item is hidden (Calc uses items text, Excel items value [])
+                bool hidden = false;
+                if (hide.Contains(";" + itemText + ";"))
+                    hidden = true;
+
+                OutputItem(name, sortedNumbers[i].ToString().Replace(',', '.'),hidden);
+            }
+            
             for (int i = 0; i < sortedStrings.Length; i++)
             {
-                OutputItem(name, sortedStrings[i]);
+                //check if this item is hidden
+                bool hidden = false;
+                if (hide.Contains(";" + sortedStrings[i] + ";"))
+                    hidden = true;
+
+                OutputItem(name, sortedStrings[i],hidden);
             }
 
             if (isBlank)
-                OutputItem(name,"");
+            {
+                Console.WriteLine("item: " + "(blank)");
+                //check if this item is hidden
+                bool hidden = false;
+                if (hide.Contains(";;"))
+                    hidden = true;
+                
+                OutputItem(name, "", hidden);
+            }
+
+            //output subtotal items
+            if (!"".Equals(subtotals))
+            {
+                Console.WriteLine(subtotals + "(" + subtotals.Length + ")");
+                string[] subItems = subtotals.Split(';');
+
+                for (int item = 0; item < subItems.Length; item++)
+                {
+                    this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
+                    this.nextWriter.WriteStartAttribute("t");
+                    this.nextWriter.WriteString(subItems[item]);
+                    this.nextWriter.WriteEndAttribute();
+                    this.nextWriter.WriteEndElement();
+                }
+            }
         }
 
-        private void OutputItem(string name, string item)
+        private void OutputItem(string name, string item, bool hide)
         {
             int fieldNum = Convert.ToInt32(fieldNames[0][name]); 
             
             this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
 
             //if this item is hidden
-            /*if (itemsHide.Contains(";" + item + ";"))
+            if (hide)
             {
                 this.nextWriter.WriteStartAttribute("h");
                 this.nextWriter.WriteString("1");
                 this.nextWriter.WriteEndAttribute();
-            }*/
+            }
             
             this.nextWriter.WriteStartAttribute("x");
             this.nextWriter.WriteString(fieldItems[fieldNum, 0][item].ToString());
