@@ -234,20 +234,23 @@
 
             <xsl:if
               test="table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]">
-              <xsl:text>;</xsl:text>
 
               <xsl:for-each
                 select="table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]">
 
+                <xsl:if test="position() &gt; 1 ">
+                  <xsl:text>;</xsl:text>
+                </xsl:if>
+                
                 <xsl:choose>
                   <xsl:when test="@table:function = 'sum' ">
                     <xsl:text>sum</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'count' ">
-                    <xsl:text>count</xsl:text>
+                    <xsl:text>countA</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'average' ">
-                    <xsl:text>average</xsl:text>
+                    <xsl:text>avg</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'max' ">
                     <xsl:text>max</xsl:text>
@@ -256,26 +259,27 @@
                     <xsl:text>min</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'product' ">
-                    <xsl:text>productSubtotal</xsl:text>
+                    <xsl:text>product</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'countnums' ">
-                    <xsl:text>countnums</xsl:text>
+                    <xsl:text>count</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'stdev' ">
-                    <xsl:text>stdev</xsl:text>
+                    <xsl:text>stdDev</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'stdevp' ">
-                    <xsl:text>stdevp</xsl:text>
+                    <xsl:text>stdDevP</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'var' ">
                     <xsl:text>var</xsl:text>
                   </xsl:when>
                   <xsl:when test="@table:function = 'varp' ">
-                    <xsl:text>varp</xsl:text>
+                    <xsl:text>varP</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'auto' ">
+                    <xsl:text>default</xsl:text>
                   </xsl:when>
                 </xsl:choose>
-                <xsl:text>;</xsl:text>
-
               </xsl:for-each>
             </xsl:if>
           </xsl:for-each>
@@ -302,161 +306,6 @@
             <xsl:value-of select="$subtotals"/>
           </xsl:attribute>
         </pxsi:pivotFields>
-
-        <!-- pivotFields have names, the one field without name (definition?) can occur not only on the first place -->
-        <!--xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
-
-          <pivotField showAll="0"-->
-
-        <!-- field orientation -->
-        <!--xsl:choose>
-              <xsl:when test="@table:orientation = 'page' ">
-                <xsl:attribute name="axis">
-                  <xsl:text>axisPage</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
-              <xsl:when test="@table:orientation = 'column' ">
-                <xsl:attribute name="axis">
-                  <xsl:text>axisCol</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
-              <xsl:when test="@table:orientation = 'row' ">
-                <xsl:attribute name="axis">
-                  <xsl:text>axisRow</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
-              <xsl:when test="@table:orientation = 'data' ">
-                <xsl:attribute name="dataField">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
-            </xsl:choose>
-
-
-            <xsl:for-each
-              select="table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]">
-
-              <xsl:if test="@table:function = 'sum' ">
-                <xsl:attribute name="sumSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'count' ">
-                <xsl:attribute name="countASubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'average' ">
-                <xsl:attribute name="avgSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'max' ">
-                <xsl:attribute name="maxSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'min' ">
-                <xsl:attribute name="minSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'product' ">
-                <xsl:attribute name="productSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-
-              <xsl:if test="@table:function = 'countnums' ">
-                <xsl:attribute name="countSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'stdev' ">
-                <xsl:attribute name="stdDevSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'stdevp' ">
-                <xsl:attribute name="stdDevPSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'var' ">
-                <xsl:attribute name="varSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-              <xsl:if test="@table:function = 'varp' ">
-                <xsl:attribute name="varPSubtotal">
-                  <xsl:text>1</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
-
-            </xsl:for-each>
-
-            <xsl:choose>
-              <xsl:when
-                test="table:data-pilot-level/table:data-pilot-sort-info[@table:order = 'descending' and @table:sort-mode != 'manual' and @table:sort-mode != 'none']">
-                <xsl:attribute name="sortType">
-                  <xsl:text>descending</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
-              <xsl:when
-                test="table:data-pilot-level/table:data-pilot-sort-info[@table:order = 'ascending' and @table:sort-mode != 'manual' and @table:sort-mode != 'none'] ">
-                <xsl:attribute name="sortType">
-                  <xsl:text>ascending</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
-            </xsl:choose>
-
-            <xsl:if test="not(@table:orientation = 'data')">
-              <items-->
-        <!-- w tym miejscu trzeba dodać do postprocesora, ze jesli wystepuje 
-                        table:data-pilot-level/table:data-pilot-subtotals/table:data-pilot-subtotal[@table:function]
-                  to dla każdego @table:function stworzyć <item t='wartosc_funkcji'>-->
-        <!-- 
-                  z   'sum'             na     'sum'
-                  z   'count'           na     'countA'
-                  z   'average'      na     'avg'
-                  z   'max'             na     'max'
-                  z   'min'              na     'min'
-                  z   'product'       na     'product'
-                  z   'countnums'    na     'count'
-                  z   'stdev'           na     'stdDev'
-                  z   'stdevp'       na   'stdDevP'
-                  z   'var'             na     'var'
-                  z   'varp'           na     'varP'
-                -->
-        <!--pxsi:items pxsi:field="{@table:source-field-name}">
-                  <xsl:if
-                    test="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
-                    <xsl:attribute name="pxsi:hide">
-                      <xsl:text>;</xsl:text>
-                      <xsl:for-each
-                        select="table:data-pilot-level/table:data-pilot-members/table:data-pilot-member[@table:display = 'false' ]">
-                        <xsl:value-of select="@table:name"/>
-                        <xsl:text>;</xsl:text>
-                      </xsl:for-each>
-                    </xsl:attribute>
-                  </xsl:if>
-                </pxsi:items>
-                <item t="default"/>
-              </items>
-            </xsl:if>
-
-          </pivotField>
-        </xsl:for-each-->
 
         <xsl:variable name="sourceStartCol">
           <xsl:call-template name="GetColNum">
