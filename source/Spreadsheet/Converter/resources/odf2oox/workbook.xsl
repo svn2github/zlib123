@@ -335,8 +335,8 @@
     
     <xsl:variable name="PrintRange">
       <xsl:choose>
-        <xsl:when test="contains($range, ' ')">
-          <xsl:value-of select="substring-before($range, ' ')"/>    
+        <xsl:when test="contains(substring-after($range, '.'), ' ')">
+          <xsl:value-of select="concat(substring-before($range, '.'), '.', substring-before(substring-after($range, '.'), ' '))"/>    
         </xsl:when>
         <xsl:when test="$range != ''">
           <xsl:value-of select="$range"/>
@@ -427,7 +427,7 @@
            </xsl:with-param>
            <xsl:with-param name="range">
              <xsl:value-of
-               select="substring-after($range,' ')"/>
+               select="substring-after(substring-after($range,'.'), ' ')"/>
            </xsl:with-param>
          </xsl:call-template>
        
@@ -488,7 +488,7 @@
          </xsl:with-param>
          <xsl:with-param name="range">
            <xsl:value-of
-             select="substring-after($range,' ')"/>
+               select="substring-after(substring-after($range,'.'), ' ')"/>
          </xsl:with-param>
        </xsl:call-template>
               
