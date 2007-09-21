@@ -638,7 +638,7 @@
             <xsl:text>none</xsl:text>
           </xsl:attribute>
         </xsl:if>
-        <xsl:if test="@applyBorder = 1 or  @borderId != '0'">
+        <xsl:if test="@applyBorder = 1 or  @borderId != '0' or $MergeCell != ''">
           <xsl:call-template name="InsertBorder">
             <xsl:with-param name="Id">
               <xsl:value-of select="$Id"/>
