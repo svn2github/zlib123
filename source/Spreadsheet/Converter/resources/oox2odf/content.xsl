@@ -107,6 +107,7 @@
         <xsl:call-template name="InsertRowStyles"/>
         <xsl:call-template name="InsertNumberStyles"/>
         <xsl:call-template name="InsertCellStyles"/>
+        <xsl:call-template name="InsertMergeCellStyles"/>
         <xsl:call-template name="InsertStyleTableProperties"/>
         <xsl:call-template name="InsertTextStyles"/>
         <xsl:call-template name="InsertTextBoxTextStyles"/>

@@ -1001,11 +1001,22 @@
               </xsl:when>
 
               <xsl:when test="@s">
+                <xsl:choose>
+                  <xsl:when test="$CheckIfMerge != 'false'">
+                    <xsl:attribute name="table:style-name">
+                      <xsl:for-each select="document('xl/styles.xml')">
+                        <xsl:value-of select="concat(generate-id(key('Xf', '')[position() = $position]), generate-id(key('Xf', '')[position() = $position]))"/>
+                      </xsl:for-each>
+                    </xsl:attribute>    
+                  </xsl:when>
+                  <xsl:otherwise>
                 <xsl:attribute name="table:style-name">
                   <xsl:for-each select="document('xl/styles.xml')">
                     <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
                   </xsl:for-each>
                 </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:when>
 
               <xsl:otherwise>

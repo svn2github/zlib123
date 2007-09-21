@@ -39,7 +39,9 @@
 
 
   <xsl:template name="InsertBorder">
-    <xsl:param name="mergedcellborder"/>
+    <xsl:param name="Id"/>
+    <xsl:param name="MergeCell"/>
+    
     <xsl:variable name="BorderId">
       <xsl:choose>
         <xsl:when test="@borderId != ''">
@@ -48,16 +50,35 @@
         <xsl:otherwise/>
       </xsl:choose>
     </xsl:variable>
+    
+    <xsl:variable name="LastMergeCell">
+      <xsl:value-of select="substring-after(substring-before($MergeCell, ';'), ':')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="NrStyleMergeEnd">
+      <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:sheetData">
+        <xsl:value-of select="e:row/e:c[@r = $LastMergeCell]/@s"/>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="LastMergeCellBorderId">
+      <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $NrStyleMergeEnd +1]">
+        <xsl:value-of select="@borderId"/>
+      </xsl:for-each>
+    </xsl:variable>
 
     <xsl:choose>
       <xsl:when test="$BorderId != 0 and $BorderId != ''">
         <xsl:for-each select="key('Border', '')/e:border[position() = $BorderId + 1]">
           <xsl:call-template name="InsertBorderProperties">
-            <xsl:with-param name="mergedcellborder">
-              <xsl:value-of select="$mergedcellborder"/>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
             <xsl:with-param name="thisborderId">
               <xsl:value-of select="$BorderId"/>
+            </xsl:with-param>
+            <xsl:with-param name="LastMergeCellBorderId">
+              <xsl:value-of select="$LastMergeCellBorderId"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:for-each>
@@ -65,8 +86,8 @@
       <xsl:otherwise>
         <xsl:for-each select="e:border">
           <xsl:call-template name="InsertBorderProperties">
-            <xsl:with-param name="mergedcellborder">
-              <xsl:value-of select="$mergedcellborder"/>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
             <xsl:with-param name="thisborderId">
               <xsl:value-of select="$BorderId"/>
@@ -106,18 +127,46 @@
 
 
   <xsl:template name="InsertBottomAndRightBorderProperties">
+    <xsl:param name="LastMergeCellBorderId"/>
+  
+  
     <xsl:attribute name="fo:border-bottom">
       <xsl:variable name="BorderStyleBottom">
+        <xsl:choose>
+          <xsl:when test="$LastMergeCellBorderId != ''">
+            <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:borders/e:border[position() = $LastMergeCellBorderId +1]">        
         <xsl:call-template name="GetBorderStyle">
           <xsl:with-param name="style">
             <xsl:value-of select="e:bottom/@style"/>
           </xsl:with-param>
         </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="GetBorderStyle">
+              <xsl:with-param name="style">
+                <xsl:value-of select="e:bottom/@style"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
+      
       <xsl:variable name="BorderColorBottom">
-        <xsl:for-each select="e:bottom/e:color">
-          <xsl:call-template name="InsertColor"/>
-        </xsl:for-each>
+        <xsl:choose>
+          <xsl:when test="$LastMergeCellBorderId != ''">
+            <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:borders/e:border[position() = $LastMergeCellBorderId +1]">        
+            <xsl:for-each select="e:bottom/e:color">
+              <xsl:call-template name="InsertColor"/>
+            </xsl:for-each>    
+              </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="e:bottom/e:color">
+              <xsl:call-template name="InsertColor"/>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="$BorderStyleBottom != 'none'">
@@ -133,14 +182,34 @@
       <xsl:variable name="BorderStyleRight">
         <xsl:call-template name="GetBorderStyle">
           <xsl:with-param name="style">
-            <xsl:value-of select="e:right/@style"/>
+            <xsl:choose>
+              <xsl:when test="$LastMergeCellBorderId != ''">
+                <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:borders/e:border[position() = $LastMergeCellBorderId +1]">
+                  <xsl:value-of select="e:right/@style"/>
+                 </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="e:right/@style"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="BorderColorRight">
-        <xsl:for-each select="e:right/e:color">
-          <xsl:call-template name="InsertColor"/>
-        </xsl:for-each>
+        <xsl:choose>
+          <xsl:when test="$LastMergeCellBorderId != ''">
+            <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:borders/e:border[position() = $LastMergeCellBorderId +1]">
+            <xsl:for-each select="e:right/e:color">
+              <xsl:call-template name="InsertColor"/>
+            </xsl:for-each>    
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="e:right/e:color">
+              <xsl:call-template name="InsertColor"/>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="$BorderStyleRight != 'none'">
@@ -154,8 +223,13 @@
   </xsl:template>
 
   <xsl:template name="InsertBorderProperties">
+    <xsl:param name="LastMergeCellBorderId"/>
     
-    <xsl:call-template name="InsertBottomAndRightBorderProperties"/>
+    <xsl:call-template name="InsertBottomAndRightBorderProperties">
+      <xsl:with-param name="LastMergeCellBorderId">
+        <xsl:value-of select="$LastMergeCellBorderId"/>
+      </xsl:with-param>
+    </xsl:call-template>
      
     <xsl:attribute name="fo:border-left">
       <xsl:variable name="BorderStyleLeft">

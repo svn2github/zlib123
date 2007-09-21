@@ -441,24 +441,119 @@
       mode="automaticstyles"/>
   </xsl:template>
 
-  <xsl:template name="InsertCellStyles">
-    <xsl:variable name="mergedcellborder">
+<xsl:template name="InsertCellStyles">
+
+    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf">
+      <style:style style:name="{generate-id(.)}" style:family="table-cell">
+        <xsl:call-template name="InsertCellFormat"/>
+      </style:style> 
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertMergeCellStyles">
+   
+    <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
+      mode="MergeStyle">
+      <xsl:with-param name="number">1</xsl:with-param>
+    </xsl:apply-templates>
+    <!--xsl:variable name="MergeCell">
      <xsl:call-template name="PreprocessMergedCellsForBorders"/>    
     </xsl:variable>
+   
     <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf">
       <style:style style:name="{generate-id(.)}" style:family="table-cell">
         <xsl:call-template name="InsertCellFormat">
-          <xsl:with-param name="mergedcellborder"><xsl:value-of select="$mergedcellborder"/></xsl:with-param>
+          <xsl:with-param name="MergeCell"><xsl:value-of select="$MergeCell"/></xsl:with-param>
         </xsl:call-template>
       </style:style> 
+    </xsl:for-each-->
+  </xsl:template>
+  
+  <xsl:template match="e:sheet" mode="MergeStyle">
+    <xsl:param name="number"/>
+    
+    <xsl:variable name="Id">
+      <xsl:call-template name="GetTarget">
+        <xsl:with-param name="id">
+          <xsl:value-of select="@r:id"/>
+        </xsl:with-param>
+        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="sheetName">
+      <xsl:value-of select="@name"/>
+    </xsl:variable>
+    
+      <xsl:variable name="MergeCell">
+        <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:mergeCells">
+          <xsl:apply-templates select="e:mergeCell[1]" mode="merge"/>
+        </xsl:for-each>
+      </xsl:variable>
+    
+    <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:sheetData">
+    <xsl:call-template name="InsertMergeCellStyleProperties">
+      <xsl:with-param name="Id">
+        <xsl:value-of select="$Id"/>
+      </xsl:with-param>
+      <xsl:with-param name="MergeCell">
+        <xsl:value-of select="$MergeCell"/>
+      </xsl:with-param>
+    </xsl:call-template>
     </xsl:for-each>
+    
+    <!-- Insert next Table -->
+    
+    <xsl:apply-templates select="following-sibling::e:sheet[1]" mode="MergeStyle">
+      <xsl:with-param name="number">
+        <xsl:value-of select="$number + 1"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    
+  </xsl:template>
+  
+  <xsl:template name="InsertMergeCellStyleProperties">
+    <xsl:param name="MergeCell"/>
+    <xsl:param name="Id"/>
+    
+    <xsl:if test="$MergeCell != ''">
+      
+      <xsl:variable name="NrStyleMergeStart">
+        <xsl:value-of select="e:row/e:c[@r = substring-before($MergeCell, ':')]/@s"/>
+      </xsl:variable>
+      
+      <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $NrStyleMergeStart +1]">        
+        <style:style style:name="{concat(generate-id(.), generate-id(.))}" style:family="table-cell">
+          <xsl:call-template name="InsertCellFormat">
+            <xsl:with-param name="Id">
+              <xsl:value-of select="$Id"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
+            </xsl:with-param>
+          </xsl:call-template>
+          </style:style>
+        </xsl:for-each>
+      
+      <xsl:call-template name="InsertMergeCellStyleProperties">
+        <xsl:with-param name="Id">
+          <xsl:value-of select="$Id"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="substring-after($MergeCell, ';')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
+    
   </xsl:template>
 
   <!-- cell formats -->
 
   <xsl:template name="InsertCellFormat">
-    <xsl:param name="mergedcellborder"/>
-    
+    <xsl:param name="Id"/>
+    <xsl:param name="MergeCell"/>
+
     <xsl:choose>
 
       <!-- existing number format -->
@@ -545,7 +640,12 @@
         </xsl:if>
         <xsl:if test="@applyBorder = 1 or  @borderId != '0'">
           <xsl:call-template name="InsertBorder">
-            <xsl:with-param name="mergedcellborder"><xsl:value-of select="$mergedcellborder"/></xsl:with-param>
+            <xsl:with-param name="Id">
+              <xsl:value-of select="$Id"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
 
