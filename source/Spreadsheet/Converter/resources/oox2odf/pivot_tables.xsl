@@ -381,7 +381,7 @@
                 <xsl:attribute name="table:function">
 
                   <xsl:choose>
-                    <xsl:when test="@axis = 'axisRow' or @axis = 'axisCol'">
+                    <xsl:when test="@axis = 'axisRow' or @axis = 'axisCol'  or @axis = 'axisPage'">
                       <xsl:text>auto</xsl:text>
                     </xsl:when>
 
