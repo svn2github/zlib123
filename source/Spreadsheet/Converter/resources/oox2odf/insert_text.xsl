@@ -48,7 +48,7 @@
     <xsl:param name="rSheredStrings"/>
 
     <xsl:choose>
-      <xsl:when test="@t='s' ">
+      <xsl:when test="@t='s' or key('ref',@r)">
         <xsl:attribute name="office:value-type">
           <xsl:text>string</xsl:text>
         </xsl:attribute>
@@ -95,6 +95,12 @@
                     <xsl:attribute name="xlink:href">
                       <xsl:value-of select="$XlinkHref"/>
                     </xsl:attribute>
+                    <xsl:choose>
+                      <xsl:when test="@t='s'"/>
+                      <xsl:otherwise>
+                        <xsl:value-of select="e:v"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                     <pxsi:v>
                       <xsl:value-of select="e:v"/>
                     </pxsi:v>
@@ -255,43 +261,43 @@
           </xsl:choose>
         </xsl:attribute>
 
-          <xsl:choose>
-            <xsl:when
-              test="((contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)) and not(contains($numStyle, '[$$-409]') or contains($numStyle, '[$Sk-41B]') or contains($numStyle, '[$Din.-81A]') or contains($numStyle, '[$€-180C]') or contains($numStyle, '[$€-1007]'))">
-              <xsl:attribute name="office:date-value">
-                <xsl:call-template name="NumberToDate">
-                  <xsl:with-param name="value">
-                    <xsl:choose>
-                      <xsl:when
-                        test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
-                        <xsl:value-of select="(e:v) + (1462)"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="e:v"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:when>
+        <xsl:choose>
+          <xsl:when
+            test="((contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)) and not(contains($numStyle, '[$$-409]') or contains($numStyle, '[$Sk-41B]') or contains($numStyle, '[$Din.-81A]') or contains($numStyle, '[$€-180C]') or contains($numStyle, '[$€-1007]'))">
+            <xsl:attribute name="office:date-value">
+              <xsl:call-template name="NumberToDate">
+                <xsl:with-param name="value">
+                  <xsl:choose>
+                    <xsl:when
+                      test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
+                      <xsl:value-of select="(e:v) + (1462)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="e:v"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
 
-            <!--'and' at the end is for Latvian currency -->
-            <xsl:when
-              test="not(contains($numStyle,'[$Ls-426]') or contains($numStyle,'[$kr-425]') or contains($numStyle,'[$€-813]')) and (contains($strippedFormat,'h') or contains($strippedFormat,'s') or $numId = 18 or $numId = 20)">
-              <xsl:attribute name="office:time-value">
-                <xsl:call-template name="NumberToTime">
-                  <xsl:with-param name="value">
-                    <xsl:value-of select="e:v"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:attribute name="office:value">
-                <xsl:value-of select="e:v"/>
-              </xsl:attribute>
-            </xsl:otherwise>
-          </xsl:choose>
+          <!--'and' at the end is for Latvian currency -->
+          <xsl:when
+            test="not(contains($numStyle,'[$Ls-426]') or contains($numStyle,'[$kr-425]') or contains($numStyle,'[$€-813]')) and (contains($strippedFormat,'h') or contains($strippedFormat,'s') or $numId = 18 or $numId = 20)">
+            <xsl:attribute name="office:time-value">
+              <xsl:call-template name="NumberToTime">
+                <xsl:with-param name="value">
+                  <xsl:value-of select="e:v"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="office:value">
+              <xsl:value-of select="e:v"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
         <text:p>
           <xsl:choose>
 
