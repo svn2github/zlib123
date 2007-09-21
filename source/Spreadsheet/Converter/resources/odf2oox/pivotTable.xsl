@@ -452,7 +452,25 @@
           <xsl:for-each
             select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data']">
             <dataField>
+              
               <xsl:attribute name="name">
+                <!-- Function name with uppercase first letter -->
+                <xsl:choose>
+                  <xsl:when test="@table:function = 'countnums' ">
+                    <xsl:text>Count</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'stdev' ">
+                    <xsl:text>StdDev</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@table:function = 'stdevp' ">
+                    <xsl:text>StdDevp</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="translate(substring(@table:function,1,1),'scampv','SCAMPV')"/>
+                    <xsl:value-of select="substring(@table:function,2)"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+                <xsl:text> of </xsl:text>
                 <xsl:value-of select="@table:source-field-name"/>
               </xsl:attribute>
 
