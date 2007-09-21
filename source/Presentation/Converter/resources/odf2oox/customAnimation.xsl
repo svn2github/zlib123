@@ -52,7 +52,7 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name ="slideId"/>
 		<!--<xsl:if test ="anim:par/anim:seq/anim:par">-->
 
-		<xsl:variable name ="animationVal">
+		  <xsl:variable name ="animationVal">
 			<xsl:for-each select ="anim:par/anim:seq/anim:par">
 				<xsl:variable name ="validateAnimation">
 					<xsl:call-template name ="validateAnimation"/>
@@ -713,6 +713,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:with-param >
       </xsl:call-template>
     </xsl:variable>
+    <xsl:value-of select ="$spId"/>
   </xsl:template>
 	<xsl:template name ="tavListValues">
 		<xsl:call-template name ="addTavListNode">
@@ -1350,6 +1351,9 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:when>
 			<xsl:when test ="$animationType ='emph'">
 				<xsl:choose >
+          <xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-fill-color'">
+            <xsl:value-of select ="'1'"/>
+          </xsl:when>
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font'">
 						<xsl:value-of select ="'2'"/>
 					</xsl:when>
@@ -1365,13 +1369,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-grow-and-shrink'">
 						<xsl:value-of select ="'6'"/>
 					</xsl:when>
+          <xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-line-color'">
+            <xsl:value-of select ="'7'"/>
+          </xsl:when>
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-spin'">
 						<xsl:value-of select ="'8'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-transparency'">
 						<xsl:value-of select ="'9'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-bold-flash'">
+					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-bold-flash' or 
+                          ./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-bold-flash'">
 						<xsl:value-of select ="'10'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-color-over-by-word'">
@@ -1431,7 +1439,7 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-grow-with-color'">
 						<xsl:value-of select ="'28'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-shimmer'">
+          <xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-shimmer'">
 						<xsl:value-of select ="'36'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-teeter'">
@@ -1447,7 +1455,8 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:value-of select ="'15'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-style-emphasis'
-						or ./anim:par/anim:anim/@presentation:preset-id ='ooo-emphasis-style-emphasis' ">
+						or ./anim:par/anim:anim/@presentation:preset-id ='ooo-emphasis-style-emphasis'
+            or ./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-style-emphasis' ">
 						<xsl:value-of select ="'31'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-wave'">
