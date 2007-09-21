@@ -116,6 +116,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private bool isPageItem;
         private string pageItem;
 
+        //<pxsi:filterType> variables
+        private bool isInFilterType;
+        private bool isFilterField;
+        private string filterField;
+        private bool isCondition;
+        private string condition;
+
         public OoxPivotCachePostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
@@ -182,7 +189,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.pageField = "";
             this.isPageItem = false;
             this.pageItem = "";
-}
+
+            //<pxsi:filterType> variables
+            this.isInFilterType = false;
+            this.isFilterField = false;
+            this.filterField = "";
+            this.isCondition = false;
+            this.condition = "";
+        }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
@@ -262,6 +276,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.isInPageItem = true;
                 this.isPxsi = true;
             }
+            else if (PXSI_NAMESPACE.Equals(ns) && "filterType".Equals(localName))
+            {
+                this.pivotContext = new Stack();
+                this.pivotContext.Push(new Element(prefix, localName, ns));
+                this.isInFilterType = true;
+                this.isPxsi = true;
+            }
             else
             {
                 this.nextWriter.WriteStartElement(prefix, localName, ns);
@@ -321,6 +342,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isPageField = true;
                 else if (PXSI_NAMESPACE.Equals(ns) && "pageItem".Equals(localName))
                     this.isPageItem = true;
+            }
+            else if (isInFilterType)
+            {
+                if (PXSI_NAMESPACE.Equals(ns) && "filterField".Equals(localName))
+                    this.isFilterField = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "condition".Equals(localName))
+                    this.isCondition = true;
             }
             else
             {
@@ -386,6 +414,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else if (isPageItem)
                     this.pageItem += text;
             }
+            else if (isInFilterType)
+            {
+                if (isFilterField)
+                    this.filterField += text;
+                else if (isCondition)
+                    this.condition += text;
+            }
             else
             {
                 this.nextWriter.WriteString(text);
@@ -432,6 +467,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.isPageField = false;
             else if (isPageItem)
                 this.isPageItem = false;
+            else if (isFilterField)
+                this.isFilterField = false;
+            else if (isCondition)
+                this.isCondition = false;
             else if (!isPxsi)
                 this.nextWriter.WriteEndAttribute();
         }
@@ -730,6 +769,41 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isInPageItem = false;
                     this.pageField = "";
                     this.pageItem = "";
+                    this.isPxsi = false;
+                }
+                else if (PXSI_NAMESPACE.Equals(element.Ns) && "filterType".Equals(element.Name))
+                {
+
+                    int fieldNum = Convert.ToInt32(this.filterField);
+                    string name = fieldNames[1][fieldNum].ToString();
+
+                    string[] names = pivotNames.Split('~');
+                    string[] axes = pivotAxes.Split('~');
+
+                    int nameNum = -1;
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        if (name.Equals(names[i]))
+                        {
+                            nameNum = i;
+                            break;
+                        }
+                    }
+
+                    Console.WriteLine("filterName: " + name);
+                    Console.WriteLine("filterAxis: " + axes[nameNum]);
+                    Console.WriteLine("filterCondition: " + condition);
+
+                    this.nextWriter.WriteStartAttribute("type");
+                    if (axes[nameNum].Contains("axis"))
+                        this.nextWriter.WriteString("caption" + this.condition);
+                    else
+                        this.nextWriter.WriteString("value" + this.condition);
+                    this.nextWriter.WriteEndAttribute();
+
+                    this.isInFilterType = false;
+                    this.filterField = "";
+                    this.condition = "";
                     this.isPxsi = false;
                 }
                 else
