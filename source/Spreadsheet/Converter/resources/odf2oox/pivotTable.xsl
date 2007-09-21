@@ -216,8 +216,9 @@
                     <xsl:text>axisRow</xsl:text>
                   </xsl:when>
                 </xsl:choose>
-                
-                <xsl:if test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'data']">
+
+                <xsl:if
+                  test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'data']">
                   <xsl:text>,data</xsl:text>
                 </xsl:if>
 
@@ -336,6 +337,9 @@
           </xsl:for-each>
         </xsl:variable>
 
+
+        <!-- please insert in postprocessor an 'show elements without data' handling-->
+        <!-- if table:data-pilot-level/@table:show-empty['true'] then in pivotField/ there cant be an  showAll="0" -->
         <pxsi:pivotFields>
           <xsl:attribute name="pxsi:names">
             <xsl:value-of select="$names"/>
@@ -574,7 +578,170 @@
 
       <pivotTableStyleInfo name="PivotStyleLight16" showRowHeaders="1" showColHeaders="1"
         showRowStripes="0" showColStripes="0" showLastColumn="1"/>
+
+      <!-- insert filters -->
+      <xsl:if test="parent::node()/table:data-pilot-table/table:source-cell-range/table:filter">
+        <filters>
+          <xsl:for-each
+            select="table:source-cell-range/table:filter/child::node()[name() ='table:filter-or' or name() ='table:filter-and']/table:filter-condition[@table:field-number]">
+
+            <xsl:variable name="pivotIdFilter">
+              <xsl:value-of select="@table:field-number"/>
+            </xsl:variable>
+            
+            <!--xsl:variable name="dataPilotFieldPosition">
+              <xsl:for-each select="ancestor::table:data-pilot-table/table:data-pilot-field[@table:orientation = 'row' or @table:orientation = 'column' or @table:orientation = 'page']">
+                <xsl:value-of select="position()"/>
+              </xsl:for-each>
+            </xsl:variable-->
+
+            <xsl:if
+              test="not(preceding-sibling::table:filter-condition[@table:field-number = $pivotIdFilter])">
+
+              <filter evalOrder="-1" id="10">
+
+                <xsl:variable name="fieldType">
+                  <xsl:for-each
+                    select="ancestor::table:data-pilot-table/table:data-pilot-field[@table:source-field-name != ''][position() = $pivotIdFilter + 1]">
+                    <xsl:value-of select="@table:orientation"/>
+                  </xsl:for-each>
+                </xsl:variable>
+                
+                <!--xsl:for-each
+                  select="ancestor::table:data-pilot-table/table:data-pilot-field[@table:source-field-name != ''][position() = $pivotIdFilter + 1][@table:orientation='row' or @table:orientation='column' or @table:orientation='page' ]">
+                  <xsl:attribute name="stringValue1">
+                    <xsl:value-of select="parent::node()/table:source-cell-range/table:filter/child::node()[name() ='table:filter-or' or name() ='table:filter-and']/table:filter-condition[ position() = $dataPilotFieldPosition - 1]/@table:value"/>
+                  </xsl:attribute>
+                </xsl:for-each-->
+
+                <xsl:attribute name="fld">
+                  <xsl:value-of select="@table:field-number"/>
+                </xsl:attribute>
+
+                <pxsi:filterType pxsi:filterField="{@table:field-number}" pxsi:filterValue="{@table:value}">
+                  <xsl:attribute name="pxsi:condition">
+
+                    <xsl:choose>
+                      <xsl:when test="@table:operator='=' ">
+                        <xsl:text>Equal</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:operator='!=' ">
+                        <xsl:text>NotEqual</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:operator='&lt;' ">
+                        <xsl:text>LessThan</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:operator='&lt;=' ">
+                        <xsl:text>LessThanOrEqual</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:operator='&gt;' ">
+                        <xsl:text>GreaterThan</xsl:text>
+                      </xsl:when>
+
+                      <xsl:when test="@table:operator='&gt;=' ">
+                        <xsl:text>GreaterThanOrEqual</xsl:text>
+                      </xsl:when>
+                    </xsl:choose>
+
+                  </xsl:attribute>
+                </pxsi:filterType>
+
+                <autoFilter ref="A1">
+                  <filterColumn colId="0">
+                    <customFilters>
+                      <xsl:call-template name="InsertFilters"/>
+                    </customFilters>
+                  </filterColumn>
+                </autoFilter>
+              </filter>
+            </xsl:if>
+          </xsl:for-each>
+
+          <!--xsl:if test="table:source-cell-range/table:filter[@table:field-number]">
+            <filter>
+              
+              <xsl:attribute name="fld">
+                <xsl:value-of select="@table:field-number"/>
+              </xsl:attribute>
+             
+              <autoFilter ref="A1">
+                <filterColumn colId="0">
+                <customFilters>
+                <customFilter operator="lessThan" val="3"/>
+                <customFilter operator="greaterThan" val="7"/>
+                </customFilters>
+                </filterColumn>
+                </autoFilter>
+            </filter>
+          </xsl:if-->
+
+        </filters>
+
+      </xsl:if>
+
     </pivotTableDefinition>
+
+  </xsl:template>
+
+  <xsl:template name="InsertFilters">
+
+    <xsl:variable name="pivotIdFilter">
+      <xsl:value-of select="@table:field-number"/>
+    </xsl:variable>
+
+    <customFilter val="3">
+
+      <xsl:if test="@table:operator != '=' ">
+
+        <xsl:attribute name="operator">
+          <xsl:choose>
+
+            <xsl:when test="@table:operator='=' ">
+              <xsl:text>equal</xsl:text>
+            </xsl:when>
+
+            <xsl:when test="@table:operator='!=' ">
+              <xsl:text>notEqual</xsl:text>
+            </xsl:when>
+
+            <xsl:when test="@table:operator='&lt;' ">
+              <xsl:text>lessThan</xsl:text>
+            </xsl:when>
+
+            <xsl:when test="@table:operator='&lt;=' ">
+              <xsl:text>lessThanOrEqual</xsl:text>
+            </xsl:when>
+
+            <xsl:when test="@table:operator='&gt;' ">
+              <xsl:text>greaterThan</xsl:text>
+            </xsl:when>
+
+            <xsl:when test="@table:operator='&gt;=' ">
+              <xsl:text>greaterThanOrEqual</xsl:text>
+            </xsl:when>
+
+          </xsl:choose>
+        </xsl:attribute>
+
+      </xsl:if>
+
+      <xsl:attribute name="val">
+        <xsl:value-of select="@table:value"/>
+      </xsl:attribute>
+
+    </customFilter>
+
+    <xsl:if test="following-sibling::table:filter-condition[@table:field-number = $pivotIdFilter]">
+      <xsl:for-each
+        select="following-sibling::table:filter-condition[@table:field-number = $pivotIdFilter][1]">
+        <xsl:call-template name="InsertFilters"/>
+      </xsl:for-each>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="InsertCacheDefinition">
