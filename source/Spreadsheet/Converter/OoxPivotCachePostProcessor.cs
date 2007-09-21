@@ -98,6 +98,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private string pivotHide;
         private bool isPivotSubtotals;
         private string pivotSubtotals;
+        private bool isPivotBlanks;
+        private string pivotBlanks;
 
         //<pxsi:cacheFields> variables
         private bool isInCacheFields;
@@ -172,6 +174,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.pivotHide = "";
             this.isPivotSubtotals = false;
             this.pivotSubtotals = "";
+            this.isPivotBlanks = false;
+            this.pivotBlanks = "";
 
             //<pxsi:cacheFields> variables
             this.isInCacheFields = false;
@@ -240,6 +244,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.pivotSort = "";
                 this.pivotHide = "";
                 this.pivotSubtotals = "";
+                this.pivotBlanks = "";
             }
             else if (PXSI_NAMESPACE.Equals(ns) && "pivotFields".Equals(localName))
             {
@@ -325,6 +330,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isPivotHide = true;
                 else if (PXSI_NAMESPACE.Equals(ns) && "subtotals".Equals(localName))
                     this.isPivotSubtotals = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "blanks".Equals(localName))
+                    this.isPivotBlanks = true;
             }
             else if (isInCacheFields)
             {
@@ -396,6 +403,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.pivotHide += text;
                 else if (isPivotSubtotals)
                     this.pivotSubtotals += text;
+                else if (isPivotBlanks)
+                    this.pivotBlanks += text;
             }
             else if (isInCacheFields)
             {
@@ -456,6 +465,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.isPivotHide = false;
             else if (isPivotSubtotals)
                 this.isPivotSubtotals = false;
+            else if (isPivotBlanks)
+                this.isPivotBlanks = false;
             else if (isInCacheFields)
             {
             }
@@ -530,12 +541,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     Console.WriteLine(pivotSort);
                     Console.WriteLine(pivotHide);
                     Console.WriteLine(pivotSubtotals);
+                    Console.WriteLine(pivotBlanks);
 
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
                     string[] sort = pivotSort.Split('~');
                     string[] hide = pivotHide.Split('~');
                     string[] subtotals = pivotSubtotals.Split('~');
+                    string[] blanks = pivotBlanks.Split('~');
 
                     //for each cache column output <pivotField> element
                     for (int col = 0; col < fieldNames[1].Count; col++)
@@ -558,15 +571,26 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                         this.nextWriter.WriteStartElement("pivotField", EXCEL_NAMESPACE);
 
-                        //insert showAll attribute
-                        this.nextWriter.WriteStartAttribute("showAll");
-                        this.nextWriter.WriteString("0");
-                        this.nextWriter.WriteEndAttribute();
+                        //default attribute for not used fields
+                        if (nameNum == -1)
+                        {
+                            this.nextWriter.WriteStartAttribute("showAll");
+                            this.nextWriter.WriteString("0");
+                            this.nextWriter.WriteEndAttribute();
+                        }
 
                         //if field is in use
                         if (nameNum != -1)
                         {
-                            Console.WriteLine(name + "(" + nameNum.ToString() + ")" + ":" + axes[nameNum]);
+                            
+                            //show empty fields
+                            if ("false".Equals(blanks[nameNum]))
+                            {
+                                this.nextWriter.WriteStartAttribute("showAll");
+                                this.nextWriter.WriteString("0");
+                                this.nextWriter.WriteEndAttribute();
+                            }
+
                             //insert field type attributes
                             if (axes[nameNum].Contains("axis"))
                             {
@@ -789,10 +813,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             break;
                         }
                     }
-
-                    Console.WriteLine("filterName: " + name);
-                    Console.WriteLine("filterAxis: " + axes[nameNum]);
-                    Console.WriteLine("filterCondition: " + condition);
 
                     this.nextWriter.WriteStartAttribute("type");
                     if (axes[nameNum].Contains("axis"))

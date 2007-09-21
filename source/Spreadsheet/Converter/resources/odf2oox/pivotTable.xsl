@@ -319,6 +319,22 @@
             </xsl:if>
           </xsl:for-each>
         </xsl:variable>
+        
+        <xsl:variable name="blanks">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
+            <xsl:choose>
+              <xsl:when test="table:data-pilot-level[@table:show-empty = 'false' ]">
+                <xsl:text>false</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>true</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:variable>
 
         <pxsi:pivotFields>
           <xsl:attribute name="pxsi:names">
@@ -339,6 +355,10 @@
 
           <xsl:attribute name="pxsi:subtotals">
             <xsl:value-of select="$subtotals"/>
+          </xsl:attribute>
+          
+          <xsl:attribute name="pxsi:blanks">
+            <xsl:value-of select="$blanks"/>
           </xsl:attribute>
         </pxsi:pivotFields>
 
