@@ -79,7 +79,9 @@
               <xsl:value-of select="$BorderId"/>
             </xsl:with-param>
             <xsl:with-param name="LastMergeCellBorderId">
-              <xsl:value-of select="$LastMergeCellBorderId"/>
+              <xsl:if test="$BorderId != $LastMergeCellBorderId">
+                <xsl:value-of select="$LastMergeCellBorderId"/>
+             </xsl:if>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:for-each>
