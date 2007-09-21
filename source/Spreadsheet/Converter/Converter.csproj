@@ -68,6 +68,7 @@
     <EmbeddedResource Include="resources\odf2oox\sortFilter.xsl" />
     <EmbeddedResource Include="resources\odf2oox\data_consolidation.xsl" />
     <EmbeddedResource Include="resources\odf2oox\scenario.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\pivotTable.xsl" />
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
@@ -96,7 +97,8 @@
     <EmbeddedResource Include="resources\oox2odf\scenario.xsl" />
     <EmbeddedResource Include="resources\oox2odf\change_tracking.xsl" />
     <EmbeddedResource Include="resources\oox2odf\database-ranges.xsl" />
-    <Compile Include="OdfSharedStringsPostProcessor.cs" />
+    <EmbeddedResource Include="resources\oox2odf\pivot_tables.xsl" />
+	<Compile Include="OdfSharedStringsPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />
     <Compile Include="OoxMaximumCellTextPostProcessor.cs" />
     <Compile Include="OoxPhysicalPathPostProcessor.cs" />
