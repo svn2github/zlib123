@@ -124,6 +124,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private string filterField;
         private bool isCondition;
         private string condition;
+        private bool isFilterValue;
+        private string filterValue;
 
         public OoxPivotCachePostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
@@ -200,6 +202,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.filterField = "";
             this.isCondition = false;
             this.condition = "";
+            this.isFilterValue = false;
+            this.filterValue = "";
+
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
@@ -356,6 +361,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isFilterField = true;
                 else if (PXSI_NAMESPACE.Equals(ns) && "condition".Equals(localName))
                     this.isCondition = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "filterValue".Equals(localName))
+                    this.isFilterValue = true;
             }
             else
             {
@@ -429,6 +436,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.filterField += text;
                 else if (isCondition)
                     this.condition += text;
+                else if (isFilterValue)
+                    this.filterValue += text;
             }
             else
             {
@@ -482,6 +491,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.isFilterField = false;
             else if (isCondition)
                 this.isCondition = false;
+            else if (isFilterValue)
+                this.isFilterValue = false;
             else if (!isPxsi)
                 this.nextWriter.WriteEndAttribute();
         }
@@ -814,6 +825,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         }
                     }
 
+                    //filter type attribute
                     this.nextWriter.WriteStartAttribute("type");
                     if (axes[nameNum].Contains("axis"))
                         this.nextWriter.WriteString("caption" + this.condition);
@@ -821,9 +833,24 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         this.nextWriter.WriteString("value" + this.condition);
                     this.nextWriter.WriteEndAttribute();
 
+                    //field type dependant attribute
+                    if (axes[nameNum].Contains("axis"))
+                    {
+                        this.nextWriter.WriteStartAttribute("stringValue1");
+                        this.nextWriter.WriteString(filterValue);
+                        this.nextWriter.WriteEndAttribute();
+                    }
+                    else
+                    {
+                        this.nextWriter.WriteStartAttribute("iMeasureFld");
+                        this.nextWriter.WriteString("0");
+                        this.nextWriter.WriteEndAttribute();
+                    }
+
                     this.isInFilterType = false;
                     this.filterField = "";
                     this.condition = "";
+                    this.filterValue = "";
                     this.isPxsi = false;
                 }
                 else
