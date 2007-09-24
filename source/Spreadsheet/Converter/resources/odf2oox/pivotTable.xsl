@@ -346,9 +346,12 @@
               <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'tabular-layout' ">
                 <xsl:text>0</xsl:text>
               </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>1</xsl:text>
-              </xsl:otherwise>
+              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'outline-subtotals-bottom' ">
+                <xsl:text>bottom</xsl:text>
+              </xsl:when>
+              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'outline-subtotals-top' ">
+                <xsl:text>top</xsl:text>
+              </xsl:when>
             </xsl:choose>
           </xsl:for-each>          
         </xsl:variable>

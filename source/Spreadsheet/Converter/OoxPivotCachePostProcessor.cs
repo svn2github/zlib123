@@ -635,6 +635,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                 this.nextWriter.WriteString("0");
                                 this.nextWriter.WriteEndAttribute();
                             }
+                            else if ("bottom".Equals(outlines[nameNum]))
+                            {
+                                this.nextWriter.WriteStartAttribute("subtotalTop");
+                                this.nextWriter.WriteString("0");
+                                this.nextWriter.WriteEndAttribute();
+                            }
 
                             if ("1".Equals(emptyLines[nameNum]))
                             {
