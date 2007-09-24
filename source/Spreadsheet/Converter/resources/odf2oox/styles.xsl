@@ -1905,6 +1905,7 @@
                           />
                         </xsl:attribute>
 
+
                         <xsl:call-template name="SetFormatProperties">
                           <xsl:with-param name="multiline">
                             <xsl:text>true</xsl:text>
@@ -1939,7 +1940,16 @@
                   </xsl:variable>
 
                   <xsl:attribute name="fontId">
-                    <xsl:value-of select="$contentFontCount + $styleFontCount +$styleFontCount"/>
+                    <xsl:choose>
+                      <xsl:when
+                        test="document('styles.xml')/office:document-styles/office:styles/style:style[contains(@style:name, 'Hyperlink') and @style:family = 'table-cell']">
+                        <xsl:value-of select="$contentFontCount + $styleFontCount + 2"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$contentFontCount + $styleFontCount +$styleFontCount"
+                        />
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:attribute>
 
                   <alignment wrapText="1"/>
@@ -2467,14 +2477,18 @@
           <xsl:when
             test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' and @style:family = 'table-cell']">
             <xsl:value-of select="$contentFontCount + $styleFontCount"/>
-            
+
+          </xsl:when>
+          <xsl:when
+            test="document('styles.xml')/office:document-styles/office:styles/style:style[contains(@style:name, 'Hyperlink') and @style:family = 'table-cell']">
+            <xsl:value-of select="$contentFontCount + $styleFontCount + 2"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$contentFontCount + $styleFontCount + $styleFontCount"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xf numFmtId="0" fillId="0" borderId="0" xfId="{$xfId}" fontId="{$fontId}"/>
 
     </xsl:if>
