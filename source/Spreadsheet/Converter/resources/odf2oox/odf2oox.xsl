@@ -442,7 +442,13 @@
                 </xsl:variable>
 
                 <xsl:attribute name="pxsi:sheetNum">
-                  <xsl:value-of select="$sheetNum"/>
+                  <xsl:variable name="sourceSheet">
+                    <xsl:value-of select="substring-before(@table:cell-range-address,'.')"/>
+                  </xsl:variable>
+                  
+                  <xsl:for-each select="parent::node()/parent::node()/parent::node()/table:table[@table:name = $sourceSheet]">
+                    <xsl:value-of select="count(preceding-sibling::table:table) + 1"/>
+                  </xsl:for-each>
                 </xsl:attribute>
 
                 <xsl:attribute name="pxsi:colStart">

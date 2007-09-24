@@ -547,13 +547,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     int nameNum;
 
-                    Console.WriteLine(pivotNames);
+                    /*Console.WriteLine(pivotNames);
                     Console.WriteLine(pivotAxes);
                     Console.WriteLine(pivotSort);
                     Console.WriteLine(pivotHide);
                     Console.WriteLine(pivotSubtotals);
                     Console.WriteLine(pivotBlanks);
-
+                    */
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
                     string[] sort = pivotSort.Split('~');
@@ -893,7 +893,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 int keyRow = Convert.ToInt32(rowStart) - 1;
 
                 string key = sheetNum + "#" + keyCol.ToString() + ":" + keyRow.ToString();
-                
+
                 if (!fieldNames[0].ContainsKey((string)pivotCellsText[key]))
                 {
                     fieldNames[0].Add((string)pivotCellsText[key], col);
