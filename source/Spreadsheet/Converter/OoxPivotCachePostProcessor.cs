@@ -101,6 +101,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private string pivotSubtotals;
         private bool isPivotBlanks;
         private string pivotBlanks;
+        private bool isPivotOutlines;
+        private string pivotOutlines;
 
         //<pxsi:cacheFields> variables
         private bool isInCacheFields;
@@ -179,6 +181,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.pivotSubtotals = "";
             this.isPivotBlanks = false;
             this.pivotBlanks = "";
+            this.isPivotOutlines = false;
+            this.pivotOutlines = "";
 
             //<pxsi:cacheFields> variables
             this.isInCacheFields = false;
@@ -251,6 +255,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.pivotHide = "";
                 this.pivotSubtotals = "";
                 this.pivotBlanks = "";
+                this.pivotOutlines = "";
             }
             else if (PXSI_NAMESPACE.Equals(ns) && "pivotFields".Equals(localName))
             {
@@ -338,6 +343,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.isPivotSubtotals = true;
                 else if (PXSI_NAMESPACE.Equals(ns) && "blanks".Equals(localName))
                     this.isPivotBlanks = true;
+                else if (PXSI_NAMESPACE.Equals(ns) && "outlines".Equals(localName))
+                    this.isPivotOutlines = true;
             }
             else if (isInCacheFields)
             {
@@ -413,6 +420,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.pivotSubtotals += text;
                 else if (isPivotBlanks)
                     this.pivotBlanks += text;
+                else if (isPivotOutlines)
+                    this.pivotOutlines += text;
             }
             else if (isInCacheFields)
             {
@@ -477,6 +486,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.isPivotSubtotals = false;
             else if (isPivotBlanks)
                 this.isPivotBlanks = false;
+            else if (isPivotOutlines)
+                this.isPivotOutlines = false;
             else if (isInCacheFields)
             {
             }
@@ -555,12 +566,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     Console.WriteLine(pivotSubtotals);
                     Console.WriteLine(pivotBlanks);
                     */
+                    Console.WriteLine(pivotOutlines);
+
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
                     string[] sort = pivotSort.Split('~');
                     string[] hide = pivotHide.Split('~');
                     string[] subtotals = pivotSubtotals.Split('~');
                     string[] blanks = pivotBlanks.Split('~');
+                    string[] outlines = pivotOutlines.Split('~');
 
                     //for each cache column output <pivotField> element
                     for (int col = 0; col < fieldNamesText[1].Count; col++)
@@ -599,6 +613,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             if ("false".Equals(blanks[nameNum]))
                             {
                                 this.nextWriter.WriteStartAttribute("showAll");
+                                this.nextWriter.WriteString("0");
+                                this.nextWriter.WriteEndAttribute();
+                            }
+
+                            if ("0".Equals(outlines[nameNum]))
+                            {
+                                this.nextWriter.WriteStartAttribute("outline");
                                 this.nextWriter.WriteString("0");
                                 this.nextWriter.WriteEndAttribute();
                             }
@@ -697,12 +718,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             double realName = Convert.ToDouble(nameVal.Replace('.', ','));
                             realName = Math.Round(realName,9);
                             this.nextWriter.WriteString(realName.ToString());
-                            Console.WriteLine("Val name: " + nameVal);
-
                         }
                         catch
                         {
-                            Console.WriteLine("Text name: " + name);
                             this.nextWriter.WriteString(name);
                         }
 

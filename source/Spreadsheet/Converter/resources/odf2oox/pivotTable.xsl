@@ -336,10 +336,23 @@
             </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
+        
+        <xsl:variable name="outlines">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
+            <xsl:choose>
+              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'tabular-layout' ">
+                <xsl:text>0</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>1</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>          
+        </xsl:variable>
 
-
-        <!-- please insert in postprocessor an 'show elements without data' handling-->
-        <!-- if table:data-pilot-level/@table:show-empty['true'] then in pivotField/ there cant be an  showAll="0" -->
         <pxsi:pivotFields>
           <xsl:attribute name="pxsi:names">
             <xsl:value-of select="$names"/>
@@ -363,6 +376,10 @@
           
           <xsl:attribute name="pxsi:blanks">
             <xsl:value-of select="$blanks"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="pxsi:outlines">
+            <xsl:value-of select="$outlines"/>
           </xsl:attribute>
         </pxsi:pivotFields>
 
