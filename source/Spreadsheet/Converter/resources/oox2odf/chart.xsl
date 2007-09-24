@@ -412,7 +412,7 @@
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart">
+          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -892,7 +892,7 @@
           </xsl:when>
 
           <!--  or key('plotArea','')/c:ofPieChart or key('plotArea','')/c:doughnutChart -->
-          <xsl:when test="key('plotArea','')/c:pieChart or key('plotArea','')/c:pie3DChart">
+          <xsl:when test="key('plotArea','')/c:pieChart or key('plotArea','')/c:pie3DChart or key('plotArea','')/c:ofPieChart">
             <xsl:text>chart:circle</xsl:text>
           </xsl:when>
 
