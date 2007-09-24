@@ -456,17 +456,7 @@
       mode="MergeStyle">
       <xsl:with-param name="number">1</xsl:with-param>
     </xsl:apply-templates>
-    <!--xsl:variable name="MergeCell">
-     <xsl:call-template name="PreprocessMergedCellsForBorders"/>    
-    </xsl:variable>
-   
-    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf">
-      <style:style style:name="{generate-id(.)}" style:family="table-cell">
-        <xsl:call-template name="InsertCellFormat">
-          <xsl:with-param name="MergeCell"><xsl:value-of select="$MergeCell"/></xsl:with-param>
-        </xsl:call-template>
-      </style:style> 
-    </xsl:for-each-->
+    
   </xsl:template>
   
   <xsl:template match="e:sheet" mode="MergeStyle">
@@ -547,12 +537,127 @@
     
     
   </xsl:template>
+  
+  <xsl:template name="InsertHorizontalCellStyles">
+    
+    <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
+      mode="HorizontalStyle">
+      <xsl:with-param name="number">1</xsl:with-param>
+    </xsl:apply-templates>
+    
+  </xsl:template>
+  
+  <xsl:template match="e:sheet" mode="HorizontalStyle">
+    <xsl:param name="number"/>
+    
+    <xsl:variable name="Id">
+      <xsl:call-template name="GetTarget">
+        <xsl:with-param name="id">
+          <xsl:value-of select="@r:id"/>
+        </xsl:with-param>
+        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="sheetName">
+      <xsl:value-of select="@name"/>
+    </xsl:variable>
+    
+    <xsl:apply-templates select="document(concat('xl/',$Id))/e:worksheet/e:sheetData/e:row[1]" mode="HorizontalStyle"/>
+    
+    <!-- Insert next Table -->
+    
+    <xsl:apply-templates select="following-sibling::e:sheet[1]" mode="HorizontalStyle">
+      <xsl:with-param name="number">
+        <xsl:value-of select="$number + 1"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    
+  </xsl:template>
+  
+  <xsl:template match="e:row" mode="HorizontalStyle">
+    
+    <xsl:apply-templates select="e:c[1]" mode="HorizontalStyle"/> 
+    
+    <xsl:if test="following-sibling::e:row">
+      NEXT
+      <xsl:apply-templates select="following-sibling::e:row[1]" mode="HorizontalStyle"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="e:c" mode="HorizontalStyle">
+    
+    <xsl:if test="e:v">
+      
+    <xsl:variable name="position">
+      <xsl:value-of select="@s + 1"/>
+    </xsl:variable>
+    
+    <xsl:variable name="horizontal">
+      <xsl:for-each select="document('xl/styles.xml')">
+        <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
+        />
+      </xsl:for-each>
+    </xsl:variable>
+      
+      <xsl:variable name="continuous">
+        <xsl:call-template name="CountContinuous"/>
+      </xsl:variable>
+      
+    <xsl:if test="$horizontal = 'centerContinuous'">
+      
+     
+      <xsl:call-template name="InsertHorizontalCellStylesProperties">
+        <xsl:with-param name="FirstHorizontalCellStyle">
+          <xsl:value-of select="@s"/>
+        </xsl:with-param>
+        <xsl:with-param name="LastHorizontalCellStyle">
+          <xsl:value-of select="following-sibling::e:c[position() = $continuous - 1]/@s"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+      
+      <xsl:if test="following-sibling::e:c">
+            <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
+      </xsl:if>
+      
+    </xsl:if>
+    
+    <xsl:if test="not(e:v)">
+      
+    <xsl:if test="following-sibling::e:c">      
+          <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
+    </xsl:if>
+      
+    </xsl:if>
+    
+  </xsl:template>
+  
+  <xsl:template name="InsertHorizontalCellStylesProperties">
+    <xsl:param name="FirstHorizontalCellStyle"/>
+    <xsl:param name="LastHorizontalCellStyle"/>
+    
+  
+  
+    
+    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $FirstHorizontalCellStyle + 1]">        
+      <style:style style:name="{concat(generate-id(.), generate-id(.))}" style:family="table-cell">
+        <xsl:call-template name="InsertCellFormat">
+          <xsl:with-param name="LastHorizontalCellStyle">
+            <xsl:value-of select="$LastHorizontalCellStyle"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </style:style>
+    </xsl:for-each>
+    
+  </xsl:template>
 
   <!-- cell formats -->
 
   <xsl:template name="InsertCellFormat">
     <xsl:param name="Id"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="LastHorizontalCellStyle"/>
 
     <xsl:choose>
 
@@ -645,6 +750,9 @@
             </xsl:with-param>
             <xsl:with-param name="MergeCell">
               <xsl:value-of select="$MergeCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="LastHorizontalCellStyle">
+              <xsl:value-of select="$LastHorizontalCellStyle"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>

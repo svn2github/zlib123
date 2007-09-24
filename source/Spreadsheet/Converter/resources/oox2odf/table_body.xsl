@@ -951,6 +951,13 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
+          
+          <xsl:variable name="horizontal">
+            <xsl:for-each select="document('xl/styles.xml')">
+              <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
+              />
+            </xsl:for-each>
+          </xsl:variable>
 
 
           <!-- Insert "Merge Cell" if "Merge Cell" is starting in this cell -->
@@ -993,7 +1000,7 @@
                     select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1])"
                   />
                 </xsl:variable>
-                <xsl:attribute name="table:style-name">
+                <xsl:attribute name="table:style-name">                  
                   <xsl:for-each select="document('xl/styles.xml')">
                     <xsl:value-of select="concat($CellStyleId, $ConditionalStyleId)"/>
                   </xsl:for-each>
@@ -1010,9 +1017,16 @@
                     </xsl:attribute>    
                   </xsl:when>
                   <xsl:otherwise>
-                <xsl:attribute name="table:style-name">
+                <xsl:attribute name="table:style-name">                  
                   <xsl:for-each select="document('xl/styles.xml')">
-                    <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+                    <xsl:choose>
+                      <xsl:when test="$horizontal = 'centerContinuous'">
+                        <xsl:value-of select="concat(generate-id(key('Xf', '')[position() = $position]), generate-id(key('Xf', '')[position() = $position]))"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>    
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:for-each>
                 </xsl:attribute>
                   </xsl:otherwise>
@@ -1029,12 +1043,7 @@
             </xsl:choose>
 
 
-            <xsl:variable name="horizontal">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
-                />
-              </xsl:for-each>
-            </xsl:variable>
+            
             <xsl:if test="$horizontal = 'centerContinuous' and e:v">
               <xsl:variable name="continous">
                 <xsl:call-template name="CountContinuous"/>
@@ -1046,6 +1055,7 @@
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
             </xsl:if>
+            
           </xsl:if>
 
           <!-- chceck if DataValidation -->

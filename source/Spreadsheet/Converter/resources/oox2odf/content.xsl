@@ -108,6 +108,9 @@
         <xsl:call-template name="InsertNumberStyles"/>
         <xsl:call-template name="InsertCellStyles"/>
         <xsl:call-template name="InsertMergeCellStyles"/>
+        <xsl:if test="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf/e:alignment/@horizontal = 'centerContinuous'">
+            <xsl:call-template name="InsertHorizontalCellStyles"/>
+        </xsl:if>
         <xsl:call-template name="InsertStyleTableProperties"/>
         <xsl:call-template name="InsertTextStyles"/>
         <xsl:call-template name="InsertTextBoxTextStyles"/>
