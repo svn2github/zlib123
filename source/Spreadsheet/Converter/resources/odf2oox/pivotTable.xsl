@@ -353,6 +353,22 @@
           </xsl:for-each>          
         </xsl:variable>
 
+        <xsl:variable name="emptyLines">
+          <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
+            <xsl:if test="position() &gt; 1 ">
+              <xsl:text>~</xsl:text>
+            </xsl:if>
+            <xsl:choose>
+              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:add-empty-lines = 'true' ">
+                <xsl:text>1</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>0</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>          
+        </xsl:variable>
+        
         <pxsi:pivotFields>
           <xsl:attribute name="pxsi:names">
             <xsl:value-of select="$names"/>
@@ -380,6 +396,10 @@
 
           <xsl:attribute name="pxsi:outlines">
             <xsl:value-of select="$outlines"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="pxsi:emptyLines">
+            <xsl:value-of select="$emptyLines"/>
           </xsl:attribute>
         </pxsi:pivotFields>
 
