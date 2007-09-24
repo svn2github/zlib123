@@ -515,7 +515,19 @@
           </xsl:call-template>
           </xsl:when>
           </xsl:choose>
-          </xsl:when-->
+        </xsl:when-->
+      
+      <xsl:when test="contains($string,'..\..\..\')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'..\..\..\') =''">
+            
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string"
+                select="concat('../../../',substring-after($string,'..\..\..\'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
 
       <xsl:when test="contains($string,'..\..\')">
         <xsl:choose>
