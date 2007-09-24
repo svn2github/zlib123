@@ -248,7 +248,7 @@
 
         <xsl:variable name="comment">
           <xsl:choose>
-            <xsl:when test="descendant::office:annotation">
+            <xsl:when test="not(table:scenario) and descendant::office:annotation">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
