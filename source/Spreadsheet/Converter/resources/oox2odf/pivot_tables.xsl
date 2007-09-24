@@ -739,14 +739,23 @@
                     <xsl:attribute name="table:layout-mode">
 
                       <xsl:choose>
-                        <xsl:when test="@measureFilter= '1' ">
-                          <xsl:text>outline-subtotals-top</xsl:text>
-                        </xsl:when>
-                        <xsl:otherwise>
+                        <xsl:when test="@outline = 0 ">
                           <xsl:text>tabular-layout</xsl:text>
+                        </xsl:when>
+                        
+                        <xsl:otherwise>
+                          <xsl:choose>
+                            <xsl:when test="@subtotalTop = 0 ">
+                              <xsl:text>outline-subtotals-bottom</xsl:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:text>outline-subtotals-top</xsl:text>
+                            </xsl:otherwise>
+                          </xsl:choose>
                         </xsl:otherwise>
+                        
                       </xsl:choose>
-
+                      
                     </xsl:attribute>
 
                   </table:data-pilot-layout-info>
