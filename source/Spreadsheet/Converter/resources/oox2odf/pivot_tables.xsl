@@ -262,7 +262,8 @@
                             </xsl:when>
 
                             <xsl:when test="e:autoFilter/e:filterColumn/e:top10">
-                              <xsl:message terminate="no">translation.oox2odf.PivotFilter</xsl:message>
+                              <xsl:message terminate="no"
+                              >translation.oox2odf.PivotFilter</xsl:message>
                             </xsl:when>
 
                             <xsl:when test="count(e:filters/e:filter) &gt; 1">
@@ -346,12 +347,13 @@
                       <xsl:when test="number(translate(@name, ',' , '.' ))">
 
                         <xsl:variable name="replaceDecimal">
-                          <xsl:value-of select="format-number(translate(@name, ',' , '.' ),'0.##')"/>
+                          <xsl:value-of select="format-number(translate(@name, ',' , '.' ),'0.##')"
+                          />
                         </xsl:variable>
 
                         <xsl:value-of select="translate($replaceDecimal, '.' , ',' )"/>
                       </xsl:when>
-                      
+
                       <xsl:otherwise>
                         <xsl:value-of select="@name"/>
                       </xsl:otherwise>
@@ -433,7 +435,7 @@
                           <xsl:otherwise>
                             <xsl:text>sum</xsl:text>
                           </xsl:otherwise>
-                          
+
                         </xsl:choose>
 
                       </xsl:for-each>
@@ -574,7 +576,7 @@
                           </xsl:attribute>
 
                         </table:data-pilot-member>
-                      
+
                       </xsl:for-each>
 
                     </table:data-pilot-members>
@@ -583,7 +585,7 @@
 
                   <xsl:if
                     test="@axis and(@sumSubtotal or @countSubtotal or @avgSubtotal or @maxSubtotal or @minSubtotal or @productSubtotal or @countSubtotal or @stdDevSubtotal or @stdDevPSubtotal or @varSubtotal or @varPSubtotal)">
-                    
+
                     <table:data-pilot-subtotals>
 
                       <xsl:if test="@sumSubtotal">
@@ -675,8 +677,9 @@
                       </xsl:if>
 
                     </table:data-pilot-subtotals>
+
                   </xsl:if>
-                  
+
                   <table:data-pilot-display-info>
 
                     <xsl:attribute name="table:enabled">
@@ -686,16 +689,22 @@
                     <xsl:attribute name="table:display-member-mode">
                       <xsl:text>from-top</xsl:text>
                     </xsl:attribute>
-                
+
                   </table:data-pilot-display-info>
 
                   <table:data-pilot-sort-info>
 
-                    <xsl:if test="parent::node()/e:pivotField[@axis][1]/@sortType">
-                      <xsl:attribute name="table:order">
-                        <xsl:value-of select="parent::node()/e:pivotField[@axis][1]/@sortType"/>
-                      </xsl:attribute>
-                    </xsl:if>
+
+
+                    <xsl:attribute name="table:order">
+                      <xsl:choose>
+                        <xsl:when test="parent::node()/e:pivotField[@axis]/@sortType">
+                          <xsl:value-of select="@sortType"/>
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:attribute>
+
+
 
                     <xsl:attribute name="table:sort-mode">
                       <xsl:choose>
@@ -716,11 +725,28 @@
                   <table:data-pilot-layout-info>
 
                     <xsl:attribute name="table:add-empty-lines">
-                      <xsl:text>false</xsl:text>
+                      <xsl:choose>
+                        <xsl:when test="@insertBlankRow = '1' ">
+                          <xsl:text>true</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:text>false</xsl:text>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:attribute>
 
+
                     <xsl:attribute name="table:layout-mode">
-                      <xsl:text>tabular-layout</xsl:text>
+
+                      <xsl:choose>
+                        <xsl:when test="@measureFilter= '1' ">
+                          <xsl:text>outline-subtotals-top</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:text>tabular-layout</xsl:text>
+                        </xsl:otherwise>
+                      </xsl:choose>
+
                     </xsl:attribute>
 
                   </table:data-pilot-layout-info>
@@ -728,7 +754,7 @@
                 </table:data-pilot-level>
 
               </table:data-pilot-field>
-                
+
               <!-- put empty field after Row Label or Column Label-->
               <xsl:if test="@axis and not (following-sibling::e:pivotField/@axis)">
                 <table:data-pilot-field table:source-field-name="">
@@ -762,6 +788,28 @@
                   <table:data-pilot-level table:show-empty="true"/>
                 </table:data-pilot-field>
               </xsl:if>
+
+              <!--xsl:if test="@countSubtotal">
+              <table:data-pilot-field>
+                
+                <xsl:attribute name="table:source-field-name">
+                  
+                </xsl:attribute>
+                
+                <xsl:attribute name="table:orientation">
+                  
+                </xsl:attribute>
+                
+                <xsl:attribute name="table:used-hierarchy">
+                <xsl:text>-1</xsl:text>  
+                </xsl:attribute>
+                
+                <xsl:attribute name="table:function">
+                 
+                </xsl:attribute>
+                
+              </table:data-pilot-field>
+              </xsl:if-->
 
             </xsl:for-each>
 
