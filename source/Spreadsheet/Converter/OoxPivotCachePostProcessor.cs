@@ -61,6 +61,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private string[,] pivotTable;
         private string[,] pivotTableText;
         private Hashtable[] fieldNames;
+        private Hashtable[] fieldNamesText;
         private Hashtable[,] fieldItems;
         private Hashtable[,] fieldItemsText;
         //fieldItems[i,j] (dimesion i equals number of pivotFields, dimesion j equals 2) 
@@ -562,10 +563,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     string[] blanks = pivotBlanks.Split('~');
 
                     //for each cache column output <pivotField> element
-                    for (int col = 0; col < fieldNames[1].Count; col++)
+                    for (int col = 0; col < fieldNamesText[1].Count; col++)
                     {
                         //get field name
-                        string name = fieldNames[1][col].ToString();
+                        string name = fieldNamesText[1][col].ToString();
 
                         //search position of field with this name inside <table:data-pilot-table>
                         //field with empty name is not counted
@@ -664,13 +665,16 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "cacheFields".Equals(element.Name))
                 {
                     int nameNum;
+                    string nameVal;
+                    string name;
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
 
-                    for (int col = 0; col < fieldNames[1].Count; col++)
+                    for (int col = 0; col < fieldNamesText[1].Count; col++)
                     {
                         //get field name
-                        string name = fieldNames[1][col].ToString();
+                        nameVal = fieldNames[1][col].ToString();
+                        name = fieldNamesText[1][col].ToString();
 
 
                         //search position of field with this name inside <table:data-pilot-table>
@@ -686,7 +690,22 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                         //insert showAll attribute
                         this.nextWriter.WriteStartAttribute("name");
-                        this.nextWriter.WriteString(name);
+                        try
+                        {
+                            //if name is of float type round it's represetation to 9 decimal places
+                            //and output it wit a comma as separator
+                            double realName = Convert.ToDouble(nameVal.Replace('.', ','));
+                            realName = Math.Round(realName,9);
+                            this.nextWriter.WriteString(realName.ToString());
+                            Console.WriteLine("Val name: " + nameVal);
+
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Text name: " + name);
+                            this.nextWriter.WriteString(name);
+                        }
+
                         this.nextWriter.WriteEndAttribute();
 
                             this.nextWriter.WriteStartElement("sharedItems", EXCEL_NAMESPACE);
@@ -743,7 +762,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "fieldPos".Equals(element.Name))
                 {
-                    string fieldNum = fieldNames[0][this.fieldPosName].ToString();
+                    string fieldNum = fieldNamesText[0][this.fieldPosName].ToString();
 
                     this.nextWriter.WriteStartAttribute(this.fieldPosAttribute);
                     this.nextWriter.WriteString(fieldNum);
@@ -795,7 +814,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "pageItem".Equals(element.Name))
                 {
-                    int fieldNum = Convert.ToInt32(fieldNames[0][pageField]);
+                    int fieldNum = Convert.ToInt32(fieldNamesText[0][pageField]);
                     this.nextWriter.WriteStartAttribute("item");
                     //output value increased by 1
                     this.nextWriter.WriteString((Convert.ToInt32(fieldItems[fieldNum, 0][pageItem]) + 1).ToString());
@@ -810,7 +829,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
 
                     int fieldNum = Convert.ToInt32(this.filterField);
-                    string name = fieldNames[1][fieldNum].ToString();
+                    string name = fieldNamesText[1][fieldNum].ToString();
 
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
@@ -872,6 +891,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             int[] index = new int[cols];
 
             this.fieldNames = new Hashtable[2];
+            this.fieldNamesText = new Hashtable[2];
             this.fieldItems = new Hashtable[cols, 2];
             this.fieldItemsText = new Hashtable[cols, 2];
 
@@ -879,6 +899,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             for (int i = 0; i < 2; i++)
             {
                 fieldNames[i] = new Hashtable();
+                fieldNamesText[i] = new Hashtable();
+
                 for (int field = 0; field < cols; field++)
                 {
                     fieldItems[field, i] = new Hashtable();
@@ -886,7 +908,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
             }
             
-            //fill fieldNames (from cells text value)
+            //fill fieldNamesText (from cells text value)
             for (int col = 0; col < cols; col++)
             {
                 int keyCol = Convert.ToInt32(colStart) + col;
@@ -894,10 +916,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                 string key = sheetNum + "#" + keyCol.ToString() + ":" + keyRow.ToString();
 
-                if (!fieldNames[0].ContainsKey((string)pivotCellsText[key]))
+                if (!fieldNamesText[0].ContainsKey((string)pivotCellsText[key]))
                 {
-                    fieldNames[0].Add((string)pivotCellsText[key], col);
-                    fieldNames[1].Add(col, (string)pivotCellsText[key]);
+                    fieldNames[0].Add((string)pivotCells[key], col);
+                    fieldNames[1].Add(col, (string)pivotCells[key]);
+
+                    fieldNamesText[0].Add((string)pivotCellsText[key], col);
+                    fieldNamesText[1].Add(col, (string)pivotCellsText[key]);
                 }
             }
 
@@ -1041,7 +1066,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         private void OutputItems(string name, string hide, string subtotals)
         {
-            int fieldNum = Convert.ToInt32(fieldNames[0][name]);
+            int fieldNum = Convert.ToInt32(fieldNamesText[0][name]);
 
             int items = fieldItems[fieldNum, 0].Count;
 
@@ -1147,7 +1172,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         private void OutputItem(string name, string item, bool hide)
         {
-            int fieldNum = Convert.ToInt32(fieldNames[0][name]); 
+            int fieldNum = Convert.ToInt32(fieldNamesText[0][name]); 
             
             this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
 
