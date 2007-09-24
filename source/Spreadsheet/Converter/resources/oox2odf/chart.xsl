@@ -1050,13 +1050,20 @@
             <xsl:call-template name="InsertLineStyle"/>
           </xsl:for-each>
         </style:graphic-properties>
-        <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="13pt"
+        <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
+          style:font-pitch="variable" fo:font-size="18pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="13pt" style:font-family-complex="Tahoma"
+          style:font-size-asian="18pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="13pt">
+          style:font-size-complex="18pt">
+          
+          <!-- default "bold" font attribute for default title -->
+          <xsl:if test="not(c:tx) and not(c:txPr)">
+            <xsl:attribute name="fo:font-weight">
+              <xsl:text>bold</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
 
           <xsl:choose>
             <!-- custom title -->
