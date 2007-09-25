@@ -1670,10 +1670,15 @@
 
           <!-- default stroke for scatter and bubble chart -->
           <xsl:if
-            test="( key('plotArea','')/c:scatterChart and not(c:smooth) ) 
-                      or key('plotArea','')/c:bubbleChart or key('plotArea','')/c:barChart or key('plotArea','')/c:bar3DChart">
+            test="key('plotArea','')/c:bubbleChart or key('plotArea','')/c:barChart or key('plotArea','')/c:bar3DChart">
             <xsl:attribute name="draw:stroke">
               <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          
+          <xsl:if test="key('plotArea','')/c:scatterChart and not(c:smooth)">
+            <xsl:attribute name="draw:stroke">
+              <xsl:text>solid</xsl:text>
             </xsl:attribute>
           </xsl:if>
 
