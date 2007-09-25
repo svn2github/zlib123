@@ -902,6 +902,9 @@
         <xsl:choose>
           <xsl:when test="$isFraction = 'false'">
             <xsl:attribute name="number:min-integer-digits">0</xsl:attribute>
+            <xsl:if test="substring-before($formatCodeWithoutComma, '%') = '0'">
+              <xsl:attribute name="number:min-integer-digits">1</xsl:attribute>
+            </xsl:if>
           </xsl:when>
           <xsl:when
             test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='#'">
