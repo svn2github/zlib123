@@ -47,13 +47,120 @@
 
 
     <xsl:template name="InsertScenario">
-        <xsl:if test="following-sibling::table:table[1]/table:scenario">
-
-            <scenarios>
-                <xsl:apply-templates select="following-sibling::table:table[1]" mode="scenario"/>
-            </scenarios>
-
+      
+      <xsl:for-each select="table:scenario">
+        <!-- the first cell in the scenario -->
+        <xsl:variable name="firstCell">
+          <xsl:value-of
+            select="substring-after(substring-before(@table:scenario-ranges, ':'),'.')"/>
+        </xsl:variable>
+        <!-- the last cell in the scenario -->
+        <xsl:variable name="lastCell">
+          <xsl:value-of
+            select="substring-after(substring-after(@table:scenario-ranges, '.'), '.')"/>
+        </xsl:variable>
+        
+        <xsl:variable name="absFirstCell">
+          <xsl:call-template name="rel2Abs">
+            <xsl:with-param name="relatCellAddress">
+              <xsl:value-of select="$firstCell"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:variable name="absLastCell">
+          <xsl:call-template name="rel2Abs">
+            <xsl:with-param name="relatCellAddress">
+              <xsl:value-of select="$lastCell"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <!-- one-based index number of the column, e.g. 'A' becomes 1 -->
+        <xsl:variable name="firstColumnNumber">
+          <!-- for columns from 'A' to 'Z'(one-letter column name) -->
+          <xsl:choose>
+            <xsl:when
+              test="string-length(substring-before(substring-after($absFirstCell, '$'), '$')) = 1">
+              <xsl:call-template name="CharacterToPosition">
+                <xsl:with-param name="character">
+                  <xsl:value-of
+                    select="substring-before(substring-after($absFirstCell, '$'), '$')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <!-- for columns which names contain more than one letter -->
+            <xsl:otherwise>
+              <xsl:call-template name="returnColumnNumber">
+                <xsl:with-param name="columnName">
+                  <xsl:value-of select="substring-before(substring-after($absFirstCell, '$'), '$')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:variable name="lastColumnNumber">
+          <!-- for columns from 'A' to 'Z'(one-letter column name) -->
+          <xsl:choose>
+            <xsl:when
+              test="string-length(substring-before(substring-after($absLastCell, '$'), '$')) = 1">
+              <xsl:call-template name="CharacterToPosition">
+                <xsl:with-param name="character">
+                  <xsl:value-of
+                    select="substring-before(substring-after($absLastCell, '$'), '$')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <!-- for columns which names contain more than one letter -->
+            <xsl:otherwise>
+              <xsl:call-template name="returnColumnNumber">
+                <xsl:with-param name="columnName">
+                  <xsl:value-of select="substring-before(substring-after($absLastCell, '$'), '$')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <!-- scenario width measured in cells -->
+        <xsl:variable name="scenarioWidth">
+          <xsl:value-of select="number($lastColumnNumber) - number($firstColumnNumber)"/>
+        </xsl:variable>
+        
+        <xsl:variable name="firstRowNumber">
+          <xsl:value-of select="substring-after(substring-after($absFirstCell, '$'), '$')"/>
+        </xsl:variable> 
+        
+        <xsl:variable name="lastRowNumber">
+          <xsl:value-of select="substring-after(substring-after($absLastCell, '$'), '$')"/>
+        </xsl:variable>
+        
+        <!-- scenario height measured in cells -->
+        <xsl:variable name="scenarioHeight">
+          <xsl:value-of select="number($lastRowNumber) - number($firstRowNumber)"/>
+        </xsl:variable> 
+        
+        <!-- when scenario bigger than supported -->
+        <xsl:if test="number($scenarioHeight) * number($scenarioWidth) &gt; 32">
+          <xsl:message terminate="yes">translation.odf2oox.scenarioTooBig</xsl:message>
         </xsl:if>
+        
+        <xsl:variable name="scenarioSize">
+          <xsl:value-of select="number($scenarioHeight) * number($scenarioWidth)"/>
+        </xsl:variable>
+        
+        <!-- must be checked whether scenario is not too big, Excel supports only 32 changing cells -->
+        <xsl:if test="following-sibling::table:table[1]/table:scenario and not($scenarioSize &gt; 32)">
+          
+          <scenarios>
+            <xsl:apply-templates select="following-sibling::table:table[1]" mode="scenario"/>
+          </scenarios>
+          
+        </xsl:if>
+        
+      </xsl:for-each>
+
     </xsl:template>
 
 
