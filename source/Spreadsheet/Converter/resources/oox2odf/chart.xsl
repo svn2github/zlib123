@@ -51,7 +51,8 @@
   <xsl:import href="relationships.xsl"/>
 
   <xsl:key name="dataSeries" match="c:ser" use="''"/>
-  <xsl:key name="numPoints" match="c:numCache/c:ptCount" use="''"/>
+  <xsl:key name="numPoints" match="c:val" use="''"/>
+  <xsl:key name="xNumPoints" match="c:xVal" use="''"/>
   <xsl:key name="categories" match="c:cat" use="''"/>
   <xsl:key name="plotArea" match="c:plotArea" use="''"/>
   <xsl:key name="grouping" match="c:grouping" use="''"/>
@@ -250,8 +251,7 @@
             </xsl:when>
             <!-- scatter chart has two value axes -->
             <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
-              <xsl:for-each
-                select="key('plotArea','')/c:valAx[1]/c:axPos">
+              <xsl:for-each select="key('plotArea','')/c:valAx[1]/c:axPos">
                 <xsl:call-template name="InsertAxisXProperties">
                   <xsl:with-param name="type">
                     <xsl:text>valAx</xsl:text>
@@ -352,7 +352,7 @@
       <!-- TO DO chart:style-name -->
       <chart:series chart:style-name="{concat('series',position())}">
         <xsl:if
-          test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart and position() = 1">
+          test="(key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart) and position() = 1">
           <chart:domain/>
         </xsl:if>
         <!-- for stock chart type 3 and type 4 -->
@@ -384,7 +384,15 @@
 
         <chart:data-point>
           <xsl:attribute name="chart:repeated">
-            <xsl:value-of select="key('numPoints','')/@val"/>
+            <xsl:choose>
+              <!-- for scatter chart -->
+              <xsl:when test="key('xNumPoints','')/descendant::c:ptCount">
+                <xsl:value-of select="key('xNumPoints','')/descendant::c:ptCount/@val"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="key('numPoints','')/descendant::c:ptCount/@val"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
         </chart:data-point>
       </chart:series>
@@ -412,7 +420,8 @@
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart">
+          <xsl:when
+            test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -450,9 +459,22 @@
         </xsl:choose>
       </table:table-header-rows>
 
+      <xsl:variable name="points">
+        <xsl:choose>
+          <!-- for scatter charts -->
+          <xsl:when test="key('xNumPoints','')/descendant::c:ptCount">
+            <xsl:value-of select="key('xNumPoints','')/descendant::c:ptCount/@val"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="key('numPoints','')/descendant::c:ptCount/@val"/>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:variable>
+
       <table:table-rows>
         <xsl:call-template name="InsertDataRows">
-          <xsl:with-param name="points" select="key('numPoints','')/@val"/>
+          <xsl:with-param name="points" select="$points"/>
           <xsl:with-param name="categories" select="key('categories','')/descendant::c:ptCount/@val"/>
           <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
           <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
@@ -508,7 +530,9 @@
             <xsl:value-of select="c:tx/descendant::c:v"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat('Series',key('numPoints','')/@val + 1 - $count)"/>
+            <xsl:value-of
+              select="concat('Series',key('numPoints','')/descendant::c:ptCount/@val + 1 - $count)"
+            />
           </xsl:otherwise>
         </xsl:choose>
       </text:p>
@@ -571,10 +595,9 @@
               <xsl:choose>
                 <xsl:when test="c:xVal">
                   <table:table-cell office:value-type="float"
-                    office:value="{c:xVal/c:numRef/c:numCache/c:pt[@idx = $categoryNumber]/c:v}">
+                    office:value="{c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v}">
                     <text:p>
-                      <xsl:value-of
-                        select="c:xVal/c:numRef/c:numCache/c:pt[@idx = $categoryNumber]/c:v"/>
+                      <xsl:value-of select="c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v"/>
                     </text:p>
                   </table:table-cell>
                 </xsl:when>
@@ -626,20 +649,20 @@
 
     <xsl:for-each select="key('dataSeries','')">
       <xsl:choose>
-        <xsl:when test="c:val/c:numRef/c:numCache/c:pt[@idx = $point]">
+        <xsl:when test="c:val/descendant::c:pt[@idx = $point]">
           <table:table-cell office:value-type="float"
-            office:value="{c:val/c:numRef/c:numCache/c:pt[@idx = $point]/c:v}">
+            office:value="{c:val/descendant::c:pt[@idx = $point]/c:v}">
             <text:p>
-              <xsl:value-of select="c:val/c:numRef/c:numCache/c:pt[@idx = $point]/c:v"/>
+              <xsl:value-of select="c:val/descendant::c:pt[@idx = $point]/c:v"/>
             </text:p>
           </table:table-cell>
         </xsl:when>
         <!-- values to scatter chart -->
-        <xsl:when test="c:yVal/c:numRef/c:numCache/c:pt[@idx = $point]">
+        <xsl:when test="c:yVal/descendant::c:pt[@idx = $point]">
           <table:table-cell office:value-type="float"
-            office:value="{c:yVal/c:numRef/c:numCache/c:pt[@idx = $point]/c:v}">
+            office:value="{c:yVal/descendant::c:pt[@idx = $point]/c:v}">
             <text:p>
-              <xsl:value-of select="c:yVal/c:numRef/c:numCache/c:pt[@idx = $point]/c:v"/>
+              <xsl:value-of select="c:yVal/descendant::c:pt[@idx = $point]/c:v"/>
             </text:p>
           </table:table-cell>
         </xsl:when>
@@ -662,11 +685,11 @@
 
     <xsl:for-each select="key('dataSeries','')[last() - $count]">
       <xsl:choose>
-        <xsl:when test="c:val/c:numRef/c:numCache/c:pt[@idx = $point]">
+        <xsl:when test="c:val/descendant::c:pt[@idx = $point]">
           <table:table-cell office:value-type="float"
-            office:value="{c:val/c:numRef/c:numCache/c:pt[@idx = $point]/c:v}">
+            office:value="{c:val/descendant::c:pt[@idx = $point]/c:v}">
             <text:p>
-              <xsl:value-of select="c:val/c:numRef/c:numCache/c:pt[@idx = $point]/c:v"/>
+              <xsl:value-of select="c:val/descendant::c:pt[@idx = $point]/c:v"/>
             </text:p>
           </table:table-cell>
         </xsl:when>
@@ -737,8 +760,7 @@
     <!-- @Context: input chart file root -->
 
     <xsl:for-each select="c:chartSpace/c:chart/c:legend">
-      <chart:legend chart:legend-position="end" 
-        chart:style-name="legend">
+      <chart:legend chart:legend-position="end" chart:style-name="legend">
         <!-- legend position -->
         <xsl:if test="c:legendPos/@val != '' ">
           <xsl:attribute name="chart:legend-position">
@@ -803,9 +825,21 @@
         <chart:grid chart:style-name="majorGridX" chart:class="major"/>
       </xsl:if>
 
+      <xsl:variable name="points">
+        <xsl:choose>
+          <!-- for scatter chart -->
+          <xsl:when test="key('xNumPoints','')/descendant::c:ptCount">
+            <xsl:value-of select="key('xNumPoints','')/descendant::c:ptCount/@val"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="key('numPoints','')/descendant::c:ptCount/@val"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
       <chart:categories>
         <xsl:attribute name="table:cell-range-address">
-          <xsl:value-of select="concat('local-table.A2:.A',1 + key('numPoints','')/@val)"/>
+          <xsl:value-of select="concat('local-table.A2:.A',1 + $points)"/>
         </xsl:attribute>
       </chart:categories>
     </chart:axis>
@@ -892,7 +926,8 @@
           </xsl:when>
 
           <!--  or key('plotArea','')/c:ofPieChart or key('plotArea','')/c:doughnutChart -->
-          <xsl:when test="key('plotArea','')/c:pieChart or key('plotArea','')/c:pie3DChart or key('plotArea','')/c:ofPieChart">
+          <xsl:when
+            test="key('plotArea','')/c:pieChart or key('plotArea','')/c:pie3DChart or key('plotArea','')/c:ofPieChart">
             <xsl:text>chart:circle</xsl:text>
           </xsl:when>
 
@@ -1057,7 +1092,7 @@
           style:font-size-asian="18pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
           style:font-size-complex="18pt">
-          
+
           <!-- default "bold" font attribute for default title -->
           <xsl:if test="not(c:tx) and not(c:txPr)">
             <xsl:attribute name="fo:font-weight">
@@ -1299,8 +1334,9 @@
               <xsl:text>automatic</xsl:text>
             </xsl:attribute>
           </xsl:if>
-		  <!-- japanese candle-stick can be true only for stockChart or lineChart -->
-          <xsl:if test="key('plotArea','')/c:stockChart/c:upDownBars or key('plotArea','')/c:lineChart/c:upDownBars">
+          <!-- japanese candle-stick can be true only for stockChart or lineChart -->
+          <xsl:if
+            test="key('plotArea','')/c:stockChart/c:upDownBars or key('plotArea','')/c:lineChart/c:upDownBars">
             <xsl:attribute name="chart:japanese-candle-stick">
               <xsl:text>true</xsl:text>
             </xsl:attribute>
@@ -1634,14 +1670,16 @@
 
           <!-- default stroke for scatter and bubble chart -->
           <xsl:if
-            test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart or key('plotArea','')/c:barChart or key('plotArea','')/c:bar3DChart">
+            test="( key('plotArea','')/c:scatterChart and not(c:smooth) ) 
+                      or key('plotArea','')/c:bubbleChart or key('plotArea','')/c:barChart or key('plotArea','')/c:bar3DChart">
             <xsl:attribute name="draw:stroke">
               <xsl:text>none</xsl:text>
             </xsl:attribute>
           </xsl:if>
 
           <!-- default line width for line chart -->
-          <xsl:if test="key('plotArea','')/c:lineChart">
+          <xsl:if
+            test="key('plotArea','')/c:lineChart or c:smooth or key('plotArea','')/c:radarChart">
             <xsl:attribute name="svg:stroke-width">
               <xsl:text>0.079cm</xsl:text>
             </xsl:attribute>
@@ -1930,18 +1968,18 @@
     <xsl:for-each select="parent::node()/c:valAx[generate-id(.) != $id][1]">
       <xsl:choose>
         <!-- for stock chart type 3 and 4 -->
-         <xsl:when test="key('plotArea','')/c:stockChart and key('plotArea','')/c:barChart">
-           <xsl:attribute name="chart:origin">
-             <xsl:value-of select="key('plotArea','')/c:valAx[2]/c:scaling[1]/c:min/@val"/>
-           </xsl:attribute>
-         </xsl:when> 
+        <xsl:when test="key('plotArea','')/c:stockChart and key('plotArea','')/c:barChart">
+          <xsl:attribute name="chart:origin">
+            <xsl:value-of select="key('plotArea','')/c:valAx[2]/c:scaling[1]/c:min/@val"/>
+          </xsl:attribute>
+        </xsl:when>
         <xsl:when test="c:crossesAt">
           <xsl:attribute name="chart:origin">
             <xsl:value-of select="c:crossesAt/@val"/>
           </xsl:attribute>
         </xsl:when>
       </xsl:choose>
-      
+
     </xsl:for-each>
 
     <!-- major unit -->

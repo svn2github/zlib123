@@ -704,7 +704,7 @@
       </xsl:when>
       <xsl:when test="@chart:class='chart:line' ">
         <c:lineChart>
-          
+
 
           <c:grouping val="standard">
             <xsl:call-template name="SetDataGroupingAtribute"/>
@@ -1651,25 +1651,52 @@
       <c:order val="{$primarySeries + $count}"/>
 
       <!-- series name -->
-      <c:tx>
-        <c:v>
-          <xsl:choose>
-            <xsl:when test="$chartType = 'chart:scatter' ">
-              <xsl:value-of select="key('header','')/table:table-row/table:table-cell[$number + 2]"
-              />
-            </xsl:when>
-            <!-- for chart with swapped data sources-->
-            <xsl:when test="$seriesFrom = 'rows'">
-              <xsl:value-of
-                select="key('rows','')/table:table-row[position() = $number]/table:table-cell[1]"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="key('header','')/table:table-row/table:table-cell[$number + 1]"
-              />
-            </xsl:otherwise>
-          </xsl:choose>
-        </c:v>
-      </c:tx>
+      <xsl:choose>
+        <!-- pie chart series name is also a chart title and it can be occur only if chart title is displayed -->
+        <xsl:when test="$chartType = 'chart:circle' ">
+          <xsl:if test="key('chart','')/chart:title">
+            <c:tx>
+              <c:v>
+                <xsl:choose>
+                  <!-- for chart with swapped data sources-->
+                  <xsl:when test="$seriesFrom = 'rows'">
+                    <xsl:value-of
+                      select="key('rows','')/table:table-row[position() = $number]/table:table-cell[1]"
+                    />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of
+                      select="key('header','')/table:table-row/table:table-cell[$number + 1]"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </c:v>
+            </c:tx>
+          </xsl:if>
+        </xsl:when>
+
+        <xsl:otherwise>
+          <c:tx>
+            <c:v>
+              <xsl:choose>
+                <xsl:when test="$chartType = 'chart:scatter' ">
+                  <xsl:value-of
+                    select="key('header','')/table:table-row/table:table-cell[$number + 2]"/>
+                </xsl:when>
+                <!-- for chart with swapped data sources-->
+                <xsl:when test="$seriesFrom = 'rows'">
+                  <xsl:value-of
+                    select="key('rows','')/table:table-row[position() = $number]/table:table-cell[1]"
+                  />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of
+                    select="key('header','')/table:table-row/table:table-cell[$number + 1]"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </c:v>
+          </c:tx>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <!-- insert series shape properties -->
       <xsl:choose>
@@ -1688,7 +1715,9 @@
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:for-each select="key('style',$styleName)/style:graphic-properties">
-                      <xsl:call-template name="InsertDrawingBorder"/>
+                      <xsl:if test="@svg:stroke-width and @svg:stroke-color">
+                        <xsl:call-template name="InsertDrawingBorder"/>
+                      </xsl:if>
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
@@ -1697,13 +1726,26 @@
 
           </c:spPr>
         </xsl:when>
+
+        <xsl:when test="$chartType = 'chart:radar' ">
+          <xsl:for-each select="key('series','')[position() = $number]">
+
+            <xsl:if test="@svg:stroke-width and @svg:stroke-color">
+              <c:spPr>
+                <xsl:call-template name="InsertDrawingBorder"/>
+              </c:spPr>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+
         <!-- without line between points in series in stockChart4 -->
-        <xsl:when test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
-        <c:spPr>
-          <a:ln w="28575">
-            <a:noFill/>
-          </a:ln>
-        </c:spPr>
+        <xsl:when
+          test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
+          <c:spPr>
+            <a:ln w="28575">
+              <a:noFill/>
+            </a:ln>
+          </c:spPr>
         </xsl:when>
         <xsl:when test="$chartType = 'chart:ring'"/>
         <xsl:otherwise>
@@ -1964,7 +2006,8 @@
               </xsl:for-each>
             </xsl:when>
             <!-- default marker type for 'close' series in stockChart 1&3 -->
-            <xsl:when test="$chartType = 'chart:stock' and ($numSeries = 3 and $number = 3 or $numSeries = 3 and $number = 4)">
+            <xsl:when
+              test="$chartType = 'chart:stock' and ($numSeries = 3 and $number = 3 or $numSeries = 3 and $number = 4)">
               <c:marker>
                 <c:symbol val="dot"/>
                 <c:size val="6"/>
@@ -1981,7 +2024,8 @@
               </c:marker>
             </xsl:when>
             <!-- default "none" marker type for series in stockChart 4 -->
-            <xsl:when test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
+            <xsl:when
+              test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
               <c:marker>
                 <c:symbol val="none"/>
               </c:marker>
@@ -1989,7 +2033,7 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:if>
-      
+
       <xsl:choose>
         <!-- insert X and Y values-->
         <xsl:when test="$chartType = 'chart:scatter' ">
@@ -2104,7 +2148,8 @@
             <xsl:if test="@chart:interpolation != 'none' ">
               <c:smooth val="1"/>
               <xsl:if test="@chart:interpolation = 'b-spline' ">
-                <xsl:message terminate="no">translation.odf2oox.LineChartSmoothingBSpline</xsl:message>
+                <xsl:message terminate="no"
+                >translation.odf2oox.LineChartSmoothingBSpline</xsl:message>
               </xsl:if>
             </xsl:if>
           </xsl:for-each>
@@ -2280,6 +2325,7 @@
           <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
           <xsl:with-param name="default" select="$defaultFill"/>
         </xsl:call-template>
+
         <xsl:call-template name="InsertDrawingBorder"/>
       </c:spPr>
     </xsl:for-each>
@@ -2451,7 +2497,7 @@
           <xsl:text>chart:stock</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="key('series','')[@chart:class][1]"/>    
+          <xsl:value-of select="key('series','')[@chart:class][1]"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
