@@ -1074,7 +1074,8 @@
     </c:scaling>
 
     <!-- axis position -->
-    <xsl:for-each select="key('chart','')[1]">
+    <!-- key('chart','')[1] is the office:chart element,  key('chart','')[2] is the chart:chart element -->
+    <xsl:for-each select="key('chart','')[2]">
       <xsl:choose>
         <xsl:when
           test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'false' ">
