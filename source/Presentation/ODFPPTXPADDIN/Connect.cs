@@ -91,9 +91,23 @@ namespace OdfPPTXPAddin
             //addInInstance = addInInst;
             this.applicationObject = (PowerPoint.Application)application;
 
-            System.Globalization.CultureInfo ci;
-            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            int culture = 0;
+            string languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
+
+            if (languageVal != null)
+            {
+                int.TryParse(languageVal, out culture);
+            }
+
+            if (culture == 0)
+            {
+                culture = this.applicationObject.LanguageSettings
+                    .get_LanguageID(MsoAppLanguageID.msoLanguageIDUI);
+            }
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture =
+                new System.Globalization.CultureInfo(culture);
 
             this.DialogBoxTitle = addinLib.GetString("OdfConverterTitle");
             if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)

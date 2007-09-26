@@ -105,6 +105,26 @@
       <Name>Addin %28Presentation\Addin%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="OdfPPTXPAddinSetup-de\OdfPPTXPAddinSetup-de.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup-fr\OdfPPTXPAddinSetup-fr.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup-nl\OdfPPTXPAddinSetup-nl.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup-pl\OdfPPTXPAddinSetup-pl.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup\AddExcelCustomActions.vbs" />
+    <Content Include="OdfPPTXPAddinSetup\Debug\dotnetfx\dotnetfx.exe" />
+    <Content Include="OdfPPTXPAddinSetup\Debug\dotnetfx\instmsia.exe" />
+    <Content Include="OdfPPTXPAddinSetup\Debug\dotnetfx\WindowsInstaller-KB893803-v2-x86.exe" />
+    <Content Include="OdfPPTXPAddinSetup\Debug\setup.exe" />
+    <Content Include="OdfPPTXPAddinSetup\OdfPPTXPAddinSetup.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup\README.htm" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OdfPPTXPAddinSetup\Debug\OdfPPTXPAddinSetup.tmp" />
+    <None Include="OdfPPTXPAddinSetup\PostBuild.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="OdfPPTXPAddinSetup\Release\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
     <PreBuildEvent>
