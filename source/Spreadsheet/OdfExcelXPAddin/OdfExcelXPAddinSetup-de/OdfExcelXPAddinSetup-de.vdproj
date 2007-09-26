@@ -396,7 +396,7 @@
         "Subject" = "8:"
         "ARPCONTACT" = "8:Clever Age"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Build: 3694"
+        "ARPCOMMENTS" = "8:Build: 3783"
         "ARPURLINFOABOUT" = "8:"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
@@ -1194,7 +1194,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_AB381C31B7B349D696DBB1D4D6307118"
             {
-            "SourcePath" = "8:..\\..\\..\\Common\\OdfAddinLib\\obj\\Debug\\OdfAddinLib.dll"
+            "SourcePath" = "8:..\\..\\..\\Common\\OdfAddinLib\\obj\\Release\\OdfAddinLib.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_ADA2E45FC05F43BD90FC5E44F3543FA1"

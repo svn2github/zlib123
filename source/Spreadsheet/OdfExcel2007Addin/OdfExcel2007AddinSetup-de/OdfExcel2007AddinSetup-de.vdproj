@@ -76,12 +76,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_053FCFE95011732F29BA24BE8758724A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_E5998EA260F8D25E3DC45CE350C58827"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -89,6 +83,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_AD6D9DFDB43D13C2E098AB2F07C68A0F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_053FCFE95011732F29BA24BE8758724A"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -261,11 +261,11 @@
                 {
                     "_AD6D9DFDB43D13C2E098AB2F07C68A0F"
                     {
-                    "Name" = "8:Office.dll"
+                    "Name" = "8:office.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Office.dll"
+            "SourcePath" = "8:office.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
@@ -384,7 +384,7 @@
         "Subject" = "8:"
         "ARPCONTACT" = "8:Clever Age"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Build: 3694"
+        "ARPCOMMENTS" = "8:Build: 3783"
         "ARPURLINFOABOUT" = "8:"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
@@ -1182,7 +1182,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8233B145276A4A98BC9708CAE69C1AEE"
             {
-            "SourcePath" = "8:..\\obj\\Debug\\OdfExcel2007Addin.dll"
+            "SourcePath" = "8:..\\obj\\Release\\OdfExcel2007Addin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
