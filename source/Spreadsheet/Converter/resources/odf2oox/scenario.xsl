@@ -143,7 +143,7 @@
         
         <!-- when scenario bigger than supported -->
         <xsl:if test="number($scenarioHeight) * number($scenarioWidth) &gt; 32">
-          <xsl:message terminate="yes">translation.odf2oox.scenarioTooBig</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.scenarioTooBig</xsl:message>
         </xsl:if>
         
         <xsl:variable name="scenarioSize">
