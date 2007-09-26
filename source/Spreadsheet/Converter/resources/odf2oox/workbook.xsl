@@ -260,6 +260,18 @@
       </xsl:choose>
 
     </xsl:variable>
+    
+    <xsl:variable name="contentFontsCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style)"
+      />
+    </xsl:variable>
+    
+    <xsl:variable name="styleFontsCount">
+      <xsl:value-of
+        select="count(document('styles.xml')/office:document-styles/office:styles/style:style)"
+      />
+    </xsl:variable>
 
     <!-- convert first table -->
     <xsl:apply-templates
@@ -272,6 +284,12 @@
       </xsl:with-param>
       <xsl:with-param name="hyperlinkStyle">
         <xsl:value-of select="$hyperlinkStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="contentFontsCount">
+        <xsl:value-of select="$contentFontsCount"/>
+      </xsl:with-param>
+      <xsl:with-param name="styleFontsCount">
+        <xsl:value-of select="$styleFontsCount"/>
       </xsl:with-param>
       <xsl:with-param name="cellFormats">
         <xsl:value-of select="$cellFormats"/>

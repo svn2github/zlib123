@@ -545,6 +545,8 @@
     <xsl:param name="tableId"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="contentFontsCount"/>
+    <xsl:param name="styleFontsCount"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
@@ -624,6 +626,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
           </xsl:with-param>
@@ -684,6 +692,12 @@
             </xsl:with-param>
             <xsl:with-param name="hyperlinkStyle">
               <xsl:value-of select="$hyperlinkStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="contentFontsCount">
+              <xsl:value-of select="$contentFontsCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="styleFontsCount">
+              <xsl:value-of select="$styleFontsCount"/>
             </xsl:with-param>
             <xsl:with-param name="cellFormats">
               <xsl:value-of select="$cellFormats"/>
@@ -753,6 +767,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
           </xsl:with-param>
@@ -815,6 +835,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
           </xsl:with-param>
@@ -876,6 +902,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
           </xsl:with-param>
@@ -909,6 +941,8 @@
     <xsl:param name="tableId"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="contentFontsCount"/>
+    <xsl:param name="styleFontsCount"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
@@ -966,6 +1000,12 @@
               </xsl:with-param>
               <xsl:with-param name="hyperlinkStyle">
                 <xsl:value-of select="$hyperlinkStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="contentFontsCount">
+                <xsl:value-of select="$contentFontsCount"/>
+              </xsl:with-param>
+              <xsl:with-param name="styleFontsCount">
+                <xsl:value-of select="$styleFontsCount"/>
               </xsl:with-param>
               <xsl:with-param name="cellFormats">
                 <xsl:value-of select="$cellFormats"/>
@@ -1032,6 +1072,12 @@
               <xsl:with-param name="hyperlinkStyle">
                 <xsl:value-of select="$hyperlinkStyle"/>
               </xsl:with-param>
+              <xsl:with-param name="contentFontsCount">
+                <xsl:value-of select="$contentFontsCount"/>
+              </xsl:with-param>
+              <xsl:with-param name="styleFontsCount">
+                <xsl:value-of select="$styleFontsCount"/>
+              </xsl:with-param>
               <xsl:with-param name="cellFormats">
                 <xsl:value-of select="$cellFormats"/>
               </xsl:with-param>
@@ -1062,6 +1108,8 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="contentFontsCount"/>
+    <xsl:param name="styleFontsCount"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
@@ -1097,6 +1145,12 @@
       </xsl:with-param>
       <xsl:with-param name="hyperlinkStyle">
         <xsl:value-of select="$hyperlinkStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="contentFontsCount">
+        <xsl:value-of select="$contentFontsCount"/>
+      </xsl:with-param>
+      <xsl:with-param name="styleFontsCount">
+        <xsl:value-of select="$styleFontsCount"/>
       </xsl:with-param>
       <xsl:with-param name="cellFormats">
         <xsl:value-of select="$cellFormats"/>
@@ -1159,6 +1213,8 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="contentFontsCount"/>
+    <xsl:param name="styleFontsCount"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
@@ -1198,6 +1254,12 @@
           </xsl:with-param>
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
           </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
@@ -1248,6 +1310,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
           </xsl:with-param>
@@ -1279,6 +1347,8 @@
     <xsl:param name="CountStyleTableCell"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="contentFontsCount"/>
+    <xsl:param name="styleFontsCount"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
@@ -1324,6 +1394,12 @@
       </xsl:with-param>
       <xsl:with-param name="hyperlinkStyle">
         <xsl:value-of select="$hyperlinkStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="contentFontsCount">
+        <xsl:value-of select="$contentFontsCount"/>
+      </xsl:with-param>
+      <xsl:with-param name="styleFontsCount">
+        <xsl:value-of select="$styleFontsCount"/>
       </xsl:with-param>
       <xsl:with-param name="cellFormats">
         <xsl:value-of select="$cellFormats"/>
@@ -1383,6 +1459,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
           </xsl:with-param>
@@ -1426,6 +1508,12 @@
           <xsl:with-param name="hyperlinkStyle">
             <xsl:value-of select="$hyperlinkStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:with-param>
           <xsl:with-param name="cellFormats">
             <xsl:value-of select="$cellFormats"/>
           </xsl:with-param>
@@ -1459,6 +1547,8 @@
     <xsl:param name="CountStyleTableCell"/>
     <xsl:param name="multilines"/>
     <xsl:param name="hyperlinkStyle"/>
+    <xsl:param name="contentFontsCount"/>
+    <xsl:param name="styleFontsCount"/>
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
@@ -1531,19 +1621,28 @@
           <!-- if it is a hyperlink  in the cell-->
           <xsl:when test="descendant::text:a[not(ancestor::office:annotation)]">
 
-            <xsl:attribute name="s">
               <xsl:choose>
                 <!-- if there is no 'Hyperlink' style -->
                 <xsl:when
                   test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ])">
-                  <xsl:value-of select="$cellFormats + $cellStyles + $multilines"/>
+                  <xsl:variable name="TableStyleName">
+                    <xsl:value-of select="@table:style-name"/>
+                  </xsl:variable>                 
+                    <xsl:attribute name="style-number-change-post">
+                      <xsl:value-of select="concat($TableStyleName, 'h')"/>
+                    </xsl:attribute>
                 </xsl:when>
-
                 <xsl:otherwise>
-                  <xsl:value-of select="$CountStyleTableCell + $hyperlinkStyle"/>
+                  <xsl:variable name="hyperlinkId">
+                    <xsl:number count="table:table-cell[descendant::text:a]"
+                      level="any"/>
+                  </xsl:variable>
+                  <xsl:attribute name="s">
+                      <xsl:value-of select="$CountStyleTableCell + $styleFontsCount + $hyperlinkId"/>
+                  </xsl:attribute>
                 </xsl:otherwise>
               </xsl:choose>
-            </xsl:attribute>
+
           </xsl:when>
 
           <xsl:otherwise>
