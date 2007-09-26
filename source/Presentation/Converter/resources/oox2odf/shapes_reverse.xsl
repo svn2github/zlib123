@@ -284,6 +284,48 @@ Copyright (c) 2007, Sonata Software Limited
                 </presentation:sound>
               </presentation:event-listener>
             </xsl:when>
+              <xsl:otherwise>
+                <xsl:if test="a:hlinkClick/@r:id">
+                <presentation:event-listener script:event-name="dom:click" presentation:action="show"
+                                      xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                  <xsl:variable name="RelationId">
+                    <xsl:value-of select="a:hlinkClick/@r:id"/>
+                  </xsl:variable>
+                  <xsl:variable name="Target">
+                    <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Target"/>
+                  </xsl:variable>
+                  <xsl:variable name="type">
+                    <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Type"/>
+                  </xsl:variable>
+                  <xsl:choose>
+                    <xsl:when test="contains($Target,'mailto:') or contains($Target,'http:') or contains($Target,'https:')">
+                      <xsl:attribute name="xlink:href">
+                        <xsl:value-of select="$Target"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:when test="contains($Target,'slide')">
+                      <xsl:attribute name="xlink:href">
+                        <xsl:value-of select="concat('#Slide ',substring-before(substring-after($Target,'slide'),'.xml'))"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:when test="contains($Target,'file:///')">
+                      <xsl:attribute name="xlink:href">
+                        <xsl:value-of select="concat('/',translate(substring-after($Target,'file:///'),'\','/'))"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:when test="contains($type,'hyperlink') and not(contains($Target,'http:')) and not(contains($Target,'https:'))">
+                      <!-- warn if hyperlink Path  -->
+                      <xsl:message terminate="no">translation.oox2odf.hyperlinkTypeRelativePath</xsl:message>
+                      <xsl:attribute name="xlink:href">
+                        <!--Link Absolute Path-->
+                        <xsl:value-of select ="concat('hyperlink-path:',$Target)"/>
+                        <!--End-->
+                      </xsl:attribute>
+                    </xsl:when>
+                  </xsl:choose>
+                </presentation:event-listener>
+                </xsl:if>
+              </xsl:otherwise>
             <!-- End => Play sound  -->
           </xsl:choose>
         </xsl:for-each>
@@ -502,7 +544,18 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
             <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
                        draw:type="rectangle" 
-                       draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+                       draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N">
+              <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+                <xsl:attribute name ="draw:mirror-horizontal">
+                  <xsl:value-of select="'true'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+                <xsl:attribute name ="draw:mirror-vertical">
+                  <xsl:value-of select="'true'"/>
+                </xsl:attribute>
+              </xsl:if>
+            </draw:enhanced-geometry>
             <xsl:copy-of select="$varHyperLinksForShapes" />
           </draw:custom-shape>
         </xsl:when>
@@ -545,11 +598,56 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 											draw:text-areas="3200 3200 18400 18400" 
 											draw:type="ellipse"
-											draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160"/>
+											draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
 	  </xsl:when>
-		
+
+      <!--Added by Mathi for bug Fix on 17th Sep 2007-->
+      <xsl:when test ="(not(p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')]) or (p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')])) and (p:spPr/a:prstGeom/@prst='ellipse')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+            <xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+            <xsl:with-param name="TypeId" select ="$TypeId" />
+            <xsl:with-param name="grpBln" select ="$grpBln" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+											draw:text-areas="3200 3200 18400 18400" 
+											draw:type="ellipse"
+											draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!--End of Code-->
+      
       <!--Right Arrow (Added by A.Mathi as on 2/07/2007) -->
       <xsl:when test = "(p:spPr/a:prstGeom/@prst='rightArrow')">
         <draw:custom-shape draw:layer="layout" >
@@ -567,6 +665,16 @@ Copyright (c) 2007, Sonata Software Limited
 					  draw:text-areas="0 ?f0 ?f5 ?f2" 
 					  draw:type="right-arrow" draw:modifiers="16200 5400" 
 					  draw:enhanced-path="M 0 ?f0 L ?f1 ?f0 ?f1 0 21600 10800 ?f1 21600 ?f1 ?f2 0 ?f2 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$1 "/>
             <draw:equation draw:name="f1" draw:formula="$0 "/>
             <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
@@ -601,6 +709,16 @@ Copyright (c) 2007, Sonata Software Limited
 					  draw:text-areas="?f0 ?f7 ?f2 21600" 
 					  draw:type="up-arrow" draw:modifiers="5400 5400" 
 					  draw:enhanced-path="M ?f0 21600 L ?f0 ?f1 0 ?f1 10800 0 21600 ?f1 ?f2 ?f1 ?f2 21600 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$1 "/>
             <draw:equation draw:name="f1" draw:formula="$0 "/>
             <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
@@ -636,6 +754,16 @@ Copyright (c) 2007, Sonata Software Limited
 					  draw:type="left-arrow" 
 					  draw:modifiers="5400 5400" 
 					  draw:enhanced-path="M 21600 ?f0 L ?f1 ?f0 ?f1 0 0 10800 ?f1 21600 ?f1 ?f2 21600 ?f2 Z N">
+             <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$1 "/>
             <draw:equation draw:name="f1" draw:formula="$0 "/>
             <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
@@ -671,6 +799,16 @@ Copyright (c) 2007, Sonata Software Limited
 					  draw:type="down-arrow" 
 					  draw:modifiers="16200 5400" 
 					  draw:enhanced-path="M ?f0 0 L ?f0 ?f1 0 ?f1 10800 21600 21600 ?f1 ?f2 ?f1 ?f2 0 Z N">
+              <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$1 "/>
             <draw:equation draw:name="f1" draw:formula="$0 "/>
             <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
@@ -706,6 +844,16 @@ Copyright (c) 2007, Sonata Software Limited
 					  draw:type="left-right-arrow" 
 					  draw:modifiers="4300 5400" 
 					  draw:enhanced-path="M 0 10800 L ?f0 0 ?f0 ?f1 ?f2 ?f1 ?f2 0 21600 10800 ?f2 21600 ?f2 ?f3 ?f0 ?f3 ?f0 21600 Z N">
+              <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="$1 "/>
             <draw:equation draw:name="f2" draw:formula="21600-$0 "/>
@@ -743,6 +891,16 @@ Copyright (c) 2007, Sonata Software Limited
 					  draw:type="up-down-arrow" 
 					  draw:modifiers="5400 4300" 
 					  draw:enhanced-path="M 0 ?f1 L 10800 0 21600 ?f1 ?f2 ?f1 ?f2 ?f3 21600 ?f3 10800 21600 0 ?f3 ?f0 ?f3 ?f0 ?f1 Z N">
+              <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="$1 "/>
             <draw:equation draw:name="f2" draw:formula="21600-$0 "/>
@@ -781,6 +939,16 @@ Copyright (c) 2007, Sonata Software Limited
 						draw:text-areas="?f1 10800 ?f2 18000 ?f3 7200 ?f4 21600" 
 						draw:type="isosceles-triangle" draw:modifiers="10800" 
 						draw:enhanced-path="M ?f0 0 L 21600 21600 0 21600 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="$0 /2"/>
             <draw:equation draw:name="f2" draw:formula="?f1 +10800"/>
@@ -814,7 +982,18 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:glue-points="10800 0 5400 10800 0 21600 10800 21600 21600 21600 16200 10800" 
 											draw:text-areas="1900 12700 12700 19700" 
 											draw:type="right-triangle" 
-											draw:enhanced-path="M 0 0 L 21600 21600 0 21600 0 0 Z N"/>
+											draw:enhanced-path="M 0 0 L 21600 21600 0 21600 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -835,7 +1014,18 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 						draw:glue-points="?f6 0 10800 ?f8 ?f11 10800 ?f9 21600 10800 ?f10 ?f5 10800" 
 						draw:text-areas="?f3 ?f3 ?f4 ?f4" draw:type="parallelogram" 
-						draw:modifiers="5400" draw:enhanced-path="M ?f0 0 L 21600 0 ?f1 21600 0 21600 Z N">
+						draw:modifiers="5400" 
+            draw:enhanced-path="M ?f0 0 L 21600 0 ?f1 21600 0 21600 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="21600-$0 "/>
             <draw:equation draw:name="f2" draw:formula="$0 *10/24"/>
@@ -877,6 +1067,16 @@ Copyright (c) 2007, Sonata Software Limited
           draw:glue-points="457200 0 114300 608076 457200 1216152 800100 608076" 
           draw:type="mso-spt100" 
           draw:enhanced-path="M 0 1216152 L 228600 0 L 685800 0 L 914400 1216152 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
           </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
@@ -899,7 +1099,18 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
 											draw:text-areas="5400 5400 16200 16200" 
 											draw:type="diamond" 
-											draw:enhanced-path="M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N"/>
+											draw:enhanced-path="M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
 
@@ -922,7 +1133,18 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:glue-points="10800 0 0 8260 4230 21600 10800 21600 17370 21600 21600 8260" 
 											draw:text-areas="4230 5080 17370 21600" 
 											draw:type="pentagon" 
-											draw:enhanced-path="M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N"/>
+											draw:enhanced-path="M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -945,6 +1167,16 @@ Copyright (c) 2007, Sonata Software Limited
 											draw:text-areas="?f3 ?f3 ?f4 ?f4" draw:type="hexagon" 
 											draw:modifiers="5400" 
 											draw:enhanced-path="M ?f0 0 L ?f1 0 21600 10800 ?f1 21600 ?f0 21600 0 10800 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="21600-$0 "/>
             <draw:equation draw:name="f2" draw:formula="$0 *100/234"/>
@@ -975,6 +1207,16 @@ Copyright (c) 2007, Sonata Software Limited
 						draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800"
 						draw:text-areas="?f5 ?f6 ?f7 ?f8" draw:type="octagon" draw:modifiers="5000"
 						draw:enhanced-path="M ?f0 0 L ?f2 0 21600 ?f1 21600 ?f3 ?f2 21600 ?f0 21600 0 ?f3 0 ?f1 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="left+$0 "/>
             <draw:equation draw:name="f1" draw:formula="top+$0 "/>
             <draw:equation draw:name="f2" draw:formula="right-$0 "/>
@@ -1007,6 +1249,16 @@ Copyright (c) 2007, Sonata Software Limited
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600"  draw:text-areas="0 0 21600 21600" draw:type="circular-arrow" draw:modifiers="180 0 5500" draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="$1 "/>
             <draw:equation draw:name="f2" draw:formula="$2 "/>
@@ -1063,8 +1315,20 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:text-areas="?f2 ?f7 ?f1 ?f1 ?f7 ?f2 ?f1 ?f1" draw:type="mso-spt89" draw:modifiers="10062 18378 6098" draw:enhanced-path="M 0 ?f5 L ?f2 ?f0 ?f2 ?f7 ?f7 ?f7 ?f7 ?f2 ?f0 ?f2 ?f5 0 21600 ?f2 ?f1 ?f2 ?f1 ?f1 ?f2 ?f1 ?f2 21600 Z N">
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" 
+            draw:text-areas="?f2 ?f7 ?f1 ?f1 ?f7 ?f2 ?f1 ?f1" draw:type="mso-spt89" 
+            draw:modifiers="10062 18378 6098" 
+            draw:enhanced-path="M 0 ?f5 L ?f2 ?f0 ?f2 ?f7 ?f7 ?f7 ?f7 ?f2 ?f0 ?f2 ?f5 0 21600 ?f2 ?f1 ?f2 ?f1 ?f1 ?f2 ?f1 ?f2 21600 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="$1 "/>
             <draw:equation draw:name="f2" draw:formula="$2 "/>
@@ -1094,7 +1358,22 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 3276600 1905000" draw:extrusion-allowed="true" draw:text-areas="0 1428750 3038475 1905000" draw:glue-points="2800350 0 2324100 476250 0 1666874 1519238 1905000 3038475 1190624 3276600 476250" draw:type="mso-spt100" draw:enhanced-path="M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 3276600 1905000" draw:extrusion-allowed="true" 
+              draw:text-areas="0 1428750 3038475 1905000" 
+              draw:glue-points="2800350 0 2324100 476250 0 1666874 1519238 1905000 3038475 1190624 3276600 476250" 
+              draw:type="mso-spt100" 
+              draw:enhanced-path="M 0 1428750 L 2562225 1428750 L 2562225 476250 L 2324100 476250 L 2800350 0 L 3276600 476250 L 3038475 476250 L 3038475 1905000 L 0 1905000 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -1117,6 +1396,16 @@ Copyright (c) 2007, Sonata Software Limited
 						draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" 
 						draw:text-areas="0 ?f1 ?f4 ?f12" draw:type="cube" draw:modifiers="5400" 
 						draw:enhanced-path="M 0 ?f12 L 0 ?f1 ?f2 0 ?f11 0 ?f11 ?f3 ?f4 ?f12 Z N M 0 ?f1 L ?f2 0 ?f11 0 ?f4 ?f1 Z N M ?f4 ?f12 L ?f4 ?f1 ?f11 0 ?f11 ?f3 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="top+?f0 "/>
             <draw:equation draw:name="f2" draw:formula="left+?f0 "/>
@@ -1156,6 +1445,16 @@ Copyright (c) 2007, Sonata Software Limited
 						draw:glue-points="44 ?f6 44 0 0 10800 44 21600 88 10800"
 						draw:text-areas="0 ?f6 88 ?f3" draw:type="can" draw:modifiers="5400"
 						draw:enhanced-path="M 44 0 C 20 0 0 ?f2 0 ?f0 L 0 ?f3 C 0 ?f4 20 21600 44 21600 68 21600 88 ?f4 88 ?f3 L 88 ?f0 C 88 ?f2 68 0 44 0 Z N M 44 0 C 20 0 0 ?f2 0 ?f0 0 ?f5 20 ?f6 44 ?f6 68 ?f6 88 ?f5 88 ?f0 88 ?f2 68 0 44 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 *2/4" />
             <draw:equation draw:name="f1" draw:formula="?f0 *6/11" />
             <draw:equation draw:name="f2" draw:formula="?f0 -?f1" />
@@ -1190,6 +1489,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="cross" 
             draw:modifiers="5400" 
             draw:enhanced-path="M ?f1 0 L ?f2 0 ?f2 ?f1 21600 ?f1 21600 ?f3 ?f2 ?f3 ?f2 21600 ?f1 21600 ?f1 ?f3 0 ?f3 0 ?f1 ?f1 ?f1 ?f1 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 *10799/10800"/>
             <draw:equation draw:name="f1" draw:formula="?f0 "/>
             <draw:equation draw:name="f2" draw:formula="right-?f0 "/>
@@ -1221,6 +1530,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="forbidden" 
             draw:modifiers="2700" 
             draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z B ?f0 ?f0 ?f1 ?f1 ?f9 ?f10 ?f11 ?f12 Z B ?f0 ?f0 ?f1 ?f1 ?f13 ?f14 ?f15 ?f16 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="21600-$0 "/>
             <draw:equation draw:name="f2" draw:formula="10800-$0 "/>
@@ -1264,6 +1583,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="paper" 
             draw:modifiers="18900" 
             draw:enhanced-path="M 0 0 L 21600 0 21600 ?f0 ?f0 21600 0 21600 Z N M ?f0 21600 L ?f3 ?f0 C ?f8 ?f9 ?f10 ?f11 21600 ?f0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 "/>
             <draw:equation draw:name="f1" draw:formula="21600-?f0 "/>
             <draw:equation draw:name="f2" draw:formula="?f1 *8000/10800"/>
@@ -1299,7 +1628,18 @@ Copyright (c) 2007, Sonata Software Limited
           <draw:enhanced-geometry svg:viewBox="0 0 640 861" 
             draw:text-areas="257 295 414 566" 
             draw:type="non-primitive" 
-            draw:enhanced-path="M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N"/>
+            draw:enhanced-path="M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -1320,7 +1660,18 @@ Copyright (c) 2007, Sonata Software Limited
             draw:glue-points="9722 1887 0 12875 11614 18844 21600 6646" 
             draw:text-areas="5400 6570 14160 15290" 
             draw:type="bang" 
-            draw:enhanced-path="M 11464 4340 L 9722 1887 8548 6383 4503 3626 5373 7816 1174 8270 3934 11592 0 12875 3329 15372 1283 17824 4804 18239 4918 21600 7525 18125 8698 19712 9871 17371 11614 18844 12178 15937 14943 17371 14640 14348 18878 15632 16382 12311 18270 11292 16986 9404 21600 6646 16382 6533 18005 3172 14524 5778 14789 0 11464 4340 Z N"/>
+            draw:enhanced-path="M 11464 4340 L 9722 1887 8548 6383 4503 3626 5373 7816 1174 8270 3934 11592 0 12875 3329 15372 1283 17824 4804 18239 4918 21600 7525 18125 8698 19712 9871 17371 11614 18844 12178 15937 14943 17371 14640 14348 18878 15632 16382 12311 18270 11292 16986 9404 21600 6646 16382 6533 18005 3172 14524 5778 14789 0 11464 4340 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -1359,7 +1710,18 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="21600 0 0 10800 21600 21600" draw:text-areas="6350 ?f3 21600 ?f4" draw:type="left-bracket" draw:modifiers="1800" draw:enhanced-path="M 21600 0 C 10800 0 0 ?f3 0 ?f1 L 0 ?f2 C 0 ?f4 10800 21600 21600 21600 N">
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="21600 0 0 10800 21600 21600" draw:text-areas="6350 ?f3 21600 ?f4" draw:type="left-bracket" draw:modifiers="1800" 
+            draw:enhanced-path="M 21600 0 C 10800 0 0 ?f3 0 ?f1 L 0 ?f2 C 0 ?f4 10800 21600 21600 21600 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 /2"/>
             <draw:equation draw:name="f1" draw:formula="top+$0 "/>
             <draw:equation draw:name="f2" draw:formula="bottom-$0 "/>
@@ -1383,7 +1745,18 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="0 0 0 21600 21600 10800" draw:text-areas="0 ?f3 15150 ?f4" draw:type="right-bracket" draw:modifiers="1800" draw:enhanced-path="M 0 0 C 10800 0 21600 ?f3 21600 ?f1 L 21600 ?f2 C 21600 ?f4 10800 21600 0 21600 N">
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="0 0 0 21600 21600 10800" draw:text-areas="0 ?f3 15150 ?f4" draw:type="right-bracket" draw:modifiers="1800" 
+            draw:enhanced-path="M 0 0 C 10800 0 21600 ?f3 21600 ?f1 L 21600 ?f2 C 21600 ?f4 10800 21600 0 21600 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 /2"/>
             <draw:equation draw:name="f1" draw:formula="top+$0 "/>
             <draw:equation draw:name="f2" draw:formula="bottom-$0 "/>
@@ -1407,7 +1780,18 @@ Copyright (c) 2007, Sonata Software Limited
 			  <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
 			  <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
 		  </xsl:call-template>
-		  <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="21600 0 0 10800 21600 21600" draw:text-areas="13800 ?f9 21600 ?f10" draw:type="left-brace" draw:modifiers="1800 10800" draw:enhanced-path="M 21600 0 C 16200 0 10800 ?f0 10800 ?f1 L 10800 ?f2 C 10800 ?f3 5400 ?f4 0 ?f4 5400 ?f4 10800 ?f5 10800 ?f6 L 10800 ?f7 C 10800 ?f8 16200 21600 21600 21600 N">
+		  <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="21600 0 0 10800 21600 21600" draw:text-areas="13800 ?f9 21600 ?f10" draw:type="left-brace" draw:modifiers="1800 10800" 
+        draw:enhanced-path="M 21600 0 C 16200 0 10800 ?f0 10800 ?f1 L 10800 ?f2 C 10800 ?f3 5400 ?f4 0 ?f4 5400 ?f4 10800 ?f5 10800 ?f6 L 10800 ?f7 C 10800 ?f8 16200 21600 21600 21600 N">
+        <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+          <xsl:attribute name ="draw:mirror-horizontal">
+            <xsl:value-of select="'true'"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+          <xsl:attribute name ="draw:mirror-vertical">
+            <xsl:value-of select="'true'"/>
+          </xsl:attribute>
+        </xsl:if>
 			  <draw:equation draw:name="f0" draw:formula="$0 /2"/>
 			  <draw:equation draw:name="f1" draw:formula="$0 "/>
 			  <draw:equation draw:name="f2" draw:formula="?f4 -$0 "/>
@@ -1444,6 +1828,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="right-brace" 
             draw:modifiers="1800 10800" 
             draw:enhanced-path="M 0 0 C 5400 0 10800 ?f0 10800 ?f1 L 10800 ?f2 C 10800 ?f3 16200 ?f4 21600 ?f4 16200 ?f4 10800 ?f5 10800 ?f6 L 10800 ?f7 C 10800 ?f8 5400 21600 0 21600 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 /2"/>
             <draw:equation draw:name="f1" draw:formula="$0 "/>
             <draw:equation draw:name="f2" draw:formula="?f4 -$0 "/>
@@ -1480,6 +1874,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="rectangular-callout" 
             draw:modifiers="1011.57024793388 43743.8237608183" 
             draw:enhanced-path="M 0 0 L 0 3590 ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 0 21600 3590 21600 ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 21600 21600 21600 18010 ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 21600 0 18010 0 ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 3590 0 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 -10800"/>
             <draw:equation draw:name="f1" draw:formula="$1 -10800"/>
             <draw:equation draw:name="f2" draw:formula="if(?f18 ,$0 ,0)"/>
@@ -1545,6 +1949,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="round-rectangular-callout" 
             draw:modifiers="2125.14757969303 44984.4217151849" 
             draw:enhanced-path="M 3590 0 X 0 3590 L ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 Y 3590 21600 L ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 X 21600 18010 L ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 Y 18010 0 L ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 -10800"/>
             <draw:equation draw:name="f1" draw:formula="$1 -10800"/>
             <draw:equation draw:name="f2" draw:formula="if(?f18 ,$0 ,0)"/>
@@ -1611,6 +2025,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="round-callout" 
             draw:modifiers="4965 38560" 
             draw:enhanced-path="W 0 0 21600 21600 ?f22 ?f23 ?f18 ?f19 L ?f14 ?f15 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 -10800"/>
             <draw:equation draw:name="f1" draw:formula="$1 -10800"/>
             <draw:equation draw:name="f2" draw:formula="?f0 *?f0 "/>
@@ -1658,6 +2082,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:type="cloud-callout" 
             draw:modifiers="6775 39682" 
             draw:enhanced-path="M 1930 7160 C 1530 4490 3400 1970 5270 1970 5860 1950 6470 2210 6970 2600 7450 1390 8340 650 9340 650 10004 690 10710 1050 11210 1700 11570 630 12330 0 13150 0 13840 0 14470 460 14870 1160 15330 440 16020 0 16740 0 17910 0 18900 1130 19110 2710 20240 3150 21060 4580 21060 6220 21060 6720 21000 7200 20830 7660 21310 8460 21600 9450 21600 10460 21600 12750 20310 14680 18650 15010 18650 17200 17370 18920 15770 18920 15220 18920 14700 18710 14240 18310 13820 20240 12490 21600 11000 21600 9890 21600 8840 20790 8210 19510 7620 20000 7930 20290 6240 20290 4850 20290 3570 19280 2900 17640 1300 17600 480 16300 480 14660 480 13900 690 13210 1070 12640 380 12160 0 11210 0 10120 0 8590 840 7330 1930 7160 Z N M 1930 7160 C 1950 7410 2040 7690 2090 7920 F N M 6970 2600 C 7200 2790 7480 3050 7670 3310 F N M 11210 1700 C 11130 1910 11080 2160 11030 2400 F N M 14870 1160 C 14720 1400 14640 1720 14540 2010 F N M 19110 2710 C 19130 2890 19230 3290 19190 3380 F N M 20830 7660 C 20660 8170 20430 8620 20110 8990 F N M 18660 15010 C 18740 14200 18280 12200 17000 11450 F N M 14240 18310 C 14320 17980 14350 17680 14370 17360 F N M 8220 19510 C 8060 19250 7960 18950 7860 18640 F N M 2900 17640 C 3090 17600 3280 17540 3460 17450 F N M 1070 12640 C 1400 12900 1780 13130 2330 13040 F N U ?f17 ?f18 1800 1800 0 23592960 Z N U ?f19 ?f20 1200 1200 0 23592960 Z N U ?f13 ?f14 700 700 0 23592960 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="$0 -10800"/>
             <draw:equation draw:name="f1" draw:formula="$1 -10800"/>
             <draw:equation draw:name="f2" draw:formula="atan2(?f1 ,?f0 )/(pi/180)"/>
@@ -1699,11 +2133,20 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 841 854" 
-            draw:mirror-horizontal="false" 
-            draw:mirror-vertical="true" 
-            draw:type="non-primitive" 
-            draw:enhanced-path="M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N">
+          <draw:enhanced-geometry svg:viewBox="0 0 813816 868680" draw:extrusion-allowed="true" 
+            draw:text-areas="0 0 813816 868680" draw:glue-points="610362 0 610362 406908 101727 868680 813816 203454" 
+            draw:type="mso-spt100" 
+            draw:enhanced-path="M 0 868680 L 0 457772 W 0 101727 712090 813817 0 457772 356046 101727 L 610362 101727 L 610362 0 L 813816 203454 L 610362 406908 L 610362 305181 L 356045 305181 A 203454 305181 508636 610363 356045 305181 203454 457772 L 203454 868680 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
           </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
@@ -1723,50 +2166,20 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-            draw:text-areas="0 0 21600 21600" 
-            draw:type="circular-arrow" 
-            draw:modifiers="180 0 5500" 
-            draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
-            <draw:equation draw:name="f0" draw:formula="$0 "/>
-            <draw:equation draw:name="f1" draw:formula="$1 "/>
-            <draw:equation draw:name="f2" draw:formula="$2 "/>
-            <draw:equation draw:name="f3" draw:formula="10800+$2 "/>
-            <draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))"/>
-            <draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))"/>
-            <draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f8" draw:formula="?f4 +10800"/>
-            <draw:equation draw:name="f9" draw:formula="?f5 +10800"/>
-            <draw:equation draw:name="f10" draw:formula="?f6 +10800"/>
-            <draw:equation draw:name="f11" draw:formula="?f7 +10800"/>
-            <draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))"/>
-            <draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))"/>
-            <draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f16" draw:formula="?f12 +10800"/>
-            <draw:equation draw:name="f17" draw:formula="?f13 +10800"/>
-            <draw:equation draw:name="f18" draw:formula="?f14 +10800"/>
-            <draw:equation draw:name="f19" draw:formula="?f15 +10800"/>
-            <draw:equation draw:name="f20" draw:formula="21600-?f3 "/>
-            <draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
-            <draw:equation draw:name="f24" draw:formula="?f22 +10800"/>
-            <draw:equation draw:name="f25" draw:formula="$2 -2700"/>
-            <draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f28" draw:formula="?f26 +10800"/>
-            <draw:equation draw:name="f29" draw:formula="?f27 +10800"/>
-            <draw:equation draw:name="f30" draw:formula="($1+45)*pi/180"/>
-            <draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))"/>
-            <draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31"/>
-            <draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)"/>
-            <draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)"/>
-            <draw:equation draw:name="f35" draw:formula="?f28+?f33"/>
-            <draw:equation draw:name="f36" draw:formula="?f29+?f34"/>
-            <draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
-            <draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 886968 877824" 
+            draw:extrusion-allowed="true" draw:text-areas="0 0 886968 877824" 
+            draw:glue-points="448056 438912 667512 658368 886968 438912 388620 0 109728 877824" 
+            draw:type="mso-spt100" draw:enhanced-path="M 0 877824 L 0 384048 W 0 0 768096 768096 0 384048 384049 0 L 393192 0 W 9144 0 777240 768096 393192 0 777240 384049 L 777240 438912 L 886968 438912 L 667512 658368 L 448056 438912 L 557784 438912 L 557784 384048 A 228600 219456 557784 548640 557784 384048 393192 219456 L 384048 219456 A 219456 219456 548640 548640 384048 219456 219456 384048 L 219456 877824 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
           </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
@@ -1837,6 +2250,16 @@ Copyright (c) 2007, Sonata Software Limited
             draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800"
             draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600"
             draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="45"/>
             <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
             <draw:equation draw:name="f2" draw:formula="?f1 *3163/7636"/>
@@ -1876,7 +2299,18 @@ Copyright (c) 2007, Sonata Software Limited
 						draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
 						draw:text-areas="0 4300 21600 21600" 
 						draw:mirror-horizontal="true" draw:type="flowchart-card" 
-						draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N"/>
+						draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
         
@@ -2108,7 +2542,18 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:type="flowchart-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:type="flowchart-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2123,6 +2568,16 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="grpBln" select ="$grpBln" />
           </xsl:call-template>
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
             <draw:equation draw:name="f0" draw:formula="45"/>
             <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
             <draw:equation draw:name="f2" draw:formula="?f1 *3163/7636"/>
@@ -2152,7 +2607,19 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-decision" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 0 10800 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-decision" 
+            draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 0 10800 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2169,7 +2636,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="12960 0 10800 0 2160 10800 8600 21600 10800 21600 19400 10800" draw:text-areas="4230 0 17370 21600" draw:type="flowchart-data" draw:enhanced-path="M 4230 0 L 21600 0 17370 21600 0 21600 4230 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="12960 0 10800 0 2160 10800 8600 21600 10800 21600 19400 10800" draw:text-areas="4230 0 17370 21600" draw:type="flowchart-data" draw:enhanced-path="M 4230 0 L 21600 0 17370 21600 0 21600 4230 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2186,7 +2664,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="2540 0 19060 21600" draw:type="flowchart-predefined-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 2540 0 L 2540 21600 N M 19060 0 L 19060 21600 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="2540 0 19060 21600" draw:type="flowchart-predefined-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 2540 0 L 2540 21600 N M 19060 0 L 19060 21600 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2203,7 +2692,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="4230 4230 21600 21600" draw:type="flowchart-internal-storage" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 4230 0 L 4230 21600 N M 0 4230 L 21600 4230 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="4230 4230 21600 21600" draw:type="flowchart-internal-storage" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 4230 0 L 4230 21600 N M 0 4230 L 21600 4230 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2220,7 +2720,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 20320 21600 10800" draw:text-areas="0 0 21600 17360" draw:type="flowchart-document" draw:enhanced-path="M 0 0 L 21600 0 21600 17360 C 13050 17220 13340 20770 5620 21600 2860 21100 1850 20700 0 20120 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 20320 21600 10800" draw:text-areas="0 0 21600 17360" draw:type="flowchart-document" draw:enhanced-path="M 0 0 L 21600 0 21600 17360 C 13050 17220 13340 20770 5620 21600 2860 21100 1850 20700 0 20120 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2237,7 +2748,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 19890 21600 10800" draw:text-areas="0 3600 18600 18009" draw:type="flowchart-multidocument" draw:enhanced-path="M 0 3600 L 1500 3600 1500 1800 3000 1800 3000 0 21600 0 21600 14409 20100 14409 20100 16209 18600 16209 18600 18009 C 11610 17893 11472 20839 4833 21528 2450 21113 1591 20781 0 20300 Z N M 1500 3600 F L 18600 3600 18600 16209 N M 3000 1800 F L 20100 1800 20100 14409 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 19890 21600 10800" draw:text-areas="0 3600 18600 18009" draw:type="flowchart-multidocument" draw:enhanced-path="M 0 3600 L 1500 3600 1500 1800 3000 1800 3000 0 21600 0 21600 14409 20100 14409 20100 16209 18600 16209 18600 18009 C 11610 17893 11472 20839 4833 21528 2450 21113 1591 20781 0 20300 Z N M 1500 3600 F L 18600 3600 18600 16209 N M 3000 1800 F L 20100 1800 20100 14409 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2254,7 +2776,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="1060 3180 20540 18420" draw:type="flowchart-terminator" draw:enhanced-path="M 3470 21600 X 0 10800 3470 0 L 18130 0 X 21600 10800 18130 21600 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="1060 3180 20540 18420" draw:type="flowchart-terminator" draw:enhanced-path="M 3470 21600 X 0 10800 3470 0 L 18130 0 X 21600 10800 18130 21600 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2271,7 +2804,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-preparation" draw:enhanced-path="M 4350 0 L 17250 0 21600 10800 17250 21600 4350 21600 0 10800 4350 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-preparation" draw:enhanced-path="M 4350 0 L 17250 0 21600 10800 17250 21600 4350 21600 0 10800 4350 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2288,7 +2832,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2150 0 10800 10800 19890 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-manual-input" draw:enhanced-path="M 0 4300 L 21600 0 21600 21600 0 21600 0 4300 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2150 0 10800 10800 19890 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-manual-input" draw:enhanced-path="M 0 4300 L 21600 0 21600 21600 0 21600 0 4300 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2305,7 +2860,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 2160 10800 10800 21600 19440 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-manual-operation" draw:enhanced-path="M 0 0 L 21600 0 17250 21600 4350 21600 0 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 2160 10800 10800 21600 19440 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-manual-operation" draw:enhanced-path="M 0 0 L 21600 0 17250 21600 4350 21600 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2322,7 +2888,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3180 3180 18420 18420" draw:type="flowchart-connector" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3180 3180 18420 18420" draw:type="flowchart-connector" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2339,7 +2916,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 0 21600 17150" draw:type="flowchart-off-page-connector" draw:enhanced-path="M 0 0 L 21600 0 21600 17150 10800 21600 0 17150 0 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 0 21600 17150" draw:type="flowchart-off-page-connector" draw:enhanced-path="M 0 0 L 21600 0 21600 17150 10800 21600 0 17150 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2356,7 +2944,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-card" draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-card" draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2373,7 +2972,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2020 0 10800 10800 19320 21600 10800" draw:text-areas="0 4360 21600 17240" draw:type="flowchart-punched-tape" draw:enhanced-path="M 0 2230 C 820 3990 3410 3980 5370 4360 7430 4030 10110 3890 10690 2270 11440 300 14200 160 16150 0 18670 170 20690 390 21600 2230 L 21600 19420 C 20640 17510 18320 17490 16140 17240 14710 17370 11310 17510 10770 19430 10150 21150 7380 21290 5290 21600 3220 21250 610 21130 0 19420 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2020 0 10800 10800 19320 21600 10800" draw:text-areas="0 4360 21600 17240" draw:type="flowchart-punched-tape" draw:enhanced-path="M 0 2230 C 820 3990 3410 3980 5370 4360 7430 4030 10110 3890 10690 2270 11440 300 14200 160 16150 0 18670 170 20690 390 21600 2230 L 21600 19420 C 20640 17510 18320 17490 16140 17240 14710 17370 11310 17510 10770 19430 10150 21150 7380 21290 5290 21600 3220 21250 610 21130 0 19420 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2390,7 +3000,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-summing-junction" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 3100 3100 L 18500 18500 N M 3100 18500 L 18500 3100 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-summing-junction" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 3100 3100 L 18500 18500 N M 3100 18500 L 18500 3100 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2407,7 +3028,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-or" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 0 10800 L 21600 10800 N M 10800 0 L 10800 21600 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-or" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 0 10800 L 21600 10800 N M 10800 0 L 10800 21600 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2424,7 +3056,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 10800 10800 10800 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-collate" draw:enhanced-path="M 0 0 L 21600 21600 0 21600 21600 0 0 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 10800 10800 10800 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-collate" draw:enhanced-path="M 0 0 L 21600 21600 0 21600 21600 0 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2441,7 +3084,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-sort" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 Z N M 0 10800 L 21600 10800 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-sort" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 Z N M 0 10800 L 21600 10800 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2458,7 +3112,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 10800 16200 21600" draw:type="flowchart-extract" draw:enhanced-path="M 10800 0 L 21600 21600 0 21600 10800 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 10800 16200 21600" draw:type="flowchart-extract" draw:enhanced-path="M 10800 0 L 21600 21600 0 21600 10800 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2475,7 +3140,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 0 16200 10800" draw:type="flowchart-merge" draw:enhanced-path="M 0 0 L 21600 0 10800 21600 0 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 0 16200 10800" draw:type="flowchart-merge" draw:enhanced-path="M 0 0 L 21600 0 10800 21600 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2492,7 +3168,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 18000 10800" draw:text-areas="3600 0 18000 21600" draw:type="flowchart-stored-data" draw:enhanced-path="M 3600 21600 X 0 10800 3600 0 L 21600 0 X 18000 10800 21600 21600 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 18000 10800" draw:text-areas="3600 0 18000 21600" draw:type="flowchart-stored-data" draw:enhanced-path="M 3600 21600 X 0 10800 3600 0 L 21600 0 X 18000 10800 21600 21600 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2509,7 +3196,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 3100 18500 18500" draw:type="flowchart-delay" draw:enhanced-path="M 10800 0 X 21600 10800 10800 21600 L 0 21600 0 0 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 3100 18500 18500" draw:type="flowchart-delay" draw:enhanced-path="M 10800 0 X 21600 10800 10800 21600 L 0 21600 0 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2526,7 +3224,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-sequential-access" draw:enhanced-path="M 20980 18150 L 20980 21600 10670 21600 C 4770 21540 0 16720 0 10800 0 4840 4840 0 10800 0 16740 0 21600 4840 21600 10800 21600 13520 20550 16160 18670 18170 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-sequential-access" draw:enhanced-path="M 20980 18150 L 20980 21600 10670 21600 C 4770 21540 0 16720 0 10800 0 4840 4840 0 10800 0 16740 0 21600 4840 21600 10800 21600 13520 20550 16160 18670 18170 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2543,7 +3252,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 14800 10800 21600 10800" draw:text-areas="3400 0 14800 21600" draw:type="flowchart-direct-access-storage" draw:enhanced-path="M 18200 0 X 21600 10800 18200 21600 L 3400 21600 X 0 10800 3400 0 Z N M 18200 0 X 14800 10800 18200 21600 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 14800 10800 21600 10800" draw:text-areas="3400 0 14800 21600" draw:type="flowchart-direct-access-storage" draw:enhanced-path="M 18200 0 X 21600 10800 18200 21600 L 3400 21600 X 0 10800 3400 0 Z N M 18200 0 X 14800 10800 18200 21600 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2560,7 +3280,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 6800 10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 6800 21600 18200" draw:type="flowchart-magnetic-disk" draw:enhanced-path="M 0 3400 Y 10800 0 21600 3400 L 21600 18200 Y 10800 21600 0 18200 Z N M 0 3400 Y 10800 6800 21600 3400 N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 6800 10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 6800 21600 18200" draw:type="flowchart-magnetic-disk" draw:enhanced-path="M 0 3400 Y 10800 0 21600 3400 L 21600 18200 Y 10800 21600 0 18200 Z N M 0 3400 Y 10800 6800 21600 3400 N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -2577,7 +3308,18 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3600 0 17800 21600" draw:type="flowchart-display" draw:enhanced-path="M 3600 0 L 17800 0 X 21600 10800 17800 21600 L 3600 21600 0 10800 Z N"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3600 0 17800 21600" draw:type="flowchart-display" draw:enhanced-path="M 3600 0 L 17800 0 X 21600 10800 17800 21600 L 3600 21600 0 10800 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -3081,6 +3823,13 @@ Copyright (c) 2007, Sonata Software Limited
   <!-- Get fill color for shape-->
   <xsl:template name="Fill">
     <xsl:choose>
+      <!-- Code for the Brakets,Braces Bug as not to display solid fill-->
+      <xsl:when test="(p:spPr/a:prstGeom/@prst='leftBrace') or (p:spPr/a:prstGeom/@prst='leftBracket') or (p:spPr/a:prstGeom/@prst='rightBracket') or (p:spPr/a:prstGeom/@prst='rightBrace')">
+        <xsl:attribute name ="draw:fill">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+      </xsl:when>
+      <!-- End of code-->
       <!-- No fill -->
       <xsl:when test ="p:spPr/a:noFill">
         <xsl:attribute name ="draw:fill">
@@ -3141,13 +3890,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </xsl:if>
       </xsl:when>
-      <!-- Code for the Brakets,Braces Bug as not to display solid fill-->
-      <xsl:when test="(p:spPr/a:prstGeom/@prst='leftBrace') or (p:spPr/a:prstGeom/@prst='leftBracket') or (p:spPr/a:prstGeom/@prst='rightBracket') or (p:spPr/a:prstGeom/@prst='rightBrace')">
-        <xsl:attribute name ="draw:fill">
-          <xsl:value-of select="'none'" />
-        </xsl:attribute>
-      </xsl:when>
-      <!-- End of code-->
+    
       <!--added by vipul for gradient fill-->
       <xsl:when test="p:spPr/a:gradFill">
         <xsl:for-each select="p:spPr/a:gradFill/a:gsLst/child::node()[1]">
@@ -3178,6 +3921,28 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:attribute name="draw:fill">
                   <xsl:value-of select="'solid'"/>
                 </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+              <xsl:when test="a:srgbClr/a:alpha/@val">
+                <xsl:variable name ="opacity">
+                  <xsl:value-of select ="a:srgbClr/a:alpha/@val"/>
+                </xsl:variable>
+                <xsl:if test="($opacity != '') or ($opacity != 0)">
+                  <xsl:attribute name ="draw:opacity">
+                    <xsl:value-of select="concat(($opacity div 1000), '%')"/>
+                  </xsl:attribute>
+                </xsl:if>
+              </xsl:when>
+              <xsl:when test="a:schemeClr/a:alpha/@val">
+                <xsl:variable name ="opacity">
+                  <xsl:value-of select ="a:schemeClr/a:alpha/@val"/>
+                </xsl:variable>
+                <xsl:if test="($opacity != '') or ($opacity != 0)">
+                  <xsl:attribute name ="draw:opacity">
+                    <xsl:value-of select="concat(($opacity div 1000), '%')"/>
+                  </xsl:attribute>
+                </xsl:if>
               </xsl:when>
             </xsl:choose>
           </xsl:if>
@@ -3322,6 +4087,7 @@ Copyright (c) 2007, Sonata Software Limited
 									((p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')]) and (p:spPr/a:prstGeom/@prst='rect')) or
 									((p:nvSpPr/p:cNvPr/@name[contains(., 'Oval Custom')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or
 									((p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or 
+                  ((p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or
 									(p:spPr/a:prstGeom/@prst='rightArrow') or
 									(p:spPr/a:prstGeom/@prst='upArrow') or 
 									(p:spPr/a:prstGeom/@prst='leftArrow') or 
@@ -3439,6 +4205,7 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <!-- Get line styles for shape -->
   <xsl:template name ="LineStyle">
+    <xsl:param name="ThemeName"/>
     <!-- Line width-->
     <xsl:for-each select ="p:spPr">
       <xsl:if test ="a:ln/@w">
@@ -3448,15 +4215,15 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
-      </xsl:if>
+      </xsl:if> 
       <xsl:if test ="not(a:ln/@w) and (parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Text')])">
         <xsl:attribute name ="draw:stroke">
           <xsl:value-of select ="'none'"/>
         </xsl:attribute>
       </xsl:if>
-		
-		<!--Bug fix for default BlueBorder in textbox by Mathi on 26thAug 2007-->
-		<xsl:if test="(not(a:ln) and not(parent::node()/p:nvSpPr/p:cNvSpPr/@txBox) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style)) or 
+    
+      <!--Bug fix for default BlueBorder in textbox by Mathi on 26thAug 2007-->
+      <xsl:if test="(not(a:ln) and not(parent::node()/p:nvSpPr/p:cNvSpPr/@txBox) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style)) or 
 		              (not(a:ln/@w) and (parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Content Placeholder')]) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style)) or 
 					  ((parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Title ')]) and (parent::node()/p:nvSpPr/p:cNvSpPr/@txBox) and not(parent::node()/p:nvSpPr/p:nvPr/p:ph) and not(parent::node()/p:style))">
 			<xsl:attribute name ="draw:stroke">
@@ -3465,7 +4232,28 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:if>
 		<!--End of Code-->
     </xsl:for-each>
-
+    <xsl:choose>
+      <xsl:when test ="p:style/a:lnRef/@idx and not(p:spPr/a:ln/@w)">
+        <xsl:variable name="idx" select="p:style/a:lnRef/@idx"/>
+        <xsl:for-each select ="document($ThemeName)//a:themeElements/a:fmtScheme/a:lnStyleLst/a:ln">
+          <xsl:if test="position()=$idx">
+            <xsl:attribute name ="svg:stroke-width">
+              <xsl:value-of select="concat(format-number(./@w div 360000, '#.#####'), 'cm')"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="not(p:spPr/a:ln/@w) and p:spPr/a:ln">
+        <xsl:for-each select ="document($ThemeName)//a:themeElements/a:fmtScheme/a:lnStyleLst/a:ln">
+          <xsl:if test="position()=1">
+            <xsl:attribute name ="svg:stroke-width">
+              <xsl:value-of select="concat(format-number(./@w div 360000, '#.#####'), 'cm')"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+  
     <!-- Line Dash property-->
     <xsl:for-each select ="p:spPr/a:ln">
       <xsl:if test ="not(a:noFill)">
@@ -4046,7 +4834,7 @@ Copyright (c) 2007, Sonata Software Limited
 
 
   <xsl:template name ="PictureBorderColor">
-
+    
     <xsl:choose>
       <!-- No line-->
       <xsl:when test ="p:spPr/a:ln/a:noFill">
@@ -4054,7 +4842,6 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:value-of select="'none'" />
         </xsl:attribute>
       </xsl:when>
-
       <!-- Solid line color-->
       <xsl:when test ="p:spPr/a:ln/a:solidFill">
         <!-- Standard color for border-->
@@ -4102,6 +4889,37 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </xsl:if>
       </xsl:when>
+      
+      <xsl:otherwise>
+        <!--Line reference-->
+        <xsl:if test ="p:style/a:lnRef">
+          <xsl:attribute name ="draw:stroke">
+            <xsl:value-of select="'solid'" />
+          </xsl:attribute>
+          <!--Standard color for border-->
+          <xsl:if test ="p:style/a:lnRef/a:srgbClr/@val">
+            <xsl:attribute name ="svg:stroke-color">
+              <xsl:value-of select="concat('#',p:style/a:lnRef/a:srgbClr/@val)"/>
+            </xsl:attribute>
+          </xsl:if>
+          <!--Theme color for border-->
+          <xsl:if test ="p:style/a:lnRef/a:schemeClr/@val">
+            <xsl:attribute name ="svg:stroke-color">
+              <xsl:call-template name ="getColorCode">
+                <xsl:with-param name ="color">
+                  <xsl:value-of select="p:style/a:lnRef/a:schemeClr/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name ="lumMod">
+                  <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumMod/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name ="lumOff">
+                  <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumOff/@val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 </xsl:stylesheet >

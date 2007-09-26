@@ -75,7 +75,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 		<xsl:param name ="animType"/>
 		<xsl:param name ="slideNo"/>
 		<anim:par smil:begin="next">
-			<anim:par smil:begin="0s">
+			<anim:par >
 				<xsl:for-each select ="p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par">
 					<xsl:variable name ="animationId">
 						<xsl:if test ="p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg">
@@ -85,6 +85,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:value-of select="concat('sl',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid)" />
 						</xsl:if>
 					</xsl:variable>
+         
 					<!--anim:iterate-type="by-letter" anim:iterate-interval="0.05s"-->
 					<xsl:if test ="./p:cTn/p:iterate">
 						<anim:iterate smil:begin="0s" smil:fill="hold" anim:iterate-type="by-letter">
@@ -121,7 +122,17 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						</anim:iterate>
 					</xsl:if>
 					<xsl:if test ="not(./p:cTn/p:iterate)">
-						<anim:par smil:begin="0s" smil:fill="hold">
+						<anim:par smil:fill="hold">
+              <xsl:attribute name ="smil:begin">
+                <xsl:choose >
+                  <xsl:when test ="./parent::node()/parent::node()/p:stCondLst/p:cond/@delay"  >
+                    <xsl:value-of select ="concat(./parent::node()/parent::node()/p:stCondLst/p:cond/@delay div 1000,'s')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select ="'0s'"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
 							<xsl:attribute name ="presentation:node-type">
 								<xsl:if test ="position()=1">
 									<xsl:value-of select ="'on-click'"/>
@@ -708,6 +719,14 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 					<xsl:value-of select ="'horizontal'"/>
 				</xsl:attribute>
 			</xsl:when>
+      
+      <xsl:when test ="@filter='dissolve'" >
+        <xsl:attribute name ="smil:type">
+          <xsl:value-of select ="'dissolve'"/>
+        </xsl:attribute>        
+      </xsl:when>
+      
+      
 			<xsl:when test ="@filter='blinds(vertical)'" >
 				<xsl:attribute name ="smil:type">
 					<xsl:value-of select ="'blindsWipe'"/>
@@ -962,6 +981,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				</xsl:attribute>
 			</xsl:when>
 			
+      
 		</xsl:choose>
 		
 	</xsl:template>

@@ -248,74 +248,113 @@ exclude-result-prefixes="p a r xlink rels xmlns">
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
-  <xsl:template name="tmpNotesDrawingPageStyle">
-    <xsl:param name="slideRel"/>
-    <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'notesSlides')]">
-      <xsl:variable name ="NotesNumber">
-        <xsl:value-of  select ="substring-before(substring-after(.,'../notesSlides/'),'.xml')" />
-      </xsl:variable>
-      <xsl:variable name ="NotesFile">
-        <xsl:value-of  select ="concat('ppt',substring-after(.,'..'))" />
-      </xsl:variable>
-      <xsl:variable name ="NoteMasterFile">
-        <xsl:for-each select ="document(concat('ppt/notesSlides/_rels/',$NotesNumber,'.xml','.rels'))//node()/@Target[contains(.,'notesMasters')]">
-          <xsl:value-of  select ="concat('ppt',substring-after(.,'..'))" />
-        </xsl:for-each>
-      </xsl:variable>
-      <style:style  style:family="drawing-page">
-        <xsl:attribute name ="style:name" >
-          <xsl:value-of select ="concat($NotesNumber,'dp')"/>
-        </xsl:attribute>
-        <style:drawing-page-properties>
-          <xsl:attribute name ="presentation:background-visible" >
-            <xsl:value-of select ="'true'"/>
-          </xsl:attribute>
-          <xsl:attribute name ="presentation:background-objects-visible" >
-            <xsl:value-of select ="'true'"/>
-          </xsl:attribute>
-          <xsl:attribute name ="presentation:display-footer">
-            <xsl:choose>
-              <xsl:when test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
+  <xsl:template name ="tmpNotesDrawingPageStyle"  >
+    <xsl:variable name="drawingPageAttributes">
+      <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+        <xsl:variable name="slideRel" select="concat('ppt/slides/_rels/slide',position(),'.xml.rels')"/>
+        <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'notesSlides')]">
+          <xsl:variable name ="NotesNumber">
+            <xsl:value-of  select ="substring-before(substring-after(.,'../notesSlides/'),'.xml')" />
+          </xsl:variable>
+          <xsl:variable name ="NotesFile">
+            <xsl:value-of  select ="concat('ppt',substring-after(.,'..'))" />
+          </xsl:variable>
+          <xsl:variable name ="NoteMasterFile">
+            <xsl:for-each select ="document(concat('ppt/notesSlides/_rels/',$NotesNumber,'.xml','.rels'))//node()/@Target[contains(.,'notesMasters')]">
+              <xsl:value-of  select ="concat('ppt',substring-after(.,'..'))" />
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:if test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
+                                          /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'hdr')]">
+
+            <xsl:value-of select ="'1'"/>
+          </xsl:if>
+          <xsl:if test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
                                           /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'ftr')]">
 
-                <xsl:value-of select ="'true'"/>             
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select ="'false'"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:attribute name ="presentation:display-page-number" >
-            <xsl:choose>
-              <xsl:when test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
+            <xsl:value-of select ="'2'"/>
+          </xsl:if>
+          <xsl:if test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
                                           /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'sldNum')]">
 
-                <xsl:value-of select ="'true'"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select ="'false'"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:attribute name ="presentation:display-date-time" >
-            <xsl:choose>
-              <xsl:when test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
+            <xsl:value-of select ="'3'"/>
+          </xsl:if>
+          <xsl:if test ="document($NoteMasterFile)//p:cSld/p:spTree/p:sp
                                           /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt')]">
 
-                <xsl:value-of select ="'true'"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select ="'false'"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </style:drawing-page-properties>
-      </style:style>
-    </xsl:for-each>
+            <xsl:value-of select ="'4'"/>
+          </xsl:if>
+
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:variable>
+    <style:style  style:family="drawing-page">
+      <xsl:attribute name ="style:name" >
+        <xsl:value-of select ="'Notesdp'"/>
+      </xsl:attribute>
+      <style:drawing-page-properties>
+        <xsl:attribute name ="presentation:background-visible" >
+          <xsl:value-of select ="'true'"/>
+        </xsl:attribute>
+        <xsl:attribute name ="presentation:background-objects-visible" >
+          <xsl:value-of select ="'true'"/>
+        </xsl:attribute>
+        <xsl:attribute name ="presentation:display-header">
+          <xsl:choose>
+            <xsl:when test ="contains($drawingPageAttributes,'1')">
+
+              <xsl:value-of select ="'true'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select ="'false'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:attribute name ="presentation:display-footer">
+          <xsl:choose>
+            <xsl:when test ="contains($drawingPageAttributes,'2')">
+
+              <xsl:value-of select ="'true'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select ="'false'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+
+        <xsl:attribute name ="presentation:display-page-number" >
+          <xsl:choose>
+            <xsl:when test ="contains($drawingPageAttributes,'3')">
+
+              <xsl:value-of select ="'true'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select ="'false'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:attribute name ="presentation:display-date-time" >
+          <xsl:choose>
+            <xsl:when test ="contains($drawingPageAttributes,'4')">
+
+              <xsl:value-of select ="'true'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select ="'false'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </style:drawing-page-properties>
+    </style:style>
   </xsl:template>
   <xsl:template name ="tmpNotesDrawFrames">
     <xsl:param name ="slideRel"/>
     <xsl:param name ="SlidePos"/>
+    <presentation:notes>
+      <xsl:attribute name="draw:style-name">
+        <xsl:value-of select ="'Notesdp'"/>
+      </xsl:attribute>
     <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'notesSlides')]">
       <xsl:variable name ="NotesNumber">
         <xsl:value-of  select ="substring-before(substring-after(.,'../notesSlides/'),'.xml')" />
@@ -323,10 +362,6 @@ exclude-result-prefixes="p a r xlink rels xmlns">
       <xsl:variable name ="NotesFile">
         <xsl:value-of  select ="concat('ppt',substring-after(.,'..'))" />
       </xsl:variable>
-      <presentation:notes>
-        <xsl:attribute name="draw:style-name">
-          <xsl:value-of select="concat($NotesNumber,'dp')"/>
-        </xsl:attribute>
         <xsl:attribute name ="presentation:use-header-name">
           <xsl:value-of select ="concat($NotesNumber,'hdr')"/>
         </xsl:attribute>
@@ -529,8 +564,8 @@ exclude-result-prefixes="p a r xlink rels xmlns">
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
-      </presentation:notes>
-    </xsl:for-each>
+       </xsl:for-each>
+    </presentation:notes>
   </xsl:template>
   <xsl:template name="tmpNotesHeaderFtr">
     <xsl:for-each select="document('ppt/presentation.xml')//p:notesMasterIdLst/p:notesMasterId">

@@ -2471,11 +2471,13 @@ Copyright (c) 2007, Sonata Software Limited
                                           <text:line-break/>
                                         </xsl:if>
                                         <xsl:if test="name()='a:endParaRPr'">
-                                          <text:span>
+
+                                          <presentation:footer />
+                                          <!--<text:span>
                                             <xsl:attribute name="text:style-name">
                                               <xsl:value-of select="concat($slideMasterName,generate-id())"/>
                                             </xsl:attribute>
-                                          </text:span>
+                                          </text:span>-->
                                         </xsl:if>
                                       </xsl:for-each>
                                     </text:p>
