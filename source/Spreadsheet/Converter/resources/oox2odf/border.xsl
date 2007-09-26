@@ -62,7 +62,7 @@
     
     <xsl:variable name="NrStyleMergeEnd">
       <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:sheetData">
-        <xsl:value-of select="e:row/e:c[@r = $LastMergeCell]/@s"/>
+        <xsl:value-of select="key('Cell', $LastMergeCell)/@s"/>
       </xsl:for-each>
     </xsl:variable>
     

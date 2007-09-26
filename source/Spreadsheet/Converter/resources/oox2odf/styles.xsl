@@ -47,6 +47,7 @@
 
   <xsl:key name="Border" match="e:borders" use="''"/>
   <xsl:key name="CellStylesId" match="e:cellStyle" use="@xfId"/>
+  <xsl:key name="Cell" match="e:c" use="@r"/>
 
   <xsl:template name="styles">
 
@@ -509,7 +510,7 @@
     <xsl:if test="$MergeCell != ''">
       
       <xsl:variable name="NrStyleMergeStart">
-        <xsl:value-of select="e:row/e:c[@r = substring-before($MergeCell, ':')]/@s"/>
+        <xsl:value-of select="key('Cell', substring-before($MergeCell, ':'))/@s"/>
       </xsl:variable>
       
       <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $NrStyleMergeStart +1]">        
