@@ -995,28 +995,30 @@
       </c:hiLowLines>
 
       <!-- stock gain/loss bars -->
-      <xsl:if test="$numSeries = 4">
-        <c:upDownBars>
-          <c:gapWidth val="150"/>
+      <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)">
+        <xsl:if test="style:chart-properties/@chart:japanese-candle-stick = 'true' ">
+          <c:upDownBars>
+            <c:gapWidth val="150"/>
 
-          <c:upBars>
-            <xsl:for-each select="chart:plot-area/chart:stock-gain-marker">
-              <xsl:call-template name="InsertSpPr">
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </c:upBars>
+            <c:upBars>
+              <xsl:for-each select="chart:plot-area/chart:stock-gain-marker">
+                <xsl:call-template name="InsertSpPr">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </c:upBars>
 
-          <c:downBars>
-            <xsl:for-each select="chart:plot-area/chart:stock-loss-marker">
-              <xsl:call-template name="InsertSpPr">
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </c:downBars>
+            <c:downBars>
+              <xsl:for-each select="chart:plot-area/chart:stock-loss-marker">
+                <xsl:call-template name="InsertSpPr">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </c:downBars>
 
-        </c:upDownBars>
-      </xsl:if>
+          </c:upDownBars>
+        </xsl:if>
+      </xsl:for-each>
     </xsl:if>
 
     <c:axId val="104463360"/>
@@ -1247,7 +1249,7 @@
     </xsl:choose>
 
     <xsl:for-each
-      select="key('style',parent::node()/chart:axis[@chart:name = 'primary-y']/@chart:style-name)/style:chart-properties">
+      select="key('style',parent::node()/chart:axis[@chart:name = 'primary-y']/@chart:style-name)/style:chart-properties[@chart:origin != '' ]">
       <c:crossesAt val="0">
         <xsl:attribute name="val">
           <xsl:choose>
@@ -1573,7 +1575,7 @@
     <xsl:choose>
       <xsl:when test="$count &lt; $numSeries">
         <xsl:choose>
-          <!-- if there is secondary axis ommit its series for now -->
+          <!-- if there is secondary axis ommit its series -->
           <xsl:when test="key('series','')[position() = $number and @chart:attached-axis]">
             <xsl:if
               test="key('series','')[position() = $number and @chart:attached-axis = 'primary-y']">
@@ -1945,6 +1947,14 @@
         </xsl:if>
       </xsl:for-each>
 
+      <xsl:variable name="japaneseCandle">
+        <xsl:for-each select="key('chart','')[2]">
+          <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)">
+            <xsl:value-of select="@chart:japanese-candle-stick"/>
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:variable>
+
       <!-- marker type -->
       <!-- if line chart or radar chart or bar chart with lines -->
       <xsl:if
@@ -2006,30 +2016,14 @@
                 </c:marker>
               </xsl:for-each>
             </xsl:when>
-            <!-- default marker type for 'close' series in stockChart 1&3 -->
-            <xsl:when
-              test="$chartType = 'chart:stock' and ($numSeries = 3 and $number = 3 or $numSeries = 3 and $number = 4)">
-              <c:marker>
-                <c:symbol val="dot"/>
-                <c:size val="6"/>
-                <c:spPr>
-                  <a:solidFill>
-                    <a:srgbClr val="000000"/>
-                  </a:solidFill>
-                  <a:ln>
-                    <a:solidFill>
-                      <a:srgbClr val="000000"/>
-                    </a:solidFill>
-                  </a:ln>
-                </c:spPr>
-              </c:marker>
-            </xsl:when>
-            <!-- default "none" marker type for series in stockChart 4 -->
-            <xsl:when
-              test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
-              <c:marker>
-                <c:symbol val="none"/>
-              </c:marker>
+            <!-- default "none" marker type for series in stockCharts -->
+            <xsl:when test="$chartType = 'chart:stock' ">
+              <xsl:if test="not(key('style',$styleName)/style:chart-properties/@chart:symbol-type = 'automatic') and 
+                not(key('style',$styleName)/style:chart-properties/@chart:symbol-type = 'named-symbol' )">
+                <c:marker>
+                  <c:symbol val="none"/>
+                </c:marker>
+              </xsl:if>
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
@@ -2588,28 +2582,30 @@
       </c:hiLowLines>
 
       <!-- stock gain/loss bars -->
-      <xsl:if test="$numSeries = 4">
-        <c:upDownBars>
-          <c:gapWidth val="150"/>
+      <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)">
+        <xsl:if test="style:chart-properties/@chart:japanese-candle-stick = 'true' ">
+          <c:upDownBars>
+            <c:gapWidth val="150"/>
 
-          <c:upBars>
-            <xsl:for-each select="chart:plot-area/chart:stock-gain-marker">
-              <xsl:call-template name="InsertSpPr">
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </c:upBars>
+            <c:upBars>
+              <xsl:for-each select="chart:plot-area/chart:stock-gain-marker">
+                <xsl:call-template name="InsertSpPr">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </c:upBars>
 
-          <c:downBars>
-            <xsl:for-each select="chart:plot-area/chart:stock-loss-marker">
-              <xsl:call-template name="InsertSpPr">
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </c:downBars>
+            <c:downBars>
+              <xsl:for-each select="chart:plot-area/chart:stock-loss-marker">
+                <xsl:call-template name="InsertSpPr">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </c:downBars>
 
-        </c:upDownBars>
-      </xsl:if>
+          </c:upDownBars>
+        </xsl:if>
+      </xsl:for-each>
     </xsl:if>
     <xsl:choose>
       <!-- primary axes -->
