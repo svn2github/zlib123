@@ -1228,16 +1228,6 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:if test ="$isNumberingEnabled='false'">
           <a:buNone/>
         </xsl:if>
-        <xsl:if test ="$isBulleted='true'">
-          <xsl:if test ="$isNumberingEnabled='true'">
-            <xsl:call-template name ="insertBulletsNumbers" >
-              <xsl:with-param name ="listId" select ="$listId"/>
-              <xsl:with-param name ="level" select ="$level+1"/>
-              <!-- parameter added by vijayeta, dated 13-7-07-->
-              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:if>
 
         <!--Code Inserted by vijayeta,For Bullets and Numbering,Set Level if present-->
         <!-- @@ Code for paragraph tabs -Start-->

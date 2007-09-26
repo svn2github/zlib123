@@ -30,7 +30,8 @@
     <xsl:param name ="FrameCount"/>
     <!--<xsl:variable name ="newLevel" select ="$level+1"/>-->
     <xsl:for-each select ="document('content.xml')//text:list-style [@style:name=$listId]">
-      <xsl:if test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color">
+      <xsl:choose>
+        <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color">
         <a:buClr>
           <a:srgbClr>
             <xsl:attribute name ="val">
@@ -38,12 +39,17 @@
             </xsl:attribute>
           </a:srgbClr>
         </a:buClr>
-      </xsl:if>
-      <xsl:if test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true']">
+        </xsl:when>
+        <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true']">
         <a:buClr>
           <a:sysClr val="windowText"/>
         </a:buClr>
-      </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <a:buClrTx/>
+        </xsl:otherwise>
+      </xsl:choose>
+
       <xsl:if test ="(./child::node()[1]/style:text-properties[@fo:font-size] and not(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100)) ">
         <a:buSzPct>
           <xsl:attribute name ="val">
@@ -51,6 +57,15 @@
           </xsl:attribute>
         </a:buSzPct>
       </xsl:if>
+      <!-- Fix for the bug 1794640-->
+      <xsl:if test ="(./child::node()[1]/style:text-properties[@fo:font-size] and substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100) ">
+        <a:buSzPct>
+          <xsl:attribute name ="val">
+            <xsl:value-of select ="'100000'"/>
+          </xsl:attribute>
+        </a:buSzPct>
+      </xsl:if>
+      <!--End Fix for the bug 1794640-->
       <a:buFont>
         <xsl:attribute name ="typeface">
           <xsl:call-template name ="getBulletType">
@@ -87,16 +102,21 @@
                 <xsl:with-param name ="prefix" select ="text:list-level-style-number[@text:level =$level]/@style:num-prefix"/>
               </xsl:call-template>
             </xsl:attribute>
-            <xsl:if test ="text:list-level-style-number[@text:level =$level]/@text:start-value">
+            <xsl:if test ="text:list-level-style-number[@text:level =$level]/@text:start-value and text:list-level-style-number[@text:level =$level]/@text:start-value != 0">
               <xsl:attribute name ="startAt">
                 <xsl:value-of select ="text:list-level-style-number[@text:level =$level]/@text:start-value"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test ="text:list-level-style-number[@text:level =$level]/@text:start-value and text:list-level-style-number[@text:level =$level]/@text:start-value = 0">
+              <xsl:attribute name ="startAt">
+                <xsl:value-of select ="1"/>
               </xsl:attribute>
             </xsl:if>
           </a:buAutoNum>
         </xsl:if>
         <!--</xsl:for-each>-->
       </xsl:if>
-      <xsl:if test ="text:list-level-style-image[@text:level=$level]">
+      <xsl:if test ="text:list-level-style-image[@text:level=$level] and text:list-level-style-image/@xlink:href">
         <xsl:variable name ="rId" select ="concat('buImage',$listId,$level,$pos,$shapeCount,$FrameCount)"/>       
         <a:buBlip>
           <a:blip>
@@ -105,14 +125,15 @@
             </xsl:attribute>
           </a:blip>
         </a:buBlip>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name ="level" select ="$level"/>
+        </xsl:call-template>
       </xsl:if>
-      <xsl:call-template name="copyPictures">
-        <xsl:with-param name ="level" select ="$level"/>
-      </xsl:call-template>      
     </xsl:for-each>
     <!--End of condition,If Levels Present-->
   </xsl:template>
   <!-- Code by Vijayeta,Types of Bullets and Numbering formats-->
+  <!-- Fix for bug 1793092-->
   <xsl:template name="insertBulletChar">
     <xsl:param name ="character"/>
     <xsl:choose>
@@ -137,8 +158,8 @@
         <!--<xsl:when test="$character = '✔' ">-->
         <xsl:value-of select ="'ü'"/>
       </xsl:when>
-      <xsl:when test="$character = ''  or $character ='■' ">
-        <xsl:value-of select ="''"/>
+      <xsl:when test="$character = ''  or $character ='■' ">
+        <xsl:value-of select ="'§'"/>
       </xsl:when>
       <!--<xsl:when test="$character = '' ">
         <xsl:value-of select ="'§'"/>
@@ -147,7 +168,6 @@
       <xsl:when test="$character = '➔' ">è</xsl:when>
       <xsl:when test="$character = '✗' ">✗</xsl:when>
       <xsl:when test="$character = '–' ">–</xsl:when>
-      <xsl:when test="$character = '»' ">»</xsl:when>
       <xsl:otherwise>
         <!-- warn if Custom Bullet -->
         <xsl:message terminate="no">translation.odf2oox.bulletTypeCustomBullet</xsl:message>
@@ -160,7 +180,7 @@
     <xsl:param name ="typeFace"/>
     <xsl:choose >
       <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
-      <xsl:when test="$character = '' or $character = '' or $character= '●' or $character= '➢' or $character= '' or $character= '✔' or $character = '' or $character= '■' or $character= '' or $character= '➔'">
+      <xsl:when test="$character = ''  or $character ='■' or $character = '' or $character = '' or $character= '●' or $character= '➢' or $character= '' or $character= '✔' or $character = '' or $character= '' or $character= '➔'">
         <!--<xsl:when test="$character= '➢' or $character= '■' or $character= '✔' or $character= '➔'">-->
         <!-- or $character= ''  -->
         <xsl:value-of select ="'Wingdings'"/>
@@ -277,14 +297,19 @@
       <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
         <xsl:value-of select ="'7'"/>
       </xsl:when>
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <!-- warn if level 10 -->
+        <!--<xsl:message terminate="no">translation.odf2oox.bulletTypeLevel10</xsl:message>-->
+        <xsl:value-of select ="'8'"/>
+      </xsl:when>
       <!-- DRM.odp File Crash in roundtrip
 			Since pptx does not support 10th level, any text that is of 10th level in odp, 
 			is set to 9th level in pptx.
 			date:14th Aug, '07-->
-      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+      <xsl:when test ="text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
         <!-- warn if level 10 -->
         <xsl:message terminate="no">translation.odf2oox.bulletTypeLevel10</xsl:message>
-        <xsl:value-of select ="'7'"/>
+        <xsl:value-of select ="'8'"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select ="'0'"/>

@@ -212,6 +212,7 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:template name ="fontStyles">
 		<xsl:param name ="Tid"/>
 		<xsl:param name ="prClassName"/>
+    <xsl:param name ="flagPresentationClass"/>
 		<xsl:param name ="lvl"/>
 		<!-- Parameter Added by Vijayeta, on 13-7-07-->
 		<xsl:param name ="masterPageName"/>
@@ -511,7 +512,9 @@ Copyright (c) 2007, Sonata Software Limited
 					</a:srgbClr >
 				</a:solidFill>
 			</xsl:if>
-
+      <xsl:if test ="not(style:text-properties/@fo:color) and $flagPresentationClass='No'">
+              <xsl:call-template name ="getDefaultFontColor"/>
+      </xsl:if>
 			<!-- Text Shadow fix -->
 			<xsl:if test ="style:text-properties/@fo:text-shadow != 'none'">
 				<a:effectLst>
@@ -807,32 +810,73 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
 		<xsl:for-each select ="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$prId] ">
 			<!--test="not(style:graphic-properties/@draw:fill = 'none' - Added by lohith.ar for invalid fill color for textboxes - Fill type should be given priority on fill color-->
-			<xsl:if test ="style:graphic-properties/@draw:fill-color">
-				<a:solidFill>
-					<a:srgbClr  >
-						<xsl:attribute name ="val">
-							<xsl:value-of select ="translate(substring-after(style:graphic-properties/@draw:fill-color,'#'),$lcletters,$ucletters)"/>
-						</xsl:attribute>
-						<xsl:if test ="not(style:graphic-properties/@draw:fill)">
-							<a:alpha val="0" />
-						</xsl:if>
-						<xsl:if test ="style:graphic-properties/@draw:fill ='none'">
-							<a:alpha val="0" />
-						</xsl:if>
-					</a:srgbClr >
-				</a:solidFill>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
-	<xsl:template name ="getClassName">
-		<xsl:param name ="clsName"/>
-		<!-- Node added by vijayeta,to insert font sizes to inner levels-->
-		<xsl:param name ="lvl"/>
-		<xsl:param name ="masterPageName"/>
-		<xsl:choose >
-			<xsl:when test ="$clsName='title'">
-				<xsl:choose>
-					<xsl:when test="$masterPageName='Standard'">
+      <xsl:choose>
+        <xsl:when test ="style:graphic-properties/@draw:fill='solid'">
+          <a:solidFill>
+            <a:srgbClr  >
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="translate(substring-after(style:graphic-properties/@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+              </xsl:attribute>
+              <xsl:if test ="style:graphic-properties/@draw:opacity">
+                <xsl:variable name="tranparency" select="substring-before(style:graphic-properties/@draw:opacity,'%')"/>
+                <xsl:choose>
+                  <xsl:when test="$tranparency !=''">
+                    <a:alpha>
+                      <xsl:attribute name="val">
+                        <xsl:value-of select="format-number($tranparency * 1000,'#')" />
+                      </xsl:attribute>
+                    </a:alpha>
+                  </xsl:when>
+                </xsl:choose>               
+              </xsl:if>
+            </a:srgbClr >
+          </a:solidFill>
+        </xsl:when>
+        <xsl:when test ="style:graphic-properties/@draw:fill='none'">
+          <a:noFill/>
+          </xsl:when>
+        <xsl:when test ="style:graphic-properties/@draw:fill='gradient'">
+            <xsl:variable name="gradStyleName" select="style:graphic-properties/@draw:fill-gradient-name"/>
+          <a:solidFill>
+            <a:srgbClr>
+                <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
+                  <xsl:attribute name="val">
+                    <xsl:if test="@draw:start-color">
+                      <xsl:value-of select="substring-after(@draw:start-color,'#')" />
+                    </xsl:if>
+                    <xsl:if test="not(@draw:start-color)">
+                      <xsl:value-of select="'ffffff'" />
+                    </xsl:if>
+                  </xsl:attribute>
+                </xsl:for-each>
+              <xsl:if test ="style:graphic-properties/@draw:opacity">
+                <xsl:variable name="tranparency" select="substring-before(style:graphic-properties/@draw:opacity,'%')"/>
+                <xsl:choose>
+                  <xsl:when test="$tranparency !=''">
+                    <a:alpha>
+                      <xsl:attribute name="val">
+                        <xsl:value-of select="format-number($tranparency * 1000,'#')" />
+                      </xsl:attribute>
+                    </a:alpha>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:if>
+            </a:srgbClr >
+          </a:solidFill>
+          
+        </xsl:when>
+        </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name ="getClassName">
+    <xsl:param name ="clsName"/>
+    <!-- Node added by vijayeta,to insert font sizes to inner levels-->
+    <xsl:param name ="lvl"/>
+    <xsl:param name ="masterPageName"/>
+    <xsl:choose >
+      <xsl:when test ="$clsName='title'">
+        <xsl:choose>
+          <xsl:when test="$masterPageName='Standard'">
 						<xsl:value-of select ="'Standard-title'"/>
 					</xsl:when>
 					<xsl:when test="$masterPageName='Default'">
@@ -926,6 +970,37 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+  <xsl:template name ="getDefaultFontColor">
+    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <!--<xsl:for-each select="document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties">
+      <xsl:if test="position()=1">-->
+     
+      <xsl:choose >
+        <xsl:when test ="document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties/@fo:color">
+          <a:solidFill>
+            <a:srgbClr  >
+          <xsl:attribute name ="val">
+          <xsl:value-of select ="translate(substring-after(document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+          </xsl:attribute>
+            </a:srgbClr >
+          </a:solidFill>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties/@style:use-window-font-color='true'">
+            <a:solidFill>
+                <a:sysClr val="windowText"/>
+            </a:solidFill>
+          </xsl:if>
+          
+        </xsl:otherwise>
+      </xsl:choose>
+  
+         <!--</xsl:if>
+    </xsl:for-each>-->
+
+  
+  </xsl:template>
 	<xsl:template name ="getDefaultFontSize">
 		<xsl:param name ="className"/>
 		<xsl:param name ="lvl"/>
@@ -1281,6 +1356,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="HyperlinksForBullets" />
     <xsl:param name ="masterPageName"/>
     <xsl:param name ="fileName"/>
+    <xsl:param name ="flagPresentationClass"/>
+    
 	  <xsl:choose>
 		  <!-- level 0 or no level in pptx,level 1 in odp-->
 		  <xsl:when test ="./text:p">
@@ -1291,6 +1368,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1303,6 +1381,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1315,6 +1394,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1327,6 +1407,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1339,6 +1420,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1351,6 +1433,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1363,6 +1446,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1375,6 +1459,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1387,6 +1472,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1402,6 +1488,7 @@ Copyright (c) 2007, Sonata Software Limited
 					  <xsl:with-param name ="HyperlinksForBullets" select ="$HyperlinksForBullets"/>
 					  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 					  <xsl:with-param name ="fileName" select ="$fileName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
 				  </xsl:call-template>
 			  </xsl:for-each>
 		  </xsl:when>
@@ -1414,6 +1501,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="HyperlinksForBullets" />
     <xsl:param name ="masterPageName" />
     <xsl:param name ="fileName"/>
+    <xsl:param name ="flagPresentationClass"/>
+
     <xsl:for-each select ="child::node()[position()]">
       <xsl:if test ="name()='text:span'">
         <xsl:if test ="not(./text:line-break)">
@@ -1431,6 +1520,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:with-param name ="lvl" select ="$lvl"/>
                     <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                     <xsl:with-param name ="fileName" select ="$fileName"/>
+                    <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
                   </xsl:call-template>
                 </xsl:if>
               <xsl:if test="name()='text:a' or ./text:a">
@@ -1484,6 +1574,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="lvl" select ="$lvl"/>
                 <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                 <xsl:with-param name ="fileName" select ="$fileName"/>
+                <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
               </xsl:call-template>
             </xsl:if>
             <xsl:if test="name()='text:a' or ./text:a">
@@ -2364,6 +2455,10 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='ellipse')">
         <xsl:value-of select ="'Oval Custom '"/>
       </xsl:when>
+      <!-- U-Turn Arrow (Added by A.Mathi as on 23/07/2007) -->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 877824 L 0 384048 W 0 0 768096 768096 0 384048 384049 0 L 393192 0 W 9144 0 777240 768096 393192 0 777240 384049 L 777240 438912 L 886968 438912 L 667512 658368 L 448056 438912 L 557784 438912 L 557784 384048 A 228600 219456 557784 548640 557784 384048 393192 219456 L 384048 219456 A 219456 219456 548640 548640 384048 219456 219456 384048 L 219456 877824 Z N')">
+        <xsl:value-of select ="'U-Turn Arrow'"/>
+      </xsl:when>
       <!-- Isosceles Triangle -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='isosceles-triangle')">
         <xsl:value-of select ="'Isosceles Triangle '"/>
@@ -2459,7 +2554,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:value-of select ="'noSmoking '"/>
       </xsl:when>
       <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 868680 L 0 457772 W 0 101727 712090 813817 0 457772 356046 101727 L 610362 101727 L 610362 0 L 813816 203454 L 610362 406908 L 610362 305181 L 356045 305181 A 203454 305181 508636 610363 356045 305181 203454 457772 L 203454 868680 Z N')">
         <xsl:value-of select ="'bentArrow '"/>
       </xsl:when>
       <!--  Folded Corner (Added by A.Mathi as on 19/07/2007) -->
@@ -2505,10 +2600,6 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Cloud Callout (Added by A.Mathi as on 23/07/2007) -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='cloud-callout')">
         <xsl:value-of select ="'Cloud Callout '"/>
-      </xsl:when>
-      <!-- U-Turn Arrow (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='circular-arrow')">
-        <xsl:value-of select ="'U-Turn Arrow '"/>
       </xsl:when>
       <!-- Rectangle -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangle') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">

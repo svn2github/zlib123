@@ -80,11 +80,21 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select ="./@presentation:start-page"/>
                 </xsl:variable>
                 <xsl:variable name ="startPage">
-                  <xsl:for-each select ="./parent::node()/draw:page">
-                    <xsl:if test ="./@draw:name=$pageName">
-                      <xsl:value-of select ="position()"/>
-                    </xsl:if>
-                  </xsl:for-each>
+                  <xsl:variable name ="flag">
+                    <xsl:for-each select ="./parent::node()/draw:page[@draw:name=$pageName]">
+                      <xsl:value-of select ="'true'"/>
+                    </xsl:for-each>
+                  </xsl:variable>
+                  <xsl:if test ="contains($flag,'true')">
+                    <xsl:for-each select ="./parent::node()/draw:page">
+                      <xsl:if test ="./@draw:name=$pageName">
+                        <xsl:value-of select ="position()"/>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </xsl:if >
+                  <xsl:if test ="not(contains($flag,'true'))">
+                    <xsl:value-of select ="1"/>
+                  </xsl:if>
                 </xsl:variable>
                 <p:sldRg>
                   <xsl:attribute name ="st">

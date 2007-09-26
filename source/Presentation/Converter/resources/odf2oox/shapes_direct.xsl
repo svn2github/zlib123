@@ -120,7 +120,12 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:for-each>
 			</xsl:for-each >
 		</xsl:variable>
+     <xsl:if test="$varSpid !=''">
 		<xsl:value-of select ="$varSpid"/>
+     </xsl:if>
+     <xsl:if test="$varSpid =''">
+       <xsl:value-of select ="position()"/>
+     </xsl:if>
 	</xsl:template>
 	
   <!-- Template for Shapes in direct conversion -->
@@ -305,6 +310,7 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:when>
                       <!--Go to Last slide-->
                       <xsl:when test="@presentation:action[ contains(.,'last-page')]">
+                        <a:hlinkClick>
                         <xsl:attribute name="action">
                           <xsl:value-of select="'ppaction://hlinkshowjump?jump=lastslide'"/>
                         </xsl:attribute>
@@ -312,6 +318,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name="ShapeType" select="$ShapeType"/>
                           <xsl:with-param name="PostionCount" select="$PostionCount"/>
                         </xsl:call-template>
+                        </a:hlinkClick>
                       </xsl:when>
                       <!--End Presentation-->
                       <xsl:when test="@presentation:action[ contains(.,'stop')]">
@@ -360,7 +367,15 @@ Copyright (c) 2007, Sonata Software Limited
                             </a:hlinkClick>
                         </xsl:if>
                       </xsl:when>
-
+                      <!--Go to Http-->
+                      <xsl:when test="@xlink:href[ contains(.,'http')] and @presentation:action[ contains(.,'show')] ">
+                        <a:hlinkClick>
+                          <xsl:call-template name="tmpSetRid">
+                            <xsl:with-param name="ShapeType" select="$ShapeType"/>
+                            <xsl:with-param name="PostionCount" select="$PostionCount"/>
+                          </xsl:call-template>
+                        </a:hlinkClick>
+                      </xsl:when>
                       <!--Go to document-->
                       <xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
                         <a:hlinkClick>
@@ -539,6 +554,11 @@ Copyright (c) 2007, Sonata Software Limited
       <!--
                     </xsl:when>-->
       <!--For Go to document-->
+      <xsl:when test="( @xlink:href[ contains(.,'http')] or @xlink:href[ contains(.,'mailto:')]) and @presentation:action[ contains(.,'show')] ">
+        <xsl:attribute name="r:id">
+          <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+        </xsl:attribute>
+      </xsl:when>
       <xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
         <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
           <xsl:attribute name="r:id">
@@ -833,12 +853,13 @@ Copyright (c) 2007, Sonata Software Limited
 				  <xsl:variable name="stGluePoint">
 					  <xsl:value-of select="@draw:start-glue-point"/>
 				  </xsl:variable>
-				  
-				  <a:stCxn>
-					  <xsl:attribute name="id">
+          <xsl:if test="$startShape !=''">
+            <a:stCxn>
+
+              <xsl:attribute name="id">
 						  <xsl:value-of  select="$startShape" />
 					  </xsl:attribute>
-
+         
 					  <xsl:attribute name="idx">
 						  <xsl:choose>
 							  <xsl:when test="$stGluePoint = 0  or $stGluePoint = 4">
@@ -868,9 +889,11 @@ Copyright (c) 2007, Sonata Software Limited
 					  </xsl:attribute>
 				  </a:stCxn>
 			  </xsl:if>
-			  
+        </xsl:if>
+       
 			  <xsl:if test="@draw:end-glue-point">
-<xsl:variable name="endShape">
+         
+             <xsl:variable name="endShape">
 						  <xsl:call-template name ="shapeGetnvPrId">
 							  <xsl:with-param name ="spId">
 								  <xsl:value-of select="@draw:end-shape"/>
@@ -881,7 +904,7 @@ Copyright (c) 2007, Sonata Software Limited
 				  <xsl:variable name="endGluePoint">
 					  <xsl:value-of select="@draw:end-glue-point"/>
 				  </xsl:variable>
-				  
+          <xsl:if test="$endShape !=''">
 				  <a:endCxn>
 					  
 					  <xsl:attribute name="id">
@@ -914,7 +937,8 @@ Copyright (c) 2007, Sonata Software Limited
 						  </xsl:choose>
 					  </xsl:attribute>
 				  </a:endCxn>
-			  </xsl:if>
+        </xsl:if>
+          </xsl:if>
 		</p:cNvCxnSpPr>
         <p:nvPr/>
       </p:nvCxnSpPr>
@@ -1064,14 +1088,19 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:variable>
 
 			<xsl:variable name="shadowColor">
-				<xsl:if test="@draw:shadow-color">
+        <xsl:choose>
+				<xsl:when test="@draw:shadow-color">
 					<xsl:value-of select="substring-after(@draw:shadow-color,'#')"/>
-				</xsl:if>
-				<xsl:if test="not(@draw:shadow-color)">
+				</xsl:when>
+				<xsl:when test="not(@draw:shadow-color)">
 					<xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties">
 						<xsl:value-of select="substring-after(@draw:shadow-color,'#')"/>
 					</xsl:for-each>
-				</xsl:if>
+				</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'000000'"/>
+        </xsl:otherwise>
+        </xsl:choose>
 			</xsl:variable>
 
 			<!-- Transparency -->
@@ -1856,7 +1885,15 @@ Copyright (c) 2007, Sonata Software Limited
 
 					<a:alpha>
 						<xsl:attribute name="val">
+              <!--<xsl:value-of select="$shadowOpacity"/>-->
+              <xsl:choose>
+                <xsl:when test = "$shadowOpacity != ''">
 							<xsl:value-of select="$shadowOpacity"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'0'"/>
+                </xsl:otherwise>
+               </xsl:choose>
 						</xsl:attribute>
 					</a:alpha>
 				</a:srgbClr>
@@ -2449,6 +2486,13 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select ="'none'"/>
             </xsl:attribute>
           </xsl:when>
+          <!--Bug fix for text Wrap in textbox by Mathi on 12thSep 2007-->
+          <xsl:when test="(not(@fo:wrap-option='no-wrap') and ((@draw:auto-grow-height = 'true') and (@draw:auto-grow-width = 'true')))">
+            <xsl:attribute name ="wrap">
+              <xsl:value-of select ="'none'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <!--end of code-->
           <xsl:otherwise>
             <xsl:attribute name ="wrap">
               <xsl:value-of select ="'square'"/>
@@ -2611,6 +2655,7 @@ Copyright (c) 2007, Sonata Software Limited
                             <xsl:with-param name ="slideMaster" select ="$fileName"/>
                             <xsl:with-param name ="fileName" select ="$fileName"/>
                             <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                            <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
                           </xsl:call-template>
                         </xsl:if>
 						<xsl:if test ="$textId =''">
@@ -2666,6 +2711,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name ="Tid" select ="$textId" />
                           <xsl:with-param name ="prClassName" select ="$prClsName"/>
                           <xsl:with-param name ="slideMaster" select ="$fileName"/>
+                          <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
                         </xsl:call-template>
                       </xsl:if>
                     </a:endParaRPr>
@@ -2690,6 +2736,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name ="prClassName" select ="$prClsName"/>
                           <xsl:with-param name ="slideMaster" select ="$fileName"/>
                           <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                          <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
                         </xsl:call-template>						  
                       </xsl:if>
 						<xsl:if test ="$textId =''">
@@ -2843,6 +2890,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
                     <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                     <xsl:with-param name ="fileName" select ="$fileName"/>
+                    <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
                   </xsl:call-template>
                 </xsl:variable>
                 <xsl:copy-of select ="$currentNodeStyle"/>

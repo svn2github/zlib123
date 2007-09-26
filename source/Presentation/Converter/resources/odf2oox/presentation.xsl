@@ -93,7 +93,10 @@ Copyright (c) 2007, Sonata Software Limited
       </p:sldIdLst>
       <p:sldSz >
         <!-- Page width and height-->
-        <xsl:for-each select ="document('styles.xml')//style:page-layout[@style:name='PM1']">
+        <xsl:for-each select="document('styles.xml')//office:master-styles/style:master-page">
+          <xsl:if test="position()=1">
+            <xsl:variable name="PMName" select="@style:page-layout-name"/>
+            <xsl:for-each select ="document('styles.xml')//style:page-layout[@style:name=$PMName]">
           <xsl:attribute name ="cx" >
             <xsl:if test="style:page-layout-properties/@fo:page-width">
               <xsl:call-template name ="convertToPoints">
@@ -119,6 +122,8 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:if>
           </xsl:attribute>
         </xsl:for-each >
+          </xsl:if>
+        </xsl:for-each>
       </p:sldSz >
       <!--NotesMaster-->
          <xsl:for-each select="document('styles.xml')//office:master-styles/style:master-page">
