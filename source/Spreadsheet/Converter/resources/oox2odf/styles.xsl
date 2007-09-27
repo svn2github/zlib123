@@ -1212,28 +1212,28 @@
 
   <xsl:template name="InsertPageMargins">
     <xsl:for-each select="e:pageMargins">
-      <xsl:if test="@top and not(@header)">
+      <xsl:if test="(@top and not(@header)) or (@top and @header = 0)">
         <xsl:attribute name="fo:margin-top">
           <xsl:call-template name="ConvertToCentimeters">
             <xsl:with-param name="length" select="concat(@top,'in')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="@header">
+      <xsl:if test="@header and @header != 0">
         <xsl:attribute name="fo:margin-top">
           <xsl:call-template name="ConvertToCentimeters">
             <xsl:with-param name="length" select="concat(@header,'in')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="@bottom and not(@footer)">
+      <xsl:if test="(@bottom and not(@footer) or (@bottom and @footer = 0))">
         <xsl:attribute name="fo:margin-bottom">
           <xsl:call-template name="ConvertToCentimeters">
             <xsl:with-param name="length" select="concat(@bottom,'in')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="@footer">
+      <xsl:if test="@footer and @footer != 0">
         <xsl:attribute name="fo:margin-bottom">
           <xsl:call-template name="ConvertToCentimeters">
             <xsl:with-param name="length" select="concat(@footer,'in')"/>
