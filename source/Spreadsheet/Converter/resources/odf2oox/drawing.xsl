@@ -579,7 +579,6 @@
   </xsl:template>
 
   <xsl:template match="text:s" mode="text-box">
-    <xsl:text>before</xsl:text>
     <xsl:call-template name="InsertRepeatSpaces">
       <xsl:with-param name="nr">
         <xsl:text>1</xsl:text>
@@ -588,7 +587,6 @@
         <xsl:value-of select="@text:c"/>
       </xsl:with-param>
     </xsl:call-template>
-    <xsl:text>after</xsl:text>
   </xsl:template>
 
   <xsl:template name="InsertEndPara">
