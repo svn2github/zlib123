@@ -343,7 +343,7 @@
         <xsl:variable name="pivot">
           <xsl:choose>
             <xsl:when
-              test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName]">
+              test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName] and table:source-cell-range/@table:cell-range-address">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
