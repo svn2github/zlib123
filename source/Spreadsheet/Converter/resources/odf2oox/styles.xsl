@@ -326,7 +326,7 @@
       <xsl:choose>
         <xsl:when
           test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)and not(ancestor::office:annotation)]">
-        
+
           <xsl:call-template name="InsertHyperlinkTextStyle"/>
 
         </xsl:when>
@@ -523,7 +523,7 @@
         select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
       />
     </xsl:variable>
-    
+
     <xsl:variable name="styleFontsCount">
       <xsl:value-of
         select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
@@ -710,7 +710,7 @@
       <xsl:call-template name="InsertMultilineCellFormats"/>
 
       <!-- add cell formats for hyperlinks-->
-      
+
 
       <xsl:call-template name="InsertHyperlinksStyleProperties">
         <xsl:with-param name="numStyleCount">
@@ -874,12 +874,12 @@
             <xsl:when test="$hyperlink = 'true'">
               <xsl:attribute name="table:post-style-name">
                 <xsl:value-of select="concat(@style:name, 'h')"/>
-              </xsl:attribute>    
+              </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-          <xsl:attribute name="table:post-style-name">
-            <xsl:value-of select="@style:name"/>
-          </xsl:attribute>
+              <xsl:attribute name="table:post-style-name">
+                <xsl:value-of select="@style:name"/>
+              </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
@@ -921,7 +921,7 @@
     <xsl:param name="contentFillCount"/>
     <xsl:param name="hyperlink"/>
     <xsl:param name="hyperlinkId" select="0"/>
-    
+
     <!-- font -->
     <xsl:call-template name="FontId">
       <xsl:with-param name="FileName" select="$FileName"/>
@@ -1180,41 +1180,43 @@
         </xsl:attribute>
 
         <xsl:attribute name="fontId">
-         <xsl:choose>
-           <xsl:when test="$hyperlink = 'true'">
-             <xsl:value-of select="$contentFontsCount + $styleFontsCount + $hyperlinkId + 1"/>
-           </xsl:when>
-           <xsl:otherwise>
-          <!-- change referencing node to style:text-properties and count-->
-          <xsl:for-each select="style:text-properties">
-            <xsl:variable name="fontNum">
-              <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
-                level="any"/>
-            </xsl:variable>
-            <xsl:choose>
-              <xsl:when test="$FileName = 'styles' ">
-                <xsl:value-of select="$contentFontsCount + $fontNum"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$fontNum"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
-           </xsl:otherwise>
-         </xsl:choose>
-          
-         
+          <xsl:choose>
+            <xsl:when test="$hyperlink = 'true'">
+              <xsl:value-of select="$contentFontsCount + $styleFontsCount + $hyperlinkId + 1"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- change referencing node to style:text-properties and count-->
+              <xsl:for-each select="style:text-properties">
+                <xsl:variable name="fontNum">
+                  <xsl:number
+                    count="style:text-properties[parent::node()/@style:family='table-cell']"
+                    level="any"/>
+                </xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="$FileName = 'styles' ">
+                    <xsl:value-of select="$contentFontsCount + $fontNum"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$fontNum"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+
+
         </xsl:attribute>
-        
+
       </xsl:when>
-      <xsl:when test="(@style:parent-style-name != '' and @style:parent-style-name != 'Default') or (not(@table:style-name) and $hyperlink = 'true')">
+      <xsl:when
+        test="(@style:parent-style-name != '' and @style:parent-style-name != 'Default') or (not(@table:style-name) and $hyperlink = 'true')">
         <xsl:variable name="StyleParentStyleName">
           <xsl:value-of select="@style:parent-style-name"/>
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$hyperlink = 'true'">
             <xsl:attribute name="fontId">
-                <xsl:value-of select="$contentFontsCount + $styleFontsCount + $hyperlinkId + 1"/>
+              <xsl:value-of select="$contentFontsCount + $styleFontsCount + $hyperlinkId + 1"/>
             </xsl:attribute>
           </xsl:when>
           <xsl:when test="key('style',@style:parent-style-name)/style:text-properties">
@@ -1369,60 +1371,66 @@
       <xsl:variable name="FontSize">
         <xsl:value-of select="@style:family"/>
       </xsl:variable>
-      <rPr>
-        <!-- if the style is for the text that is inside text:span tag -->
-        <xsl:if
-          test="style:text-properties/parent::node()/@style:name = //table:table-cell/child::*/text:span/@text:style-name and not(style:text-properties/parent::node()/@style:name = //table:table-cell/@table:style-name and not(style:text-properties/parent::node()/@style:name = //table:table-cell/child::*/text:span/@text:style-name))">
-          <xsl:variable name="StyleName">
-            <xsl:value-of select="@style:name"/>
-          </xsl:variable>
-          <xsl:variable name="ParentStyleName">
-            <xsl:value-of
-              select="//text:span[@text:style-name = $StyleName]/parent::node()/parent::node()/@table:style-name"
-            />
-          </xsl:variable>
-          <xsl:variable name="ParentFontSize">
-            <xsl:value-of
-              select="//style:style[@style:name = $ParentStyleName]/style:text-properties/@fo:font-size"
-            />
-          </xsl:variable>
-          <xsl:variable name="ParentFontWeight">
-            <xsl:value-of
-              select="//style:style[@style:name = $ParentStyleName]/style:text-properties/@fo:font-weight"
-            />
-          </xsl:variable>
 
-          <!-- if text surrounded by text:span -->
-          <xsl:if test="@style:family = 'text'">
-            <!-- font size -->
-            <sz>
-              <xsl:attribute name="val">
-                <!-- if there is font size for the current span -->
-                <xsl:if test="@fo:font-size!=''">
-                  <xsl:value-of select="@fo:font-size"/>
-                </xsl:if>
-                <!-- if not but there is a global font size, insert global font size -->
-                <xsl:if test="not(@fo:font-size) and $ParentFontSize!=''">
-                  <xsl:value-of select="translate(translate($ParentFontSize, 'p', ''), 't', '')"/>
-                </xsl:if>
-                <!-- else insert some default font size-->
-                <xsl:if test="not(@fo:font-size) and $ParentFontSize=''">
-                  <xsl:value-of select="10"/>
-                </xsl:if>
-              </xsl:attribute>
-            </sz>
-            <xsl:if test="not(@fo:font-weight) and $ParentFontWeight = 'bold'">
-              <b/>
+      <xsl:variable name="styleNameName">
+        <xsl:value-of select="@style:name"/>
+      </xsl:variable>
+
+      <xsl:if test="not(preceding-sibling::style:style/@style:name = $styleNameName)">
+        <rPr>
+          <!-- if the style is for the text that is inside text:span tag -->
+          <xsl:if
+            test="style:text-properties/parent::node()/@style:name = //table:table-cell/child::*/text:span/@text:style-name and not(style:text-properties/parent::node()/@style:name = //table:table-cell/@table:style-name and not(style:text-properties/parent::node()/@style:name = //table:table-cell/child::*/text:span/@text:style-name))">
+            <xsl:variable name="StyleName">
+              <xsl:value-of select="@style:name"/>
+            </xsl:variable>
+            <xsl:variable name="ParentStyleName">
+              <xsl:value-of
+                select="//text:span[@text:style-name = $StyleName]/parent::node()/parent::node()/@table:style-name"
+              />
+            </xsl:variable>
+            <xsl:variable name="ParentFontSize">
+              <xsl:value-of
+                select="//style:style[@style:name = $ParentStyleName]/style:text-properties/@fo:font-size"
+              />
+            </xsl:variable>
+            <xsl:variable name="ParentFontWeight">
+              <xsl:value-of
+                select="//style:style[@style:name = $ParentStyleName]/style:text-properties/@fo:font-weight"
+              />
+            </xsl:variable>
+
+            <!-- if text surrounded by text:span -->
+            <xsl:if test="@style:family = 'text'">
+              <!-- font size -->
+              <sz>
+                <xsl:attribute name="val">
+                  <!-- if there is font size for the current span -->
+                  <xsl:if test="@fo:font-size!=''">
+                    <xsl:value-of select="@fo:font-size"/>
+                  </xsl:if>
+                  <!-- if not but there is a global font size, insert global font size -->
+                  <xsl:if test="not(@fo:font-size) and $ParentFontSize!=''">
+                    <xsl:value-of select="translate(translate($ParentFontSize, 'p', ''), 't', '')"/>
+                  </xsl:if>
+                  <!-- else insert some default font size-->
+                  <xsl:if test="not(@fo:font-size) and $ParentFontSize=''">
+                    <xsl:value-of select="10"/>
+                  </xsl:if>
+                </xsl:attribute>
+              </sz>
+              <xsl:if test="not(@fo:font-weight) and $ParentFontWeight = 'bold'">
+                <b/>
+              </xsl:if>
             </xsl:if>
+          
           </xsl:if>
-
-
-        </xsl:if>
-        <xsl:apply-templates select="style:text-properties" mode="textstyles">
-          <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
-          <xsl:with-param name="defaultCellStyleName" select="$defaultCellStyleName"/>
-        </xsl:apply-templates>
-      </rPr>
+          <xsl:apply-templates select="style:text-properties" mode="textstyles">
+            <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
+            <xsl:with-param name="defaultCellStyleName" select="$defaultCellStyleName"/>
+          </xsl:apply-templates>
+        </rPr>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
@@ -1676,7 +1684,8 @@
       <xsl:when test="$hyperlink = 'true'">
         <color theme="10"/>
       </xsl:when>
-      <xsl:when test="$fontColor != '' or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
+      <xsl:when
+        test="$fontColor != '' or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="$fontColor != '' ">
@@ -1691,7 +1700,7 @@
         <color rgb="{concat('FF',substring-after($color,'#'))}"/>
       </xsl:when>
     </xsl:choose>
- 
+
 
     <!-- font family -->
     <xsl:variable name="fontFamily">
@@ -1831,7 +1840,7 @@
         select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
       />
     </xsl:variable>
-    
+
     <xsl:variable name="styleFontsCount">
       <xsl:value-of
         select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
@@ -2078,8 +2087,7 @@
                         <xsl:value-of select="$contentFontCount + $styleFontCount + 2"/>
                       </xsl:when>
                       <xsl:otherwise>
-                        <xsl:value-of select="$contentFontCount + $styleFontCount "
-                        />
+                        <xsl:value-of select="$contentFontCount + $styleFontCount "/>
                       </xsl:otherwise>
                     </xsl:choose>
                   </xsl:attribute>
@@ -2704,7 +2712,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertHyperlinksStyleProperties">
     <xsl:param name="numStyleCount"/>
     <xsl:param name="styleNumStyleCount"/>
@@ -2721,69 +2729,72 @@
     <xsl:param name="styleFontsCount"/>
     <xsl:param name="contentFillCount"/>
     <xsl:param name="postStyleName" select="false"/>
-    
-    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]">
-     
+
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]">
+
       <xsl:variable name="StyleName">
         <xsl:value-of select="@table:style-name"/>
       </xsl:variable>
-      
-      <xsl:choose>
-          <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]">
 
-            <xsl:apply-templates
-              select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
-              mode="cellFormats">
-              <xsl:with-param name="numStyleCount">
-                <xsl:value-of select="$numStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="styleNumStyleCount">
-                <xsl:value-of select="$styleNumStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="percentStyleCount">
-                <xsl:value-of select="$percentStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="stylePercentStyleCount">
-                <xsl:value-of select="$stylePercentStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="currencyStyleCount">
-                <xsl:value-of select="$currencyStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="styleCurrencyStyleCount">
-                <xsl:value-of select="$styleCurrencyStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="dateStyleCount">
-                <xsl:value-of select="$dateStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="styleDateStyleCount">
-                <xsl:value-of select="$styleDateStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="timeStyleCount">
-                <xsl:value-of select="$timeStyleCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="contentFontsCount">
-                <xsl:value-of select="$contentFontsCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="styleFontsCount">
-                <xsl:value-of select="$styleFontsCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="contentFillCount">
-                <xsl:value-of select="$contentFillCount"/>
-              </xsl:with-param>
-              <xsl:with-param name="postStyleName">
-                <xsl:text>true</xsl:text>
-              </xsl:with-param>     
-              <xsl:with-param name="hyperlink">
-                <xsl:text>true</xsl:text>
-              </xsl:with-param>
-              <xsl:with-param name="hyperlinkId">
-                <xsl:number count="table:table-cell[descendant::text:a]" level="any"/>
-              </xsl:with-param>
-            </xsl:apply-templates>
-            
-          </xsl:when>
-        <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]">
-          
+      <xsl:choose>
+        <xsl:when
+          test="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]">
+
+          <xsl:apply-templates
+            select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
+            mode="cellFormats">
+            <xsl:with-param name="numStyleCount">
+              <xsl:value-of select="$numStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="styleNumStyleCount">
+              <xsl:value-of select="$styleNumStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="percentStyleCount">
+              <xsl:value-of select="$percentStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="stylePercentStyleCount">
+              <xsl:value-of select="$stylePercentStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="currencyStyleCount">
+              <xsl:value-of select="$currencyStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="styleCurrencyStyleCount">
+              <xsl:value-of select="$styleCurrencyStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="dateStyleCount">
+              <xsl:value-of select="$dateStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="styleDateStyleCount">
+              <xsl:value-of select="$styleDateStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="timeStyleCount">
+              <xsl:value-of select="$timeStyleCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="contentFontsCount">
+              <xsl:value-of select="$contentFontsCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="styleFontsCount">
+              <xsl:value-of select="$styleFontsCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="contentFillCount">
+              <xsl:value-of select="$contentFillCount"/>
+            </xsl:with-param>
+            <xsl:with-param name="postStyleName">
+              <xsl:text>true</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="hyperlink">
+              <xsl:text>true</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="hyperlinkId">
+              <xsl:number count="table:table-cell[descendant::text:a]" level="any"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+
+        </xsl:when>
+        <xsl:when
+          test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]">
+
           <xsl:apply-templates
             select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]"
             mode="cellFormats">
@@ -2825,7 +2836,7 @@
             </xsl:with-param>
             <xsl:with-param name="postStyleName">
               <xsl:text>true</xsl:text>
-            </xsl:with-param>     
+            </xsl:with-param>
             <xsl:with-param name="hyperlink">
               <xsl:text>true</xsl:text>
             </xsl:with-param>
@@ -2833,11 +2844,10 @@
               <xsl:number count="table:table-cell[descendant::text:a]" level="any"/>
             </xsl:with-param>
           </xsl:apply-templates>
-          
+
         </xsl:when>
-        
-        <xsl:otherwise>
-          domyślny<xsl:apply-templates
+
+        <xsl:otherwise> domyślny<xsl:apply-templates
             select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default']"
             mode="cellFormats">
             <xsl:with-param name="numStyleCount">
@@ -2878,7 +2888,7 @@
             </xsl:with-param>
             <xsl:with-param name="postStyleName">
               <xsl:text>true</xsl:text>
-            </xsl:with-param>     
+            </xsl:with-param>
             <xsl:with-param name="hyperlink">
               <xsl:text>true</xsl:text>
             </xsl:with-param>
@@ -2887,14 +2897,14 @@
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:otherwise>
-        
-       </xsl:choose>
-      
-      
+
+      </xsl:choose>
+
+
     </xsl:for-each>
-    
+
   </xsl:template>
-  
+
   <xsl:template match="table:table-cell" mode="HyperlinkStyle">
     <xsl:param name="numStyleCount"/>
     <xsl:param name="styleNumStyleCount"/>
@@ -2912,12 +2922,12 @@
     <xsl:param name="contentFillCount"/>
     <xsl:param name="postStyleName" select="false"/>
     <xsl:param name="hyperlinkId"/>
-    
-    
+
+
     <xsl:variable name="StyleName">
       <xsl:value-of select="@table:style-name"/>
     </xsl:variable>
-    
+
     <xsl:apply-templates
       select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
       mode="cellFormats">
@@ -2959,15 +2969,14 @@
       </xsl:with-param>
       <xsl:with-param name="postStyleName">
         <xsl:text>true</xsl:text>
-      </xsl:with-param>     
+      </xsl:with-param>
       <xsl:with-param name="hyperlink">
         <xsl:text>true</xsl:text>
       </xsl:with-param>
     </xsl:apply-templates>
-    
-    <xsl:if test="following-sibling::table:table-cell[1]">
-      next
-      <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="HyperlinkStyle">
+
+    <xsl:if test="following-sibling::table:table-cell[1]"> next <xsl:apply-templates
+        select="following-sibling::table:table-cell[1]" mode="HyperlinkStyle">
         <xsl:with-param name="numStyleCount">
           <xsl:value-of select="$numStyleCount"/>
         </xsl:with-param>
@@ -3010,7 +3019,7 @@
         <xsl:with-param name="hyperlinkId">
           <xsl:choose>
             <xsl:when test="descendant::text:a">
-              <xsl:value-of select="$hyperlinkId + 1"/>    
+              <xsl:value-of select="$hyperlinkId + 1"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$hyperlinkId"/>
@@ -3019,87 +3028,97 @@
         </xsl:with-param>
       </xsl:apply-templates>
     </xsl:if>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertHyperlinkTextStyle">
-    
+
     <xsl:apply-templates
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]" mode="HyperlinkText"/>
-    
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]"
+      mode="HyperlinkText"/>
+
   </xsl:template>
-  
+
   <xsl:template match="table:table-cell" mode="HyperlinkText">
-    
+
     <xsl:variable name="StyleName">
       <xsl:value-of select="@table:style-name"/>
     </xsl:variable>
-   
+
     <xsl:for-each select="descendant::text:a">
-    <xsl:choose>
-      <xsl:when test="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties">
-        <xsl:apply-templates
-          select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties" mode="fonts">
-          <xsl:with-param name="hyperlink">
-            <xsl:text>true</xsl:text>
-          </xsl:with-param>
-        </xsl:apply-templates>    
-      </xsl:when>
-      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]">
-      
-        <xsl:choose>
-          <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/style:text-properties">
-            <xsl:apply-templates
-              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/style:text-properties" mode="fonts">
-              <xsl:with-param name="hyperlink">
-                <xsl:text>true</xsl:text>
-              </xsl:with-param>
-            </xsl:apply-templates>      
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:choose>
-              <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/@style:parent-style-name">
-                <xsl:variable name="ParentStyleName">
-                  <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/@style:parent-style-name"/>
-                </xsl:variable>
-                <xsl:apply-templates
-                  select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$ParentStyleName]/style:text-properties" mode="fonts">
-                  <xsl:with-param name="hyperlink">
-                    <xsl:text>true</xsl:text>
-                  </xsl:with-param>
-                </xsl:apply-templates> 
-              </xsl:when>
-              <xsl:otherwise>
-                <font>
-                  <u val="single"/>
-                  <sz val="11"/>
-                  <color theme="10"/>
-                  <name val="Calibri"/>
-                  <family val="2"/>
-                </font>
-              </xsl:otherwise>
-            </xsl:choose>
-            
-          
-          </xsl:otherwise>
-        </xsl:choose>
-        
-        
-      </xsl:when>
-      <xsl:otherwise>
-        <font>
-          <u val="single"/>
-          <sz val="11"/>
-          <color theme="10"/>
-          <name val="Calibri"/>
-          <family val="2"/>
-        </font>
-      </xsl:otherwise>
-    </xsl:choose>
-    
+      <xsl:choose>
+        <xsl:when
+          test="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties">
+          <xsl:apply-templates
+            select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties"
+            mode="fonts">
+            <xsl:with-param name="hyperlink">
+              <xsl:text>true</xsl:text>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:when
+          test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]">
+
+          <xsl:choose>
+            <xsl:when
+              test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/style:text-properties">
+              <xsl:apply-templates
+                select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/style:text-properties"
+                mode="fonts">
+                <xsl:with-param name="hyperlink">
+                  <xsl:text>true</xsl:text>
+                </xsl:with-param>
+              </xsl:apply-templates>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when
+                  test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/@style:parent-style-name">
+                  <xsl:variable name="ParentStyleName">
+                    <xsl:value-of
+                      select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleName]/@style:parent-style-name"
+                    />
+                  </xsl:variable>
+                  <xsl:apply-templates
+                    select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$ParentStyleName]/style:text-properties"
+                    mode="fonts">
+                    <xsl:with-param name="hyperlink">
+                      <xsl:text>true</xsl:text>
+                    </xsl:with-param>
+                  </xsl:apply-templates>
+                </xsl:when>
+                <xsl:otherwise>
+                  <font>
+                    <u val="single"/>
+                    <sz val="11"/>
+                    <color theme="10"/>
+                    <name val="Calibri"/>
+                    <family val="2"/>
+                  </font>
+                </xsl:otherwise>
+              </xsl:choose>
+
+
+            </xsl:otherwise>
+          </xsl:choose>
+
+
+        </xsl:when>
+        <xsl:otherwise>
+          <font>
+            <u val="single"/>
+            <sz val="11"/>
+            <color theme="10"/>
+            <name val="Calibri"/>
+            <family val="2"/>
+          </font>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </xsl:for-each>
-    
-    
+
+
   </xsl:template>
-  
+
 </xsl:stylesheet>
