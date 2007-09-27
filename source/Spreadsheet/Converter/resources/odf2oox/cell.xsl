@@ -1627,10 +1627,20 @@
                   test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ])">
                   <xsl:variable name="TableStyleName">
                     <xsl:value-of select="@table:style-name"/>
-                  </xsl:variable>                 
-                    <xsl:attribute name="style-number-change-post">
-                      <xsl:value-of select="concat($TableStyleName, 'h')"/>
-                    </xsl:attribute>
+                  </xsl:variable>   
+                  <xsl:choose>
+                    <xsl:when test="$TableStyleName != ''">
+                      <xsl:attribute name="style-number-change-post">
+                        <xsl:value-of select="concat($TableStyleName, 'h')"/>
+                      </xsl:attribute>                      
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name="style-number-change-post">
+                        <xsl:value-of select="concat('Default', 'h')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                 
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:variable name="hyperlinkId">

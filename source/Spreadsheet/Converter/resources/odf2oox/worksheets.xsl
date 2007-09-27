@@ -1322,12 +1322,34 @@
 
   <xsl:template name="InsertHyperlinks">
 
+    <xsl:variable name="CheckIfHyperlink">
+    <xsl:choose>
+      <xsl:when test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+        <xsl:call-template name="CheckIfHyperlink"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>false</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable>
+    
     <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
     <xsl:if
-      test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+      test="contains($CheckIfHyperlink, 'true')">
       <hyperlinks>
         <xsl:for-each
           select="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+          <xsl:variable name="Check">
+            <xsl:for-each select="parent::node()">
+              <xsl:if test="not(following-sibling::text:p) or not(preceding-sibling::text:p)">
+                <xsl:text>true</xsl:text>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          
+          <xsl:if test="contains($Check, 'true')">
+          
           <xsl:variable name="ViewHyperlinks">
             <xsl:value-of select="."/>
           </xsl:variable>
@@ -1456,10 +1478,27 @@
               <xsl:value-of select="$HypeDiscDisp"/>
             </xsl:attribute>
           </hyperlink>
+            </xsl:if>
         </xsl:for-each>
       </hyperlinks>
+   
     </xsl:if>
 
+  </xsl:template>
+  
+  <xsl:template name="CheckIfHyperlink">
+   
+    <xsl:for-each select="descendant::text:a">
+      <xsl:for-each select="parent::node()">        
+        <xsl:choose>
+          <xsl:when test="not(following-sibling::text:p) and not(preceding-sibling::text:p)">
+            <xsl:text>true</xsl:text>  
+          </xsl:when>
+          <xsl:otherwise/>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:for-each>
+      
   </xsl:template>
 
   <xsl:template match="table:table-row" mode="rowBreakes">
