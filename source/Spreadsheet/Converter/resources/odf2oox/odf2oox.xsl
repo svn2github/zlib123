@@ -336,10 +336,14 @@
           <xsl:value-of select="@table:name"/>
         </xsl:variable>
 
+        <xsl:variable name="apos">
+          <xsl:text>&apos;</xsl:text>
+        </xsl:variable>
+        
         <xsl:variable name="pivot">
           <xsl:choose>
             <xsl:when
-              test="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+              test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -394,7 +398,7 @@
         <xsl:if test="$pivot = 'true'">
 
           <xsl:for-each
-            select="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+            select="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName]">
 
             <!-- create pivot table array in postprocessor -->
             <pxsi:pivotTable>
@@ -443,7 +447,7 @@
 
                 <xsl:attribute name="pxsi:sheetNum">
                   <xsl:variable name="sourceSheet">
-                    <xsl:value-of select="substring-before(@table:cell-range-address,'.')"/>
+                    <xsl:value-of select="translate(substring-before(@table:cell-range-address,'.'),$apos,'')"/>
                   </xsl:variable>
                   
                   <xsl:for-each select="parent::node()/parent::node()/parent::node()/table:table[@table:name = $sourceSheet]">

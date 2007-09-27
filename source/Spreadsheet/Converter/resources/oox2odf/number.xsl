@@ -484,7 +484,7 @@
         <xsl:with-param name="preserveCurrency" select="'true'"/>
       </xsl:call-template>
     </xsl:variable>
-
+    
     <!-- adding '\' -->
     <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
       <xsl:call-template name="AddNumberText">
@@ -696,7 +696,7 @@
     <xsl:variable name="quot">
       <xsl:text>&quot;</xsl:text>
     </xsl:variable>
-
+    
     <!-- checked if there is " -->
     <xsl:if test="contains($realFormatCode, $quot)">
       <xsl:choose>
@@ -704,7 +704,8 @@
           test="contains(substring-after(substring-after(translate($realFormatCode, 0, '#'), $quot), $quot), '#')">
           <xsl:call-template name="CheckEndText">
             <xsl:with-param name="realFormatCode"
-              select="substring-after(substring-after($realFormatCode, $quot), $quot)"/>
+              select="substring-after(substring-after($realFormatCode, $quot), $quot)"
+            />
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
@@ -724,7 +725,7 @@
     <xsl:param name="endText"/>
 
     <xsl:choose>
-
+      
       <!-- if there are currency at the beginning of string -->
       <xsl:when
         test="substring-before(substring-after($endText, '&quot;'), '&quot;') = 'zł' or 
@@ -735,7 +736,7 @@
           <xsl:with-param name="endText"
             select="substring-after(substring-after($endText, '&quot;'), '&quot;')"/>
         </xsl:call-template>
-      </xsl:when>
+      </xsl:when> 
 
       <!-- if there is " at the beginning of string -->
       <xsl:when test="substring($endText,1,1) = '&quot;' ">
@@ -752,7 +753,8 @@
       <!-- if there is \  at the beginning of string -->
       <xsl:when test="substring($endText,1,1) = '\' ">
         <number:text>
-          <xsl:value-of select="substring($endText,2,1)"/>
+          <xsl:value-of
+            select="substring($endText,2,1)"/>
         </number:text>
         <xsl:call-template name="InsertEndText">
           <xsl:with-param name="endText" select="substring($endText,2)"/>
@@ -1697,11 +1699,11 @@
     <!-- (int) number format ID -->
     <xsl:choose>
       <xsl:when test="$ID = 14">
-        <number:month number:style="long"/>
+        <number:year number:style="long"/>
+        <number:text>-</number:text>
+        <number:month/>
         <number:text>-</number:text>
         <number:day number:style="long"/>
-        <number:text>-</number:text>
-        <number:year/>
       </xsl:when>
       <xsl:when test="$ID = 15">
         <number:day/>
@@ -2072,5 +2074,37 @@
     </xsl:choose>
   </xsl:template>
 
-
+<xsl:template name="GetBuiltInformatCode">
+  <xsl:param name="ID"/>
+    
+  <xsl:choose>
+    <xsl:when test="$ID = 14">
+      <xsl:text>yyyy-mm-dd</xsl:text>
+    </xsl:when>
+    <xsl:when test="$ID = 15">
+      <xsl:text>d-mmm-yy</xsl:text>
+    </xsl:when>
+    <xsl:when test="$ID = 16">
+      <xsl:text>d-mmm</xsl:text>
+    </xsl:when>
+    <xsl:when test="$ID = 17">
+      <xsl:text>mmm-yy</xsl:text>
+    </xsl:when>
+    <xsl:when test="$ID = 18">
+      <xsl:text>h:mm AM/PM</xsl:text>
+    </xsl:when>
+    <xsl:when test="$ID = 19">
+      <xsl:text>h:mm:ss AM/PM</xsl:text>
+    </xsl:when>
+    <xsl:when test="$ID = 20">
+      <xsl:text>h:mm</xsl:text>
+    </xsl:when>
+    <xsl:when test="$ID = 21">
+      <xsl:text>h:mm:ss</xsl:text>
+    </xsl:when>  
+    <xsl:when test="$ID = 22">
+      <xsl:text>m/d/yy h:mm</xsl:text>
+    </xsl:when>
+  </xsl:choose>  
+</xsl:template>
 </xsl:stylesheet>

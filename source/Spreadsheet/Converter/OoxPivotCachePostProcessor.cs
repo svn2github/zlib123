@@ -465,7 +465,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         public override void WriteEndAttribute()
         {
-
             if (isSheetNum)
                 this.isSheetNum = false;
             else if (isColStart)
@@ -531,7 +530,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.pivotTable = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
                     this.pivotTableText = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
 
-                    CreatePivotTable(Convert.ToInt32(cacheSheetNum),Convert.ToInt32(cacheRowStart),Convert.ToInt32(cacheRowEnd),Convert.ToInt32(cacheColStart),Convert.ToInt32(cacheColEnd));
+                    CreatePivotTable(Convert.ToInt32(cacheSheetNum), Convert.ToInt32(cacheRowStart), Convert.ToInt32(cacheRowEnd), Convert.ToInt32(cacheColStart), Convert.ToInt32(cacheColEnd));
 
                     this.isInPivotTable = false;
                     
@@ -569,16 +568,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     int nameNum;
 
-                    /*Console.WriteLine(pivotNames);
-                    Console.WriteLine(pivotAxes);
-                    Console.WriteLine(pivotSort);
-                    Console.WriteLine(pivotHide);
-                    Console.WriteLine(pivotSubtotals);
-                    Console.WriteLine(pivotBlanks);
-                    Console.WriteLine(pivotOutlines);
-                    */
-                    Console.WriteLine(pivotEmptyLines);
-
                     string[] names = pivotNames.Split('~');
                     string[] axes = pivotAxes.Split('~');
                     string[] sort = pivotSort.Split('~');
@@ -588,11 +577,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     string[] outlines = pivotOutlines.Split('~');
                     string[] emptyLines = pivotEmptyLines.Split('~');
 
+                    Console.WriteLine("names: " + pivotNames);
+
                     //for each cache column output <pivotField> element
                     for (int col = 0; col < fieldNamesText[1].Count; col++)
                     {
                         //get field name
                         string name = fieldNamesText[1][col].ToString();
+                        Console.WriteLine("Column: " + name);
 
                         //search position of field with this name inside <table:data-pilot-table>
                         //field with empty name is not counted
@@ -950,7 +942,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     fieldItemsText[field, i] = new Hashtable();
                 }
             }
-            
+
             //fill fieldNamesText (from cells text value)
             for (int col = 0; col < cols; col++)
             {
@@ -959,19 +951,25 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                 string key = sheetNum + "#" + keyCol.ToString() + ":" + keyRow.ToString();
 
-                if (!fieldNamesText[0].ContainsKey((string)pivotCellsText[key]))
+                if (pivotCellsText.ContainsKey(key))
                 {
-                    fieldNames[0].Add((string)pivotCells[key], col);
-                    fieldNames[1].Add(col, (string)pivotCells[key]);
+                    if (!fieldNamesText[0].ContainsKey((string)pivotCellsText[key]))
+                    {
+                        fieldNames[0].Add((string)pivotCells[key], col);
+                        fieldNames[1].Add(col, (string)pivotCells[key]);
 
-                    fieldNamesText[0].Add((string)pivotCellsText[key], col);
-                    fieldNamesText[1].Add(col, (string)pivotCellsText[key]);
+                        fieldNamesText[0].Add((string)pivotCellsText[key], col);
+                        fieldNamesText[1].Add(col, (string)pivotCellsText[key]);
+
+                    }
                 }
             }
 
             //fill pivotTable and fieldItems (from cells value)
             for (int row = 0; row < rows; row++)
-                for (int col = 0; col < cols; col++)
+                //the number of fields matches number of non-empty cells in the first row of the source
+                //if source range is wider then columns starting with an empty cell are not treated as a field
+                for (int col = 0; col < fieldNames[0].Count; col++)
                 {
                     int keyCol = Convert.ToInt32(colStart) + col;
                     int keyRow = Convert.ToInt32(rowStart) + row;
@@ -1117,17 +1115,22 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.nextWriter.WriteString((items + 1).ToString());
             this.nextWriter.WriteEndAttribute();
 
-            Hashtable numbers = new Hashtable();
+            Hashtable[] numbers = new Hashtable[2];
             Hashtable strings = new Hashtable();
 
-            bool isBlank = false;
+            for (int i = 0; i < 2; i++)
+                numbers[i] = new Hashtable();
 
+            bool isBlank = false;
             foreach (string key in fieldItems[fieldNum, 0].Keys)
             {
+
                 try
                 {
-                    Convert.ToDouble(key.ToString().Replace('.',','));
-                    numbers.Add(key.ToString().Replace('.', ','),key);
+                    //numbers with high precision can be rounded during conversion to double and back to string!!! (i.e 18.399999999999999 -> 18,4  )
+                    Convert.ToDouble(key.Replace('.', ','));
+                    numbers[0].Add(key.Replace('.', ','), key);
+                    numbers[1].Add(Convert.ToDouble(key.Replace('.', ',')).ToString(), key);
                 }
                 catch
                 {
@@ -1139,17 +1142,18 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
             }
 
-            double[] sortedNumbers = new double[numbers.Count];
+            double[] sortedNumbers = new double[numbers[0].Count];
             string[] sortedStrings = new string[strings.Count];
 
             //sort numbers and strings
             int count = 0;
-            foreach (string key in numbers.Keys)
+            foreach (string key in numbers[0].Keys)
             {
                 sortedNumbers[count] = Convert.ToDouble(key);
                 count++;
             }
             Array.Sort(sortedNumbers);
+
             count = 0;
             foreach (string key in strings.Keys)
             {
@@ -1161,10 +1165,19 @@ namespace CleverAge.OdfConverter.Spreadsheet
             //output sorted item types in order: numbers, strings, blank
             int itemNum;
             string itemText;
+
+            Console.WriteLine("ITEMS");
+            Console.WriteLine("name: " + name);
             for (int i = 0; i < sortedNumbers.Length; i++)
             {
+                double sortedNumber = Convert.ToDouble(sortedNumbers[i]);
+
+                //sorted number can be rounded during conversion to double and back to string!!! (i.e 18.399999999999999 -> 18,4  )
+                //so take string value from number[1] hashtable based on sortedNumber
+                string number = numbers[1][sortedNumber.ToString()].ToString();
+                
                 //find number of this item and take textItem under this number
-                itemNum = Convert.ToInt32(fieldItems[fieldNum, 0][sortedNumbers[i].ToString().Replace(',', '.')]);
+                itemNum = Convert.ToInt32(fieldItems[fieldNum, 0][number]);
                 itemText = fieldItemsText[fieldNum, 1][itemNum].ToString();
 
                 //check if this item is hidden (Calc uses items text, Excel items value [])
@@ -1172,34 +1185,36 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 if (hide.Contains(";" + itemText + ";"))
                     hidden = true;
 
-                OutputItem(name, sortedNumbers[i].ToString().Replace(',', '.'),hidden);
+                OutputItem(name, itemNum, hidden);
             }
             
             for (int i = 0; i < sortedStrings.Length; i++)
             {
+                itemNum = Convert.ToInt32(fieldItems[fieldNum, 0][sortedStrings[i].ToString()]);
+                
                 //check if this item is hidden
                 bool hidden = false;
                 if (hide.Contains(";" + sortedStrings[i] + ";"))
                     hidden = true;
 
-                OutputItem(name, sortedStrings[i],hidden);
+                OutputItem(name, itemNum,hidden);
             }
 
             if (isBlank)
             {
-                Console.WriteLine("item: " + "(blank)");
+                itemNum = Convert.ToInt32(fieldItems[fieldNum, 0][""]);
+
                 //check if this item is hidden
                 bool hidden = false;
                 if (hide.Contains(";;"))
                     hidden = true;
                 
-                OutputItem(name, "", hidden);
+                OutputItem(name, itemNum, hidden);
             }
 
             //output subtotal items
             if (!"".Equals(subtotals))
             {
-                Console.WriteLine(subtotals + "(" + subtotals.Length + ")");
                 string[] subItems = subtotals.Split(';');
 
                 for (int item = 0; item < subItems.Length; item++)
@@ -1213,8 +1228,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
         }
 
-        private void OutputItem(string name, string item, bool hide)
+        private void OutputItem(string name, int itemNum, bool hide)
         {
+            //Console.WriteLine("name: " + name + " item: " + itemNum);
             int fieldNum = Convert.ToInt32(fieldNamesText[0][name]); 
             
             this.nextWriter.WriteStartElement("item", EXCEL_NAMESPACE);
@@ -1228,7 +1244,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
             
             this.nextWriter.WriteStartAttribute("x");
-            this.nextWriter.WriteString(fieldItems[fieldNum, 0][item].ToString());
+            this.nextWriter.WriteString(itemNum.ToString());
             this.nextWriter.WriteEndAttribute();
             this.nextWriter.WriteEndElement();
         }

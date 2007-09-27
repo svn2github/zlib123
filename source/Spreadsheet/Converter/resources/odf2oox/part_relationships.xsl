@@ -228,6 +228,10 @@
     <xsl:variable name="tableName">
       <xsl:value-of select="@table:name"/>
     </xsl:variable>
+    
+    <xsl:variable name="apos">
+      <xsl:text>&apos;</xsl:text>
+    </xsl:variable>
 
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <!-- comments.xml file -->
@@ -321,7 +325,7 @@
 
       <xsl:if test="$pivot = 'true' ">
         <xsl:for-each
-          select="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+          select="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName]">
           <Relationship Id="{generate-id(.)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotTable"
             Target="{concat('../pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}"/>

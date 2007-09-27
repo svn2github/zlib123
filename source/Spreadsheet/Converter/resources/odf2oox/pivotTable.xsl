@@ -1084,9 +1084,13 @@
     <xsl:for-each
       select="key('pivot','')[not(preceding-sibling::table:data-pilot-table/table:source-cell-range/@table:cell-range-address = table:source-cell-range/@table:cell-range-address)]">
 
+      <xsl:variable name="apos">
+        <xsl:text>&apos;</xsl:text>
+      </xsl:variable>
+      
       <!-- check only pivot sources on this sheet -->
       <xsl:if
-        test="substring-before(table:source-cell-range/@table:cell-range-address, '.') = $sheetName ">
+        test="substring-before(translate(table:source-cell-range/@table:cell-range-address,$apos,''), '.') = $sheetName ">
 
         <xsl:variable name="rowStart">
           <xsl:for-each select="table:source-cell-range">

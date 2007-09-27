@@ -303,6 +303,20 @@
 
             <xsl:when
               test="(contains($strippedFormat,'y') or (contains($strippedFormat,'m') and not(contains($strippedFormat,'h') or contains($strippedFormat,'s'))) or (contains($strippedFormat,'d') and not(contains($strippedFormat,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
+              
+              <xsl:variable name="formatCode">
+                <xsl:choose>
+                  <xsl:when test="$numStyle != '' ">
+                    <xsl:value-of select="$numStyle"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="GetBuiltInformatCode">
+                      <xsl:with-param name="ID" select="$numId"/>
+                    </xsl:call-template>
+                  </xsl:otherwise>
+                </xsl:choose>                
+              </xsl:variable>
+              
               <xsl:call-template name="FormatDate">
                 <xsl:with-param name="value">
                   <xsl:call-template name="NumberToDate">
@@ -313,11 +327,11 @@
                 </xsl:with-param>
                 <xsl:with-param name="format">
                   <xsl:choose>
-                    <xsl:when test="contains($numStyle,']')">
-                      <xsl:value-of select="substring-after($numStyle,']')"/>
+                    <xsl:when test="contains($formatCode,']')">
+                      <xsl:value-of select="substring-after($formatCode,']')"/>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select="$numStyle"/>
+                      <xsl:value-of select="$formatCode"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:with-param>
@@ -326,11 +340,11 @@
                 </xsl:with-param>
                 <xsl:with-param name="processedFormat">
                   <xsl:choose>
-                    <xsl:when test="contains($numStyle,']')">
-                      <xsl:value-of select="substring-after($numStyle,']')"/>
+                    <xsl:when test="contains($formatCode,']')">
+                      <xsl:value-of select="substring-after($formatCode,']')"/>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select="$numStyle"/>
+                      <xsl:value-of select="$formatCode"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:with-param>
@@ -343,6 +357,20 @@
             <!--'and' at the end is for Latvian currency -->
             <xsl:when
               test="contains($strippedFormat,'h') or contains($strippedFormat,'s') and not(contains($strippedFormat,'[$Ls-426]'))">
+              
+              <xsl:variable name="formatCode">
+                <xsl:choose>
+                  <xsl:when test="$numStyle != '' ">
+                    <xsl:value-of select="$numStyle"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="GetBuiltInformatCode">
+                      <xsl:with-param name="ID" select="$numId"/>
+                    </xsl:call-template>
+                  </xsl:otherwise>
+                </xsl:choose>                
+              </xsl:variable>
+              
               <xsl:call-template name="FormatTime">
                 <xsl:with-param name="value">
                   <xsl:call-template name="NumberToTime">
@@ -353,11 +381,11 @@
                 </xsl:with-param>
                 <xsl:with-param name="format">
                   <xsl:choose>
-                    <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h'))">
-                      <xsl:value-of select="substring-after($numStyle,']')"/>
+                    <xsl:when test="contains($formatCode,']') and not(contains($formatCode,'[h'))">
+                      <xsl:value-of select="substring-after($formatCode,']')"/>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select="$numStyle"/>
+                      <xsl:value-of select="$formatCode"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:with-param>
@@ -366,11 +394,11 @@
                 </xsl:with-param>
                 <xsl:with-param name="processedFormat">
                   <xsl:choose>
-                    <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h'))">
-                      <xsl:value-of select="substring-after($numStyle,']')"/>
+                    <xsl:when test="contains($formatCode,']') and not(contains($formatCode,'[h'))">
+                      <xsl:value-of select="substring-after($formatCode,']')"/>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select="$numStyle"/>
+                      <xsl:value-of select="$formatCode"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:with-param>
