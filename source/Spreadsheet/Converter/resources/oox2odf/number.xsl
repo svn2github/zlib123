@@ -484,7 +484,7 @@
         <xsl:with-param name="preserveCurrency" select="'true'"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <!-- adding '\' -->
     <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
       <xsl:call-template name="AddNumberText">
@@ -696,7 +696,7 @@
     <xsl:variable name="quot">
       <xsl:text>&quot;</xsl:text>
     </xsl:variable>
-    
+
     <!-- checked if there is " -->
     <xsl:if test="contains($realFormatCode, $quot)">
       <xsl:choose>
@@ -704,8 +704,7 @@
           test="contains(substring-after(substring-after(translate($realFormatCode, 0, '#'), $quot), $quot), '#')">
           <xsl:call-template name="CheckEndText">
             <xsl:with-param name="realFormatCode"
-              select="substring-after(substring-after($realFormatCode, $quot), $quot)"
-            />
+              select="substring-after(substring-after($realFormatCode, $quot), $quot)"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
@@ -725,7 +724,7 @@
     <xsl:param name="endText"/>
 
     <xsl:choose>
-      
+
       <!-- if there are currency at the beginning of string -->
       <xsl:when
         test="substring-before(substring-after($endText, '&quot;'), '&quot;') = 'zł' or 
@@ -736,7 +735,7 @@
           <xsl:with-param name="endText"
             select="substring-after(substring-after($endText, '&quot;'), '&quot;')"/>
         </xsl:call-template>
-      </xsl:when> 
+      </xsl:when>
 
       <!-- if there is " at the beginning of string -->
       <xsl:when test="substring($endText,1,1) = '&quot;' ">
@@ -753,8 +752,7 @@
       <!-- if there is \  at the beginning of string -->
       <xsl:when test="substring($endText,1,1) = '\' ">
         <number:text>
-          <xsl:value-of
-            select="substring($endText,2,1)"/>
+          <xsl:value-of select="substring($endText,2,1)"/>
         </number:text>
         <xsl:call-template name="InsertEndText">
           <xsl:with-param name="endText" select="substring($endText,2)"/>
@@ -1153,35 +1151,41 @@
 
         <!-- date style -->
         <xsl:when test="(@numFmtId &gt; 13 and @numFmtId &lt; 18) or @numFmtId = 22">
-          <number:date-style style:name="{concat('N',@numFmtId)}">
-            <xsl:call-template name="InsertFixedDateFormat">
-              <xsl:with-param name="ID">
-                <xsl:value-of select="@numFmtId"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </number:date-style>
+          <xsl:if test="not (preceding-sibling::e:xf/@numFmtId = $VarNumFmtId)">
+            <number:date-style style:name="{concat('N',@numFmtId)}">
+              <xsl:call-template name="InsertFixedDateFormat">
+                <xsl:with-param name="ID">
+                  <xsl:value-of select="@numFmtId"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:date-style>
+          </xsl:if>
         </xsl:when>
 
         <!-- percentage style -->
         <xsl:when test="@numFmtId = 9 or @numFmtId = 10">
-          <number:percentage-style style:name="{concat('N',@numFmtId)}">
-            <xsl:call-template name="InsertFixedNumFormat">
-              <xsl:with-param name="ID">
-                <xsl:value-of select="@numFmtId"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </number:percentage-style>
+          <xsl:if test="not (preceding-sibling::e:xf/@numFmtId = $VarNumFmtId)">
+            <number:percentage-style style:name="{concat('N',@numFmtId)}">
+              <xsl:call-template name="InsertFixedNumFormat">
+                <xsl:with-param name="ID">
+                  <xsl:value-of select="@numFmtId"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:percentage-style>
+          </xsl:if>
         </xsl:when>
 
         <!-- number style -->
         <xsl:otherwise>
-          <number:number-style style:name="{concat('N',@numFmtId)}">
-            <xsl:call-template name="InsertFixedNumFormat">
-              <xsl:with-param name="ID">
-                <xsl:value-of select="@numFmtId"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </number:number-style>
+          <xsl:if test="not (preceding-sibling::e:xf/@numFmtId = $VarNumFmtId)">
+            <number:number-style style:name="{concat('N',@numFmtId)}">
+              <xsl:call-template name="InsertFixedNumFormat">
+                <xsl:with-param name="ID">
+                  <xsl:value-of select="@numFmtId"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+          </xsl:if>
         </xsl:otherwise>
 
       </xsl:choose>
