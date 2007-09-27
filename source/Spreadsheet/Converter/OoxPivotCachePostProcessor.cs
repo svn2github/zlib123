@@ -527,6 +527,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                 if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotTable".Equals(element.Name))
                 {
+                    Console.WriteLine(" Row start: " + cacheRowStart + " Row end: " + cacheRowEnd + " Col start: " + cacheColStart + " Col end: " + cacheColEnd + " sheet: " + cacheSheetNum);
                     this.pivotTable = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
                     this.pivotTableText = new string[Convert.ToInt32(cacheRowEnd) - Convert.ToInt32(cacheRowStart) + 1, Convert.ToInt32(cacheColEnd) - Convert.ToInt32(cacheColStart) + 1];
 
@@ -981,8 +982,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         this.pivotTable[row, col] = (string)pivotCells[key];
                         this.pivotTableText[row, col] = (string)pivotCellsText[key];
 
-                        if (!fieldItems[col,0].ContainsKey((string)pivotCells[key]))
+                        //Search for items based on cell text (Known Issue: [ 1803689 ] Duplicated field items in Calc pilot tables)
+                        if (!fieldItemsText[col,0].ContainsKey((string)pivotCellsText[key]))
                         {
+                            Console.WriteLine((string)pivotCells[key]);
                             fieldItems[col,0].Add((string)pivotCells[key], index[col]);
                             fieldItems[col,1].Add(index[col],(string)pivotCells[key]);
 
