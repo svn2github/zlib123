@@ -1,76 +1,24 @@
 <html>
 <head>
-<title>ODF Add-in for Excel XP</title>
+<META HTTP-EQUIV="content-type" CONTENT="text/html; charset=windows-1252">
+
+<title>ODF Add-In f&uuml;r Excel XP</title>
 </head>
 <body>
-<h1>ODF Add-in for Excel XP</h1>
-Thank you for downloading ODF Add-in for Excel XP. The purpose of the software is to enable users to open ODF Specification based documents in Excel XP and demonstrate the interoperability between OpenXML & ODF specifications. Since this is still a beta release, you may use and test it... at your own risk! Any feedback is welcome though! ;)<br/>
-<br/>
-<h2>Software Requirements</h2>
-To test the add-in, you will need the following:<br/>
- 1. Excel XP<br/>
- 2. .NET Framework 2.0<br/>
- 3. Compatibility Pack* for Word, Excel, and PowerPoint 2007 File Formats (beta 2 or higher).<br/>
-<br/>
-IMPORTANT NOTES:<br/>
-<br/>
-(*) Please make sure you run the complete Office update before installing the compatibility pack. Office update is available from Office Online (http://office.microsoft.com/en-us/default.aspx)<br/>
-<br/>
-<br/>
-<h2>Installing the add-in</h2>
-Run the downloaded setup.exe program and follow the steps...<br/>
-<br/>
-If installation is successful, you should see a new "Open ODF" entry in the “File” menu in Excel. It allows you to either import an ODF spreadsheet file or export your current working document as an ODF spreadsheet file (note that during development process, those functionalities might be temporary unavailable).<br/>
-<br/>
-Important note: The ODF file opened by the add-in is imported in Microsoft Excel as a read-only XLSX file. If you want to save it back as ODF, you will have to first make a copy of the document ("Menu>Save As") and then use the "Export as ODF" menu.<br/>
-<br/>
-<h2>Silent mode installation</h2>
-1. Download and install the Microsoft .NET Framework Version 2.0 Redistributable Package<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=0856EACB-4362-4B0D-8EDD-AAB15C5E04F5&displaylang=en">http://www.microsoft.com/downloads/details.aspx?FamilyID=0856EACB-4362-4B0D-8EDD-AAB15C5E04F5&displaylang=en</a>)<br/>
-2. If you are installing the ODF Add-in for Microsoft Excel 2003, download and install the Microsoft Office 2003 Primary Interop Assemblies<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad&displaylang=en">http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad&displaylang=en</a>),<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 3<br/>
-3. If you are installing the ODF Add-in for Microsoft Excel XP or 2003, download and install Microsoft Office Compatibility Pack for Word 2007 File Formats
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466</a>),<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 4.<br/>
-4. Download the ODF Add-in for Excel<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="https://sourceforge.net/project/showfiles.php?group_id=169337&package_id=226811">https://sourceforge.net/project/showfiles.php?group_id=169337&package_id=226811</a>)<br/>
-5. Extract the zip file to a location of your choice using your favourite zip tool</br>
-6. If you are installing the ODF Add-in for Microsoft Excel XP or 2003, from the extracted zip file install the shared add-in extensibility update for Microsoft .NET Framework 2.0 (KB908002) :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\extensibilityMSM.msi</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 8.<br/>
-7. Install the shared add-in support update for Microsoft .NET Framework 2.0 (KB908002) :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\lockbackRegKey.msi</code><br/>
-8. Installation of the add-in:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for Office 2007:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcel2007AddinSetup.msi /q EXCELVERSION=12 ALLUSERS=1</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;for Office 2003:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcel2003AddinSetup.msi /q EXCELVERSION=11 ALLUSERS=1</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;for Office XP:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcelXPAddinSetup.msi /q EXCELVERSION=10 ALLUSERS=1</code><br/>
-9. If you are installing the ODF Add-in for Microsoft Excel 2003 install the office2003-kb907417sfxcab-ENU executable for Office 2003:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\office2003-kb907417sfxcab-ENU.exe /quiet</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 10.<br/>
-10. Finally, check that the installation is finished before launching Excel.
-<br/>
-<br/>
-<h2>Troubleshooting Guide</h2>
-If you don't see the ODF entry, it could be due to missing features in Excel (see the Software Requirements listed above). After completing the ODF Add-in installation, you need to activate the Add-in by doing the following actions:<br/>
-* Go to "Tools > Customize", and then click the "Commands" tab.<br/>
-* In the "Categories" box, click "Tools".<br/>
-* Drag COM Add-Ins from the "Commands" box over the "Tools" menu. When the "Tools" menu displays the menu commands, point to the location where you want the COM Add-Ins command to appear on the menu, and then release the mouse button.<br/>
-* Click Close.<br/>
-* In the Tools menu, click "COM Add-Ins" and check the box next to the ODF add-in in the available list. If the add-in you want isn't in the list, click Add, locate the add-in, and then click OK.<br/>
-<br/>
-<h2>Conversion currently supports</h2>
-For a complete list of features, please refer to our roadmap on sourceForge.net (https://sourceforge.net/project/showfiles.php?group_id=169337).<br/>
-<br/>
-<br/>
-<h2>Features/options lost in the ODF to OpenXML translation</h2>
-Please to refer to sourceForge (https://sourceforge.net/tracker/?group_id=169337&atid=932582) for a detailed list of unsupported features.<br/>
-<br/>
-<h2>Release notes</h2>
-(1) The AddIn does not work when Office 2007 and 2003 are installed in parallel<br/>
-<br/>
-</body>
+<h1>ODF Add-In f&uuml;r Excel XP</h1>
+Vielen Dank f&uuml;r das Herunterladen des ODF Add-Ins f&uuml;r Excel XP. Die Software erm&ouml;glicht das &Ouml;ffnen eines auf der ODF-Spezifikation basierenden Dokuments in Excel XP und die Interoperabilit&auml;t zwischen OpenXML und ODF-Spezifikationen. Da es sich um eine Betaversion handelt, verwenden Sie die Software auf eigenes Risiko. Ihr Feedback ist jedoch willkommen! ;)<br/> <br/>
+<h2>Softwareanforderungen</h2>
+Zum Testen des Add-Ins ist Folgendes erforderlich:<br/> 1. Excel XP<br/> 2. .NET Framework 2.0*<br/> 3. Compatibility Pack* f&uuml;r Word-, Excel- und PowerPoint 2007-Dateiformate (mindestens Beta 2).<br/> <br/> Wichtige Hinweise:<br/> <br/> (*) Stellen Sie sicher, dass das vollst&auml;ndige Office-Update ausgef&uuml;hrt wird, bevor Sie das Compatibility Pack installieren. Das Office-Update ist &uuml;ber Office Online (http://office.microsoft.com/en-us/default.aspx) verf&uuml;gbar.<br/> <br/> <br/>
+<h2>Installieren des Add-Ins</h2>
+F&uuml;hren Sie die heruntergeladene Datei setup.exe aus und folgen Sie den Anweisungen.<br/> <br/> Nachdem die Installation erfolgreich abgeschlossen wurde, wird im Excel-Men&uuml; &quot;Datei&quot; die Option &quot;ODF &ouml;ffnen&quot; angezeigt. Sie k&ouml;nnen die ODF-Arbeitsblattdatei importieren oder das aktuelle Dokument als ODF-Arbeitsblattdatei exportieren (w&auml;hrend der Entwicklung sind diese Funktionen m&ouml;glicherweise vor&uuml;bergehend nicht verf&uuml;gbar).<br/> <br/> Wichtiger Hinweis: Die mit dem Add-In ge&ouml;ffnete ODF-Datei wird als schreibgesch&uuml;tzte XLSX-Datei in Microsoft Excel importiert. Um die Datei wieder als ODF-Datei zu speichern, m&uuml;ssen Sie zuerst eine Kopie des Dokuments (&quot;Men&uuml; &gt; Speichern unter&quot;) erstellen und anschlie&szlig;end die Men&uuml;option &ldquo;Als ODF exportieren&quot; ausw&auml;hlen.<br/> <br/>
+<h2>Problembehandlung</h2>
+Wenn die ODF-Option nicht angezeigt wird, sind m&ouml;glicherweise Features in Excel nicht vorhanden (siehe Softwareanforderungen). Nachdem die Installation des ODF Add-ins abgeschlossen ist, gehen Sie wie folgt vor, um das Add-In zu aktivieren:<br/> * W&auml;hlen Sie &quot;Tools &gt; Anpassen&quot; aus und klicken Sie auf die Registerkarte &quot;Befehle&quot;.<br/> * Klicken Sie im Feld &quot;Kategorien&quot; auf &quot;Tools&quot;.<br/> * Ziehen Sie &quot;COM Add-Ins&quot; aus dem Feld &quot;Befehle&quot; in das Men&uuml; &quot;Tools&quot;. Wenn die Befehle im Men&uuml; &quot;Tools&quot; angezeigt werden, zeigen Sie auf die Stelle, an der die COM Add-Ins eingef&uuml;gt werden sollen, und lassen Sie die Maustaste los.<br/> * Klicken Sie auf &quot;Schlie&szlig;en&quot;.<br/> * Klicken Sie im Men&uuml; &quot;Tools&quot; auf &quot;COM Add-Ins&quot; und aktivieren Sie in der Liste das Kontrollk&auml;stchen &quot;ODF Add-In&quot;. Wenn das gew&uuml;nschte Add-In nicht in der Liste aufgef&uuml;hrt ist, klicken Sie auf &quot;Hinzuf&uuml;gen&quot;, w&auml;hlen Sie das Add-In aus und klicken Sie auf &quot;OK&quot;.<br/> <br/>
+<h2>Derzeit unterst&uuml;tzte Konvertierung</h2>
+Eine vollst&auml;ndige Liste der Features finden Sie auf sourceForge.net (https://sourceforge.net/project/showfiles.php?group_id=169337).<br/> <br/> <br/>
+<h2>In der ODF/OpenXML-Konvertierung nicht verf&uuml;gbare Features/Optionen</h2>
+Eine vollst&auml;ndige Liste der nicht unterst&uuml;tzten Features finden Sie unter sourceForge.net (https://sourceforge.net/tracker/?group_id=169337&amp;atid=932582).<br/> <br/>
+<h2>Neuigkeiten</h2>
+(1) Das Add-In funktioniert nicht, wenn Office 2007 und 2003 gleichzeitig installiert sind.<br/> <br/>
+<h2>Nicht behobene Probleme in M3</h2>
+[ 1736396 ] XLSX: Konvertierung fehlgeschlagen<br /> [ 1740752 ] Negatives Testergebnis: Tagverarbeitung.<br /> [ 1740145 ] Kopf- und Fu&szlig;zeilen: Seitennummern werden nach Konvertierung als # angezeigt<br /> [ 1739928 ] Gruppe: Bedingte Formatierung wird nach Konvertierung nicht beibehalten<br /> [ 1739924 ] Gruppe: Hyperlink wird nach Konvertierung nicht beibehalten<br /> [ 1739915 ] Mehrere Gruppen nach Konvertierung<br /> [ 1739904 ] Gruppe: Hinweis wird nach Konvertierung nicht beibehalten<br /> [ 1738257 ] Leerzeichen nach Hyperlink wird nicht beibehalten.<br /> [ 1738256 ] Hyperlink: Zellschutz wird nach Konvertierung nicht richtig beibehalten<br /> [ 1736971 ] ODS: Zellenformat: Textausrichtung wird nicht beibehalten<br /> [ 1736952 ] ODS: Zellenformat: Farbe wird nicht richtig beibehalten (Excel 2003)<br /> [ 1736424 ] ODS: Zellenformat: Datumsformat wird nicht beibehalten<br /> [ 1736421 ] ODS: Zellenformat: Zeitformat AM/PM wird nicht richtig beibehalten<br /> [ 1736372 ] ODS: Zellenformat: Leerzeichen werden nicht beibehalten<br /> [ 1735726 ] ODS: Diagramme: Austausch der Achsenwerte<br /> [ 1735657 ]  Zahlenformat wird nicht richtig beibehalten<br /> [ 1735547 ] ODS: Zahlenformat \&quot;Standard\&quot; wird nicht richtig beibehalten<br /> [ 1733369 ] Bedingte Formatierung f&uuml;r leere Zellen wird nicht beibehalten<br /> [ 1726732 ] Add-In-Absturz: Gezogenes Bild in ODS-Datei.<br /> [ 1707249 ] Textkonvertierung nicht ordnungsgem&auml;&szlig; (Strg + Eingabetaste)<br /> [ 1706146 ] Spalten zu breit (ODF -&gt; OOX)<br /> [ 1705827 ] Leistung: Konvertierungszeiten zwischen 5 und 34 Minuten<br /> [ 1701990 ] Bidirektionale Konvertierung: Unerwartete Meldung bei der Konvertierung<br /> [ 1693462 ] Dateikonverter konnte die Datei nicht &ouml;ffnen<br /> [ 1677077 ] Gruppierter Inhalt wird nicht beibehalten<br /> [ 1675771 ] Konvertierung vergr&ouml;&szlig;ert die Datei<br /> [ 1740901 ] XLSX: Bedingte Formatierung: Vollst&auml;ndig verloren<br /> [ 1740406 ] Blattname wird nicht richtig beibehalten<br /> [ 1740161 ] Zelleninhalt nach Konvertierung falsch positioniert (ods &ndash;xlsx<br /> [ 1740139 ] Benutzerdefinierte Kopf- und Fu&szlig;zeilen werden nicht richtig beibehalten (unerwarteter Text)<br /> [ 1739971 ] Umgekehrt: Bedingte Formatierung f&uuml;r leere Zellen wird nicht beibehalten<br /> [ 1737798 ] XLSX: Kopfzeile: Formatierung und Seitenr&auml;nder werden nicht richtig beibehalten<br /> [ 1737696 ] XLSX: Inhalt wird im Blatt verschoben<br /> [ 1737693 ] XLSX: Fensterausrichtung wird nicht beibehalten<br /> [ 1737691 ] ODS: Probleme mit Bildern und Diagrammen<br /> [ 1737689 ] XLSX: Zellenformat: Format wird in Zahlen konvertiert<br /> [ 1737683 ] XLSX: Zellenformat: Rahmenprobleme<br /> [ 1735668 ] Zahlenformat wird nicht richtig beibehalten (Text und Zahl).<br /> [ 1735659 ] Zahlenformat wird in Datumsformat konvertiert<br /> [ 1735531 ] Mehrere Kommentare nach Konvertierung<br /> [ 1718525 ] Bidirektional: Zeilenumbruch geht verloren<br /> [ 1707213 ] Problem mit bidirektionaler Konvertierung: Rahmen-/Hintergrundfarbe<br /> [ 1707205 ] Problem mit bidirektionaler Konvertierung: Zeilenumbruch<br /> [ 1705914 ] Zeichenposition wird nicht beibehalten<br /> [ 1705905 ] Kommentar wird nicht beibehalten<br /> [ 1705806 ] Leistung: 061031_-_Pilotage_ADELE.CONFIDENTIAL.xlsx<br /> [ 1686766 ] Absturz bei bidirektionaler Konvertierung: Diagrammtypen.xlsx<br /> [ 1673978 ] Spalten nicht breit genug (OOX -&gt; ODT)<br /></body>
 </html>

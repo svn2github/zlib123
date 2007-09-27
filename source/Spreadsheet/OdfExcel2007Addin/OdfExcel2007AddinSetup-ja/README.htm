@@ -1,77 +1,25 @@
 <html>
 <head>
-<title>ODF Add-in for Excel2007</title>
+<META HTTP-EQUIV="content-type" CONTENT="text/html; charset=Shift_JIS">
+
+<title>ODF Add-in for Excel 2007 (Excel 2007 用 ODF アドイン プログラム)</title>
 </head>
 <body>
-<h1>ODF Add-in for Excel2007</h1>
-Thank you for downloading ODF Add-in for Excel 2007. The purpose of the software is to enable users to open ODF Specification based documents in Excel 2007 and demonstrate the interoperability between OpenXML & ODF specifications. Since this is still a beta release, you may use and test it... at your own risk! Any feedback is welcome though! ;)<br/>
-<br/>
-<h2>Software Requirements</h2>
-To test the add-in, you will need the following:<br/>
- 1. Excel 2007<br/>
- 2. .NET Framework 2.0*<br/>
-<br/>
-IMPORTANT NOTES:<br/>
-<br/>
-(*) Warning: if you install Microsoft Excel before the .NET Framework, you will need to update your Excel installation, by running the following these steps below.<br/>
-<br/>
-   1. Open "Add or remove Programs" from the Control Panel<br/>
-   2. Find the Microsoft Excel entry and choose "Modify"<br/>
-   3. Within the installation process, choose "Add or remove features" then add ".NET Programmability Support" in the "Microsoft Office Excel" section.<br/>
-<br/>
-<h2>Installing the add-in</h2>
-Run the downloaded install program and follow the steps...<br/>
-<br/>
-If installation is successful, you should see a new "Open ODF" entry in the 擢ile� menu in Excel. It allows you to either import an ODF spreadsheet file or export your current working document as an ODF spreadsheet file (note that during development process, those functionalities might be temporary unavailable).<br/>
-<br/>
-Important note: The ODF file opened by the add-in is imported in Microsoft Excel as a read-only DOCX file. If you want to save it back as ODF, you will have to first make a copy of the document ("Menu>Save As") and then use the "Export as ODF" menu.<br/>
-<br/>
-<h2>Silent mode installation</h2>
-1. Download and install the Microsoft .NET Framework Version 2.0 Redistributable Package<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=0856EACB-4362-4B0D-8EDD-AAB15C5E04F5&displaylang=en">http://www.microsoft.com/downloads/details.aspx?FamilyID=0856EACB-4362-4B0D-8EDD-AAB15C5E04F5&displaylang=en</a>)<br/>
-2. If you are installing the ODF Add-in for Microsoft Excel 2003, download and install the Microsoft Office 2003 Primary Interop Assemblies<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad&displaylang=en">http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad&displaylang=en</a>),<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 3<br/>
-3. If you are installing the ODF Add-in for Microsoft Excel XP or 2003, download and install Microsoft Office Compatibility Pack for Word 2007 File Formats
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466</a>),<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 4.<br/>
-4. Download the ODF Add-in for Excel<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a href="https://sourceforge.net/project/showfiles.php?group_id=169337&package_id=226811">https://sourceforge.net/project/showfiles.php?group_id=169337&package_id=226811</a>)<br/>
-5. Extract the zip file to a location of your choice using your favourite zip tool</br>
-6. If you are installing the ODF Add-in for Microsoft Excel XP or 2003, from the extracted zip file install the shared add-in extensibility update for Microsoft .NET Framework 2.0 (KB908002) :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\extensibilityMSM.msi</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 8.<br/>
-7. Install the shared add-in support update for Microsoft .NET Framework 2.0 (KB908002) :<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\lockbackRegKey.msi</code><br/>
-8. Installation of the add-in:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for Office 2007:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcel2007AddinSetup.msi /q EXCELVERSION=12 ALLUSERS=1</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;for Office 2003:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcel2003AddinSetup.msi /q EXCELVERSION=11 ALLUSERS=1</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;for Office XP:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>msiexec /i OdfExcelXPAddinSetup.msi /q EXCELVERSION=10 ALLUSERS=1</code><br/>
-9. If you are installing the ODF Add-in for Microsoft Excel 2003 install the office2003-kb907417sfxcab-ENU executable for Office 2003:<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<code>&lt;path&gt;\KB908002\office2003-kb907417sfxcab-ENU.exe /quiet</code><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;else go to step 10.<br/>
-10. Finally, check that the installation is finished before launching Excel.
-<br/>
-<br/>
-<h2>Troubleshooting Guide</h2>
-If you don't see the ODF entry, it could be due to missing features in Excel (see the Software Requirements listed above). After completing the ODF Add-in installation,  you need to activate the Add-in by doing the following actions:<br/>
-<br/>
-* Click "Excel Options" in the File menu<br/>
-* In the "Add-ins" section, select "COM Add-ins" in the list box and press the "Go" button<br/>
-* Make sure to select the checkbox "ODF Excel 2007 Add-in" and validate with the "OK" button.<br/>
-<br/>
-<h2>Conversion currently supports</h2>
-For a complete list of features, please refer to our roadmap on sourceForge.net (https://sourceforge.net/project/showfiles.php?group_id=169337).<br/>
-<br/>
-<br/>
-<h2>Features/options lost in the ODF to OpenXML translation</h2>
-Please to refer to sourceForge (https://sourceforge.net/tracker/?group_id=169337&atid=932582) for a detailed list of unsupported features.<br/>
-<br/>
-<h2>Release notes</h2>
-(1) The AddIn does not work when Office 2007 and 2003 are installed in parallel<br/>
-<br/>
+<h1>ODF Add-in for Excel 2007 (Excel 2007 用 ODF アドイン プログラム)</h1>
+ODF Add-in for Excel 2007 をダウンロードいただき、ありがとうございます。このソフトウェアをご使用になると、ODF 仕様のドキュメントを Excel 2007 で開くことができ、OpenXML と ODF 仕様との間の相互運用性を発揮することができます。このアドイン プログラムはベータ版ですので、ご自分の責任においてこのプログラムをご使用ください。皆様からのフィードバックをお待ちしております。 ;)<br/> <br/>
+<h2>ソフトウェアの要件</h2>
+このアドイン プログラムをテストするには、以下の要件を満たしていただく必要があります。<br/>1. Excel 2007<br/> 2. .NET Framework 2.0*<br/> <br/>重要事項:<br/><br/> (*)ご注意:Microsoft Excel が既にインストールされている状態で .Net Framework をインストールした場合は、次の手順に従って Excel を更新してください。<br/><br/> 1. [コントロール パネル] の [ソフトウェアの追加と削除] をクリックします。<br/> 2. Microsoft Excel の [変更] をクリックします。<br/> 3. インストール プログラムの [機能の追加と削除] を選択し、[Microsoft Office Excel の .NET プログラミング サポート] を追加します。<br/> <br/>
+<h2>アドインのインストール</h2>
+以下の手順に従い、ダウンロードしたインストール プログラムをインストールしてください。<br/><br/>インストールが完了すると、Excel の [ファイル] メニューに [ODF を開く] が追加され、ODF スプレッドシート ファイルをインポートするか、または現在作業中のドキュメントを ODF スプレッドシート ファイルにエクスポートすることができます (注意: 開発段階で、これらの機能が一時的に使用できない場合がありますので、ご了承ください)。<br/><br/> 重要事項:アドインが開いた ODF ファイルは、Microsoft Excel の読み取り専用の DOCX ファイル形式です。ODF ファイル形式で保存し直す場合は、[ファイル] メニューの [名前を付けて保存] を選択して、そのドキュメントをいったん保存してから、[ODF 形式で保存] を選択します。<br/> <br/>
+<h2>トラブルシューティング ガイド</h2>
+メニューに ODF が表示されない場合は、Excel の必須機能がインストールされていない可能性があります (上記の「ソフトウェアの要件」をご覧ください)。ODF アドインのインストールが完了したら、以下の手順でアドインを有効にしてください。<br/><br/> * [ファイル] メニューの [Excel オプション] をクリックします。<br/>* [アドイン] セクションの [COM アドイン] を選択して、[移動] ボタンをクリックします。<br/>* [ODF Excel 2007 Add-in] チェックボックスをオンにし、[OK] をクリックします。<br/> <br/>
+<h2>現バージョンでサポートされている変換</h2>
+全機能についての詳細は、sourceForge.net のロードマップ (https://sourceforge.net/project/showfiles.php?group_id=169337) をご覧ください。<br/> <br/> <br/>
+<h2>ODF から OpenXML への変換で削除された機能またはオプション</h2>
+サポートされていない機能についての詳細は、sourceForge.net (https://sourceforge.net/tracker/?group_id=169337&amp;atid=932582) をご覧ください。<br/> <br/>
+<h2>リリース ノート</h2>
+(1) Office 2003 と Office 2007 の両方がインストールされている場合、アドインは動作しませんのでご注意ください。<br/> <br/>
+<h2>M3 で解消されていないバグ</h2>
+[ 1736396 ] XLSX: Conversion failed (XLSX: 変換に失敗しました)<br /> [ 1740752 ] Negative test &ndash;Tag handling. (否定的なテスト &ndash; タグの処理)<br /> [ 1740145 ] Header &amp; footers-Page number are retained as # after convers (ヘッダー/フッター - 変換後、ページ番号が # で表示される)<br /> [ 1739928 ] Group-conditional formatting not retained after conversion (グループ - 変換すると条件付書式が失われる)<br /> [ 1739924 ] Group-hyperlink not retained after conversion (グループ - 変換するとハイパーリンクが失われる)<br /> [ 1739915 ] Multiple groups after conversion (変換後の複数グループ)<br /> [ 1739904 ] Group-Note not retained after conversion (グループ - 変換するとメモが失われる)<br /> [ 1738257 ] Space lost after hyperlink. (ハイパーリンク後、スペースが失われる)<br />[ 1738256 ] Hyperlink -Cell protection is not properly retained after co (ハイパーリンク - 変換すると、セルの保護が失われる)<br /> [ 1736971 ] ODS: Cell format: text alignment not retained (ODS: セルの書式: テキストの配置設定が失われる)<br /> [ 1736952 ] ODS: Cell format: Color not retained properly in Excel 2003) (ODS: セルの書式: Excel 2003 の色の設定が失われる)<br /> [ 1736424 ] ODS: Cell format: date formatwith time not retained (ODS: セルの書式: 時間が表示される日付の書式設定が失われる)<br /> [ 1736421 ] ODS: Cell format: time format AM/PM not retained correctly (ODS: セルの書式: 時間の午前/午後の書式設定が失われる)<br /> [ 1736372 ] ODS: Cell format: blanks are not retained (ODS: セルの書式:空白が失われる)<br /> [ 1735726 ] ODS: Charts: swap of axis values (ODS: グラフ: 軸の値が入れ替わる)<br /> [ 1735657 ]  Number format not properly retained (数字の書式が失われる)<br /> [ 1735547 ] ODS: Number Format \&quot;Standard\&quot; not retained properly (ODS: セルの書式: 数字の標準書式設定が失われる)<br /> [ 1733369 ] Conditional formatting not retained for empty cells (空白のセルの条件付き書式が失われる)<br /> [ 1726732 ] Add-in crash- Dragged image in ods file. (アドインのクラッシュ - ODS ファイルにドラッグした画像)<br /> [ 1707249 ] Text conversion not proper (Ctrl + Return) (テキストが正しく変換されない、Ctrl + Return)<br /> [ 1706146 ] Columns too wide (ODF -&gt; OOX) (カラム幅が広すぎる ODF -&gt; OOX)<br /> [ 1705827 ] Performance: Conversion times between 5 and 34minutes (パフォーマンス: 変換時間が 5 ～ 34 分かかる)<br /> [ 1701990 ] Round Trip Conversion- Unexpected message while conversion (ラウンド トリップ変換 - 変換中に予期しないメッセージが表示される)<br /> [ 1693462 ] File converter failed to open the file (コンバーターがファイルを開けない)<br /> [ 1677077 ] Grouped content lost (グループ化されたコンテンツが失われる)<br /> [ 1675771 ] Conversion increases file size (変換によってファイルのサイズが増大する)<br /> [ 1740901 ] XLSX: Conditional Formatting: completly lost (XLSX: 条件付き書式が完全に失われる)<br /> [ 1740406 ] Sheet name is not properly retained. (シートの名前が失われる)<br /> [ 1740161 ] Content of cell misplaced after conversion (ods &ndash;xlsx） (変換 (ods &ndash;xlsx) すると、セルの内容が誤って配置される)<br /> [ 1740139 ] Custom header and footer not properly retained (unexp txt) (unexp txt のカスタム ヘッダーとフッターが失われる)<br /> [ 1739971 ] Reverse-Conditional formatting not retained for blank cells (反転 - 空白セルの条件付き書式が失われる）<br /> [ 1737798 ] XLSX: Header: Formatting and margins not retained correctly (XLSX: ヘッダー: 書式設定および余白が失われる)<br /> [ 1737696 ] XLSX: Content moved inside sheet (XLSX: シート内のコンテンツが移動する)<br /> [ 1737693 ] XLSX: Window Orientation not retained (XLSX: ウィンドウ方向の設定が失われる)<br /> [ 1737691 ] XLSX: Pictures and Chart problems (XLSX: 画像とグラフの問題)<br /> [ 1737689 ] XLSX: Cell format: format custom converted to number (XLSX: セルの書式設定: カスタム書式設定が番号に変換される)<br /> [ 1737683 ] XLSX: Cell format: border problems (XLSX: セルの書式設定: 罫線の問題)<br /> [ 1735668 ] Number format not properly retained ( text &amp; Number). (数値の書式設定が失われる (テキストと数値)<br /> [ 1735659 ] Number format converted to date format (数値の書式設定が日付の書式設定に変換される)<br /> [ 1735531 ] Multiple comments after conversion (変換するとコメントが複数になる)<br /> [ 1718525 ] Roundtrip: Linebrake lost (ラウンド トリップ変換:改行が失われる)<br /> [ 1707213 ] Roundtrip Conversion Bug: border/background color (ラウンド トリップ変換のバグ: 罫線/背景色の色設定)<br /> [ 1707205 ] Roundtrip Conversion Bug: line break (ラウンド トリップ変換のバグ: 改行)<br /> [ 1705914 ] Character position not retained (文字の配置設定が失われる)<br /> [ 1705905 ] Comment not retained (コメントが失われる)<br /> [ 1705806 ] Performance: 061031_-_Pilotage_ADELE.CONFIDENTIAL.xlsx (パフォーマンス: 061031_-_Pilotage_ADELE.CONFIDENTIAL.xlsx)<br /> [ 1686766 ] Roundtrip Conversion Crash: Diagrammtypen.xlsx (ラウンド トリップ変換のクラッシュ: Diagrammtypen.xlsx)<br /> [ 1673978 ] Columns not wide enough (OOX -&gt; ODT) (カラムの幅が狭すぎる OOX -&gt; ODT)<br />
 </body>
 </html>
