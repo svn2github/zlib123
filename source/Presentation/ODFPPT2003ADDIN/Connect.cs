@@ -88,10 +88,27 @@ namespace OdfPPT2003Addin
             //applicationObject = application;
             //addInInstance = addInInst;
             this.applicationObject = (PowerPoint.Application)application;
+            int culture = 0;
+            string languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
 
-            System.Globalization.CultureInfo ci;
-            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            if (languageVal != null)
+            {
+                int.TryParse(languageVal, out culture);
+            }
+
+            if (culture == 0)
+            {
+                culture = this.applicationObject.LanguageSettings
+                    .get_LanguageID(MsoAppLanguageID.msoLanguageIDUI);
+            }
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture =
+                new System.Globalization.CultureInfo(culture);
+
+            //System.Globalization.CultureInfo ci;
+            //ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            //System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
             this.DialogBoxTitle = addinLib.GetString("OdfConverterTitle");
             if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)
@@ -233,7 +250,7 @@ namespace OdfPPT2003Addin
                         ci = System.Threading.Thread.CurrentThread.CurrentCulture;
                         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-                        PowerPoint.Presentation p = this.applicationObject.Presentations.Open((string)fileName, MsoTriState.msoFalse, MsoTriState.msoFalse, MsoTriState.msoFalse);
+                        PowerPoint.Presentation p = this.applicationObject.Presentations.Open((string)fileName, MsoTriState.msoCTrue, MsoTriState.msoFalse, MsoTriState.msoFalse);
                         p.NewWindow();
 
                     }
