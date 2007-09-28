@@ -29,11 +29,15 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   exclude-result-prefixes="text">
+
+  <xsl:import href="sharedStrings.xsl"/>
 
   <xsl:template name="InsertPivotTable">
     <!-- @Context: table:data-pilot-table -->
@@ -320,7 +324,7 @@
             </xsl:if>
           </xsl:for-each>
         </xsl:variable>
-        
+
         <xsl:variable name="blanks">
           <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
             <xsl:if test="position() &gt; 1 ">
@@ -336,24 +340,27 @@
             </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
-        
+
         <xsl:variable name="outlines">
           <xsl:for-each select="table:data-pilot-field[@table:source-field-name != '' ]">
             <xsl:if test="position() &gt; 1 ">
               <xsl:text>~</xsl:text>
             </xsl:if>
             <xsl:choose>
-              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'tabular-layout' ">
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'tabular-layout' ">
                 <xsl:text>0</xsl:text>
               </xsl:when>
-              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'outline-subtotals-bottom' ">
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'outline-subtotals-bottom' ">
                 <xsl:text>bottom</xsl:text>
               </xsl:when>
-              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'outline-subtotals-top' ">
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-layout-info/@table:layout-mode = 'outline-subtotals-top' ">
                 <xsl:text>top</xsl:text>
               </xsl:when>
             </xsl:choose>
-          </xsl:for-each>          
+          </xsl:for-each>
         </xsl:variable>
 
         <xsl:variable name="emptyLines">
@@ -362,16 +369,17 @@
               <xsl:text>~</xsl:text>
             </xsl:if>
             <xsl:choose>
-              <xsl:when test="table:data-pilot-level/table:data-pilot-layout-info/@table:add-empty-lines = 'true' ">
+              <xsl:when
+                test="table:data-pilot-level/table:data-pilot-layout-info/@table:add-empty-lines = 'true' ">
                 <xsl:text>1</xsl:text>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>0</xsl:text>
               </xsl:otherwise>
             </xsl:choose>
-          </xsl:for-each>          
+          </xsl:for-each>
         </xsl:variable>
-        
+
         <pxsi:pivotFields>
           <xsl:attribute name="pxsi:names">
             <xsl:value-of select="$names"/>
@@ -392,7 +400,7 @@
           <xsl:attribute name="pxsi:subtotals">
             <xsl:value-of select="$subtotals"/>
           </xsl:attribute>
-          
+
           <xsl:attribute name="pxsi:blanks">
             <xsl:value-of select="$blanks"/>
           </xsl:attribute>
@@ -516,7 +524,7 @@
           <xsl:for-each
             select="table:data-pilot-field[@table:source-field-name != '' and @table:orientation = 'data']">
             <dataField>
-              
+
               <xsl:attribute name="name">
                 <!-- Function name with uppercase first letter -->
                 <xsl:choose>
@@ -530,7 +538,8 @@
                     <xsl:text>StdDevp</xsl:text>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="translate(substring(@table:function,1,1),'scampv','SCAMPV')"/>
+                    <xsl:value-of
+                      select="translate(substring(@table:function,1,1),'scampv','SCAMPV')"/>
                     <xsl:value-of select="substring(@table:function,2)"/>
                   </xsl:otherwise>
                 </xsl:choose>
@@ -628,7 +637,7 @@
             <xsl:variable name="pivotIdFilter">
               <xsl:value-of select="@table:field-number"/>
             </xsl:variable>
-            
+
             <!--xsl:variable name="dataPilotFieldPosition">
               <xsl:for-each select="ancestor::table:data-pilot-table/table:data-pilot-field[@table:orientation = 'row' or @table:orientation = 'column' or @table:orientation = 'page']">
                 <xsl:value-of select="position()"/>
@@ -646,7 +655,7 @@
                     <xsl:value-of select="@table:orientation"/>
                   </xsl:for-each>
                 </xsl:variable>
-                
+
                 <!--xsl:for-each
                   select="ancestor::table:data-pilot-table/table:data-pilot-field[@table:source-field-name != ''][position() = $pivotIdFilter + 1][@table:orientation='row' or @table:orientation='column' or @table:orientation='page' ]">
                   <xsl:attribute name="stringValue1">
@@ -658,7 +667,8 @@
                   <xsl:value-of select="@table:field-number"/>
                 </xsl:attribute>
 
-                <pxsi:filterType pxsi:filterField="{@table:field-number}" pxsi:filterValue="{@table:value}">
+                <pxsi:filterType pxsi:filterField="{@table:field-number}"
+                  pxsi:filterValue="{@table:value}">
                   <xsl:attribute name="pxsi:condition">
 
                     <xsl:choose>
@@ -1087,7 +1097,7 @@
       <xsl:variable name="apos">
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
-      
+
       <!-- check only pivot sources on this sheet -->
       <xsl:if
         test="substring-before(translate(table:source-cell-range/@table:cell-range-address,$apos,''), '.') = $sheetName ">
@@ -1208,22 +1218,23 @@
   </xsl:template>
 
   <xsl:template match="text:s" mode="pivot">
-    <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
-      <xsl:attribute name="pxs:c">
-        <xsl:choose>
-          <xsl:when test="@text:c">
-            <xsl:value-of select="@text:c"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>1</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </pxs:s>
+
+    <xsl:call-template name="InsertRepeatSpaces">
+      <xsl:with-param name="nr">
+        <xsl:text>1</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="repeat">
+        <xsl:value-of select="@text:c"/>
+      </xsl:with-param>
+    </xsl:call-template>
+
   </xsl:template>
 
   <xsl:template match="text()" mode="pivot">
     <xsl:value-of select="."/>
   </xsl:template>
+  
+<!-- do not process theese elements -->
+  <xsl:template match="draw:frame|office:annotation" mode="pivot"/>
 
 </xsl:stylesheet>

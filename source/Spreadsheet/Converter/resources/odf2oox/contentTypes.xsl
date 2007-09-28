@@ -82,11 +82,12 @@
   </xsl:template>
   <!-- OLE object types -->
   <xsl:template name="InsertExternalLinkTypes">
-    <xsl:for-each
-      select="document('content.xml')">
-      <xsl:for-each select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
-      <Override PartName="{concat(concat('/xl/externalLinks/externalLink', position()),'.xml')}"
-        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml"/>
+    <xsl:for-each select="document('content.xml')">
+      <xsl:for-each
+        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        <Override PartName="{concat(concat('/xl/externalLinks/externalLink', position()),'.xml')}"
+          ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml"
+        />
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
@@ -118,16 +119,16 @@
         <xsl:for-each select="descendant::draw:frame/draw:object">
           <xsl:choose>
             <xsl:when test="not(document(concat(translate(@xlink:href,'./',''),'/settings.xml')))">
-          <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
-            <xsl:choose>
-              <xsl:when test="office:document-content/office:body/office:chart">
-                <xsl:text>true</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>false</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
+              <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+                <xsl:choose>
+                  <xsl:when test="office:document-content/office:body/office:chart">
+                    <xsl:text>true</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>false</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>false</xsl:text>
@@ -135,7 +136,7 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
-            
+
       <xsl:variable name="picture">
         <xsl:choose>
           <xsl:when
@@ -147,7 +148,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="textBox">
         <xsl:choose>
           <xsl:when test="descendant::draw:frame/draw:text-box">
@@ -158,37 +159,37 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
 
-      <!-- TO DO for pictures-->      
+
+      <!-- TO DO for pictures-->
       <xsl:if test="contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
         <Override PartName="{concat('/xl/drawings/drawing',position(),'.xml')}"
-          ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>        
-        
+          ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>
+
         <xsl:call-template name="InsertChartContentTypes">
-          <xsl:with-param name="sheetNum" select="position()"></xsl:with-param>
+          <xsl:with-param name="sheetNum" select="position()"/>
           <xsl:with-param name="chart">
             <xsl:value-of select="$chart"/>
           </xsl:with-param>
-        </xsl:call-template>         
-        
+        </xsl:call-template>
+
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
-  
-    <xsl:template name="InsertChartContentTypes">
-      <xsl:param name="sheetNum"/>
-      <xsl:param name="chart"/>
 
-      <xsl:if test="contains($chart, 'true')">
+  <xsl:template name="InsertChartContentTypes">
+    <xsl:param name="sheetNum"/>
+    <xsl:param name="chart"/>
+
+    <xsl:if test="contains($chart, 'true')">
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <Override PartName="{concat('/xl/charts/chart',$sheetNum,'_',position(),'.xml')}"
-          ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>        
+          ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>
       </xsl:for-each>
-      </xsl:if>
-    </xsl:template>
-  
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template name="InsertConnectionContentTypes">
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
@@ -196,38 +197,46 @@
         <xsl:value-of select="concat('/xl/queryTables/queryTable', position(), '.xml')"/>
       </xsl:variable>
       <Override PartName="{$queryTableTarget}"
-        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.queryTable+xml"/>    
-    </xsl:for-each>   
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.queryTable+xml"/>
+    </xsl:for-each>
   </xsl:template>
-  
-  
+
+
   <!-- Change Tracking -->
-  
+
   <xsl:template name="InsertChangeTrackingTypes">
-    
-    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
-      
+
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+
       <Override PartName="/xl/revisions/revisionHeaders.xml"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.revisionHeaders+xml"/>
-      <xsl:apply-templates select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="Content_Types"/>
+      <xsl:apply-templates
+        select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']"
+        mode="Content_Types"/>
     </xsl:for-each>
-    
-    <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+
+    <xsl:if
+      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
       <Override PartName="/xl/revisions/userNames.xml"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.userNames+xml"/>
     </xsl:if>
-    
+
   </xsl:template>
-  
-  <xsl:template match="table:cell-content-change|table:deletion|table:movement|table:insertion" mode="Content_Types">
-    
+
+  <xsl:template match="table:cell-content-change|table:deletion|table:movement|table:insertion"
+    mode="Content_Types">
+
     <Override PartName="{concat('/xl/revisions/revisionLog', generate-id(), '.xml')}"
       ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.revisionLog+xml"/>
-    
-    <xsl:if test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
-      <xsl:apply-templates select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']" mode="Content_Types"/>
+
+    <xsl:if
+      test="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
+      <xsl:apply-templates
+        select="following-sibling::node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']"
+        mode="Content_Types"/>
     </xsl:if>
-    
+
   </xsl:template>
 
 
@@ -239,13 +248,17 @@
       <xsl:variable name="tableName">
         <xsl:value-of select="@table:name"/>
       </xsl:variable>
-      
+
       <xsl:variable name="sheetNum">
         <xsl:value-of select="position()"/>
       </xsl:variable>
 
+      <xsl:variable name="apos">
+        <xsl:text>&apos;</xsl:text>
+      </xsl:variable>
+      
       <xsl:for-each
-        select="key('pivot','')[substring-before(@table:target-range-address,'.') = $tableName]">
+        select="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address]">
 
         <!-- pivotTable -->
         <Override PartName="{concat('/xl/pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}"
