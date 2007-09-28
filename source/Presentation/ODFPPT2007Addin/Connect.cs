@@ -212,7 +212,7 @@ namespace OdfPPT2007Addin
                         ci = System.Threading.Thread.CurrentThread.CurrentCulture;
                         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-                        PPT.Presentation p = this.applicationObject.Presentations.Open((string)fileName, MsoTriState.msoFalse, MsoTriState.msoFalse, MsoTriState.msoFalse);
+                        PPT.Presentation p = this.applicationObject.Presentations.Open((string)fileName, MsoTriState.msoCTrue, MsoTriState.msoFalse, MsoTriState.msoFalse);
                         p.NewWindow();
 
                     }
