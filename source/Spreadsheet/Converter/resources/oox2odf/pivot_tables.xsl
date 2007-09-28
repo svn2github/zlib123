@@ -412,14 +412,14 @@
                     <xsl:call-template name="InsertDataPilotField">
                       <xsl:with-param name="cacheFile" select="$cacheFile"/>
                       <xsl:with-param name="orientation">
-                        <xsl:text>col</xsl:text>
+                        <xsl:text>column</xsl:text>
                       </xsl:with-param>
                     </xsl:call-template>
                   </xsl:when>
                   <xsl:when test="@x ='-2'">
                     <xsl:call-template name="InsertEmptyDataPilotField">
                       <xsl:with-param name="orientation">
-                        <xsl:text>col</xsl:text>
+                        <xsl:text>column</xsl:text>
                       </xsl:with-param>
                     </xsl:call-template>
                   </xsl:when>
