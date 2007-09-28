@@ -112,7 +112,14 @@
       select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[position() = $sheetNum]">
 
       <xsl:variable name="sheetName">
-        <xsl:value-of select="@name"/>
+        <xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="$sheetNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of select="translate(@name,'!-$#:(),.+','')"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="sheet">
