@@ -49,6 +49,7 @@ Copyright (c) 2007, Sonata Software Limited
 
   <xsl:template name ="slides" match ="/office:document-content/office:body/office:presentation/draw:page" mode="slide">
     <xsl:param name ="pageNo"/>
+    <xsl:message terminate="no">progress:text:p</xsl:message>
     <p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
 				   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
 				   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
@@ -1695,7 +1696,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="attributeName" select ="'padding-bottom'" />
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test ="not(@fo:padding-left)">
+        <xsl:if test ="not(@fo:padding-left) and $parentStyle !=''">
 
           <xsl:attribute name ="lIns">
             <xsl:call-template name ="convertToPoints">
@@ -1704,7 +1705,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
-        <xsl:if test ="not(@fo:padding-top)">
+        <xsl:if test ="not(@fo:padding-top) and $parentStyle !=''">
 
           <xsl:attribute name ="tIns">
             <xsl:call-template name ="convertToPoints">
@@ -1713,7 +1714,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
-        <xsl:if test ="not(@fo:padding-right)">
+        <xsl:if test ="not(@fo:padding-right) and $parentStyle !=''">
 
           <xsl:attribute name ="rIns">
             <xsl:call-template name ="convertToPoints">
@@ -1722,7 +1723,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
-        <xsl:if test ="not(@fo:padding-bottom)">
+        <xsl:if test ="not(@fo:padding-bottom) and $parentStyle !=''">
 
           <xsl:attribute name ="bIns">
             <xsl:call-template name ="convertToPoints">

@@ -1813,7 +1813,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 
 				<!-- the if condition is to check for center selections -->
-				<xsl:if test="not($shadowOffsetX =  0 and $shadowOffsetY = 0)">
+				<xsl:if test="not($shadowOffsetX =  0 and $shadowOffsetY = 0) and ($shadowOffsetX !='' and $shadowOffsetY !='')">
 					<xsl:variable name ="distVal" >
 						<xsl:value-of select ="$shadowOffsetX"/>
 					</xsl:variable>
@@ -2219,36 +2219,20 @@ Copyright (c) 2007, Sonata Software Limited
         <!-- Horizontal alignment -->
         <xsl:if test="not(./parent::node()/style:paragraph-properties/@style:writing-mode='tb-rl')">
           <xsl:choose>
-			  <xsl:when test ="(@draw:textarea-horizontal-align='left' and @draw:textarea-vertical-align='middle')">  
+            <xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='center')">
 				  <xsl:attribute name ="anchor">
 					  <xsl:value-of select ="'ctr'"/>
 				  </xsl:attribute>
 				  <xsl:attribute name ="anchorCtr">
-					  <xsl:value-of select ="'0'"/>
+                <xsl:value-of select ="'1'"/>
 				  </xsl:attribute>
 			  </xsl:when>
-			  <xsl:when test ="(@draw:textarea-horizontal-align='left' and @draw:textarea-vertical-align='bottom')"> 
+            <xsl:when test ="(@draw:textarea-vertical-align='bottom' and @draw:textarea-horizontal-align='center')">
 				  <xsl:attribute name ="anchor">
 					  <xsl:value-of select ="'b'"/>
 				  </xsl:attribute>
 				  <xsl:attribute name ="anchorCtr">
-					  <xsl:value-of select ="'0'"/>
-				  </xsl:attribute>
-			  </xsl:when>
-            <xsl:when test ="(@draw:textarea-vertical-align='top' and @draw:textarea-horizontal-align='justify')">
-              <xsl:attribute name ="anchor">
-                <xsl:value-of select ="'t'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="anchorCtr">
-                <xsl:value-of select ="'0'"/>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='justify')">
-              <xsl:attribute name ="anchor">
-                <xsl:value-of select ="'ctr'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="anchorCtr">
-                <xsl:value-of select ="'0'"/>
+                <xsl:value-of select ="'1'"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:when test ="(@draw:textarea-vertical-align='top' and @draw:textarea-horizontal-align='center')">
@@ -2259,44 +2243,28 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="'1'"/>
               </xsl:attribute>
             </xsl:when>
-            <xsl:when test ="(@draw:textarea-vertical-align='bottom' and @draw:textarea-horizontal-align='justify')">
-              <xsl:attribute name ="anchor">
-                <xsl:value-of select ="'b'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="anchorCtr">
-                <xsl:value-of select ="'0'"/>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:when test ="(@draw:textarea-vertical-align='middle' and @draw:textarea-horizontal-align='center')">
+			      <xsl:when test ="@draw:textarea-vertical-align='middle'">  
               <xsl:attribute name ="anchor">
                 <xsl:value-of select ="'ctr'"/>
               </xsl:attribute>
               <xsl:attribute name ="anchorCtr">
-                <xsl:value-of select ="'1'"/>
+					  <xsl:value-of select ="'0'"/>
               </xsl:attribute>
             </xsl:when>
-            <xsl:when test ="(@draw:textarea-vertical-align='bottom' and @draw:textarea-horizontal-align='center')">
+			      <xsl:when test ="@draw:textarea-vertical-align='bottom'"> 
               <xsl:attribute name ="anchor">
                 <xsl:value-of select ="'b'"/>
               </xsl:attribute>
               <xsl:attribute name ="anchorCtr">
-                <xsl:value-of select ="'1'"/>
-              </xsl:attribute>
-            </xsl:when>
-			  <xsl:when test ="(@draw:textarea-horizontal-align='left')">
-				  <xsl:attribute name ="anchor">
-					  <xsl:value-of select="'t'"/>
-				  </xsl:attribute>
-				  <xsl:attribute name ="anchorCtr">
-					  <xsl:value-of select="'0'"/>
+                <xsl:value-of select="'0'"/>
 				  </xsl:attribute>
 			  </xsl:when>
-			  <xsl:when test ="(@draw:textarea-horizontal-align='center')">
+            <xsl:when test ="@draw:textarea-vertical-align='top'">
 				  <xsl:attribute name ="anchor">
 					  <xsl:value-of select="'t'"/>
 			      </xsl:attribute>
 				  <xsl:attribute name ="anchorCtr">
-					  <xsl:value-of select="'1'"/>
+                <xsl:value-of select ="'0'"/>
 				  </xsl:attribute>
 			  </xsl:when>
           </xsl:choose>

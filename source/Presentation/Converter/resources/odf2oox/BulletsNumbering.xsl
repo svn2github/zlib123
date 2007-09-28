@@ -49,22 +49,32 @@
           <a:buClrTx/>
         </xsl:otherwise>
       </xsl:choose>
-
-      <xsl:if test ="(./child::node()[1]/style:text-properties[@fo:font-size] and not(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100)) ">
-        <a:buSzPct>
-          <xsl:attribute name ="val">
-            <xsl:value-of select ="format-number(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-          </xsl:attribute>
-        </a:buSzPct>
+      <xsl:if test ="./child::node()[1]/style:text-properties/@fo:font-size">     
+        <xsl:if test ="not(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100) ">
+          <xsl:if test ="substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') &gt; 25 ">
+            <a:buSzPct>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="format-number(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
+              </xsl:attribute>
+            </a:buSzPct>
+          </xsl:if>
+          <xsl:if test ="substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') &lt; 25 ">
+            <a:buSzPct>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="'25000'"/>
+              </xsl:attribute>
+            </a:buSzPct>
+          </xsl:if>
       </xsl:if>
       <!-- Fix for the bug 1794640-->
-      <xsl:if test ="(./child::node()[1]/style:text-properties[@fo:font-size] and substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100) ">
+      <xsl:if test ="substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100 ">
         <a:buSzPct>
           <xsl:attribute name ="val">
             <xsl:value-of select ="'100000'"/>
           </xsl:attribute>
         </a:buSzPct>
       </xsl:if>
+      </xsl:if>      
       <!--End Fix for the bug 1794640-->
       <a:buFont>
         <xsl:attribute name ="typeface">

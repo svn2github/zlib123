@@ -814,10 +814,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="prClassName"/>
     <xsl:param name ="lvl"/>
     <xsl:param name ="masterPageName"/>
-    <xsl:message terminate="no">progress:text:p</xsl:message>
   
     <xsl:for-each  select ="document('content.xml')//office:automatic-styles/style:style[@style:name =$TextStyleID ]">
-      <xsl:message terminate="no">progress:text:p</xsl:message>
       <!-- Added by lohith :substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0  because sz(font size) shouldnt be zero - 16filesbug-->
       <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
         <xsl:attribute name ="sz">
@@ -1080,7 +1078,6 @@ Copyright (c) 2007, Sonata Software Limited
     <!-- parameter added by vijayeta, dated 13-7-07-->
     <xsl:param name ="masterPageName"/>
     <xsl:param name="slideMaster" />
-    <xsl:message terminate="no">progress:text:p</xsl:message>
     <xsl:variable name ="fileName">
       <xsl:if test ="$slideMaster !=''">
         <xsl:value-of select ="$slideMaster"/>
@@ -1090,7 +1087,6 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if >
     </xsl:variable >
     <xsl:for-each select ="document($fileName)//style:style[@style:name=$paraId]">
-      <xsl:message terminate="no">progress:text:p</xsl:message>
       <a:pPr>
         <!-- Code inserted by Vijayeta for Bullets and numbering,For bullet properties-->
         <xsl:if test ="not($level='0')">
@@ -1897,7 +1893,6 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="className"/>
     <xsl:param name ="lvl"/>
     <xsl:param name ="masterPageName" />
-    <xsl:message terminate="no">progress:text:p</xsl:message>
     <xsl:variable name ="defaultClsName">
       <xsl:call-template name ="getClassName">
         <xsl:with-param name ="clsName" select="$className"/>
