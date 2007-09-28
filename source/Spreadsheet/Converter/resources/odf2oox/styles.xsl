@@ -1179,18 +1179,24 @@
           <xsl:text>1</xsl:text>
         </xsl:attribute>
 
-        <xsl:attribute name="ZMIENNA_contentFontsCount">
-          <xsl:value-of select="$contentFontsCount"/>
-        </xsl:attribute>
-        
-        <xsl:attribute name="ZMIENNA_styleFontsCount">
-          <xsl:value-of select="$styleFontsCount"/>
-        </xsl:attribute>
-        
-        <xsl:attribute name="ZMIENNA_hyperlinkId">
-          <xsl:value-of select="$hyperlinkId"/>
-        </xsl:attribute>
-        
+        <xsl:if test="$contentFontsCount !='' ">
+          <xsl:attribute name="ZMIENNA_contentFontsCount">
+            <xsl:value-of select="$contentFontsCount"/>
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:if test="$styleFontsCount !='' ">
+          <xsl:attribute name="ZMIENNA_styleFontsCount">
+            <xsl:value-of select="$styleFontsCount"/>
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:if test="$hyperlinkId !='' ">
+          <xsl:attribute name="ZMIENNA_hyperlinkId">
+            <xsl:value-of select="$hyperlinkId"/>
+          </xsl:attribute>
+        </xsl:if>
+
         <xsl:attribute name="fontId">
           <xsl:choose>
             <xsl:when test="$hyperlink = 'true'">
@@ -1435,7 +1441,7 @@
                 <b/>
               </xsl:if>
             </xsl:if>
-          
+
           </xsl:if>
           <xsl:apply-templates select="style:text-properties" mode="textstyles">
             <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
@@ -2859,7 +2865,8 @@
 
         </xsl:when>
 
-        <xsl:otherwise> <xsl:apply-templates
+        <xsl:otherwise>
+          <xsl:apply-templates
             select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default']"
             mode="cellFormats">
             <xsl:with-param name="numStyleCount">
