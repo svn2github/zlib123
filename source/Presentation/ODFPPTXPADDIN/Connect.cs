@@ -249,7 +249,7 @@ namespace OdfPPTXPAddin
                         ci = System.Threading.Thread.CurrentThread.CurrentCulture;
                         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-                        PowerPoint.Presentation p = this.applicationObject.Presentations.Open((string)fileName, MsoTriState.msoFalse, MsoTriState.msoFalse, MsoTriState.msoFalse);
+                        PowerPoint.Presentation p = this.applicationObject.Presentations.Open((string)fileName, MsoTriState.msoCTrue, MsoTriState.msoFalse, MsoTriState.msoFalse);
                         p.NewWindow();
                         
                     }
