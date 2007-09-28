@@ -109,52 +109,57 @@
     <xsl:param name="sheetNum"/>
 
     <xsl:for-each
-      select="document(concat('xl/worksheets/_rels/sheet',$sheetNum,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'pivotTable' )]">
-
-      <xsl:variable name="TargetPilotFile">
-        <xsl:value-of select="substring-after(@Target,'../')"/>
-      </xsl:variable>
+      select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[position() = $sheetNum]">
 
       <xsl:variable name="sheetName">
-        <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-          <xsl:if test="position() = $sheetNum">
-            <xsl:value-of select="@name"/>
-          </xsl:if>
-        </xsl:for-each>
+        <xsl:value-of select="@name"/>
       </xsl:variable>
 
-      <xsl:if
-        test="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
-        <xsl:for-each
-          select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
+      <xsl:variable name="sheet">
+        <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
+        <xsl:call-template name="GetTarget">
+          <xsl:with-param name="id" select="@r:id"/>
+          <xsl:with-param name="document">
+            <xsl:text>xl/workbook.xml</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
 
-          <xsl:variable name="name">
-            <xsl:value-of select="@name"/>
-          </xsl:variable>
+      <xsl:variable name="fileName">
+        <xsl:value-of select="substring-after(substring-before($sheet, '.'),'/')"/>
+      </xsl:variable>
 
-          <table:data-pilot-table table:name="{$name}">
+      <xsl:for-each
+        select="document(concat('xl/worksheets/_rels/',$fileName,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'pivotTable' )]">
 
-            <xsl:for-each select="e:location">
+        <xsl:variable name="TargetPilotFile">
+          <xsl:value-of select="substring-after(@Target,'../')"/>
+        </xsl:variable>
 
-              <xsl:variable name="firstTargetAdress">
-                <xsl:value-of select="substring-before(@ref,':')"/>
-              </xsl:variable>
+        <xsl:if test="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
+          <xsl:for-each select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
 
-              <xsl:variable name="lastTargetAdress">
-                <xsl:value-of select="substring-after(@ref,':')"/>
-              </xsl:variable>
+            <xsl:variable name="name">
+              <xsl:value-of select="@name"/>
+            </xsl:variable>
+            
+            <xsl:variable name="numberOfAxisPage">
+              <xsl:for-each select="e:pivotFields">
+                <xsl:value-of select="count(e:pivotField[@axis ='axisPage'])"/>
+              </xsl:for-each>
+            </xsl:variable>
+          
+            <table:data-pilot-table table:name="{$name}">
 
-              <xsl:variable name="apos">
-                <xsl:text>&apos;</xsl:text>
-              </xsl:variable>
+              <xsl:for-each select="e:location">
 
-              <xsl:attribute name="table:target-range-address">
-                <xsl:value-of
-                  select="concat($apos,$sheetName,$apos,'.',$firstTargetAdress,':',$apos,$sheetName, $apos,'.',$lastTargetAdress)"
-                />
-              </xsl:attribute>
+                <xsl:variable name="firstTargetAdress">
+                  <xsl:value-of select="substring-before(@ref,':')"/>
+                </xsl:variable>
 
-              <xsl:attribute name="table:buttons">
+                <xsl:variable name="lastTargetAdress">
+                  <xsl:value-of select="substring-after(@ref,':')"/>
+                </xsl:variable>
 
                 <xsl:variable name="numRow">
                   <xsl:call-template name="GetRowNum">
@@ -162,6 +167,17 @@
                       <xsl:value-of select="$firstTargetAdress"/>
                     </xsl:with-param>
                   </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:variable name="ifPageRow">
+                  <xsl:choose>
+                    <xsl:when test="parent::node()/e:pivotFields/e:pivotField[@axis ='axisPage']">
+                      <xsl:value-of select="$numRow - 1 - $numberOfAxisPage"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$numRow"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:variable>
 
                 <xsl:variable name="numCol">
@@ -188,110 +204,103 @@
                   </xsl:call-template>
                 </xsl:variable>
 
-                <xsl:value-of
-                  select="concat($apos,$sheetName,$apos,'.',$firstButtonCellCol,$numRow,' ',$apos,$sheetName,$apos,'.',$nextButtonCellCol,$numRow)"/>
-
-              </xsl:attribute>
-
-              <xsl:attribute name="table:show-filter-button">
-                <xsl:text>false</xsl:text>
-              </xsl:attribute>
-
-            </xsl:for-each>
-
-            <!-- locate cache for this pivot table -->
-            <xsl:variable name="cacheFile">
-              <xsl:for-each
-                select="document(concat('xl/pivotTables/_rels/',substring-after($TargetPilotFile,'/'),'.rels'))//node()[name()='Relationship' and contains(@Type,'pivotCacheDefinition' )]">
-
-                <xsl:value-of select="substring-after(@Target,'../')"/>
-                
-              </xsl:for-each>
-            </xsl:variable>
-
-            
-            <!-- insert pilot table source range -->
-            <xsl:for-each select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition">
-              <xsl:for-each select="e:cacheSource/e:worksheetSource">
-
                 <xsl:variable name="apos">
                   <xsl:text>&apos;</xsl:text>
                 </xsl:variable>
 
-                <xsl:variable name="sheetSourceName">
-                  <xsl:value-of select="@sheet"/>
-                </xsl:variable>
+                <xsl:attribute name="table:target-range-address">
+                  <xsl:value-of
+                    select="concat($apos,$sheetName,$apos,'.',$firstButtonCellCol,$ifPageRow,':',$apos,$sheetName, $apos,'.',$lastTargetAdress)"
+                  />
+                </xsl:attribute>
 
-                <xsl:variable name="firstSourceAdress">
-                  <xsl:value-of select="substring-before(@ref,':')"/>
-                </xsl:variable>
+                <!--xsl:variable name="pageButton">
+                  <xsl:if test="parent::node()/e:pivotFields/e:pivotField[@axis ='axisPage']">
+                  <xsl:text> 1 </xsl:text>
+                  </xsl:if>
+                  </xsl:variable>
+                  
+                  <xsl:variable name="rowButton">
+                  <xsl:if test="parent::node()/e:pivotFields/e:pivotField[@axis ='axisRow']">
+                  <xsl:text> 1 </xsl:text>
+                  </xsl:if>
+                  </xsl:variable>
+                  
+                  <xsl:variable name="colButton">
+                  <xsl:if test="parent::node()/e:pivotFields/e:pivotField[@axis ='axisCol']">
+                  <xsl:text> 1 </xsl:text>
+                  </xsl:if>
+                  </xsl:variable-->
 
-                <xsl:variable name="lastSourceAdress">
-                  <xsl:value-of select="substring-after(@ref,':')"/>
-                </xsl:variable>
 
-                <table:source-cell-range>
+                <xsl:attribute name="table:buttons">
 
-                  <xsl:attribute name="table:cell-range-address">
-                    <xsl:value-of
-                      select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"
-                    />
-                  </xsl:attribute>
+                  <xsl:value-of
+                    select="concat($apos,$sheetName,$apos,'.',$firstButtonCellCol,$numRow,' ',$apos,$sheetName,$apos,'.',$nextButtonCellCol,$numRow)"/>
 
-                  <!-- Insert Filters-->
-                  <xsl:for-each
-                    select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters">
+                </xsl:attribute>
 
-                    <table:filter table:condition-source-range-address="">
-                      <table:filter-or>
+                <xsl:attribute name="table:show-filter-button">
+                  <xsl:text>false</xsl:text>
+                </xsl:attribute>
 
-                        <xsl:for-each
-                          select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters/e:filter">
-                          <xsl:variable name="labelFilterNum">
-                            <xsl:value-of select="@fld"/>
-                          </xsl:variable>
+              </xsl:for-each>
 
-                          <xsl:choose>
-                            <xsl:when
-                              test="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
-                              <xsl:for-each
-                                select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
-                                <table:filter-condition>
-                                  <xsl:attribute name="table:operator">
-                                    <xsl:call-template name="TranslateFilterOperator"/>
-                                  </xsl:attribute>
-                                  <xsl:attribute name="table:field-number">
-                                    <xsl:value-of select="$labelFilterNum"/>
-                                  </xsl:attribute>
-                                  <xsl:attribute name="table:value">
-                                    <xsl:call-template name="TranslateFilterValue"/>
-                                  </xsl:attribute>
-                                </table:filter-condition>
-                              </xsl:for-each>
-                            </xsl:when>
+              <!-- locate cache for this pivot table -->
+              <xsl:variable name="cacheFile">
+                <xsl:for-each
+                  select="document(concat('xl/pivotTables/_rels/',substring-after($TargetPilotFile,'/'),'.rels'))//node()[name()='Relationship' and contains(@Type,'pivotCacheDefinition' )]">
 
-                            <xsl:when test="e:autoFilter/e:filterColumn/e:top10">
-                              <xsl:message terminate="no"
-                              >translation.oox2odf.PivotFilter</xsl:message>
-                            </xsl:when>
+                  <xsl:value-of select="substring-after(@Target,'../')"/>
 
-                            <xsl:when test="count(e:filters/e:filter) &gt; 1">
-                              <table:filter-or>
-                                <xsl:for-each select="e:filters/e:filter">
-                                  <table:filter-condition table:operator="=">
-                                    <xsl:attribute name="table:field-number">
-                                      <xsl:value-of select="$labelFilterNum"/>
-                                    </xsl:attribute>
-                                    <xsl:attribute name="table:value">
-                                      <xsl:value-of select="@val"/>
-                                    </xsl:attribute>
-                                  </table:filter-condition>
-                                </xsl:for-each>
-                              </table:filter-or>
-                            </xsl:when>
+                </xsl:for-each>
+              </xsl:variable>
 
-                            <xsl:when test="e:autoFilter/e:filterColumn/e:customFilters/@and = 1">
-                              <table:filter-and>
+
+              <!-- insert pilot table source range -->
+              <xsl:for-each select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition">
+                <xsl:for-each select="e:cacheSource/e:worksheetSource">
+
+                  <xsl:variable name="apos">
+                    <xsl:text>&apos;</xsl:text>
+                  </xsl:variable>
+
+                  <xsl:variable name="sheetSourceName">
+                    <xsl:value-of select="@sheet"/>
+                  </xsl:variable>
+
+                  <xsl:variable name="firstSourceAdress">
+                    <xsl:value-of select="substring-before(@ref,':')"/>
+                  </xsl:variable>
+
+                  <xsl:variable name="lastSourceAdress">
+                    <xsl:value-of select="substring-after(@ref,':')"/>
+                  </xsl:variable>
+
+                  <table:source-cell-range>
+
+                    <xsl:attribute name="table:cell-range-address">
+                      <xsl:value-of
+                        select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"
+                      />
+                    </xsl:attribute>
+
+                    <!-- Insert Filters-->
+                    <xsl:for-each
+                      select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters">
+
+                      <table:filter table:condition-source-range-address="">
+                        <table:filter-or>
+
+                          <xsl:for-each
+                            select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters/e:filter">
+                            <xsl:variable name="labelFilterNum">
+                              <xsl:value-of select="@fld"/>
+                            </xsl:variable>
+
+                            <xsl:choose>
+                              <xsl:when
+                                test="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
                                 <xsl:for-each
                                   select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
                                   <table:filter-condition>
@@ -306,93 +315,160 @@
                                     </xsl:attribute>
                                   </table:filter-condition>
                                 </xsl:for-each>
-                              </table:filter-and>
-                            </xsl:when>
+                              </xsl:when>
 
-                            <xsl:when
-                              test="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
-                              <xsl:for-each
-                                select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
-                                <table:filter-condition>
-                                  <xsl:attribute name="table:operator">
-                                    <xsl:call-template name="TranslateFilterOperator"/>
-                                  </xsl:attribute>
-                                  <xsl:attribute name="table:field-number">
-                                    <xsl:value-of select="$labelFilterNum"/>
-                                  </xsl:attribute>
-                                  <xsl:attribute name="table:value">
-                                    <xsl:call-template name="TranslateFilterValue"/>
-                                  </xsl:attribute>
-                                </table:filter-condition>
-                              </xsl:for-each>
-                            </xsl:when>
+                              <xsl:when test="e:autoFilter/e:filterColumn/e:top10">
+                                <xsl:message terminate="no"
+                                >translation.oox2odf.PivotFilter</xsl:message>
+                              </xsl:when>
 
-                          </xsl:choose>
-                        </xsl:for-each>
+                              <xsl:when test="count(e:filters/e:filter) &gt; 1">
+                                <table:filter-or>
+                                  <xsl:for-each select="e:filters/e:filter">
+                                    <table:filter-condition table:operator="=">
+                                      <xsl:attribute name="table:field-number">
+                                        <xsl:value-of select="$labelFilterNum"/>
+                                      </xsl:attribute>
+                                      <xsl:attribute name="table:value">
+                                        <xsl:value-of select="@val"/>
+                                      </xsl:attribute>
+                                    </table:filter-condition>
+                                  </xsl:for-each>
+                                </table:filter-or>
+                              </xsl:when>
 
-                      </table:filter-or>
-                    </table:filter>
-                  </xsl:for-each>
+                              <xsl:when test="e:autoFilter/e:filterColumn/e:customFilters/@and = 1">
+                                <table:filter-and>
+                                  <xsl:for-each
+                                    select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                                    <table:filter-condition>
+                                      <xsl:attribute name="table:operator">
+                                        <xsl:call-template name="TranslateFilterOperator"/>
+                                      </xsl:attribute>
+                                      <xsl:attribute name="table:field-number">
+                                        <xsl:value-of select="$labelFilterNum"/>
+                                      </xsl:attribute>
+                                      <xsl:attribute name="table:value">
+                                        <xsl:call-template name="TranslateFilterValue"/>
+                                      </xsl:attribute>
+                                    </table:filter-condition>
+                                  </xsl:for-each>
+                                </table:filter-and>
+                              </xsl:when>
 
-                </table:source-cell-range>
+                              <xsl:when
+                                test="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                                <xsl:for-each
+                                  select="e:autoFilter/e:filterColumn/e:customFilters/e:customFilter">
+                                  <table:filter-condition>
+                                    <xsl:attribute name="table:operator">
+                                      <xsl:call-template name="TranslateFilterOperator"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="table:field-number">
+                                      <xsl:value-of select="$labelFilterNum"/>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="table:value">
+                                      <xsl:call-template name="TranslateFilterValue"/>
+                                    </xsl:attribute>
+                                  </table:filter-condition>
+                                </xsl:for-each>
+                              </xsl:when>
+
+                            </xsl:choose>
+                          </xsl:for-each>
+
+                        </table:filter-or>
+                      </table:filter>
+                    </xsl:for-each>
+
+                  </table:source-cell-range>
+                </xsl:for-each>
               </xsl:for-each>
-            </xsl:for-each>
 
-            <!-- insert pilot table fields -->
-            <xsl:for-each select="e:pageFields/e:pageField">
-              <xsl:choose>
-                <xsl:when test="@fld !='-2' ">
-                  <xsl:call-template name="InsertDataPilotField">
-                    <xsl:with-param name="cacheFile" select="$cacheFile"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:when test="@fld !='-2' ">
-                  <xsl:call-template name="InsertEmptyDataPilotField"/>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:for-each>
+              <!-- insert pilot table fields -->
+              <xsl:for-each select="e:pageFields/e:pageField">
+                <xsl:choose>
+                  <xsl:when test="@fld !='-2' ">
+                    <xsl:call-template name="InsertDataPilotField">
+                      <xsl:with-param name="cacheFile" select="$cacheFile"/>
+                      <xsl:with-param name="orientation">
+                        <xsl:text>page</xsl:text>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:when test="@fld ='-2' ">
+                    <xsl:call-template name="InsertEmptyDataPilotField">
+                    <xsl:with-param name="orientation">
+                      <xsl:text>page</xsl:text>
+                    </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:for-each>
 
-            <xsl:for-each select="e:colFields/e:field">
-              <xsl:choose>
-                <xsl:when test="@x !='-2' ">
-                  <xsl:call-template name="InsertDataPilotField">
-                    <xsl:with-param name="cacheFile" select="$cacheFile"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:when test="@x ='-2'">
-                  <xsl:call-template name="InsertEmptyDataPilotField"/>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:for-each>
+              <xsl:for-each select="e:colFields/e:field">
+                <xsl:choose>
+                  <xsl:when test="@x !='-2' ">
+                    <xsl:call-template name="InsertDataPilotField">
+                      <xsl:with-param name="cacheFile" select="$cacheFile"/>
+                      <xsl:with-param name="orientation">
+                        <xsl:text>col</xsl:text>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:when test="@x ='-2'">
+                    <xsl:call-template name="InsertEmptyDataPilotField">
+                    <xsl:with-param name="orientation">
+                      <xsl:text>col</xsl:text>
+                    </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:for-each>
 
-            <xsl:for-each select="e:rowFields/e:field">
-              <xsl:choose>
-                <xsl:when test="@x !='-2' ">
-                  <xsl:call-template name="InsertDataPilotField">
-                    <xsl:with-param name="cacheFile" select="$cacheFile"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:when test="@x ='-2'">
-                  <xsl:call-template name="InsertEmptyDataPilotField"/>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:for-each>
+              <xsl:for-each select="e:rowFields/e:field">
+                <xsl:choose>
+                  <xsl:when test="@x !='-2' ">
+                    <xsl:call-template name="InsertDataPilotField">
+                      <xsl:with-param name="cacheFile" select="$cacheFile"/>
+                      <xsl:with-param name="orientation">
+                        <xsl:text>row</xsl:text>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                  
+                  <xsl:when test="@x ='-2'">
+                    <xsl:call-template name="InsertEmptyDataPilotField">
+                    <xsl:with-param name="orientation">
+                      <xsl:text>row</xsl:text>
+                    </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:for-each>
 
-            <xsl:for-each select="e:dataFields/e:dataField">
-              <xsl:call-template name="InsertDataPilotField">
-                <xsl:with-param name="cacheFile" select="$cacheFile"/>
-              </xsl:call-template>
-            </xsl:for-each>
+              <xsl:for-each select="e:dataFields/e:dataField">
+                <xsl:call-template name="InsertDataPilotField">
+                  <xsl:with-param name="cacheFile" select="$cacheFile"/>
+                  <xsl:with-param name="orientation">
+                    <xsl:text>data</xsl:text>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:for-each>
 
-          </table:data-pilot-table>
-        </xsl:for-each>
-      </xsl:if>
+            </table:data-pilot-table>
+          </xsl:for-each>
+        </xsl:if>
+      </xsl:for-each>
+
     </xsl:for-each>
+
   </xsl:template>
 
   <xsl:template name="InsertDataPilotField">
     <xsl:param name="cacheFile"/>
-
+    <xsl:param name="orientation"/>
+    
     <xsl:variable name="fieldNum">
       <xsl:choose>
 
@@ -407,6 +483,12 @@
       </xsl:choose>
     </xsl:variable>
 
+    <xsl:variable name="checkIfDataField">
+      <xsl:for-each select="e:dataFields/e:dataField">
+        <xsl:value-of select="@fld"/>
+      </xsl:for-each>
+    </xsl:variable>
+    
     <table:data-pilot-field>
 
       <xsl:for-each
@@ -437,7 +519,9 @@
       </xsl:attribute>
 
       <xsl:attribute name="table:orientation">
-        <xsl:for-each
+        
+      <xsl:value-of select="$orientation"/>
+        <!--xsl:for-each
           select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position() = $fieldNum + 1]">
           <xsl:choose>
             <xsl:when test="@axis = 'axisPage' ">
@@ -453,7 +537,7 @@
               <xsl:text>data</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:for-each>
+        </xsl:for-each-->
       </xsl:attribute>
 
       <xsl:attribute name="table:function">
@@ -654,7 +738,8 @@
 
         </xsl:if>
 
-        <xsl:for-each select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position() = $fieldNum + 1][@axis and @sumSubtotal or @countSubtotal or @avgSubtotal or @maxSubtotal or @minSubtotal or @productSubtotal or @countSubtotal or @stdDevSubtotal or @stdDevPSubtotal or @varSubtotal or @varPSubtotal]">
+        <xsl:for-each
+          select="parent::node()/parent::node()/e:pivotFields/e:pivotField[position() = $fieldNum + 1][@axis and @sumSubtotal or @countSubtotal or @avgSubtotal or @maxSubtotal or @minSubtotal or @productSubtotal or @countSubtotal or @stdDevSubtotal or @stdDevPSubtotal or @varSubtotal or @varPSubtotal]">
 
           <table:data-pilot-subtotals>
 
@@ -800,7 +885,8 @@
 
           <xsl:attribute name="table:add-empty-lines">
             <xsl:choose>
-              <xsl:when test="parent::node()/parent::node()/e:pivotFields/e:pivotField/@insertBlankRow = '1' ">
+              <xsl:when
+                test="parent::node()/parent::node()/e:pivotFields/e:pivotField/@insertBlankRow = '1' ">
                 <xsl:text>true</xsl:text>
               </xsl:when>
               <xsl:otherwise>
@@ -812,13 +898,15 @@
           <xsl:attribute name="table:layout-mode">
 
             <xsl:choose>
-              <xsl:when test="parent::node()/parent::node()/e:pivotFields/e:pivotField/@outline = '0' ">
+              <xsl:when
+                test="parent::node()/parent::node()/e:pivotFields/e:pivotField/@outline = '0' ">
                 <xsl:text>tabular-layout</xsl:text>
               </xsl:when>
 
               <xsl:otherwise>
                 <xsl:choose>
-                  <xsl:when test="parent::node()/parent::node()/e:pivotFields/e:pivotField/@subtotalTop = '0' ">
+                  <xsl:when
+                    test="parent::node()/parent::node()/e:pivotFields/e:pivotField/@subtotalTop = '0' ">
                     <xsl:text>outline-subtotals-bottom</xsl:text>
                   </xsl:when>
                   <xsl:otherwise>
@@ -857,6 +945,7 @@
 
   <!-- put empty field after Row Label or Column Label-->
   <xsl:template name="InsertEmptyDataPilotField">
+    <xsl:param name="orientation"/>
 
     <table:data-pilot-field table:source-field-name="">
 
@@ -865,7 +954,9 @@
       </xsl:attribute>
 
       <xsl:attribute name="table:orientation">
-        <xsl:choose>
+        
+        <xsl:value-of select="$orientation"/>
+        <!--xsl:choose>
 
           <xsl:when test="@axis = 'axisPage' ">
             <xsl:text>row</xsl:text>
@@ -879,7 +970,7 @@
             <xsl:text>column</xsl:text>
           </xsl:when>
 
-        </xsl:choose>
+        </xsl:choose-->
       </xsl:attribute>
 
       <xsl:attribute name="table:used-hierarchy">
