@@ -222,7 +222,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
                             Microsoft.Office.Interop.Excel.Workbook wb =
-                                this.applicationObject.Workbooks.Open((string)fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+                                this.applicationObject.Workbooks.Open((string)fileName, missing, readOnly , missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
 
                             wb.Activate();
 

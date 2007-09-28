@@ -361,7 +361,7 @@ namespace OdfExcel2003Addin
                             try
                             {
                                 Microsoft.Office.Interop.Excel.Workbook wb =
-                                    this.applicationObject.Workbooks.Open((string)fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+                                    this.applicationObject.Workbooks.Open((string)fileName, missing, readOnly, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
 
                                 wb.Activate();
                             }
