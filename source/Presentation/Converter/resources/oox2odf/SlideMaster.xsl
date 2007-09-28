@@ -2398,7 +2398,13 @@ Copyright (c) 2007, Sonata Software Limited
                                       <xsl:attribute name ="text:style-name">
                                         <xsl:value-of select ="concat($ParaId,position())"/>
                                       </xsl:attribute>
+                          <xsl:variable name="FlagFtrText">
+                            <xsl:if test ="a:r//a:t">
+                              <xsl:value-of select="'1'"/>
+                            </xsl:if>
+                          </xsl:variable>
                                       <xsl:for-each select ="node()">
+
                                         <xsl:if test ="name()='a:r'">
                                           <text:span>
                                             <xsl:attribute name="text:style-name">
@@ -2470,8 +2476,7 @@ Copyright (c) 2007, Sonata Software Limited
                                         <xsl:if test ="name()='a:br'">
                                           <text:line-break/>
                                         </xsl:if>
-                                        <xsl:if test="name()='a:endParaRPr'">
-
+                            <xsl:if test="name()='a:endParaRPr' and not(contains($FlagFtrText,'1'))">
                                           <presentation:footer />
                                           <!--<text:span>
                                             <xsl:attribute name="text:style-name">
@@ -4117,6 +4122,11 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="blnSubTitle"/>
     <xsl:for-each select=".">
     <xsl:choose>
+      <xsl:when test ="p:spPr/a:noFill">
+        <xsl:attribute name ="draw:fill">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+      </xsl:when>
       <xsl:when test="./p:spPr/a:solidFill/a:srgbClr">
         <xsl:attribute name ="draw:fill-color">
           <xsl:value-of select ="concat('#',./p:spPr/a:solidFill/a:srgbClr/@val)"/>
@@ -4151,6 +4161,93 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:attribute name="draw:fill">
           <xsl:value-of select="'solid'"/>
         </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="p:spPr/a:gradFill">
+        <xsl:for-each select="p:spPr/a:gradFill/a:gsLst/child::node()[1]">
+          <xsl:if test="name()='a:gs'">
+            <xsl:choose>
+              <xsl:when test="a:srgbClr/@val">
+                <xsl:attribute name="draw:fill-color">
+                  <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+                </xsl:attribute>
+                <xsl:attribute name="draw:fill">
+                  <xsl:value-of select="'solid'"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="a:schemeClr/@val">
+                <xsl:attribute name="draw:fill-color">
+                  <xsl:call-template name="getColorCode">
+                    <xsl:with-param name="color">
+                      <xsl:value-of select="a:schemeClr/@val" />
+                    </xsl:with-param>
+                    <xsl:with-param name="lumMod">
+                      <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
+                    </xsl:with-param>
+                    <xsl:with-param name="lumOff">
+                      <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:attribute>
+                <xsl:attribute name="draw:fill">
+                  <xsl:value-of select="'solid'"/>
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+              <xsl:when test="a:srgbClr/a:alpha/@val">
+                <xsl:variable name ="opacity">
+                  <xsl:value-of select ="a:srgbClr/a:alpha/@val"/>
+                </xsl:variable>
+                <xsl:if test="($opacity != '') or ($opacity != 0)">
+                  <xsl:attribute name ="draw:opacity">
+                    <xsl:value-of select="concat(($opacity div 1000), '%')"/>
+                  </xsl:attribute>
+                </xsl:if>
+              </xsl:when>
+              <xsl:when test="a:schemeClr/a:alpha/@val">
+                <xsl:variable name ="opacity">
+                  <xsl:value-of select ="a:schemeClr/a:alpha/@val"/>
+                </xsl:variable>
+                <xsl:if test="($opacity != '') or ($opacity != 0)">
+                  <xsl:attribute name ="draw:opacity">
+                    <xsl:value-of select="concat(($opacity div 1000), '%')"/>
+                  </xsl:attribute>
+                </xsl:if>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:when>
+      <!--Fill refernce-->
+      <xsl:when test ="p:style/a:fillRef">
+        <!-- Standard color-->
+        <xsl:if test ="p:style/a:fillRef/a:srgbClr/@val">
+          <xsl:attribute name ="draw:fill">
+            <xsl:value-of select="'solid'" />
+          </xsl:attribute>
+          <xsl:attribute name ="draw:fill-color">
+            <xsl:value-of select="concat('#',p:style/a:fillRef/a:srgbClr/@val)"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!--Theme color-->
+        <xsl:if test ="p:style/a:fillRef//a:schemeClr/@val">
+          <xsl:attribute name ="draw:fill">
+            <xsl:value-of select="'solid'" />
+          </xsl:attribute>
+          <xsl:attribute name ="draw:fill-color">
+            <xsl:call-template name ="getColorCode">
+              <xsl:with-param name ="color">
+                <xsl:value-of select="p:style/a:fillRef/a:schemeClr/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumMod">
+                <xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumOff">
+                <xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="draw:fill">

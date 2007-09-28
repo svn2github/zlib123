@@ -55,6 +55,7 @@ exclude-result-prefixes="p a r xlink rels">
   <xsl:strip-space elements="*"/>
   <!--main document-->
   <xsl:template name="content">
+    <xsl:message terminate="no">progress:a:p</xsl:message>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
     <office:document-content>
       <office:automatic-styles>
@@ -777,6 +778,7 @@ exclude-result-prefixes="p a r xlink rels">
 <xsl:param name ="SlideFile"/>
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
       <draw:page>
+        <xsl:message terminate="no">progress:a:p</xsl:message>
         <!--added by vipul to link each slides with slide Master-->
         <!--Start-->
         <xsl:attribute name="draw:master-page-name">
@@ -825,7 +827,9 @@ exclude-result-prefixes="p a r xlink rels">
   <xsl:template name ="DrawFrames">
 	 <xsl:param name ="SlideFile"/>
 	 <xsl:param name ="slideId"/>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
       <xsl:for-each  select="document('ppt/_rels/presentation.xml.rels')">
+        <xsl:message terminate="no">progress:a:p</xsl:message>
       <!-- added by vipul-->
       <!-- start-->
       <xsl:variable name="SlidePos" select="substring-after(substring-before($SlideFile,'.xml'),'slide')"/>
@@ -861,6 +865,7 @@ exclude-result-prefixes="p a r xlink rels">
       </xsl:variable>
       <xsl:for-each select="document($LayoutFileNoo)/p:sldLayout/p:cSld/p:spTree">
          <xsl:for-each select="node()">
+           <xsl:message terminate="no">progress:a:p</xsl:message>
           <xsl:choose>
             <xsl:when test="name()='p:pic'">
               <!-- warn, layouts to slide mapping-->
@@ -874,6 +879,7 @@ exclude-result-prefixes="p a r xlink rels">
             <xsl:when test="name()='p:sp'">
               <!-- warn, layouts to slide mapping-->
               <xsl:message terminate="no">translation.oox2odf.layoutsToSlideMappingTypeShapes</xsl:message>
+              <xsl:message terminate="no">progress:a:p</xsl:message>
               <xsl:variable name="var_pos" select="position()"/>
               <xsl:for-each select=".">
                 <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph)">
@@ -921,6 +927,7 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:for-each select="document(concat('ppt/',$slideNo))/p:sld/p:cSld/p:spTree">
        
         <xsl:for-each select="node()">
+          <xsl:message terminate="no">progress:a:p</xsl:message>
           <xsl:choose>
             <xsl:when test="name()='p:pic'">
               <xsl:for-each select=".">
@@ -2125,6 +2132,7 @@ exclude-result-prefixes="p a r xlink rels">
 				<xsl:value-of  select ="$drawAnimId"/>
 			  </xsl:attribute>
           <xsl:for-each select="node()">
+            <xsl:message terminate="no">progress:a:p</xsl:message>
            <xsl:choose>
             <xsl:when test="name()='p:pic'">
               <xsl:for-each select=".">
@@ -2686,14 +2694,30 @@ exclude-result-prefixes="p a r xlink rels">
                                 </xsl:for-each>
                               </xsl:attribute>
                             </xsl:when>
-                            <xsl:when test ="a:cs/@typeface">
+                            <xsl:when test ="a:rPr/a:cs/@typeface">
                               <xsl:attribute name ="fo:font-family">
-                                <xsl:value-of select ="a:cs/@typeface"/>
+                                <xsl:variable name ="typeFaceVal" select ="a:rPr/a:cs/@typeface"/>
+                                <xsl:for-each select ="a:rPr/a:cs/@typeface">
+                                  <xsl:if test ="$typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs'">
+                                    <xsl:value-of  select ="$DefFont"/>
+                                  </xsl:if>
+                                  <xsl:if test ="not($typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs')">
+                                    <xsl:value-of select ="."/>
+                                  </xsl:if>
+                                </xsl:for-each>
                               </xsl:attribute>
                             </xsl:when>
-                            <xsl:when test ="a:sym/@typeface">
+                            <xsl:when test ="a:rPr/a:sym/@typeface">
                               <xsl:attribute name ="fo:font-family">
-                                <xsl:value-of select ="a:sym/@typeface"/>
+                                <xsl:variable name ="typeFaceVal" select ="a:rPr/a:sym/@typeface"/>
+                                <xsl:for-each select ="a:rPr/a:sym/@typeface">
+                                  <xsl:if test ="$typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym'">
+                                    <xsl:value-of  select ="$DefFont"/>
+                                  </xsl:if>
+                                  <xsl:if test ="not($typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym')">
+                                    <xsl:value-of select ="."/>
+                                  </xsl:if>
+                                </xsl:for-each>
                               </xsl:attribute>
                             </xsl:when>
                             <xsl:when test ="not(a:latin/@typeface) and not(a:cs/@typeface) and not(a:sym/@typeface) ">
@@ -3200,6 +3224,7 @@ exclude-result-prefixes="p a r xlink rels">
   </xsl:template>
   <xsl:template name ="textSpacingProp">
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+      <xsl:message terminate="no">progress:a:p</xsl:message>
       <!-- Added by vipul-->
       <!--Start-->
       <xsl:variable name="SlidePos" select="position()"/>
@@ -9028,7 +9053,7 @@ exclude-result-prefixes="p a r xlink rels">
       </xsl:if>
     </xsl:if>
     <xsl:choose>
-      <xsl:when test ="not(a:pPr/a:spcBef/a:spcPct/@val) or not(a:pPr/a:spcBef/a:spcPts/@val)">
+      <xsl:when test ="not(a:pPr/a:spcBef/a:spcPct/@val) and not(a:pPr/a:spcBef/a:spcPts/@val)">
         <xsl:variable name="var_MaxFntSize">
           <xsl:for-each select="./a:r/a:rPr/@sz">
             <xsl:sort data-type="number" order="descending"/>
@@ -9130,7 +9155,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:if>
       </xsl:when>
 
-      <xsl:when test ="not(a:pPr/a:spcAft/a:spcPct/@val) or not(a:pPr/a:spcAft/a:spcPts/@val)">
+      <xsl:when test ="not(a:pPr/a:spcAft/a:spcPct/@val) and not(a:pPr/a:spcAft/a:spcPts/@val)">
         <xsl:variable name="var_MaxFntSize">
           <xsl:for-each select="./a:r/a:rPr/@sz">
             <xsl:sort data-type="number" order="descending"/>

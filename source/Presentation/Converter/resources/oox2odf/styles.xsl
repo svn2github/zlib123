@@ -71,6 +71,7 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:variable>
 	
 	<xsl:template name="styles">
+    <xsl:message terminate="no">progress:a:p</xsl:message>
 		<office:document-styles>
 			<office:font-face-decls>
 			</office:font-face-decls>
@@ -81,6 +82,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:call-template name="InsertShapeStyles"/>
 				<xsl:call-template name ="InsertLayoutStyle"/>
         <xsl:for-each select="document('ppt/presentation.xml')//p:sldMasterIdLst/p:sldMasterId">
+          <xsl:message terminate="no">progress:a:p</xsl:message>
           <xsl:variable name="sldMasterIdRelation">
             <xsl:value-of select="@r:id"></xsl:value-of>
           </xsl:variable>
@@ -251,6 +253,7 @@ Copyright (c) 2007, Sonata Software Limited
   <!-- Notes Size-->
   <xsl:template name="NotesMasterSlideSize">
     <xsl:for-each select ="document('ppt/presentation.xml')//p:presentation/p:notesSz">
+      <xsl:message terminate="no">progress:a:p</xsl:message>
       <style:page-layout style:name="PMNotes">
         <style:page-layout-properties 
 				 fo:margin-top="0cm" 

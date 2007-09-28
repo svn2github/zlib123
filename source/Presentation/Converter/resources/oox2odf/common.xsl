@@ -82,6 +82,7 @@ exclude-result-prefixes="p a r xlink ">
 	<!-- Get line styles for shape -->
 	<xsl:template name ="tmpLineStyle">
     <xsl:param name="ThemeName"/>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
 		<!-- Line width-->
 		<xsl:for-each select ="p:spPr">
 			<xsl:if test ="a:ln/@w">
@@ -325,6 +326,7 @@ exclude-result-prefixes="p a r xlink ">
 		<xsl:param name="color"/>
 		<xsl:param name ="lumMod"/>
 		<xsl:param name ="lumOff"/>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
 		<xsl:message terminate="no">progress:p:cSld</xsl:message>
 		<xsl:variable name ="ThemeColor">
 			<xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
@@ -714,6 +716,7 @@ exclude-result-prefixes="p a r xlink ">
   <!-- Added by Vipul-->
   <!--Start-->
   <xsl:template name="tmpWriteCordinates">
+    <xsl:message terminate="no">progress:a:p</xsl:message>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:for-each select ="p:spPr/a:xfrm">
       <xsl:choose>
@@ -1150,12 +1153,28 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:when>
       <xsl:when test ="a:rPr/a:cs/@typeface">
         <xsl:attribute name ="fo:font-family">
-          <xsl:value-of select ="a:rPr/a:cs/@typeface"/>
+          <xsl:variable name ="typeFaceVal" select ="a:rPr/a:cs/@typeface"/>
+          <xsl:for-each select ="a:rPr/a:cs/@typeface">
+            <xsl:if test ="$typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs'">
+              <xsl:value-of  select ="$DefFont"/>
+            </xsl:if>
+            <xsl:if test ="not($typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs')">
+              <xsl:value-of select ="."/>
+            </xsl:if>
+          </xsl:for-each>
         </xsl:attribute >
       </xsl:when>
       <xsl:when test ="a:rPr/a:sym/@typeface">
         <xsl:attribute name ="fo:font-family">
-          <xsl:value-of select ="a:rPr/a:sym/@typeface"/>
+          <xsl:variable name ="typeFaceVal" select ="a:rPr/a:sym/@typeface"/>
+          <xsl:for-each select ="a:rPr/a:sym/@typeface">
+            <xsl:if test ="$typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym'">
+              <xsl:value-of  select ="$DefFont"/>
+            </xsl:if>
+            <xsl:if test ="not($typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym')">
+              <xsl:value-of select ="."/>
+            </xsl:if>
+          </xsl:for-each>
         </xsl:attribute >
       </xsl:when>
     </xsl:choose>
@@ -1320,6 +1339,7 @@ exclude-result-prefixes="p a r xlink ">
   <xsl:template name="tmpSlideGrahicProp">
     <xsl:param name="ThemeName"/>
 	  <xsl:message terminate="no">progress:p:cSld</xsl:message>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
     <!--Background Fill color-->
     <xsl:choose>
       <!-- No fill -->
@@ -2039,6 +2059,7 @@ exclude-result-prefixes="p a r xlink ">
     
     <xsl:variable name ="slideRel" select ="concat('ppt/slides/_rels/',$TypeId,'.xml.rels')"/>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
     <xsl:for-each select ="./p:txBody">
       <xsl:variable name="var_fontScale">
         <xsl:if test="./a:bodyPr/a:normAutofit/@fontScale">
@@ -2175,12 +2196,28 @@ exclude-result-prefixes="p a r xlink ">
                   </xsl:when>
                   <xsl:when test ="a:cs/@typeface">
                     <xsl:attribute name ="fo:font-family">
-                      <xsl:value-of select ="a:cs/@typeface"/>
+                      <xsl:variable name ="typeFaceVal" select ="a:cs/@typeface"/>
+                      <xsl:for-each select ="a:cs/@typeface">
+                        <xsl:if test ="$typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs'">
+                          <xsl:value-of select ="$DefFont"/>
+                        </xsl:if>
+                        <xsl:if test ="not($typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs')">
+                          <xsl:value-of select ="."/>
+                        </xsl:if>
+                      </xsl:for-each>
                     </xsl:attribute>
                   </xsl:when>
                   <xsl:when test ="a:sym/@typeface">
                     <xsl:attribute name ="fo:font-family">
-                      <xsl:value-of select ="a:sym/@typeface"/>
+                      <xsl:variable name ="typeFaceVal" select ="a:sym/@typeface"/>
+                      <xsl:for-each select ="a:sym/@typeface">
+                        <xsl:if test ="$typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym'">
+                          <xsl:value-of select ="$DefFont"/>
+                        </xsl:if>
+                        <xsl:if test ="not($typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym')">
+                          <xsl:value-of select ="."/>
+                        </xsl:if>
+                      </xsl:for-each>
                     </xsl:attribute>
                   </xsl:when>
                   <xsl:when test ="not(a:latin/@typeface) and not(a:cs/@typeface) and not(a:sym/@typeface) ">
@@ -2511,6 +2548,7 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:param name="DefFont"/>
     <xsl:param name="SMName"/>
     <xsl:message terminate="no">progress:p:cSld</xsl:message>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
     <xsl:variable name ="nodeName">
       <xsl:value-of select ="concat('a:lvl',$level,'pPr')"/>
     </xsl:variable>
@@ -2528,7 +2566,7 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:for-each>
       </xsl:if>
     </xsl:if>
-    <xsl:if test ="not(a:rPr/a:latin/@typeface)">
+    <xsl:if test ="not(a:rPr/a:latin/@typeface) and not(a:rPr/a:cs/@typeface) and not(a:rPr/a:sym/@typeface)">
       <xsl:if test="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:otherStyle/a:lvl1pPr/a:defRPr/a:latin/@typeface">
         <xsl:attribute name ="fo:font-family">
           <xsl:variable name ="typeFaceVal" select ="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:otherStyle/a:lvl1pPr/a:defRPr/a:latin/@typeface"/>
