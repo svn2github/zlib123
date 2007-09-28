@@ -117,79 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>打开 ODF...</value>
+  <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
+    <value>Excel 不支持数据验证中的单元格范围条件。</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>打开开放文档格式（ODF）文件。</value>
+  <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
+    <value>Excel 不支持数据验证中的错误宏警报。sprawdzania poprawności danych.</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
-    <value>另存为 ODF...</value>
+  <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
+    <value>Excel 仅支持 256 个字符或以下的页眉/页脚字符串（含格式）。任何 256 个字符以外者都将丢失。</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>用开放文档格式（ODF）保存该文档的副本。</value>
+  <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
+    <value>Excel 不支持方案边框颜色</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+  <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
+    <value>Excel 不支持季度日期格式。日期格式将被改变成年。</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>遇到意外错误。过项目网站（http://odf-converter.sourceforge.net）提交错误报告（可附加文件）。</value>
+  <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
+    <value>由于 Excel 不支持某些数据筛选器，因此不得不删除它们</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>全部文件</value>
+  <data name="translation.odf2oox.ScenarioNumber" xml:space="preserve">
+    <value>方案单元格太多。Excel 仅支持 32 个方案单元格</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument 文本文件</value>
+  <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
+    <value>Excel 不允许工作表名称超过 31 个字符。禁止字符 *\/[]:";? 以及 31 个字符以外者都将丢失。</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>对不起，尚未实现此功能</value>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Open Office Calc 仅支持 IV 列。任何超出 IV 列者都将永久丢失</value>
   </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
-    <value>正在转换 %1...</value>
+  <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
+    <value>无法转换数据合并</value>
   </data>
-  <data name="FeedbackLabel" xml:space="preserve">
-    <value>在转换过程中丢失某些元素。 如要查看可能丢失元素的列表，单击“详细信息”。</value>
+  <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
+    <value>在需重复的页眉栏内有一个以上手动分栏符。仅显示一个。</value>
   </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>此加载项的当前版本未实现此功能。</value>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>Open Office Calc 仅支持作为文件链接实现的 OLEObject。</value>
   </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>此文档受密码保护。</value>
+  <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>由于 Calc 不支持某些数据筛选器，因此不得不删除它们</value>
   </data>
-  <data name="PossiblyEncryptedDocument" xml:space="preserve">
-    <value>无法打开此 ZIP 存档。您的文档是否未加密。</value>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>Open Office Calc 仅支持 65536 行。任何超出 65536 行者都将永久丢失</value>
   </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>如果您认为这是一份有效的 ODF 文档，您应该通过项目网站（http://odf-converter.sourceforge.net）提交错误报告，并附上您的文件。</value>
-  </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>此文档看似并非有效的 OASIS OpenDocument 文件。</value>
-  </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Office 2007 文件转换器未安装：ODF 转换无法执行。</value>
-  </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>转换失败，请先尝试以 Word 2007 格式保存该文档。</value>
-  </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>请保存您的文档，然后再导出成 ODF</value>
-  </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
-    <value>ODF 转换器</value>
-  </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>无法创建目标文件：检查路径是否正确，文件是否正被另一个应用程序使用。</value>
-  </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>无法创建目标文件</value>
-  </data>
-  <data name="OdfConversionCanceled" xml:space="preserve">
-    <value>转换被用户取消</value>
-  </data>
-  <data name="CorruptedInputFileDetail" xml:space="preserve">
-    <value>如果您认为这是一份有效的 ODF 文档，您应该通过项目网站（http://odf-converter.sourceforge.net）提交错误报告，并附上您的文件。</value>
-  </data>
-  <data name="CorruptedInputFileLabel" xml:space="preserve">
-    <value>此文档好像为已损坏的 OASIS OpenDocument 文件。</value>
+  <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
+    <value>Open Office Calc 仅支持 256 张数据表。任何超出 256 张表者都将永久丢失</value>
   </data>
 </root>

@@ -117,68 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>Open ODF</value>
+  <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
+    <value>Excel ondersteunt geen celbereikcriteria in gegevensvalidatie.</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>Open een Open Document Format (ODF) bestand.</value>
+  <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
+    <value>Excel ondersteunt geen foutmelding voor macro's in gegevensvalidatie.sprawdzania poprawności danych.</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
-    <value>Opslaan als ODF</value>
+  <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
+    <value>Excel ondersteunt slechts 256 tekens in kop-/voettekst (met opmaak). Alleen de eerste 256 tekens worden bewaard.</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>Bewaar een kopie van het document met Open Document Format (ODF).</value>
+  <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
+    <value>Excel ondersteunt geen randkleuren voor scenario's.</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF</value>
+  <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
+    <value>Excel ondersteunt geen datumindeling met kwartalen. De datumindeling wordt gewijzigd in jaren.</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>Een onverwachte fout is opgetreden. U kunt gerust een bug-rapport invullen op de projectwebsite (http://odf-converter.sourceforge.net) met uw bestand als bijlage.</value>
+  <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
+    <value>Sommige gegevensfilters moesten worden verwijderd omdat Excel ze niet ondersteunt.</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>Alle bestanden</value>
+  <data name="translation.odf2oox.ScenarioNumber" xml:space="preserve">
+    <value>Te veel scenariocellen. Excel ondersteunt slechts 32 scenariocellen.</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument tekstbestanden</value>
+  <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
+    <value>Excel ondersteunt geen bladnamen van meer dan 31 tekens. Niet-toegestane tekens *\/[]:";? en tekens die het aantal van 31 overschrijden, gaan verloren.</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>Sorry, deze functie is nog niet geïmplementeerd</value>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Open Office Calc ondersteunt slechts kolommen tot IV. Alleen de kolommen tot en met IV worden bewaard.</value>
   </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
-    <value>Converteren %1...</value>
+  <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
+    <value>Gegevensconsolidatie kan niet worden geconverteerd.</value>
   </data>
-  <data name="FeedbackLabel" xml:space="preserve">
-    <value>Sommige elementen kunnen verloren geraakt zijn tijdens de transformatie. Om een lijst te zien met de mogelijk verloren elementen, klik op "Details".</value>
+  <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
+    <value>Er is meer dan één handmatig kolomeinde binnen kopkolommen. Er wordt slechts één einde getoond.</value>
   </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>Deze functie is niet geïmplementeerd door de huidige versie van de add-in.</value>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>Open Office Calc ondersteunt alleen OLEObject als koppeling naar bestand.</value>
   </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>Dit document is beschermd met een wachtwoord.</value>
+  <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>Sommige gegevensfilters moesten worden verwijderd omdat Calc ze niet ondersteunt.</value>
   </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>Als u denkt dat dit een geldig ODF-document is, dient u een bug-rapport in te vullen op de projectwebsite (http://odf-converter.sourceforge.net) met uw bestand in bijlage.</value>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>Open Office Calc ondersteunt slechts 65536 rijen. Alleen de eerste 65536 rijen worden bewaard.</value>
   </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>Dit document lijkt geen geldig OASIS OpenDocument-bestand te zijn.</value>
+  <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
+    <value>Open Office Calc ondersteunt slechts 256 bladen. Alleen de eerste 256 bladen worden bewaard.</value>
   </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Office 2007 File converters zijn niet geïnstalleerd: de ODF-conversie werkt niet zonder.</value>
-  </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>Conversie mislukt, gelieve het document eerst op te slaan in Word 2007-formaat.</value>
-  </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>Gelieve uw document op te slaan vooraleer het naar ODF te exporteren</value>
-  </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
-    <value>ODF Converter</value>
-  </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>Het doelbestand kan niet aangemaakt worden: controleer of het pad correct is en of het bestand niet gebruikt wordt door een andere toepassing.</value>
-  </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>Het doelbestand kan niet aangemaakt worden</value>
-  </data>
-  
 </root>

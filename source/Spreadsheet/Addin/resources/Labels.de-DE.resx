@@ -11,7 +11,7 @@
     associated with the data types.
     
     Example:
-
+    
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -117,68 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>ODF Dateien öffnen</value>
+  <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
+    <value>Bei der Datenüberprüfung werden die Zellbereichskritieren von Excel nicht unterstützt.</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>Dateien im OpenDocument Format (ODF) öffnen.</value>
+  <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
+    <value>Bei der Datenüberprüfung werden die Makrowarnungen von Excel nicht unterstützt.</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
-    <value>Speichern als ODF</value>
+  <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
+    <value>Excel unterstützt in Kopf-/Fußzeilen nur 256 Zeichen (mit Formatierung). Alle Zeichen, die darüberhinausgehen, gehen verloren.</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>Eine Kopie des Dokumentes im OpenDocument Format (ODF) erstellen.</value>
+  <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
+    <value>Rahmenfarben für Szenarios werden von Excel nicht unterstützt.</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF</value>
+  <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
+    <value>Datumsformate für Quartale werden von Excel nicht unterstützt. Das Datumsformat wird in das Jahresformat geändert.</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden.</value>
+  <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
+    <value>Einige Datenfilter mussten entfernt werden, da diese von Excel nicht unterstützt werden.</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>Alle Dateien</value>
+  <data name="translation.odf2oox.ScenarioNumber" xml:space="preserve">
+    <value>Zu viele Szenariozellen. Excel unterstützt nur 32 Szenariozellen.</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument Text Dateien</value>
+  <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
+    <value>Excel lässt Arbeitsblattnamen, die aus mehr als 31 Zeichen bestehen, nicht zu. Unzulässige Zeichen (*\/[]:";?) und Zeichen, die über 31 Zeichen hinausgehen, gehen verloren.</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>Dieses Feature ist noch nicht implementiert.</value>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Open Office Calc unterstützt nur bis zu IV Spalten. Alle Spalten, die darüberhinausgehen, gehen unwiderruflich verloren.</value>
   </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
-    <value>%1 wird übersetzt.</value>
+  <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
+    <value>Die Datenkonsolidierung kann nicht konvertiert werden.</value>
   </data>
-  <data name="FeedbackLabel" xml:space="preserve">
-    <value>Einige Elemente können durch die Übersetzung verloren gegangen sein. Klicken Sie auf "Details", um eine Liste von möglicherweise verlorenen Elementen zu sehen.</value>
+  <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
+    <value>In der Kopfzeilenspalte sind mehrere manuelle Spaltenumbrüche zum Wiederholen vorhanden. Nur ein Umbruch ist sichtbar.</value>
   </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>Dieses Feature wird von der aktuellen Version des Add-Ins nicht unterstützt.</value>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>Open Office Calc unterstützt OLEObject nur, wenn dieses als Link in die Datei implementiert ist.</value>
   </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>Das Dokument ist mit einem Passwort geschützt.</value>
+  <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>Einige Datenfilter mussten entfernt werden, da diese von Calc nicht unterstützt werden.</value>
   </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>Falls Sie ein valides ODF Dokument konvertieren wollten, melden Sie bitte den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net)</value>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>Open Office Calc unterstützt nur 65536 Zeilen. Alle Zeilen, die darüberhinausgehen, gehen unwiderruflich verloren.</value>
   </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>Das Dokument scheint keine valide OASIS OpenDocument Datei zu sein.</value>
+  <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
+    <value>Open Office Calc unterstützt nur 256 Arbeitsblätter. Alle Arbeitsblätter, die darüberhinausgehen, gehen unwiderruflich verloren.</value>
   </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Der Konverter für das Word 2007 Dateiformat ist nicht installiert. Der ODF Übersetzer benötigt diesen Konverter.</value>
-  </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>Die Übersetzung hat nicht funktioniert; bitte speichern Sie das Dokument zuerst als Word 2007 Datei (.DOCX).</value>
-  </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>Bitte speichern Sie das Dokument, bevor Sie es nach ODF übersetzen.</value>
-  </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
-    <value>ODF Übersetzer</value>
-  </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>Die Datei kann nicht angelegt werden. Überprüfen Sie, ob der Pfad korrekt ist und ob die Datei nicht von einer anderen Anwendung benutzt wird.</value>
-  </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>Die Datei kann nicht angelegt werden</value>
-  </data>
-  
 </root>

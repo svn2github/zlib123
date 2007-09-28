@@ -117,72 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>Ouvrir un fichier ODF...</value>
+  <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
+    <value>Excel ne prend pas en charge les critères de plage de cellules lors de la validation des données.</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>Ouvrir un fichier au format OpenDocument (ODF).</value>
+  <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
+    <value>Excel ne prend pas en charge les alertes de macros d’erreur lors de la validation des données.</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
-    <value>Enregistrer au format ODF...</value>
+  <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
+    <value>Excel ne prend en charge que 256 caractères dans les chaînes d’en tête/de pied de page (avec mise en forme). Tout caractère au-delà de la limite de 256 caractères sera perdu.</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>Enregistrer une copie du document dans le format OpenDocument (ODF).</value>
+  <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
+    <value>Excel ne prend pas en charge les couleurs de bordure pour les scénarios.</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+  <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
+    <value>Excel ne prend pas en charge le format de date trimestriel. Le format de date sera remplacé par le format annuel.</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
+  <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
+    <value>Certains filtres de données ont du être supprimés car ils ne sont pas pris en charge par Excel.</value>
   </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>Ce document ne semble pas être un fichier OASIS  OpenDocument valide.</value>
+  <data name="translation.odf2oox.ScenarioNumber" xml:space="preserve">
+    <value>Trop de cellules de scénario. Excel ne prend en charge que 32 cellules de scénario.</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>Tous les fichiers</value>
+  <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
+    <value>Les noms de feuilles Excel ne peuvent pas contenir plus de 31 caractères. Les caractères non valides *\/[]:";? et les caractères au-delà de la limite de 31 caractères seront perdus.</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>Fichiers textes OpenDocument</value>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Seules les colonnes I à IV sont prises en charge par la Calculatrice Open Office. Toute colonne au-delà de la colonne IV sera définitivement perdue.</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>Désolé, cette fonctionnalité n'est pas implémentée.</value>
+  <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
+    <value>Impossible de convertir les données consolidées.</value>
   </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
-    <value>Conversion de %1...</value>
+  <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
+    <value>Plus d’un saut de colonne manuel doit être inséré dans les colonnes d’en-tête. Seul l’un deux sera visible.</value>
   </data>
-  <data name="FeedbackLabel" xml:space="preserve">
-    <value>Certains éléments ont pu être perdus durant la transformation. Pour voir la liste de ces éléments, cliquez sur "Détails".</value>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>La Calculatrice Open Office ne prend en charge que les objets OLEObject implémentés en tant que liens vers des fichiers.</value>
   </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>Cette fonctionnalité n'est pas implémentée dans la version actuelle du plug-in.</value>
+  <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>Certains filtres de données ont du être supprimés car ils ne sont pas pris en charge par la Calculatrice.</value>
   </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>Le document est protégé par un mot de passe.</value>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>La Calculatrice Open Office ne prend en charge que 65536 lignes. Toute ligne au-delà de la limite de 65536 lignes sera définitivement perdue.</value>
   </data>
-  <data name="PossiblyEncryptedDocument" xml:space="preserve">
-    <value>L'archive ZIP ne peut être ouverte. Verifiez que le document n'est pas encrypté.</value>
+  <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
+    <value>La Calculatrice Open Office ne prend en charge que 256 feuilles. Toute feuille au-delà de la limite de 256 feuilles sera définitivement perdue.</value>
   </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>Si vous pensez que ce document est un document ODF valide, vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
-  </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>La prise en charge des formats Office 2007 n'est pas installée et elle est indispensable pour les conversions ODF</value>
-  </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>Une erreur est survenue pendant la conversion. Essayez de sauvegarder votre document au format Word 2007 avant de lancer l'export vers ODF</value>
-  </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>Sauvegardez votre document avant de lancer l'export vers ODF</value>
-  </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
-    <value>Convertisseur ODF</value>
-  </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>Impossible de créer le fichier cible</value>
-  </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>Impossible de créer le fichier cible : vérifiez que le chemin est correct et que le fichier n'est
-pas en cours d'utilisation par une autre application.</value>
-  </data>
-  
 </root>

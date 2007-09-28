@@ -117,79 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>ODF を開く...</value>
+  <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
+    <value>Excel はデータの入力規則でセル範囲の条件をサポートしていませExcel はデータの入力規則でセル範囲の条件をサポートしていません。</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>OpenDocument 形式 (ODF) のファイルを開きます。</value>
+  <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
+    <value>Excel はデータの入力規則でエラー マクロのアラートをサポートしていません。</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
-    <value>ODF として保存...</value>
+  <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
+    <value>Excel のヘッダー/フッターの文字列には、256 文字までしか入力できません (書式設定を含む)。256 文字を超えた場合、超過した文字は失われます。nagłówka/stopki (wraz z formatowaniem). Wszystkie znaki powyżej 256 zostaną utracone.</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>ドキュメントのコピーを OpenDocument 形式 (ODF) で保存します。</value>
+  <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
+    <value>Excel はシナリオの罫線の色はサポートしていません。</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+  <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
+    <value>Excel は四半期形式の日付はサポートしていません。日付の形式は、年に変更されます。</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>予期しないエラーが発生しました。プロジェクト Web サイト (http://odf-converter.sourceforge.net) のバグ レポートに必要事項を入力し、ファイルを添付してください。</value>
+  <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
+    <value>Excel がサポートしていないデータ フィルタは削除されます。</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>すべてのファイル</value>
+  <data name="translation.odf2oox.ScenarioNumber" xml:space="preserve">
+    <value>シナリオのセルが多すぎます。Excel のシナリオのセルは 32 個までしかサポートされていません。</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument テキスト ファイル</value>
+  <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
+    <value>Excel のシート名には、31 文字までしか使用できません。31 文字を超えた場合、超過した文字は失われます。また、*\/[]:";? は使用できません。</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>この機能はまだ実装されていません</value>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Open Office Calc は、IV までのセルしかサポートしていません。IV の後のセルは永久的に失われます。</value>
   </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
-    <value>%1 を変換しています...</value>
+  <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
+    <value>データ統合は変換できません。</value>
   </data>
-  <data name="FeedbackLabel" xml:space="preserve">
-    <value>いくつかの要素が変換中に失われた可能性があります。そのような要素の一覧を表示するには、[詳細] をクリックしてください。</value>
+  <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
+    <value>ヘッダー カラム内に、反復する手動のカラム改行が複数あります。表示できるのは 1 つだけです。</value>
   </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>この機能は、アドインの現在のバージョンで実装されません。</value>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>Open Office Calc の OLEObject の埋め込みは、[ファイルにリンク] のオプションのみをサポートしています。</value>
   </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>このドキュメントはパスワードで保護されています。</value>
+  <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>Calc がサポートしていないデータ フィルタは削除されます。</value>
   </data>
-  <data name="PossiblyEncryptedDocument" xml:space="preserve">
-    <value>ZIPアーカイブを開けません。ドキュメントが暗号化されていないか確認してください。</value>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>Open Office Calc は、65536 行までしかサポートしていません。65536 を超えた行は永久的に失われます。</value>
   </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>有効な ODF ドキュメントであると思われる場合は、プロジェクト Web サイト (http://odf-converter.sourceforge.net) のバグ レポートに必要事項を入力し、ファイルを添付してください。</value>
-  </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>このドキュメントは、有効な OASIS OpenDocument ファイルではありません。</value>
-  </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Office 2007 ファイル コンバータがインストールされていません。コンバータがないと ODF に変換できません。</value>
-  </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>変換に失敗しました。まず、ドキュメントを Word 2007 形式で保存してください。</value>
-  </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>ODF にエクスポートする前に、ドキュメントを保存してください</value>
-  </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
-    <value>ODF コンバータ</value>
-  </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>ターゲット ファイルを作成できません。パスが正しいこと、ファイルが他のアプリケーションで使用されていないことを確認してください。</value>
-  </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>ターゲット ファイルを作成できません</value>
-  </data>
-  <data name="OdfConversionCanceled" xml:space="preserve">
-    <value>変換がキャンセルされました。</value>
-  </data>
-  <data name="CorruptedInputFileDetail" xml:space="preserve">
-    <value>有効な ODF ドキュメントであると思われる場合は、プロジェクト Web サイト (http://odf-converter.sourceforge.net) のバグ レポートに必要事項を入力し、ファイルを添付してください。</value>
-  </data>
-  <data name="CorruptedInputFileLabel" xml:space="preserve">
-    <value>このドキュメントは、破損した OASIS OpenDocument ファイルです。</value>
+  <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
+    <value>Open Office Calc は、256 シートしかサポートしていません。256 シートを超えた場合、超過したシートは失われます。</value>
   </data>
 </root>
