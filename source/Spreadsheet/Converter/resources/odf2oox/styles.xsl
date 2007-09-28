@@ -526,7 +526,7 @@
 
     <xsl:variable name="styleFontsCount">
       <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
+        select="count(document('styles.xml')/office:document-styles/office:styles/style:style[(@style:family='table-cell' or @style:family='text') and not(@style:name='Default')]/style:text-properties)"
       />
     </xsl:variable>
 
@@ -1179,6 +1179,18 @@
           <xsl:text>1</xsl:text>
         </xsl:attribute>
 
+        <xsl:attribute name="ZMIENNA_contentFontsCount">
+          <xsl:value-of select="$contentFontsCount"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="ZMIENNA_styleFontsCount">
+          <xsl:value-of select="$styleFontsCount"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="ZMIENNA_hyperlinkId">
+          <xsl:value-of select="$hyperlinkId"/>
+        </xsl:attribute>
+        
         <xsl:attribute name="fontId">
           <xsl:choose>
             <xsl:when test="$hyperlink = 'true'">
@@ -2847,7 +2859,7 @@
 
         </xsl:when>
 
-        <xsl:otherwise> domyślny<xsl:apply-templates
+        <xsl:otherwise> <xsl:apply-templates
             select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default']"
             mode="cellFormats">
             <xsl:with-param name="numStyleCount">
