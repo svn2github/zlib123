@@ -326,17 +326,17 @@
               </xsl:attribute>
             </xsl:if>
             <xsl:variable name="styleCondition">
-              <xsl:value-of select="key('style', $styleName)/style:map/@style:condition"/>
+              <xsl:value-of select="@style:condition"/>
             </xsl:variable>
             <xsl:if test="contains($styleCondition, concat('cell-content()=', $quot))">
               <xsl:attribute name="type">
-                <xsl:value-of select="'containsText'"/>
+                <xsl:value-of select="'cellIs'"/>
               </xsl:attribute>
               <xsl:attribute name="text">
                 <xsl:value-of select="substring-after($styleCondition, '=')"/>
               </xsl:attribute>
               <xsl:attribute name="operator">
-                <xsl:value-of select="'containsText'"/>
+                <xsl:value-of select="'equal'"/>
               </xsl:attribute>
             </xsl:if>
             <xsl:if test="not(contains($styleCondition, concat('cell-content()=', $quot)))">
@@ -346,11 +346,7 @@
             </xsl:if>
             <xsl:if test="contains($styleCondition, concat('cell-content()=', $quot))">
               <formula>
-                <xsl:text>NOT(ISERROR(SEARCH(</xsl:text>
                 <xsl:value-of select="substring-after($styleCondition, '=')"/>
-                <xsl:text>,</xsl:text>
-                <xsl:value-of select="$cellName"/>
-                <xsl:text>)))</xsl:text>
               </formula>
             </xsl:if>
           </cfRule>
