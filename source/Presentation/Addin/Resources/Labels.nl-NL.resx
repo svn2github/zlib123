@@ -121,19 +121,19 @@
     <value>Alle lijneigenschappen in opmaak zijn gemapt naar dia.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
-    <value>Vorm Gebogen pijl geconverteerd naar Hoekpijl.</value>
+    <value>Vorm 'gebogen pijl' kan niet worden behouden en is geconverteerd naar 'hoekpijl'.</value>
   </data>
   <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
     <value>Aangepast opsommingsteken vervangen door eenvoudig opsommingsteken in masterdia.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
-    <value>Vorm 'Chord' geconverteerd naar 'Ellipse'.</value>
+    <value>Vorm 'akkoord' kan niet worden behouden en is geconverteerd naar 'ellips'.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
-    <value>Vorm Rechthoek met geknipte hoek geconverteerd naar vorm FlowChart(Card Flipped).</value>
+    <value>Vorm 'rechthoek met één geknipte hoek' kon niet worden behouden en is geconverteerd naar '(omgekeerd) stroomschema'</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
-    <value>Alleen eerste kleur geleidelijke vulling achtergrond geconverteerd in opmaak.</value>
+    <value>Alleen de eerste kleur van de achtergrond is geconverteerd in de opmaak.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsKiosk" xml:space="preserve">
     <value>Presentatietype 'Kiosk' niet compatibel, vervangen door standaardtype 'Volledig scherm'.</value>
@@ -157,7 +157,7 @@
     <value>Startvorm tijdens diavoorstelling kan niet worden behouden.</value>
   </data>
   <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
-    <value>Alleen eerste kleur van geleidelijke vulling graphic geconverteerd in dia.</value>
+    <value>Alleen de eerste kleur van de gelijdelijke grafische vulling is geconverteerd in de dia.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
     <value>Penkleur tijdens diavoorstelling kan niet worden behouden.</value>
@@ -175,7 +175,7 @@
     <value>10e niveau geconverteerd naar 9e (laatste) niveaulevel.</value>
   </data>
   <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
-    <value>Alleen eerste kleur geleidelijke vulling geconverteerd in dia.</value>
+    <value>Alleen de eerste kleur van de gelijdelijke vulling van de achtergrond is geconverteerd in de dia.</value>
   </data>
   <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
     <value>Miniaturen in handout-pagina die dia's weergeven waarvan de grootte niet kan worden aangepast. 
@@ -186,13 +186,13 @@ Oriëntatie handoutpagina niet gemapt.</value>
     <value>Vertraging bij presentatie van dia's in lussen tijdens diavoorstelling kan niet worden behouden.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
-    <value>Vorm Gebogen pijl (links, rechts, omhoog, omlaag) geconverteerd naar Ronde pijl.</value>
+    <value>Gesherpe gebogen pijl (links, rechts, omhoog, omlaag) kan niet worden behouden en is geconverteerd naar cirkelvormige pijl</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
-    <value>Eerste kleur voor de geleidelijke vulling graphic alleen geconverteerd in opmaak.</value>
+    <value>Alleen de eerste kleur van de gelijdelijke grafische vulling is geconverteerd in de opmaak.</value>
   </data>
   <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
-    <value>Eerste kleur van achtergrond geleidelijke vulling alleen geconverteerd in masterdia.</value>
+    <value>Alleen de eerste kleur van de gelijdelijke vulling van de achtergrond is geconverteerd in de diamaster.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTransitionOnClick" xml:space="preserve">
     <value>Overgang bij klikken tijdens diavoorstelling kan niet worden bewaard.</value>
@@ -219,7 +219,7 @@ Oriëntatie handoutpagina niet gemapt.</value>
     <value>Grootte niet aangepast van vorm Onder en boven uitgelijnde tekst met terugloop.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
-    <value>Vorm 'U-pijl' geconverteerd naarm 'Ronde pijl'.</value>
+    <value>Vorm 'u-pijl' kan niet worden behouden en is geconverteerd naar 'cirkelvormige pijl'.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
     <value>'Presenatie bovenliggend' tijdens diavoorstelling kan niet worden behouden.</value>
@@ -233,4 +233,7 @@ Oriëntatie handoutpagina niet gemapt.</value>
   <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
     <value>Diavoorstelling met commentaar tijdens diavoorstelling kan niet worden behouden.</value>
   </data>
-</root>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+  <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
+    <value>Koppelingen naar toepassingen werken alleen als de toepassingen zich bevinden in standaardmappen, bijv. WINDOWS, of in dezelfde map als de presentatie.</value>
+  </data>
+</root>

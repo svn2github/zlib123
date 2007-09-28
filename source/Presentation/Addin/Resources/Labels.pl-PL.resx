@@ -121,16 +121,16 @@
     <value>Wszystkie właściwości linii w układzie zostały odwzorowane na slajdzie.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
-    <value>Kształt „Zagięta strzałka” został przekonwertowany na kształt „Strzałka narożna”.</value>
+    <value>Nie można zachować kształtu „Zagięta strzałka”. Został on przekonwertowany na kształt „Strzałka narożna”.</value>
   </data>
   <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
     <value>Niestandardowy punktor został zastąpiony we wzorcu slajdów prostym punktorem.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
-    <value>Typ kształtu „Struna” został przekonwertowany na kształt „Elipsa”.</value>
+    <value>Nie można zachować kształtu „Struna”. Został on przekonwertowany na kształt „Elipsa”.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
-    <value>Kształt „Prostokąt ze ściętym rogiem” został przekonwertowany na kształt „Schemat blokowy(Odwrócona karta)”</value>
+    <value>Nie można zachować kształtu „Prostokąt ze ściętym rogiem”. Został on przekonwertowany na kształt „Schemat blokowy (odwrócona karta)”.</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
     <value>Tylko pierwszy kolor wypełnienia gradientowego tła został przekonwertowany na układzie.</value>
@@ -157,7 +157,7 @@
     <value>Nie można zachować ustawienia „Rozpocznij od” podczas pokazu slajdów.</value>
   </data>
   <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
-    <value>Tylko pierwszy kolor graficznego wypełnienia gradientowego zostanie przekonwertowany na slajdzie.</value>
+    <value>Tylko pierwszy kolor graficznego wypełnienia gradientowego został przekonwertowany na slajdzie.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
     <value>Nie można zachować ustawienia „Kolor pióra” podczas pokazu slajdów.</value>
@@ -186,10 +186,10 @@ Orientacja strony materiałów informacyjnych nie jest odwzorowana.</value>
     <value>Ustawienie „Opóźnienie w prezentacji slajdów w pętli” nie może zostać zachowane podczas pokazu slajdów.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
-    <value>Kształt Strzałka zakrzywiona (w lewo, w prawo, w górę, w dół) został przekonwertowany na kształt Strzałka kolista</value>
+    <value>Nie można zachować kształtu „Strzałka zakrzywiona” (w lewo, w prawo, w górę, w dół). Został on przekonwertowany na kształt „Strzałka kolista”.</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
-    <value>Tylko pierwszy kolor graficznego wypełnienia gradientowego został przekonwertowany w układzie.</value>
+    <value>Tylko pierwszy kolor graficznego wypełnienia gradientowego został przekonwertowany na układzie.</value>
   </data>
   <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
     <value>Tylko pierwszy kolor wypełnienia gradientowego tła został przekonwertowany we wzorcu slajdów.</value>
@@ -219,7 +219,7 @@ Orientacja strony materiałów informacyjnych nie jest odwzorowana.</value>
     <value>Rozmiar kształtu Tekst, wyrównanego do góry i do dołu z zawinięciem, nie zostanie zmieniony.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
-    <value>Kształt „Strzałka zawracania” został przekonwertowany na kształt „Strzałka kolista”.</value>
+    <value>Nie można zachować kształtu „Strzałka zawracania”. Został on przekonwertowany na kształt „Strzałka kolista”.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
     <value>Nie można zachować ustawienia „Ustaw prezentację na wierzchu” podczas pokazu slajdów.</value>
@@ -233,4 +233,7 @@ Orientacja strony materiałów informacyjnych nie jest odwzorowana.</value>
   <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
     <value>Nie można zachować ustawienia „Pokaz slajdów z narracją” podczas pokazu slajdów.</value>
   </data>
-</root>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+  <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
+    <value>Łącza do aplikacji działają jedynie wówczas, gdy aplikacje znajdują się w standardowych folderach, np. WINDOWS lub w folderze prezentacji.</value>
+  </data>
+</root>

@@ -121,19 +121,19 @@
     <value>Propriétés de toutes les lignes de la disposition mappées sur la diapositive.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
-    <value>Forme « Flèche courbée » convertie en forme « Flèche de coin ».</value>
+    <value>La forme « Flèche courbée » ne peut être conservée et a été convertie en forme « Flèche de coin ».</value>
   </data>
   <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
     <value>Puce personnalisée remplacée par une puce simple dans la matrice de diapositives.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
-    <value>Type « Corde » converti en forme « Ellipse ».</value>
+    <value>La forme de type « Corde » ne peut être conservée et a été convertie en forme « Ellipse ».</value>
   </data>
   <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
-    <value>Forme « Rectangle à un coin coupé » convertie en forme « Organigramme(Carte retournée) »</value>
+    <value>La forme « Rectangle à un coin coupé » ne peut être conservée et a été convertie en forme « Organigramme (Carte retournée) ».</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
-    <value>Première couleur du Remplissage du gradient de l’arrière-plan seulement converti lors de la disposition.</value>
+    <value>Seule la première couleur du Remplissage du gradient de l’arrière-plan a été convertie pendant la disposition.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsKiosk" xml:space="preserve">
     <value>Type de présentation « Kiosque » incompatible, remplacé par le type par défaut, « Plein écran ».</value>
@@ -157,7 +157,7 @@
     <value>Impossible de conserver l’option « Commencer par » utilisée pendant le diaporama.</value>
   </data>
   <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
-    <value>Première couleur Remplissage du gradient du graphique seulement convertie dans la diapositive.</value>
+    <value>Seule la première couleur du Remplissage du gradient du graphique a été convertie dans la diapositive.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
     <value>Impossible de conserver la « Couleur du stylo » utilisée pendant le diaporama.</value>
@@ -175,7 +175,7 @@
     <value>10ème niveau converti en 9ème (dernier) niveau.</value>
   </data>
   <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
-    <value>Première couleur du Remplissage du gradient de l’arrière-plan seulement convertie dans la diapositive.</value>
+    <value> Seule la première couleur du Remplissage du gradient de l’arrière-plan a été convertie dans la diapositive.</value>
   </data>
   <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
     <value>Impossible de redimensionner les miniatures de page de document, représentant des diapositives. 
@@ -186,13 +186,13 @@ Orientation de page de document non mappée.</value>
     <value>Impossible de conserver l’option « Retard dans la présentation des diapositives dans la boucle » utilisée pendant le diaporama.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
-    <value>Forme Flèche arrondie (Gauche, Droite, Haut, Bas) convertie en forme Flèche circulaire</value>
+    <value>La forme Flèche arrondie (Gauche, Droite, Haut, Bas) ne peut être conservée et a été convertie en forme Flèche circulaire</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
-    <value>Première couleur du Remplissage du gradient du graphique seulement convertie pendant la dispositiont.</value>
+    <value>Seule la première couleur du Remplissage du gradient du graphique a été convertie pendant la disposition.</value>
   </data>
   <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
-    <value>Première couleur du Remplissage du gradient de l’arrière-plan seulement convertie dans la matrice de diapositives.</value>
+    <value>Seule la première couleur du Remplissage du gradient de l’arrière-plan a été convertie dans la matrice de diapositives.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTransitionOnClick" xml:space="preserve">
     <value>Impossible de conserver la « Transition par clic » utilisée pendant le diaporama.</value>
@@ -219,7 +219,7 @@ Orientation de page de document non mappée.</value>
     <value>Forme Texte justifié en haut et en bas avec retour à la ligne non redimensionnée.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
-    <value>Forme « Flèche demi-tour » convertie en forme « Flèche circulaire ».</value>
+    <value>La forme « Flèche demi-tour » ne peut être conservée et a été convertie en forme « Flèche circulaire ».</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
     <value>Impossible de conserver l’option « Mettre la présentation au dessus » utilisée pendant le diaporama.</value>
@@ -233,4 +233,8 @@ Orientation de page de document non mappée.</value>
   <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
     <value>Impossible de conserver l’option « Diaporama avec narration » utilisée pendant le diaporama.</value>
   </data>
-</root>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+  <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
+    <value>Les liens vers des applications ne fonctionnent que pour les applications résidant dans des dossiers standard, comme WINDOWS, ou dans  
+le même dossier que la présentation.</value>
+  </data>
+</root>

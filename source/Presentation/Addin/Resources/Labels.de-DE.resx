@@ -118,119 +118,125 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="translation.oox2odf.layoutsToSlideMappingTypeLines" xml:space="preserve">
-    <value>Alle Linieneigenschaften im Layout wurden der Folie zugeordnet.</value>
+    <value>Alle Linieneigenschaften auf Layoutebene wurden der Folie zugeordnet.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
-    <value>Die Form 'Rechteckiger Pfeil' wurde in die Form 'Winkelpfeil' konvertiert.</value>
+    <value>'Rechteckige Pfeile' wurden zu 'Winkelpfeilen' konvertiert.</value>
   </data>
   <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
-    <value>Das benutzerdefinierte Aufzählungszeichen wurde in der Folienvorlage durch ein einfaches Aufzählungszeichen ersetzt.</value>
+    <value>Benutzerdefinierte Aufzählungszeichen wurden im Folienmaster durch einfache Aufzählungszeichen ersetzt.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
-    <value>Die Form 'Gerade' wurde in die Form 'Ellipse' konvertiert.</value>
+    <value>'Geraden' wurden zu 'Ellipsen' konvertiert.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
-    <value>Die Form 'Eine Ecke des Rechtecks schneiden' wurde in die Form 'Flussdiagramm' konvertiert.</value>
+    <value>'Rechtecke mit abgeschnittener Ecke' wurden zu 'Flussdiagrammen (Karten)' konvertiert.</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
-    <value>Die erste Farbe der graduellen Hintergrundfüllung wird nur im Layout konvertiert.</value>
+    <value>Nur die erste Farbe des Hintergrundfarbverlaufs auf Layoutebene wurde konvertiert.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsKiosk" xml:space="preserve">
-    <value>Der Präsentationstyp 'Kiosk' ist nicht kompatibel und wird durch den Standardtyp 'Vollbild' ersetzt.</value>
+    <value>Der Präsentationstyp 'Kiosk' ist nicht kompatibel und wurde durch den Standardtyp 'Vollbild' ersetzt.</value>
   </data>
   <data name="translation.odf2oox.bulletTypeCustomBullet" xml:space="preserve">
-    <value>Das benutzerdefinierte Aufzählungszeichen wurde in der Folie durch ein einfaches Aufzählungszeichen ersetzt.</value>
+    <value>Benutzerdefinierte Aufzählungszeichen wurden in der Folie durch einfache Aufzählungszeichen ersetzt.</value>
   </data>
   <data name="translation.oox2odf.pictureTypeProperties" xml:space="preserve">
     <value>Die Bildeigenschaft wurde nicht konvertiert.</value>
   </data>
   <data name="translation.oox2odf.bulletTypeCustomBullet" xml:space="preserve">
-    <value>Das benutzerdefinierte Aufzählungszeichen wurde in der Folie durch ein einfaches Aufzählungszeichen ersetzt.</value>
+    <value>Benutzerdefinierte Aufzählungszeichen wurden in der Folie durch einfache Aufzählungszeichen ersetzt.</value>
   </data>
   <data name="translation.odf2oox.notesTypeShapesInNotes" xml:space="preserve">
-    <value>Formen in Notizen können nicht beibehalten werden.</value>
+    <value>Formen in Notizen wurden nicht konvertiert.</value>
   </data>
   <data name="translation.oox2odf.notesMasterSingleToMultiple" xml:space="preserve">
-    <value>Die einfache Notizenvorlage wurde für alle Folien durch die mehrfache Notizenvorlage ersetzt.</value>
+    <value>Der einfache Notizenmaster wurde für alle Folien durch den mehrfachen Notizenmaster ersetzt.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsSlideStartEnd" xml:space="preserve">
-    <value>'Starten von' kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Starten von' nicht konvertiert werden.</value>
   </data>
   <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
-    <value>Die erste Farbe der graduellen Grafikfüllung wird nur in der Folie konvertiert.</value>
+    <value>Nur die erste Farbe des Farbverlaufs in einer Grafik auf Folienebene wurde konvertiert.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
-    <value>'Stiftfarbe' kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Stiftfarbe' nicht konvertiert werden.</value>
   </data>
   <data name="translation.odf2oox.notesMasterMultipleToSingle" xml:space="preserve">
-    <value>Die mehrfache Notizenvorlage wurde für alle Folien durch die einfache Notizenvorlage ersetzt.</value>
+    <value>Der mehrfache Notizenmaster wurde für alle Folien durch den einfachen Notizenmaster ersetzt.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTypeNavigator" xml:space="preserve">
-    <value>'Ansichtsnavigation' kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Ansichtsnavigation' nicht konvertiert werden.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeInnerShadow" xml:space="preserve">
-    <value>Der innere Schatten einer Form kann nicht beibehalten werden.</value>
+    <value>Der innere Schatten einer Form wurde nicht beibehalten.</value>
   </data>
   <data name="translation.odf2oox.bulletTypeLevel10" xml:space="preserve">
-    <value>Die 10. Ebene wird in die 9. Ebene (letzte) konvertiert.</value>
+    <value>Die 10. Ebene einer Liste wurde in die 9. Ebene (letzte) konvertiert.</value>
   </data>
   <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
-    <value>Die erste Farbe der graduellen Hintergrundfüllung wird nur in der Folie konvertiert.</value>
+    <value>Nur die erste Farbe des Hintergrundfarbverlaufs auf Folienebene wurde konvertiert.</value>
   </data>
   <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
-    <value>Die Größe der Miniaturansichten auf der Handzettelseite, die Folien darstellen, kann nicht geändert werden. 
-Es sind nur sechs Folienhandzettel verfügbar.
-Die Ausrichtung der Handzettelseite wurde nicht zugeordnet.</value>
+    <value>Die Größe der Miniaturansichten der Folien auf dem Handzettel konnte nicht übernommen werden. 
+Es sind nur sechs Folien auf dem Handzettel verfügbar.
+Die Handzettelorientierung wurde nicht konvertiert.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTypePauseGreaterThanZero" xml:space="preserve">
-    <value>‘Präsentation der Folien in Schleife verzögern’ kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Präsentation der Folien in Schleife verzögern' nicht konvertiert werden.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
-    <value>Die Form 'Gekrümmter Pfeil (links, rechts, oben, unten) wurde in die Form 'Gebogener Pfeil' konvertiert.</value>
+    <value>'Gekrümmte Pfeile' wurden zu 'Gebogenen Pfeilen' konvertiert.</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
-    <value>Die erste Farbe der graduellen Grafikfüllung wird nur im Layout konvertiert.</value>
+    <value>Nur die erste Farbe des Farbverlaufs in einer Grafik auf Layoutebene wurde konvertiert.</value>
   </data>
   <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
-    <value>Die erste Farbe der graduellen Hintergrundfüllung wird nur in der Folienvorlage konvertiert.</value>
+    <value>Nur die erste Farbe des Hintergrundfarbverlaufs im Folienmaster wurde konvertiert.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTransitionOnClick" xml:space="preserve">
-    <value>'Übergang beim Klicken' kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Übergang beim Klicken' nicht konvertiert werden.</value>
   </data>
   <data name="translation.oox2odf.groupingTypeExtensionChange" xml:space="preserve">
-    <value>Gruppierungverlust, da die Erweiterungseigenschaft des Objekts geändert wurde.</value>
+    <value>Gruppen konnten nicht konvertiert werden, da die Objektgröße  geändert wurde.</value>
   </data>
   <data name="translation.oox2odf.layoutsToSlideMappingTypePicture" xml:space="preserve">
-    <value>Alle Bildeigenschaften im Layout wurden der Folie zugeordnet.</value>
+    <value>Alle Bildeigenschaften auf Layoutebene wurden der Folie zugeordnet.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTypeMouseAsPen" xml:space="preserve">
-    <value>'Mauszeiger als Stift' kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Mauszeiger als Stift' nicht konvertiert werden.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeArrowHeadTailSize" xml:space="preserve">
-    <value>Die Spitze und das Ende der Pfeile können nicht berechnet werden, da die Zuordnung nicht verfügbar ist.</value>
+    <value>Die Spitze und das Ende der Pfeile konnten nicht berechnet werden.</value>
   </data>
   <data name="translation.odf2oox.audioVideoTypeImage" xml:space="preserve">
-    <value>Der Snapshot für Audio/Video in der Folie wurde durch eine Miniaturansicht des letzten Foliensnapshots ersetzt.</value>
+    <value>Der Darstellung eines Audio/Video Objekts auf der Folie wurde durch eine Miniaturansicht der Folie ersetzt.</value>
   </data>
   <data name="translation.oox2odf.handOutMasterTypeOrientation" xml:space="preserve">
-    <value>Die Ausrichtung der Handzettelseite kann nicht beibehalten werden.</value>
+    <value>Die Handzettelorientierung konnte nicht beibehalten werden.</value>
   </data>
   <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
-    <value>Der Formtext, der am Zeilenumbruch ausgerichtet ist, wurden nicht geändert.</value>
+    <value>Text in Formen, der nach oben oder unten ausgerichtet ist und umbrechen soll, wurde in der Größe nicht angepasst.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
-    <value>Die Form '180-Grad-Pfeil' wurde in die Form 'Gebogener Pfeil' konvertiert.</value>
+    <value>'180-Grad-Pfeile' wurden zu 'Gebogenen Pfeilen' konvertiert.</value>
   </data>
   <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
-    <value>'Präsentation im Vordergrund' kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Präsentation im Vordergrund' nicht konvertiert werden.</value>
   </data>
   <data name="translation.oox2odf.layoutsToSlideMappingTypeShapes" xml:space="preserve">
-    <value>Die Formeigenschaften im Layout wurden der Folie zugeordnet.</value>
+    <value>Formeigenschaften auf Layoutebene wurden der Folie zugeordnet.</value>
   </data>
   <data name="translation.oox2odf.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
-    <value>Das benutzerdefinierte Aufzählungszeichen wurde in der Folienvorlage durch ein einfaches Aufzählungszeichen ersetzt.</value>
+    <value>Benutzerdefinierte Aufzählungszeichen wurden im Folienmaster durch einfache Aufzählungszeichen ersetzt.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
-    <value>'Diashow mit Audiokommentar' kann während der Diashow nicht beibehalten werden.</value>
+    <value>In Diashows konnte die Eigenschaft 'Diashow mit Audiokommentar' nicht konvertiert werden.</value>
   </data>
-</root>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+  <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
+    <value>Hyperlinks zu Anwendungen funktionieren nur, wenn die Anwendungen in Standardverzeichnissen, z.B. WINDOWS, oder im selben Verzeichnis wie die Präsentation liegen.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeOuterShadow" xml:space="preserve">
+    <value>Die Schatteneigenschaften 'Weichzeichner' und 'Größe' sind im ODP Format nicht verfügbar.</value>
+  </data>
+</root>

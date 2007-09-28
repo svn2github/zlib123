@@ -135,7 +135,7 @@
   <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
     <value>Thumbnails in Handout Page, representing slides cannot be resized. 
 Only six slides handouts available.
-Handout Page Oreintation not mapped.</value>
+Handout Page Orientation not mapped.</value>
   </data>
   <data name="translation.oox2odf.layoutsToSlideMappingTypePicture" xml:space="preserve">
     <value>All Picture properties in Layout are mapped to Slide.</value>
@@ -183,31 +183,31 @@ Handout Page Oreintation not mapped.</value>
     <value>Head and Tail size of Arrows calculated approximately due to mapping not available.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
-    <value>Shape 'Bent Arrow' converted to shape 'Corner Arrow'.</value>
+    <value>Shape 'Bent Arrow' cannot be retained and is converted to shape 'Corner Arrow'.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
-    <value>Shape 'Chord' type converted to shape 'Ellipse'.</value>
+    <value>Shape 'Chord' type  cannot be retained and is converted to shape 'Ellipse'.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
-    <value>Shape Curved Arrow(Left, Right, Up, Down) converted to Shape Circular Arrow</value>
+    <value>Shape Curved Arrow(Left, Right, Up, Down)  cannot be retained and is converted to Shape Circular Arrow</value>
   </data>
   <data name="translation.oox2odf.shapesTypeInnerShadow" xml:space="preserve">
     <value>Inner/Perspective shadow for a shape cannot be retained.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
-    <value>Shape 'Snip Single Corner Rectangle' converted to shape 'FlowChart(Card Flipped)'</value>
+    <value>Shape 'Snip Single Corner Rectangle'  cannot be retained and is converted to shape 'FlowChart(Card Flipped)'</value>
   </data>
   <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
-    <value>Shape 'U-Turn Arrow' converted to shape 'Circular Arrow'.</value>
+    <value>Shape 'U-Turn Arrow'  cannot be retained and is converted to shape 'Circular Arrow'.</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
-    <value>First color of the background Gradient Fill only converted in Layout.</value>
+    <value>Only the first color of the background Gradient Fill was converted in Layout.</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
-    <value>First color of the graphic Gradient Fill only converted in Layout.</value>
+    <value>Only the first color of the graphic Gradient Fill was converted in Layout.</value>
   </data>
   <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
-    <value>First color of the background Gradient Fill only converted in Slide Master.</value>
+    <value>Only the first color of the background Gradient Fill was converted in Slide Master.</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsKiosk" xml:space="preserve">
     <value>Presentation Type 'Kiosk' not compatible, replaced by default type 'Full Screen'.</value>
@@ -222,10 +222,10 @@ Handout Page Oreintation not mapped.</value>
     <value>'Start From' during Slide Show cannot be retained.</value>
   </data>
   <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
-    <value>First color of the background Gradient Fill only converted in Slide.</value>
+    <value>Only the first color of the background Gradient Fill was converted in Slide.</value>
   </data>
   <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
-    <value>First color of the graphic Gradient Fill only converted in Slide.</value>
+    <value>Only the first color of the graphic Gradient Fill was converted in Slide.</value>
   </data>
   <data name="translation.oox2odf.pictureTypeProperties" xml:space="preserve">
     <value>Picture property not converted.</value>
@@ -234,7 +234,7 @@ Handout Page Oreintation not mapped.</value>
     <value>Grouping loss due to object's extension property changed.</value>
   </data>
   <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
-    <value>Links to applications like Notepad.exe will not function if application is not set in current directory.</value>
+    <value>Links to applications only work if the applications are located in standard folders, e.g. WINDOWS, or in the same folder as the presentation.</value>
   </data>
   <data name="translation.oox2odf.shapesTypeOuterShadow" xml:space="preserve">
     <value>Blur and Size properties are not supported in ODP.</value>
