@@ -127,6 +127,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteString(string text)
         {
+            //added by clam for bug 1785583
+            //Start
+            if (text.StartsWith(" "))
+            {
+                try
+                {
+                    this.nextWriter.WriteStartElement("text", "s", ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)this.currentNode.Peek()).Ns);
+                    this.nextWriter.WriteEndElement();
+                    text = text.Substring(1);
+                }
+                catch (Exception ex)
+                {                   
+                }
+            }
+            //End
+            
             if (InSpan())
             {
                 StoreString(text);
