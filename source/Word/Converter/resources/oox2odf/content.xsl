@@ -40,6 +40,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut"
   xmlns:v="urn:schemas-microsoft-com:vml" exclude-result-prefixes="w r xlink number wp ">
 
   <xsl:import href="tables.xsl"/>
@@ -89,10 +90,19 @@
 
   <!--  generates automatic styles for frames -->
   <xsl:template name="InsertFrameStyle">
+    <!-- when w:pict is child of paragraph-->
     <xsl:if test="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
       <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict"
         mode="automaticpict"/>
     </xsl:if>
+
+    <!-- when w:pict is child of a cell-->
+    <xsl:if test="document('word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
+      <xsl:apply-templates select="document('word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict"
+        mode="automaticpict"/>
+    </xsl:if>
+
+
   </xsl:template>
 
   <!--  generates automatic styles for sections-->
@@ -280,6 +290,49 @@
           </xsl:variable>
           <!--Search outlineLvl in styles.xml  -->
           <xsl:choose>
+            <xsl:when test="key('StyleId', $outline)[1][w:pPr/w:outlineLvl/@w:val and w:basedOn/@w:val='Normal']">
+              <xsl:value-of select="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val"/>
+            </xsl:when>
+            <xsl:otherwise/>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="outline">
+            <xsl:value-of select="$node/w:r/w:rPr/w:rStyle/@w:val"/>
+          </xsl:variable>
+          <xsl:variable name="linkedStyleOutline">
+            <xsl:value-of select="key('StyleId', $outline)[1]/w:link/@w:val"/>
+          </xsl:variable>
+          <!--if outlineLvl is not defined search in parent style by w:link-->
+          <xsl:choose>
+            <xsl:when test="key('StyleId', $linkedStyleOutline)[1]/w:pPr/w:outlineLvl/@w:val">
+              <xsl:value-of
+                select="key('StyleId', $linkedStyleOutline)[1]/w:pPr/w:outlineLvl/@w:val"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetStyleOutlineLevel">
+                <xsl:with-param name="outline">
+                  <xsl:value-of select="key('StyleId', $outline)[1]/w:link/@w:val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- get outlineLvl if the paragraph's ancestor is heading -->
+  <xsl:template name="GetDummyOutlineLevel">
+    <xsl:param name="node"/>
+    <xsl:for-each select="document('word/styles.xml')">
+      <xsl:choose>
+        <xsl:when test="$node/w:pPr/w:pStyle/@w:val">
+          <xsl:variable name="outline">
+            <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
+          </xsl:variable>
+          <!--Search outlineLvl in styles.xml  -->
+          <xsl:choose>
             <xsl:when test="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val">
               <xsl:value-of select="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val"/>
             </xsl:when>
@@ -327,6 +380,12 @@
         <xsl:with-param name="node" select="."/>
       </xsl:call-template>
     </xsl:variable>
+    
+    <xsl:variable name="dummyOutlineLevel">
+      <xsl:call-template name="GetDummyOutlineLevel">
+        <xsl:with-param name="node" select="."/>
+      </xsl:call-template>
+    </xsl:variable>
 
     <xsl:variable name="numId">
       <xsl:call-template name="GetListProperty">
@@ -341,9 +400,43 @@
         <xsl:with-param name="property">w:ilvl</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+    
     <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
 
+    <xsl:variable name="ifNormal">
+        <xsl:for-each select="document('word/styles.xml')">
+          <xsl:if test="key('StyleId', $styleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
+        </xsl:for-each>
+    </xsl:variable>
+    
+    <!-- check if preceding paragraph is a heading in order not to lose numbered paragraphs inside headings-->
+    <xsl:variable name="isPrecedingHeading">
+      <xsl:if test="$numId!=''">
+      <xsl:for-each select="preceding::w:p[1]">
+        <xsl:variable name="precedingOutlineLevel">
+          <xsl:call-template name="GetOutlineLevel">
+            <xsl:with-param name="node" select="."/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="precedingStyleId" select="w:pPr/w:pStyle/@w:val"/>
+        
+        <xsl:variable name="ifPrecedingNormal">
+          <xsl:for-each select="document('word/styles.xml')">
+            <xsl:if test="key('StyleId', $precedingStyleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="precedingNumId">
+          <xsl:call-template name="GetListProperty">
+            <xsl:with-param name="node" select="."/>
+            <xsl:with-param name="property">w:numId</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:if test="$precedingOutlineLevel != '' and not(w:pPr/w:numPr) and $ifPrecedingNormal='true' and contains($precedingStyleId,'Heading') and $precedingNumId !=''">true</xsl:if>
+      </xsl:for-each>
+      </xsl:if>
+    </xsl:variable>
+   
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
       <xsl:when
@@ -359,13 +452,15 @@
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
       
       <xsl:when
-        test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
+        test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
         <!--xsl:when
           test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
           and not(document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
         <xsl:apply-templates select="." mode="list">
           <xsl:with-param name="numId" select="$numId"/>
           <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
+          <xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>
         </xsl:apply-templates>
       </xsl:when>
 
@@ -463,6 +558,7 @@
     <!--check if there's a any numId in document-->
     <xsl:for-each select="document('word/document.xml')">
       <xsl:choose>
+        <xsl:when test="key('pPr','')/w:numPr/w:ins"/>
         <xsl:when test="key('pPr', '')/w:numPr/w:numId">
           <xsl:call-template name="InsertListHeader">
             <xsl:with-param name="numId" select="$numId"/>
@@ -567,6 +663,15 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Detect if there is text before a break page in a paragraph -->
+  <!-- BUG 1583404 - Page breaks not correct converted - 17/07/2007-->
+  <xsl:template match="w:r[w:br[@w:type='page']]">
+    <xsl:if test="preceding-sibling::w:r/w:t[1]">
+      <pcut:paragraph_to_cut/>
+    </xsl:if>
+    <xsl:apply-templates select="w:t"/>
+  </xsl:template>
+  
   <!--tabs-->
   <xsl:template match="w:tab[not(parent::w:tabs)]">
     <xsl:choose>

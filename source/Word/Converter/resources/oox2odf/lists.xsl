@@ -102,7 +102,13 @@
     <xsl:choose>
 <!-- if numFmt is none, nothing to do -->
       <xsl:when test="w:numFmt/@w:val = 'none' ">
-        <text:list-level-style-number text:level="{$lvl}" style:num-format=""/>
+        <text:list-level-style-number text:level="{$lvl}" style:num-format="">
+          <xsl:attribute name="style:num-prefix">
+            <xsl:call-template name="TextChar">
+              <xsl:with-param name="isNumPrefix">true</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </text:list-level-style-number>
       </xsl:when>
 
       <!--check if it's numbering, bullet or picture bullet -->
@@ -419,8 +425,8 @@
                       test="../w:multiLevelType/@w:val='multilevel' and number($tab) > number($WLeft)">
                       <xsl:value-of select="$tab - number($WLeft)"/>
                     </xsl:when>
-                    <xsl:otherwise><xsl:value-of
-                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/></xsl:otherwise>
+                    <xsl:otherwise>0<!--<xsl:value-of
+                      select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0--></xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
                 <xsl:when test="$WFirstLine = '0'">0<!--<xsl:value-of
@@ -497,13 +503,14 @@
   <!-- ➢types of bullets -->
 
   <xsl:template name="TextChar">
+    <xsl:param name="isNumPrefix"/>
     <xsl:choose>
       <xsl:when test="w:lvlText[@w:val = ''] "></xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]"></xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">☑</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '•' ]">•</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">●</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]"></xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '' ]">➢</xsl:when>
       <!--<xsl:when test="w:lvlText[@w:val = '➢' ]">➢</xsl:when>-->
       <xsl:when test="w:lvlText[@w:val = '' ]">✔</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">■</xsl:when>
@@ -514,6 +521,9 @@
       <xsl:when test="w:lvlText[@w:val = '–' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]"></xsl:when>
+      <xsl:when test="$isNumPrefix and $isNumPrefix='true'">
+        <xsl:value-of select="w:lvlText/@w:val"/>
+      </xsl:when>
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -608,7 +618,8 @@
     <xsl:param name="numId"/>
     <xsl:param name="level"/>
     <xsl:param name="listLevel"/>
-
+    <xsl:param name="dummyOutlineLevel"/>
+    <xsl:param name="isPrecedingHeading"/>
     <xsl:variable name="isFirstListItem">
       <xsl:call-template name="IsFirstListItem">
         <xsl:with-param name="node" select="."/>
@@ -652,24 +663,28 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:if test="$isFirstListItem = 'true'">
-      <text:list text:style-name="{$listNum}">
-
-        <!--  TODO - continue numbering-->
-        <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
-
-        <xsl:variable name="currentListLevel">
-          <xsl:call-template name="GetGeneratedListLevel">
-            <xsl:with-param name="listLevel" select="$listLevel"/>
-          </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:call-template name="InsertListLevel">
-          <xsl:with-param name="level" select="$level"/>
-          <xsl:with-param name="numId" select="$numId"/>
-          <xsl:with-param name="listLevel" select="$currentListLevel"/>
-        </xsl:call-template>
-      </text:list>
+    <xsl:if test="$isFirstListItem = 'true' or ($dummyOutlineLevel!='' and $isPrecedingHeading='true')">
+      
+          <text:list text:style-name="{$listNum}">
+            
+            <!--  TODO - continue numbering-->
+            <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
+            
+            <xsl:variable name="currentListLevel">
+              <xsl:call-template name="GetGeneratedListLevel">
+                <xsl:with-param name="listLevel" select="$listLevel"/>
+              </xsl:call-template>
+            </xsl:variable>
+            
+            <xsl:call-template name="InsertListLevel">
+              <xsl:with-param name="level" select="$level"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="listLevel" select="$currentListLevel"/>
+              <xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
+              <xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>
+            </xsl:call-template>
+          </text:list>
+        
     </xsl:if>
   </xsl:template>
 
@@ -692,6 +707,8 @@
     <xsl:param name="level"/>
     <xsl:param name="numId"/>
     <xsl:param name="listLevel"/>
+    <xsl:param name="dummyOutlineLevel"/>
+    <xsl:param name="isPrecedingHeading"/>
 
     <xsl:variable name="isNestedList">
       <xsl:call-template name="IsNestedList">
@@ -707,8 +724,10 @@
       <xsl:with-param name="listLevel" select="$listLevel"/>
       <xsl:with-param name="isNestedList" select="$isNestedList"/>
     </xsl:apply-templates>
-
+    
     <xsl:choose>
+      <!-- don't put  numbered heading into list-->
+      <xsl:when test="number($listLevel)=0 and number($level) &gt; 0 and $dummyOutlineLevel!=''"/>
       <xsl:when test="$isNestedList = 'true'">
         <xsl:call-template name="InsertCurrentLevel">
           <xsl:with-param name="node" select="$node"/>
@@ -1029,12 +1048,24 @@
     <text:outline-style>
       <!--create outline level style only for styles which have outlineLvl and numId what means that list level is linked to a style -->
       <xsl:for-each
-        select="document('word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
+        select="document('word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr and contains(@w:styleId,'Heading')]">
         <xsl:variable name="styleId">
           <xsl:value-of select="@w:styleId"/>
         </xsl:variable>
-        <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val=$styleId]/w:numPr)">
-          <xsl:variable name="numId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+
+          <xsl:variable name="numId">
+            <xsl:choose>
+              <xsl:when test="w:pPr/w:numPr/w:numId/@w:val">
+                <xsl:value-of select="w:pPr/w:numPr/w:numId/@w:val"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="GetListStyleProperty">
+                  <xsl:with-param name="style" select="."/>
+                  <xsl:with-param name="property">w:numId</xsl:with-param>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
           <xsl:variable name="levelId" select="w:pPr/w:numPr/w:ilvl/@w:val | w:pPr/w:outlineLvl/@w:val"/>
           <text:outline-level-style>
             <xsl:attribute name="text:level">
@@ -1047,8 +1078,18 @@
                 <xsl:if
                   test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
                   <xsl:attribute name="style:num-suffix">
-                    <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"
-                    />
+                    <xsl:variable name="suffix">
+                      <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"
+                      />
+                    </xsl:variable>
+                    <xsl:choose>
+                      <xsl:when test="w:suff/@w:val='space'">
+                        <xsl:value-of select="concat($suffix,' ')"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$suffix"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:attribute>
                 </xsl:if>
                 <xsl:if test="./w:lvlText/@w:val != ''">
@@ -1083,7 +1124,6 @@
               </xsl:for-each>
             </xsl:for-each>
           </text:outline-level-style>
-        </xsl:if>
       </xsl:for-each>
     </text:outline-style>
   </xsl:template>

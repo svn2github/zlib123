@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <title>ODF Add-in for Microsoft Word</title>
+    </head>
+    <body>
+        <h1><a name="top">ODF Add-in for Microsoft Word</a></h1>        
+        <p>感谢您下载 ODF Add-in for Word。 该软件的目的在于使用户能够用 Microsoft Word 打开基于 ODF 规格的文档，并展示 OpenXML 和 ODF 规格之间的互操作性。  互操作性项目托管在<a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>上。 如需有关此项目的更多细节和未来更新，请查看“路线图（RoadMap）”文档。</p>
+        <p>此加载项由<a href="http://www.microsoft.com/">Microsoft</a>出资，由<a href="http://www.clever-age.com/">Clever Age</a>，<a href="http://www.dialogika.de/">DIaLOGIKa</a> 和 <a href="http://www.aztecsoft.com/">Aztecsoft</a> 开发（请参见项目<a href="http://odf-converter.sourceforge.net/">网站</a>，以获取更多信息）。</p>
+        
+        <h2>目录</h2>
+        <ul>
+            <li><a href="#hRequirements">软件要求</a></li>
+            <li><a href="#hInstall">安装该加载项</a>                </li>
+            <li><a href="#hTroobleshooting">故障排除指南</a><ul>
+                    <li><a href="#hTroobleshootingXP2003">Microsoft Word 2000/XP/2003</a></li>
+                    <li><a href="#hTroobleshooting2007">Microsoft Word 2007</a></li>
+                </ul>
+            </li>
+            <li><a href="#hFeatures">不支持的功能/选项</a></li>
+        </ul>
+        
+        <h2><a name="hRequirements"> 软件要求</a></h2>
+        <p>在安装该加载荐之前，确保您拥有下列项目之一...</p>
+        <ul>
+            <li>Microsoft Word 2000</li>
+            <li><a href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office 兼容包</a></li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5amp;displaylang=en">.NET framework 2.0</a></li>
+        </ul>      
+        <p><strong>或者</strong></p>        
+        <ul>
+            <li>Microsoft Word XP</li>
+            <li><a href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office 兼容包</a></li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5amp;displaylang=en">.NET framework 2.0</a></li>
+        </ul>      
+        <p><strong>或者</strong></p>        
+        <ul>
+            <li>Microsoft Word 2003</li>
+            <li><a href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office 兼容包</a></li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5amp;displaylang=en">.NET framework 2.0*</a></li>
+        </ul>
+        <p><strong>或者</strong></p>
+        <ul>
+            <li>具有已激活 .NET 可编程性支持的<a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word 2007</a></li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5amp;displaylang=en">.NET framework 2.0*</a></li>
+        </ul>
+        
+        
+        <p><strong>（*）警告：</strong> 如果您先安装 Microsoft Word，再安装 .NET Framework，您将需要通过运行以下步骤，更新您的 Word 安装。 </p>
+        <ol>
+            <li>从控制面板打开“添加或删除程序”</li>
+            <li>找到 Microsoft Word 条目并选择“修改”</li>
+            <li>在安装进程中，选择“添加或删功能”，然后在“Microsoft Office Word”部分中添加“.NET 可编程支持”。 </li>
+        </ol>
+        <p><a href="#top" class="back">返回页首</a></p>
+        
+        <h2><a name="hInstall">安装此加载项</a></h2>
+        <p>双击<strong>“OdfAddInForWordSetup-en-1.0.exe”</strong> 文件</p>
+        <p> 如果安装成功，您应该能够从 Microsoft Word 中打开“.ODT”文件（参见菜单“FileODF...”）。 同时，当在资源管理器中右击“.ODT”文件时，您应该有在 Microsoft Word 中打开该文档的选项（菜单“用 Word 打开”）。 </p>
+        <p><strong>重要注释：</strong> 由该加载项打开的 ODF 文件，可在 Microsoft Word 中作为只读 .DOCX 文件导入。 如果您想将其保存为 ODF，您将必须首先为该文档创建一个副本（“菜单另存为”），然后使用“导出成 ODF”菜单。 </p>
+        <p><a href="#top" class="back">返回页首</a></p>
+        
+        <h2><a name="hTroobleshooting">故障排除</a></h2>
+        <p> 如果您未在 Microsoft Word 菜单中看到 ODF 项，这可归因于 Word 缺少功能（参见 <a href="#hRequirements">软件要求</a> 部分）或者未能安装 Word 主互操作程序集。 那么您将需要通过执行以下步骤，手动激活加载项... </p>
+        <h3><a name="hTroobleshootingXP2003">Microsoft Word 2000/XP/2003</a></h3>
+        <ol>
+                <li>转到工具 gt; 自定义，然后单击“命令”选项卡。</li>
+                <li>在“类别”框中，单击“工具”。</li>
+                <li>将 COM 加载项从“命令”框拖至“工具”菜单。 当“工具”菜单显示菜单命令时，指向您希望显示 COM 加载项命令的菜单位置，然后松开鼠标按钮。 </li>
+                <li>单击“关闭”。</li>
+                <li>在“工具”菜单中，单击 COM 加载项，并选定可用列表加载项名称旁的复选框。 如果您想要的加载项未在列表上，单击“添加”，找到该加载项，然后单击“确定”。</li>
+        </ol>
+        <h3><a name="hTroobleshooting2007">Microsoft Word 2007</a></h3>
+        <ol>
+            <li>在“文件”菜单中单击“Word 选项”</li>
+            <li>在“加载项”部分中，选择列表框中的“COM 加载项”，并按“转到”按钮</li>
+            <li>确保选择复选框“ODF Word 加载项”，并用“确定”按钮验证。</li>
+        </ol>
+        <p><a href="#top" class="back">返回页首</a></p>
+        
+        <h2><a name="hFeatures">不支持的功能/选项</a></h2>
+        <p>本公司网站存有未支持功能的完整列表。 您可在<a href="http://odf-converter.sourceforge.net/features.html">此页</a>上找到该列表。</p>
+        <p><a href="#top" class="back">返回页首</a></p>
+    </body>
+</html>

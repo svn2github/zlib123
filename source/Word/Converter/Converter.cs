@@ -44,7 +44,8 @@ namespace CleverAge.OdfConverter.Word
                 return new string []  {
                     "CleverAge.OdfConverter.Word.OdfParagraphPostProcessor,"+fullname,
 			        "CleverAge.OdfConverter.Word.OdfCheckIfIndexPostProcessor,"+fullname,
-        	        "CleverAge.OdfConverter.OdfConverterLib.OdfCharactersPostProcessor"
+        	        "CleverAge.OdfConverter.OdfConverterLib.OdfCharactersPostProcessor",
+                    "CleverAge.OdfConverter.Word.OdfIndexSourceStylesPostProcessor,"+fullname
                 };
             }
         }

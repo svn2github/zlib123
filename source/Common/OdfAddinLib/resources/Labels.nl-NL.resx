@@ -118,67 +118,78 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="OdfImportLabel" xml:space="preserve">
-    <value>Open ODF</value>
+    <value>Open ODF...</value>
   </data>
   <data name="OdfImportDescription" xml:space="preserve">
-    <value>Open een Open Document Format (ODF) bestand.</value>
+    <value>Een Open Document Format (ODF)-bestand openen.</value>
   </data>
   <data name="OdfExportLabel" xml:space="preserve">
-    <value>Opslaan als ODF</value>
+    <value>Opslaan als ODF...</value>
   </data>
   <data name="OdfExportDescription" xml:space="preserve">
-    <value>Bewaar een kopie van het document met Open Document Format (ODF).</value>
+    <value>Een kopie van het document met Open Document Format (ODF) opslaan.</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF</value>
+    <value>ODF...</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>Een onverwachte fout is opgetreden. U kunt gerust een bug-rapport invullen op de projectwebsite (http://odf-converter.sourceforge.net) met uw bestand als bijlage.</value>
+    <value>"Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."</value>
   </data>
   <data name="AllFileType" xml:space="preserve">
     <value>Alle bestanden</value>
   </data>
   <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument tekstbestanden</value>
+    <value>OpenDocument-tekstbestanden</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
-    <value>Sorry, deze functie is nog niet geïmplementeerd</value>
+    <value>"Sorry, deze functie is nog niet geïmplementeerd"</value>
   </data>
   <data name="ConversionFormTitle" xml:space="preserve">
-    <value>Converteren %1...</value>
+    <value>Bezig met converteren van %1...</value>
   </data>
   <data name="FeedbackLabel" xml:space="preserve">
-    <value>Sommige elementen kunnen verloren geraakt zijn tijdens de transformatie. Om een lijst te zien met de mogelijk verloren elementen, klik op "Details".</value>
+    <value>"Sommige elementen kunnen tijdens de transformatie verloren zijn gegaan. Om een lijst met eventueel verloren elementen te bekijken, klik op "Details"."</value>
   </data>
   <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>Deze functie is niet geïmplementeerd door de huidige versie van de add-in.</value>
+    <value>Deze functie is door de huidige versie van de invoegtoepassing niet geïmplementeerd.</value>
   </data>
   <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>Dit document is beschermd met een wachtwoord.</value>
+    <value>Dit document is met een wachtwoord beveiligd.</value>
+  </data>
+  <data name="PossiblyEncryptedDocument" xml:space="preserve">
+    <value>Het ziparchief kon niet worden geopend. Controleer of uw document niet versleuteld is.</value>
   </data>
   <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>Als u denkt dat dit een geldig ODF-document is, dient u een bug-rapport in te vullen op de projectwebsite (http://odf-converter.sourceforge.net) met uw bestand in bijlage.</value>
+    <value>"Als het volgens u een geldig ODF-document is, vul dan een bugrapport in op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."</value>
   </data>
   <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>Dit document lijkt geen geldig OASIS OpenDocument-bestand te zijn.</value>
+    <value>Dit document is schijnbaar geen geldig OASIS OpenDocument-bestand.</value>
   </data>
   <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Office 2007 File converters zijn niet geïnstalleerd: de ODF-conversie werkt niet zonder.</value>
+    <value>Er zijn geen Office 2007-bestandsconversieprogramma's geïnstalleerd: de ODF-conversie kan zonder deze programma's niet worden uitgevoerd.</value>
   </data>
   <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>Conversie mislukt, gelieve het document eerst op te slaan in Word 2007-formaat.</value>
+    <value>Conversie mislukt; probeer het document eerst in Word 2007-formaat op te slaan.</value>
   </data>
   <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>Gelieve uw document op te slaan vooraleer het naar ODF te exporteren</value>
+    <value>Sla uw document op voordat u het naar ODF exporteert</value>
   </data>
   <data name="OdfConverterTitle" xml:space="preserve">
-    <value>ODF Converter</value>
+    <value>ODF-conversieprogramma</value>
   </data>
   <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>Het doelbestand kan niet aangemaakt worden: controleer of het pad correct is en of het bestand niet gebruikt wordt door een andere toepassing.</value>
+    <value>Kon doelbestand niet aanmaken: controleer of het pad juist is en dat het bestand niet door een andere applicatie wordt gebruikt.</value>
   </data>
   <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>Het doelbestand kan niet aangemaakt worden</value>
+    <value>Kan doelbestand niet aanmaken</value>
   </data>
-  
+  <data name="OdfConversionCanceled" xml:space="preserve">
+    <value>De conversion is geannuleerd door de gebruiker</value>
+  </data>
+  <data name="CorruptedInputFileDetail" xml:space="preserve">
+    <value>"Als het volgens u een geldig ODF-document is, vul dan een bugrapport in op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."</value>
+  </data>
+  <data name="CorruptedInputFileLabel" xml:space="preserve">
+    <value>Dit document is schijnbaar een corrupt OASIS OpenDocument-bestand.</value>
+  </data>
 </root>

@@ -224,6 +224,17 @@
       <w:pPr>
         <xsl:apply-templates mode="pPr"/>
         <xsl:call-template name="InsertOutlineLevel"/>
+        <xsl:if test="style:paragraph-properties and contains(@style:name,'NumPar')">
+          <!-- outline level for numbering -->
+          <xsl:choose>
+            <xsl:when test="@style:default-outline-level">
+              <w:outlineLvl w:val="{number(@style:default-outline-level) - 1}"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <w:outlineLvl w:val="9"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
       </w:pPr>
 
       <!-- style's text properties -->
@@ -381,6 +392,10 @@
       </w:autoSpaceDN>
     </xsl:if>
 
+    <xsl:if test="contains(@style:writing-mode, 'rl')">
+      <w:bidi/>
+    </xsl:if>
+    
     <!-- Spacing -->
     <xsl:if
       test="@style:line-height-at-least or @fo:line-height or @fo:margin-bottom or @fo:margin-top or @style:line-spacing">
@@ -397,25 +412,7 @@
 
     <!-- Paragraph alignment -->
     <xsl:if test="@fo:text-align">
-      <w:jc>
-        <xsl:choose>
-          <xsl:when test="@fo:text-align='center'">
-            <xsl:attribute name="w:val">center</xsl:attribute>
-          </xsl:when>
-          <xsl:when test="@fo:text-align='start'">
-            <xsl:attribute name="w:val">left</xsl:attribute>
-          </xsl:when>
-          <xsl:when test="@fo:text-align='end'">
-            <xsl:attribute name="w:val">right</xsl:attribute>
-          </xsl:when>
-          <xsl:when test="@fo:text-align='justify'">
-            <xsl:attribute name="w:val">both</xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="w:val">left</xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-      </w:jc>
+      <xsl:call-template name="InsertTextAlignment"/>
     </xsl:if>
 
     <!-- Vertical alignment of all text on each line of the paragraph -->
@@ -439,9 +436,17 @@
     </xsl:if>
 
     <!-- outline level for numbering -->
-    <xsl:if test="parent::style:style/@style:default-outline-level">
+    <xsl:choose>
+    <xsl:when test="parent::style:style/@style:default-outline-level">
       <w:outlineLvl w:val="{number(parent::style:style/@style:default-outline-level) - 1}"/>
-    </xsl:if>
+    </xsl:when>
+      <xsl:otherwise>
+        <!-- avoid putting TOC heading into TOC (bug #1760863) -->
+        <xsl:if test="parent::style:style[@style:name='Contents_20_Heading']">
+          <w:outlineLvl w:val="10"/>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
 
   </xsl:template>
 
@@ -453,9 +458,14 @@
         <xsl:call-template name="InsertOutlineNumPr"/>
       </xsl:if>
       <!-- outline level for numbering -->
-      <xsl:if test="@style:default-outline-level">
+      <xsl:choose>
+        <xsl:when test="@style:default-outline-level">
         <w:outlineLvl w:val="{number(@style:default-outline-level) - 1}"/>
-      </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <w:outlineLvl w:val="9"/>
+        </xsl:otherwise>
+        </xsl:choose>
     </xsl:if>
   </xsl:template>
 
@@ -495,7 +505,44 @@
     </xsl:if>
   </xsl:template>
 
-
+  <!-- Text alignment property -->
+  <!-- Also depends on the writing direction (righ to left, etc) -->
+  <xsl:template name="InsertTextAlignment">
+    <w:jc>
+      <xsl:choose>
+        <xsl:when test="@fo:text-align='center'">
+          <xsl:attribute name="w:val">center</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@fo:text-align='start'">
+          <xsl:if test="contains(@style:writing-mode, 'rl')">
+            <xsl:attribute name="w:val">right</xsl:attribute>
+          </xsl:if>
+          <xsl:if test="not(contains(@style:writing-mode, 'rl'))">
+            <xsl:attribute name="w:val">left</xsl:attribute>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="@fo:text-align='end'">
+          <xsl:if test="contains(@style:writing-mode, 'rl')">
+            <xsl:attribute name="w:val">left</xsl:attribute>
+          </xsl:if>
+          <xsl:if test="not(contains(@style:writing-mode, 'rl'))">
+            <xsl:attribute name="w:val">right</xsl:attribute>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="@fo:text-align='justify'">
+          <xsl:attribute name="w:val">both</xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="contains(@style:writing-mode, 'rl')">
+            <xsl:attribute name="w:val">right</xsl:attribute>
+          </xsl:if>
+          <xsl:if test="not(contains(@style:writing-mode, 'rl'))">
+            <xsl:attribute name="w:val">left</xsl:attribute>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:jc>
+  </xsl:template>
 
   <!-- Paragraph tabs property -->
   <xsl:template name="ComputeParagraphTabs">
@@ -523,11 +570,11 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:call-template name="ClearParentStyleTabs">
+   <!-- <xsl:call-template name="ClearParentStyleTabs">
       <xsl:with-param name="parentstyleName" select="$parentstyleName"/>
       <xsl:with-param name="styleContext" select="$styleContext"/>
       <xsl:with-param name="styleName" select="$styleName"/>
-    </xsl:call-template>
+    </xsl:call-template>-->
   </xsl:template>
 
   <!-- clear tabs of parent style -->
@@ -679,7 +726,7 @@
           <xsl:with-param name="property">indent</xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$rightInd = 0 and $leftInd = 0 and $firstLineIndent = 0"></xsl:when>
+     
       <xsl:otherwise>
         
         <w:ind>
@@ -1178,7 +1225,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-
+    
     <xsl:if test="@style:text-emphasize">
       <w:em>
         <xsl:attribute name="w:val">
@@ -1468,6 +1515,9 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
+          <xsl:when test="(contains(ancestor::style:style/@style:name,'Contents_20')) and not (contains(ancestor::style:style/@style:name,'Contents_20_Heading'))">
+            <xsl:value-of select="0"/>
+          </xsl:when>
           <xsl:when test="ancestor::office:styles or ancestor::office:automatic-styles">
             <xsl:value-of select="$margin + $position"/>
           </xsl:when>
@@ -2767,5 +2817,51 @@
 
   <!-- ignored -->
   <xsl:template match="text()" mode="styles"/>
+  
+  
+  <!-- Climb style hierarchy for a property -->
+  <xsl:template name="FindPropertyInStyleHierarchy">
+    <xsl:param name="style-name"/>
+    <xsl:param name="property-name"/>
+    <xsl:param name="context">content.xml</xsl:param>
+    
+    <xsl:variable name="style-name-exists">
+      <xsl:for-each select="document($context)">
+        <xsl:value-of select="boolean(key('styles', $style-name))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="$style-name-exists = 'true' ">
+        <xsl:for-each select="document($context)">
+          <xsl:variable name="style" select="key('styles', $style-name)[1]"/>
+          <xsl:choose>
+            <xsl:when test="$style/style:paragraph-properties/@*[name() = $property-name]">
+              <xsl:value-of select="$style/style:paragraph-properties/@*[name() = $property-name]"/>
+            </xsl:when>
+            <xsl:when test="$style/@style:parent-style-name">
+              <xsl:if test="$style/@style:parent-style-name != $style-name">
+                <xsl:call-template name="FindPropertyInStyleHierarchy">
+                  <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
+                  <xsl:with-param name="property-name" select="$property-name"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:when>
+            <xsl:otherwise></xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- switch the context, let's look into styles.xml -->
+      <xsl:when test="$context != 'styles.xml'">
+        <xsl:call-template name="FindPropertyInStyleHierarchy">
+          <xsl:with-param name="style-name" select="$style-name"/>
+          <xsl:with-param name="property-name" select="$property-name"/>
+          <xsl:with-param name="context" select="'styles.xml'"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
 
 </xsl:stylesheet>

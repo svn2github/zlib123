@@ -38,12 +38,17 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:v="urn:schemas-microsoft-com:vml" exclude-result-prefixes="w r draw number wp xlink">
+  xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut" xmlns:v="urn:schemas-microsoft-com:vml"
+  exclude-result-prefixes="w r draw number wp xlink v">
 
   <xsl:import href="footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
   <xsl:key name="default-styles"
     match="w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on']" use="@w:type"/>
+  <xsl:variable name="pm1"
+    select="concat('PAGE', generate-id(document('word/document.xml')/w:document/w:body/w:sectPr))"/>
+
+
 
   <xsl:template name="styles">
     <office:document-styles>
@@ -52,6 +57,12 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
+        <!--gradient fill -->
+        <xsl:for-each select="document('word/document.xml')/w:document/descendant::v:rect">
+          <xsl:if test="v:fill/@type = 'gradient'">
+            <xsl:call-template name="InsertGradientFill"/>
+          </xsl:if>
+        </xsl:for-each>
         <!--heading numbering style, insert outline numbering style only if heading style is linked to level in Word (numId and outlineLvl are in styles.xml Heading style defintion) -->
         <xsl:if
           test="document('word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
@@ -111,9 +122,11 @@
       <style:default-style style:family="paragraph">
         <style:paragraph-properties>
           <xsl:call-template name="InsertDefaultTabStop"/>
+
           <xsl:for-each select="key('default-styles', 'paragraph')[last()]/w:pPr">
-            <xsl:call-template name="InsertParagraphProperties"/>
+            <xsl:call-template name="InsertParagraphPropertiesDefault"/>
           </xsl:for-each>
+
           <!-- do not retain docDefault pPr properties that are already retained -->
           <xsl:for-each select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/child::node()">
             <xsl:variable name="elementName" select="name()"/>
@@ -317,7 +330,13 @@
           <xsl:variable name="headerXmlDocument"
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
           <xsl:for-each select="document($headerXmlDocument)">
+
+            <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
+
+            <!-- Generate automatic Styles for pict/shapes/textboxes-->
+            <xsl:apply-templates mode="automaticpict"/>
+
             <xsl:if test="document($headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
               <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
@@ -329,7 +348,13 @@
           <xsl:variable name="headerXmlDocument"
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
           <xsl:for-each select="document($headerXmlDocument)">
+
+            <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
+
+            <!-- Generate automatic Styles for pict/shapes/textboxes-->
+            <xsl:apply-templates mode="automaticpict"/>
+
             <xsl:if test="document($headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
               <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
@@ -341,7 +366,13 @@
           <xsl:variable name="headerXmlDocument"
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
           <xsl:for-each select="document($headerXmlDocument)">
+
+            <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
+
+            <!-- Generate automatic Styles for pict/shapes/textboxes-->
+            <xsl:apply-templates mode="automaticpict"/>
+
             <xsl:if test="document($headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
               <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
@@ -357,7 +388,13 @@
           <xsl:variable name="footerXmlDocument"
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
           <xsl:for-each select="document($footerXmlDocument)">
+
+            <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
+
+            <!-- Generate automatic Styles for pict/shapes/textboxes-->
+            <xsl:apply-templates mode="automaticpict"/>
+
             <xsl:if test="document($footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
               <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
@@ -369,7 +406,13 @@
           <xsl:variable name="footerXmlDocument"
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
           <xsl:for-each select="document($footerXmlDocument)">
+
+            <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
+
+            <!-- Generate automatic Styles for pict/shapes/textboxes-->
+            <xsl:apply-templates mode="automaticpict"/>
+
             <xsl:if test="document($footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
               <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
@@ -381,7 +424,13 @@
           <xsl:variable name="footerXmlDocument"
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
           <xsl:for-each select="document($footerXmlDocument)">
+
+            <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
+
+            <!-- Generate automatic Styles for pict/shapes/textboxes-->
+            <xsl:apply-templates mode="automaticpict"/>
+
             <xsl:if test="document($footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
               <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
@@ -395,16 +444,17 @@
   <!-- handle default master page style -->
   <xsl:template name="InsertDefaultMasterPage">
 
-    <!-- default master page -->
-    <style:master-page style:name="Standard" style:page-layout-name="pm1">
+    <!-- default master page : -->
+    <!-- actually, this assumption is false : w:body/w:sectPr does not carry any default section properties
+        it is simply the last section of the document. There are no default section properties in an OOX document -->
+    <style:master-page style:name="Standard" style:page-layout-name="{$pm1}">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:call-template name="HeaderFooter"/>
       </xsl:for-each>
     </style:master-page>
     <!-- first page default master page -->
-    <xsl:if
-      test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
-      <style:master-page style:name="First_Page" style:page-layout-name="pm1"
+    <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
+      <style:master-page style:name="First_Page" style:page-layout-name="{$pm1}"
         style:next-style-name="Standard" style:display-name="First Page">
         <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="HeaderFooterFirst"/>
@@ -414,8 +464,7 @@
 
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <!-- create first-page of section master page -->
-      <xsl:if
-        test="w:titlePg or document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
+      <xsl:if test="w:titlePg or document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
         <style:master-page>
           <xsl:attribute name="style:name">
             <xsl:value-of select="concat('First_H_',generate-id(.))"/>
@@ -424,20 +473,7 @@
             <xsl:value-of select="concat('H_',generate-id(.))"/>
           </xsl:attribute>
           <xsl:attribute name="style:page-layout-name">
-            <xsl:choose>
-              <xsl:when
-                test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
-                or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
-                or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient
-                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
-                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
-                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
-                <xsl:value-of select="concat('PAGE',generate-id(.))"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>pm1</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="concat('PAGE', generate-id(.))"/>
           </xsl:attribute>
           <xsl:attribute name="style:display-name">
             <xsl:value-of select="concat('First_H_',generate-id(.))"/>
@@ -461,15 +497,7 @@
           <xsl:value-of select="concat('H_',generate-id(.))"/>
         </xsl:attribute>
         <xsl:attribute name="style:page-layout-name">
-          <xsl:choose>
-            <xsl:when
-              test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or (preceding::w:sectPr/w:cols and not(./w:cols)) or (not(preceding::w:sectPr/w:cols) and ./w:cols) or preceding::w:sectPr/w:cols/@w:num != ./w:cols/@w:num or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or not(preceding::w:sectPr) or (document('word/document.xml')/w:document/w:body/w:sectPr/w:cols and not(./w:cols)) or (not(document('word/document.xml')/w:document/w:body/w:sectPr/w:cols) and ./w:cols) or document('word/document.xml')/w:document/w:body/w:sectPr/w:cols/@w:num != ./w:cols/@w:num">
-              <xsl:value-of select="concat('PAGE',generate-id(.))"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>pm1</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:value-of select="concat('PAGE', generate-id(.))"/>
         </xsl:attribute>
         <xsl:attribute name="style:display-name">
           <xsl:value-of select="concat('H_',generate-id(.))"/>
@@ -540,16 +568,23 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:if test="$headerId != ''">
-        <style:header-left>
-          <xsl:variable name="headerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)"/>
-          <!-- change context to get header content -->
-          <xsl:for-each select="document($headerXmlDocument)">
-            <xsl:apply-templates/>
-          </xsl:for-each>
-        </style:header-left>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="$headerIdEven != ''">
+          <style:header-left>
+            <xsl:variable name="headerXmlDocument"
+              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)"/>
+            <!-- change context to get header content -->
+            <xsl:for-each select="document($headerXmlDocument)">
+              <xsl:apply-templates/>
+            </xsl:for-each>
+          </style:header-left>
+        </xsl:when>
+        <xsl:otherwise>
+          <style:header-left>
+            <text:p/>
+          </style:header-left>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
 
     <xsl:variable name="footerId">
@@ -588,16 +623,23 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:if test="$footerId != ''">
-        <style:footer-left>
-          <xsl:variable name="footerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerIdEven]/@Target)"/>
-          <!-- change context to get footer content -->
-          <xsl:for-each select="document($footerXmlDocument)">
-            <xsl:apply-templates/>
-          </xsl:for-each>
-        </style:footer-left>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="$footerIdEven != ''">
+          <style:footer-left>
+            <xsl:variable name="footerXmlDocument"
+              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerIdEven]/@Target)"/>
+            <!-- change context to get footer content -->
+            <xsl:for-each select="document($footerXmlDocument)">
+              <xsl:apply-templates/>
+            </xsl:for-each>
+          </style:footer-left>
+        </xsl:when>
+        <xsl:otherwise>
+          <style:footer-left>
+            <text:p/>
+          </style:footer-left>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
@@ -650,7 +692,7 @@
 
   <!-- handle default page layout -->
   <xsl:template name="InsertDefaultPageLayout">
-    <style:page-layout style:name="pm1">
+    <style:page-layout style:name="{$pm1}">
       <xsl:if test="document('word/settings.xml')/w:settings/w:mirrorMargins">
         <xsl:attribute name="style:page-usage">
           <xsl:text>mirrored</xsl:text>
@@ -660,6 +702,39 @@
         <style:page-layout-properties>
           <xsl:call-template name="InsertPageLayoutProperties"/>
           <xsl:call-template name="InsertColumns"/>
+        </style:page-layout-properties>
+        <xsl:if test="./w:headerReference/@w:type">
+          <style:header-style>
+            <style:header-footer-properties>
+              <xsl:call-template name="InsertHeaderFooterProperties">
+                <xsl:with-param name="object">header</xsl:with-param>
+              </xsl:call-template>
+            </style:header-footer-properties>
+          </style:header-style>
+        </xsl:if>
+        <xsl:if test="./w:footerReference[@w:type='default' or @w:type='even']">
+          <style:footer-style>
+            <style:header-footer-properties>
+              <xsl:call-template name="InsertHeaderFooterProperties">
+                <xsl:with-param name="object">footer</xsl:with-param>
+              </xsl:call-template>
+            </style:header-footer-properties>
+          </style:footer-style>
+        </xsl:if>
+      </xsl:for-each>
+    </style:page-layout>
+    <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+      <style:page-layout>
+        <xsl:if test="document('word/settings.xml')/w:settings/w:mirrorMargins">
+          <xsl:attribute name="style:page-usage">
+            <xsl:text>mirrored</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="concat('PAGE', generate-id(.))"/>
+        </xsl:attribute>
+        <style:page-layout-properties>
+          <xsl:call-template name="InsertPageLayoutProperties"/>
         </style:page-layout-properties>
         <style:header-style>
           <style:header-footer-properties>
@@ -675,21 +750,6 @@
             </xsl:call-template>
           </style:header-footer-properties>
         </style:footer-style>
-      </xsl:for-each>
-    </style:page-layout>
-    <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-      <style:page-layout>
-        <xsl:if test="document('word/settings.xml')/w:settings/w:mirrorMargins">
-          <xsl:attribute name="style:page-usage">
-            <xsl:text>mirrored</xsl:text>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:attribute name="style:name">
-          <xsl:value-of select="concat('PAGE',generate-id(.))"/>
-        </xsl:attribute>
-        <style:page-layout-properties>
-          <xsl:call-template name="InsertPageLayoutProperties"/>
-        </style:page-layout-properties>
       </style:page-layout>
     </xsl:for-each>
   </xsl:template>
@@ -1071,7 +1131,7 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
           <xsl:with-param name="length">
             <xsl:choose>
-              <xsl:when test="./w:headerReference[@w:type='default' or @w:type='even']">
+              <xsl:when test="./w:headerReference/@w:type">
                 <xsl:choose>
                   <xsl:when test="w:pgMar/@w:top &lt; 0">
                     <xsl:value-of select="w:pgMar/@w:top"/>
@@ -1356,8 +1416,8 @@
           <xsl:choose>
             <xsl:when test="$object = 'header' ">
               <xsl:choose>
-                <xsl:when
-                  test="document('word/document.xml')//w:document/w:body/w:sectPr/w:headerReference[@w:type='default' or @w:type='even']">
+                <!-- if @w:header is not 0, we assume there's a header to compute in this section -->
+                <xsl:when test="w:pgMar[@w:header] and w:pgMar[@w:header != 0]">
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:top &lt; 0">
                       <xsl:choose>
@@ -1411,8 +1471,8 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when
-                  test="document('word/document.xml')//w:document/w:body/w:sectPr/w:footerReference[@w:type='default' or @w:type='even']">
+                <!-- if @w:footer is not 0, we assume there's a footer to compute in this section -->
+                <xsl:when test="w:pgMar[@w:footer] and w:pgMar[@w:footer != 0]">
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:bottom &lt; 0">
                       <xsl:choose>
@@ -1501,9 +1561,9 @@
           <xsl:if test="w:name/@w:val != '' ">
             <xsl:attribute name="style:display-name">
               <xsl:choose>
-               <!-- change display name for: heading to Heading to avoid duplicate styles (Heading 1-9 are added by default by  OO)-->
+                <!-- change display name for: heading to Heading to avoid duplicate styles (Heading 1-9 are added by default by  OO)-->
                 <xsl:when test="contains(w:name/@w:val, 'heading')">
-                      <xsl:value-of select="translate(w:name/@w:val,'h','H')"/>
+                  <xsl:value-of select="translate(w:name/@w:val,'h','H')"/>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="w:name/@w:val"/>
@@ -1522,13 +1582,17 @@
               <xsl:value-of select="w:next/@w:val"/>
             </xsl:attribute>
           </xsl:if>
-          <xsl:choose> <!--Begin part responsible for numbering paragrafs -->
-            <xsl:when test="w:pPr/w:outlineLvl/@w:val&lt;9">
-              <!--<xsl:attribute name="style:default-outline-level">
+
+
+
+          <xsl:choose>
+            <!--Begin part responsible for numbering paragrafs -->
+            <xsl:when test="w:pPr/w:outlineLvl/@w:val&lt;9 and contains($currentStyleId,'Heading')">
+              <xsl:attribute name="style:default-outline-level">
                 <xsl:value-of select="number(w:pPr/w:outlineLvl/@w:val)+1"/>
-                </xsl:attribute>-->
+              </xsl:attribute>
             </xsl:when>
-            <xsl:otherwise>
+            <!--<xsl:otherwise>
               <xsl:if test="w:basedOn">
                 <xsl:variable name="parentStyle">
                   <xsl:value-of select="w:basedOn/@w:val"/>
@@ -1539,8 +1603,9 @@
                   </xsl:attribute>
                 </xsl:if>
               </xsl:if>
-            </xsl:otherwise>
-          </xsl:choose> <!--End part responsible for numbering paragrafs-->
+            </xsl:otherwise>-->
+          </xsl:choose>
+          <!--End part responsible for numbering paragrafs-->
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:otherwise>
@@ -1574,24 +1639,114 @@
   <xsl:template name="InsertDefaultParagraphProperties">
     <xsl:if test="self::w:p[not(w:pPr)]">
       <style:paragraph-properties>
-        
+
+
+        <!-- Sets top and/or bottom  margin if contextual spacing applies-->
+        <xsl:call-template name="contextualSpacing">
+          <xsl:with-param name="prevP" select="preceding-sibling::w:p[1]"/>
+          <xsl:with-param name="nextP" select="following-sibling::w:p[1]"/>
+        </xsl:call-template>
+
+        <xsl:variable name="isContextualSpacingApplied">
+          <!-- Copy of the preceding template (we cant write attributes and get a retgurn value-->
+          <xsl:call-template name="contextualSpacingApplied">
+            <xsl:with-param name="prevP" select="preceding-sibling::w:p[1]"/>
+            <xsl:with-param name="nextP" select="following-sibling::w:p[1]"/>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <!--Check if contextualSpacing was applied-->
+        <!--If not Insert margins in style from Normal Style or w:default -->
+
+        <xsl:if test="$isContextualSpacingApplied='false'">
+          <xsl:variable name="DefaultBefore">
+            <xsl:call-template name="getMarginTopFromWpPrDefault"/>
+          </xsl:variable>
+
+          <xsl:variable name="DefaultAfter">
+            <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
+          </xsl:variable>
+
+          <xsl:call-template name="setFoMarginTop">
+            <xsl:with-param name="setParagraphWBefore" select="$DefaultBefore"/>
+          </xsl:call-template>
+
+          <xsl:call-template name="setFoMarginBottom">
+            <xsl:with-param name="setParagraphWAfter" select="$DefaultAfter"/>
+          </xsl:call-template>
+        </xsl:if>
+        <!--//Insert margins in style from Normal
+        Style or w:default -->
+
         <!-- no spacing in OOX. when the paragraph is in table-->
         <xsl:if test="ancestor::w:tc">
           <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
           <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
         </xsl:if>
-        
-        <!-- Sets top and/or bottom  margin if contextual spacing applies -->
-        <xsl:call-template name="contextualSpacing">
-          <xsl:with-param name="prevP" select="preceding-sibling::w:p[1]"/>
-          <xsl:with-param name="nextP" select="following-sibling::w:p[1]"/>
-        </xsl:call-template>
-        
+
         <xsl:call-template name="InsertParagraphWidowControl"/>
-        
         <xsl:call-template name="InsertDropCapProperties"/>
       </style:paragraph-properties>
     </xsl:if>
+  </xsl:template>
+
+
+
+  <xsl:template name="contextualSpacingApplied">
+    <xsl:param name="prevP" select="parent::w:p/preceding-sibling::w:p[1]"/>
+    <!-- The previous paragraph -->
+    <xsl:param name="nextP" select="parent::w:p/following-sibling::w:p[1]"/>
+    <!-- The next paragraph -->
+
+    <xsl:variable name="isContextualSpacing">
+      <xsl:call-template name="isContextualSpacing"/>
+    </xsl:variable>
+
+    <xsl:variable name="topContextualApplied">
+      <!-- Sets the top margin if there is a preceding paragraph... -->
+      <xsl:if test="$prevP">
+        <xsl:variable name="prevStyle" select="$prevP/w:pPr/w:pStyle/@w:val"/>
+        <!-- The previous paragraph's style  -->
+        <!-- ... and the previous pararaph has the same style -->
+        <xsl:if
+          test="w:pStyle/@w:val = $prevStyle or
+          (boolean(w:pStyle/@w:val) = false() and boolean($prevStyle) = false())">
+          <xsl:value-of select="'true'"/>
+        </xsl:if>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:variable name="BottomContextualApplied">
+      <!-- Sets the bottom margin if there is a following paragraph... -->
+      <xsl:if test="$nextP">
+
+        <xsl:variable name="nextStyle" select="$nextP/w:pPr/w:pStyle/@w:val"/>
+        <!-- The next paragraph's style  -->
+        <!-- ... and the next paragraph has the same style  -->
+        <xsl:if
+          test="w:pStyle/@w:val = $nextStyle or 
+          (boolean(w:pStyle/@w:val) = false() and boolean($nextStyle) = false())">
+          <xsl:value-of select="'true'"/>
+        </xsl:if>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:variable name="bCtxIsApplied">
+      <xsl:choose>
+        <xsl:when
+          test="$isContextualSpacing='true' and ($topContextualApplied='true' or $BottomContextualApplied='true')">
+          <xsl:value-of select="'true'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'false'"/>
+        </xsl:otherwise>
+
+      </xsl:choose>
+
+    </xsl:variable>
+
+    <xsl:value-of select="$bCtxIsApplied"/>
+
   </xsl:template>
 
 
@@ -1657,6 +1812,12 @@
 
         <!-- Drop cap paragraph properties -->
         <xsl:call-template name="InsertDropCapProperties"/>
+
+        <!-- Insert default text alignment property for bidi paragraphs -->
+        <!--<xsl:for-each select="w:pPr">
+          <xsl:call-template name="InsertDefaultBidiProperties"/>
+        </xsl:for-each>-->
+
       </style:paragraph-properties>
     </xsl:if>
 
@@ -1788,7 +1949,7 @@
     <xsl:param name="CheckIfList"/>
     <xsl:param name="IndHanging"/>
     <xsl:param name="IndLeft"/>
-
+    <xsl:message>log:here</xsl:message>
     <xsl:choose>
       <xsl:when test="$CheckIfList='true'">
         <xsl:variable name="NumId">
@@ -1937,10 +2098,12 @@
             <xsl:value-of select="w:ind/@w:left"/>
           </xsl:when>
           <xsl:otherwise>
+            <!-- Regression JP 24.08.2007 <xsl:variable name="context" select="self::node()"/>-->
             <xsl:for-each select="document('word/styles.xml')">
               <xsl:choose>
+                <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
                 <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
-                  <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
+                    <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
                 </xsl:when>
                 <xsl:when
                   test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
@@ -1966,6 +2129,15 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="InsertParagraphPropertiesDefault">
+    <xsl:call-template name="InsertParagraphBreakBefore"/>
+    <xsl:call-template name="InsertParagraphAutoSpace"/>
+    <xsl:call-template name="InsertParagraphWidowControl"/>
+    <xsl:call-template name="InsertSuppressLineNumbering"/>
+    <xsl:call-template name="InsertDropCapProperties"/>
+  </xsl:template>
+
+
 
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
@@ -1973,11 +2145,11 @@
       w:afterAutospacing and w:beforeAutospacing attributes are lost
       w:afterLines and w:beforeLines attributes are lost 
     -->
-    
+
     <xsl:variable name="StyleId">
       <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
     </xsl:variable>
-    
+
     <!-- are we in a list -->
     <xsl:variable name="CheckIfList">
       <xsl:call-template name="CheckIfList">
@@ -1986,13 +2158,14 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <!-- left indent -->
     <xsl:variable name="IndLeft">
       <xsl:choose>
         <xsl:when test="w:ind/@w:left != ''">
           <xsl:value-of select="number(w:ind/@w:left)"/>
         </xsl:when>
+        <!-- Automatic styles should not duplicate the inherited fo:margin-left property (cf. 15.5.17 of ODF v 1.0 spec)  -->
         <xsl:when
           test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left != '' and $CheckIfList != 'true'">
           <xsl:value-of
@@ -2001,13 +2174,14 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- hanging indent -->
     <xsl:variable name="IndHanging">
       <xsl:choose>
         <xsl:when test="w:ind/@w:hanging != ''">
           <xsl:value-of select="number(w:ind/@w:hanging)"/>
         </xsl:when>
+        <!-- Automatic styles should not duplicate the inherited fo:text-indent property  -->
         <xsl:when
           test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:hanging != ''">
           <xsl:value-of
@@ -2016,7 +2190,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- margin left -->
     <xsl:variable name="MarginLeft">
       <xsl:call-template name="CalculateMarginLeft">
@@ -2041,20 +2215,30 @@
       test="contains(parent::w:p/w:r/w:pict/v:shape/@style,'mso-position-horizontal-relative:char') and not(w:textAlignment)">
       <xsl:attribute name="style:vertical-align">bottom</xsl:attribute>
     </xsl:if>
-    
+
+
     <!-- no spacing in OOX. when the paragraph is in table-->
-    <xsl:if test="ancestor::w:tc">
-      <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
-      <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
-    </xsl:if>
-    
-    <!-- Sets top and/or bottom  margin if contextual spacing applies -->
-    <xsl:call-template name="contextualSpacing"/>
-    
-    
+
+    <!-- BUG 1693008 - Space before and after paragraph is lost in tables - 05/07/2007
+      Why desactivate spacing when paragraph is in table ???
+      With theses values set to 0cm, never the margin on top and bottom will be applied
+      -->
+
     <!-- insert attributes using match -->
     <xsl:apply-templates mode="pPrChildren"/>
-    
+
+    <!-- insert default properties for bidi paragraphs -->
+    <xsl:call-template name="InsertDefaultBidiProperties"/>
+
+    <!-- Sets top and/or bottom  margin if contextual spacing applies -->
+    <xsl:call-template name="contextualSpacing"/>
+
+    <!-- Must not set it to 0 because it can overwrite the parent style -->
+    <!--xsl:if test="ancestor::w:tc">
+      <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+      <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
+    </xsl:if-->
+
     <!-- insert attributes using template -->
     <xsl:call-template name="InsertParagraphBreakBefore"/>
     <xsl:call-template name="InsertParagraphAutoSpace"/>
@@ -2066,7 +2250,7 @@
     </xsl:call-template>
     <xsl:call-template name="InsertParagraphWidowControl"/>
     <xsl:call-template name="InsertSuppressLineNumbering"/>
-    
+
     <!-- child elements : -->
     <!-- tab-stops -->
     <xsl:call-template name="InsertParagraphTabStops">
@@ -2074,129 +2258,137 @@
       <xsl:with-param name="parentStyleId" select="w:pStyle/@w:val|parent::w:style/w:basedOn/@w:val"
       />
     </xsl:call-template>
-    
+
     <!-- drop cap properties -->
     <xsl:call-template name="InsertDropCapProperties"/>
   </xsl:template>
 
-  
+
   <xsl:template name="contextualSpacing">
     <!-- @Description: Sets top and bottom margin to zero to emulate contextual spacing feature -->
     <!-- @Context: A paragraph node (i.e. &lt;w:Ppr&gt;), or a node paragraph property node (i.e. &lt;w:Ppr&gt;) -->
     <!-- @Returns: Nothing -->
-    
-    <xsl:param name="prevP" select="parent::w:p/preceding-sibling::w:p[1]"/> <!-- The previous paragraph -->
-    <xsl:param name="nextP" select="parent::w:p/following-sibling::w:p[1]"/> <!-- The next paragraph -->
-                
-    <xsl:variable name="isContextualSpacing"> 
+
+    <xsl:param name="prevP" select="parent::w:p/preceding-sibling::w:p[1]"/>
+    <!-- The previous paragraph -->
+    <xsl:param name="nextP" select="parent::w:p/following-sibling::w:p[1]"/>
+    <!-- The next paragraph -->
+
+    <xsl:variable name="isContextualSpacing">
       <xsl:call-template name="isContextualSpacing"/>
     </xsl:variable>
-    
+
     <!-- if contextual spacing is applied to the current paragraph -->
     <xsl:if test="$isContextualSpacing = 'true' ">
-    
+
       <!-- Sets the top margin if there is a preceding paragraph... -->
       <xsl:if test="$prevP">
-        
-        <xsl:variable name="prevStyle" select="$prevP/w:pPr/w:pStyle/@w:val"/>      <!-- The previous paragraph's style  -->
-        
+
+        <xsl:variable name="prevStyle" select="$prevP/w:pPr/w:pStyle/@w:val"/>
+        <!-- The previous paragraph's style  -->
+
         <!-- ... and the previous pararaph has the same style -->
-        <xsl:if test="w:pStyle/@w:val = $prevStyle or
+        <xsl:if
+          test="w:pStyle/@w:val = $prevStyle or
           (boolean(w:pStyle/@w:val) = false() and boolean($prevStyle) = false())">
           <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
         </xsl:if>
       </xsl:if>
-              
+
       <!-- Sets the bottom margin if there is a following paragraph... -->
       <xsl:if test="$nextP">
-        
-        <xsl:variable name="nextStyle" select="$nextP/w:pPr/w:pStyle/@w:val" />     <!-- The next paragraph's style  -->
-        
+
+        <xsl:variable name="nextStyle" select="$nextP/w:pPr/w:pStyle/@w:val"/>
+        <!-- The next paragraph's style  -->
+
         <!-- ... and the next paragraph has the same style  -->
-        <xsl:if test="w:pStyle/@w:val = $nextStyle or 
+        <xsl:if
+          test="w:pStyle/@w:val = $nextStyle or 
           (boolean(w:pStyle/@w:val) = false() and boolean($nextStyle) = false())">
-          <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>    
+          <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
         </xsl:if>
-      </xsl:if>   
+      </xsl:if>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="isContextualSpacing">
     <!-- @Description:  Checks whether the current paragraph has contextual spacing -->
     <!-- @Context: A paragraph node (i.e. &lt;w:Ppr&gt;), or a node paragraph property node (i.e. &lt;w:Ppr&gt;)-->
     <!-- @Returns: <b>true</b> if the current paragraph has contextual spacing, <b>false</b> otherwise    -->
-    
+
     <xsl:choose>
-      
+
       <!-- is Contextual Spacing defined in current paragraph properties?... -->
       <xsl:when test="w:contextualSpacing/@w:val= '0' ">false</xsl:when>
       <xsl:when test="w:contextualSpacing">true</xsl:when>
-      
+
       <!-- is Contextual Spacing defined in parent style?... -->
       <xsl:when test="w:pStyle/@w:val">
         <xsl:call-template name="isContextualSpacingInStyle">
           <xsl:with-param name="styleID" select="w:pStyle/@w:val"/>
         </xsl:call-template>
       </xsl:when>
-      
+
       <!-- is Contextual Spacing defined in default style?... -->
       <xsl:otherwise>
         <xsl:call-template name="isContextualSpacingInStyle"/>
-      </xsl:otherwise>        
-    </xsl:choose>        
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="isContextualSpacingInStyle">
     <!-- @Description: Checks a given style for contextual spacing. If not found, 
                        will search recursively in the parent's styles -->
     <!-- @Context:     none -->
     <!-- @Returns:     <b>true</b> if the element &lt;w:contextualSpacing/&gt; is found, 
                        <b>false</b> otherwise. -->
-    
-    <xsl:param name="styleID" /> <!-- The style ID of the style to be parsed. 
+
+    <xsl:param name="styleID"/>
+    <!-- The style ID of the style to be parsed. 
                                       If not specified will use the default style -->
-    
+
     <!-- Switch context in order to parse the styles in word/styles.xml -->
     <xsl:for-each select="document('word/styles.xml')/w:styles">
       <xsl:choose>
-        
+
         <!-- We have a named style... -->
         <xsl:when test="$styleID">
-          <xsl:variable name="style" select="key('StyleId', $styleID)"/> <!--  The style to be parsed -->
-          
+          <xsl:variable name="style" select="key('StyleId', $styleID)"/>
+          <!--  The style to be parsed -->
+
           <xsl:choose>
             <xsl:when test="$style/w:pPr/w:contextualSpacing/@w:val= '0' ">false</xsl:when>
             <xsl:when test="$style/w:pPr/w:contextualSpacing">true</xsl:when>
-            
+
             <!-- Search the parent style if any... -->
             <xsl:otherwise>
               <xsl:variable name="parentStyleID" select="$style/w:basedOn/@w:val"/>
-              <xsl:choose>                                                                
+              <xsl:choose>
                 <xsl:when test="$parentStyleID">
                   <xsl:call-template name="isContextualSpacingInStyle">
                     <xsl:with-param name="styleID" select="$parentStyleID"/>
                   </xsl:call-template>
-                </xsl:when>                
+                </xsl:when>
                 <xsl:otherwise>false</xsl:otherwise>
-              </xsl:choose>                            
+              </xsl:choose>
             </xsl:otherwise>
-          </xsl:choose>           
+          </xsl:choose>
         </xsl:when>
-        
+
         <!-- Checks the default style...  -->
         <xsl:otherwise>
           <xsl:variable name="style" select="key('default-styles', 'paragraph')"/>
           <xsl:choose>
             <xsl:when test="$style/w:pPr/w:contextualSpacing">true</xsl:when>
             <xsl:otherwise>false</xsl:otherwise>
-          </xsl:choose> 
+          </xsl:choose>
         </xsl:otherwise>
-        
-      </xsl:choose>               
-    </xsl:for-each>    
+
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
-  
-  
+
+
   <!-- avoid inserting text in paragraph properties -->
   <xsl:template match="w:t" mode="pPrChildren">
     <xsl:apply-templates mode="automaticstyles"/>
@@ -2238,11 +2430,19 @@
   <xsl:template name="InsertParagraphBreakBefore">
     <xsl:choose>
       <xsl:when test="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']">
+        <!-- if this is a break page-->
+        <xsl:if test="parent::w:p/w:r/w:br[@w:type='page']">
+          <xsl:call-template name="InsertFlagTextBeforeBreakPage2"/>
+        </xsl:if>
         <xsl:attribute name="fo:break-before">
           <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
         </xsl:attribute>
       </xsl:when>
       <xsl:when test="w:r/w:br[@w:type='page' or @w:type='column']">
+        <!-- if this is a break page-->
+        <xsl:if test="w:r/w:br[@w:type='page']">
+          <xsl:call-template name="InsertFlagTextBeforeBreakPage1"/>
+        </xsl:if>
         <xsl:attribute name="fo:break-before">
           <xsl:value-of select="w:br[@w:type='page' or @w:type='column']/@w:type"/>
         </xsl:attribute>
@@ -2263,6 +2463,11 @@
           and (not(preceding::w:p[1]/w:pPr/w:sectPr/w:footerReference) or not(following::w:sectPr[1]/w:footerReference)))
           or not(preceding::w:p[1]/w:pPr/w:sectPr)">
           <xsl:if test="w:pageBreakBefore">
+            <!-- if this is a break page-->
+            <xsl:if
+              test="w:pageBreakBefore/@w:val!='off' and w:pageBreakBefore/@w:val!='false' and w:pageBreakBefore/@w:val!=0">
+              <xsl:call-template name="InsertFlagTextBeforeBreakPage3"/>
+            </xsl:if>
             <xsl:attribute name="fo:break-before">
               <xsl:choose>
                 <xsl:when
@@ -2284,6 +2489,30 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Detect if there is text before a break page in a paragraph -->
+  <!-- BUG 1583404 - Page breaks not correct converted - 09/07/2007-->
+  <xsl:template name="InsertFlagTextBeforeBreakPage1">
+    <xsl:if test="preceding-sibling::w:r/w:t[1]">
+      <xsl:attribute name="pcut:cut">
+        <xsl:value-of select="'1'"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="InsertFlagTextBeforeBreakPage2">
+    <xsl:if test="parent::w:p/w:r[w:br[@w:type='page']]/preceding-sibling::w:r/w:t[1]">
+      <xsl:attribute name="pcut:cut">
+        <xsl:value-of select="'1'"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="InsertFlagTextBeforeBreakPage3">
+    <xsl:if test="ancestor::w:r/preceding-sibling::w:r/w:t[1]">
+      <xsl:attribute name="pcut:cut">
+        <xsl:value-of select="'1'"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
   <!-- borders. -->
   <xsl:template match="w:pBdr" mode="pPrChildren">
     <xsl:call-template name="InsertParagraphBorder"/>
@@ -2294,12 +2523,7 @@
   <!-- bg color -->
   <xsl:template match="w:shd" mode="pPrChildren">
     <xsl:attribute name="fo:background-color">
-      <xsl:choose>
-        <xsl:when test="@w:fill='auto' or not(@w:fill)">transparent</xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="concat('#',@w:fill)"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="ComputeShading"/>
     </xsl:attribute>
   </xsl:template>
 
@@ -2334,7 +2558,7 @@
     <!-- margin left -->
     <xsl:attribute name="fo:margin-left">
       <xsl:choose>
-        <xsl:when test="$MarginLeft != '' and $MarginLeft != 'NaN'">
+        <xsl:when test="$MarginLeft != '' and $MarginLeft != 'NaN' and $MarginLeft != 0">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:value-of select="$MarginLeft"/>
@@ -2345,7 +2569,7 @@
         <xsl:otherwise>0cm</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-
+    
     <xsl:variable name="FirstLine">
       <xsl:call-template name="FirstLine"/>
     </xsl:variable>
@@ -2390,28 +2614,174 @@
   </xsl:template>
 
   <!-- spacing before/after and line spacing -->
+  <!-- Can came from style.xml or document.xml-->
   <xsl:template match="w:spacing" mode="pPrChildren">
-    <!-- spacing before/after -->
-    <xsl:if test="@w:before">
-      <xsl:attribute name="fo:margin-top">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="@w:before"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
+
+    <!--fo:margin-top and bottom must be defined together (ODF 1.1 Spec.)-->
+    <!--if only one is set we must get the other in hierarchy style-->
+    <xsl:variable name="From" select="name(parent::node()/parent::node())"/>
+    <xsl:variable name="parentStyle" select="parent::node()/parent::node()/w:basedOn/@w:val"/>
+    <xsl:variable name="NodeStyleId" select="parent::node()/parent::node()/@w:styleId"/>
+
+    <xsl:variable name="NodeStyleFromContent" select="parent::node()/w:pStyle/@w:val"/>
+
+
+    <!--/@w:styleId-->
+
+    <!--if name of parent:parent node is w:style or w:p -->
+
+    <xsl:choose>
+      <xsl:when test="$From='w:style'">
+
+        <xsl:choose>
+          <xsl:when test="count(@w:before)=0 and count(@w:after)=0">
+            <!--Nothing to do the parent style is well defined-->
+          </xsl:when>
+
+          <xsl:when test="count(@w:before)=1 and count(@w:after)=0">
+            <!--Retrieve w:after from hierarchy styles  -->
+            <xsl:variable name="foMarginBottomToWrite">
+              <xsl:call-template name="getMarginBottomForParagraph">
+                <xsl:with-param name="StyleParagraphId" select="$NodeStyleId"/>
+                <xsl:with-param name="documentParagraphWAfter" select="@w:after"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <!--Write the margins-->
+            <xsl:call-template name="setFoMarginTop">
+              <xsl:with-param name="setParagraphWBefore" select="@w:before"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="setFoMarginBottom">
+              <xsl:with-param name="setParagraphWAfter" select="$foMarginBottomToWrite"/>
+            </xsl:call-template>
+
+          </xsl:when>
+
+          <xsl:when test="count(@w:before)=0 and count(@w:after)=1">
+
+            <!--Retrieve w:after from hierarchy styles  -->
+            <xsl:variable name="foMarginTopToWrite">
+              <xsl:call-template name="getMarginTopForParagraph">
+                <xsl:with-param name="StyleParagraphId" select="$NodeStyleId"/>
+                <xsl:with-param name="documentParagraphWBefore" select="@w:before"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <!--Write the margins-->
+            <xsl:call-template name="setFoMarginTop">
+              <xsl:with-param name="setParagraphWBefore" select="$foMarginTopToWrite"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="setFoMarginBottom">
+              <xsl:with-param name="setParagraphWAfter" select="@w:after"/>
+            </xsl:call-template>
+
+
+          </xsl:when>
+
+
+          <xsl:when test="count(@w:before)=1 and count(@w:after)=1">
+            <xsl:call-template name="setFoMarginTop">
+              <xsl:with-param name="setParagraphWBefore" select="@w:before"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="setFoMarginBottom">
+              <xsl:with-param name="setParagraphWAfter" select="@w:after"/>
+            </xsl:call-template>
+
+          </xsl:when>
+        </xsl:choose>
+
+
+      </xsl:when>
+
+      <xsl:when test="$From='w:p'">
+
+        <xsl:choose>
+          <xsl:when test="count(@w:before)=0 and count(@w:after)=0">
+            <!--Nothing to do the parent style is well defined-->
+          </xsl:when>
+
+          <xsl:when test="count(@w:before)=1 and count(@w:after)=0">
+            <!--Retrieve w:after from hierarchy styles  -->
+            <xsl:variable name="foMarginBottomToWrite">
+              <xsl:call-template name="getMarginBottomForParagraph">
+                <xsl:with-param name="StyleParagraphId" select="$NodeStyleFromContent"/>
+                <xsl:with-param name="documentParagraphWAfter" select="@w:after"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <!--Write the margins-->
+            <xsl:call-template name="setFoMarginTop">
+              <xsl:with-param name="setParagraphWBefore" select="@w:before"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="setFoMarginBottom">
+              <xsl:with-param name="setParagraphWAfter" select="$foMarginBottomToWrite"/>
+            </xsl:call-template>
+
+          </xsl:when>
+
+          <xsl:when test="count(@w:before)=0 and count(@w:after)=1">
+
+            <!--Retrieve w:after from hierarchy styles  -->
+            <xsl:variable name="foMarginTopToWrite">
+              <xsl:call-template name="getMarginTopForParagraph">
+                <xsl:with-param name="StyleParagraphId" select="$NodeStyleFromContent"/>
+                <xsl:with-param name="documentParagraphWBefore" select="@w:before"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <!--Write the margins-->
+            <xsl:call-template name="setFoMarginTop">
+              <xsl:with-param name="setParagraphWBefore" select="$foMarginTopToWrite"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="setFoMarginBottom">
+              <xsl:with-param name="setParagraphWAfter" select="@w:after"/>
+            </xsl:call-template>
+
+          </xsl:when>
+
+
+          <xsl:when test="count(@w:before)=1 and count(@w:after)=1">
+            <xsl:call-template name="setFoMarginTop">
+              <xsl:with-param name="setParagraphWBefore" select="@w:before"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="setFoMarginBottom">
+              <xsl:with-param name="setParagraphWAfter" select="@w:after"/>
+            </xsl:call-template>
+
+          </xsl:when>
+        </xsl:choose>
+
+      </xsl:when>
+
+
+      <xsl:otherwise>
+        <!--Come from Default Style (OOX-wpPrDefault)-->
+        <!-- spacing before/after -->
+        <xsl:call-template name="setFoMarginTop">
+          <xsl:with-param name="setParagraphWBefore" select="@w:before"/>
         </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test="@w:after">
-      <xsl:attribute name="fo:margin-bottom">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="@w:after"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
+
+        <xsl:call-template name="setFoMarginBottom">
+          <xsl:with-param name="setParagraphWAfter" select="@w:after"/>
         </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
+
+
+      </xsl:otherwise>
+
+    </xsl:choose>
+
+
+
+
+
+
+
     <!-- line spacing -->
     <xsl:if test="@w:line">
       <xsl:choose>
@@ -2450,20 +2820,26 @@
   <xsl:template match="w:jc" mode="pPrChildren">
     <xsl:attribute name="fo:text-align">
       <xsl:choose>
-        <xsl:when test="@w:val='center'">
-          <xsl:value-of select="'center'"/>
-        </xsl:when>
+        <xsl:when test="@w:val='center'">center</xsl:when>
         <xsl:when test="@w:val='left'">
-          <xsl:value-of select="'start'"/>
+          <xsl:choose>
+            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ])">end</xsl:when>
+            <xsl:otherwise>start</xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:when test="@w:val='right'">
-          <xsl:value-of select="'end'"/>
+          <xsl:choose>
+            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ])"
+              >start</xsl:when>
+            <xsl:otherwise>end</xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
-        <xsl:when test="@w:val='both' or @w:val='distribute'">
-          <xsl:value-of select="'justify'"/>
-        </xsl:when>
+        <xsl:when test="@w:val='both' or @w:val='distribute'">justify</xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="'start'"/>
+          <xsl:choose>
+            <xsl:when test="parent::w:pPr/w:bidi and not(parent::w:pPr/w:bidi[@w:val = 'off' ])">end</xsl:when>
+            <xsl:otherwise>start</xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
@@ -2561,12 +2937,24 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Default properties for bidi paragraphs -->
+  <xsl:template name="InsertDefaultBidiProperties">
+    <xsl:if test="w:bidi and not(w:bidi[@w:val = 'off'])">
+      <xsl:if test="not(w:jc)">
+        <xsl:attribute name="fo:text-align">end</xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="style:writing-mode">rl-tb</xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
   <!-- tab stops -->
   <xsl:template name="InsertParagraphTabStops">
     <xsl:param name="MarginLeft"/>
     <xsl:param name="parentStyleId"/>
     <xsl:variable name="parentParentStyleId">
-      <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:basedOn/@w:val"/>
+      <xsl:value-of
+        select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:basedOn/@w:val"
+      />
     </xsl:variable>
     <xsl:if
       test="w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:pPr/w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentParentStyleId]/w:pPr/w:tabs">
@@ -3580,7 +3968,7 @@
             <xsl:value-of select="concat(number($percentValue),' 100')"/>
           </xsl:attribute>
         </xsl:when>
-        
+
         <!-- BUG [ 1743455 ] DOCX: 3 files corrupted during conversion
                03 / 07 / 2007
                It seems the Text-position value is wrong for the otherwise condition
@@ -3701,6 +4089,239 @@
         </style:text-properties>
       </style:style>
     </xsl:for-each>
+  </xsl:template>
+
+
+  <!-- Called from getMarginTopForParagraph in case of lack of styleId-->
+  <!-- Find the default w:before in w:pPrDefault-->
+  <xsl:template name="getMarginTopFromWpPrDefault">
+
+    <xsl:variable name="documentParagraphWBeforeNormal"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId='Normal']/w:pPr/w:spacing/@w:before"/>
+    <xsl:variable name="documentParagraphWBeforeDefault"
+      select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before"/>
+
+    <xsl:choose>
+
+      <xsl:when
+        test="count($documentParagraphWBeforeNormal)=0 and count($documentParagraphWBeforeDefault)=0">
+        <xsl:value-of select="'0'"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentParagraphWBeforeNormal)=0 and count($documentParagraphWBeforeDefault)>0">
+        <xsl:value-of select="$documentParagraphWBeforeDefault"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentParagraphWBeforeNormal)>0 and count($documentParagraphWBeforeDefault)=0">
+        <xsl:value-of select="$documentParagraphWBeforeNormal"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentParagraphWBeforeNormal)>0 and count($documentParagraphWBeforeDefault)>0">
+        <xsl:value-of select="$documentParagraphWBeforeNormal"/>
+      </xsl:when>
+
+    </xsl:choose>
+
+  </xsl:template>
+
+
+  <!-- Called from getMarginBottomForParagraph in case of lack of styleId-->
+  <!-- Find the default w:after in w:pPrDefault-->
+  <xsl:template name="getMarginBottomFromWpPrDefault">
+
+    <xsl:variable name="documentParagraphWAfterNormal"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId='Normal']/w:pPr/w:spacing/@w:after"/>
+    <xsl:variable name="documentParagraphWAfterDefault"
+      select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after"/>
+
+    <xsl:choose>
+      <xsl:when
+        test="count($documentParagraphWAfterNormal)=0 and count($documentParagraphWAfterDefault)=0">
+        <xsl:value-of select="'0'"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentParagraphWAfterNormal)=0 and count($documentParagraphWAfterDefault)>0">
+        <xsl:value-of select="$documentParagraphWAfterDefault"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentParagraphWAfterNormal)>0 and count($documentParagraphWAfterDefault)=0">
+        <xsl:value-of select="$documentParagraphWAfterNormal"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentParagraphWAfterNormal)>0 and count($documentParagraphWAfterDefault)>0">
+        <xsl:value-of select="$documentParagraphWAfterNormal"/>
+      </xsl:when>
+
+    </xsl:choose>
+  </xsl:template>
+
+
+
+  <!-- Writing attributes -->
+  <!-- Write the attribute for fo:margin-top-->
+  <xsl:template name="setFoMarginTop">
+    <xsl:param name="setParagraphWBefore"/>
+
+    <xsl:if test="$setParagraphWBefore!=''">
+      <xsl:attribute name="fo:margin-top">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$setParagraphWBefore"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Write the attribute for fo:margin-bottom-->
+  <xsl:template name="setFoMarginBottom">
+    <xsl:param name="setParagraphWAfter"/>
+
+    <xsl:if test="$setParagraphWAfter!=''">
+      <xsl:attribute name="fo:margin-bottom">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$setParagraphWAfter"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  <!--// Writing attributes -->
+  <xsl:template name="getMarginTopForParagraph">
+
+    <xsl:param name="StyleParagraphId"/>
+    <xsl:param name="documentParagraphWBefore"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleParagraphId]/w:pPr/w:spacing/@w:before"/>
+
+    <xsl:variable name="parentStyleId"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleParagraphId]/w:basedOn[1]/@w:val"/>
+
+    <xsl:variable name="bStop">
+
+      <xsl:if test="count($documentParagraphWBefore)>0 and $StyleParagraphId!=''">
+        <!-- We have values for margin-->
+        <xsl:value-of select="1"/>
+      </xsl:if>
+
+      <xsl:if
+        test="count($documentParagraphWBefore)=0 and count($parentStyleId)>0 and $StyleParagraphId!=''">
+        <!-- we dont have values for margin but we have a parent-->
+        <xsl:value-of select="0"/>
+      </xsl:if>
+
+      <xsl:if
+        test="count($documentParagraphWBefore)=0 and count($parentStyleId)=0 and $StyleParagraphId!=''">
+        <!-- We are at the top of the tree without any values -->
+        <xsl:value-of select="2"/>
+      </xsl:if>
+
+      <xsl:if test="$StyleParagraphId=''">
+        <!-- No styleId is defined, we must apply the the <w:pPrDefault> -->
+        <xsl:value-of select="3"/>
+      </xsl:if>
+
+
+    </xsl:variable>
+
+    <xsl:choose>
+
+      <!--Stop Condition-->
+      <xsl:when test="$bStop='1'">
+        <!--Return founded margins-->
+        <xsl:value-of select="$documentParagraphWBefore"/>
+      </xsl:when>
+
+      <xsl:when test="$bStop='0'">
+        <xsl:call-template name="getMarginTopForParagraph">
+          <xsl:with-param name="StyleParagraphId" select="$parentStyleId"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test="$bStop='2'">
+        <xsl:call-template name="getMarginTopFromWpPrDefault"/>
+      </xsl:when>
+
+      <xsl:when test="$bStop='3'">
+        <!-- No styleId is defined, we must apply the the <w:pPrDefault> -->
+        <xsl:call-template name="getMarginTopFromWpPrDefault"/>
+      </xsl:when>
+
+    </xsl:choose>
+  </xsl:template>
+
+
+  <!--Return values of w:spacing/@w:after value from hierarchystyle-->
+  <xsl:template name="getMarginBottomForParagraph">
+
+    <xsl:param name="StyleParagraphId"/>
+    <xsl:param name="documentParagraphWAfter"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleParagraphId]/w:pPr/w:spacing/@w:after"/>
+
+    <xsl:variable name="parentStyleId"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleParagraphId]/w:basedOn[1]/@w:val"/>
+
+    <xsl:variable name="bStop">
+
+      <xsl:if test="count($documentParagraphWAfter)>0 and $StyleParagraphId!=''">
+        <!-- We have values for margin-->
+        <xsl:value-of select="1"/>
+      </xsl:if>
+
+      <xsl:if
+        test="count($documentParagraphWAfter)=0 and count($parentStyleId)>0 and $StyleParagraphId!=''">
+        <!-- we dont have values for margin but we have a parent-->
+        <xsl:value-of select="0"/>
+      </xsl:if>
+
+      <xsl:if
+        test="count($documentParagraphWAfter)=0 and count($parentStyleId)=0 and $StyleParagraphId!=''">
+        <!-- We are at the top of the tree without any values -->
+        <xsl:value-of select="2"/>
+      </xsl:if>
+
+      <xsl:if test="$StyleParagraphId=''">
+        <!-- No styleId is defined, we must apply the the <w:pPrDefault> if exists -->
+        <xsl:value-of select="3"/>
+      </xsl:if>
+
+
+    </xsl:variable>
+
+    <xsl:choose>
+
+      <!--Stop Condition-->
+
+      <xsl:when test="$bStop='1'">
+        <!--Return founded margins-->
+        <xsl:value-of select="$documentParagraphWAfter"/>
+      </xsl:when>
+
+      <xsl:when test="$bStop='0'">
+        <xsl:call-template name="getMarginBottomForParagraph">
+          <xsl:with-param name="StyleParagraphId" select="$parentStyleId"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test="$bStop='2'">
+        <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
+      </xsl:when>
+
+      <xsl:when test="$bStop='3'">
+        <!-- No styleId is defined, we must apply the the <w:pPrDefault> -->
+        <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
+      </xsl:when>
+
+
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

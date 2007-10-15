@@ -77,46 +77,50 @@
     </xsl:choose>
   </xsl:template>
 
+  
   <xsl:template match="w:tc">
     <xsl:choose>
+      <!-- for w:vMerge="continuous" cells, create a table:covered-table-cell element --> 
       <xsl:when test="w:tcPr/w:vMerge and not(w:tcPr/w:vMerge/@w:val = 'restart')">
-        <table:covered-table-cell>
-          <xsl:attribute name="table:style-name">
-            <xsl:value-of select="generate-id(self::w:tc)"/>
-          </xsl:attribute>
-          <!-- COMMENT : no span attributes -->
+        <table:covered-table-cell table:style-name="{generate-id()}">
           <xsl:apply-templates/>
         </table:covered-table-cell>
       </xsl:when>
       <xsl:otherwise>
-        <table:table-cell>
-          <xsl:attribute name="table:style-name">
-            <xsl:value-of select="generate-id(self::w:tc)"/>
-          </xsl:attribute>
-
+        <!-- create normal a table cell -->
+        <table:table-cell table:style-name="{generate-id()}">
           <!-- column-span -->
           <xsl:if test="w:tcPr/w:gridSpan and w:tcPr/w:gridSpan/@w:val != '0'">
             <xsl:attribute name="table:number-columns-spanned">
               <xsl:value-of select="w:tcPr/w:gridSpan/@w:val"/>
             </xsl:attribute>
           </xsl:if>
-          <!-- row-span -->
+          <!-- new row-span (w:vMerge="restart") -->
           <xsl:if test="w:tcPr/w:vMerge and w:tcPr/w:vMerge/@w:val = 'restart' ">
-            <xsl:attribute name="table:number-rows-spanned">
+            <xsl:variable name="number-rows-spanned">
               <xsl:call-template name="ComputeNumberRowsSpanned">
                 <xsl:with-param name="cellPosition">
                   <xsl:call-template name="GetCellPosition"/>
                 </xsl:with-param>
               </xsl:call-template>
+            </xsl:variable>
+            <xsl:attribute name="table:number-rows-spanned">
+              <xsl:choose>
+                <!-- patch: can't have number-rows-spanned < 2 -->
+                <xsl:when test="$number-rows-spanned &lt; 2">2</xsl:when>
+                <xsl:otherwise><xsl:value-of select="$number-rows-spanned"/></xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:if>
-
           <xsl:apply-templates/>
         </table:table-cell>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
+  
+ 
+  
   <xsl:template match="w:tblPr" mode="automaticstyles">
     <style:style style:name="{generate-id(parent::w:tbl)}" style:family="table">
       <xsl:if test="w:tblStyle">
@@ -170,7 +174,7 @@
     <xsl:param name="rowCount" select="1"/>
 
     <xsl:choose>
-      <xsl:when test="ancestor::w:tr[1]/following-sibling::w:tr">
+      <xsl:when test="ancestor::w:tr[1]/following-sibling::w:tr[1]">
         <xsl:for-each select="ancestor::w:tr[1]/following-sibling::w:tr[1]/w:tc[1]">
           <xsl:call-template name="ComputeNumberRowsSpannedUsingCells">
             <xsl:with-param name="cellPosition" select="$cellPosition"/>
@@ -191,13 +195,32 @@
     <xsl:variable name="currentPosition">
       <xsl:call-template name="GetCellPosition"/>
     </xsl:variable>
-
     <xsl:choose>
       <xsl:when test="$currentPosition = $cellPosition">
-        <xsl:if test="w:tcPr/w:vMerge and not(w:tcPr/w:vMerge/@w:val = 'restart')">
-          <xsl:value-of select="$rowCount + 1"/>
-        </xsl:if>
+        <xsl:choose>
+          <!-- go to the following row -->
+          <xsl:when test="w:tcPr/w:vMerge and not(w:tcPr/w:vMerge/@w:val = 'restart')">
+             <xsl:choose>
+               <xsl:when test="not(parent::w:tr/following-sibling::w:tr[1]/w:tc[1])">
+                 <!-- Bug #1694962 -->
+                 <xsl:value-of select="$rowCount +2"/>
+               </xsl:when>
+               <xsl:otherwise>
+                 <xsl:for-each select="parent::w:tr/following-sibling::w:tr[1]/w:tc[1]">
+                   <xsl:call-template name="ComputeNumberRowsSpannedUsingCells">
+                     <xsl:with-param name="cellPosition" select="$cellPosition"/>
+                     <xsl:with-param name="rowCount" select="$rowCount+1"/>
+                   </xsl:call-template>
+                 </xsl:for-each>
+               </xsl:otherwise>
+             </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$rowCount"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
+      <!-- go to the following cell -->
       <xsl:when test="$currentPosition &lt; $cellPosition and following-sibling::w:tc[1]">
         <xsl:for-each select="following-sibling::w:tc[1]">
           <xsl:call-template name="ComputeNumberRowsSpannedUsingCells">
@@ -438,10 +461,13 @@
     <!-- Background color -->
     <xsl:if test="w:shd">
       <xsl:attribute name="fo:background-color">
-        <xsl:value-of select="concat('#', w:shd/@w:fill)"/>
+        <xsl:for-each select="w:shd">
+          <xsl:call-template name="ComputeShading"/>
+          </xsl:for-each>
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
+ 
 
   <!-- insert table cell content vertical alignment -->
   <xsl:template name="InsertCellVAlign">

@@ -59,46 +59,47 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -112,56 +113,58 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  
+
   <data name="translation.odf2oox.paddingShortened" xml:space="preserve">
-    <value>Padding verkort</value>
+    <value>Opvulgrootte</value>
   </data>
   <data name="translation.odf2oox.borderShortened" xml:space="preserve">
-    <value>Rand verkort</value>
+    <value>Randgrootte</value>
   </data>
   <data name="translation.odf2oox.textBgColor" xml:space="preserve">
-    <value>Kleur achtergrond tekst</value>
+    <value>Tekstachtergrondkleur</value>
   </data>
   <data name="translation.odf2oox.dateFormat" xml:space="preserve">
-    <value>Formaat datum</value>
+    <value>Datumformaat</value>
   </data>
   <data name="translation.odf2oox.chapterField" xml:space="preserve">
-    <value>Veld hoofdstuk (als stijl niet bepaald)</value>
+    <value>Hoofdstukveld (stijl niet gedefinieerd)</value>
   </data>
   <data name="translation.odf2oox.descriptionField" xml:space="preserve">
-    <value>Veld beschrijving</value>
+    <value>Beschrijvingsveld</value>
   </data>
   <data name="translation.odf2oox.printedByField" xml:space="preserve">
-    <value>Veld gedrukt door</value>
+    <value>Veld Afgedrukt op</value>
   </data>
   <data name="translation.odf2oox.pageVariableField" xml:space="preserve">
-    <value>Veld paginavariabele</value>
+    <value>Veld Paginavariabelen</value>
   </data>
   <data name="translation.odf2oox.ddeConnection" xml:space="preserve">
     <value>DDE-verbinding</value>
   </data>
   <data name="translation.odf2oox.formulaField" xml:space="preserve">
-    <value>Veld formule</value>
+    <value>Formuleveld</value>
   </data>
   <data name="translation.odf2oox.internetProperties" xml:space="preserve">
-    <value>Eigenschappen internet</value>
+    <value>Interneteigenschappen</value>
   </data>
   <data name="translation.odf2oox.documentCreationDate" xml:space="preserve">
-    <value>Datum aanmaak document</value>
+    <value>Datum waarop het document is aangemaakt</value>
   </data>
   <data name="translation.odf2oox.documentModificationDate" xml:space="preserve">
-    <value>Datum laatste wijziging document</value>
+    <value>Datum waarop het document het laatst is gewijzigd</value>
   </data>
   <data name="translation.odf2oox.nestedFrames" xml:space="preserve">
-    <value>Ingevoegde kaders</value>
+    <value>Geneste frames</value>
   </data>
   <data name="translation.odf2oox.positionInsideTextbox" xml:space="preserve">
-    <value>Positie object binnen tekstvak</value>
+    <value>Positie van object in tekstvak</value>
   </data>
   <data name="translation.odf2oox.annotationsInsideTextbox" xml:space="preserve">
     <value>Aantekeningen in tekstvak</value>
@@ -182,58 +185,58 @@
     <value>Voorwaardelijke verborgen sectie</value>
   </data>
   <data name="translation.odf2oox.protectionKey" xml:space="preserve">
-    <value>Beschermingssleutel voor %1 </value>
+    <value>Beveiligingssleutel voor %1</value>
   </data>
   <data name="translation.odf2oox.indexChapterScope" xml:space="preserve">
-    <value>Index %1 bereik hoofdstuk</value>
+    <value>Index %1 hoofdstukscope</value>
   </data>
   <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve">
-    <value>Index %1 eigenschap inspringing</value>
+    <value>Index %1 inspringeigenschap</value>
   </data>
   <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve">
-    <value>Index %1 sorteeralgoritme</value>
+    <value>Index %1 soort algoritme</value>
   </data>
   <data name="translation.odf2oox.indexProtection" xml:space="preserve">
-    <value>Index %1 bescherming</value>
+    <value>Index %1 beveiliging</value>
   </data>
   <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve">
-    <value>Alfabetische index overeenstemmingsbestand</value>
+    <value>Alfabetische index concordantiebestand</value>
   </data>
   <data name="translation.odf2oox.dropcapSize" xml:space="preserve">
-    <value>Omvang dropcap </value>
+    <value>Initiaalgrootte</value>
   </data>
   <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve">
-    <value>Pagina-einde voor eindnoten</value>
+    <value>Pagina-einde vóór eindnoten</value>
   </data>
   <data name="translation.odf2oox.noteInList" xml:space="preserve">
-    <value>Noot in lijst</value>
+    <value>Opmerking in lijst</value>
   </data>
   <data name="translation.odf2oox.footnoteContinuationSeparator" xml:space="preserve">
-    <value>Scheidingsteken vervolg voetnoot</value>
+    <value>Voetnoot vervolgscheidingsteken</value>
   </data>
   <data name="translation.odf2oox.footnoteSeparatorWidth" xml:space="preserve">
-    <value>Breedte scheidingsteken voetnoot</value>
+    <value>Breedte voetnootscheidingsteken</value>
   </data>
   <data name="translation.odf2oox.footnoteSeparatorLength" xml:space="preserve">
-    <value>Lengte scheidingsteken voetnoot</value>
+    <value>Lengte voetnootscheidingsteken</value>
   </data>
   <data name="translation.odf2oox.footnoteSeparatorColor" xml:space="preserve">
-    <value>Kleur scheidingsteken voetnoot</value>
+    <value>Kleur voetnootscheidingsteken</value>
   </data>
   <data name="translation.odf2oox.footnoteSeparatorStyle" xml:space="preserve">
-    <value>Stijl scheidingsteken voetnoot</value>
+    <value>Stijl voetnootscheidingsteken</value>
   </data>
   <data name="translation.odf2oox.footnoteMaximumHeight" xml:space="preserve">
-    <value>Maximale hoogte voetnoot</value>
+    <value>Hoogte voetnootscheidingsteken</value>
   </data>
   <data name="translation.odf2oox.svmImage" xml:space="preserve">
-    <value>SVM-beeld</value>
+    <value>SVM-afbeelding</value>
   </data>
   <data name="translation.odf2oox.embeddedObject" xml:space="preserve">
-    <value>Ingebed object</value>
+    <value>Ingesloten object</value>
   </data>
   <data name="translation.odf2oox.embeddedPluginFile" xml:space="preserve">
-    <value>Ingebed bestand met plug-in</value>
+    <value>Ingesloten bestand met invoegtoepassing</value>
   </data>
   <data name="translation.odf2oox.applet" xml:space="preserve">
     <value>Applet</value>
@@ -242,46 +245,46 @@
     <value>Zwevend frame</value>
   </data>
   <data name="translation.odf2oox.croppedImage" xml:space="preserve">
-    <value>Afgesneden beeld</value>
+    <value>Afbeelding bijsnijden</value>
   </data>
   <data name="translation.odf2oox.scaledImage" xml:space="preserve">
-    <value>Aangepast beeld</value>
+    <value>Schaal van afbeelding aanpassen</value>
   </data>
   <data name="translation.odf2oox.valignInsideTextbox" xml:space="preserve">
-    <value>Verticale uitlijning van tekst binnen tekstvak</value>
+    <value>Verticale uitlijning in tekstvak</value>
   </data>
   <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
-    <value>Vorm tekstomloop boven-en-onder</value>
+    <value>Vorm van boven- en ondertekstomloop</value>
   </data>
   <data name="translation.odf2oox.textOrientationInsideTextbox" xml:space="preserve">
-    <value>Richting tekst in tekstvak</value>
+    <value>Tekstafdrukstand in tekstvak</value>
   </data>
   <data name="translation.odf2oox.alphabeticalIndexColumnNumber" xml:space="preserve">
     <value>Alfabetische index kolomnummer</value>
   </data>
   <data name="translation.odf2oox.listBulletAlignment" xml:space="preserve">
-    <value>Uitlijning lijst met opsommingstekens</value>
+    <value>Uitlijning opsommingstekens</value>
   </data>
   <data name="translation.odf2oox.distanceNumberingText" xml:space="preserve">
-    <value>Afstand tussen nummering en tekst</value>
+    <value>Afstand tussen nummers en tekst</value>
   </data>
   <data name="translation.odf2oox.spacingTopPageAndTable" xml:space="preserve">
-    <value>Afstand bovenaan pagina/tabel</value>
+    <value>Afstand aan de bovenkant van pagina/tabel</value>
   </data>
   <data name="translation.odf2oox.pageLayout" xml:space="preserve">
-    <value>Weergave pagina</value>
+    <value>Eigenschappen pagina-layout</value>
   </data>
   <data name="translation.odf2oox.alignmentLastLine" xml:space="preserve">
-    <value>Uitlijning laatste lijn</value>
+    <value>Uitlijning laatste regel</value>
   </data>
   <data name="translation.odf2oox.paragraphBgImage" xml:space="preserve">
-    <value>Achtergrondbeeld alinea</value>
+    <value>Alinea-achtergrondafbeelding</value>
   </data>
   <data name="translation.odf2oox.automaticPageBreak" xml:space="preserve">
     <value>Automatisch pagina-einde</value>
   </data>
   <data name="translation.odf2oox.numberWidowsOrphans" xml:space="preserve">
-    <value>Aantal zwevende regels </value>
+    <value>Aantal zwevende regels</value>
   </data>
   <data name="translation.odf2oox.blinkingText" xml:space="preserve">
     <value>Knipperende tekst</value>
@@ -290,7 +293,7 @@
     <value>Gedraaide tekst</value>
   </data>
   <data name="translation.odf2oox.fontWeight" xml:space="preserve">
-    <value>Dikte lettertype</value>
+    <value>Tekengewicht</value>
   </data>
   <data name="translation.odf2oox.capitalizedText" xml:space="preserve">
     <value>Tekst in hoofdletters</value>
@@ -299,141 +302,141 @@
     <value>Tekst in kleine letters</value>
   </data>
   <data name="translation.odf2oox.textScale600pct" xml:space="preserve">
-    <value>Tekstschaal groter dan 600%</value>
+    <value>Tekstschaal groter dan 600% verloren</value>
   </data>
   <data name="translation.odf2oox.leaderText" xml:space="preserve">
-    <value>Opvulteken tekst</value>
+    <value>Opvultekst</value>
   </data>
   <data name="translation.odf2oox.pageBgColor" xml:space="preserve">
-    <value>Kleur achtergrond pagina</value>
+    <value>Pagina-achtergrondkleur</value>
   </data>
   <data name="translation.odf2oox.paperTray" xml:space="preserve">
     <value>Papierlade</value>
   </data>
   <data name="translation.odf2oox.lineNumbering" xml:space="preserve">
-    <value>Regelnummers</value>
+    <value>Regelnummering</value>
   </data>
   <data name="translation.odf2oox.headerDistance" xml:space="preserve">
-    <value>Afstand koptekst</value>
+    <value>Koptekstafmetingen</value>
   </data>
   <data name="translation.odf2oox.footerDistance " xml:space="preserve">
-    <value>Afstand voettekst</value>
+    <value>Voettekstafmetingen</value>
   </data>
   <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
-    <value>Kenmerken scheidingsteken kolom</value>
+    <value>Eigenschappen kolomscheidingsteken</value>
   </data>
   <data name="translation.odf2oox.paragraphPageShadow" xml:space="preserve">
-    <value>Arcering alinea/pagina</value>
+    <value>Schaduweigenschap alinea/pagina</value>
   </data>
   <data name="translation.odf2oox.subtableBordersPadding" xml:space="preserve">
-    <value>Subtabel randen en padding</value>
+    <value>Randen en opvulling subtabel</value>
   </data>
   <data name="translation.odf2oox.consecutiveTables" xml:space="preserve">
     <value>Opeenvolgende tabellen</value>
   </data>
   <data name="translation.odf2oox.tableHeaderRepeated" xml:space="preserve">
-    <value>Hoofdtekst tabel herhaald op elke pagina</value>
+    <value>Herhaling tabelkoptekst</value>
   </data>
   <data name="translation.odf2oox.tableHeaderRows" xml:space="preserve">
-    <value>Rijen koptekst tabel</value>
+    <value>Tabelkoptekstrijen</value>
   </data>
   <data name="translation.odf2oox.tableTogetherWithParagraph" xml:space="preserve">
-    <value>Tabel samen met volgende alinea</value>
+    <value>Eigenschap tabel combineren met volgende alinea</value>
   </data>
   <data name="translation.odf2oox.unsplitableTable" xml:space="preserve">
-    <value>Niet splitsbare tabel</value>
+    <value>Eigenschap niet-splitsbare tabel</value>
   </data>
   <data name="translation.odf2oox.tableBgImage" xml:space="preserve">
-    <value>Beeld achtergrond tabel</value>
+    <value>Tabelachtergrondafbeelding</value>
   </data>
   <data name="translation.odf2oox.tableShadow" xml:space="preserve">
-    <value>Schaduw tabel</value>
+    <value>Eigenschap tabelschaduw</value>
   </data>
   <data name="translation.odf2oox.tableManualAlignment" xml:space="preserve">
-    <value>Manuele uitlijning tabel</value>
+    <value>Handmatige uitlijning van tabel</value>
   </data>
   <data name="translation.odf2oox.tableWith64Columns" xml:space="preserve">
-    <value>Kolommen op tafels met index hoger dan 64</value>
+    <value>Kolommen boven index 64 in een tabel</value>
   </data>
   <data name="translation.odf2oox.rowBgImage" xml:space="preserve">
-    <value>Beeld achtergrond rij</value>
+    <value>Rij-achtergrondafbeelding</value>
   </data>
   <data name="translation.odf2oox.protectedCell" xml:space="preserve">
-    <value>Beschermde cel</value>
+    <value>Eigenschap beveiligde cel</value>
   </data>
   <data name="translation.odf2oox.cellBgImage" xml:space="preserve">
-    <value>Beeld achtergrond cel</value>
+    <value>Celachtergrondafbeelding</value>
   </data>
   <data name="translation.odf2oox.cellShadow" xml:space="preserve">
-    <value>Schaduw cel</value>
+    <value>Eigenschap celschaduw</value>
   </data>
   <data name="translation.odf2oox.cellContentNotPrinted" xml:space="preserve">
-    <value>Inhoud cel niet gedrukt</value>
+    <value>Eigenschap celinhoud niet afgedrukt</value>
   </data>
   <data name="translation.odf2oox.cellContentRepeated" xml:space="preserve">
-    <value>Inhoud cel herhaald</value>
+    <value>Eigenschap celinhoud herhaald</value>
   </data>
   <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve">
-    <value>Draaihoek cel</value>
+    <value>Eigenschap celdraaiingshoek</value>
   </data>
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
-    <value>Uitlijning draaihoek cel</value>
+    <value>Eigenschap uitlijning celdraaiing</value>
   </data>
-  <data name="translation.odf2oox.tableIllustration.captionFormat" xml:space="preserve">
-    <value>Betitel formaat in tafel van illustratie niet vasthield</value>
+  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+    <value>Bijschriftformaat afbeeldingstabel</value>
   </data>
-  <data name="translation.odf2oox.text.lineThrough.width" xml:space="preserve">
-    <value>De lijn door breedte eigendom hield niet vast</value>
+  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">
+    <value>Eigenschap lijn door breedte</value>
   </data>
-  <data name="translation.odf2oox.text.lineThrough.color" xml:space="preserve">
-    <value>De lijn door breedte eigendom hield niet vast</value>
+  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve">
+    <value>Eigenschap lijn door kleur</value>
   </data>
   <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve">
-    <value>3D gevolgen voor behouden niet vormen</value>
+    <value>3D-effecten op vormen</value>
   </data>
   <data name="translation.oox2odf.shape.shadow" xml:space="preserve">
-    <value>De opaciteit van de schaduw op behouden niet vormen</value>
+    <value>Schaduweffect op vormen</value>
   </data>
   <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve">
-    <value>Shadow obscurity on shapes not retained</value>
+    <value>Schaduwduistereffect op vormen</value>
   </data>
   <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve">
-    <value>Obscurity van de schaduw op behouden niet vormen</value>
+    <value>Perspectiefschaduweffect op vormen</value>
   </data>
   <data name="translation.oox2odf.background.textWatermark" xml:space="preserve">
-    <value>Text watermark feature not retained</value>
+    <value>Achtergrond met watermerk</value>
   </data>
   <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve">
-    <value>Behouden niet het watermerkeigenschap van de tekst</value>
+    <value>Gestreept randeffect op tekstvakken</value>
   </data>
   <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve">
-    <value>De bescherming van TOC tegen hand behouden niet veranderingeneigenschap</value>
+    <value>Beveiliging tegen handmatige wijzigingen van TOC</value>
   </data>
   <data name="translation.oox2odf.frame.inHeader" xml:space="preserve">
-    <value>Positie van behouden niet kader in header</value>
+    <value>Frames aanwezig in kopteksten</value>
   </data>
   <data name="translation.oox2odf.frame.inFooter" xml:space="preserve">
-    <value>Positie van behouden niet kader in footer</value>
+    <value>Frames aanwezig in voetteksten</value>
   </data>
   <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve">
-    <value>Het relatieve behouden niet bezit van de kadergrootte</value>
+    <value>Relatieve grootte van frames</value>
   </data>
   <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve">
-    <value>Het slotvan het beeld aspectverhouding behouden niet bezit</value>
+    <value>Vergrendeloptie voor hoogte-/breedteverhouding bij foto's</value>
   </data>
   <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve">
-    <value>Het schrapen beeld met betrekking tot zijn behouden niet orginalgrootte </value>
+    <value>Optie verhouding tot de oorspronkelijke grootte bij foto's</value>
   </data>
   <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve">
-    <value>Het behouden niet bezit van het slotanker van het beeld</value>
+    <value>Ankervergrendeling van foto's</value>
   </data>
   <data name="translation.oox2odf.picture.overlap" xml:space="preserve">
-    <value>Sta het behouden niet bezit van het overlappingsbeeld toe </value>
+    <value>Foto-overlappingsoptie</value>
   </data>
   <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve">
-    <value>"In Margin" dropcap hield optie niet vast</value>
+    <value>In marge-optie voor initialen</value>
   </data>
   <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
-    <value>De starten opnieuw lijn nummerend op elk niet vastgehouden onderdeel</value>
+    <value>Herstarten van regelnummering per sectie</value>
   </data>
 </root>

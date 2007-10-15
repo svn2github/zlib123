@@ -1,0 +1,26 @@
+// AddIn.idl : IDL source for AddIn
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AddIn.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(17E76E70-B60A-4D0C-B3DF-E4C41AC709AB),
+	version(1.0),
+	helpstring("OdfWord2000Addin 1.0 Type Library")
+]
+library OdfWord2000AddinLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(9952C3A8-17A1-4754-B388-8926383A5E3B),
+		helpstring("Connect Class")
+	]
+	coclass Connect
+	{
+		[default] interface IUnknown;
+	};
+};

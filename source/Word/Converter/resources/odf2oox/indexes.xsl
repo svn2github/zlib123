@@ -988,5 +988,47 @@
   <xsl:template match="text:alphabetical-index-auto-mark-file">
     <xsl:message terminate="no">translation.odf2oox.alphabeticalIndexConcordanceFile</xsl:message>
   </xsl:template>
+  
+  <xsl:template name="InsertIndexTabs">
+    <xsl:variable name="styleName">
+      <xsl:value-of select="@text:style-name"/>
+    </xsl:variable>
+    <xsl:if test="ancestor::office:document-content/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/style:tab-stops">
+    <w:tabs>
+      <xsl:variable name="tabInd">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="ancestor::office:document-content/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-left"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+        <xsl:for-each select="ancestor::office:document-content/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/style:tab-stops/style:tab-stop">
+        <w:tab>
+          <xsl:attribute name="w:val">
+            <xsl:choose>
+              <xsl:when test="@style:type = 'left' ">left</xsl:when>
+              <xsl:when test="@style:type = 'right' ">right</xsl:when>
+              <xsl:when test="@style:type = 'center' ">center</xsl:when>
+              <xsl:otherwise>left</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:attribute name="w:leader">
+            <xsl:call-template name="ComputeTabStopLeader"/>
+          </xsl:attribute>
+          <xsl:variable name="pos">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="@style:position"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:attribute name="w:pos">
+                <xsl:value-of select="$pos+$tabInd"/>
+          </xsl:attribute>
+        </w:tab>
+      </xsl:for-each>
+    </w:tabs>
+    </xsl:if>
+  </xsl:template>
 
 </xsl:stylesheet>

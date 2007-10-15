@@ -31,6 +31,7 @@ using System.Collections;
 using System;
 using System.IO;
 
+
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
 
@@ -41,6 +42,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private const string NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         private string[] RUN_PROPERTIES = { "ins", "del", "moveFrom", "moveTo", "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange" };
+
+        private static char[] PONCTUATION = { '\u002E', '\u0021', '\u003F',  '\u002C', '\u003A', '\u003B', '\u0028', '\u0029', '\u002D' };
 
         // series of symbol that do not use reverse direction
         private static char[] HEBREW_DIRECT_SYMBOLS = 
@@ -74,6 +77,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private Stack currentNode;
         private Stack store;
+        private bool isRightToLeft;
+        
 
         public OoxCharactersPostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
@@ -579,13 +584,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (e is Run)
             {
                 Run r = (Run)e;
-
                 if (r.HasReversedText)
                 {
+                    isRightToLeft = true;
                     SplitRun(r);
+                    isRightToLeft = false;
                 }
                 else
-                {
+                { 
                     if (this.store.Count < 2)
                     {
                         if (r.HasText)
@@ -721,9 +727,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
             }
 
-            if (r.HasReversedText)
+            // Check the rest of the content : Run r now contains the remaining text.
+            if (r.HasReversedText || r.HasPonctuation)
             {
-                SplitRun(r);
+                    SplitRun(r);
             }
             else
             {
@@ -770,29 +777,29 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             char[] charTable = null;
 
             // get start of special symbol substring
-            if ((startHebrew = text.IndexOfAny(HEBREW_SYMBOLS)) >= 0)
+            if ((startHebrew = text.IndexOfAny(HEBREW_SYMBOLS)) > -1)
             {
                 startChar = startHebrew;
                 charTable = HEBREW_SYMBOLS;
             }
-            if ((startArabic = text.IndexOfAny(ARABIC_BASIC_SYMBOLS)) >= 0)
+            if ((startArabic = text.IndexOfAny(ARABIC_BASIC_SYMBOLS)) > -1)
             {
-                if (startChar >= 0)
+                if (startChar > -1)
                     startChar = System.Math.Min(startChar, startArabic);
                 else startChar = startArabic;
                 if (startChar.Equals(startArabic))
                     charTable = ARABIC_BASIC_SYMBOLS;
             }
-            if ((startExtendedArabic = text.IndexOfAny(ARABIC_EXTENDED_SYMBOLS)) >= 0)
+            if ((startExtendedArabic = text.IndexOfAny(ARABIC_EXTENDED_SYMBOLS)) > -1)
             {
-                if (startChar >= 0)
+                if (startChar > -1)
                     startChar = System.Math.Min(startChar, startExtendedArabic);
                 else startChar = startExtendedArabic;
                 if (startChar.Equals(startExtendedArabic))
                     charTable = ARABIC_EXTENDED_SYMBOLS;
             }
 
-            if (startChar.Equals(0))
+            if (startChar.Equals(0)) // isolate right to left words
             {
                 // get end of special symbol substring
                 endChar = this.GetLastIndexOfCharSetInString(text, startChar, charTable);
@@ -802,19 +809,65 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 extractedText.Content = text.Substring(0, endChar + 1);
                 extractedText.IsReverse = true;
             }
-            else if (startChar > 0)
+            else if (startChar > 0) // all the rest : left to right words, spaces and ponctuation.
             {
-                // retrieve substring from run
-                r.ReplaceFirstTextChild(text.Substring(startChar, text.Length - startChar));
-                // return first substring
-                extractedText.Content = this.ReplaceSoftHyphens(text.Substring(0, startChar), r);
-                extractedText.IsReverse = false;
+                string remaining = text.Substring(startChar, text.Length - startChar);
+                if (text.IndexOf('\u0020').Equals(0) || text.IndexOfAny(PONCTUATION).Equals(0))
+                {
+                    extractedText.Content = text.Substring(0, 1);
+                    r.ReplaceFirstTextChild(text.Substring(1, text.Length - 1));
+                    extractedText.IsReverse = isRightToLeft;
+                }
+                else
+                {
+                    string begining = text.Substring(0, startChar);
+                    // remove trailing spaces and ponctuation from the begining string.
+                    
+                    // text ending with ponctuation of space
+                    if (begining.IndexOf('\u0020').Equals(begining.Length-1) || begining.IndexOfAny(PONCTUATION).Equals(begining.Length - 1)) 
+                    {
+                        begining = TrimPonctuation(begining);
+                        r.ReplaceFirstTextChild(text.Substring(begining.Length, text.Length - begining.Length));
+                        extractedText.Content = this.ReplaceSoftHyphens(begining, r);
+                        extractedText.IsReverse = false;
+                    }
+                    else 
+                    {
+                        // retrieve substring from run
+                        r.ReplaceFirstTextChild(remaining);
+                        // return first substring
+                        extractedText.Content = this.ReplaceSoftHyphens(begining, r);
+                        extractedText.IsReverse = false;
+                    }
+                }
+
             }
-            else
+            else // text that does not have right to left text
             {
-                extractedText.Content = this.ReplaceSoftHyphens(text, r);
-                extractedText.IsReverse = false;
+                // begining with space or ponctuation => must be cut in two runs
+                if (text.IndexOf('\u0020') == 0 || text.IndexOfAny(PONCTUATION) == 0)
+                {
+                    extractedText.Content = text.Substring(0, 1);
+                    r.ReplaceFirstTextChild(text.Substring(1, text.Length - 1));
+                    extractedText.IsReverse = isRightToLeft;
+                }
+                // ending with space or ponctuation => must be cut in two runs
+                else if (text.Length > 0 && (text.IndexOf('\u0020').Equals(text.Length - 1) ||
+                    text.Substring(text.Length - 1, 1).IndexOfAny(PONCTUATION) == 0))
+                {
+                    string begining = TrimPonctuation(text);
+                    r.ReplaceFirstTextChild(text.Substring(begining.Length, text.Length - begining.Length));
+                    extractedText.Content = this.ReplaceSoftHyphens(begining, r);
+                    extractedText.IsReverse = false;
+                }
+                else
+                {
+                    // text that does not begin or end with ponctiuation or space
+                    extractedText.Content = this.ReplaceSoftHyphens(text, r);
+                    extractedText.IsReverse = false;
+                }
             }
+
             return extractedText;
         }
 
@@ -828,6 +881,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 i++;
             }
             return i-1;
+        }
+
+        public string TrimPonctuation(string text)
+        {
+            string res = text;
+            string lastChar = res.Substring(res.Length - 1, 1);
+            while (res.Length > 0 && (lastChar.IndexOf('\u0020') == 0 || lastChar.IndexOfAny(PONCTUATION) == 0))
+            {
+                res = res.Substring(0, res.Length - 1);
+                lastChar = res.Substring(res.Length - 1, 1);
+            }
+            return res;
         }
 
 
@@ -935,12 +1000,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 set { TextProperties = value; }
             }
 
-            public Run(Element e)
-                :
-                base(e.Prefix, e.Name, e.Ns) { }
+            public Run(Element e) : base(e.Prefix, e.Name, e.Ns) { }
 
-            public Run(string prefix, string localName, string ns)
-                :
+            public Run(string prefix, string localName, string ns) : 
                 base(prefix, localName, ns) { }
 
             public bool HasReversedText
@@ -948,6 +1010,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 get
                 {
                     return HasReversedTextNode(this);
+                }
+            }
+
+            public bool HasPonctuation
+            {
+                get
+                {
+                    return HasPonctuationNode(this);
                 }
             }
 
@@ -966,6 +1036,41 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     }
                 }
                 return b;
+            }
+
+            private bool HasPonctuationNode(Element e)
+            {
+                bool b = false;
+                foreach (object node in e.Children)
+                {
+                    if (node is Element)
+                    {
+                        Element element = (Element) node;
+                        if (element.GetTextChild() != null)
+                        {
+                            b = b || hasPonctuation(element.GetTextChild());
+                        }
+                    }
+                }
+                return b;
+            }
+
+            private bool hasPonctuation(string text)
+            {
+                if (text.IndexOf('\u0020') == 0)
+                    return true;
+                else if (text.IndexOfAny(PONCTUATION) == 0)
+                    return true;
+                else if (text.Length > 0) 
+                {
+                    string lastChar = text.Substring(text.Length - 1, 1);
+                    if (lastChar.LastIndexOf('\u0020') == 0)
+                        return true;
+                    else if (lastChar.IndexOfAny(PONCTUATION) == 0)
+                        return true;
+                    else return false;
+                }
+                else return false;
             }
 
             private bool isReversed(string text)
@@ -1084,7 +1189,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             return newRPr;
         }
-
 
     }
 }

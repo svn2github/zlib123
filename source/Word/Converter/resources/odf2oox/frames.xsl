@@ -134,7 +134,17 @@
         <!-- WMF images inside text-box are properly displayed in Word 2007, but cause an opening crash in prior Word versions -->
         <!--xsl:when test="contains($name, '.wmf') and ancestor::draw:text-box">
           <xsl:message terminate="no">feedback:WMF image inside text-box</xsl:message> false </xsl:when-->
-        <xsl:otherwise>true</xsl:otherwise>
+        <xsl:when test="contains($name, '.jpg')">true</xsl:when>
+        <xsl:when test="contains($name, '.jpeg')">true</xsl:when>
+        <xsl:when test="contains($name, '.gif')">true</xsl:when>
+        <xsl:when test="contains($name, '.png')">true</xsl:when>
+        <xsl:when test="contains($name, '.emf')">true</xsl:when>
+        <xsl:when test="contains($name, '.wmf')">true</xsl:when>
+        <xsl:when test="contains($name, '.tif')">true</xsl:when>
+        <xsl:when test="contains($name, '.tiff')">true</xsl:when>
+        <xsl:otherwise>
+          <xsl:message terminate="no">translation.odf2oox.unsupportedImageType</xsl:message>
+          false</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:value-of select="$support"/>

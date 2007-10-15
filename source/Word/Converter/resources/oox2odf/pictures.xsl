@@ -37,11 +37,13 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  exclude-result-prefixes="w uri draw a pic">
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  exclude-result-prefixes="w uri draw a pic r wp w xlink">
 
   <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
 
@@ -145,6 +147,7 @@
     </xsl:attribute>
   </xsl:template>
 
+  
   <xsl:template name="SetSize">
     <xsl:choose>
       <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln">
@@ -364,6 +367,18 @@
           <xsl:when
             test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:prstDash/@val = 'solid'">
             <xsl:text>solid</xsl:text>
+          </xsl:when>
+          <xsl:when
+           test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@cmpd = 'double'">
+            <xsl:text>double</xsl:text>
+          </xsl:when>
+          <xsl:when
+           test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@cmpd = 'thickThin'">
+            <xsl:text>double</xsl:text>
+          </xsl:when>
+          <xsl:when
+          test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@cmpd = 'thinThick'">
+            <xsl:text>double</xsl:text>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>solid</xsl:text>

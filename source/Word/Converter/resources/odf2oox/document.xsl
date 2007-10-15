@@ -127,6 +127,9 @@
           <xsl:with-param name="isFirstRow" select="$isFirstRow"/>
         </xsl:call-template>
         <xsl:call-template name="InsertParagraphSectionProperties"/>
+        <xsl:if test="parent::text:index-body">
+          <xsl:call-template name="InsertIndexTabs"/>
+        </xsl:if>
       </w:pPr>
 
       <!-- if paragraph is the very first of page, declare user variables -->
@@ -323,9 +326,10 @@
     <xsl:call-template name="InsertFrameProperties"/>
 
     <!-- insert numbering properties -->
-    <xsl:call-template name="InsertNumbering">
-      <xsl:with-param name="level" select="$level"/>
-    </xsl:call-template>
+      <xsl:call-template name="InsertNumbering">
+        <xsl:with-param name="level" select="$level"/>
+      </xsl:call-template>
+      
 
     <!-- line numbering -->
     <xsl:call-template name="InsertSupressLineNumbers"/>

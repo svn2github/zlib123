@@ -80,5 +80,8 @@
     <EmbeddedResource Include="resources\Labels.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="resources\Labels.zh-CHS.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

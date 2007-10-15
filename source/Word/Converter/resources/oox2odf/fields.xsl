@@ -166,6 +166,10 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
+        <!-- handling text after AUTOTEXT field -->
+        <xsl:when test="contains($fieldCode,'STYLEREF') and preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
+          <xsl:value-of select="following::w:r[w:t][1]"/>
+        </xsl:when>
         <xsl:when test="$fieldType = 'XE' or $fieldType = 'xe' ">
           <xsl:call-template name="InsertIndexMark">
             <xsl:with-param name="instrText" select="$fieldCode"/>
@@ -710,9 +714,10 @@
   
   <xsl:template match="w:fldSimple">
     <text:span text:style-name="{generate-id(w:r)}">
-      <xsl:choose>
-        <xsl:when test="preceding::w:instrText[contains(.,'AUTOTEXT')]">
-          <xsl:apply-templates select="descendant::w:t"/>
+      <xsl:choose>  
+        <!-- handling text after AUTOTEXT field -->
+        <xsl:when test="contains(@w:instr,'STYLEREF') and preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
+          <xsl:value-of  select="descendant::w:t"/>
         </xsl:when>
         <xsl:otherwise>
       <xsl:apply-templates select="." mode="fields"/>

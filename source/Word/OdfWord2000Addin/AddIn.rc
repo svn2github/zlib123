@@ -1,0 +1,407 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AddIn"
+    IDS_IMPORT_LABEL        "ODF ‚ğŠJ‚­..."
+    IDS_EXPORT_LABEL        "ODF ‚Æ‚µ‚Ä•Û‘¶..."
+    IDS_FILE_FILTER         "OpenDocument ƒeƒLƒXƒg ƒtƒ@ƒCƒ‹|*.ODT|‚·‚×‚Ä‚Ìƒtƒ@ƒCƒ‹|*.*|"
+    IDS_IMPORT_TITLE        "ODF ‚ğŠJ‚­..."
+    IDS_NO_CONVERTER        "—\Šú‚µ‚È‚¢ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½BƒvƒƒWƒFƒNƒg Web ƒTƒCƒg (http://odf-converter.sourceforge.net) ‚ÌƒoƒO ƒŒƒ|[ƒg‚É•K—v–€‚ğ“ü—Í‚µAƒtƒ@ƒCƒ‹‚ğ“Y•t‚µ‚Ä‚­‚¾‚³‚¢B"
+    IDS_ODTTITLE            "ODF ƒRƒ“ƒo[ƒ^"
+    IDS_UNABLE_TO_CONNECT   "—\Šú‚µ‚È‚¢ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½BƒvƒƒWƒFƒNƒg Web ƒTƒCƒg (http://odf-converter.sourceforge.net) ‚ÌƒoƒO ƒŒƒ|[ƒg‚É•K—v–€‚ğ“ü—Í‚µAƒtƒ@ƒCƒ‹‚ğ“Y•t‚µ‚Ä‚­‚¾‚³‚¢B"
+    IDS_UNABLE_TO_CONFIGURE_MENU 
+                            "—\Šú‚µ‚È‚¢ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½BƒvƒƒWƒFƒNƒg Web ƒTƒCƒg (http://odf-converter.sourceforge.net) ‚ÌƒoƒO ƒŒƒ|[ƒg‚É•K—v–€‚ğ“ü—Í‚µAƒtƒ@ƒCƒ‹‚ğ“Y•t‚µ‚Ä‚­‚¾‚³‚¢B"
+    IDS_UNABLE_TO_LAUNCH_CONVERTER 
+                            "—\Šú‚µ‚È‚¢ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½BƒvƒƒWƒFƒNƒg Web ƒTƒCƒg (http://odf-converter.sourceforge.net) ‚ÌƒoƒO ƒŒƒ|[ƒg‚É•K—v–€‚ğ“ü—Í‚µAƒtƒ@ƒCƒ‹‚ğ“Y•t‚µ‚Ä‚­‚¾‚³‚¢B"
+    IDS_FAILED_TO_OPEN_DOCUMENT "ZIPƒA[ƒJƒCƒu‚ğŠJ‚¯‚Ü‚¹‚ñBƒhƒLƒ…ƒƒ“ƒg‚ªˆÃ†‰»‚³‚ê‚Ä‚¢‚È‚¢‚©Šm”F‚µ‚Ä‚­‚¾‚³‚¢B"
+    IDS_EXPORTTITLE         "ODF ‚Æ‚µ‚Ä•Û‘¶..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SAVE_DOC_FIRST      "ODF ‚ÉƒGƒNƒXƒ|[ƒg‚·‚é‘O‚ÉAƒhƒLƒ…ƒƒ“ƒg‚ğ•Û‘¶‚µ‚Ä‚­‚¾‚³‚¢"
+    IDS_EXPORT_TRY_DOCX     "•ÏŠ·‚É¸”s‚µ‚Ü‚µ‚½B‚Ü‚¸AƒhƒLƒ…ƒƒ“ƒg‚ğ Word 2007 Œ`®‚Å•Û‘¶‚µ‚Ä‚­‚¾‚³‚¢B"
+    IDS_NOWORD12            "Office 2007 ƒtƒ@ƒCƒ‹ ƒRƒ“ƒo[ƒ^‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ä‚¢‚Ü‚¹‚ñBƒRƒ“ƒo[ƒ^‚ª‚È‚¢‚Æ ODF ‚É•ÏŠ·‚Å‚«‚Ü‚¹‚ñB"
+    IDS_INTERNAL_ERROR      "—\Šú‚µ‚È‚¢ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½BƒvƒƒWƒFƒNƒg Web ƒTƒCƒg (http://odf-converter.sourceforge.net) ‚ÌƒoƒO ƒŒƒ|[ƒg‚É•K—v–€‚ğ“ü—Í‚µAƒtƒ@ƒCƒ‹‚ğ“Y•t‚µ‚Ä‚­‚¾‚³‚¢B"
+END
+
+#endif    // Japanese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (Neutral) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_NEUTRAL
+#pragma code_page(936)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AddIn"
+    IDS_IMPORT_LABEL        "´ò¿ª ODF..."
+    IDS_EXPORT_LABEL        "Áí´æÎª ODF..."
+    IDS_FILE_FILTER         "OpenDocument ÎÄ±¾ÎÄ¼ş|*.ODT|È«²¿ÎÄ¼ş|*.*|"
+    IDS_IMPORT_TITLE        "´ò¿ª ODF..."
+    IDS_NO_CONVERTER        "Óöµ½ÒâÍâ´íÎó¡£¹ıÏîÄ¿ÍøÕ¾£¨http://odf-converter.sourceforge.net£©Ìá½»´íÎó±¨¸æ£¨¿É¸½¼ÓÎÄ¼ş£©¡£"
+    IDS_ODTTITLE            "ODF ×ª»»Æ÷"
+    IDS_UNABLE_TO_CONNECT   "Óöµ½ÒâÍâ´íÎó¡£¹ıÏîÄ¿ÍøÕ¾£¨http://odf-converter.sourceforge.net£©Ìá½»´íÎó±¨¸æ£¨¿É¸½¼ÓÎÄ¼ş£©¡£"
+    IDS_UNABLE_TO_CONFIGURE_MENU 
+                            "Óöµ½ÒâÍâ´íÎó¡£¹ıÏîÄ¿ÍøÕ¾£¨http://odf-converter.sourceforge.net£©Ìá½»´íÎó±¨¸æ£¨¿É¸½¼ÓÎÄ¼ş£©¡£"
+    IDS_UNABLE_TO_LAUNCH_CONVERTER 
+                            "Óöµ½ÒâÍâ´íÎó¡£¹ıÏîÄ¿ÍøÕ¾£¨http://odf-converter.sourceforge.net£©Ìá½»´íÎó±¨¸æ£¨¿É¸½¼ÓÎÄ¼ş£©¡£"
+    IDS_FAILED_TO_OPEN_DOCUMENT "ÎŞ·¨´ò¿ª´Ë ZIP ´æµµ¡£ÄúµÄÎÄµµÊÇ·ñÎ´¼ÓÃÜ¡£"
+    IDS_EXPORTTITLE         "Áí´æÎª ODF..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SAVE_DOC_FIRST      "Çë±£´æÄúµÄÎÄµµ£¬È»ºóÔÙµ¼³ö³É ODF"
+    IDS_EXPORT_TRY_DOCX     "×ª»»Ê§°Ü£¬ÇëÏÈ³¢ÊÔÒÔ Word 2007 ¸ñÊ½±£´æ¸ÃÎÄµµ¡£"
+    IDS_NOWORD12            "Office 2007 ÎÄ¼ş×ª»»Æ÷Î´°²×°£ºODF ×ª»»ÎŞ·¨Ö´ĞĞ¡£"
+    IDS_INTERNAL_ERROR      "Óöµ½ÒâÍâ´íÎó¡£¹ıÏîÄ¿ÍøÕ¾£¨http://odf-converter.sourceforge.net£©Ìá½»´íÎó±¨¸æ£¨¿É¸½¼ÓÎÄ¼ş£©¡£"
+END
+
+#endif    // Chinese (Neutral) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Polish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_PLK)
+#ifdef _WIN32
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+#pragma code_page(1250)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AddIn"
+    IDS_IMPORT_LABEL        "Otwórz ODF…"
+    IDS_EXPORT_LABEL        "Zapisz jako ODF…"
+    IDS_FILE_FILTER         "Dokument tekstowy|*.ODT|Dokument tekstowy|*.*|"
+    IDS_IMPORT_TITLE        "Otwórz ODF…"
+    IDS_NO_CONVERTER        "Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur."
+    IDS_ODTTITLE            "ODF Converter pour Word 2000"
+    IDS_UNABLE_TO_CONNECT   "Pojawi³ siê niespodziewany b³¹d. Prosimy o wype³nienie raporu dotycz¹cego b³êdu na stronie projektu (http://odf-converter.sourceforge.net) za³¹czaj¹c wadliwy plik."
+    IDS_UNABLE_TO_CONFIGURE_MENU 
+                            "Pojawi³ siê niespodziewany b³¹d. Prosimy o wype³nienie raporu dotycz¹cego b³êdu na stronie projektu (http://odf-converter.sourceforge.net) za³¹czaj¹c wadliwy plik."
+    IDS_UNABLE_TO_LAUNCH_CONVERTER 
+                            "Pojawi³ siê niespodziewany b³¹d. Prosimy o wype³nienie raporu dotycz¹cego b³êdu na stronie projektu (http://odf-converter.sourceforge.net) za³¹czaj¹c wadliwy plik."
+    IDS_FAILED_TO_OPEN_DOCUMENT 
+                            "a cecha nie jest przekszta³cana przez aktualn¹ wtyczkê."
+    IDS_EXPORTTITLE         "Zapisz jako ODF…"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SAVE_DOC_FIRST      "Proszê zachowaæ dokument przed eksportem do ODF"
+    IDS_EXPORT_TRY_DOCX     "B³¹d konwersji, spróbuj najpierw zapisaæ dokument w formacie Word 2007."
+    IDS_NOWORD12            "Konwerter dla Office 2007 nie jest zainstalowany, konwersja ODF bez nich jest niemo¿liwa."
+    IDS_INTERNAL_ERROR      "Pojawi³ siê niespodziewany b³¹d. Prosimy o wype³nienie raporu dotycz¹cego b³êdu na stronie projektu (http://odf-converter.sourceforge.net) za³¹czaj¹c wadliwy plik."
+END
+
+#endif    // Polish resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AddIn"
+    IDS_IMPORT_LABEL        "ODF Dateien öffnen..."
+    IDS_EXPORT_LABEL        "Speichern als ODF"
+    IDS_FILE_FILTER         "OpenDocument Text Dateien|*.ODT|Alle Dateien|*.*|"
+    IDS_IMPORT_TITLE        "ODF Dateien öffnen..."
+    IDS_NO_CONVERTER        "Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden."
+    IDS_ODTTITLE            "ODF Übersetzer"
+    IDS_UNABLE_TO_CONNECT   "Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden."
+    IDS_UNABLE_TO_CONFIGURE_MENU 
+                            "Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden."
+    IDS_UNABLE_TO_LAUNCH_CONVERTER 
+                            "Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden."
+    IDS_FAILED_TO_OPEN_DOCUMENT 
+                            "Dieses Feature wird von der aktuellen Version des Add-Ins nicht unterstützt."
+    IDS_EXPORTTITLE         "Speichern als ODF"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SAVE_DOC_FIRST      "Bitte speichern Sie das Dokument, bevor Sie es nach ODF übersetzen."
+    IDS_EXPORT_TRY_DOCX     "Die Übersetzung hat nicht funktioniert; bitte speichern Sie das Dokument zuerst als Word 2007 Datei (.DOCX)."
+    IDS_NOWORD12            "Der Konverter für das Word 2007 Dateiformat ist nicht installiert. Der ODF Übersetzer benötigt diesen Konverter."
+    IDS_INTERNAL_ERROR      "Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden."
+END
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "AddIn.dll"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "AddIn.dll"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AddIn.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_ADDIN               REGISTRY                "AddIn.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AddIn"
+    IDS_IMPORT_LABEL        "Open ODF..."
+    IDS_EXPORT_LABEL        "Save as ODF..."
+    IDS_FILE_FILTER         "ODF Text files|*.ODT|All files|*.*|"
+    IDS_IMPORT_TITLE        "Select file to import"
+    IDS_NO_CONVERTER        "ODF Converter not available"
+    IDS_ODTTITLE            "ODF Converter for Word 2000"
+    IDS_UNABLE_TO_CONNECT   "Unable to connect the addin to Word 2000"
+    IDS_UNABLE_TO_CONFIGURE_MENU "Unable to configure Word 2000 Menus"
+    IDS_UNABLE_TO_LAUNCH_CONVERTER "Unable to launch ODF Converter"
+    IDS_FAILED_TO_OPEN_DOCUMENT "Unable to open document"
+    IDS_EXPORTTITLE         "Save as ODF Text file"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SAVE_DOC_FIRST      "Please save your document before exporting to ODF"
+    IDS_EXPORT_TRY_DOCX     "Conversion failed, please try to save the document in Word 2007 format first."
+    IDS_NOWORD12            "Office 2007 File converters are not installed : the ODF convertion cannot work without."
+    IDS_INTERNAL_ERROR      "Unexpected Error"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// French (France) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+#ifdef _WIN32
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AddIn"
+    IDS_IMPORT_LABEL        "Ouvrir un fichier ODF..."
+    IDS_EXPORT_LABEL        "Enregistrer au format ODF..."
+    IDS_FILE_FILTER         "Fichiers texte ODF|*.ODT|Tous les fichiers|*.*|"
+    IDS_IMPORT_TITLE        "Ouvrir un fichier ODF..."
+    IDS_NO_CONVERTER        "Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur."
+    IDS_ODTTITLE            "ODF Converter pour Word 2000"
+    IDS_UNABLE_TO_CONNECT   "Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur."
+    IDS_UNABLE_TO_CONFIGURE_MENU 
+                            "Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur."
+    IDS_UNABLE_TO_LAUNCH_CONVERTER 
+                            "Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur."
+    IDS_FAILED_TO_OPEN_DOCUMENT 
+                            "L'archive ZIP ne peut être ouverte. Verifiez que le document n'est pas encrypté."
+    IDS_EXPORTTITLE         "Enregistrer au format ODF..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SAVE_DOC_FIRST      "Sauvegardez votre document avant de lancer l'export vers ODF"
+    IDS_EXPORT_TRY_DOCX     "Une erreur est survenue pendant la conversion. Essayez de sauvegarder votre document au format Word 2007 avant de lancer l'export vers ODF"
+    IDS_NOWORD12            "La prise en charge des formats Office 2007 n'est pas installée et elle est indispensable pour les conversions ODF"
+    IDS_INTERNAL_ERROR      "Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur."
+END
+
+#endif    // French (France) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Netherlands) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+#ifdef _WIN32
+LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AddIn"
+    IDS_IMPORT_LABEL        "Open ODF..."
+    IDS_EXPORT_LABEL        "Opslaan als ODF..."
+    IDS_FILE_FILTER         "OpenDocument-tekstbestanden|*.ODT|Alle bestanden|*.*|"
+    IDS_IMPORT_TITLE        "Open ODF..."
+    IDS_NO_CONVERTER        "Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."
+    IDS_ODTTITLE            "ODF Converter pour Word 2000"
+    IDS_UNABLE_TO_CONNECT   "Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."
+    IDS_UNABLE_TO_CONFIGURE_MENU 
+                            "Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."
+    IDS_UNABLE_TO_LAUNCH_CONVERTER 
+                            "Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."
+    IDS_FAILED_TO_OPEN_DOCUMENT 
+                            "Het ziparchief kon niet worden geopend. Controleer of uw document niet versleuteld is."
+    IDS_EXPORTTITLE         "Opslaan als ODF..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SAVE_DOC_FIRST      "Sla uw document op voordat u het naar ODF exporteert"
+    IDS_EXPORT_TRY_DOCX     "Conversie mislukt; probeer het document eerst in Word 2007-formaat op te slaan."
+    IDS_NOWORD12            "Er zijn geen Office 2007-bestandsconversieprogramma's geïnstalleerd: de ODF-conversie kan zonder deze programma's niet worden uitgevoerd."
+    IDS_INTERNAL_ERROR      "Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."
+END
+
+#endif    // Dutch (Netherlands) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AddIn.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

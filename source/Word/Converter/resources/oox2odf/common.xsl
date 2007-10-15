@@ -26,7 +26,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" 
+  exclude-result-prefixes="w">
 
 
   <xsl:template name="InsertColor">
@@ -100,6 +103,171 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-
+  
+  <!-- Compute shading : call this template int the context of w:shd -->
+  <xsl:template name="ComputeShading">
+    
+    <xsl:choose>
+      <!-- clear pattern -->
+      <xsl:when test="@w:val = 'clear' ">
+        <xsl:choose>
+          <xsl:when test="@w:fill != 'auto' ">
+            <xsl:value-of select="concat('#', @w:fill)"/>
+          </xsl:when>
+          <xsl:otherwise>#ffffff</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <!-- solid pattern -->
+      <xsl:when test="@w:val = 'solid'">
+        <xsl:choose>
+          <xsl:when test="@w:color = 'auto' and @w:fill = 'auto'"><xsl:text>#000000</xsl:text></xsl:when>
+          <xsl:when test="@w:color != 'auto'">
+            <xsl:value-of select="concat('#', @w:color)"/>
+          </xsl:when>
+          <xsl:otherwise><xsl:text>#ffffff</xsl:text></xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <!-- percentage pattern -->
+      <xsl:when test="starts-with(@w:val, 'pct')">
+        <xsl:variable name="pct" select="number(substring-after(@w:val, 'pct'))" />
+        <xsl:choose>
+          <xsl:when test="@w:color= 'auto' and @w:fill = 'auto'">
+            <xsl:call-template name="AlphaBlend">
+              <xsl:with-param name="pct" select="$pct" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="@w:color != 'auto' and @w:fill = 'auto'">
+            <xsl:call-template name="AlphaBlend">
+              <xsl:with-param name="fg" select="@w:color" />
+              <xsl:with-param name="pct" select="$pct" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="@w:color != 'auto' and @w:fill != 'auto'">
+            <xsl:call-template name="AlphaBlend">
+              <xsl:with-param name="fg" select="@w:color" />
+              <xsl:with-param name="bg" select="@w:fill" />
+              <xsl:with-param name="pct" select="$pct" />
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <!-- unmanaged patterns : 25% blending -->
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="@w:color= 'auto' and @w:fill = 'auto'">
+            <xsl:call-template name="AlphaBlend">
+              <xsl:with-param name="pct" select="25" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="@w:color != 'auto' and @w:fill = 'auto'">
+            <xsl:call-template name="AlphaBlend">
+              <xsl:with-param name="fg" select="@w:color" />
+              <xsl:with-param name="pct" select="25" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="@w:color != 'auto' and @w:fill != 'auto'">
+            <xsl:call-template name="AlphaBlend">
+              <xsl:with-param name="fg" select="@w:color" />
+              <xsl:with-param name="bg" select="@w:fill" />
+              <xsl:with-param name="pct" select="25" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>#ffffff</xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- Alpha blend fg and bg hexadecimal colors -->
+  <xsl:template name="AlphaBlend">
+    <xsl:param name="fg" select="'000000'"/>
+    <xsl:param name="bg" select="'FFFFFF'"/>
+    <xsl:param name="pct" select="0"/>
+    
+    <xsl:variable name="alpha" select="floor($pct * 255 div 100)"/>
+    
+    <xsl:variable name="RfgDec">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($fg, 1, 2)"/>
+      </xsl:call-template>
+    </xsl:variable> 
+    
+    <xsl:variable name="GfgDec">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($fg, 3, 2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="BfgDec">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($fg, 5, 2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="RbgDec">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($bg, 1, 2)"/>
+      </xsl:call-template>
+    </xsl:variable> 
+    
+    <xsl:variable name="GbgDec">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($bg, 3, 2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="BbgDec">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($bg, 5, 2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="RHex">
+      <xsl:call-template name="DecToHex">
+        <xsl:with-param name="number">
+          <xsl:call-template name="AlphaBlendChannel">
+            <xsl:with-param name="fg" select="$RfgDec"/>
+            <xsl:with-param name="bg" select="$RbgDec"/>
+            <xsl:with-param name="alpha" select="$alpha"/>
+          </xsl:call-template>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="GHex">
+      <xsl:call-template name="DecToHex">
+        <xsl:with-param name="number">
+          <xsl:call-template name="AlphaBlendChannel">
+            <xsl:with-param name="fg" select="$GfgDec"/>
+            <xsl:with-param name="bg" select="$GbgDec"/>
+            <xsl:with-param name="alpha" select="$alpha"/>
+          </xsl:call-template>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="BHex">
+      <xsl:call-template name="DecToHex">
+        <xsl:with-param name="number">
+          <xsl:call-template name="AlphaBlendChannel">
+            <xsl:with-param name="fg" select="$BfgDec"/>
+            <xsl:with-param name="bg" select="$BbgDec"/>
+            <xsl:with-param name="alpha" select="$alpha"/>
+          </xsl:call-template>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:value-of select="concat('#', concat($RHex, concat($GHex, $BHex)))"/>
+    
+  </xsl:template>
+  
+  <xsl:template name="AlphaBlendChannel">
+    <xsl:param name="fg" />
+    <xsl:param name="bg"/>
+    <xsl:param name="alpha"/>
+    <xsl:value-of select="(number($fg * $alpha) + number($bg * (255 - $alpha) )) div 255"/>
+  </xsl:template>
+  
+  
 </xsl:stylesheet>

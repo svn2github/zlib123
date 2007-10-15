@@ -292,7 +292,7 @@
               <xsl:text>pt;</xsl:text>
             </xsl:if>
           </xsl:attribute>
-          <xsl:if test="@xlink:href">
+          <xsl:if test="substring-after(@xlink:href,'.') != ''">
             <v:imagedata>
               <xsl:attribute name="r:id">
                 <xsl:value-of select="generate-id(.)"/>
@@ -439,7 +439,14 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:attribute name="w:hanging">
+            <xsl:choose>
+            <xsl:when test="$minLabelWidthTwip = 0">
+              <xsl:value-of select="-$spaceBeforeTwip"/>
+            </xsl:when>
+              <xsl:otherwise>
             <xsl:value-of select="$minLabelWidthTwip"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
@@ -1641,7 +1648,7 @@
           <w:numId w:val="0"/>
         </w:numPr>
       </xsl:when>
-      <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
+      <xsl:when test="(number($defaultOutlineLevel) or $defaultOutlineLevel = 0) and number(document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style/@text:level)=number($defaultOutlineLevel)">
         <!-- WARNING : this is not supposed to exist. It is due to a Word bug (cf bug #1604472) -->
         <w:numPr>
           <w:ilvl w:val="{$defaultOutlineLevel}"/>

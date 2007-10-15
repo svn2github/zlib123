@@ -314,6 +314,17 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
                         File.Copy((string)initialName, (string)newName);
 
+                        //BUG FIX #1743469
+                        FileInfo lFi;
+
+                        lFi = new FileInfo((string)newName);
+
+                        if (lFi.IsReadOnly)
+                        {
+                            lFi.IsReadOnly = false;
+                        }
+                        //BUG FIX #1743469
+
                         // open the duplicated file
                         object addToRecentFiles = false;
                         object readOnly = false;

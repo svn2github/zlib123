@@ -173,9 +173,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 catch (Exception e)
                 {
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
-                    infoBox.ShowDialog();
-
+                    if (e.InnerException != null && e.InnerException is System.Xml.XmlException) 
+                    {
+                        // An xsl exception may embed an xml exception. In this case we have a non well formed xml document.
+                        InfoBox infoBox = new InfoBox("CorruptedInputFileLabel", 
+                            e.Message+"\r\nInnerException : " +
+                            e.InnerException.Message, this.resourceManager);
+                        infoBox.ShowDialog();
+                    }
+                    else
+                    {
+                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
+                        infoBox.ShowDialog();
+                    }
                     if (File.Exists(outputFile))
                     {
                         File.Delete(outputFile);

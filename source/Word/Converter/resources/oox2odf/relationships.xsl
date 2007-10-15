@@ -19,7 +19,8 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" exclude-result-prefixes="w">
+  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" 
+  exclude-result-prefixes="w wp r uri a pic">
 
   <xsl:template name="CopyPictures">
      <xsl:param name="document"/>

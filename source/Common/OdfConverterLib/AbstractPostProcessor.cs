@@ -317,6 +317,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.attributes.Add(attribute);
             }
 
+            public void RemoveAttribute(Attribute attribute)
+            {
+                if (this.attributes.Contains(attribute))
+                {
+                    this.attributes.Remove(attribute);
+                }
+            }
+
             public void AddChild(Object child)
             {
                 this.children.Add(child);

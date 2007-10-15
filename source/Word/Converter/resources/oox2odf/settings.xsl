@@ -38,8 +38,14 @@
           <config:config-item config:name="UseOldNumbering" config:type="boolean">false</config:config-item>
         </config:config-item-set>
           -->
+        
+        <config:config-item-set config:name="ooo:configuration-settings">
+          <config:config-item config:name="AddParaTableSpacing" config:type="boolean">
+            <xsl:value-of select="'false'"/>
+          </config:config-item>
+        </config:config-item-set >
 
-      </office:settings>
+        </office:settings>
     </office:document-settings>
   </xsl:template>
 

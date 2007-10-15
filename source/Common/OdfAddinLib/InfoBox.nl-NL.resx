@@ -127,4 +127,13 @@
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterParent</value>
   </data>
+  <data name="OK.Text" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="grpDetails.Text" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>Odf-conversieprogramma</value>
+  </data>
 </root>

@@ -129,18 +129,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             //added by clam for bug 1785583
             //Start
-            if (text.StartsWith(" "))
-            {
-                try
-                {
-                    this.nextWriter.WriteStartElement("text", "s", ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)this.currentNode.Peek()).Ns);
-                    this.nextWriter.WriteEndElement();
-                    text = text.Substring(1);
-                }
-                catch (Exception ex)
-                {                   
-                }
-            }
+            //if (text.StartsWith(" "))
+            //{
+            //    try
+            //    {
+            //        this.nextWriter.WriteStartElement("text", "s", ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)this.currentNode.Peek()).Ns);
+            //        this.nextWriter.WriteEndElement();
+            //        text = text.Substring(1);
+            //    }
+            //    catch (Exception ex)
+            //    {                   
+            //    }
+            //}
             //End
             
             if (InSpan())

@@ -262,7 +262,6 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             button.Delete(Type.Missing);
             button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfExportLabel"), Type.Missing);
             button.Delete(Type.Missing);
-            applicationObject.NormalTemplate.Save();
         }
 
         private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)

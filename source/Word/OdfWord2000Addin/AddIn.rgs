@@ -1,0 +1,26 @@
+HKCR
+{
+	OdfWord2000Addin.Connect.1 = s 'Connect Class'
+	{
+		CLSID = s '{9952C3A8-17A1-4754-B388-8926383A5E3B}'
+	}
+	OdfWord2000Addin.Connect = s 'Connect Class'
+	{
+		CLSID = s '{9952C3A8-17A1-4754-B388-8926383A5E3B}'
+		CurVer = s 'OdfWord2000Addin.Connect.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove '{9952C3A8-17A1-4754-B388-8926383A5E3B}' = s 'Connect Class'
+		{
+			ProgID = s 'OdfWord2000Addin.Connect.1'
+			VersionIndependentProgID = s 'OdfWord2000Addin.Connect'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{17E76E70-B60A-4D0C-B3DF-E4C41AC709AB}'
+		}
+	}
+}

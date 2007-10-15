@@ -35,6 +35,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   exclude-result-prefixes="w text style">
   
+  <xsl:key name="tocBookmark" match="w:bookmarkStart" use="@w:name"/>
   <xsl:key name="OutlineLevel" match="w:outlineLvl" use="''"/>
 
   <!-- paragraph which starts table of content -->
@@ -117,9 +118,69 @@
     <text:p text:style-name="{generate-id()}">
       <xsl:apply-templates mode="index"/>
     </text:p>
-    <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
+    <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text() and (not(w:r/w:fldChar) or w:r[w:fldChar]/preceding-sibling::w:r[w:t])]">
       <xsl:apply-templates select="following-sibling::w:p[1]" mode="index"/>
     </xsl:if>
+  </xsl:template>
+  
+  <!-- template to create string containing styles include in TOC with appropriate levels -->
+  
+  <xsl:template match="w:p" mode="stylesOfTOC">
+    <xsl:param name="stylesWithLevel"/>
+    
+    <!-- index source style -->
+    <xsl:variable name="thisStyle">
+      <xsl:choose>
+        <xsl:when test="w:hyperlink">
+          <xsl:for-each select="key('tocBookmark',w:hyperlink/@w:anchor)">
+            <xsl:value-of select="parent::w:p/w:pPr/w:pStyle/@w:val"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="instrTextContent">
+            <xsl:apply-templates select="w:r/w:instrText[1]" mode="textContent">
+              <xsl:with-param name="textContent"/>
+            </xsl:apply-templates>
+          </xsl:variable>
+          <xsl:for-each select="key('tocBookmark',substring-before(substring-after($instrTextContent,'PAGEREF '),' '))">
+            <xsl:value-of select="parent::w:p/w:pPr/w:pStyle/@w:val"/>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- outline level -->
+    <xsl:variable name="thisLevel">
+      <xsl:value-of select="substring(w:pPr/w:pStyle/@w:val,string-length(w:pPr/w:pStyle/@w:val))"/>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
+        <xsl:apply-templates select="following-sibling::w:p[1]" mode="stylesOfTOC">
+          <xsl:with-param name="stylesWithLevel">
+            <xsl:choose>
+              <xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">
+                <xsl:value-of select="$stylesWithLevel"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:if test="$thisStyle and $thisStyle!=''">
+                  <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
+                </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">
+            <xsl:value-of select="$stylesWithLevel"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <!-- paragraph in alphabetical index-->
@@ -290,17 +351,19 @@
     <xsl:param name="value"/>
     <xsl:param name="count"/>
     <xsl:variable name="getValue">
-      <xsl:value-of select="key('OutlineLevel', '')[$count]/@w:val"/>
+      <xsl:value-of select="key('OutlineLevel', '')[number($count)]/@w:val"/>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$count > 0">      
+      <xsl:when test="$count &gt; 0">      
         <xsl:call-template name="GetOutlineLevelMax">
           <xsl:with-param name="value">
             <xsl:choose>
-              <xsl:when test="number($getValue) > number($value)">
-                <xsl:value-of select="$getValue"/>
+              <xsl:when test="number($getValue) &gt; number($value)">
+                <xsl:value-of select="number($getValue)"/>
               </xsl:when>
-              <xsl:otherwise><xsl:value-of select="$value"/></xsl:otherwise>
+              <xsl:otherwise>
+                <xsl:value-of select="number($value)"/>
+              </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="count">
@@ -344,6 +407,11 @@
           <xsl:variable name="CountOutlineLevel">
             <xsl:for-each select="document('word/document.xml')">
               <xsl:value-of select="count(key('OutlineLevel', '')/@w:val)"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:variable name="CountStyleOutlineLevel">
+            <xsl:for-each select="document('word/styles.xml')">
+              <xsl:value-of select="count(key('OutlineLevel', '')/@w:val)"/>
             </xsl:for-each>  
           </xsl:variable>         
           <xsl:choose>
@@ -356,6 +424,16 @@
                   </xsl:with-param>                 
                 </xsl:call-template>
               </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="$CountStyleOutlineLevel > 0">
+              <xsl:for-each select="document('word/styles.xml')">
+                <xsl:call-template name="GetOutlineLevelMax">
+                  <xsl:with-param name="value">0</xsl:with-param>
+                  <xsl:with-param name="count">                    
+                    <xsl:value-of select="$CountStyleOutlineLevel"/>
+                  </xsl:with-param> 
+                </xsl:call-template>
+                </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>         
@@ -380,8 +458,8 @@
             <xsl:value-of select="$maxLevel"/>
           </xsl:otherwise>
         </xsl:choose>
-        
       </xsl:attribute>
+      <xsl:attribute name="text:use-index-source-styles">true</xsl:attribute>
       <xsl:call-template name="InsertContentOfIndexProperties">
         <xsl:with-param name="styleName">Contents_20_Heading</xsl:with-param>
         <xsl:with-param name="maxLevel" select="$maxLevel"/>
@@ -458,6 +536,22 @@
       <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
       <xsl:with-param name="type" select="$type"/>
     </xsl:call-template>
+    
+    <xsl:if test="$type='TOC'">
+      
+      <!-- create string of index source styles included in TOC -->
+      <xsl:variable name="stylesOfTOC">
+        <xsl:apply-templates select="." mode="stylesOfTOC">
+          <xsl:with-param name="stylesWithLevel"/>
+        </xsl:apply-templates>
+      </xsl:variable>
+      
+      <!-- post-processor creates text:index-source-styles elements from string -->
+      <pxsi:index-source-styles xmlns:pxsi="urn:cleverage:xmlns:post-processings:source-styles">
+        <xsl:value-of select="$stylesOfTOC"/>
+      </pxsi:index-source-styles>
+      
+    </xsl:if>
   </xsl:template>
   
   <!-- insert entry properties -->

@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="Converter.cs" />
     <Compile Include="OdfCheckIfIndexPostProcessor.cs" />
+    <Compile Include="OdfIndexSourceStylesPostProcessor.cs" />
     <Compile Include="OdfParagraphPostProcessor.cs" />
     <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
     <Compile Include="OoxChangeTrackingPostProcessor.cs" />
@@ -89,13 +90,15 @@
     <EmbeddedResource Include="resources\oox2odf\sections.xsl" />
     <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
     <EmbeddedResource Include="resources\oox2odf\source.xml" />
-    <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
     <EmbeddedResource Include="resources\oox2odf\tables.xsl" />
     <EmbeddedResource Include="resources\oox2odf\track.xsl" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\tables.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
