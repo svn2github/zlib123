@@ -804,10 +804,70 @@
       <xsl:call-template name="InsertPageNumbering"/>
     </xsl:if>
 
-
-
+    <!-- footnote seperators -->
+    <xsl:call-template name="InsertCustomFootnoteSeperator"/>
+    
   </xsl:template>
 
+  <!--
+  Author: makz (DIaLOGIKa)
+  Date: 9.10.2007
+  
+  Template inserts formatted footnote seperators.
+  -->
+  <xsl:template name="InsertCustomFootnoteSeperator">
+
+    <!-- Get the font size of the style referenced to the default paragraph -->
+    <xsl:variable name="paraStyle" select="document('word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:pStyle/@w:val" />
+    <xsl:variable name="charStyle" select="document('word/styles.xml')//w:styles/w:style[@w:styleId='$paraStyle']/w:basedOn/@w:val" />
+    <xsl:variable name="fontSize" >
+      <xsl:call-template name="ConvertPoints">
+        <xsl:with-param name="length">
+          <xsl:value-of select="document('word/styles.xml')//w:styles/w:style[@w:styleId='$charStyle']/w:rPr/w:sz/@w:val" />
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!-- Get the space-before from ooxml -->
+    <xsl:variable name="spaceBefore">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+          <xsl:value-of select="document('word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!-- Get the space-after from ooxml -->
+    <xsl:variable name="spaceAfter">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+          <xsl:value-of select="document('word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!-- create default value for relwidth and width -->
+    <xsl:variable name="width">0.005cm</xsl:variable>
+    <xsl:variable name="relwidth">30</xsl:variable>
+
+    <style:footnote-sep>
+      <xsl:attribute name="style:distance-before-sep">
+        <xsl:value-of select="$spaceBefore"/>
+      </xsl:attribute>
+      <xsl:attribute name="style:distance-after-sep">
+        <xsl:value-of select="$spaceAfter"/>
+      </xsl:attribute>
+      <xsl:attribute name="style:width">
+        <xsl:value-of select="$width"/>
+      </xsl:attribute>
+      <xsl:attribute name="style:rel-width">
+        <xsl:value-of select="$relwidth"/>
+      </xsl:attribute>
+    </style:footnote-sep>
+  </xsl:template>
 
   <xsl:template name="InsertPageBorders">
 

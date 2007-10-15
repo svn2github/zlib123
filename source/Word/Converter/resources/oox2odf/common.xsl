@@ -31,20 +31,34 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" 
   exclude-result-prefixes="w">
 
-
+  <!--
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 15.10.2007
+  
+  Template inserts legal 6-digit hex color
+  -->
   <xsl:template name="InsertColor">
     <xsl:param name="color"/>
     <xsl:choose>
-      <xsl:when test="contains($color,'#')">
-        <xsl:choose>
-          <xsl:when test="contains($color,' ')">
-            <xsl:value-of select="substring-before($color,' ')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$color"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      <!-- Color contains more then the hex value -->
+      <xsl:when test="contains($color, ' ')">
+        <xsl:call-template name="InsertColor">
+          <xsl:with-param name="color" select="substring-before($color,' ')"/>
+        </xsl:call-template>
       </xsl:when>
+      <!-- Color is a 6-digit hex color (#003564) -->
+      <xsl:when test="contains($color,'#') and string-length($color) > 4">
+        <xsl:value-of select="$color"/>
+      </xsl:when>
+      <!-- Color is a 3-digit hex color (#036) -->
+      <xsl:when test="contains($color,'#') and string-length($color) = 4">
+        <xsl:variable name="d1" select="substring($color, 2, 1)"/>
+        <xsl:variable name="d2" select="substring($color, 3, 1)"/>
+        <xsl:variable name="d3" select="substring($color, 4, 1)"/>
+        <xsl:value-of  select="concat('#', $d1, $d1, $d2, $d2, $d3, $d3)"/>
+      </xsl:when>
+      <!-- Color is a standard color -->
       <xsl:otherwise>
         <!--TODO standard colors mapping (there are 10 standard colors in Word)-->
         <xsl:choose>
