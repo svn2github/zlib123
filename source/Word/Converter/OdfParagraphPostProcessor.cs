@@ -216,28 +216,37 @@ namespace CleverAge.OdfConverter.Word
         //method to check if we are in paragraph
         private bool IsInParagraph()
         {
-        	try
-        	{
-        	Element element = (Element)this.currentParagraphNode.Peek();
-        	if(element.Name.Equals("p"))
-        	{
-        	   	return true;
-        	   }
-        	   return false;
-        	}
-        	catch(Exception){
-        		return false;
-        	}
+            try
+            {
+                // prevent exception from being thrown
+                if (this.currentParagraphNode.Count > 0)
+                {
+                    Element element = (Element)this.currentParagraphNode.Peek();
+                    if (element.Name.Equals("p"))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
         //method to check if we are in style definition
         private bool IsInStyle()
         {
             try
             {
-                Element element = (Element)this.currentStyleNode.Peek();
-                if (element.Name.Equals("style"))
+                // prevent exception from being thrown
+                if (this.currentStyleNode.Count > 0)
                 {
-                    return true;
+                    Element element = (Element)this.currentStyleNode.Peek();
+                    if (element.Name.Equals("style"))
+                    {
+                        return true;
+                    }
                 }
                 return false;
             }
