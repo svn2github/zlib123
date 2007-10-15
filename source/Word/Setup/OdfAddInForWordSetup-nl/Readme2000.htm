@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <title>ODF-invoegtoepassing voor Microsoft Word</title>
+    </head>
+    <body>
+        <h1><a name="top">ODF-invoegtoepassing voor Microsoft Word</a></h1>        
+        <p>Bedankt voor het downloaden van de ODF-invoegtoepassing voor Word. Het doel van deze software is om gebruikers in staat te stellen om documenten op ODF-specificatiebasis te openen in Microsoft Word en te laten zien dat OpenXML &amp; ODF-specificaties goed kunnen samenwerken (interoperability). Dit interoperability-project bevindt zich op <a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. Meer details en toekomstige updates van het project zijn te vinden in het RoadMap-document.</p>
+        <p>Deze invoegtoepassing is gesponsord door <a href="http://www.microsoft.com/">Microsoft</a> en ontwikkeld door <a href="http://www.clever-age.com/">Clever Age</a>, <a href="http://www.dialogika.de/">DIaLOGIKa</a> en <a href="http://www.aztecsoft.com/">Aztecsoft</a> (zie de project <a href="http://odf-converter.sourceforge.net/">website</a> voor nadere informatie).</p>
+        
+        <h2>Inhoudsopgave</h2>
+        <ul>
+            <li><a href="#hRequirements">Software-eisen</a></li>
+            <li><a href="#hInstall">Installeren van de invoegtoepassing</a></li>
+            <li><a href="#hTroobleshooting">Hulp bij het oplossen van problemen</a><ul>
+                    <li><a href="#hTroobleshootingXP2003">Microsoft Word 2000/XP/2003</a></li>
+                    <li><a href="#hTroobleshooting2007">Microsoft Word 2007</a></li>
+                </ul>
+            </li>
+            <li><a href="#hFeatures">Niet-ondersteunde functies/opties</a></li>
+        </ul>
+        
+        <h2><a name="hRequirements"> Software-eisen</a></h2>
+        <p>Voordat u de invoegtoepassing installeert, controleer of u beschikt over een van de volgende...</p>
+        <ul>
+            <li>Microsoft Word 2000</li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=941b3470-3ae9-4aee-8f43-c6bb74cd1466&displaylang=nl">Office-compatibiliteitspakket</a></li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET framework 2.0</a></li>
+        </ul>      
+        <p><strong>of</strong></p>        
+        <ul>
+            <li>Microsoft Word XP</li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=941b3470-3ae9-4aee-8f43-c6bb74cd1466&displaylang=nl">Office-compatibiliteitspakket</a></li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET framework 2.0</a></li>
+        </ul>
+        <p><strong>of</strong></p>        
+        <ul>
+            <li>Microsoft Word 2003</li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=941b3470-3ae9-4aee-8f43-c6bb74cd1466&displaylang=nl">Office-compatibiliteitspakket</a></li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET framework 2.0*</a></li>
+        </ul>
+        <p><strong>of</strong></p>
+        <ul>
+            <li><a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word 2007</a> met geactiveerde .NET Programmability Support</li>
+            <li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET framework 2.0*</a></li>
+        </ul>
+        
+        
+        <p><strong>(*) Waarschuwing:</strong> als u Microsoft Word installeert vóór .NET Framework, moet u uw Word-installatie bijwerken door de onderstaande stappen te doorlopen.</p>
+        <ol>
+            <li>Openen &quot;toevoegen of verwijderen van programma's&quot; in het Configuratiescherm</li>
+            <li>Zoek het Microsoft Word-item en kies &quot;Wijzigen&quot;</li>
+            <li>Kies tijdens de installatie &quot;Functies toevoegen of verwijderen&quot; vervolgens &quot;.NET Programmability Support toevoegen&quot; in het &quot;Microsoft Office Word&quot; gedeelte. </li>
+        </ol>
+        <p><a href="#top" class="back">Terug naar boven</a></p>
+        
+        <h2><a name="hInstall">Installeren van de invoegtoepassing</a></h2>
+        <p>Dubbelklik op het <strong>&quot;OdfAddInForWordSetup-en-1.0.exe&quot;</strong> bestand</p>
+        <p>Als de installatie is geslaagd, moet u een &quot;.ODT&quot; bestand in Microsoft Word kunnen openen (zie menu &quot;Bestand ODF...&quot;). "Ook moet u als u in Explorer met de rechtermuisknop op een &quot;.ODT&quot; bestand klikt, het document in Microsoft Word kunnen openen (menu &quot;Openen met Word&quot;).</p>
+        <p><strong>Belangrijke opmerking:</strong> het ODF-bestand dat door de invoegtoepassing is geopend, wordt naar Microsoft Word geïmporteerd als een alleen-lezen .DOCX-bestand. Als u het als ODF wilt opslaan, moet u eerst een kopie maken van het document (&quot;MenuOpslaan als&quot;) en dan de menuoptie &quot;Exporteren als ODF&quot; kiezen.</p>
+        <p><a href="#top" class="back">Terug naar boven</a></p>
+        
+        <h2><a name="hTroobleshooting">Oplossen van problemen</a></h2>
+        <p>Als u ODF niet in het Microsoft Word-menu ziet, kan dit worden veroorzaakt door ontbrekende functies in Word (zie het gedeelte <a href="#hRequirements">Software-eisen</a>) of door een mislukte installatie van Word Primary Interop assembly's. U moet dan de invoegtoepassing als volgt handmatig activeren... </p>
+        <h3><a name="hTroobleshootingXP2003">Microsoft Word 2000/XP/2003</a></h3>
+        <ol>
+                <li>Ga naar Extra &gt; Aanpassen en klik dan op het tabblad Opdrachten.</li>
+                <li>Klik in het vakje Categorieën op Extra.</li>
+                <li>Sleep de COM-invoegtoepassingen van het vakje Opdrachten over het menu Extra. Als de menuopdrachten in het menu Extra zichtbaar zijn, wijs dan naar de plaats waar u de COM-invoegtoepassingen op het menu wilt laten verschijnen en laat vervolgens de muisknop los.</li>
+                <li>Klik op Sluiten.</li>
+                <li>Klik in het menu Extra op COM-invoegtoepassingen en vink in de lijst het vakje voor de invoegtoepassing aan. Als de door u gewenste invoegtoepassing niet in de lijst aanwezig is, klik dan op Toevoegen, zoek de invoegtoepassing en klik op OK.</li>
+        </ol>
+        <h3><a name="hTroobleshooting2007">Microsoft Word 2007</a></h3>
+        <ol>
+            <li>Klik op &quot;Word-opties&quot; in het menu &quot;Bestand&quot;</li>
+            <li>Selecteer in het gedeelte &quot;Invoegtoepassingen&quot; &quot;COM-invoegtoepassingen&quot; uit de keuzelijst en druk op &quot;Start&quot;</li>
+            <li>Controleer of u het selectievakje &quot;ODF Word-invoegtoepassing&quot; hebt geselecteerd en druk op &quot;OK&quot; om te bevestigen.</li>
+        </ol>
+        <p><a href="#top" class="back">Terug naar boven</a></p>
+        
+        <h2><a name="hFeatures">Niet ondersteunde eigenschappen/opties</a></h2>
+        <p><a name="hFeatures">Niet-ondersteunde functies/opties</a> De complete lijst met niet-ondersteunde functies wordt op onze website bijgehouden.</p>
+        <p>U kunt deze lijst vinden op <a href="http://odf-converter.sourceforge.net/features.html">deze pagina</a>.</p>
+    </body>
+</html>
