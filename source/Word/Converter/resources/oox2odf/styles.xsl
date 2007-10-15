@@ -1131,7 +1131,9 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
           <xsl:with-param name="length">
             <xsl:choose>
-              <xsl:when test="./w:headerReference/@w:type">
+              <!--<xsl:when test="./w:headerReference/@w:type">-->
+              <!--clam: Bugfix #1797903-->
+              <xsl:when test="/w:document/w:body/w:sectPr/w:headerReference/@w:type">
                 <xsl:choose>
                   <xsl:when test="w:pgMar/@w:top &lt; 0">
                     <xsl:value-of select="w:pgMar/@w:top"/>
@@ -1174,8 +1176,7 @@
                 </xsl:choose>
               </xsl:otherwise>
             </xsl:choose>
-          </xsl:with-param>
-        </xsl:call-template>
+          </xsl:with-param>        </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="w:pgBorders/w:top">
