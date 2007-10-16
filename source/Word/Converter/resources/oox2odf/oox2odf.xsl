@@ -34,17 +34,17 @@
 
   <xsl:import href="measures.xsl"/>
   <xsl:import href="common-meta.xsl"/>
-  <xsl:import href="common.xsl"/>
-  <xsl:import href="content.xsl"/>
-  <xsl:import href="pictures.xsl"/>
-  <xsl:import href="styles.xsl"/>
-  <xsl:import href="frames.xsl"/>
-  <xsl:import href="settings.xsl"/>
-  <xsl:import href="relationships.xsl"/>
-  <xsl:import href="footnotes.xsl"/>
-  <xsl:import href="sections.xsl"/>
-  <xsl:import href="comments.xsl"/>
-  <xsl:import href="track.xsl"/>
+  <xsl:import href="2odf-common.xsl"/>
+  <xsl:import href="2odf-content.xsl"/>
+  <xsl:import href="2odf-pictures.xsl"/>
+  <xsl:import href="2odf-styles.xsl"/>
+  <xsl:import href="2odf-frames.xsl"/>
+  <xsl:import href="2odf-settings.xsl"/>
+  <xsl:import href="2odf-relationships.xsl"/>
+  <xsl:import href="2odf-footnotes.xsl"/>
+  <xsl:import href="2odf-sections.xsl"/>
+  <xsl:import href="2odf-comments.xsl"/>
+  <xsl:import href="2odf-track.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>

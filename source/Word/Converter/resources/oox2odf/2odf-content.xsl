@@ -43,16 +43,16 @@
   xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut"
   xmlns:v="urn:schemas-microsoft-com:vml" exclude-result-prefixes="w r xlink number wp ">
 
-  <xsl:import href="tables.xsl"/>
-  <xsl:import href="lists.xsl"/>
-  <xsl:import href="fonts.xsl"/>
-  <xsl:import href="fields.xsl"/>
-  <xsl:import href="footnotes.xsl"/>
-  <xsl:import href="indexes.xsl"/>
-  <xsl:import href="track.xsl"/>
-  <xsl:import href="frames.xsl"/>
-  <xsl:import href="sections.xsl"/>
-  <xsl:import href="comments.xsl"/>
+  <xsl:import href="2odf-tables.xsl"/>
+  <xsl:import href="2odf-lists.xsl"/>
+  <xsl:import href="2odf-fonts.xsl"/>
+  <xsl:import href="2odf-fields.xsl"/>
+  <xsl:import href="2odf-footnotes.xsl"/>
+  <xsl:import href="2odf-indexes.xsl"/>
+  <xsl:import href="2odf-track.xsl"/>
+  <xsl:import href="2odf-frames.xsl"/>
+  <xsl:import href="2odf-sections.xsl"/>
+  <xsl:import href="2odf-comments.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="w:p"/>

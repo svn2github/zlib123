@@ -41,7 +41,7 @@
   xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut" xmlns:v="urn:schemas-microsoft-com:vml"
   exclude-result-prefixes="w r draw number wp xlink v">
 
-  <xsl:import href="footnotes.xsl"/>
+  <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
   <xsl:key name="default-styles"
     match="w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on']" use="@w:type"/>

@@ -42,9 +42,9 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="office text table fo style draw xlink v svg number config">
 
-  <xsl:import href="tables.xsl"/>
-  <xsl:import href="indexes.xsl"/>
-  <xsl:import href="bookmarks.xsl"/>
+  <xsl:import href="2oox-tables.xsl"/>
+  <xsl:import href="2oox-indexes.xsl"/>
+  <xsl:import href="2oox-bookmarks.xsl"/>
 
 
   <xsl:key name="annotations" match="office:annotation" use="''"/>
