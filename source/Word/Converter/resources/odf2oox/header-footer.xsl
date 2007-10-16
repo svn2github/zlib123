@@ -74,24 +74,45 @@
   <xsl:template name="HeaderFooter">
     <xsl:param name="master-page"/>
 
-    <xsl:choose>
-      <xsl:when test="$master-page/style:header-left and $master-page/style:header">
-        <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
-        <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
-      </xsl:when>
+    <!--START clam Bugfix #1787056-->
+    <xsl:variable name="evenElementFound" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header-left or document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:footer-left"></xsl:variable>
+    
+    <xsl:choose>   
       <xsl:when test="$master-page/style:header">
-        <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
+        <xsl:variable name="headerReferenceID" select="generate-id($master-page/style:header)"></xsl:variable>
+        <w:headerReference w:type="default" r:id="{$headerReferenceID}"/>
+        <xsl:choose>
+          <xsl:when test="$master-page/style:header-left">
+            <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+            <xsl:when test="$evenElementFound">
+              <w:headerReference w:type="even" r:id="{$headerReferenceID}"/>
+            </xsl:when>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
     </xsl:choose>
+
     <xsl:choose>
       <xsl:when test="$master-page/style:footer and $master-page/style:footer-left">
         <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
         <w:footerReference w:type="even" r:id="{generate-id($master-page/style:footer-left)}"/>
       </xsl:when>
       <xsl:when test="$master-page/style:footer">
-        <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
+        <xsl:variable name="footerReferenceID" select="generate-id($master-page/style:footer)"></xsl:variable>
+        <w:footerReference w:type="default" r:id="{$footerReferenceID}"/>
+        <xsl:choose>
+          <xsl:when test="$evenElementFound">
+            <w:footerReference w:type="even" r:id="{$footerReferenceID}"/>
+          </xsl:when>
+        </xsl:choose>
       </xsl:when>
-    </xsl:choose>
+    </xsl:choose> 
+
+    <!--END clam Bugfix #1787056-->
 
   </xsl:template>
 
