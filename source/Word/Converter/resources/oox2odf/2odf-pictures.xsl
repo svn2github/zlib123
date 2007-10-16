@@ -404,45 +404,52 @@
     </xsl:if>
   </xsl:template>
 
+  <!--
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 15.10.2007
+  -->
   <xsl:template name="InsertImageWrap">
-    <xsl:if
-      test="wp:anchor/*[self::wp:wrapNone or self::wp:wrapThrough or self::wp:wrapTigh or self::wp:wrapSquare or self::wrapTopAndBottom]">
+    <!-- current context is <w:drawing> -->
+
+    <xsl:if test="wp:anchor/wp:wrapSquare or wp:anchor/wp:wrapTight or wp:anchor/wp:wrapTopAndBottom or wp:anchor/wp:wrapThrough or wp:anchor/wp:wrapNone">
+
       <xsl:attribute name="style:wrap">
-
-        <xsl:if test="wp:anchor/wp:wrapSquare">
-          <xsl:call-template name="InsertSquareWrap">
-            <xsl:with-param name="wrap" select="wp:anchor/wp:wrapSquare/@wrapText"/>
-          </xsl:call-template>
-        </xsl:if>
-
-        <xsl:if test="wp:anchor/wp:wrapTight">
-          <xsl:call-template name="InsertSquareWrap">
-            <xsl:with-param name="wrap" select="wp:anchor/wp:wrapTight/@wrapText"/>
-          </xsl:call-template>
-        </xsl:if>
-
-        <xsl:if test="wp:anchor/wp:wrapTopAndBottom">
-          <xsl:text>none</xsl:text>
-        </xsl:if>
-
-        <xsl:if test="wp:anchor/wp:wrapThrough">
-          <xsl:call-template name="InsertSquareWrap">
-            <xsl:with-param name="wrap" select="wp:anchor/wp:wrapThrough/@wrapText"/>
-          </xsl:call-template>
-        </xsl:if>
-
-        <xsl:if test="wp:anchor/wp:wrapNone">
-          <xsl:text>run-through</xsl:text>
-        </xsl:if>
+        <!-- set the wrap attribute -->
+        <xsl:choose>
+          <xsl:when test="wp:anchor/wp:wrapSquare">
+            <xsl:call-template name="InsertSquareWrap">
+              <xsl:with-param name="wrap" select="wp:anchor/wp:wrapSquare/@wrapText"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="wp:anchor/wp:wrapTight">
+            <xsl:call-template name="InsertSquareWrap">
+              <xsl:with-param name="wrap" select="wp:anchor/wp:wrapTight/@wrapText"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="wp:anchor/wp:wrapTopAndBottom">
+            <xsl:text>none</xsl:text>
+          </xsl:when>
+          <xsl:when test="wp:anchor/wp:wrapThrough">
+            <xsl:call-template name="InsertSquareWrap">
+              <xsl:with-param name="wrap" select="wp:anchor/wp:wrapThrough/@wrapText"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="wp:anchor/wp:wrapNone">
+            <xsl:text>run-through</xsl:text>
+          </xsl:when>
+        </xsl:choose>
       </xsl:attribute>
 
       <!--decide if in backround or in front of text-->
-      <xsl:if test="wp:anchor/wp:anchor/@behindDoc = 1">
+      <xsl:if test="wp:anchor/@behindDoc='1'">
         <xsl:attribute name="style:run-through">
           <xsl:text>background</xsl:text>
         </xsl:attribute>
       </xsl:if>
+
     </xsl:if>
+      
   </xsl:template>
 
   <xsl:template name="InsertImageMargins">

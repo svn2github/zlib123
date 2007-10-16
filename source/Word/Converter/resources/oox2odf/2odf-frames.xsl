@@ -1482,39 +1482,111 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 16.10.2007
+  -->
   <xsl:template name="InsertShapeBorders">
+    <!-- current context is <v:shape> -->
     <xsl:param name="shape" select="."/>
 
+    <!-- get border weight or use default value -->
+    <xsl:variable name="borderWeight">
+      <xsl:choose>
+        <xsl:when test="@strokeweight">
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$shape/@strokeweight"/>
+            <xsl:with-param name="destUnit" select="'cm'"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0.0176cm</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- get border color or use default value -->
+    <xsl:variable name="borderColor">
+      <xsl:choose>
+        <xsl:when test="@strokecolor">
+          <xsl:call-template name="InsertColor">
+            <xsl:with-param name="color" select="$shape/@strokecolor"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>#000000</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- get border style or use default -->
+    <xsl:variable name="borderStyle">
+      <xsl:choose>
+        <xsl:when test="not(v:stroke)">
+          <xsl:text>solid</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>double</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- write attributes -->
+    <xsl:attribute name="fo:border">
+      <xsl:value-of select="concat($borderWeight,' ',$borderStyle,' ',$borderColor)"/>
+    </xsl:attribute>
+
+    <xsl:attribute name="svg:stroke-color">
+      <xsl:value-of select="$borderColor"/>
+    </xsl:attribute>
+
+    <xsl:if test="v:stroke">
+      <xsl:attribute name="style:border-line-width">
+        <xsl:choose>
+          <xsl:when test="v:stroke/@linestyle='thinThin' or v:stroke/@linestyle='thickBetweenThin'">
+            <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"/>
+          </xsl:when>
+          <xsl:when test="v:stroke/@linestyle='thinThick'">
+            <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"/>
+          </xsl:when>
+          <xsl:when test="v:stroke/@linestyle='thickThin'">
+            <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- Old Clever Age Stuff 
     <xsl:choose>
-      <xsl:when test="$shape/@o:hr='t' or $shape/@stroked = 'f' ">
+      <xsl:when test="$shape/@o:hr='t' or $shape/@stroked='f'">
         <xsl:attribute name="draw:stroke">
           <xsl:text>none</xsl:text>
         </xsl:attribute>
       </xsl:when>
-      <!--  Word sets default values for borders  when no strokeweight and strokecolor is set and @stroked is not set to f (this does not work for ole-objects (v:imagedata))-->
-      <xsl:when
-        test="not($shape/@strokeweight) and not($shape/@strokecolor) and not($shape/v:imagedata)">
+      
+      <xsl:when test="not($shape/@strokeweight) and not($shape/@strokecolor) and not($shape/v:imagedata)">
         <xsl:attribute name="fo:border">
           <xsl:text>0.0176cm solid #000000</xsl:text>
         </xsl:attribute>
       </xsl:when>
-      <!--  default scenario -->
+      
       <xsl:otherwise>
         <xsl:if test="$shape/@strokeweight">
+        
           <xsl:variable name="borderWeight">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="length" select="$shape/@strokeweight"/>
               <xsl:with-param name="destUnit" select="'cm'"/>
             </xsl:call-template>
           </xsl:variable>
-
-
-
+          
           <xsl:variable name="borderColor">
             <xsl:call-template name="InsertColor">
               <xsl:with-param name="color" select="$shape/@strokecolor"/>
             </xsl:call-template>
           </xsl:variable>
+          
           <xsl:variable name="borderStyle">
             <xsl:choose>
               <xsl:when test="not($shape/v:stroke)">
@@ -1525,40 +1597,35 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-
+          
           <xsl:attribute name="fo:border">
             <xsl:value-of select="concat($borderWeight,' ',$borderStyle,' ',$borderColor)"/>
           </xsl:attribute>
           <xsl:attribute name="svg:stroke-color">
             <xsl:value-of select="$borderColor"/>
           </xsl:attribute>
-
-          <xsl:if test="$borderStyle= 'double' ">
+          
+          <xsl:if test="$borderStyle='double'">
             <xsl:variable name="strokeStyle" select="$shape/v:stroke/@linestyle"/>
-
             <xsl:attribute name="style:border-line-width">
               <xsl:choose>
                 <xsl:when test="$strokeStyle = 'thinThin' or $strokeStyle = 'thickBetweenThin'">
-                  <xsl:value-of
-                    select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"
-                  />
+                  <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"/>
                 </xsl:when>
                 <xsl:when test="$strokeStyle = 'thinThick' ">
-                  <xsl:value-of
-                    select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"
-                  />
+                  <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"/>
                 </xsl:when>
                 <xsl:when test="$strokeStyle = 'thickThin' ">
-                  <xsl:value-of
-                    select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"
-                  />
+                  <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"/>
                 </xsl:when>
               </xsl:choose>
             </xsl:attribute>
           </xsl:if>
+          
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
+    -->
   </xsl:template>
 
   <xsl:template name="InsertTextBoxAutomaticHeight">
