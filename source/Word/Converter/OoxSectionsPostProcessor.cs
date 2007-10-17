@@ -62,8 +62,7 @@ namespace CleverAge.OdfConverter.Word
         private Hashtable pages;
         private string startPageNumber = null;
 
-
-
+       
         public OoxSectionsPostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
@@ -128,6 +127,7 @@ namespace CleverAge.OdfConverter.Word
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
+
             this.currentNode.Push(new Element(prefix, localName, ns));
 
             if (IsMasterStyles())
@@ -658,10 +658,10 @@ namespace CleverAge.OdfConverter.Word
                     WritePageLayout(page);
 
                     // titlePg
-                    //	if (page.GetAttributeValue("name", PSECT_NAMESPACE).Equals("First_20_Page"))
-                    //	{
-                    //		this.titlePg.Write(nextWriter);
-                    //	}
+                    if (page.FirstDefault)
+                    {
+                    	this.titlePg.Write(nextWriter);
+                    }
 
                     nextWriter.WriteEndElement(); // end sectPr
                 }
@@ -678,7 +678,11 @@ namespace CleverAge.OdfConverter.Word
                 {
                     if ("even".Equals(e.GetAttributeValue("type", W_NAMESPACE)))
                     {
-                        page.EvenOdd = true;
+                        page.EvenOdd = true;                     
+                    }
+                    if ("first".Equals(e.GetAttributeValue("type", W_NAMESPACE)))
+                    {
+                        page.FirstDefault = true;
                     }
                     e.Write(nextWriter);
                 }
@@ -835,7 +839,8 @@ namespace CleverAge.OdfConverter.Word
         {
             private int use;
             private bool evenOdd;
-
+            private bool firstDefault;
+       
             public int Use
             {
                 get { return use; }
@@ -847,6 +852,13 @@ namespace CleverAge.OdfConverter.Word
                 get { return evenOdd; }
                 set { evenOdd = value; }
             }
+
+            public bool FirstDefault
+            {
+                get { return firstDefault; }
+                set { firstDefault = value; }
+            }
+          
 
             public Page(string prefix, string name, string ns)
                 : base(prefix, name, ns) { }
