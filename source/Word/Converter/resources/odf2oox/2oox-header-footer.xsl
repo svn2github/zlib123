@@ -74,45 +74,112 @@
   <xsl:template name="HeaderFooter">
     <xsl:param name="master-page"/>
 
-    <!--START clam Bugfix #1787056-->
+    <!--START clam Bugfix #1787056 + #1605298-->
     <xsl:variable name="evenElementFound" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header-left or document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:footer-left"></xsl:variable>
 
     <xsl:choose>
       <xsl:when test="$master-page/style:header">
         <xsl:variable name="headerReferenceID" select="generate-id($master-page/style:header)"></xsl:variable>
-        <w:headerReference w:type="default" r:id="{$headerReferenceID}"/>
+        <xsl:variable name="nextStyleDefined" select="$master-page/@style:next-style-name"></xsl:variable>
+        <xsl:variable name="nextStyle" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$master-page/@style:next-style-name]"></xsl:variable>
+        <xsl:variable name="nextStyleHasheader" select="$nextStyle/style:header"></xsl:variable>
         <xsl:choose>
-          <xsl:when test="$master-page/style:header-left">
-            <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
+          <xsl:when test="$nextStyleDefined">
+            <!-- if there is a next style defined: take its header settings -->
+            <xsl:choose>
+              <xsl:when test="$nextStyle/style:header">
+                <w:headerReference w:type="first" r:id="{$headerReferenceID}"/>
+                <w:headerReference w:type="default" r:id="{generate-id($nextStyle/style:header)}"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:headerReference w:type="first" r:id="{$headerReferenceID}"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            <!--if next style has next style defined: take its header settings for even-->
+            <xsl:variable name="nextnextStyleDefined" select="$nextStyle/@style:next-style-name"></xsl:variable>
+            <xsl:variable name="nextnextStyle" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$nextStyle/@style:next-style-name]"></xsl:variable>
+            <xsl:variable name="nextnextStyleHasheader" select="$nextnextStyle/style:header"></xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$nextnextStyleHasheader">
+                <w:headerReference w:type="even" r:id="{generate-id($nextnextStyle/style:header)}"/>
+              </xsl:when>
+            </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
-              <xsl:when test="$evenElementFound">
-                <w:headerReference w:type="even" r:id="{$headerReferenceID}"/>
+              <xsl:when test="$master-page/style:header-left">
+                <w:headerReference w:type="default" r:id="{$headerReferenceID}"/>
+                <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
               </xsl:when>
+              <xsl:otherwise>
+                <xsl:choose>
+                  <xsl:when test="$evenElementFound">
+                    <w:headerReference w:type="default" r:id="{$headerReferenceID}"/>
+                    <w:headerReference w:type="even" r:id="{$headerReferenceID}"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <w:headerReference w:type="default" r:id="{$headerReferenceID}"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
     </xsl:choose>
 
-    <xsl:choose>
-      <xsl:when test="$master-page/style:footer and $master-page/style:footer-left">
-        <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
-        <w:footerReference w:type="even" r:id="{generate-id($master-page/style:footer-left)}"/>
-      </xsl:when>
+     <xsl:choose>
       <xsl:when test="$master-page/style:footer">
         <xsl:variable name="footerReferenceID" select="generate-id($master-page/style:footer)"></xsl:variable>
-        <w:footerReference w:type="default" r:id="{$footerReferenceID}"/>
+        <xsl:variable name="nextStyleDefined" select="$master-page/@style:next-style-name"></xsl:variable>
+        <xsl:variable name="nextStyle" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$master-page/@style:next-style-name]"></xsl:variable>
+        <xsl:variable name="nextStyleHasFooter" select="$nextStyle/style:footer"></xsl:variable>
         <xsl:choose>
-          <xsl:when test="$evenElementFound">
-            <w:footerReference w:type="even" r:id="{$footerReferenceID}"/>
+          <xsl:when test="$nextStyleDefined">
+            <!-- if there is a next style defined: take its footer settings -->
+            <xsl:choose>
+              <xsl:when test="$nextStyle/style:footer">
+                <w:footerReference w:type="first" r:id="{$footerReferenceID}"/>
+                <w:footerReference w:type="default" r:id="{generate-id($nextStyle/style:footer)}"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:footerReference w:type="first" r:id="{$footerReferenceID}"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            <!--if next style has next style defined: take ist footer settings for even-->
+            <xsl:variable name="nextnextStyleDefined" select="$nextStyle/@style:next-style-name"></xsl:variable>
+            <xsl:variable name="nextnextStyle" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$nextStyle/@style:next-style-name]"></xsl:variable>
+            <xsl:variable name="nextnextStyleHasFooter" select="$nextnextStyle/style:footer"></xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$nextnextStyleHasFooter">
+                <w:footerReference w:type="even" r:id="{generate-id($nextnextStyle/style:footer)}"/>
+              </xsl:when>
+            </xsl:choose>
           </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$master-page/style:footer-left">
+                <w:footerReference w:type="default" r:id="{$footerReferenceID}"/>
+                <w:footerReference w:type="even" r:id="{generate-id($master-page/style:footer-left)}"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:choose>
+                  <xsl:when test="$evenElementFound">
+                    <w:footerReference w:type="default" r:id="{$footerReferenceID}"/>
+                    <w:footerReference w:type="even" r:id="{$footerReferenceID}"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <w:footerReference w:type="default" r:id="{$footerReferenceID}"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
     </xsl:choose>
 
-    <!--END clam Bugfix #1787056-->
+    <!--END clam Bugfix #1787056 + #1605298-->
     
     <!--<xsl:choose>
       <xsl:when test="$master-page/style:header-left and $master-page/style:header">
@@ -137,12 +204,12 @@
 
 
   <xsl:template name="InsertHeaderFooterSettings">
-    <xsl:variable name="oddPage">
+    <!--<xsl:variable name="oddPage">
       <xsl:call-template name="isOddEven"/>
-    </xsl:variable>
-    <xsl:if test="string-length($oddPage)>0">
+    </xsl:variable>-->
+    <!--<xsl:if test="string-length($oddPage)>0">-->
       <w:evenAndOddHeaders/>
-    </xsl:if>
+    <!--</xsl:if>-->
   </xsl:template>
 
   <xsl:template match="text:page-number" mode="paragraph">
