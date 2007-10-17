@@ -506,7 +506,7 @@
    <h4><xsl:value-of select="$heading"/></h4>
    <ul>
    <xsl:for-each select="$resource">
-    <li><a href="{.}"><xsl:value-of select="."/></a></li>
+    <li><a href="{.}.html"><xsl:value-of select="."/></a></li>
    </xsl:for-each>
    </ul>
   </xsl:if>
