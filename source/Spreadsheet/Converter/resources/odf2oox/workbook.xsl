@@ -484,8 +484,16 @@
            
          </xsl:if>
          <xsl:if test="contains($PrintRange, '$')">
+           <xsl:choose>
+             <xsl:when test="not(contains($PrintRange,':'))">
+               <xsl:value-of
+                 select="concat($sheetName,'!',substring-before(substring-after($PrintRange,'.'),$row1),'', $row1,':$',$row1)"/> 
+             </xsl:when>
+             <xsl:otherwise>
            <xsl:value-of
              select="concat($sheetName,'!',substring-before(substring-after($PrintRange,'.'),$row1),'', $row1)"/>
+             </xsl:otherwise>
+           </xsl:choose>
          </xsl:if>
        </xsl:variable>
   
