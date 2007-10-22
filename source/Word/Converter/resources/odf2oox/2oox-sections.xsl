@@ -63,8 +63,13 @@
   <!-- The very first text element -->
   <xsl:variable name="first-elt" select="$elts[1]"/>
 
-
-
+    <xsl:template name="SoftPageBreaks">
+    <w:pPr>
+      <w:sectPr>
+        <xsl:attribute name="psect:next-soft-page-break">true</xsl:attribute>
+      </w:sectPr>
+    </w:pPr>
+  </xsl:template>
 
   <!-- Document final section properties -->
   <xsl:template name="InsertDocumentFinalSectionProperties">
@@ -494,4 +499,6 @@
     </xsl:if>
   </xsl:template>
 
+
+  
 </xsl:stylesheet>
