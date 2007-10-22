@@ -617,7 +617,7 @@
     
     <xsl:param name="base"/>     <!-- (number) The exponent base -->
     <xsl:param name="exponent"/> <!-- (number) The exponent (e.g. y)-->
-    <xsl:param name="value1"/>   <!-- (number) The number on which the exponent should be applied (e.g. x)  -->
+    <xsl:param name="value1"  select="$base"/>   <!-- (number) The number on which the exponent should be applied (e.g. x)  -->
     
     <xsl:choose>
       <xsl:when test="$exponent = 0">
