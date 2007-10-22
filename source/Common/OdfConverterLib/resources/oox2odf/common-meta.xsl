@@ -308,55 +308,7 @@
         </meta:document-statistic>
     </xsl:template>
     
-    <!-- Convert hex to decimal -->
-    <xsl:template name="DecToHex">
-        <xsl:param name="number"/>
-        
-        <xsl:variable name="high">
-            <xsl:call-template name="HexMap">
-                <xsl:with-param name="value">
-                    <xsl:value-of select="floor($number div 16)"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable>
-        
-        <xsl:variable name="low">
-            <xsl:call-template name="HexMap">
-                <xsl:with-param name="value">
-                    <xsl:value-of select="$number mod 16"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable>
-        
-        <xsl:value-of select="concat($high,$low)"/>
-    </xsl:template>
-    
-    <xsl:template name="HexMap">
-        <xsl:param name="value"/>
-        <xsl:choose>
-            <xsl:when test="$value = 10">
-                <xsl:text>A</xsl:text>
-            </xsl:when>
-            <xsl:when test="$value = 11">
-                <xsl:text>B</xsl:text>
-            </xsl:when>
-            <xsl:when test="$value = 12">
-                <xsl:text>C</xsl:text>
-            </xsl:when>
-            <xsl:when test="$value = 13">
-                <xsl:text>D</xsl:text>
-            </xsl:when>
-            <xsl:when test="$value = 14">
-                <xsl:text>E</xsl:text>
-            </xsl:when>
-            <xsl:when test="$value = 15">
-                <xsl:text>F</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$value"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
+   
     
     <!-- other properties to fit :
         core : category, contentStatus, contentType
