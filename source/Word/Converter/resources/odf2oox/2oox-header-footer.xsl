@@ -89,21 +89,28 @@
             <xsl:choose>
               <xsl:when test="$nextStyle/style:header">
                 <w:headerReference w:type="first" r:id="{$headerReferenceID}"/>
-                <w:headerReference w:type="default" r:id="{generate-id($nextStyle/style:header)}"/>
+                <!--if next style has next style defined: take its header settings for even-->
+                <xsl:variable name="nextnextStyleDefined" select="$nextStyle/@style:next-style-name"></xsl:variable>
+                <xsl:variable name="nextnextStyle" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$nextStyle/@style:next-style-name]"></xsl:variable>
+                <xsl:variable name="nextnextStyleHasheader" select="$nextnextStyle/style:header"></xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="$nextnextStyleHasheader">
+                    <w:headerReference w:type="even" r:id="{generate-id($nextStyle/style:header)}"/>
+                    <w:headerReference w:type="default" r:id="{generate-id($nextnextStyle/style:header)}"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <w:headerReference w:type="default" r:id="{generate-id($nextStyle/style:header)}"/>
+                    <xsl:if test="$evenElementFound">
+                      <w:headerReference w:type="even" r:id="{generate-id($nextStyle/style:header)}"/>
+                    </xsl:if>
+                  </xsl:otherwise>
+                </xsl:choose>                
               </xsl:when>
               <xsl:otherwise>
                 <w:headerReference w:type="first" r:id="{$headerReferenceID}"/>
               </xsl:otherwise>
             </xsl:choose>
-            <!--if next style has next style defined: take its header settings for even-->
-            <xsl:variable name="nextnextStyleDefined" select="$nextStyle/@style:next-style-name"></xsl:variable>
-            <xsl:variable name="nextnextStyle" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$nextStyle/@style:next-style-name]"></xsl:variable>
-            <xsl:variable name="nextnextStyleHasheader" select="$nextnextStyle/style:header"></xsl:variable>
-            <xsl:choose>
-              <xsl:when test="$nextnextStyleHasheader">
-                <w:headerReference w:type="even" r:id="{generate-id($nextnextStyle/style:header)}"/>
-              </xsl:when>
-            </xsl:choose>
+          
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
