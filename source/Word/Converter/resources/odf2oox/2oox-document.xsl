@@ -69,7 +69,7 @@
       <xsl:value-of select="count(key('toc', ''))"/>
     </xsl:for-each>
   </xsl:variable>
-
+  
   <!-- main document -->
   <xsl:template name="document">
     <w:document>
@@ -104,8 +104,8 @@
       <xsl:call-template name="InsertDocumentFinalSectionProperties"/>
     </w:body>
   </xsl:template>
-
-
+ 
+  
   <!-- paragraphs and headings -->
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
@@ -156,7 +156,7 @@
 
       <!-- reference to user-defined-TOC if we are in first paragraph of a table -->
       <xsl:call-template name="InsertTCField"/>
-
+     
       <!-- If there is a page-break-after in the paragraph style -->
       <xsl:call-template name="InsertPageBreakAfter"/>
     </w:p>
@@ -236,6 +236,21 @@
         <w:br w:type="page"/>
       </w:r>
     </xsl:if>
+    <xsl:choose>
+      <xsl:when test="following-sibling::*[position()=1]//text:soft-page-break">
+        <xsl:call-template name="SoftPageBreaks"></xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="not(following-sibling::*[position()=1])">
+          <xsl:if test="../following-sibling::*[position()=1]//text:soft-page-break">
+            <xsl:call-template name="SoftPageBreaks"></xsl:call-template>
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--<xsl:if test="following-sibling::*[position()=1]//text:soft-page-break">
+      <xsl:call-template name="SoftPageBreaks"></xsl:call-template>
+    </xsl:if>-->
   </xsl:template>
 
   <!-- inserts page-break-before if defined in preceding table -->
@@ -249,8 +264,6 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
-
-
 
 
   <!-- Inserts the paragraph properties -->
