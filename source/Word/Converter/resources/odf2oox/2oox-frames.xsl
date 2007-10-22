@@ -48,143 +48,56 @@
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
 
   <!-- 
-    embedd all consecutive frames that are not inserted into a paragraph in a single paragraph
-    (avoid paragraph not present in original document)
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
   -->
-  <xsl:template match="node()[contains(name(), 'draw:') and parent::office:text]">
-    <!-- concerned elements : draw:custom-shape, draw:rect, draw:ellipse, draw:frame[ole-object|image|text-box] -->
-    <xsl:choose>
-      <xsl:when test="following-sibling::text:p">
-        <!-- do nothing : handled by the first paragraph -->
-      </xsl:when>
-      <xsl:otherwise>
-        <w:p>
-          <xsl:choose>
-            <xsl:when test="self::draw:frame">
-              <xsl:apply-templates select="." mode="paragraph"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:apply-templates select="." mode="shapes"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:apply-templates select="following-sibling::node()[1][contains(name(), 'draw:')]"/>
-        </w:p>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- handle the frames that are ignored. context is text:p -->
-  <xsl:template name="InsertPrecedingDrawingObject">
-    <xsl:if test="parent::office:text and preceding-sibling::node()[1][contains(name(), 'draw:')]">
-      <xsl:choose>
-        <xsl:when test="preceding-sibling::node()[1][self::draw:frame]">
-          <!--xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
-            mode="paragraph"/-->
-          <xsl:if
-            test="preceding-sibling::node()[1][not(descendant::*[(self::text:p or self::text:h) and (@text:style-name='Sender' or @text:style-name='Addressee')])]">
-            <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
-              mode="paragraph"/>
-          </xsl:if>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
-            mode="shapes"/>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:for-each select="preceding-sibling::node()[1]">
-        <xsl:call-template name="InsertPrecedingDrawingObject"/>
-      </xsl:for-each>
-    </xsl:if>
-  </xsl:template>
-
+  
+  <!-- 
+  Summary: converts frames
+  Author: makz (DIaLOGIKa)
+  Date: 18.10.2007
+  -->
   <xsl:template match="draw:frame" mode="paragraph">
+    <!-- Inserted by makz for testing
+    <w:r>
+      <w:p>
+        <w:pPr>
+          <w:framePr>
+            <xsl:attribute name="w:w">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="@svg:width"/>
+                <xsl:with-param name="unit">twips</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+            <xsl:attribute name="w:h">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="./draw:text-box/@fo:min-height"/>
+                <xsl:with-param name="unit">twips</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+            <xsl:call-template name="InsertFramePropsFromStyle">
+              <xsl:with-param name="styleName" select="@draw:style-name"/>
+            </xsl:call-template>
+          </w:framePr>
+        </w:pPr>
+        <w:r>
+          <w:t>
+            <xsl:value-of select="draw:text-box/text:p"/>
+          </w:t>
+        </w:r>
+      </w:p>
+    </w:r>
+    -->
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
     <xsl:call-template name="InsertEmbeddedTextboxes"/>
   </xsl:template>
 
-  <!-- forward shapes in paragraph mode to shapes mode -->
-  <xsl:template match="draw:custom-shape|draw:rect|draw:ellipse" mode="paragraph">
-    <!-- COMMENT : many other shapes to be handled by 1.1 -->
-    <xsl:choose>
-      <xsl:when test="ancestor::draw:text-box">
-        <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select="." mode="shapes"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- inserts textboxes which are embedded in odf as one after another in word -->
-  <xsl:template name="InsertEmbeddedTextboxes">
-    <xsl:apply-templates select="draw:text-box" mode="paragraph"/>
-  </xsl:template>
-
-
-  <!-- check if image type is supported in word  -->
-  <xsl:template name="image-support">
-    <xsl:param name="name"/>
-    <xsl:variable name="support">
-      <xsl:choose>
-        <xsl:when test="contains($name, '.svm')">
-          <xsl:message terminate="no">translation.odf2oox.svmImage</xsl:message>
-          <xsl:text>false</xsl:text>
-        </xsl:when>
-        <!-- WMF images inside text-box are properly displayed in Word 2007, but cause an opening crash in prior Word versions -->
-        <!--xsl:when test="contains($name, '.wmf') and ancestor::draw:text-box">
-          <xsl:message terminate="no">feedback:WMF image inside text-box</xsl:message> false </xsl:when-->
-        <xsl:when test="contains($name, '.jpg')">true</xsl:when>
-        <xsl:when test="contains($name, '.jpeg')">true</xsl:when>
-        <xsl:when test="contains($name, '.gif')">true</xsl:when>
-        <xsl:when test="contains($name, '.png')">true</xsl:when>
-        <xsl:when test="contains($name, '.emf')">true</xsl:when>
-        <xsl:when test="contains($name, '.wmf')">true</xsl:when>
-        <xsl:when test="contains($name, '.tif')">true</xsl:when>
-        <xsl:when test="contains($name, '.tiff')">true</xsl:when>
-        <xsl:otherwise>
-          <xsl:message terminate="no">translation.odf2oox.unsupportedImageType</xsl:message>
-          false</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:value-of select="$support"/>
-  </xsl:template>
-
-
-  <!-- Get the position of an element in the draw:frame group -->
-  <xsl:template name="GetPosition">
-    <xsl:variable name="node" select="."/>
-    <xsl:variable name="positionInGroup">
-      <xsl:for-each select="document('content.xml')">
-        <xsl:for-each select="key('frames', '')">
-          <xsl:if test="generate-id($node) = generate-id(.)">
-            <xsl:value-of select="position()"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="string-length($positionInGroup)>0">
-        <xsl:value-of select="$positionInGroup"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="countContentImages">
-          <xsl:for-each select="document('content.xml')">
-            <xsl:value-of select="count(key('frames', ''))"/>
-          </xsl:for-each>
-        </xsl:variable>
-        <xsl:for-each select="document('styles.xml')">
-          <xsl:for-each select="key('frames', '')">
-            <xsl:if test="generate-id($node) = generate-id(.)">
-              <xsl:value-of select="$countContentImages+position()"/>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!--draw:object-ole element represents objects that only have a binary representation -->
+  <!--
+  Summary: OLE objects in frames 
+  Author: Clever Age
+  -->
   <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
@@ -219,34 +132,37 @@
     </w:r>
   </xsl:template>
 
-  <!-- object with xml representation are lost -->
-  <xsl:template match="draw:frame[./draw:object]" mode="paragraph">
-    <!-- insert link to TOC field when required (user indexes) -->
-    <!--sl:call-template name="InsertTCField"/-->
-    <xsl:message terminate="no">translation.odf2oox.embeddedObject</xsl:message>
+  <!-- 
+    embedd all consecutive frames that are not inserted into a paragraph in a single paragraph
+    (avoid paragraph not present in original document)
+  -->
+  <xsl:template match="node()[contains(name(), 'draw:') and parent::office:text]">
+    <!-- concerned elements : draw:custom-shape, draw:rect, draw:ellipse, draw:frame[ole-object|image|text-box] -->
+    <xsl:choose>
+      <xsl:when test="following-sibling::text:p">
+        <!-- do nothing : handled by the first paragraph -->
+      </xsl:when>
+      <xsl:otherwise>
+        <w:p>
+          <xsl:choose>
+            <xsl:when test="self::draw:frame">
+              <xsl:apply-templates select="." mode="paragraph"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="." mode="shapes"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:apply-templates select="following-sibling::node()[1][contains(name(), 'draw:')]"/>
+        </w:p>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <!-- plugin (for instance audio and video content) -->
-  <xsl:template match="draw:plugin" mode="paragraph">
-    <xsl:message terminate="no">translation.odf2oox.embeddedPluginFile</xsl:message>
-  </xsl:template>
-
-  <!-- plugin (for instance audio and video content) -->
-  <xsl:template match="draw:applet" mode="paragraph">
-    <xsl:message terminate="no">translation.odf2oox.applet</xsl:message>
-  </xsl:template>
-
-  <!-- plugin (for instance audio and video content) -->
-  <xsl:template match="draw:floating-frame" mode="paragraph">
-    <!-- insert link to TOC field when required (user indexes) -->
-    <!--sl:call-template name="InsertTCField"/-->
-    <xsl:message terminate="no">translation.odf2oox.floatingFrame</xsl:message>
-  </xsl:template>
-
-  <!-- conversion of external images -->
-  <xsl:template
-    match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and not(starts-with(@xlink:href, 'Pictures/'))]]"
-    mode="paragraph">
+  <!-- 
+  Summary: frames containing external images
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and not(starts-with(@xlink:href, 'Pictures/'))]]" mode="paragraph">
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
 
@@ -294,10 +210,11 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- frame containing an image -->
-  <xsl:template
-    match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]"
-    mode="paragraph">
+  <!-- 
+  Summary: frames containing images
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]" mode="paragraph">
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
 
@@ -314,6 +231,129 @@
     </xsl:if>
 
   </xsl:template>
+
+  <!-- 
+  Summary: converts text boxes in frames
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:text-box" mode="paragraph">
+    <w:r>
+      <w:rPr>
+        <xsl:call-template name="InsertTextBoxStyle"/>
+      </w:rPr>
+      <w:pict>
+
+        this properties are needed to make z-index work properly
+        <v:shapetype coordsize="21600,21600" path="m,l,21600r21600,l21600,xe"
+          xmlns:o="urn:schemas-microsoft-com:office:office">
+          <v:stroke joinstyle="miter"/>
+          <v:path gradientshapeok="t" o:connecttype="rect"/>
+        </v:shapetype>
+
+        <v:shape type="#_x0000_t202">
+          <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name"/>
+          <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
+          <xsl:variable name="officeStyle"
+            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+          <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+
+          <xsl:call-template name="InsertShapeProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="shapeProperties" select="parent::draw:frame"/>
+          </xsl:call-template>
+
+          <xsl:call-template name="InsertTextBox">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+          </xsl:call-template>
+
+          <xsl:call-template name="InsertShapeWrap">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+          </xsl:call-template>
+
+        </v:shape>
+      </w:pict>
+    </w:r>
+  </xsl:template>
+
+  <!-- 
+  Summary: forward shapes in paragraph mode to shapes mode 
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:custom-shape|draw:rect|draw:ellipse" mode="paragraph">
+    <!-- COMMENT : many other shapes to be handled by 1.1 -->
+    <xsl:choose>
+      <xsl:when test="ancestor::draw:text-box">
+        <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="." mode="shapes"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- 
+  Summary: custom shapes
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:custom-shape" mode="shapes">
+    <xsl:call-template name="InsertShapes">
+      <xsl:with-param name="shapeType">
+        <xsl:value-of select="draw:enhanced-geometry/@draw:type"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- 
+  Summary: rectangles and ellipses
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:rect|draw:ellipse" mode="shapes">
+    <xsl:call-template name="InsertShapes">
+      <xsl:with-param name="shapeType" select="name()"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- 
+  Summary: error message for embedded plugins
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:plugin" mode="paragraph">
+    <xsl:message terminate="no">translation.odf2oox.embeddedPluginFile</xsl:message>
+  </xsl:template>
+
+  <!-- 
+  Summary: error message for applets
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:applet" mode="paragraph">
+    <xsl:message terminate="no">translation.odf2oox.applet</xsl:message>
+  </xsl:template>
+
+  <!-- 
+  Summary: error message for floating frames
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:floating-frame" mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <!--sl:call-template name="InsertTCField"/-->
+    <xsl:message terminate="no">translation.odf2oox.floatingFrame</xsl:message>
+  </xsl:template>
+
+  <!--
+  Summary: error message: object with xml representation are lost
+  Author: Clever Age
+  -->
+  <xsl:template match="draw:frame[./draw:object]" mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <!--sl:call-template name="InsertTCField"/-->
+    <xsl:message terminate="no">translation.odf2oox.embeddedObject</xsl:message>
+  </xsl:template>
+
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
 
   <!--   word has two types of images: inline (positioned with text) and anchor (can be aligned relative to page, margin etc); -->
   <xsl:template name="InsertImage">
@@ -483,6 +523,73 @@
 
   </xsl:template>
 
+  <!-- inserts textboxes which are embedded in odf as one after another in word -->
+  <xsl:template name="InsertEmbeddedTextboxes">
+    <xsl:apply-templates select="draw:text-box" mode="paragraph"/>
+  </xsl:template>
+
+  <!-- check if image type is supported in word  -->
+  <xsl:template name="image-support">
+    <xsl:param name="name"/>
+    <xsl:variable name="support">
+      <xsl:choose>
+        <xsl:when test="contains($name, '.svm')">
+          <xsl:message terminate="no">translation.odf2oox.svmImage</xsl:message>
+          <xsl:text>false</xsl:text>
+        </xsl:when>
+        <!-- WMF images inside text-box are properly displayed in Word 2007, but cause an opening crash in prior Word versions -->
+        <!--xsl:when test="contains($name, '.wmf') and ancestor::draw:text-box">
+          <xsl:message terminate="no">feedback:WMF image inside text-box</xsl:message> false </xsl:when-->
+        <xsl:when test="contains($name, '.jpg')">true</xsl:when>
+        <xsl:when test="contains($name, '.jpeg')">true</xsl:when>
+        <xsl:when test="contains($name, '.gif')">true</xsl:when>
+        <xsl:when test="contains($name, '.png')">true</xsl:when>
+        <xsl:when test="contains($name, '.emf')">true</xsl:when>
+        <xsl:when test="contains($name, '.wmf')">true</xsl:when>
+        <xsl:when test="contains($name, '.tif')">true</xsl:when>
+        <xsl:when test="contains($name, '.tiff')">true</xsl:when>
+        <xsl:otherwise>
+          <xsl:message terminate="no">translation.odf2oox.unsupportedImageType</xsl:message>
+          false
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$support"/>
+  </xsl:template>
+
+  <!-- Get the position of an element in the draw:frame group -->
+  <xsl:template name="GetPosition">
+    <xsl:variable name="node" select="."/>
+    <xsl:variable name="positionInGroup">
+      <xsl:for-each select="document('content.xml')">
+        <xsl:for-each select="key('frames', '')">
+          <xsl:if test="generate-id($node) = generate-id(.)">
+            <xsl:value-of select="position()"/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="string-length($positionInGroup)>0">
+        <xsl:value-of select="$positionInGroup"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="countContentImages">
+          <xsl:for-each select="document('content.xml')">
+            <xsl:value-of select="count(key('frames', ''))"/>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:for-each select="key('frames', '')">
+            <xsl:if test="generate-id($node) = generate-id(.)">
+              <xsl:value-of select="$countContentImages+position()"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="InsertZindex">
     <xsl:param name="imageStyle"/>
 
@@ -515,6 +622,30 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
+  </xsl:template>
+
+  <!-- handle the frames that are ignored. context is text:p -->
+  <xsl:template name="InsertPrecedingDrawingObject">
+    <xsl:if test="parent::office:text and preceding-sibling::node()[1][contains(name(), 'draw:')]">
+      <xsl:choose>
+        <xsl:when test="preceding-sibling::node()[1][self::draw:frame]">
+          <!--xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
+            mode="paragraph"/-->
+          <xsl:if
+            test="preceding-sibling::node()[1][not(descendant::*[(self::text:p or self::text:h) and (@text:style-name='Sender' or @text:style-name='Addressee')])]">
+            <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
+              mode="paragraph"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
+            mode="shapes"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:for-each select="preceding-sibling::node()[1]">
+        <xsl:call-template name="InsertPrecedingDrawingObject"/>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertImageGraphicProperties">
@@ -1247,24 +1378,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="draw:custom-shape" mode="shapes">
-    <xsl:call-template name="InsertShapes">
-      <xsl:with-param name="shapeType">
-        <xsl:value-of select="draw:enhanced-geometry/@draw:type"/>
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!-- basic shapes - ellipse and rect -->
-
-  <xsl:template match="draw:rect|draw:ellipse" mode="shapes">
-    <xsl:call-template name="InsertShapes">
-      <xsl:with-param name="shapeType" select="name()"/>
-    </xsl:call-template>
-  </xsl:template>
-
   <!-- shapes template -->
-
   <xsl:template name="InsertShapes">
     <xsl:param name="shapeType"/>
     <xsl:variable name="styleName" select=" @draw:style-name"/>
@@ -1399,7 +1513,6 @@
   </xsl:template>
 
   <!-- get graphic properties for shapes -->
-
   <xsl:template name="GetDrawnGraphicProperties">
     <xsl:param name="attrib"/>
     <xsl:param name="shapeStyle"/>
@@ -1470,7 +1583,6 @@
     <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
     <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
   </xsl:template>
-
 
   <!-- computes text-box margin. Returns a value in points -->
   <xsl:template name="ComputeMarginX">
@@ -2259,49 +2371,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-  <!-- text boxes -->
-  <xsl:template match="draw:text-box" mode="paragraph">
-    <w:r>
-      <w:rPr>
-        <xsl:call-template name="InsertTextBoxStyle"/>
-      </w:rPr>
-      <w:pict>
-
-        <!--this properties are needed to make z-index work properly-->
-        <v:shapetype coordsize="21600,21600" path="m,l,21600r21600,l21600,xe"
-          xmlns:o="urn:schemas-microsoft-com:office:office">
-          <v:stroke joinstyle="miter"/>
-          <v:path gradientshapeok="t" o:connecttype="rect"/>
-        </v:shapetype>
-
-        <v:shape type="#_x0000_t202">
-          <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name"/>
-          <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
-          <xsl:variable name="officeStyle"
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-          <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
-
-          <xsl:call-template name="InsertShapeProperties">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-            <xsl:with-param name="shapeProperties" select="parent::draw:frame"/>
-          </xsl:call-template>
-
-          <!--insert text-box-->
-          <xsl:call-template name="InsertTextBox">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-          </xsl:call-template>
-
-          <xsl:call-template name="InsertShapeWrap">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-          </xsl:call-template>
-
-        </v:shape>
-      </w:pict>
-    </w:r>
-  </xsl:template>
-
-
+  
   <!-- shape properties attributes : size, position, z-index... -->
   <xsl:template name="InsertShapeSize">
     <xsl:param name="shapeProperties"/>
@@ -3127,7 +3197,6 @@
 
   </xsl:template>
 
-
   <!-- text vertical anchor -->
   <xsl:template name="InsertTextAnchor">
     <xsl:param name="shapeStyle"/>
@@ -3148,7 +3217,6 @@
     </xsl:choose>
     <xsl:text>;</xsl:text>
   </xsl:template>
-
 
   <xsl:template name="InsertGradientFill">
     <xsl:param name="shapeStyle"/>
@@ -3619,4 +3687,144 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--
+  Summary: This template writes the properties of a ODF frame into a OOX frame
+  Author: makz (DIaLOGIKa)
+  Date: 18.10.2007
+  -->
+  <xsl:template name="InsertFramePropsFromStyle">
+    <xsl:param name="styleName"/>
+    <xsl:variable name="style" select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name = $styleName]"/>
+
+    <xsl:attribute name="w:xAlign">
+      <xsl:variable name="hpos" select="$style/style:graphic-properties/@style:horizontal-pos"/>
+      <xsl:choose>
+        <xsl:when test="$hpos='from-left'">
+          <xsl:text>left</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hpos='from-inside'">
+          <xsl:text>right</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$hpos"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    <xsl:attribute name="w:yAlign">
+      <xsl:variable name="vpos" select="$style/style:graphic-properties/@style:vertical-pos"/>
+      <xsl:choose>
+        <xsl:when test="$vpos='middle'">
+          <xsl:text>center</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vpos='from-top'">
+          <xsl:text>top</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vpos='below'">
+          <xsl:text>bottom</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$vpos"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    <xsl:attribute name="w:hAnchor">
+      <xsl:variable name="hrel" select="$style/style:graphic-properties/@style:horizontal-rel"/>
+      <xsl:choose>
+        <xsl:when test="$hrel='page-content'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='page-start-margin'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='page-end-margin'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='frame'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='frame-content'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='frame-start-margin'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='frame-end-margin'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='paragraph'">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='paragraph-content'">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='paragraph-start-margin'">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hrel='paragraph-end-margin'">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$hrel"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    <xsl:attribute name="w:vAnchor">
+      <xsl:variable name="vrel" select="$style/style:graphic-properties/@style:vertical-rel"/>
+      <xsl:choose>
+        <xsl:when test="$vrel='page-content'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vrel='frame'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vrel='frame-content'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vrel='paragraph'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vrel='paragraph-content'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vrel='char'">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vrel='line'">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vrel='baseline'">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$vrel"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    <xsl:attribute name="w:wrap">
+      <xsl:variable name="wrap" select="$style/style:graphic-properties/@style:wrap"/>
+      <xsl:choose>
+        <xsl:when test="$wrap='left'">
+          <xsl:text>around</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap='right'">
+          <xsl:text>around</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap='parallel'">
+          <xsl:text>around</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap='dynamic'">
+          <xsl:text>auto</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap='biggest'">
+          <xsl:text>around</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap='run-through'">
+          <xsl:text>through</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$wrap"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
 </xsl:stylesheet>
