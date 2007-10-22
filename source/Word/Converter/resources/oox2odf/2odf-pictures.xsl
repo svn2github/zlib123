@@ -44,8 +44,59 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:v="urn:schemas-microsoft-com:vml"
   exclude-result-prefixes="w uri draw a pic r wp w xlink">
-
+  
+  <!-- 
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
+  -->
+  
   <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
+
+  <xsl:template match="w:drawing">
+    <xsl:apply-templates select="wp:inline | wp:anchor"/>
+  </xsl:template>
+
+  <xsl:template match="w:drawing" mode="automaticstyles">
+
+    <style:style style:name="{generate-id(.)}" style:family="graphic">
+
+      <!--in Word there are no parent style for image - make default Graphics in OO -->
+      <xsl:attribute name="style:parent-style-name">
+        <xsl:text>Graphics</xsl:text>
+        <xsl:value-of select="w:tblStyle/@w:val"/>
+      </xsl:attribute>
+
+      <style:graphic-properties>
+        <xsl:call-template name="InsertPictureProperties"/>
+      </style:graphic-properties>
+    </style:style>
+  </xsl:template>
+
+  <xsl:template match="w:drawing[descendant::a:hlinkClick]">
+    <draw:a xlink:type="simple">
+      <xsl:attribute name="xlink:href">
+        <xsl:variable name="relationshipId" select="descendant::a:hlinkClick/@r:id"/>
+        <xsl:variable name="document">
+          <xsl:call-template name="GetDocumentName">
+            <xsl:with-param name="rootId" select="generate-id(/node())"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="relDestination">
+          <xsl:call-template name="GetTarget">
+            <xsl:with-param name="document" select="$document"/>
+            <xsl:with-param name="id" select="$relationshipId"/>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:call-template name="GetLinkPath">
+          <xsl:with-param name="linkHref" select="$relDestination"/>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:apply-templates select="wp:inline | wp:anchor"/>
+    </draw:a>
+
+  </xsl:template>
 
   <xsl:template match="wp:inline | wp:anchor">
     <xsl:variable name="document">
@@ -111,6 +162,12 @@
     </draw:frame>
   </xsl:template>
 
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
+
   <xsl:template name="InsertImageAnchorType">
     <xsl:attribute name="text:anchor-type">
       <xsl:variable name="verticalRelativeFrom" select="wp:positionV/@relativeFrom"/>
@@ -147,7 +204,6 @@
     </xsl:attribute>
   </xsl:template>
 
-  
   <xsl:template name="SetSize">
     <xsl:choose>
       <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln">
@@ -303,22 +359,6 @@
         </xsl:attribute>
       </xsl:if>
     </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template match="w:drawing" mode="automaticstyles">
-
-    <style:style style:name="{generate-id(.)}" style:family="graphic">
-
-      <!--in Word there are no parent style for image - make default Graphics in OO -->
-      <xsl:attribute name="style:parent-style-name">
-        <xsl:text>Graphics</xsl:text>
-        <xsl:value-of select="w:tblStyle/@w:val"/>
-      </xsl:attribute>
-
-      <style:graphic-properties>
-        <xsl:call-template name="InsertPictureProperties"/>
-      </style:graphic-properties>
-    </style:style>
   </xsl:template>
 
   <xsl:template name="InsertPictureProperties">
@@ -806,33 +846,5 @@
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
-
-  <xsl:template match="w:drawing">
-    <xsl:apply-templates select="wp:inline | wp:anchor"/>
-  </xsl:template>
-
-  <xsl:template match="w:drawing[descendant::a:hlinkClick]">
-    <draw:a xlink:type="simple">
-      <xsl:attribute name="xlink:href">
-        <xsl:variable name="relationshipId" select="descendant::a:hlinkClick/@r:id"/>
-        <xsl:variable name="document">
-          <xsl:call-template name="GetDocumentName">
-            <xsl:with-param name="rootId" select="generate-id(/node())"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="relDestination">
-          <xsl:call-template name="GetTarget">
-            <xsl:with-param name="document" select="$document"/>
-            <xsl:with-param name="id" select="$relationshipId"/>
-          </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:call-template name="GetLinkPath">
-          <xsl:with-param name="linkHref" select="$relDestination"/>
-        </xsl:call-template>
-      </xsl:attribute>
-      <xsl:apply-templates select="wp:inline | wp:anchor"/>
-    </draw:a>
-
-  </xsl:template>
+  
 </xsl:stylesheet>
