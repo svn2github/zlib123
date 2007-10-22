@@ -56,6 +56,7 @@ namespace CleverAge.OdfConverter.Word
         private bool nextIsNewSection = false;
         private bool nextIsEndSection = false;
         private bool nextIsMasterPage = false;
+        private bool nextIsSoftPageBreak = false;
         private Element odfSectPr;
         private Element cont;
         private Element titlePg;
@@ -350,6 +351,9 @@ namespace CleverAge.OdfConverter.Word
                     case "next-master-page":
                         this.nextIsMasterPage = true;
                         break;
+                    case "next-soft-page-break":
+                        this.nextIsSoftPageBreak = true;
+                        break;
                 }
             }
             else
@@ -588,16 +592,17 @@ namespace CleverAge.OdfConverter.Word
         /// </summary>
         public void Update()
         {
-            if (this.nextIsPageBreak && !this.skip)
+            if ((this.nextIsPageBreak || this.nextIsSoftPageBreak) && !this.skip)
             {
                 Page page = (Page)this.pages[this.name];
                 if (page != null)
                 {
+
                     this.name = page.GetAttributeValue("next-style", PSECT_NAMESPACE);
                 }
             }
 
-            if (!this.nextIsPageBreak || !this.skip)
+            if ((!this.nextIsPageBreak || !this.skip) && !this.nextIsSoftPageBreak)
             {
                 this.startPageNumber = null;
             }
@@ -608,6 +613,7 @@ namespace CleverAge.OdfConverter.Word
             this.nextIsNewSection = false;
             this.nextIsEndSection = false;
             this.nextIsMasterPage = false;
+            this.nextIsSoftPageBreak = false;
             this.skip = false;
             this.odfSectPr = null;
         }
@@ -624,7 +630,7 @@ namespace CleverAge.OdfConverter.Word
                 Page page = (Page)this.pages[this.name];
 
                 // a page break with no change in page style => no section needed
-                if (this.nextIsPageBreak && !this.nextIsMasterPage)
+                if ((this.nextIsPageBreak && !this.nextIsMasterPage) || (this.nextIsSoftPageBreak && !this.nextIsMasterPage))
                 {
                     string nextStyle = page.GetAttributeValue("next-style", PSECT_NAMESPACE);
 
@@ -645,6 +651,12 @@ namespace CleverAge.OdfConverter.Word
                     {
                         WriteHeaderFooter(page, "headerReference");
                         WriteHeaderFooter(page, "footerReference");
+
+                        // titlePg
+                        if (page.FirstDefault)
+                        {
+                            this.titlePg.Write(nextWriter);
+                        }
                     }
 
                     // footnotes config
@@ -657,11 +669,7 @@ namespace CleverAge.OdfConverter.Word
                     // page geometry properties
                     WritePageLayout(page);
 
-                    // titlePg
-                    if (page.FirstDefault)
-                    {
-                    	this.titlePg.Write(nextWriter);
-                    }
+                   
 
                     nextWriter.WriteEndElement(); // end sectPr
                 }
