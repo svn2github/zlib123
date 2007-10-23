@@ -24,15 +24,15 @@
   -->
 
   <!-- 
-  Summary: Converts Word Frames
+  Summary: Converts frames which are defined in document.xml
   Author: Clever Age
   -->
   <xsl:template match="w:p[w:pPr/w:framePr]">
     <xsl:choose>
-      <!-- skip drop-capped paragraphs -->
-      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'drop']"/>
-      <!-- margin drop cap -->
-      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'margin' ]">
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap='drop']">
+        <!--Do nothing-->
+      </xsl:when>
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap='margin']">
         <xsl:message terminate="no">translation.oox2odf.dropcap.inMargin</xsl:message>
       </xsl:when>
       <xsl:otherwise>
@@ -83,20 +83,19 @@
   </xsl:template>
 
   <!-- 
-  Summary: Writes the style of frames
+  Summary: Convert the frame properties which are defined in the automatic styles of styles.xml
   Author: Clever Age
   -->
   <xsl:template match="w:p[w:pPr/w:framePr]" mode="automaticstyles">
     <xsl:choose>
-      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'drop' ]">
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap='drop']">
         <!--Do nothing-->
       </xsl:when>
-      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'margin' ]">
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap='margin']">
         <xsl:message terminate="no">translation.oox2odf.dropcap.inMargin</xsl:message>
       </xsl:when>
       <xsl:otherwise>
-        <style:style style:name="{generate-id(w:pPr/w:framePr)}" style:family="graphic"
-          style:parent-style-name="Frame">
+        <style:style style:name="{generate-id(w:pPr/w:framePr)}" style:family="graphic" style:parent-style-name="Frame">
           <style:graphic-properties>
 
             <!--<xsl:call-template name="InsertShapeStyleName">
@@ -132,7 +131,16 @@
                 <xsl:text>none</xsl:text>
               </xsl:attribute>
             </xsl:if>
+
+            <!--
+            Insert border and shadow
+            Template is located in 2odf-styles.xsl
             <xsl:apply-templates select="w:pPr" mode="pPrChildren"/>
+            -->
+            <xsl:call-template name="InsertParagraphBorder">
+              <xsl:with-param name="pBdr" select="w:pPr/w:pBdr"/>
+            </xsl:call-template>
+            
           </style:graphic-properties>
         </style:style>
       </xsl:otherwise>
@@ -528,7 +536,7 @@
   CALLED TEMPLATES
   *************************************************************************
   -->
-
+  
   <xsl:template name="InsertGradientFill">
     <draw:gradient >
       <xsl:attribute name="draw:name">
