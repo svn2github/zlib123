@@ -754,7 +754,7 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-
+  
   <!-- 
   Summary: Template inserts paragraph borders
   Author: Clever Age
@@ -762,17 +762,10 @@
   Date: 22.10.2007
   -->
   <xsl:template match="w:pBdr" mode="pPrChildren">
-    <!--
-    If the paragraph has a framePr, the it is a frame.
-    Frame borders are inserted seperatly in 2odf-frames.xsl
-    Bugfix 1786035
-    -->
-    <xsl:if test="not(../w:framePr)">
-      <xsl:call-template name="InsertParagraphBorder">
-        <xsl:with-param name="pBdr" select="w:pBdr"/>
-      </xsl:call-template>
-      <!--xsl:call-template name="InsertParagraphShadow"/-->
-   </xsl:if>
+     <xsl:call-template name="InsertParagraphBorder">
+      <xsl:with-param name="pBdr" select="w:pBdr"/>
+    </xsl:call-template>
+    <xsl:call-template name="InsertParagraphShadow"/>
   </xsl:template>
 
   <!-- bg color -->
@@ -1623,10 +1616,9 @@
   </xsl:template>
 
   <!--
+  Summary: Template inserts formatted footnote seperators.
   Author: makz (DIaLOGIKa)
   Date: 9.10.2007
-  
-  Template inserts formatted footnote seperators.
   -->
   <xsl:template name="InsertCustomFootnoteSeperator">
 
@@ -3386,8 +3378,7 @@
 
   <!--
   Summary: Writes the attributes of a paragraph border
-  Author: Clever Age
-  Modified: makz (DIaLOGIKa)
+  Author: makz (DIaLOGIKa)
   Date: 22.10.2007
   -->
   <xsl:template name="InsertParagraphBorder">
@@ -3426,29 +3417,10 @@
       </xsl:with-param>
     </xsl:call-template>
     
-    <!--
-    OLD Clever Age Stuff
-    <xsl:choose>
-      <xsl:when test="w:top/@color=w:bottom/@color and w:top/@space=w:bottom/@space and w:top/@sz=w:bottom/@sz and w:top/@val=w:bottom/@val
-          and w:top/@color=w:left/@color and w:top/@space=w:left/@space and w:top/@sz=w:left/@sz and w:top/@val=w:left/@val
-          and w:top/@color=w:right/@color and w:top/@space=w:right/@space and w:top/@sz=w:right/@sz and w:top/@val=w:right/@val">
-        <xsl:call-template name="InsertBorderAttributes"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="child::node()[name()='w:top' or name()='w:left' or name()='w:bottom' or name()='w:right']">
-          <xsl:if test="./@w:val != 'none'">
-            <xsl:call-template name="InsertBorderAttributes">
-              <xsl:with-param name="side" select="substring-after(name(),'w:')"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-    -->
   </xsl:template>
 
   <!--
-  Summary: Template writes the value  of a border definition
+  Summary: Template writes the value of a border side
   Author: makz (DIaLOGIKa)
   Date: 22.10.2007
   -->
@@ -3575,7 +3547,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:if test="$firstVal !=0 and $secondVal != 0">
+    <xsl:if test="$firstVal!=0 and $secondVal!=0">
       <xsl:attribute name="style:shadow">
         <xsl:value-of select="concat('#000000 ',$firstVal,' ',$secondVal)"/>
       </xsl:attribute>
@@ -3830,7 +3802,6 @@
       </xsl:choose>
     </xsl:if>
   </xsl:template>
-
 
   <!-- ODF Text properties contained in OOX pPr element -->
   <xsl:template name="InsertpPrTextProperties">

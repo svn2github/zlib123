@@ -24,7 +24,7 @@
   -->
 
   <!-- 
-  Summary: Converts frames which are defined in document.xml
+  Summary: Converts frames
   Author: Clever Age
   -->
   <xsl:template match="w:p[w:pPr/w:framePr]">
@@ -82,8 +82,8 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- 
-  Summary: Convert the frame properties which are defined in the automatic styles of styles.xml
+  <!--
+  Summary: Convert the frame properties into automatic styles
   Author: Clever Age
   -->
   <xsl:template match="w:p[w:pPr/w:framePr]" mode="automaticstyles">
@@ -133,13 +133,15 @@
             </xsl:if>
 
             <!--
-            Insert border and shadow
+            Insert border
             Template is located in 2odf-styles.xsl
-            <xsl:apply-templates select="w:pPr" mode="pPrChildren"/>
             -->
+            <xsl:apply-templates select="w:pPr" mode="pPrChildren"/>
+            
             <xsl:call-template name="InsertParagraphBorder">
               <xsl:with-param name="pBdr" select="w:pPr/w:pBdr"/>
             </xsl:call-template>
+            <xsl:call-template name="InsertParagraphShadow"/>
             
           </style:graphic-properties>
         </style:style>
@@ -157,7 +159,7 @@
       <xsl:call-template name="InsertCommonShapeProperties"/>
       <xsl:call-template name="InsertShapeZindex"/>
       <xsl:apply-templates/>
-      <!--  some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
+      <!-- some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
       <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
     </draw:frame>
   </xsl:template>
@@ -310,7 +312,7 @@
           <xsl:call-template name="InsertShapeHeight"/>
           <xsl:call-template name="InsertshapeAbsolutePos"/>
 
-          <xsl:call-template name="InsertParagraphToFrame"/>
+          <!--<xsl:call-template name="InsertParagraphToFrame"/>-->
         </draw:rect>
       </xsl:otherwise>
     </xsl:choose>
@@ -1371,75 +1373,6 @@
       </xsl:attribute>
     </xsl:if>
 
-    <!-- Old Clever Age Stuff 
-    <xsl:choose>
-      <xsl:when test="$shape/@o:hr='t' or $shape/@stroked='f'">
-        <xsl:attribute name="draw:stroke">
-          <xsl:text>none</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      
-      <xsl:when test="not($shape/@strokeweight) and not($shape/@strokecolor) and not($shape/v:imagedata)">
-        <xsl:attribute name="fo:border">
-          <xsl:text>0.0176cm solid #000000</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      
-      <xsl:otherwise>
-        <xsl:if test="$shape/@strokeweight">
-        
-          <xsl:variable name="borderWeight">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="length" select="$shape/@strokeweight"/>
-              <xsl:with-param name="destUnit" select="'cm'"/>
-            </xsl:call-template>
-          </xsl:variable>
-          
-          <xsl:variable name="borderColor">
-            <xsl:call-template name="InsertColor">
-              <xsl:with-param name="color" select="$shape/@strokecolor"/>
-            </xsl:call-template>
-          </xsl:variable>
-          
-          <xsl:variable name="borderStyle">
-            <xsl:choose>
-              <xsl:when test="not($shape/v:stroke)">
-                <xsl:text>solid</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>double</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:variable>
-          
-          <xsl:attribute name="fo:border">
-            <xsl:value-of select="concat($borderWeight,' ',$borderStyle,' ',$borderColor)"/>
-          </xsl:attribute>
-          <xsl:attribute name="svg:stroke-color">
-            <xsl:value-of select="$borderColor"/>
-          </xsl:attribute>
-          
-          <xsl:if test="$borderStyle='double'">
-            <xsl:variable name="strokeStyle" select="$shape/v:stroke/@linestyle"/>
-            <xsl:attribute name="style:border-line-width">
-              <xsl:choose>
-                <xsl:when test="$strokeStyle = 'thinThin' or $strokeStyle = 'thickBetweenThin'">
-                  <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"/>
-                </xsl:when>
-                <xsl:when test="$strokeStyle = 'thinThick' ">
-                  <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"/>
-                </xsl:when>
-                <xsl:when test="$strokeStyle = 'thickThin' ">
-                  <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"/>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
-          
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
-    -->
   </xsl:template>
 
   <xsl:template name="InsertTextBoxAutomaticHeight">
@@ -1476,7 +1409,11 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-
+  
+  <!--
+  Summary: Inserts the paragraphs in a frame
+  Author: Clever Age
+  -->
   <xsl:template name="InsertParagraphToFrame">
     <xsl:param name="paragraph" select="."/>
     <text:p>
