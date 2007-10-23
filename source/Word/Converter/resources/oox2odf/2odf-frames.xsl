@@ -126,23 +126,37 @@
               <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
             </xsl:call-template>
 
-            <xsl:if test="not(w:pPr/w:pBdr)">
-              <xsl:attribute name="fo:border">
-                <xsl:text>none</xsl:text>
-              </xsl:attribute>
-            </xsl:if>
-
             <!--
-            Insert border
-            Template is located in 2odf-styles.xsl
+            The border properties of a border can be defined in the automatic styles of the content.xml
+            or in the styles.xml
+            That happens if a predefined paragraph style is made to a frame.
             -->
+            <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
+            <xsl:variable name="externalBorderStyle" select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$styleId]"/>
+            <xsl:choose>
+              <!-- The border is defined in context.xml -->
+              <xsl:when test="w:pPr/w:pBdr">
+                <xsl:call-template name="InsertParagraphBorder">
+                  <xsl:with-param name="pBdr" select="w:pPr/w:pBdr"/>
+                </xsl:call-template>
+                <xsl:call-template name="InsertParagraphShadow"/>
+              </xsl:when>
+              <!-- The border is defined in styles.xml -->
+              <xsl:when test="$externalBorderStyle">
+                <xsl:call-template name="InsertParagraphBorder">
+                  <xsl:with-param name="pBdr" select="$externalBorderStyle/w:pPr/w:pBdr"/>
+                </xsl:call-template>
+                <xsl:call-template name="InsertParagraphShadow"/>
+              </xsl:when>
+              <!-- No border is defined -->
+              <xsl:otherwise>
+                <xsl:attribute name="fo:border">
+                  <xsl:text>none</xsl:text>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+
             <xsl:apply-templates select="w:pPr" mode="pPrChildren"/>
-            
-            <xsl:call-template name="InsertParagraphBorder">
-              <xsl:with-param name="pBdr" select="w:pPr/w:pBdr"/>
-            </xsl:call-template>
-            <xsl:call-template name="InsertParagraphShadow"/>
-            
           </style:graphic-properties>
         </style:style>
       </xsl:otherwise>
