@@ -1342,6 +1342,8 @@
     </xsl:for-each>
   </xsl:template>
 
+
+  <!--START clam bugfix #1802289-->
   <xsl:template name="HeaderFooter">
     <xsl:variable name="headerId">
       <xsl:choose>
@@ -1349,20 +1351,42 @@
           <xsl:value-of select="w:headerReference[./@w:type = 'default']/@r:id"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="preceding::w:sectPr[w:headerReference/@w:type = 'default'][1]/w:headerReference[./@w:type = 'default']/@r:id" />
+          <xsl:choose>
+             <xsl:when test="w:titlePg">
+              <xsl:choose>
+                <xsl:when test="preceding::w:sectPr[w:headerReference/@w:type = 'default'][1]/w:headerReference[./@w:type = 'first']/@r:id">
+                  <xsl:value-of select="preceding::w:sectPr[w:headerReference/@w:type = 'default'][1]/w:headerReference[./@w:type = 'default']/@r:id"/>
+                </xsl:when>
+                <xsl:otherwise>newempty</xsl:otherwise>
+              </xsl:choose>            
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="preceding::w:sectPr[w:headerReference/@w:type = 'default'][1]/w:headerReference[./@w:type = 'default']/@r:id"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
-    <xsl:if test="$headerId != ''">
-      <style:header>
-        <xsl:variable name="headerXmlDocument" select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-        <!-- change context to get header content -->
-        <xsl:for-each select="document($headerXmlDocument)">
-          <xsl:apply-templates/>
-        </xsl:for-each>
-      </style:header>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="$headerId = 'newempty'">
+        <style:header>
+          <text:p></text:p>
+        </style:header>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="$headerId != ''">
+          <style:header>
+            <xsl:variable name="headerXmlDocument"
+              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+            <!-- change context to get header content -->
+            <xsl:for-each select="document($headerXmlDocument)">
+              <xsl:apply-templates/>
+            </xsl:for-each>
+          </style:header>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--END clam bugfix #1802289-->
 
     <xsl:if test="document('word/settings.xml')/w:settings/w:evenAndOddHeaders">
       <xsl:variable name="headerIdEven">
@@ -1457,9 +1481,8 @@
           <xsl:value-of select="w:headerReference[./@w:type = 'first']/@r:id"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="preceding::w:sectPr/w:headerReference[./@w:type = 'first'][1]/@r:id"
-          />
-        </xsl:otherwise>
+              <xsl:value-of select="preceding::w:sectPr/w:headerReference[./@w:type = 'first'][1]/@r:id"/>
+         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:if test="$headerId != ''">
