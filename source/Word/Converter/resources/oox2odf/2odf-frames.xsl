@@ -1553,14 +1553,23 @@
       <xsl:attribute name="style:horizontal-rel">
         <xsl:choose>
           <xsl:when test="$hAnchor='margin'">
-            <xsl:value-of select="'page-start-margin'"/>
+            <xsl:choose>
+              <!--
+              makz: margin-aligned frames in footer are 
+              converted to paragraph
+              -->
+              <xsl:when test="count(ancestor::node()[name()='w:ftr'])>0">
+                  <xsl:value-of select="'paragraph'"/>
+              </xsl:when>
+              <!--
+              makz: margin-aligned frames everywhere else
+              in the document are converted page-start-margin
+              -->
+              <xsl:otherwise>
+                <xsl:value-of select="'page-start-margin'"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
-          <!--
-          makz: If the frame is in the footer and the frame is aligned to the margin.
-          <xsl:when test="../../..='w:ftr' and $hAnchor='margin'">
-            <xsl:value-of select="'paragraph'"/>
-          </xsl:when>
-          -->
           <xsl:when test="$hAnchor='page'">
             <xsl:value-of select="'page'"/>
           </xsl:when>
