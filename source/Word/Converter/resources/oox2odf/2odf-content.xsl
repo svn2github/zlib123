@@ -1111,7 +1111,9 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="preceding::w:p[parent::w:body][1]/w:pPr/w:sectPr">
+        <!--clam: bugfix #1800794-->
+        <!--<xsl:if test="preceding::w:p[parent::w:body|parent::w:tbl/tr/tv][1]/w:pPr/w:sectPr">-->
+          <xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr">
           <xsl:choose>
             <xsl:when
               test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
@@ -1125,8 +1127,7 @@
               <xsl:choose>
                 <xsl:when test="$followingSectPr">
                   <xsl:choose>
-                    <xsl:when
-                      test="$followingSectPr/w:titlePg">
+                    <xsl:when test="$followingSectPr/w:titlePg">
                       <xsl:attribute name="style:master-page-name">
                         <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
                       </xsl:attribute>
