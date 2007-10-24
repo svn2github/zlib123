@@ -1555,10 +1555,10 @@
           <xsl:when test="$hAnchor='margin'">
             <xsl:choose>
               <!--
-              makz: margin-aligned frames in footer are 
-              converted to paragraph
+              makz: 'margin-aligned' frames in footer or header
+              are converted to 'paragraph-aligned'
               -->
-              <xsl:when test="count(ancestor::node()[name()='w:ftr'])>0">
+              <xsl:when test="count(ancestor::node()[name()='w:ftr'])>0 or count(ancestor::node()[name()='w:hdr'])>0">
                   <xsl:value-of select="'paragraph'"/>
               </xsl:when>
               <!--
@@ -1698,13 +1698,42 @@
     <xsl:attribute name="text:anchor-type">
       <xsl:choose>
         
-        <xsl:when test="w10:wrap/@type='none' ">
+        <!-- 
+        makz: default for word inline elements.
+        If no wrap is definied the style does not contain position informations
+        
+        Fix #1786094
+        -->
+        <xsl:when test="not(w10:wrap) and not(contains($shape/@style, 'position'))">
+          <xsl:text>as-char</xsl:text>
+        </xsl:when>
+
+        <xsl:when test="w10:wrap/@type='none'">
+          <xsl:text>as-char</xsl:text>
+        </xsl:when>
+
+        <!-- 
+        anchor should be 'as-char' in some particular cases.
+        Explanation of test :
+        1. if no wrap is defined (default in OOX is inline with text)
+        2. if there is another run in current paragraph OR we are in a table cell
+        3. No absolute position is defined OR wrapping is explicitely set to 'as-char'
+
+        JP 27/08/2007 
+        Fix #1666915 if position is absolute must not be set as-char
+        -->
+        <xsl:when
+          test="not(w10:wrap) 
+          and (count(ancestor::w:r[1]/parent::node()/w:r) &gt; 1  or (not(count(ancestor::w:r[1]/parent::node()/w:r) &gt; 1) and ancestor::w:tc)) 
+          and (not(contains($shape/@style, 'position:absolute')))
+          and (contains($shape/@style, 'mso-position-horizontal-relative:text') or contains($shape/@style, 'mso-position-vertical-relative:text') or ($shape/@vAnchor='text') or ($shape/@hAnchor='relative') )">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
 
         <xsl:when test="(w10:wrap/@anchorx='page' and w10:wrap/@anchory='page') or ($shape/@w:hAnchor='page' and $shape/@w:vAnchor='page')">
           <xsl:text>page</xsl:text>
         </xsl:when>
+        
 
         <!-- 
         Clever Age: In header of footer, frames that are not in background must be anchored as character 
@@ -1722,30 +1751,6 @@
             <xsl:message terminate="no">translation.oox2odf.frame.inFooter</xsl:message>
           </xsl:if>
           <xsl:text>paragraph</xsl:text>
-        </xsl:when>
-
-        <!-- 
-        anchor should be 'as-char' in some particular cases. Explanation of test :
-        1. if no wrap is defined (default in OOX is inline with text)
-        2. if there is another run in current paragraph OR we are in a table cell
-        3. No absolute position is defined OR wrapping is explicitely set to 'as-char'
-
-        JP 27/08/2007 
-        Fix #1666915 if position is absolute must not be set as-char
-        -->
-        <xsl:when
-          test="not(w10:wrap) and ( 
-          count(ancestor::w:r[1]/parent::node()/w:r) &gt; 1
-          or (not(count(ancestor::w:r[1]/parent::node()/w:r) &gt; 1) and ancestor::w:tc)
-          ) 
-          and (
-          not(contains($shape/@style, 'position:absolute'))
-          )
-          and (
-          contains($shape/@style, 'mso-position-horizontal-relative:text')
-          or contains($shape/@style, 'mso-position-vertical-relative:text')
-          or ($shape/@vAnchor='text') or ($shape/@hAnchor='relative') )">
-          <xsl:text>as-char</xsl:text>
         </xsl:when>
         
         <xsl:otherwise>

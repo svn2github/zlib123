@@ -168,6 +168,10 @@
   *************************************************************************
   -->
 
+  <!--
+  Summary: Writes the anchor-type attribute
+  Author: Clever Age
+  -->
   <xsl:template name="InsertImageAnchorType">
     <xsl:attribute name="text:anchor-type">
       <xsl:variable name="verticalRelativeFrom" select="wp:positionV/@relativeFrom"/>

@@ -55,40 +55,9 @@
   
   <!-- 
   Summary: converts frames
-  Author: makz (DIaLOGIKa)
-  Date: 18.10.2007
+  Author: Clever Age
   -->
   <xsl:template match="draw:frame" mode="paragraph">
-    <!-- Inserted by makz for testing
-    <w:r>
-      <w:p>
-        <w:pPr>
-          <w:framePr>
-            <xsl:attribute name="w:w">
-              <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length" select="@svg:width"/>
-                <xsl:with-param name="unit">twips</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name="w:h">
-              <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length" select="./draw:text-box/@fo:min-height"/>
-                <xsl:with-param name="unit">twips</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:call-template name="InsertFramePropsFromStyle">
-              <xsl:with-param name="styleName" select="@draw:style-name"/>
-            </xsl:call-template>
-          </w:framePr>
-        </w:pPr>
-        <w:r>
-          <w:t>
-            <xsl:value-of select="draw:text-box/text:p"/>
-          </w:t>
-        </w:r>
-      </w:p>
-    </w:r>
-    -->
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
     <xsl:call-template name="InsertEmbeddedTextboxes"/>
@@ -211,7 +180,7 @@
   </xsl:template>
 
   <!-- 
-  Summary: frames containing images
+  Summary: frames containing internal images
   Author: Clever Age
   -->
   <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]" mode="paragraph">
@@ -243,7 +212,7 @@
       </w:rPr>
       <w:pict>
 
-        this properties are needed to make z-index work properly
+        <!-- this properties are needed to make z-index work properly -->
         <v:shapetype coordsize="21600,21600" path="m,l,21600r21600,l21600,xe"
           xmlns:o="urn:schemas-microsoft-com:office:office">
           <v:stroke joinstyle="miter"/>
@@ -355,7 +324,7 @@
   *************************************************************************
   -->
 
-  <!--   word has two types of images: inline (positioned with text) and anchor (can be aligned relative to page, margin etc); -->
+  <!--  word has two types of images: inline (positioned with text) and anchor (can be aligned relative to page, margin etc); -->
   <xsl:template name="InsertImage">
 
     <w:drawing>
@@ -403,10 +372,12 @@
       </xsl:variable>
 
       <xsl:choose>
-        <!-- image embedded in draw:frame/draw:text-box or in text:note element has to be inline with text -->
-        <xsl:when
-          test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote'] or $wrappedPara = 1">
-          <xsl:call-template name="InsertInlineImage">
+        <!-- 
+        Image embedded in draw:frame/draw:text-box or in text:note element has to be inline with text.
+        Word cannot not have w:anchor elements in v:shape elements (ODF frames are converted to Word shapes).
+        -->
+        <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote'] or $wrappedPara = 1">
+        <xsl:call-template name="InsertInlineImage">
             <xsl:with-param name="cx" select="$cx"/>
             <xsl:with-param name="cy" select="$cy"/>
             <xsl:with-param name="imageId" select="$imageId"/>
@@ -1438,7 +1409,6 @@
     <xsl:param name="shape"></xsl:param>
   </xsl:template>
   -->
-
   <!-- simple shape properties -->
   <xsl:template name="SimpleShape">
     <xsl:param name="shapeStyle"/>
@@ -2652,12 +2622,11 @@
   <xsl:template name="InsertShapePosition">
     <xsl:param name="shapeStyle"/>
     <xsl:param name="shapeProperties"/>
+    
     <xsl:variable name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
-
     <xsl:variable name="anchor">
       <xsl:value-of select="$shapeProperties/@text:anchor-type"/>
     </xsl:variable>
-
     <xsl:variable name="wrappedPara">
       <xsl:variable name="wrapping">
         <xsl:call-template name="GetGraphicProperties">
@@ -2672,8 +2641,10 @@
         </xsl:call-template>
       </xsl:if>
     </xsl:variable>
+    
     <!-- if inline image, no positioning -->
-    <xsl:if test="not($wrappedPara = 1 or $anchor = 'as-char')">
+    <xsl:if test="not($wrappedPara=1 or $anchor='as-char')">
+      
       <!-- two cases : absolute (=>define margin-left and margin-top), or mso-position-horizontal / -vertical -->
       <xsl:variable name="horizontalPos">
         <xsl:call-template name="GetGraphicProperties">
@@ -2717,7 +2688,6 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-
       <xsl:variable name="verticalPos">
         <xsl:call-template name="GetGraphicProperties">
           <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -2760,7 +2730,6 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-
       <xsl:variable name="rotation">
         <xsl:if test="contains($shapeProperties/@draw:transform,'rotate')">
           <xsl:call-template name="DegreesAngle">
@@ -2774,8 +2743,9 @@
         </xsl:if>
       </xsl:variable>
 
-      <!-- declare an absolute positioning (ignored if margin-left/rigt=0)
-        NB : it should not be compulsory to declare absolute positioning, but it causes troubles for images embedded in text-boxes in Word if not declared.
+      <!-- 
+        declare an absolute positioning (ignored if margin-left/rigt=0)
+        NB: it should not be compulsory to declare absolute positioning, but it causes troubles for images embedded in text-boxes in Word if not declared.
       -->
       <xsl:text>position:absolute;</xsl:text>
 
@@ -2842,13 +2812,20 @@
       <!-- horizontal position (overrides margin-left) -->
       <xsl:choose>
         <!-- centered position -->
-        <xsl:when
-          test="$horizontalPos = 'center' and not(contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin'))">
+        <xsl:when test="$horizontalPos='center' 
+                  and not(contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin'))">
           <xsl:text>mso-position-horizontal:center;</xsl:text>
         </xsl:when>
-        <!-- relative to page, page-content, paragraph, paragraph-content, char -->
-        <xsl:when
-          test="$horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'paragraph'  or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'char' ">
+        <!-- 
+        relative to page, page-content, paragraph, paragraph-content, char 
+        makz: Do this not if a frame is left- or right-aligned to page.
+              In this case the position must be absolute because margins are ignored in word if aligned to page.
+        -->
+        <xsl:when test="($horizontalRel='page' and not($horizontalPos='left' or $horizontalPos='right'))
+                  or $horizontalRel='page-content' 
+                  or $horizontalRel='paragraph'  
+                  or $horizontalRel='paragraph-content' 
+                  or $horizontalRel='char'">
           <xsl:value-of select="concat('mso-position-horizontal:', $horizontalPos, ';')"/>
         </xsl:when>
       </xsl:choose>
@@ -2860,13 +2837,12 @@
           <xsl:text>mso-position-vertical:center;</xsl:text>
         </xsl:when>
         <!-- relative to page, page-content, paragraph, paragraph-content, char -->
-        <xsl:when
-          test="$verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content'  or $verticalRel = 'char' 
+        <xsl:when test="$verticalRel='page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content'  or $verticalRel = 'char' 
           or $verticalRel = 'char' or $verticalRel = 'baseline' or $verticalRel = 'line' or $verticalRel = 'text' ">
           <xsl:text>mso-position-vertical:</xsl:text>
           <xsl:choose>
-            <xsl:when test="$verticalPos = 'middle' ">center</xsl:when>
-            <xsl:when test="$verticalPos = 'below' ">bottom</xsl:when>
+            <xsl:when test="$verticalPos='middle'">center</xsl:when>
+            <xsl:when test="$verticalPos='below'">bottom</xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$verticalPos"/>
             </xsl:otherwise>
@@ -2882,8 +2858,7 @@
     <xsl:param name="shapeProperties"/>
 
     <!-- wrapping of text (horizontal adjustment) -->
-    <xsl:if
-      test="$shapeProperties/@fo:min-width or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
+    <xsl:if test="$shapeProperties/@fo:min-width or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
       <!--<xsl:text>mso-wrap-style:none;</xsl:text>-->
     </xsl:if>
 
