@@ -808,7 +808,7 @@ namespace CleverAge.OdfConverter.Word
 
             // columns
             Element cols = (Element)this.odfSectPr.GetChild("cols", W_NAMESPACE);
-            if (this.nextIsEndSection && cols != null)
+            if (this.nextIsEndSection && cols != null && this.name != "Index")
             {
                 cols.Write(nextWriter);
             }
