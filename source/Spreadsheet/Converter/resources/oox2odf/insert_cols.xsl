@@ -872,7 +872,14 @@
                 <xsl:value-of select="$GetMinManualColBreak - $prevManualBreak"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="$GetMinManualColBreak - preceding::e:col[1]/@max"/>
+                <xsl:choose>
+                  <xsl:when test="$GetMinManualColBreak - preceding::e:col[1]/@max &lt; 0">
+                    <xsl:value-of select="preceding::e:col[1]/@max - $GetMinManualColBreak"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$GetMinManualColBreak - preceding::e:col[1]/@max"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
