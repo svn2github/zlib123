@@ -606,9 +606,10 @@ namespace CleverAge.OdfConverter.Word
             {
                 this.startPageNumber = null;
             }
-
-            this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection)
-                || (this.nextIsContinuous && this.skip);
+            
+            //clam bugfix #1802267
+            this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection || (this.nextIsContinuous && this.skip)) && !this.nextIsPageBreak;
+            
             this.nextIsPageBreak = false;
             this.nextIsNewSection = false;
             this.nextIsEndSection = false;
