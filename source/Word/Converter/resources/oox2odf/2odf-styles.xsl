@@ -3872,97 +3872,104 @@
     <xsl:if test="@w:val">
       <xsl:choose>
         <xsl:when test="@w:val = 'dash'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dashDotDotHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dot-dot-dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dashDotHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dot-dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dashedHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dashLong'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">long-dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dashLongHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">long-dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dotDash'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dot-dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dotDotDash'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dot-dot-dash</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dotted'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dotted</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'dottedHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">dotted</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'double'">
-          <xsl:attribute name="style:text-underline-type">double</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">double</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'single'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'thick'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'wave'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">wave</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'wavyDouble'">
-          <xsl:attribute name="style:text-underline-type">double</xsl:attribute>
+          <!-- 
+          makz: the order of the attributes is importent for Open office 2.2
+          I think it's a bug in Open Office, but the style attribute must be 
+          written before the type attribute
+          
+          Fix bug #1764323
+          -->
           <xsl:attribute name="style:text-underline-style">wave</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">double</xsl:attribute>
+          <xsl:attribute name="style:text-underline-width">auto</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'wavyHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">wave</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'words'">
+          <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
           <xsl:attribute name="style:text-underline-mode">skip-white-space</xsl:attribute>
           <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:when>
         <xsl:when test="@w:val = 'none'">
           <xsl:attribute name="style:text-underline-type">none</xsl:attribute>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
           <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
@@ -3970,7 +3977,7 @@
     <xsl:if test="@w:color">
       <xsl:attribute name="style:text-underline-color">
         <xsl:choose>
-          <xsl:when test="@w:color = 'auto'">font-color</xsl:when>
+          <xsl:when test="@w:color='auto'">font-color</xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="concat('#',@w:color)"/>
           </xsl:otherwise>
