@@ -429,7 +429,6 @@
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
-
         <xsl:if test="@w:asciiTheme">
           <xsl:attribute name="style:font-name">
             <xsl:call-template name="ComputeThemeFontName">
@@ -517,13 +516,27 @@
 
   <!-- font size -->
   <xsl:template match="w:sz" mode="rPrChildren-dropcap-forbidden">
-    <!-- do not insert this property into drop cap text style -->
-    <xsl:attribute name="fo:font-size">
+    <xsl:variable name="fontSize">
       <xsl:call-template name="ConvertHalfPoints">
         <xsl:with-param name="length" select="@w:val"/>
         <xsl:with-param name="unit">pt</xsl:with-param>
       </xsl:call-template>
+    </xsl:variable>
+
+    <!-- do not insert this property into drop cap text style -->
+    <xsl:attribute name="fo:font-size">
+      <xsl:value-of select="$fontSize"/>
     </xsl:attribute>
+    
+    <!-- 
+    makz: for asian fonts write the asian attribute too 
+    Fix bug #1791505 
+    -->
+    <xsl:if test="../w:rFonts/@w:hint='eastAsia' or ../w:rFonts/@w:eastAsia">
+      <xsl:attribute name="style:font-size-asian">
+        <xsl:value-of select="$fontSize"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="w:szCs" mode="rPrChildren">
@@ -2591,8 +2604,7 @@
       </style:paragraph-properties>
     </xsl:if>
 
-    <xsl:if
-      test="(self::node()/@w:type = 'paragraph' and w:rPr) or self::node()/@w:type = 'character'">
+    <xsl:if test="(self::node()/@w:type = 'paragraph' and w:rPr) or self::node()/@w:type = 'character'">
       <style:text-properties>
         <xsl:if test="w:rPr">
           <xsl:for-each select="w:rPr">
