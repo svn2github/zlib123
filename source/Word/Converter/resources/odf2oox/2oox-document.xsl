@@ -219,6 +219,15 @@
         </xsl:choose>
       </xsl:when>
 
+      <!--clam bugfix #1615689: convert empty paragraphs to paragraphs containing one blank because Word ignores empty paragraphs-->
+      <xsl:when test="not(./text:span|.//text()|child::*)">
+        <w:r>
+          <w:t xml:space="preserve">  
+            <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces"></pxs:s>
+          </w:t>
+        </w:r>
+      </xsl:when>
+
       <xsl:otherwise>
         <xsl:apply-templates mode="paragraph"/>
       </xsl:otherwise>
