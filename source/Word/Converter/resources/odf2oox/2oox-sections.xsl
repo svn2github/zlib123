@@ -47,7 +47,7 @@
   <xsl:key name="page-layouts" match="style:page-layout" use="@style:name"/>
   <xsl:key name="master-based-styles" match="style:style[@style:master-page-name]" use="@style:name"/>
   <xsl:key name="sections" match="style:style[@style:family='section']" use="@style:name"/>
-
+  <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
 
 
   <!-- Set of text elements potentially tied to a master style -->
@@ -390,6 +390,8 @@
         <xsl:when
           test="$following-elt and key('automatic-styles', $following-elt/@text:style-name|$following-elt/@table:style-name)[1]/child::*/@fo:break-before = 'page'"
           >true</xsl:when>
+        <!--clam bugfix #1802267-->
+        <xsl:when test="$following-elt and key('automatic-styles', $following-elt/@text:style-name)[1]/@style:master-page-name">true</xsl:when>
         <xsl:otherwise>
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
