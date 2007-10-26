@@ -1367,8 +1367,8 @@
           <xsl:choose>
              <xsl:when test="w:titlePg">
               <xsl:choose>
-                <xsl:when test="preceding::w:sectPr[w:headerReference/@w:type = 'default'][1]/w:headerReference[./@w:type = 'first']/@r:id">
-                  <xsl:value-of select="preceding::w:sectPr[w:headerReference/@w:type = 'default'][1]/w:headerReference[./@w:type = 'default']/@r:id"/>
+                <xsl:when test="preceding::w:sectPr[w:headerReference/@w:type = 'first'][1]/w:headerReference[./@w:type = 'first']/@r:id">
+                  <xsl:value-of select="preceding::w:sectPr[w:headerReference/@w:type = 'first'][1]/w:headerReference[./@w:type = 'first']/@r:id"/>
                 </xsl:when>
                 <xsl:otherwise>newempty</xsl:otherwise>
               </xsl:choose>            
