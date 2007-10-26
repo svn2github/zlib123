@@ -48,7 +48,7 @@
 
     <xsl:template name="InsertScenario">
       
-      <xsl:for-each select="table:scenario">
+      <xsl:for-each select="following-sibling::table:table[1]/table:scenario">
         <!-- the first cell in the scenario -->
         <xsl:variable name="firstCell">
           <xsl:value-of
@@ -151,10 +151,10 @@
         </xsl:variable>
         
         <!-- must be checked whether scenario is not too big, Excel supports only 32 changing cells -->
-        <xsl:if test="following-sibling::table:table[1]/table:scenario and not($scenarioSize &gt; 32)">
+        <xsl:if test="not($scenarioSize &gt; 32)">
           
           <scenarios>
-            <xsl:apply-templates select="following-sibling::table:table[1]" mode="scenario"/>
+            <xsl:apply-templates select="parent::table:table" mode="scenario"/>
           </scenarios>
           
         </xsl:if>
