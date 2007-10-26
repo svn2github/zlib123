@@ -40,6 +40,12 @@
   <!-- Specifies that measurement of table properties are interpreted as twentieths of a point -->
   <xsl:variable name="type">dxa</xsl:variable>
 
+  <!-- 
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
+  -->
+
   <!-- Tables -->
   <xsl:template match="table:table">
     <!-- warn if subtable -->
@@ -47,8 +53,7 @@
       <xsl:message terminate="no">translation.odf2oox.subtableBordersPadding</xsl:message>
     </xsl:if>
     <!-- warn if consecutive tables -->
-    <xsl:if
-      test="preceding-sibling::table:table[not(@table:is-sub-table='true')] and not(@table:is-sub-table='true')">
+    <xsl:if test="preceding-sibling::table:table[not(@table:is-sub-table='true')] and not(@table:is-sub-table='true')">
       <xsl:message terminate="no">translation.odf2oox.consecutiveTables</xsl:message>
     </xsl:if>
     <w:tbl>
@@ -76,11 +81,62 @@
     <xsl:call-template name="ManageSectionsInTable"/>
   </xsl:template>
 
+  <!-- table rows -->
+  <xsl:template match="table:table-row">
+    <xsl:call-template name="InsertRow">
+      <xsl:with-param name="number" select="@table:number-rows-repeated"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- 
+  Summary: Converts table cells and convered table cells
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 26.10.2007
+  -->
+  <xsl:template match="table:table-cell | table:covered-table-cell">
+    <xsl:param name="isFirstRow"/>
+    <w:tc>
+      <w:tcPr>
+        <xsl:call-template name="InsertCellProperties"/>
+      </w:tcPr>
+      <xsl:apply-templates>
+        <xsl:with-param name="isFirstRow" select="$isFirstRow"/>
+      </xsl:apply-templates>
+      <!-- avoid crash -->
+      <xsl:if test="child::node()[last()][self::table:table]">
+        <xsl:call-template name="InsertEmptyParagraph"/>
+      </xsl:if>
+    </w:tc>
+  </xsl:template>
+  
+  
+  <xsl:template match="table:convered-table-cell">
+    
+  </xsl:template>
+
+  <!-- match columns for gridCols -->
+  <xsl:template match="table:table-column" mode="gridCol">
+    <xsl:call-template name="InsertGridCol">
+      <xsl:with-param name="width">
+        <xsl:call-template name="ComputeColumnWidth"/>
+      </xsl:with-param>
+      <xsl:with-param name="number" select="@table:number-columns-repeated"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
+
   <!-- Inserts table properties -->
   <xsl:template name="InsertTableProperties">
+    
     <w:tblStyle w:val="{@table:style-name}"/>
-    <xsl:variable name="tableProp"
-      select="key('automatic-styles', @table:style-name)/style:table-properties"/>
+    
+    <xsl:variable name="tableProp" select="key('automatic-styles', @table:style-name)/style:table-properties" />
 
     <!-- report lost attributes -->
     <xsl:if test="$tableProp/@fo:keep-with-next">
@@ -160,6 +216,121 @@
         </xsl:call-template>
       </xsl:for-each>
     </w:tblCellMar>
+  </xsl:template>
+
+  <!-- Inserts a row -->
+  <xsl:template name="InsertRow">
+    <xsl:param name="number"/>
+    <w:tr>
+      <xsl:if
+        test="key('automatic-styles',child::table:table-cell/@table:style-name)/style:table-cell-properties/@fo:wrap-option='no-wrap'">
+        <!-- Override layout algorithm -->
+        <w:tblPrEx>
+          <w:tblLayout w:type="autofit"/>
+        </w:tblPrEx>
+      </xsl:if>
+      <w:trPr>
+        <xsl:call-template name="InsertRowProperties"/>
+      </w:trPr>
+      <xsl:apply-templates select="*[position() &lt; 64]">
+        <xsl:with-param name="isFirstRow">
+          <xsl:if
+            test="key('automatic-styles', ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
+            or key('automatic-styles', ancestor::table:table[1]/@table:style-name)/@style:master-page-name != ''">
+            <xsl:value-of
+              select="boolean((@table:number-rows-repeated = $number) and (preceding-sibling::*[1][self::table:table-column or self::table:table-columns] or not(preceding-sibling::node())))"
+            />
+          </xsl:if>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      <xsl:if test="*[position() &gt;= 64]">
+        <xsl:message terminate="no">translation.odf2oox.tableWith64Columns</xsl:message>
+      </xsl:if>
+    </w:tr>
+    <xsl:if test="$number > 1">
+      <xsl:call-template name="InsertRow">
+        <xsl:with-param name="number" select="$number - 1"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Inserts row properties -->
+  <xsl:template name="InsertRowProperties">
+    <!-- report lost attributes -->
+    <xsl:if
+      test="key('automatic-styles',@table:style-name)/style:table-row-properties/@style:background-image">
+      <xsl:message terminate="no">translation.odf2oox.rowBgImage</xsl:message>
+    </xsl:if>
+
+    <xsl:call-template name="InsertRowHeaderMark"/>
+    <xsl:call-template name="InsertRowHeight"/>
+    <xsl:call-template name="InsertRowKeepTogether"/>
+  </xsl:template>
+
+  <!-- Inserts row header mark -->
+  <xsl:template name="InsertRowHeaderMark">
+    <xsl:if test="parent::table:table-header-rows">
+      <w:tblHeader/>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Inserts row height -->
+  <xsl:template name="InsertRowHeight">
+    <xsl:if test="@table:style-name">
+      <xsl:variable name="rowProp"
+        select="key('automatic-styles',@table:style-name)/style:table-row-properties"/>
+      <xsl:variable name="rowHeight">
+        <xsl:choose>
+          <xsl:when test="$rowProp[@style:row-height]">
+            <xsl:value-of select="$rowProp/@style:row-height"/>
+          </xsl:when>
+          <xsl:when test="$rowProp[@style:min-row-height]">
+            <xsl:value-of select="$rowProp/@style:min-row-height"/>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <w:trHeight>
+        <!-- get number value of height to check if row height is not negative. -->
+        <xsl:variable name="checkRowHeight">
+          <xsl:call-template name="GetValue">
+            <xsl:with-param name="length" select="$rowHeight"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="w:val">
+          <xsl:choose>
+            <xsl:when test="number($checkRowHeight) &lt; 0">0</xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="$rowHeight"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:attribute name="w:hRule">
+          <xsl:choose>
+            <xsl:when test="$rowProp[@style:row-height]">
+              <xsl:value-of select="'exact'"/>
+            </xsl:when>
+            <xsl:when test="$rowProp[@style:min-row-height]">
+              <xsl:value-of select="'atLeast'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'auto'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </w:trHeight>
+    </xsl:if>
+  </xsl:template>
+
+  <!--Inserts keep together-->
+  <xsl:template name="InsertRowKeepTogether">
+    <xsl:if
+      test="key('automatic-styles', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'
+    or key('automatic-styles', ancestor::table:table[@table:style-name][1]/@table:style-name)/style:table-properties/@style:may-break-between-rows='false'">
+      <w:cantSplit/>
+    </xsl:if>
   </xsl:template>
 
   <!-- In case the table is a subtable. Unherits a few properties of table it belongs to. -->
@@ -273,16 +444,6 @@
     </w:tblGrid>
   </xsl:template>
 
-  <!-- match columns for gridCols -->
-  <xsl:template match="table:table-column" mode="gridCol">
-    <xsl:call-template name="InsertGridCol">
-      <xsl:with-param name="width">
-        <xsl:call-template name="ComputeColumnWidth"/>
-      </xsl:with-param>
-      <xsl:with-param name="number" select="@table:number-columns-repeated"/>
-    </xsl:call-template>
-  </xsl:template>
-
   <!-- Inserts a gridCol -->
   <xsl:template name="InsertGridCol">
     <xsl:param name="width"/>
@@ -313,7 +474,6 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-
 
   <!-- returns a measured value, a twips value, or a percentage value. Context must be table:column -->
   <xsl:template name="ComputeColumnWidth">
@@ -419,147 +579,10 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- table rows -->
-  <xsl:template match="table:table-row">
-    <xsl:call-template name="InsertRow">
-      <xsl:with-param name="number" select="@table:number-rows-repeated"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!-- Inserts a row -->
-  <xsl:template name="InsertRow">
-    <xsl:param name="number"/>
-    <w:tr>
-      <xsl:if
-        test="key('automatic-styles',child::table:table-cell/@table:style-name)/style:table-cell-properties/@fo:wrap-option='no-wrap'">
-        <!-- Override layout algorithm -->
-        <w:tblPrEx>
-          <w:tblLayout w:type="autofit"/>
-        </w:tblPrEx>
-      </xsl:if>
-      <w:trPr>
-        <xsl:call-template name="InsertRowProperties"/>
-      </w:trPr>
-      <xsl:apply-templates select="*[position() &lt; 64]">
-        <xsl:with-param name="isFirstRow">
-          <xsl:if
-            test="key('automatic-styles', ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
-            or key('automatic-styles', ancestor::table:table[1]/@table:style-name)/@style:master-page-name != ''">
-            <xsl:value-of
-              select="boolean((@table:number-rows-repeated = $number) and (preceding-sibling::*[1][self::table:table-column or self::table:table-columns] or not(preceding-sibling::node())))"
-            />
-          </xsl:if>
-        </xsl:with-param>
-      </xsl:apply-templates>
-      <xsl:if test="*[position() &gt;= 64]">
-        <xsl:message terminate="no">translation.odf2oox.tableWith64Columns</xsl:message>
-      </xsl:if>
-    </w:tr>
-    <xsl:if test="$number > 1">
-      <xsl:call-template name="InsertRow">
-        <xsl:with-param name="number" select="$number - 1"/>
-      </xsl:call-template>
-    </xsl:if>
-  </xsl:template>
-
-
-  <!-- Inserts row properties -->
-  <xsl:template name="InsertRowProperties">
-    <!-- report lost attributes -->
-    <xsl:if
-      test="key('automatic-styles',@table:style-name)/style:table-row-properties/@style:background-image">
-      <xsl:message terminate="no">translation.odf2oox.rowBgImage</xsl:message>
-    </xsl:if>
-
-    <xsl:call-template name="InsertRowHeaderMark"/>
-    <xsl:call-template name="InsertRowHeight"/>
-    <xsl:call-template name="InsertRowKeepTogether"/>
-  </xsl:template>
-
-  <!-- Inserts row header mark -->
-  <xsl:template name="InsertRowHeaderMark">
-    <xsl:if test="parent::table:table-header-rows">
-      <w:tblHeader/>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- Inserts row height -->
-  <xsl:template name="InsertRowHeight">
-    <xsl:if test="@table:style-name">
-      <xsl:variable name="rowProp"
-        select="key('automatic-styles',@table:style-name)/style:table-row-properties"/>
-      <xsl:variable name="rowHeight">
-        <xsl:choose>
-          <xsl:when test="$rowProp[@style:row-height]">
-            <xsl:value-of select="$rowProp/@style:row-height"/>
-          </xsl:when>
-          <xsl:when test="$rowProp[@style:min-row-height]">
-            <xsl:value-of select="$rowProp/@style:min-row-height"/>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      <w:trHeight>
-        <!-- get number value of height to check if row height is not negative. -->
-        <xsl:variable name="checkRowHeight">
-          <xsl:call-template name="GetValue">
-            <xsl:with-param name="length" select="$rowHeight"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:attribute name="w:val">
-          <xsl:choose>
-            <xsl:when test="number($checkRowHeight) &lt; 0">0</xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$rowHeight"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:attribute name="w:hRule">
-          <xsl:choose>
-            <xsl:when test="$rowProp[@style:row-height]">
-              <xsl:value-of select="'exact'"/>
-            </xsl:when>
-            <xsl:when test="$rowProp[@style:min-row-height]">
-              <xsl:value-of select="'atLeast'"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="'auto'"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </w:trHeight>
-    </xsl:if>
-  </xsl:template>
-
-  <!--Inserts keep together-->
-  <xsl:template name="InsertRowKeepTogether">
-    <xsl:if
-      test="key('automatic-styles', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'
-    or key('automatic-styles', ancestor::table:table[@table:style-name][1]/@table:style-name)/style:table-properties/@style:may-break-between-rows='false'">
-      <w:cantSplit/>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- table cells -->
-  <xsl:template match="table:table-cell">
-    <xsl:param name="isFirstRow"/>
-    <w:tc>
-      <w:tcPr>
-        <xsl:call-template name="InsertCellProperties"/>
-      </w:tcPr>
-      <xsl:apply-templates>
-        <xsl:with-param name="isFirstRow" select="$isFirstRow"/>
-      </xsl:apply-templates>
-      <!-- avoid crash -->
-      <xsl:if test="child::node()[last()][self::table:table]">
-        <xsl:call-template name="InsertEmptyParagraph"/>
-      </xsl:if>
-    </w:tc>
-  </xsl:template>
-
+  <!-- Cell properties -->
   <xsl:template name="InsertCellProperties">
+    <!-- current context is table:table-cell -->
+    
     <xsl:variable name="cellStyleName">
       <xsl:choose>
         <xsl:when test="@table:style-name">
@@ -573,12 +596,9 @@
       </xsl:choose>
     </xsl:variable>
     <!-- pointers on the cell style properties -->
-    <xsl:variable name="cellProp"
-      select="key('automatic-styles', $cellStyleName)/style:table-cell-properties"/>
-    <xsl:variable name="rowProp"
-      select="key('automatic-styles', parent::table:table-row/@table:style-name)/style:table-row-properties"/>
-    <xsl:variable name="tableProp"
-      select="key('automatic-styles', ancestor::table:table[@table:style-name][1]/@table:style-name)/style:table-properties"/>
+    <xsl:variable name="cellProp" select="key('automatic-styles', $cellStyleName)/style:table-cell-properties" />
+    <xsl:variable name="rowProp" select="key('automatic-styles', parent::table:table-row/@table:style-name)/style:table-row-properties" />
+    <xsl:variable name="tableProp" select="key('automatic-styles', ancestor::table:table[@table:style-name][1]/@table:style-name)/style:table-properties" />
 
     <!-- report lost attributes -->
     <xsl:if test="$cellProp/@style:cell-protect">
@@ -606,9 +626,7 @@
     <xsl:call-template name="InsertCellWidth">
       <xsl:with-param name="tableProp" select="$tableProp"/>
     </xsl:call-template>
-    <xsl:call-template name="InsertCellSpan">
-      <xsl:with-param name="vmerge"/>
-    </xsl:call-template>
+    <xsl:call-template name="InsertCellSpan" />
     <xsl:call-template name="InsertCellBorders">
       <xsl:with-param name="cellProp" select="$cellProp"/>
     </xsl:call-template>
@@ -654,20 +672,21 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Inserts the cell span -->
+  <!-- 
+  Summary: Inserts the cell span 
+  Author: makz (DIaLOGIKa)
+  Date: 26.10.2007
+  -->
   <xsl:template name="InsertCellSpan">
-    <xsl:param name="vmerge"/>
-    <!--xsl:choose>
-      <xsl:when test="$vmerge != ''">
-        <w:gridSpan w:val="{$grid}"/>
-        <w:vMerge w:val="{$vmerge}"/>
-      </xsl:when>
-      <xsl:otherwise-->
+    <xsl:if test="@table:number-rows-spanned">
+      <w:vMerge w:val="restart" />
+    </xsl:if>
+    <xsl:if test="name()='table:covered-table-cell'">
+      <w:vMerge />
+    </xsl:if>
     <xsl:if test="@table:number-columns-spanned">
       <w:gridSpan w:val="{@table:number-columns-spanned}"/>
     </xsl:if>
-    <!--/xsl:otherwise>
-    </xsl:choose-->
   </xsl:template>
 
   <!-- Inserts the cell borders -->
@@ -1082,11 +1101,8 @@
 
   <!-- Gets the column number of the current cell -->
   <xsl:template name="GetColumnNumber">
-    <xsl:value-of
-      select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"
-    />
+    <xsl:value-of select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1" />
   </xsl:template>
-
 
   <!-- Inserts a page break before if needed -->
   <xsl:template name="InsertPageBreakBefore">
