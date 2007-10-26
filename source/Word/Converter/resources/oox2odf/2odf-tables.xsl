@@ -34,6 +34,12 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" exclude-result-prefixes="w table">
 
+  <!-- 
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
+  -->
+  
   <xsl:template match="w:tbl">
     <table:table>
       <xsl:attribute name="table:style-name">
@@ -77,7 +83,6 @@
     </xsl:choose>
   </xsl:template>
 
-  
   <xsl:template match="w:tc">
     <xsl:choose>
       <!-- for w:vMerge="continuous" cells, create a table:covered-table-cell element --> 
@@ -118,9 +123,6 @@
     </xsl:choose>
   </xsl:template>
 
-  
- 
-  
   <xsl:template match="w:tblPr" mode="automaticstyles">
     <style:style style:name="{generate-id(parent::w:tbl)}" style:family="table">
       <xsl:if test="w:tblStyle">
@@ -137,7 +139,6 @@
     </style:style>
   </xsl:template>
 
-
   <xsl:template match="w:tcPr" mode="automaticstyles">
     <style:style style:name="{generate-id(parent::w:tc)}" style:family="table-cell">
       <xsl:if test="w:tcStyle">
@@ -150,7 +151,6 @@
       </style:table-cell-properties>
     </style:style>
   </xsl:template>
-
 
   <xsl:template match="w:gridCol" mode="automaticstyles">
     <style:style style:name="{generate-id(self::w:gridCol)}" style:family="table-column">
@@ -167,6 +167,12 @@
       </style:table-row-properties>
     </style:style>
   </xsl:template>
+
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
 
   <!-- compute the number of rows that are spanned by context cell -->
   <xsl:template name="ComputeNumberRowsSpanned">
@@ -392,21 +398,26 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!--insert cells properties: vertical align, margins, borders  -->
+  <!--
+  Summary: insert cells properties: vertical align, margins, borders  
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 26.10.2007
+  -->
   <xsl:template name="InsertCellsProperties">
 
     <!-- vertical align -->
     <xsl:call-template name="InsertCellVAlign"/>
 
-    <!--    margins-->
+    <!-- margins-->
     <xsl:variable name="mstyleId">
       <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
+    
     <xsl:choose>
-      <xsl:when
-        test="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
-        <xsl:variable name="mstyle"
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
+      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$mstyleId or @w:styleId=concat('CONTENT_',$mstyleId)]">
+        <xsl:variable name="mstyle" select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
+        <!-- margin is specified in styles.xml -->
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
@@ -432,7 +443,8 @@
           <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="w:tcMar or ancestor::w:tbl[1]/w:tblPr/w:tblCellMar">
+        <!-- margin is specified direct in the table -->
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
@@ -453,8 +465,24 @@
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
           <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
         </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- use application dafaults (no margin specified) -->
+        <xsl:attribute name="fo:padding-top">
+          <xsl:text>0cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:padding-bottom">
+          <xsl:text>0cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:padding-left">
+          <xsl:text>0.19cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:padding-right">
+          <xsl:text>0.19cm</xsl:text>
+        </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
+    
     <!--    borders-->
     <xsl:call-template name="InsertCellBorders"/>
 
@@ -466,9 +494,9 @@
           </xsl:for-each>
       </xsl:attribute>
     </xsl:if>
+    
   </xsl:template>
  
-
   <!-- insert table cell content vertical alignment -->
   <xsl:template name="InsertCellVAlign">
     <xsl:if test="w:vAlign">
