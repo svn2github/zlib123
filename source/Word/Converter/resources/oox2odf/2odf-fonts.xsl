@@ -34,7 +34,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  exclude-result-prefixes="w dc xlink">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="w dc xlink oox">
 
   <xsl:template match="w:font">
     <style:font-face>

@@ -43,18 +43,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     /// </summary>
     public abstract class AbstractConverter
     {
-        private const string ODFToOOX_XSL = "odf2oox.xsl";
-        private const string OOXToODF_XSL = "oox2odf.xsl";
-        private const string SOURCE_XML = "source.xml";
-        private const string ODFToOOX_COMPUTE_SIZE_XSL = "odf2oox-compute-size.xsl";
-        private const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
+        protected const string ODFToOOX_XSL = "odf2oox.xsl";
+        protected const string OOXToODF_XSL = "oox2odf.xsl";
+        protected const string SOURCE_XML = "source.xml";
+        protected const string ODFToOOX_COMPUTE_SIZE_XSL = "odf2oox-compute-size.xsl";
+        protected const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
       
-        private bool isDirectTransform = true;
-        private ArrayList skipedPostProcessors = null;
-        private string externalResource = null;
-        private bool packaging = true;
-        private Assembly resourcesAssembly;
-        private Hashtable compiledProcessors;
+        protected bool isDirectTransform = true;
+        protected ArrayList skipedPostProcessors = null;
+        protected string externalResource = null;
+        protected bool packaging = true;
+        protected Assembly resourcesAssembly;
+        protected Hashtable compiledProcessors;
         
         protected AbstractConverter(Assembly resourcesAssembly)
         {
@@ -104,7 +104,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <summary>
         /// Pull an XmlUrlResolver for embedded resources
         /// </summary>
-        private XmlUrlResolver ResourceResolver
+        protected XmlUrlResolver ResourceResolver
         {
             get
             {
@@ -123,27 +123,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <summary>
         /// Pull the input xml document to the xsl transformation
         /// </summary>
-        private XmlReader Source
+        protected virtual XmlReader Source(string inputFile)
         {
-            get
+            XmlReaderSettings xrs = new XmlReaderSettings();
+            // do not look for DTD
+            xrs.ProhibitDtd = true;
+            if (this.ExternalResources == null)
             {
-                XmlReaderSettings xrs = new XmlReaderSettings();
-                // do not look for DTD
-                xrs.ProhibitDtd = true;
-                if (this.ExternalResources == null)
-                {
-                    xrs.XmlResolver = this.ResourceResolver;
-                    return XmlReader.Create(SOURCE_XML, xrs);
-                }
-                else
-                {
-                    return XmlReader.Create(this.ExternalResources + "/" + SOURCE_XML, xrs);
-                }
+                xrs.XmlResolver = this.ResourceResolver;
+                return XmlReader.Create(SOURCE_XML, xrs);
+            }
+            else
+            {
+                return XmlReader.Create(this.ExternalResources + "/" + SOURCE_XML, xrs);
             }
         }
 
       
-        private XslCompiledTransform Load(bool computeSize)
+        protected XslCompiledTransform Load(bool computeSize)
         {
             string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
             XPathDocument xslDoc = null;
@@ -192,7 +189,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <summary>
         /// Pull the xslt settings
         /// </summary>
-        private XsltSettings XsltProcSettings
+        protected XsltSettings XsltProcSettings
         {
             get
             {
@@ -263,7 +260,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
         
-        private void _Transform(string inputFile, string outputFile)
+        protected virtual void _Transform(string inputFile, string outputFile)
         {
             // this throws an exception in the the following cases:
             // - input file is not a valid file
@@ -299,7 +296,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     writer = new XmlTextWriter(new StringWriter());
                 }
-                source = this.Source;
+                source = this.Source(inputFile);
                 // Apply the transformation
                 
                 xslt.Transform(source, parameters, writer, zipResolver);
@@ -315,7 +312,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void MessageCallBack(object sender, XsltMessageEncounteredEventArgs e)
+        protected void MessageCallBack(object sender, XsltMessageEncounteredEventArgs e)
         {
             if (e.Message.StartsWith("progress:"))
             {
@@ -340,7 +337,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void CheckFile(string fileName)
+        protected void CheckFile(string fileName)
         {
             if (this.isDirectTransform)
             {
@@ -354,7 +351,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
   
 
-        private XmlWriter GetWriter(XmlWriter writer)
+        protected XmlWriter GetWriter(XmlWriter writer)
         {
             string [] postProcessors = this.DirectPostProcessorsChain;
             if (!this.isDirectTransform)
@@ -365,7 +362,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
 
-        private XmlWriter InstanciatePostProcessors(string [] procNames, XmlWriter lastProcessor)
+        protected XmlWriter InstanciatePostProcessors(string [] procNames, XmlWriter lastProcessor)
         {
             XmlWriter currentProc = lastProcessor;
             if (procNames != null)
@@ -384,7 +381,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return currentProc;
         }
 
-        private bool Contains(string processorFullName, ArrayList names)
+        protected bool Contains(string processorFullName, ArrayList names)
         {
             foreach (string name in names)
             {
@@ -397,8 +394,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
         public delegate void MessageListener(object sender, EventArgs e);
-        private event MessageListener progressMessageIntercepted;
-        private event MessageListener feedbackMessageIntercepted;
+        protected event MessageListener progressMessageIntercepted;
+        protected event MessageListener feedbackMessageIntercepted;
 
         public void AddProgressMessageListener(MessageListener listener)
         {

@@ -31,9 +31,10 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
- xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  exclude-result-prefixes="w text style">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="w text style oox">
   
   <xsl:key name="tocBookmark" match="w:bookmarkStart" use="@w:name"/>
   <xsl:key name="OutlineLevel" match="w:outlineLvl" use="''"/>
@@ -83,7 +84,7 @@
           <!-- TODO : localization -->
           <xsl:message terminate="no">feedback:many alphabetical index properties</xsl:message>
           <xsl:attribute name="text:style-name">
-            <xsl:value-of select="generate-id(following::w:p/descendant::w:sectPr)"/>
+            <xsl:value-of select="generate-id(key('p', @oox:id+1)/descendant::w:sectPr)"/>
           </xsl:attribute>
           <xsl:attribute name="text:protected">false</xsl:attribute>
           <xsl:attribute name="text:name">Alphabetical Index1</xsl:attribute>
@@ -405,18 +406,18 @@
         <xsl:when test="contains($instrTextContent,'\o')"> 
         
           <xsl:variable name="CountOutlineLevel">
-            <xsl:for-each select="document('word/document.xml')">
+            <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
               <xsl:value-of select="count(key('OutlineLevel', '')/@w:val)"/>
             </xsl:for-each>
           </xsl:variable>
           <xsl:variable name="CountStyleOutlineLevel">
-            <xsl:for-each select="document('word/styles.xml')">
+            <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
               <xsl:value-of select="count(key('OutlineLevel', '')/@w:val)"/>
             </xsl:for-each>  
           </xsl:variable>         
           <xsl:choose>
             <xsl:when test="$CountOutlineLevel > 0">
-              <xsl:for-each select="document('word/document.xml')">
+              <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
                 <xsl:call-template name="GetOutlineLevelMax">
                   <xsl:with-param name="value">0</xsl:with-param>
                   <xsl:with-param name="count">                    
@@ -426,7 +427,7 @@
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="$CountStyleOutlineLevel > 0">
-              <xsl:for-each select="document('word/styles.xml')">
+              <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
                 <xsl:call-template name="GetOutlineLevelMax">
                   <xsl:with-param name="value">0</xsl:with-param>
                   <xsl:with-param name="count">                    
@@ -799,7 +800,7 @@
   <xsl:template name="InsertBibliographyProperties">
     
     <xsl:variable name="Style">
-      <xsl:value-of select="document('customXml/item1.xml')/b:Sources/@StyleName"/>
+      <xsl:value-of select="/oox:package/oox:part[@oox:name='customXml/item1.xml']/b:Sources/@StyleName"/>
     </xsl:variable> 
     
     <text:bibliography-entry-template text:bibliography-type="book">
@@ -992,11 +993,13 @@
     <xsl:param name="maxtabCount"/>
     <xsl:choose>
       <xsl:when test="$tabCount > 0">
+        <xsl:variable name="partName" select="ancestor::oox:part/@oox:name" />
+        <xsl:variable name="precTab" select="preceding::w:tabs[ancestor::oox:part/@oox:name = $partName]" />
         <xsl:choose>
-          <xsl:when test="preceding::w:tabs[1]/w:tab[number($tabCount)][not($param='w:val' and @w:val='clear')]">
+          <xsl:when test="$precTab/w:tab[number($tabCount)][not($param='w:val' and @w:val='clear')]">
             <xsl:choose>
-              <xsl:when test="preceding::w:tabs[1]/w:tab[number($tabCount)]/attribute::node()[name()=$param]">
-                <xsl:value-of select="preceding::w:tabs[1]/w:tab[number($tabCount)]/attribute::node()[name()=$param]"/>
+              <xsl:when test="$precTab/w:tab[number($tabCount)]/attribute::node()[name()=$param]">
+                <xsl:value-of select="$precTab/w:tab[number($tabCount)]/attribute::node()[name()=$param]"/>
               </xsl:when>
               <xsl:otherwise/>
             </xsl:choose>
@@ -1032,7 +1035,7 @@
     
     <xsl:variable name="ancestor-style" select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
     
-    <xsl:for-each select="document('word/styles.xml')">
+    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
     <xsl:choose>
       <xsl:when test="$tabCount > 0">
         <xsl:choose>

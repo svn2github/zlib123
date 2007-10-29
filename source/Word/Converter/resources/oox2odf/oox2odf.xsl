@@ -52,7 +52,7 @@
 
   <!-- packages relationships -->
   <!--
-  <xsl:variable name="package-rels" select="document('_rels/.rels')"/>
+  <xsl:variable name="package-rels" select="/oox:package/oox:part[@oox:name='_rels/.rels']"/>
   <xsl:variable name="officeDocument"
     select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument']/@Target)"/>
   <xsl:variable name="core-properties"
@@ -88,7 +88,7 @@
   <!-- App version number -->
   <xsl:variable name="app-version">1.0.0</xsl:variable>
 
-  <xsl:template match="/oox:source">
+  <xsl:template match="/oox:package">
 
     <pzip:archive pzip:target="{$outputFile}">
 
@@ -102,15 +102,15 @@
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
           <xsl:for-each
-            select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
           <xsl:for-each
-            select="document('word/_rels/footer1.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            select="/oox:package/oox:part[@oox:name='word/_rels/footer1.xml.rels']//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
           <xsl:for-each
-            select="document('word/_rels/header1.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            select="/oox:package/oox:part[@oox:name='word/_rels/header1.xml.rels']//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
         </manifest:manifest>

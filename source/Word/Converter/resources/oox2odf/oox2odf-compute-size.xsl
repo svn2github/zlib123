@@ -30,7 +30,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:ct="http://schemas.openxmlformats.org/package/2006/content-types">
 
-  <xsl:template match="/oox:source">
+  <xsl:template match="/oox:package">
     <xsl:call-template name="VisitPart">
       <xsl:with-param name="content-type" select="'main+xml'"/>
     </xsl:call-template>
@@ -56,7 +56,7 @@
     <xsl:for-each
       select="document('[Content_types].xml')/ct:Types/ct:Override[contains(@ContentType, $content-type)]">
       <xsl:variable name="path" select="substring-after(@PartName, '/')"/>
-      <xsl:for-each select="document($path)">
+      <xsl:for-each select="/oox:package/oox:part[@oox:name=$path]">
         <xsl:apply-templates/>
       </xsl:for-each>
     </xsl:for-each>

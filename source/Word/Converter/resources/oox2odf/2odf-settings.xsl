@@ -4,7 +4,9 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0">
+  xmlns:ooo="http://openoffice.org/2004/office" xmlns:oox="urn:oox" 
+  office:version="1.0"
+  exclude-result-prefixes="oox">
 
   <xsl:template name="settings">
     <office:document-settings>
@@ -12,10 +14,10 @@
         <config:config-item-set config:name="ooo:view-settings">
           <xsl:choose>
             <xsl:when
-              test="document('word/document.xml')/w:document/w:body/descendant::w:ins or 
-        document('word/document.xml')/w:document/w:body/descendant::w:del or
-        document('word/document.xml')/w:document/w:body/descendant::w:pPrChange or
-        document('word/document.xml')/w:document/w:body/descendant::w:rPrChange">
+              test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/descendant::w:ins or 
+        /oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/descendant::w:del or
+        /oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/descendant::w:pPrChange or
+        /oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/descendant::w:rPrChange">
               <config:config-item config:name="ShowRedlineChanges" config:type="boolean"
               >true</config:config-item>
             </xsl:when>
@@ -31,7 +33,7 @@
         <config:config-item-set config:name="ooo:configuration-settings">                   
           <config:config-item config:name="AddParaTableSpacing" config:type="boolean">
             <xsl:choose>
-              <xsl:when test="document('word/settings.xml')/w:settings/w:compat/w:doNotUseHTMLParagraphAutoSpacing">true</xsl:when>
+              <xsl:when test="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:compat/w:doNotUseHTMLParagraphAutoSpacing">true</xsl:when>
               <xsl:otherwise>false</xsl:otherwise>
             </xsl:choose>                        
           </config:config-item>

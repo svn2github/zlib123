@@ -13,7 +13,8 @@
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  exclude-result-prefixes="w number wp xlink r b">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="w number wp xlink r b oox">
 
   <!-- Date and Time Fields -->
   <xsl:template name="InsertDate">
@@ -1446,7 +1447,7 @@
     <xsl:variable name="docName">
       <xsl:call-template name="GetDocumentName">
         <xsl:with-param name="rootId">
-          <xsl:value-of select="generate-id(/node())"/>
+          <xsl:value-of select="generate-id(/node())" />
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1476,10 +1477,10 @@
 
         <xsl:variable name="rId">
           <xsl:value-of
-            select="document('word/_rels/document.xml.rels')/Relationships/Relationship[@Target = $docName]/@Id"
+            select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/Relationships/Relationship[@Target = $docName]/@Id"
           />
         </xsl:variable>
-        <xsl:for-each select="document('word/document.xml')">
+        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
           <xsl:for-each
             select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
             <xsl:if test="w:pgNumType/@w:chapStyle">
@@ -1532,7 +1533,7 @@
     <xsl:param name="TextIdentifier"/>
 
     <xsl:variable name="Path"
-      select="document('customXml/item1.xml')/b:Sources/b:Source[b:Tag = $TextIdentifier]"/>
+      select="/oox:package/oox:part[@oox:name='customXml/item1.xml']/b:Sources/b:Source[b:Tag = $TextIdentifier]"/>
 
     <xsl:variable name="BibliographyType" select="$Path/b:SourceType"/>
 

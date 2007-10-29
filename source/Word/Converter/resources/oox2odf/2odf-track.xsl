@@ -11,7 +11,8 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  exclude-result-prefixes="w r xlink number wp ">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="w r xlink number wp oox">
 
   <xsl:key name="track-changes" match="w:ins|w:del|w:pPrChange|w:rPrChange" use="''"/>
 
@@ -22,7 +23,7 @@
           <xsl:when
             test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
           <xsl:when
-            test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+            test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
           <xsl:otherwise>
             <text:changed-region>
               <xsl:attribute name="text:id">
@@ -157,17 +158,17 @@
             <text:p>
               <xsl:attribute name="text:style-name">
                 <xsl:choose>
-                  <xsl:when test="following::w:p[1]/w:pPr/w:pPrChange/w:pPr/w:pStyle">
-                    <xsl:value-of select="following::w:p[1]/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val"
+                  <xsl:when test="key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle">
+                    <xsl:value-of select="key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val"
                     />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="generate-id(following::w:p[1])"/>
+                    <xsl:value-of select="generate-id(key('p', @oox:id+1))"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
-              <xsl:if test="following::w:p[1]/descendant::w:r[1]/parent::w:del">
-                <xsl:value-of select="following::w:p[1]/descendant::w:r[1]"/>
+              <xsl:if test="key('p', @oox:id+1)/descendant::w:r[1]/parent::w:del">
+                <xsl:value-of select="key('p', @oox:id+1)/descendant::w:r[1]"/>
               </xsl:if>
             </text:p>
           </text:deletion>
@@ -202,35 +203,35 @@
 
   <xsl:template name="TrackChanges">
     <xsl:variable name="hasTrackChanges">
-      <xsl:for-each select="document('word/document.xml')/w:document/w:body">
+      <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body">
         <xsl:if test="key('track-changes', '')">true</xsl:if>
       </xsl:for-each>
       <xsl:for-each
-        select="document('word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
+        select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
         <xsl:variable name="file">
           <xsl:value-of select="."/>
         </xsl:variable>
-        <xsl:for-each select="document(concat('word/',$file))">
+        <xsl:for-each select="/oox:package/oox:part[@oox:name=concat('word/',$file)]">
           <xsl:if test="key('track-changes', '')">true</xsl:if>
         </xsl:for-each>
       </xsl:for-each>
     </xsl:variable>
     <xsl:if test="$hasTrackChanges = 'true' ">
       <text:tracked-changes>
-        <xsl:for-each select="document('word/document.xml')/w:document/w:body">
+        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body">
           <xsl:if test="key('track-changes', '')">
-            <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
+            <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body"
               mode="trackchanges"/>
           </xsl:if>
         </xsl:for-each>
         <xsl:for-each
-          select="document('word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
+          select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
           <xsl:variable name="file">
             <xsl:value-of select="."/>
           </xsl:variable>
-          <xsl:for-each select="document(concat('word/',$file))">
+          <xsl:for-each select="/oox:package/oox:part[@oox:name=concat('word/',$file)]">
             <xsl:if test="key('track-changes', '')">
-              <xsl:apply-templates select="document(concat('word/',$file))" mode="trackchanges"/>
+              <xsl:apply-templates select="/oox:package/oox:part[@oox:name=concat('word/',$file)]" mode="trackchanges"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:for-each>
@@ -257,7 +258,7 @@
       <xsl:when
         test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
       <xsl:when
-        test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+        test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
       <xsl:otherwise>
         <text:change>
           <xsl:attribute name="text:change-id">

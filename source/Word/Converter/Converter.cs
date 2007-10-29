@@ -7,6 +7,8 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 using CleverAge.OdfConverter.OdfConverterLib;
+using CleverAge.OdfConverter.OdfZipUtils;
+using System.IO;
 
 namespace CleverAge.OdfConverter.Word
 {
@@ -93,6 +95,79 @@ namespace CleverAge.OdfConverter.Word
                                                     + ". Invalid OASIS OpenDocument file");
             }
         }
-    
+
+        //protected override void _Transform(string inputFile, string outputFile)
+        //{
+        //    // this throws an exception in the the following cases:
+        //    // - input file is not a valid file
+        //    // - input file is an encrypted file
+        //    CheckFile(inputFile);
+
+        //    XmlReader source = null;
+        //    XmlWriter writer = null;
+        //    ZipResolver zipResolver = null;
+
+        //    try
+        //    {
+        //        XslCompiledTransform xslt = this.Load(outputFile == null);
+        //        zipResolver = new ZipResolver(inputFile);
+        //        XsltArgumentList parameters = new XsltArgumentList();
+        //        parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
+
+        //        if (outputFile != null)
+        //        {
+        //            parameters.AddParam("outputFile", "", outputFile);
+        //            XmlWriter finalWriter;
+        //            if (this.packaging)
+        //            {
+        //                finalWriter = new ZipArchiveWriter(zipResolver);
+        //            }
+        //            else
+        //            {
+        //                finalWriter = new XmlTextWriter(outputFile, System.Text.Encoding.UTF8);
+        //            }
+        //            writer = GetWriter(finalWriter);
+        //        }
+        //        else
+        //        {
+        //            writer = new XmlTextWriter(new StringWriter());
+        //        }
+        //        OoxDocument doc = new OoxDocument(inputFile);
+        //        source = XmlReader.Create(doc.OpenXML);
+        //        // Apply the transformation
+        //        xslt.Transform(source, parameters, writer, zipResolver);
+
+        //        //XPathDocument xpd = new XPathDocument(doc.OpenXML);
+        //        //xslt.Transform(xpd, parameters, writer);
+        //    }
+        //    finally
+        //    {
+        //        if (writer != null)
+        //            writer.Close();
+        //        if (source != null)
+        //            source.Close();
+        //        if (zipResolver != null)
+        //            zipResolver.Dispose();
+        //    }
+        //}
+
+        /// <summary>
+        /// Pull the input xml document to the xsl transformation
+        /// </summary>
+        protected override XmlReader Source(string inputFile)
+        {
+            XmlReaderSettings xrs = new XmlReaderSettings();
+            // do not look for DTD
+            xrs.ProhibitDtd = true;
+            if (this.ExternalResources == null)
+            {
+                DocxDocument doc = new DocxDocument(inputFile);
+                return XmlReader.Create(doc.OpenXML, xrs);
+            }
+            else
+            {
+                throw new NotSupportedException("External resources are not supported for DOCX -> ODT conversion");
+            }
+        }
     }
 }

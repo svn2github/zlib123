@@ -10,22 +10,23 @@
   xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="office text  fo style dc meta pzip xlink w">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="office text  fo style dc meta pzip xlink w oox">
   
 <xsl:template name="InsertComment">
   <xsl:param name="Id"/>
   <office:annotation>
-    <xsl:if test="document('word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author">
+    <xsl:if test="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:author">
       <dc:creator>
-        <xsl:value-of select="document('word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author"/>
+        <xsl:value-of select="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:author"/>
       </dc:creator>
     </xsl:if>
-    <xsl:if test="document('word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date">
+    <xsl:if test="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:date">
       <dc:date>
-        <xsl:value-of select="document('word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date"/>
+        <xsl:value-of select="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:date"/>
       </dc:date>
     </xsl:if>
-    <xsl:apply-templates select="document('word/comments.xml')/w:comments/w:comment[@w:id = $Id]/w:p"/>    
+    <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/w:p"/>    
   </office:annotation>  
 </xsl:template>
  </xsl:stylesheet>

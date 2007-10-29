@@ -15,7 +15,8 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="w r draw number wp xlink v w10 o">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="w r draw number wp xlink v w10 o oox">
 
   <!-- 
   *************************************************************************
@@ -132,7 +133,7 @@
             That happens if a predefined paragraph style is made to a frame.
             -->
             <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
-            <xsl:variable name="externalBorderStyle" select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$styleId]"/>
+            <xsl:variable name="externalBorderStyle" select="key('StyleId', $styleId)"/>
             <xsl:choose>
               <!-- The border is defined in context.xml -->
               <xsl:when test="w:pPr/w:pBdr">
@@ -298,7 +299,7 @@
           </xsl:choose>
           <!-- image href from relationships-->
           <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" xlink:href="">
-            <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+            <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
               <xsl:call-template name="InsertImageHref">
                 <xsl:with-param name="document" select="$document"/>
                 <xsl:with-param name="rId">
@@ -456,7 +457,7 @@
     </xsl:call-template>
 
     <draw:object-ole>
-      <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+      <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
         <xsl:call-template name="InsertImageHref">
           <xsl:with-param name="document" select="$document"/>
           <xsl:with-param name="rId" select="@r:id"/>
@@ -496,7 +497,7 @@
       <xsl:with-param name="rId" select="@r:id"/>
     </xsl:call-template>
     <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-      <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+      <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
         <xsl:call-template name="InsertImageHref">
           <xsl:with-param name="document" select="$document"/>
           <xsl:with-param name="rId" select="@r:id"/>

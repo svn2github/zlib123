@@ -41,6 +41,7 @@
     <Compile Include="OdfCharactersPostProcessor.cs" />
     <Compile Include="OdfEventArgs.cs" />
     <Compile Include="OoxCharactersPostProcessor.cs" />
+    <Compile Include="OoxDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NotAnOdfDocumentException.cs" />
     <Compile Include="OoxSpacesPostProcessor.cs" />

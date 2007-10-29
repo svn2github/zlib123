@@ -43,7 +43,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:v="urn:schemas-microsoft-com:vml"
-  exclude-result-prefixes="w uri draw a pic r wp w xlink">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="w uri draw a pic r wp w xlink oox">
   
   <!-- 
   *************************************************************************
@@ -79,7 +80,9 @@
         <xsl:variable name="relationshipId" select="descendant::a:hlinkClick/@r:id"/>
         <xsl:variable name="document">
           <xsl:call-template name="GetDocumentName">
-            <xsl:with-param name="rootId" select="generate-id(/node())"/>
+            <xsl:with-param name="rootId">
+              <xsl:value-of select="generate-id(/node())" />
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="relDestination">
@@ -102,7 +105,7 @@
     <xsl:variable name="document">
       <xsl:call-template name="GetDocumentName">
         <xsl:with-param name="rootId">
-          <xsl:value-of select="generate-id(/node())"/>
+          <xsl:value-of select="generate-id(/node())" />
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -153,7 +156,7 @@
 
       <!-- image href from relationships-->
       <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" xlink:href="">
-        <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+        <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
           <xsl:call-template name="InsertImageHref">
             <xsl:with-param name="document" select="$document"/>
           </xsl:call-template>
@@ -333,7 +336,7 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:for-each
-      select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
+      select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship']">
       <xsl:if test="./@Id=$id">
         <xsl:variable name="targetmode">
           <xsl:value-of select="./@TargetMode"/>

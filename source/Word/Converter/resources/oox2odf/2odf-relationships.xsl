@@ -18,9 +18,11 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" 
-  exclude-result-prefixes="w wp r uri a pic">
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="w wp r uri a pic oox">
 
   <xsl:template name="CopyPictures">
      <xsl:param name="document"/>
@@ -40,9 +42,9 @@
       </xsl:choose>
   </xsl:variable>
     
-    <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+    <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
       <xsl:for-each
-        select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
+        select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:variable name="targetmode">
             <xsl:value-of select="./@TargetMode"/>
@@ -78,31 +80,41 @@
   <xsl:template name="GetDocumentName">
     <xsl:param name="rootId"/>
 
+    
+    <xsl:variable name="path" select="ancestor::oox:part/@oox:name" />
     <xsl:choose>
+      <xsl:when test="contains($path, '/')">
+        <xsl:value-of select="substring-after($path, '/')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$path" />
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--xsl:choose>
       <xsl:when test="ancestor::w:document ">
         <xsl:text>document.xml</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each
-          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
+          select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
           <xsl:variable name="target">
             <xsl:value-of select="./@Target"/>
           </xsl:variable>
-          <xsl:if test="generate-id(document(concat('word/',$target))//node()) = $rootId">
+          <xsl:if test="generate-id(/oox:package/oox:part[@oox:name=concat('word/',$target)]/node()) = $rootId">
             <xsl:value-of select="$target"/>
           </xsl:if>
         </xsl:for-each>
       </xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose-->
   </xsl:template>
 
   <xsl:template name="GetTarget">
     <xsl:param name="document"/>
     <xsl:param name="id"/>
     
-    <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+    <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
       <xsl:for-each
-        select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
+        select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:value-of select="./@Target"/>   
         </xsl:if>
