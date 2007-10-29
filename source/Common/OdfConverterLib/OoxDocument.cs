@@ -92,8 +92,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     
                     MemoryStream ms = new MemoryStream();
                     XmlTextWriter xtw = new XmlTextWriter(new StreamWriter(ms, Encoding.UTF8));
-                    //XmlTextWriter xtw = new XmlTextWriter(@"C:\tmp\test_dump.xml", Encoding.UTF8);
-
+                    
                     xtw.WriteStartDocument(true);
                     //xtw.WriteProcessingInstruction("mso-application", "progid='Word.Document'");
                     xtw.WriteStartElement(NS_PREFIX, "package", PACKAGE_NS);
