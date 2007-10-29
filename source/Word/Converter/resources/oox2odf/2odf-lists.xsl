@@ -81,12 +81,27 @@
 
           <!-- when numbering style is overriden, num template is used -->
           <xsl:when test="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl">
+
+            <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+            <!--added parameter <xsl:with-param name="numId">-->
+
             <xsl:apply-templates
-              select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]"/>
+              select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]">
+              <xsl:with-param name="numId">
+                <xsl:value-of select="$id"/>
+              </xsl:with-param>
+            </xsl:apply-templates>
+
+            <!--math, dialogika: changed for correct indentation calculation END -->
+            
           </xsl:when>
 
           <xsl:otherwise>
-            <xsl:apply-templates select="."/>
+            <xsl:apply-templates select=".">
+              <xsl:with-param name="numId">
+                <xsl:value-of select="$id"/>
+              </xsl:with-param>
+            </xsl:apply-templates>  
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
@@ -94,6 +109,10 @@
   </xsl:template>
 
   <xsl:template match="w:lvl">
+    <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+    <!--added parameter <xsl:param name="numId">-->
+    <xsl:param name="numId"/>
+    <!--math, dialogika: changed for correct indentation calculation END -->
 
     <xsl:variable name="lvl">
       <xsl:value-of select="number(@w:ilvl)+1"/>
@@ -157,7 +176,18 @@
             <xsl:value-of select="$XlinkHref"/>
           </xsl:attribute>
           <style:list-level-properties>
-            <xsl:call-template name="InsertListLevelProperties"/>
+
+            <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+            <!--added parameter <xsl:with-param name="numId">-->        
+            
+            <xsl:call-template name="InsertListLevelProperties">
+              <xsl:with-param name="numId">
+              <xsl:value-of select="$numId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+
+            <!--math, dialogika: changed for correct indentation calculation END -->          
+            
             <style:text-properties fo:font-size="96"/>
           </style:list-level-properties>
         </text:list-level-style-image>
@@ -177,7 +207,18 @@
             <xsl:call-template name="TextChar"/>
           </xsl:attribute>
           <style:list-level-properties>
-            <xsl:call-template name="InsertListLevelProperties"/>
+
+            <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+            <!--added parameter <xsl:with-param name="numId">-->
+
+            <xsl:call-template name="InsertListLevelProperties">
+              <xsl:with-param name="numId">
+                <xsl:value-of select="$numId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+
+            <!--math, dialogika: changed for correct indentation calculation END -->            
+
           </style:list-level-properties>
           <style:text-properties>
             <xsl:for-each select="w:rPr">
@@ -226,7 +267,18 @@
             </xsl:attribute>
           </xsl:if>
           <style:list-level-properties>
-            <xsl:call-template name="InsertListLevelProperties"/>
+
+            <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+            <!--added parameter <xsl:with-param name="numId">-->
+
+            <xsl:call-template name="InsertListLevelProperties">
+              <xsl:with-param name="numId">
+                <xsl:value-of select="$numId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+
+            <!--math, dialogika: changed for correct indentation calculation END -->
+
           </style:list-level-properties>
         </text:list-level-style-number>
       </xsl:otherwise>
@@ -276,7 +328,7 @@
   </xsl:template>
 
   <!-- text after numbering in list -->
-
+ 
   <xsl:template name="AfterTextNumber">
     <xsl:param name="BeforeAfterNum"/>
     <xsl:choose>
@@ -298,52 +350,380 @@
     </xsl:choose>
   </xsl:template>
 
+
+  <!--math, dialogika: changed for correct indentation calculation BEGIN -->  
+
   <!-- properties for each list level -->
 
   <xsl:template name="InsertListLevelProperties">
+    <xsl:param name="numId"/>
+
     <xsl:variable name="Ind" select="w:pPr/w:ind"/>
+
+    <xsl:variable name="ListStyleInd" select="w:pPr/w:ind"/>
+    
     <xsl:variable name="tab">
       <xsl:value-of select="w:pPr/w:tabs/w:tab/@w:pos"/>
     </xsl:variable>
-
+    
     <xsl:variable name="abstractNumId">
       <xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
     </xsl:variable>
 
-    <xsl:variable name="numId">
-      <xsl:value-of select="w:num[w:abstractNumId/@w:val=$abstractNumId]/@w:numId"/>
-    </xsl:variable>
+    <xsl:variable name="ilvl">
+      <xsl:value-of select="@w:ilvl"/>
+    </xsl:variable>    
+    
+    <!--<xsl:variable name="numId">
+      <xsl:value-of select="../following-sibling::w:num[w:abstractNumId/@w:val=$abstractNumId]/@w:numId"/>
+    </xsl:variable>-->
 
     <xsl:variable name="StyleId">
       <xsl:value-of select="w:pStyle/@w:val"/>
     </xsl:variable>
 
-    <xsl:variable name="paragraph"
-      select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId=$numId]"/>
+    <xsl:variable name="paragraph_ref_this_list_level"
+      select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val=$numId and w:pPr/w:numPr/w:ilvl/@w:val=$ilvl][1]"/>
 
-    <xsl:variable name="WLeft">
+    <xsl:variable name="paragraph_ref_this_styleid"
+      select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:pStyle/@w:val=$StyleId][1]"/>    
+    
+    <xsl:variable name="style"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId][1]"/>
+
+    <xsl:variable name="Hanging">
+      <xsl:choose>        
+        <xsl:when test="$paragraph_ref_this_list_level">
+          <!--Paragraph directly referencing this numID exists-->
+          <xsl:choose>            
+            <xsl:when test="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:hanging">
+              <!--Paragraph has direct formatting -> take this value-->
+              <xsl:value-of select="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:hanging"/>
+            </xsl:when>
+
+            <!--FIRSTLINE: Paragraph has direct formatting firstLine -> firstLine counts-->
+            <xsl:when test="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:firstLine">0</xsl:when>
+            
+            <xsl:otherwise>
+              <!--Paragraph has *NO* direct formatting-->
+              <xsl:choose>
+                <xsl:when test="$ListStyleInd/@w:hanging">
+                  <!--take list style value-->
+                  <xsl:value-of select="$ListStyleInd/@w:hanging"/>
+                </xsl:when>
+              <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>                      
+          </xsl:choose>                    
+        </xsl:when>
+
+        <!--Paragraph directly referencing this numID does *NOT* exist-->
+
+        <xsl:when test="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:hanging">
+          <!-- Use direct formatting of paragraph referencing this paragraph style-->
+          <xsl:value-of select="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:hanging"/>
+        </xsl:when>
+
+        <!--FIRSTLINE: direct formatting of paragraph referencing this paragraph style has firstLine -> firstLine counts-->
+        <xsl:when test="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:firstLine">0</xsl:when>
+          
+        <xsl:when test="$style/w:pPr/w:ind/@w:hanging">
+          <!-- Use paragraph style value-->
+          <xsl:value-of select="$style/w:pPr/w:ind/@w:hanging"/>
+        </xsl:when>
+
+        <!--FIRSTLINE: Paragraph style has firstLine -> firstLine counts-->        
+        <xsl:when test="$style/w:pPr/w:ind/@w:firstLine">0</xsl:when>
+        
+        <xsl:when test="w:pPr/w:ind/@w:hanging">
+          <!-- Use list style value-->
+          <xsl:value-of select="w:pPr/w:ind/@w:hanging"/>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+
+    <xsl:variable name="Left">
+      <xsl:choose>
+        <xsl:when test="$paragraph_ref_this_list_level">
+          <!--Paragraph directly referencing this numID exists-->
+          <xsl:choose>
+            <xsl:when test="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:left">
+              <!--Paragraph has direct formatting -> take this value-->
+              <xsl:value-of select="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:left"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <!--Paragraph has *NO* direct formatting-->
+              <xsl:choose>
+                <xsl:when test="$ListStyleInd/@w:left">
+                  <!--take list style value-->
+                  <xsl:value-of select="$ListStyleInd/@w:left"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+
+        <!--Paragraph directly referencing this numID does *NOT* exist-->
+
+        <xsl:when test="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:left">
+          <!-- Use direct formatting of paragraph referencing this paragraph style-->
+          <xsl:value-of select="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:left"/>
+        </xsl:when>        
+        
+        <xsl:when test="$style/w:pPr/w:ind/@w:left">
+          <!-- Use paragraph style value-->
+          <xsl:value-of select="$style/w:pPr/w:ind/@w:left"/>
+        </xsl:when>
+        <xsl:when test="w:pPr/w:ind/@w:left">
+          <!-- Use list style value-->
+          <xsl:value-of select="w:pPr/w:ind/@w:left"/>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+
+    <xsl:variable name="FirstLine">
+      <xsl:choose>
+        <xsl:when test="$paragraph_ref_this_list_level">
+          <!--Paragraph directly referencing this numID exists-->
+          <xsl:choose>
+            <xsl:when test="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:firstLine">
+              <!--Paragraph has direct formatting -> take this value-->
+              <xsl:value-of select="$paragraph_ref_this_list_level/w:pPr/w:ind/@w:firstLine"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <!--Paragraph has *NO* direct formatting-->
+              <xsl:choose>
+                <xsl:when test="$ListStyleInd/@w:firstLine">
+                  <!--take list style value-->
+                  <xsl:value-of select="$ListStyleInd/@w:firstLine"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+
+        <!--Paragraph directly referencing this numID does *NOT* exist-->
+
+        <xsl:when test="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:firstLine">
+          <!-- Use direct formatting of paragraph referencing this paragraph style-->
+          <xsl:value-of select="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:firstLine"/>
+        </xsl:when>
+
+        <xsl:when test="$style/w:pPr/w:ind/@w:firstLine">
+          <!-- Use paragraph style value-->
+          <xsl:value-of select="$style/w:pPr/w:ind/@w:firstLine"/>
+        </xsl:when>
+        <xsl:when test="w:pPr/w:ind/@w:firstLine">
+          <!-- Use list style value-->
+          <xsl:value-of select="w:pPr/w:ind/@w:firstLine"/>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>    
+    
+
+
+    <!--<xsl:variable name="WLeft">
       <xsl:choose>
         <xsl:when test="$Ind/@w:left">
           <xsl:value-of select="$Ind/@w:left"/>
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
-    </xsl:variable>
+    </xsl:variable>-->    
 
-    <xsl:variable name="WHanging">
+    <!--<xsl:variable name="WLeft">
+      <xsl:choose>
+        <xsl:when test="$paragraph/w:pPr/w:ind/@w:left">
+          <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:left"/>
+        </xsl:when>
+        <xsl:when test="$style/w:pPr/w:ind/@w:left">
+          <xsl:value-of select="$style/w:pPr/w:ind/@w:left"/>
+        </xsl:when>
+        <xsl:when test="w:pPr/w:ind/@w:left">
+          <xsl:value-of select="w:pPr/w:ind/@w:left"/>
+        </xsl:when>        
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>-->
+
+    <!--<xsl:variable name="WHanging">
       <xsl:choose>
         <xsl:when test="$Ind/@w:hanging">
           <xsl:value-of select="$Ind/@w:hanging"/>
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
-    </xsl:variable>
+    </xsl:variable>-->
 
-    <xsl:variable name="WFirstLine">
+    <!--xsl:variable name="WFirstLine">
       <xsl:call-template name="FirstLine"/>
-    </xsl:variable>
+    </xsl:variable>-->
+    
 
+    <xsl:variable name="tabs"
+      select="$paragraph_ref_this_list_level/w:pPr/w:tabs | $paragraph_ref_this_styleid/w:pPr/w:tabs | $style/w:pPr/w:tabs | w:pPr/w:tabs" />
+
+    <xsl:variable name="SpaceToNextTab">
+
+      <xsl:variable name="MinTabOffset">
+        <xsl:value-of select ="350"/>
+      </xsl:variable>      
+      
+      <xsl:choose>
+        <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
+        <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
+        <xsl:otherwise>  
+          
+        <xsl:variable name="MinRelevantCustomTab">
+          <xsl:choose>
+            <xsl:when test="$Hanging != '0'">
+              <!--hanging -> get min custom tab that is between start of first line and start of paragrah text-->
+              <xsl:call-template name="GetMinVal">
+                <xsl:with-param name="values" select="$tabs/w:tab[@w:pos &gt; ( $Left - $Hanging + $MinTabOffset) and @w:pos &lt; $Left ]/@w:pos" />
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+
+              <!--no hanging -> get min custom tab that is bigger than the start of the first line-->
+              <xsl:call-template name="GetMinVal">
+                <xsl:with-param name="values" select="$tabs/w:tab[@w:pos &gt; ( $Left + $FirstLine + $MinTabOffset)]/@w:pos" />
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>      
+        
+        <xsl:choose>
+          <xsl:when test="$Hanging != '0'">
+            
+            <!--hanging-->
+
+            <!--<xsl:value-of select="$Hanging" />-->
+
+            <xsl:choose>
+              <xsl:when test="$MinRelevantCustomTab != 'NaN'">
+                <!--take min relevant custom tab -->
+                <xsl:value-of select="$Hanging - ($Left - $MinRelevantCustomTab)" />
+              </xsl:when>
+              <xsl:otherwise>
+                <!--take hanging value-->
+                <xsl:value-of select="$Hanging" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+
+          <xsl:otherwise>
+
+            <!--no hanging-->
+            
+            <xsl:variable name="DefaultTab">
+              <xsl:value-of select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+            </xsl:variable>
+            <xsl:variable name="NextDefaultTabPos">
+              <xsl:value-of select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
+            </xsl:variable>
+
+            <xsl:choose>
+              <xsl:when test="$MinRelevantCustomTab != 'NaN'">
+                <!--take min relevant custom tab-->
+                <xsl:value-of select="$MinRelevantCustomTab - ($Left + $FirstLine)"/>
+              </xsl:when>
+
+              <xsl:otherwise>
+                <!--take next default tab-->
+                <xsl:value-of select="$NextDefaultTabPos - ($Left + $FirstLine)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            
+          </xsl:otherwise>
+        </xsl:choose>
+
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+      
+    
+    
+    
     <xsl:choose>
+      <xsl:when test="$Hanging != '0'">
+
+        <!--text:space-before-->
+
+        <xsl:attribute name="text:space-before">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+               <xsl:value-of select="$Left - $SpaceToNextTab"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+
+        <!--text:min-label-width-->
+
+        <xsl:attribute name="text:min-label-width">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <!--<xsl:choose>
+                <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
+                <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
+                <xsl:otherwise>-->
+                  <xsl:value-of select="$SpaceToNextTab"/>
+                <!--</xsl:otherwise>
+              </xsl:choose>-->
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      
+      </xsl:when>
+
+      <xsl:otherwise>
+
+        <!--no hanging-->
+
+        <!--text:space-before-->
+
+        <xsl:attribute name="text:space-before">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="$Left - $SpaceToNextTab"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+
+        <!--text:min-label-width-->
+
+        <xsl:attribute name="text:min-label-width">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <!--<xsl:choose>
+                <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
+                <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
+                <xsl:otherwise>-->
+                  <xsl:value-of select="$SpaceToNextTab"/>
+                <!--</xsl:otherwise>
+              </xsl:choose>-->
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>    
+      </xsl:otherwise>
+      
+    </xsl:choose>
+        
+        
+        
+
+
+    <!--<xsl:choose>
       <xsl:when test="$Ind/@w:hanging">
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
@@ -373,6 +753,9 @@
                     </xsl:when>
                     <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
                       <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:hanging"/>
+                    </xsl:when>
+                    <xsl:when test="$style/w:pPr/w:ind/@w:hanging">
+                      <xsl:value-of select="$style/w:pPr/w:ind/@w:hanging"/>
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="$Ind/@w:hanging"/>
@@ -425,12 +808,12 @@
                       test="../w:multiLevelType/@w:val='multilevel' and number($tab) > number($WLeft)">
                       <xsl:value-of select="$tab - number($WLeft)"/>
                     </xsl:when>
-                    <xsl:otherwise>0<!--<xsl:value-of
-                      select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0--></xsl:otherwise>
+                    <xsl:otherwise>0--><!--<xsl:value-of
+                      select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0--><!--</xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
-                <xsl:when test="$WFirstLine = '0'">0<!--<xsl:value-of
-                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0--></xsl:when>
+                <xsl:when test="$WFirstLine = '0'">0--><!--<xsl:value-of
+                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0--><!--</xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:with-param>
@@ -455,8 +838,10 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose>-->
 
+    <!--math, dialogika: changed for correct indentation calculation END -->    
+    
     <!-- Picture Bullet Size -->
     <xsl:if test="w:lvlPicBulletId/@w:val != ''">
       <xsl:attribute name="fo:width">
@@ -500,6 +885,25 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!--math, dialogika: Added template for getting min value of a node-set BEGIN -->  
+  
+  <xsl:template name="GetMinVal">
+    <xsl:param name="values"/>
+    <xsl:choose>
+      <xsl:when test="$values">
+        <xsl:for-each select="$values">
+          <xsl:sort data-type="number" order="ascending"/>
+          <xsl:if test="position()=1">
+            <xsl:value-of select="."/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>NaN</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--math, dialogika: Added template for getting min value of a node-set END -->  
+  
   <!-- ➢types of bullets -->
 
   <xsl:template name="TextChar">
@@ -1119,7 +1523,18 @@
                     <xsl:attribute name="text:min-label-distance">
                     <xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
                     </xsl:attribute>-->
-                  <xsl:call-template name="InsertListLevelProperties"/>
+
+                  <!--math, dialogika: changed for correct indentation calculation END -->
+                  <!--added parameter <xsl:with-param name="numId">-->                  
+
+                  <xsl:call-template name="InsertListLevelProperties">
+                    <xsl:with-param name="numId">
+                      <xsl:value-of select="$numid"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+
+                  <!--math, dialogika: changed for correct indentation calculation END -->                  
+                  
                 </style:list-level-properties>
               </xsl:for-each>
             </xsl:for-each>

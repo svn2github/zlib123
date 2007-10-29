@@ -588,9 +588,15 @@
       <xsl:attribute name="w:val">
         <xsl:choose>
           <!-- to avoid problems when tab-stop cannot be evaluated precisely -->
-          <xsl:when
-            test="@text:display-levels &gt; 1 and not(style:list-level-properties/@text:min-label-distance)"
-            >space</xsl:when>
+
+          <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+          <xsl:when test="@text:display-levels &gt; 1 and not(style:list-level-properties/@text:min-label-distance) and not(style:list-level-properties/@text:min-label-width)">
+            <!--<xsl:when test="@text:display-levels &gt; 1 and not(style:list-level-properties/@text:min-label-distance)"-->
+
+            <!--math, dialogika: changed for correct indentation calculation END -->
+
+            >space
+          </xsl:when>
           <!-- if no numbering defined -->
           <xsl:when test="@style:num-format = '' ">nothing</xsl:when>
           <!-- if numbering is too large -->
@@ -1383,9 +1389,10 @@
       <xsl:attribute name="w:pos">
         <xsl:choose>
           <xsl:when test="$firstLineIndent != 0 and $tabVal = 'num' ">
-            <xsl:value-of
-              select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip"
-            />
+            <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+            <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip + $spaceBeforeTwip" />
+            <!--<xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip />-->
+            <!--math, dialogika: changed for correct indentation calculation END -->
           </xsl:when>
           <xsl:when test="$spaceBeforeTwip &lt; 0">
             <xsl:choose>
@@ -1472,8 +1479,12 @@
       <!-- List element with numbering, or outlined heading -->
       <xsl:when
         test="(number($defaultOutlineLevel) or $defaultOutlineLevel = 0) or (not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())))">
-        <xsl:if
-          test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0 or $enforceOverride = 'true' ">
+
+        <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+        <xsl:if  test="$addLeftIndent != 0 or $spaceBeforeTwip != 0 or $minLabelWidthTwip != 0 or $addRightIndent !=  0 or $firstLineIndent != 0 or $enforceOverride = 'true' ">          
+        <!--<xsl:if  test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0 or $enforceOverride = 'true' ">-->
+        <!--math, dialogika: changed for correct indentation calculation END -->          
+        
           <w:ind w:left="{$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip}"
             w:right="{$addRightIndent}">
             <!-- first line and hanging indent -->
@@ -1484,7 +1495,12 @@
                 </xsl:attribute>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:choose>
+                
+                <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+                <xsl:attribute name="w:hanging">
+                  <xsl:value-of select="-($firstLineIndent - $minLabelWidthTwip)"/>
+                </xsl:attribute>
+                <!--<xsl:choose>
                   <xsl:when test="$minLabelWidthTwip &lt; 0">
                     <xsl:attribute name="w:firstLine">
                       <xsl:value-of select="$minLabelWidthTwip"/>
@@ -1495,7 +1511,9 @@
                       <xsl:value-of select="$minLabelWidthTwip"/>
                     </xsl:attribute>
                   </xsl:otherwise>
-                </xsl:choose>
+                </xsl:choose>-->
+
+                <!--math, dialogika: changed for correct indentation calculation END -->
               </xsl:otherwise>
             </xsl:choose>
           </w:ind>

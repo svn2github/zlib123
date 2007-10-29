@@ -2622,18 +2622,25 @@
   <xsl:template name="CheckIfList">
     <xsl:param name="StyleId"/>
     <xsl:choose>
-      <xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">
+
+      <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+      
+      <!--<xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">-->
+      <xsl:when test="w:numPr/w:numId/@w:val">        
         <xsl:text>true</xsl:text>
       </xsl:when>
-      <xsl:when
-        test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">
+      <!--<xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+      <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
         <xsl:text>true</xsl:text>
       </xsl:when>
 
-      <xsl:when
-        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">
+      <!--<xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">        
         <xsl:text>true</xsl:text>
       </xsl:when>
+
+      <!--math, dialogika: changed for correct indentation calculation END -->
+      
       <xsl:otherwise>
         <xsl:text>false</xsl:text>
       </xsl:otherwise>
@@ -3019,12 +3026,29 @@
     <!-- insert attributes using template -->
     <xsl:call-template name="InsertParagraphBreakBefore"/>
     <xsl:call-template name="InsertParagraphAutoSpace"/>
+
+    <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+    <!--added parameter <xsl:with-param name="StyleContext">-->
+    
     <xsl:call-template name="InsertParagraphIndent">
       <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
       <xsl:with-param name="CheckIfList" select="$CheckIfList"/>
       <xsl:with-param name="IndHanging" select="$IndHanging"/>
       <xsl:with-param name="IndLeft" select="$IndLeft"/>
+      <xsl:with-param name="StyleContext">
+        <xsl:choose>
+          <xsl:when test="parent::w:style/@w:styleId">
+            <xsl:value-of select="'true'"/>    
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'false'"/>
+          </xsl:otherwise>
+        </xsl:choose>       
+      </xsl:with-param>      
     </xsl:call-template>
+
+    <!--math, dialogika: changed for correct indentation calculation END -->
+    
     <xsl:call-template name="InsertParagraphWidowControl"/>
     <xsl:call-template name="InsertSuppressLineNumbering"/>
 
@@ -3287,15 +3311,423 @@
     </xsl:if>
   </xsl:template>
 
+
+  <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+
   <!-- space before/after -->
   <xsl:template name="InsertParagraphIndent">
     <xsl:param name="MarginLeft"/>
     <xsl:param name="CheckIfList"/>
     <xsl:param name="IndHanging"/>
     <xsl:param name="IndLeft"/>
+    <xsl:param name="StyleContext"/>
+
+    <xsl:choose>
+      <xsl:when test="$CheckIfList = 'true'">
+
+        <!-- in list -->
+
+        <xsl:attribute name="fo:margin-left">0cm</xsl:attribute>
+
+        <xsl:choose>
+
+          <xsl:when test="$StyleContext = 'true'">
+            <!--in style context-->
+            <xsl:attribute name="fo:text-indent">0cm</xsl:attribute>
+          </xsl:when>
+
+          <xsl:otherwise>
+
+            <!--not in style context-->
+
+            <xsl:variable name="DirectNumId">
+              <xsl:value-of select="w:numPr/w:numId/@w:val"/>
+            </xsl:variable>
+
+            <xsl:variable name="DirectIlvl">
+              <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
+            </xsl:variable>
+
+            <xsl:variable name="NumberingDefinitions"
+              select="document('word/numbering.xml')/w:numbering"/>
+
+            <xsl:variable name="DirectAbstractNumId">
+              <xsl:value-of select="$NumberingDefinitions/w:num[$DirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
+            </xsl:variable>
+
+            <xsl:variable name="DirectListLevelDefinition"
+               select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $DirectAbstractNumId]/w:lvl[@w:ilvl=$DirectIlvl][1]"/>
+
+            <xsl:variable name="StyleId">
+              <xsl:value-of select="w:pStyle/@w:val"/>
+            </xsl:variable>
+
+            <xsl:variable name="ParagraphStyleDefinition"
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId][1]"/>
+
+            <xsl:variable name="IndirectNumId">
+              <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
+            </xsl:variable>
+
+            <xsl:variable name="IndirectAbstractNumId">
+              <xsl:value-of select="$NumberingDefinitions/w:num[$IndirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
+            </xsl:variable>
+
+            <xsl:variable name="IndirectIlvl">
+              <xsl:choose>
+                <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val">
+                  <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val"/>
+                </xsl:when>
+                <xsl:when test="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]">
+                  <xsl:value-of select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]/@w:ilvl"/>
+                </xsl:when>
+                <!--assume default level 0-->
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
+            <xsl:variable name="IndirectListLevelDefinition"
+               select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
+
+            <xsl:variable name ="Suffix">
+              <xsl:choose>
+                <xsl:when test="$DirectListLevelDefinition/w:suff/@w:val">
+                  <xsl:value-of select="$DirectListLevelDefinition/w:suff/@w:val" />
+                </xsl:when>
+                <xsl:when test="$IndirectListLevelDefinition/w:suff/@w:val">
+                  <xsl:value-of select="$IndirectListLevelDefinition/w:suff/@w:val" />
+                </xsl:when>
+                <xsl:otherwise>'tab'</xsl:otherwise>
+              </xsl:choose>              
+            </xsl:variable>            
+
+            <xsl:variable name="Hanging">
+              <xsl:choose>
+                <xsl:when test="w:ind/@w:hanging">
+                  <!--Paragraph has direct formatting -> take this value-->
+                  <xsl:value-of select="w:ind/@w:hanging"/>
+                </xsl:when>
+
+                <xsl:otherwise>
+                  <!--Paragraph has *NO* direct formatting-->
+
+                  <xsl:choose>
+
+                    <!-- FIRSTLINE: direct firstLine counts-->
+                    <xsl:when test="w:ind/@w:firstLine">0</xsl:when>
+
+                    <xsl:when test="$DirectListLevelDefinition/w:pPr/w:ind/@w:hanging">
+                      <!--take directly referenced list style value -->
+                      <xsl:value-of select="$DirectListLevelDefinition/w:pPr/w:ind/@w:hanging"/>
+                    </xsl:when>
+
+                    <!--FIRSTLINE: directly referenced list style firstLine value counts-->
+                    <xsl:when test="$DirectListLevelDefinition/w:pPr/w:ind/@w:firstLine">0</xsl:when>
+
+                    <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:ind/@w:hanging">
+                      <!--take paragraph style value-->
+                      <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:ind/@w:hanging"/>
+                    </xsl:when>
+
+                    <!--FIRSTLINE: paragraph style firstLine value counts-->
+                    <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:ind/@w:firstLine">0</xsl:when>
+
+                    <xsl:when test="$IndirectListLevelDefinition/w:pPr/w:ind/@w:hanging">
+                      <!--take list style value referenced by paragraph style-->
+                      <xsl:value-of select="$IndirectListLevelDefinition/w:pPr/w:ind/@w:hanging"/>
+                    </xsl:when>
+
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
+
+            <xsl:variable name="FirstLine">
+              <xsl:choose>
+
+                <!--hanging has more priority than firstline-->
+                <xsl:when test="$Hanging != '0'">0</xsl:when>
+
+                <xsl:when test="w:ind/@w:firstLine">
+                  <!--Paragraph has direct formatting -> take this value-->
+                  <xsl:value-of select="w:ind/@w:firstLine"/>
+                </xsl:when>
+
+                <xsl:otherwise>
+                  <!--Paragraph has *NO* direct formatting-->
+
+                  <xsl:choose>
+
+                    <xsl:when test="$DirectListLevelDefinition/w:pPr/w:ind/@w:firstLine">
+                      <!--take directly referenced list style value -->
+                      <xsl:value-of select="$DirectListLevelDefinition/w:pPr/w:ind/@w:firstLine"/>
+                    </xsl:when>
+
+                    <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:ind/@w:firstLine">
+                      <!--take paragraph style value-->
+                      <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:ind/@w:firstLine"/>
+                    </xsl:when>
+
+                    <xsl:when test="$IndirectListLevelDefinition/w:pPr/w:ind/@w:firstLine">
+                      <!--take list style value referenced by paragraph style-->
+                      <xsl:value-of select="$IndirectListLevelDefinition/w:pPr/w:ind/@w:firstLine"/>
+                    </xsl:when>
+
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
+
+            <xsl:variable name="Left">
+              <xsl:choose>
+                <xsl:when test="w:ind/@w:left">
+                  <!--Paragraph has direct formatting -> take this value-->
+                  <xsl:value-of select="w:ind/@w:left"/>
+                </xsl:when>
+
+                <xsl:otherwise>
+                  <!--Paragraph has *NO* direct formatting-->
+
+                  <xsl:choose>
+
+                    <xsl:when test="$DirectListLevelDefinition/w:pPr/w:ind/@w:left">
+                      <!--take directly referenced list style value -->
+                      <xsl:value-of select="$DirectListLevelDefinition/w:pPr/w:ind/@w:left"/>
+                    </xsl:when>
+
+                    <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:ind/@w:left">
+                      <!--take paragraph style value-->
+                      <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:ind/@w:left"/>
+                    </xsl:when>
+
+                    <xsl:when test="$IndirectListLevelDefinition/w:pPr/w:ind/@w:left">
+                      <!--take list style value referenced by paragraph style-->
+                      <xsl:value-of select="$IndirectListLevelDefinition/w:pPr/w:ind/@w:left"/>
+                    </xsl:when>
+
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
+
+            <xsl:variable name="tabs"
+              select="$DirectListLevelDefinition/w:pPr/w:tabs | $IndirectListLevelDefinition/w:pPr/w:tabs | $ParagraphStyleDefinition/w:pPr/w:tabs | w:tabs" />
+
+            <xsl:variable name="SpaceToNextTab">
+              
+              <xsl:variable name="MinTabOffset">
+                <xsl:value-of select ="350"/>
+              </xsl:variable>
+
+              <xsl:choose>
+                <xsl:when test="$Suffix='nothing'">0</xsl:when>
+                <xsl:when test="$Suffix='space'">350</xsl:when>
+                <xsl:otherwise>
+
+                  <xsl:variable name="MinRelevantCustomTab">
+                  <xsl:choose>
+                    <xsl:when test="$Hanging != '0'">
+                      <!--hanging -> get min custom tab that is between start of first line and start of paragrah text-->
+                      <xsl:call-template name="GetMinVal">
+                        <xsl:with-param name="values" select="$tabs/w:tab[@w:pos &gt; ( $Left - $Hanging + $MinTabOffset) and @w:pos &lt; $Left ]/@w:pos" />
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+
+                      <!--no hanging -> get min custom tab that is bigger than the start of the first line-->
+                      <xsl:call-template name="GetMinVal">
+                        <xsl:with-param name="values" select="$tabs/w:tab[@w:pos &gt; ( $Left + $FirstLine + $MinTabOffset)]/@w:pos" />
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <xsl:choose>
+                  <xsl:when test="$Hanging != '0'">
+
+                    <!--hanging-->
+
+                    <!--<xsl:value-of select="$Hanging" />-->
+
+                    <xsl:choose>
+                      <xsl:when test="$MinRelevantCustomTab != 'NaN'">
+                        <!--take min relevant custom tab -->
+                        <xsl:value-of select="$Hanging - ($Left - $MinRelevantCustomTab)" />
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <!--take hanging value-->
+                        <xsl:value-of select="$Hanging" />
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:when>
+
+                  <xsl:otherwise>
+
+                    <!--no hanging-->
+
+                    <xsl:variable name="DefaultTab">
+                      <xsl:value-of select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+                    </xsl:variable>
+                    <xsl:variable name="NextDefaultTabPos">
+                      <xsl:value-of select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
+                    </xsl:variable>
+
+                    <xsl:choose>
+                      <xsl:when test="$MinRelevantCustomTab != 'NaN'">
+                        <!--take min relevant custom tab-->
+                        <xsl:value-of select="$MinRelevantCustomTab - ($Left + $FirstLine)"/>
+                      </xsl:when>
+
+                      <xsl:otherwise>
+                        <!--take next default tab-->
+                        <xsl:value-of select="$NextDefaultTabPos - ($Left + $FirstLine)"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+
+                  </xsl:otherwise>
+                </xsl:choose>
+
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>        
+
+
+            <xsl:choose>
+              <xsl:when test="$Hanging != '0'">
+
+                <!--text-indent with hanging-->
+
+                <xsl:attribute name="fo:text-indent">
+                  <xsl:call-template name="ConvertTwips">
+                    <xsl:with-param name="length">
+                      <xsl:value-of select="$SpaceToNextTab - $Hanging"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="unit">cm</xsl:with-param>
+                  </xsl:call-template>
+                </xsl:attribute>
+
+              </xsl:when>
+
+              <xsl:otherwise>
+
+                <!--text-indent without hanging-->
+
+                <!--<xsl:variable name="RelevantCustomTabs"
+                   select="$tabs/w:tab[@w:pos &gt; ( $Left + $FirstLine + $MinTabOffset)]" />
+
+                <xsl:variable name="MinRelevantCustomTab">
+                  <xsl:choose>
+                    <xsl:when test="$RelevantCustomTabs/@w:pos">
+                      <xsl:for-each select="$RelevantCustomTabs/@w:pos">
+                        <xsl:sort data-type="number" order="ascending"/>
+                        <xsl:if test="position()=1">
+                          <xsl:value-of select="."/>
+                        </xsl:if>
+                      </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>NaN</xsl:otherwise>
+                  </xsl:choose>                  
+                </xsl:variable>
+
+                <xsl:variable name="SpaceToNextTab">
+                  <xsl:variable name="DefaultTab">
+                    <xsl:value-of select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+                  </xsl:variable>
+                  <xsl:variable name="NextDefaultTabPos">
+                    <xsl:value-of select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
+                  </xsl:variable>
+
+                  <xsl:choose>
+                    <xsl:when test="$MinRelevantCustomTab != 'NaN'">
+                      <xsl:value-of select="$MinRelevantCustomTab - ($Left + $FirstLine)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$NextDefaultTabPos - ($Left + $FirstLine)"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+
+                </xsl:variable>-->
+
+                <xsl:attribute name="fo:text-indent">
+                  <xsl:call-template name="ConvertTwips">
+                    <xsl:with-param name="length">
+                      <xsl:value-of select="$FirstLine + $SpaceToNextTab"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="unit">cm</xsl:with-param>
+                  </xsl:call-template>
+                </xsl:attribute>
+
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
+
+
+      <xsl:otherwise>
+
+        <!-- not in list -->
+
+        <!-- margin left -->
+
+        <xsl:attribute name="fo:margin-left">
+          <xsl:choose>
+            <xsl:when test="$MarginLeft != '' and $MarginLeft != 'NaN' and $MarginLeft != 0">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="$MarginLeft"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>0cm</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+
+        <!-- text indent -->
+
+        <xsl:variable name="FirstLine">
+          <xsl:call-template name="FirstLine"/>
+        </xsl:variable>
+
+        <xsl:variable name="TextIndent">
+          <xsl:choose>
+            <xsl:when test="$FirstLine != 'NaN'">
+              <xsl:value-of select="$FirstLine"/>
+            </xsl:when>
+            <xsl:when test="$CheckIfList = 'true' and $IndHanging = $IndLeft and $IndLeft != ''">0</xsl:when>
+            <xsl:when test="$CheckIfList = 'true' and $IndHanging != '' and $IndLeft !=''">
+              <xsl:value-of select="-$IndHanging"/>
+            </xsl:when>
+            <xsl:when test="$CheckIfList = 'true'">0</xsl:when>
+            <xsl:when test="$IndHanging != ''">
+              <xsl:value-of select="-$IndHanging"/>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:if test="$TextIndent != ''">
+          <xsl:attribute name="fo:text-indent">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$TextIndent"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <!-- margin left -->
-    <xsl:attribute name="fo:margin-left">
+    <!--<xsl:attribute name="fo:margin-left">
       <xsl:choose>
         <xsl:when test="$MarginLeft != '' and $MarginLeft != 'NaN' and $MarginLeft != 0">
           <xsl:call-template name="ConvertTwips">
@@ -3327,7 +3759,7 @@
           <xsl:value-of select="-$IndHanging"/>
         </xsl:when>
       </xsl:choose>
-    </xsl:variable>
+    </xsl:variable>-->
     <!-- margin right -->
     <xsl:if test="w:ind/@w:right">
       <xsl:attribute name="fo:margin-right">
@@ -3340,7 +3772,7 @@
       </xsl:attribute>
     </xsl:if>
     <!-- text indent -->
-    <xsl:if test="$TextIndent != ''">
+    <!--<xsl:if test="$TextIndent != ''">
       <xsl:attribute name="fo:text-indent">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
@@ -3349,8 +3781,10 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-    </xsl:if>
+    </xsl:if>-->
   </xsl:template>
+
+  <!--math, dialogika: changed for correct indentation calculation END -->
 
   <!-- widow and orphan-->
   <xsl:template name="InsertParagraphWidowControl">

@@ -292,7 +292,176 @@
       <xsl:value-of select="@text:style-name"/>
     </xsl:variable>
     <xsl:if test="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-left">
+
+      <!--math, dialogika: changed for correct indentation calculation of headings 
+      that are not in an <text:list> element but have an outline level BEGIN -->
+      
+      <xsl:variable name = "ParagraphProperties"
+         select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties" />
+
+      <xsl:variable name="MarginLeft">
+        <xsl:value-of select="$ParagraphProperties/@fo:margin-left"/>
+      </xsl:variable>
+     
+      <xsl:variable name="OutlineLvl">
+        <xsl:choose>
+          <xsl:when test="@text:outline-level">
+            <xsl:value-of select="@text:outline-level"/>
+          </xsl:when>
+          <xsl:otherwise>NaN</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="OutlineLvlProperties"
+        select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level = $OutlineLvl]/style:list-level-properties" />     
+                
+      <xsl:variable name="SpaceBefore">
+        <xsl:choose>
+          <xsl:when test="$OutlineLvlProperties/@text:space-before" >
+            <xsl:value-of select="$OutlineLvlProperties/@text:space-before" />
+          </xsl:when>
+          <xsl:otherwise>0cm</xsl:otherwise>
+        </xsl:choose>        
+      </xsl:variable>
+
+      <xsl:variable name="MinLabelWidth">
+        <xsl:choose>
+          <xsl:when test="$OutlineLvlProperties/@text:min-label-width" >
+            <xsl:value-of select="$OutlineLvlProperties/@text:min-label-width" />
+          </xsl:when>
+          <xsl:otherwise>0cm</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="MinLabelDistance">
+        <xsl:choose>
+          <xsl:when test="$OutlineLvlProperties/@text:min-label-distance" >
+            <xsl:value-of select="$OutlineLvlProperties/@text:min-label-distance" />
+          </xsl:when>
+          <xsl:otherwise>0cm</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>      
+
+      <xsl:variable name="TextIndent">
+        <xsl:choose>
+          <xsl:when test="$ParagraphProperties/@fo:text-indent" >
+            <xsl:value-of select="$ParagraphProperties/@fo:text-indent" />
+          </xsl:when>
+          <xsl:otherwise>0cm</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+
       <w:ind>
+        
+        <xsl:attribute name="w:left">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="concat(substring-before($MarginLeft, 'cm') + substring-before($SpaceBefore, 'cm') + substring-before($MinLabelWidth, 'cm'),'cm')" />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+
+        <xsl:attribute name="w:right">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="$ParagraphProperties/@fo:margin-right"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+
+        <xsl:variable name="FirstLineIndent">
+          <xsl:value-of select="substring-before($TextIndent, 'cm') - substring-before($MinLabelWidth, 'cm')" />                      
+        </xsl:variable>
+
+        <xsl:choose>
+        <xsl:when test="$FirstLineIndent &gt; 0">
+            <xsl:attribute name="w:firstLine">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="concat($FirstLineIndent,'cm')" />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="w:hanging">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="concat(-$FirstLineIndent,'cm')" />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:otherwise>        
+        </xsl:choose>
+       
+      </w:ind>
+
+      <xsl:variable name="MarginLeftTwip">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$MarginLeft" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="TextIndentTwip">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$TextIndent" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="MinLabelDistanceTwip">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$MinLabelDistance" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:variable name="MinLabelWidthTwip">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$MinLabelWidth" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="SpaceBeforeTwip">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$SpaceBefore" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <w:tabs>
+
+        <xsl:call-template name="InsertNumberingTab">
+          <xsl:with-param name="tabVal">num</xsl:with-param>
+          <xsl:with-param name="addLeftIndent" select="$MarginLeftTwip"/>
+          <xsl:with-param name="firstLineIndent" select="$TextIndentTwip"/>
+          <xsl:with-param name="minLabelDistanceTwip" select="$MinLabelDistanceTwip"/>
+          <xsl:with-param name="minLabelWidthTwip" select="$MinLabelWidthTwip"/>
+          <xsl:with-param name="spaceBeforeTwip" select="$SpaceBeforeTwip"/>
+        </xsl:call-template>
+      </w:tabs>      
+
+      <!--<xsl:call-template name="InsertTabStops">
+        <xsl:with-param name="styleName" select="$styleName"/>
+        <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+        <xsl:with-param name="enforceOverride" select="$enforceOverride"/>
+        <xsl:with-param name="addLeftIndent" select="$addLeftIndent"/>
+        <xsl:with-param name="firstLineIndent" select="$firstLineIndent"/>
+        <xsl:with-param name="displayedLevels" select="$displayedLevels"/>
+        <xsl:with-param name="minLabelDistanceTwip" select="$minLabelDistanceTwip"/>
+        <xsl:with-param name="minLabelWidthTwip" select="$minLabelWidthTwip"/>
+        <xsl:with-param name="spaceBeforeTwip" select="$spaceBeforeTwip"/>
+      </xsl:call-template>-->
+      
+      <!--<w:ind>
         <xsl:attribute name="w:left">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
@@ -330,7 +499,11 @@
             </xsl:when>
           </xsl:choose>
         </xsl:if>
-      </w:ind>
+      </w:ind>-->
+
+      <!--math, dialogika: changed for correct indentation calculation of headings 
+      that are not in an <text:list> element but have an outline level END -->
+      
     </xsl:if>
 
     

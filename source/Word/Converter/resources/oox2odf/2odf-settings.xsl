@@ -43,6 +43,15 @@
           <config:config-item config:name="AddParaTableSpacing" config:type="boolean">
             <xsl:value-of select="'false'"/>
           </config:config-item>
+
+          <!--math, dialogika: Added for correct indentation calculation BEGIN -->
+          
+          <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">
+            <xsl:value-of select="'false'"/>
+          </config:config-item>
+
+          <!--math, dialogika: Added for correct indentation calculation END -->
+          
         </config:config-item-set >
 
         </office:settings>
