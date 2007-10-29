@@ -53,11 +53,11 @@
   *************************************************************************
   -->
   
-  <xsl:variable name="pm1" select="concat('PAGE', generate-id(/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr))"/>
+  <xsl:variable name="pm1" select="concat('PAGE', generate-id(key('Part', 'word/document.xml')/w:document/w:body/w:sectPr))"/>
 
   <!-- global variable to warn if document is number (retrieve numbering when necessary -->
   <xsl:variable name="lines-are-numbered">
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+    <xsl:for-each select="key('Part', 'word/document.xml')">
       <xsl:choose>
         <xsl:when test="key('sectPr', '')/w:lnNumType">true</xsl:when>
         <xsl:otherwise>false</xsl:otherwise>
@@ -880,27 +880,27 @@
   <xsl:template name="styles">
     <office:document-styles>
       <office:font-face-decls>
-        <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/fontTable.xml']/w:fonts"/>
+        <xsl:apply-templates select="key('Part', 'word/fontTable.xml')/w:fonts"/>
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
         <!--gradient fill -->
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/descendant::v:rect">
+        <xsl:for-each select="key('Part', 'word/document.xml')/w:document/descendant::v:rect">
           <xsl:if test="v:fill/@type = 'gradient'">
             <xsl:call-template name="InsertGradientFill"/>
           </xsl:if>
         </xsl:for-each>
         <!--heading numbering style, insert outline numbering style only if heading style is linked to level in Word (numId and outlineLvl are in styles.xml Heading style defintion) -->
         <xsl:if
-          test="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
+          test="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
           <xsl:call-template name="InsertOutlineListStyle"/>
         </xsl:if>
         <!-- document styles -->
         <xsl:call-template name="InsertDefaultStyles"/>
-        <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles"/>
+        <xsl:apply-templates select="key('Part', 'word/styles.xml')/w:styles"/>
         <xsl:call-template name="InsertNotesConfiguration"/>
         <xsl:if
-          test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
+          test="key('Part', 'word/document.xml')/w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
           <xsl:call-template name="BibliographyConfiguration"/>
         </xsl:if>
         <!-- Insert List Style Properties -->
@@ -912,13 +912,13 @@
       <office:automatic-styles>
         <xsl:call-template name="HeaderFooterAutomaticStyle"/>
         <!-- TODO : create other automatic styles. This one handles only the default (last w:sectPr of document.xml). -->
-        <xsl:if test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr">
+        <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="InsertDefaultPageLayout"/>
         </xsl:if>
       </office:automatic-styles>
       <!-- master styles -->
       <office:master-styles>
-        <xsl:if test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr">
+        <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="InsertDefaultMasterPage"/>
         </xsl:if>
       </office:master-styles>
@@ -931,7 +931,7 @@
   -->
   <xsl:template name="InsertDefaultStyles">
 
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+    <xsl:for-each select="key('Part', 'word/styles.xml')">
       <!-- paragraph default -->
       <xsl:call-template name="InsertDefaultParagraphStyle"/>
       <!-- text default -->
@@ -1023,11 +1023,11 @@
 
   <!--default tab-stop-->
   <xsl:template name="InsertDefaultTabStop">
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:defaultTabStop/@w:val">
+    <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val">
       <xsl:attribute name="style:tab-stop-distance">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length"
-            select="number(/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:defaultTabStop/@w:val)"/>
+            select="number(key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val)"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
@@ -1140,10 +1140,10 @@
   </xsl:template>
 
   <xsl:template name="HeaderFooterAutomaticStyle">
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr">
+    <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
       <xsl:call-template name="HeaderFooterStyles"/>
     </xsl:for-each>
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:sectPr">
+    <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:call-template name="HeaderFooterStyles"/>
     </xsl:for-each>
   </xsl:template>
@@ -1154,8 +1154,8 @@
         <xsl:when test="./@w:type = 'default'">
           <xsl:variable name="headerId" select="./@r:id"/>
           <xsl:variable name="headerXmlDocument"
-            select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$headerId]/@Target)"/>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name=$headerXmlDocument]">
+            select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <xsl:for-each select="key('Part', $headerXmlDocument)">
 
             <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
@@ -1163,17 +1163,17 @@
             <!-- Generate automatic Styles for pict/shapes/textboxes-->
             <xsl:apply-templates mode="automaticpict"/>
 
-            <xsl:if test="/oox:package/oox:part[@oox:name=$headerXmlDocument]/w:hdr[descendant::w:numPr/w:numId]">
+            <xsl:if test="key('Part', $headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+              <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'even'">
           <xsl:variable name="headerId" select="./@r:id"/>
           <xsl:variable name="headerXmlDocument"
-            select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$headerId]/@Target)"/>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name=$headerXmlDocument]">
+            select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <xsl:for-each select="key('Part', $headerXmlDocument)">
 
             <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
@@ -1181,17 +1181,17 @@
             <!-- Generate automatic Styles for pict/shapes/textboxes-->
             <xsl:apply-templates mode="automaticpict"/>
 
-            <xsl:if test="/oox:package/oox:part[@oox:name=$headerXmlDocument]/w:hdr[descendant::w:numPr/w:numId]">
+            <xsl:if test="key('Part', $headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+              <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'first'">
           <xsl:variable name="headerId" select="./@r:id"/>
           <xsl:variable name="headerXmlDocument"
-            select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$headerId]/@Target)"/>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name=$headerXmlDocument]">
+            select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <xsl:for-each select="key('Part', $headerXmlDocument)">
 
             <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
@@ -1199,9 +1199,9 @@
             <!-- Generate automatic Styles for pict/shapes/textboxes-->
             <xsl:apply-templates mode="automaticpict"/>
 
-            <xsl:if test="/oox:package/oox:part[@oox:name=$headerXmlDocument]/w:hdr[descendant::w:numPr/w:numId]">
+            <xsl:if test="key('Part', $headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+              <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
@@ -1212,8 +1212,8 @@
         <xsl:when test="./@w:type = 'default'">
           <xsl:variable name="footerId" select="./@r:id"/>
           <xsl:variable name="footerXmlDocument"
-            select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$footerId]/@Target)"/>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name=$footerXmlDocument]">
+            select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <xsl:for-each select="key('Part', $footerXmlDocument)">
 
             <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
@@ -1221,17 +1221,17 @@
             <!-- Generate automatic Styles for pict/shapes/textboxes-->
             <xsl:apply-templates mode="automaticpict"/>
 
-            <xsl:if test="/oox:package/oox:part[@oox:name=$footerXmlDocument]/w:ftr[descendant::w:numPr/w:numId]">
+            <xsl:if test="key('Part', $footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+              <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'even'">
           <xsl:variable name="footerId" select="./@r:id"/>
           <xsl:variable name="footerXmlDocument"
-            select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$footerId]/@Target)"/>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name=$footerXmlDocument]">
+            select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <xsl:for-each select="key('Part', $footerXmlDocument)">
 
             <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
@@ -1239,17 +1239,17 @@
             <!-- Generate automatic Styles for pict/shapes/textboxes-->
             <xsl:apply-templates mode="automaticpict"/>
 
-            <xsl:if test="/oox:package/oox:part[@oox:name=$footerXmlDocument]/w:ftr[descendant::w:numPr/w:numId]">
+            <xsl:if test="key('Part', $footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+              <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'first'">
           <xsl:variable name="footerId" select="./@r:id"/>
           <xsl:variable name="footerXmlDocument"
-            select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$footerId]/@Target)"/>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name=$footerXmlDocument]">
+            select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <xsl:for-each select="key('Part', $footerXmlDocument)">
 
             <!-- Generate automatic Styles for paragraphs-->
             <xsl:apply-templates mode="automaticstyles"/>
@@ -1257,9 +1257,9 @@
             <!-- Generate automatic Styles for pict/shapes/textboxes-->
             <xsl:apply-templates mode="automaticpict"/>
 
-            <xsl:if test="/oox:package/oox:part[@oox:name=$footerXmlDocument]/w:ftr[descendant::w:numPr/w:numId]">
+            <xsl:if test="key('Part', $footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
               <!-- automatic list styles-->
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+              <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
@@ -1274,23 +1274,23 @@
     <!-- actually, this assumption is false : w:body/w:sectPr does not carry any default section properties
         it is simply the last section of the document. There are no default section properties in an OOX document -->
     <style:master-page style:name="Standard" style:page-layout-name="{$pm1}">
-      <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr">
+      <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:call-template name="HeaderFooter"/>
       </xsl:for-each>
     </style:master-page>
     <!-- first page default master page -->
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr/w:titlePg">
+    <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
       <style:master-page style:name="First_Page" style:page-layout-name="{$pm1}"
         style:next-style-name="Standard" style:display-name="First Page">
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr">
+        <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="HeaderFooterFirst"/>
         </xsl:for-each>
       </style:master-page>
     </xsl:if>
 
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:sectPr">
+    <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <!-- create first-page of section master page -->
-      <xsl:if test="w:titlePg or /oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr/w:titlePg">
+      <xsl:if test="w:titlePg or key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
         <style:master-page>
           <xsl:attribute name="style:name">
             <xsl:value-of select="concat('First_H_',generate-id(.))"/>
@@ -1310,7 +1310,7 @@
               <xsl:call-template name="HeaderFooterFirst"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr">
+              <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
                 <xsl:call-template name="HeaderFooterFirst"/>
               </xsl:for-each>
             </xsl:otherwise>
@@ -1332,14 +1332,14 @@
       </style:master-page>
     </xsl:for-each>
 
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:sectPr">
+    <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:if
         test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
         or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
         or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient
-        or /oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
-        or /oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
-        or /oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+        or key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
+        or key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
+        or key('Part', 'word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
         <style:master-page>
           <xsl:attribute name="style:name">
             <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
@@ -1391,9 +1391,9 @@
         <xsl:if test="$headerId != ''">
           <style:header>
             <xsl:variable name="headerXmlDocument"
-              select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$headerId]/@Target)"/>
+              select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
             <!-- change context to get header content -->
-            <xsl:for-each select="/oox:package/oox:part[@oox:name=$headerXmlDocument]">
+            <xsl:for-each select="key('Part', $headerXmlDocument)">
               <xsl:apply-templates/>
             </xsl:for-each>
           </style:header>
@@ -1402,7 +1402,7 @@
     </xsl:choose>
     <!--END clam bugfix #1802289-->
 
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:evenAndOddHeaders">
+    <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:evenAndOddHeaders">
       <xsl:variable name="headerIdEven">
         <xsl:choose>
           <xsl:when test="w:headerReference/@w:type = 'even'">
@@ -1416,9 +1416,9 @@
       <xsl:choose>
         <xsl:when test="$headerIdEven != ''">
           <style:header-left>
-            <xsl:variable name="headerXmlDocument" select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$headerIdEven]/@Target)" />
+            <xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)" />
             <!-- change context to get header content -->
-            <xsl:for-each select="/oox:package/oox:part[@oox:name=$headerXmlDocument]">
+            <xsl:for-each select="key('Part', $headerXmlDocument)">
               <xsl:apply-templates/>
             </xsl:for-each>
           </style:header-left>
@@ -1447,15 +1447,15 @@
     <xsl:if test="$footerId != ''">
       <style:footer>
         <xsl:variable name="footerXmlDocument"
-          select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$footerId]/@Target)"/>
+          select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
         <!-- change context to get footer content -->
-        <xsl:for-each select="/oox:package/oox:part[@oox:name=$footerXmlDocument]">
+        <xsl:for-each select="key('Part', $footerXmlDocument)">
           <xsl:apply-templates/>
         </xsl:for-each>
       </style:footer>
     </xsl:if>
 
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:evenAndOddHeaders">
+    <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:evenAndOddHeaders">
       <xsl:variable name="footerIdEven">
         <xsl:choose>
           <xsl:when test="w:footerReference/@w:type = 'even'">
@@ -1472,9 +1472,9 @@
         <xsl:when test="$footerIdEven != ''">
           <style:footer-left>
             <xsl:variable name="footerXmlDocument"
-              select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$footerIdEven]/@Target)"/>
+              select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerIdEven]/@Target)"/>
             <!-- change context to get footer content -->
-            <xsl:for-each select="/oox:package/oox:part[@oox:name=$footerXmlDocument]">
+            <xsl:for-each select="key('Part', $footerXmlDocument)">
               <xsl:apply-templates/>
             </xsl:for-each>
           </style:footer-left>
@@ -1502,9 +1502,9 @@
     <xsl:if test="$headerId != ''">
       <style:header>
         <xsl:variable name="headerXmlDocument"
-          select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$headerId]/@Target)"/>
+          select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
         <!-- change context to get header content -->
-        <xsl:for-each select="/oox:package/oox:part[@oox:name=$headerXmlDocument]">
+        <xsl:for-each select="key('Part', $headerXmlDocument)">
           <xsl:apply-templates/>
         </xsl:for-each>
       </style:header>
@@ -1524,9 +1524,9 @@
     <xsl:if test="$footerId != ''">
       <style:footer>
         <xsl:variable name="footerXmlDocument"
-          select="concat('word/',/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/descendant::node()[@Id=$footerId]/@Target)"/>
+          select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
         <!-- change context to get footer content -->
-        <xsl:for-each select="/oox:package/oox:part[@oox:name=$footerXmlDocument]">
+        <xsl:for-each select="key('Part', $footerXmlDocument)">
           <xsl:apply-templates/>
         </xsl:for-each>
       </style:footer>
@@ -1536,12 +1536,12 @@
   <!-- handle default page layout -->
   <xsl:template name="InsertDefaultPageLayout">
     <style:page-layout style:name="{$pm1}">
-      <xsl:if test="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:mirrorMargins">
+      <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:mirrorMargins">
         <xsl:attribute name="style:page-usage">
           <xsl:text>mirrored</xsl:text>
         </xsl:attribute>
       </xsl:if>
-      <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr">
+      <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
         <style:page-layout-properties>
           <xsl:call-template name="InsertPageLayoutProperties"/>
           <xsl:call-template name="InsertColumns"/>
@@ -1566,9 +1566,9 @@
         </xsl:if>
       </xsl:for-each>
     </style:page-layout>
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:sectPr">
+    <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <style:page-layout>
-        <xsl:if test="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:mirrorMargins">
+        <xsl:if test="key('Part', 'word/settings.xml')/w:settings/w:mirrorMargins">
           <xsl:attribute name="style:page-usage">
             <xsl:text>mirrored</xsl:text>
           </xsl:attribute>
@@ -1660,12 +1660,12 @@
   <xsl:template name="InsertCustomFootnoteSeperator">
 
     <!-- Get the font size of the style referenced to the default paragraph -->
-    <xsl:variable name="paraStyle" select="/oox:package/oox:part[@oox:name='word/styles.xml']//w:styles/w:style[@w:default='1']/w:pPr/w:pStyle/@w:val" />
-    <xsl:variable name="charStyle" select="/oox:package/oox:part[@oox:name='word/styles.xml']//w:styles/w:style[@w:styleId='$paraStyle']/w:basedOn/@w:val" />
+    <xsl:variable name="paraStyle" select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:pStyle/@w:val" />
+    <xsl:variable name="charStyle" select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:styleId='$paraStyle']/w:basedOn/@w:val" />
     <xsl:variable name="fontSize" >
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length">
-          <xsl:value-of select="/oox:package/oox:part[@oox:name='word/styles.xml']//w:styles/w:style[@w:styleId='$charStyle']/w:rPr/w:sz/@w:val" />
+          <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:styleId='$charStyle']/w:rPr/w:sz/@w:val" />
         </xsl:with-param>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
@@ -1675,7 +1675,7 @@
     <xsl:variable name="spaceBefore">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="length">
-          <xsl:value-of select="/oox:package/oox:part[@oox:name='word/styles.xml']//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
+          <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
         </xsl:with-param>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
@@ -1685,7 +1685,7 @@
     <xsl:variable name="spaceAfter">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="length">
-          <xsl:value-of select="/oox:package/oox:part[@oox:name='word/styles.xml']//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
+          <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
         </xsl:with-param>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
@@ -2043,7 +2043,7 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:choose>
-                  <xsl:when test="/oox:package/oox:part[@oox:name='word/settings.xml']//w:settings/w:gutterAtTop">
+                  <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
                     <xsl:choose>
                       <xsl:when test="w:pgMar/@w:top &lt; 0">
                         <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter"/>
@@ -2108,7 +2108,7 @@
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
             <xsl:choose>
-              <xsl:when test="/oox:package/oox:part[@oox:name='word/settings.xml']//w:settings/w:gutterAtTop">
+              <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
                 <xsl:value-of select="w:pgMar/@w:left"/>
               </xsl:when>
               <xsl:otherwise>
@@ -2321,7 +2321,7 @@
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:top &lt; 0">
                       <xsl:choose>
-                        <xsl:when test="/oox:package/oox:part[@oox:name='word/settings.xml']//w:settings/w:gutterAtTop">
+                        <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
                           <xsl:choose>
                             <xsl:when
                               test=" - w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header"
@@ -2344,7 +2344,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:choose>
-                        <xsl:when test="/oox:package/oox:part[@oox:name='word/settings.xml']//w:settings/w:gutterAtTop">
+                        <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
                           <xsl:choose>
                             <xsl:when
                               test="w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
@@ -2418,7 +2418,7 @@
     <xsl:param name="currentStyleId"/>
     <style:tab-stops>
       <xsl:for-each
-        select="/oox:package/oox:part[@oox:name='word/document.xml']/descendant::w:pPr[w:pStyle/@w:val = $currentStyleId][1]/w:tabs/w:tab">
+        select="key('Part', 'word/document.xml')/descendant::w:pPr[w:pStyle/@w:val = $currentStyleId][1]/w:tabs/w:tab">
         <xsl:call-template name="InsertTabs"/>
       </xsl:for-each>
     </style:tab-stops>
@@ -2665,9 +2665,9 @@
           />
         </xsl:when>
         <xsl:when
-          test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
+          test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
           <xsl:value-of
-            select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
+            select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
           />
         </xsl:when>
         <xsl:otherwise>
@@ -2675,7 +2675,7 @@
             <xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
           </xsl:variable>
           <xsl:value-of
-            select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[w:abstractNumId/@w:val = $Abstract]/@w:numId"
+            select="key('Part', 'word/numbering.xml')/w:numbering/w:num[w:abstractNumId/@w:val = $Abstract]/@w:numId"
           />
         </xsl:otherwise>
       </xsl:choose>
@@ -2690,7 +2690,7 @@
           <xsl:value-of select="./@w:ilvl"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+          <xsl:for-each select="key('Part', 'word/styles.xml')">
             <xsl:choose>
               <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
                 <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"/>
@@ -2705,9 +2705,9 @@
     <xsl:variable name="AbstractNumId">
       <xsl:choose>
         <xsl:when
-          test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
+          test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
           <xsl:value-of
-            select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
+            select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
           />
         </xsl:when>
       </xsl:choose>
@@ -2718,15 +2718,15 @@
         <xsl:value-of select="w:ind/@w:firstLine"/>
       </xsl:when>
       <xsl:when
-        test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
+        test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
         <xsl:value-of
-          select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
+          select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
         />
       </xsl:when>
       <xsl:when
-        test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
+        test="key('Part', 'word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
         <xsl:value-of
-          select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine"
+          select="key('Part', 'word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine"
         />
       </xsl:when>
       <xsl:otherwise>NaN</xsl:otherwise>
@@ -2753,9 +2753,9 @@
               />
             </xsl:when>
             <xsl:when
-              test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
+              test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
               <xsl:value-of
-                select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
+                select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
               />
             </xsl:when>
           </xsl:choose>
@@ -2767,7 +2767,7 @@
               <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+              <xsl:for-each select="key('Part', 'word/styles.xml')">
                 <xsl:choose>
                   <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
                     <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"/>
@@ -2782,9 +2782,9 @@
         <xsl:variable name="AbstractNumId">
           <xsl:choose>
             <xsl:when
-              test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
+              test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
               <xsl:value-of
-                select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
+                select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
               />
             </xsl:when>
           </xsl:choose>
@@ -2793,15 +2793,15 @@
         <xsl:variable name="LeftNumber">
           <xsl:choose>
             <xsl:when
-              test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left">
+              test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left">
               <xsl:value-of
-                select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
+                select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
               />
             </xsl:when>
             <xsl:when
-              test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
+              test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
               <xsl:value-of
-                select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left"
+                select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left"
               />
             </xsl:when>
           </xsl:choose>
@@ -2810,15 +2810,15 @@
         <xsl:variable name="HangingNumber">
           <xsl:choose>
             <xsl:when
-              test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging">
+              test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging">
               <xsl:value-of
-                select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging"
+                select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging"
               />
             </xsl:when>
             <xsl:when
-              test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging">
+              test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging">
               <xsl:value-of
-                select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging"
+                select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging"
               />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
@@ -2831,9 +2831,9 @@
               <xsl:value-of select="w:ind/@w:firstLine"/>
             </xsl:when>
             <xsl:when
-              test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
+              test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
               <xsl:value-of
-                select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
+                select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
               />
             </xsl:when>
             <xsl:otherwise>NaN</xsl:otherwise>
@@ -2846,7 +2846,7 @@
             <xsl:value-of select="$IndLeft"/>
           </xsl:when>
           <xsl:when test=" $LeftNumber = '' and $IndLeft =''">
-            <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+            <xsl:for-each select="key('Part', 'word/styles.xml')">
               <xsl:choose>
                 <xsl:when
                   test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != '' and key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''">
@@ -2888,7 +2888,7 @@
           </xsl:when>
           <xsl:otherwise>
             <!-- Regression JP 24.08.2007 <xsl:variable name="context" select="self::node()"/>-->
-            <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+            <xsl:for-each select="key('Part', 'word/styles.xml')">
               <xsl:choose>
                 <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
                 <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
@@ -3148,7 +3148,7 @@
                                       If not specified will use the default style -->
 
     <!-- Switch context in order to parse the styles in word/styles.xml -->
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles">
+    <xsl:for-each select="key('Part', 'word/styles.xml')/w:styles">
       <xsl:choose>
 
         <!-- We have a named style... -->
@@ -3831,12 +3831,12 @@
             <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
           </xsl:call-template>
         </xsl:for-each>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
           <xsl:for-each select="key('StyleId', $parentStyleId)/w:pPr">
             <xsl:if test="w:tabs">
               <xsl:for-each select="w:tabs/w:tab">
                 <xsl:if
-                  test="not(/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos)">
+                  test="not(key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos)">
                   <xsl:call-template name="InsertTabs">
                     <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
                   </xsl:call-template>
@@ -3848,7 +3848,7 @@
             <xsl:if test="w:tabs">
               <xsl:for-each select="w:tabs/w:tab">
                 <xsl:if
-                  test="not(/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos) and not(key('StyleId',$parentStyleId)/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
+                  test="not(key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos) and not(key('StyleId',$parentStyleId)/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
                   <xsl:call-template name="InsertTabs">
                     <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
                   </xsl:call-template>
@@ -4461,7 +4461,7 @@
               <xsl:otherwise>
                 <xsl:variable name="defaultFontSize">
                   <xsl:value-of
-                    select="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val"
+                    select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val"
                   />
                 </xsl:variable>
                 <xsl:value-of select="round(w:position/@w:val * 100 div number($defaultFontSize))"/>
@@ -4516,7 +4516,7 @@
     <xsl:param name="fontTheme"/>
     <xsl:param name="fontType"/>
     <xsl:variable name="fontScheme"
-      select="/oox:package/oox:part[@oox:name='word/theme/theme1.xml']/a:theme/a:themeElements/a:fontScheme"/>
+      select="key('Part', 'word/theme/theme1.xml')/a:theme/a:themeElements/a:fontScheme"/>
 
     <xsl:variable name="fontName">
       <xsl:choose>
@@ -4556,7 +4556,7 @@
     <xsl:if test="$lines-are-numbered = 'true' ">
       <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
         style:family="text"/>
-      <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+      <xsl:for-each select="key('Part', 'word/document.xml')">
         <text:linenumbering-configuration text:style-name="Line_20_numbering" style:num-format="1"
           text:count-empty-lines="false" text:number-position="left">
           <!-- if no section is set to continuous, restart on every page -->
@@ -4592,7 +4592,7 @@
 
   <!-- Insert List Style Properties -->
   <xsl:template name="ListStyleProperties">
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum">
+    <xsl:for-each select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum">
       <style:style style:family="text">
         <xsl:attribute name="style:name">
           <xsl:value-of select="generate-id()"/>
@@ -4613,7 +4613,7 @@
     <xsl:variable name="documentParagraphWBeforeNormal"
       select="key('StyleId', 'Normal')/w:pPr/w:spacing/@w:before"/>
     <xsl:variable name="documentParagraphWBeforeDefault"
-      select="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before"/>
+      select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before"/>
 
     <xsl:choose>
 
@@ -4648,7 +4648,7 @@
     <xsl:variable name="documentParagraphWAfterNormal"
       select="key('StyleId', 'Normal')/w:pPr/w:spacing/@w:after"/>
     <xsl:variable name="documentParagraphWAfterDefault"
-      select="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after"/>
+      select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after"/>
 
     <xsl:choose>
       <xsl:when

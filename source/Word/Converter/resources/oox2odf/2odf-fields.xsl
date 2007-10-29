@@ -1477,10 +1477,10 @@
 
         <xsl:variable name="rId">
           <xsl:value-of
-            select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/Relationships/Relationship[@Target = $docName]/@Id"
+            select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship[@Target = $docName]/@Id"
           />
         </xsl:variable>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+        <xsl:for-each select="key('Part', 'word/document.xml')">
           <xsl:for-each
             select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
             <xsl:if test="w:pgNumType/@w:chapStyle">
@@ -1533,7 +1533,7 @@
     <xsl:param name="TextIdentifier"/>
 
     <xsl:variable name="Path"
-      select="/oox:package/oox:part[@oox:name='customXml/item1.xml']/b:Sources/b:Source[b:Tag = $TextIdentifier]"/>
+      select="key('Part', 'customXml/item1.xml')/b:Sources/b:Source[b:Tag = $TextIdentifier]"/>
 
     <xsl:variable name="BibliographyType" select="$Path/b:SourceType"/>
 

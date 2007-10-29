@@ -25,7 +25,7 @@
   exclude-result-prefixes="w wp r uri a pic oox">
 
   <xsl:template name="CopyPictures">
-     <xsl:param name="document"/>
+    <xsl:param name="document"/>
     <xsl:param name="rId"/>
     <xsl:param name="targetName"/>
     <xsl:param name="destFolder" select="'Pictures'"/>
@@ -42,9 +42,9 @@
       </xsl:choose>
   </xsl:variable>
     
-    <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
+    <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
       <xsl:for-each
-        select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship']">
+        select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:variable name="targetmode">
             <xsl:value-of select="./@TargetMode"/>
@@ -96,7 +96,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each
-          select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
+          select="key('Part', 'word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
           <xsl:variable name="target">
             <xsl:value-of select="./@Target"/>
           </xsl:variable>
@@ -112,9 +112,9 @@
     <xsl:param name="document"/>
     <xsl:param name="id"/>
     
-    <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
+    <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
       <xsl:for-each
-        select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship']">
+        select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:value-of select="./@Target"/>   
         </xsl:if>

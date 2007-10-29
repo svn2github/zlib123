@@ -155,7 +155,7 @@
         <xsl:variable name="XlinkHref">
           <xsl:variable name="pzipsource">
             <xsl:value-of
-              select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship'][@Id=$rId]/@Target"
+              select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship'][@Id=$rId]/@Target"
             />
           </xsl:variable>
           <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'/'))"/>
@@ -385,10 +385,10 @@
     </xsl:variable>
 
     <xsl:variable name="paragraph_ref_this_list_level"
-      select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val=$numId and w:pPr/w:numPr/w:ilvl/@w:val=$ilvl][1]"/>
+      select="key('Part', 'word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val=$numId and w:pPr/w:numPr/w:ilvl/@w:val=$ilvl][1]"/>
 
     <xsl:variable name="paragraph_ref_this_styleid"
-      select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p[w:pPr/w:pStyle/@w:val=$StyleId][1]"/>    
+      select="key('Part', 'word/document.xml')/w:document/w:body/w:p[w:pPr/w:pStyle/@w:val=$StyleId][1]"/>    
     
     <xsl:variable name="style"
       select="key('StyleId', $StyleId)[1]"/>
@@ -625,7 +625,7 @@
             <!--no hanging-->
             
             <xsl:variable name="DefaultTab">
-              <xsl:value-of select="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:defaultTabStop/@w:val"/>
+              <xsl:value-of select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
             </xsl:variable>
             <xsl:variable name="NextDefaultTabPos">
               <xsl:value-of select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>
@@ -954,7 +954,7 @@
       <xsl:otherwise>
         <xsl:if test="$style/w:basedOn">
           <xsl:variable name="parentStyle" select="$style/w:basedOn/@w:val"/>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+          <xsl:for-each select="key('Part', 'word/styles.xml')">
             <xsl:call-template name="GetListStyleProperty">
               <xsl:with-param name="style" select="key('StyleId', $parentStyle)"/>
               <xsl:with-param name="property" select="$property"/>
@@ -1039,15 +1039,15 @@
 
         <!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
         <xsl:when
-          test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$numId]/w:lvlOverride">
+          test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:lvlOverride">
           <xsl:value-of select="concat('LO',$numId)"/>
         </xsl:when>
 
         <xsl:when
-          test="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = /oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink">
+          test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink">
           <xsl:variable name="linkedStyle">
             <xsl:value-of
-              select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:abstractNum[@w:abstractNumId = /oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink/@w:val"
+              select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink/@w:val"
             />
           </xsl:variable>
           <xsl:variable name="linkedNumId">
@@ -1056,14 +1056,14 @@
             />
           </xsl:variable>
           <xsl:value-of
-            select="concat('L',/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$linkedNumId]/w:abstractNumId/@w:val)"
+            select="concat('L',key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$linkedNumId]/w:abstractNumId/@w:val)"
           />
         </xsl:when>
 
         <!-- otherwise, list style is referred to abstractNumId -->
         <xsl:otherwise>
           <xsl:value-of
-            select="concat('L',/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val)"
+            select="concat('L',key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val)"
           />
         </xsl:otherwise>
       </xsl:choose>
@@ -1438,7 +1438,7 @@
   <!-- inserts automatic list styles with empty num format for elements which has non-existent w:num attached -->
   <xsl:template match="w:numId" mode="automaticstyles">
     <xsl:variable name="numId" select="@w:val"/>
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/numbering.xml']">
+    <xsl:for-each select="key('Part', 'word/numbering.xml')">
       <xsl:if test="key('numId',@w:val) = ''">
         <xsl:call-template name="InsertDefaultListStyle">
           <xsl:with-param name="numId" select="$numId"/>
@@ -1454,7 +1454,7 @@
     <text:outline-style>
       <!--create outline level style only for styles which have outlineLvl and numId what means that list level is linked to a style -->
       <xsl:for-each
-        select="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr and contains(@w:styleId,'Heading')]">
+        select="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr and contains(@w:styleId,'Heading')]">
         <xsl:variable name="styleId">
           <xsl:value-of select="@w:styleId"/>
         </xsl:variable>
@@ -1477,7 +1477,7 @@
             <xsl:attribute name="text:level">
               <xsl:value-of select="./w:pPr/w:outlineLvl/@w:val +1"/>
             </xsl:attribute>
-            <xsl:for-each select="/oox:package/oox:part[@oox:name='word/numbering.xml']">
+            <xsl:for-each select="key('Part', 'word/numbering.xml')">
               <xsl:variable name="abstractNum" select="key('abstractNumId',key('numId',$numId)/w:abstractNumId/@w:val)"/>
               <!--w:lvl shows which level defintion should be taken from abstract num-->
               <xsl:for-each select="$abstractNum/w:lvl[@w:ilvl = $levelId][1]">

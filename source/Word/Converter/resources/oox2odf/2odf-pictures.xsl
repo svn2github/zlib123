@@ -156,7 +156,7 @@
 
       <!-- image href from relationships-->
       <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" xlink:href="">
-        <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
+        <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
           <xsl:call-template name="InsertImageHref">
             <xsl:with-param name="document" select="$document"/>
           </xsl:call-template>
@@ -336,7 +336,7 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:for-each
-      select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship']">
+      select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
       <xsl:if test="./@Id=$id">
         <xsl:variable name="targetmode">
           <xsl:value-of select="./@TargetMode"/>

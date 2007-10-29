@@ -406,18 +406,18 @@
         <xsl:when test="contains($instrTextContent,'\o')"> 
         
           <xsl:variable name="CountOutlineLevel">
-            <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+            <xsl:for-each select="key('Part', 'word/document.xml')">
               <xsl:value-of select="count(key('OutlineLevel', '')/@w:val)"/>
             </xsl:for-each>
           </xsl:variable>
           <xsl:variable name="CountStyleOutlineLevel">
-            <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+            <xsl:for-each select="key('Part', 'word/styles.xml')">
               <xsl:value-of select="count(key('OutlineLevel', '')/@w:val)"/>
             </xsl:for-each>  
           </xsl:variable>         
           <xsl:choose>
             <xsl:when test="$CountOutlineLevel > 0">
-              <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+              <xsl:for-each select="key('Part', 'word/document.xml')">
                 <xsl:call-template name="GetOutlineLevelMax">
                   <xsl:with-param name="value">0</xsl:with-param>
                   <xsl:with-param name="count">                    
@@ -427,7 +427,7 @@
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="$CountStyleOutlineLevel > 0">
-              <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+              <xsl:for-each select="key('Part', 'word/styles.xml')">
                 <xsl:call-template name="GetOutlineLevelMax">
                   <xsl:with-param name="value">0</xsl:with-param>
                   <xsl:with-param name="count">                    
@@ -800,7 +800,7 @@
   <xsl:template name="InsertBibliographyProperties">
     
     <xsl:variable name="Style">
-      <xsl:value-of select="/oox:package/oox:part[@oox:name='customXml/item1.xml']/b:Sources/@StyleName"/>
+      <xsl:value-of select="key('Part', 'customXml/item1.xml')/b:Sources/@StyleName"/>
     </xsl:variable> 
     
     <text:bibliography-entry-template text:bibliography-type="book">
@@ -1035,7 +1035,7 @@
     
     <xsl:variable name="ancestor-style" select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
     
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+    <xsl:for-each select="key('Part', 'word/styles.xml')">
     <xsl:choose>
       <xsl:when test="$tabCount > 0">
         <xsl:choose>

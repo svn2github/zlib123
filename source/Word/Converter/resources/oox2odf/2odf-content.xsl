@@ -73,7 +73,7 @@
     <office:document-content>
       <office:scripts/>
       <office:font-face-decls>
-        <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/fontTable.xml']/w:fonts"/>
+        <xsl:apply-templates select="key('Part', 'word/fontTable.xml')/w:fonts"/>
       </office:font-face-decls>
       <office:automatic-styles>
         <!-- automatic styles for document body -->
@@ -96,14 +96,14 @@
   <!--  generates automatic styles for frames -->
   <xsl:template name="InsertFrameStyle">
     <!-- when w:pict is child of paragraph-->
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:r/w:pict">
-      <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:r/w:pict"
+    <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
+      <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict"
         mode="automaticpict"/>
     </xsl:if>
 
     <!-- when w:pict is child of a cell-->
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
-      <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict"
+    <xsl:if test="key('Part', 'word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
+      <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict"
         mode="automaticpict"/>
     </xsl:if>
 
@@ -112,36 +112,36 @@
 
   <!--  generates automatic styles for sections-->
   <xsl:template name="InsertSectionsStyles">
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:sectPr">
+    <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:apply-templates
-        select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:sectPr"
+        select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr"
         mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
 
   <!--  generates automatic styles for paragraphs  ho w does it exactly work ?? -->
   <xsl:template name="InsertBodyStyles">
-    <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body"
+    <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body"
       mode="automaticstyles"/>
   </xsl:template>
 
   <xsl:template name="InsertListStyles">
     <!-- document with lists-->
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+    <xsl:for-each select="key('Part', 'word/document.xml')">
       <xsl:choose>
         <xsl:when test="key('pPr', '')/w:numPr/w:numId">
           <!-- automatic list styles with empty num format for elements which has non-existent w:num attached -->
           <xsl:apply-templates
-            select="key('pPr', '')/w:numPr/w:numId[not(/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num/@w:numId = @w:val)][1]"
+            select="key('pPr', '')/w:numPr/w:numId[not(key('Part', 'word/numbering.xml')/w:numbering/w:num/@w:numId = @w:val)][1]"
             mode="automaticstyles"/>
           <!-- automatic list styles-->
-          <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+          <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+          <xsl:for-each select="key('Part', 'word/styles.xml')">
             <xsl:if test="key('pPr', '')/w:numPr/w:numId">
               <!-- automatic list styles-->
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num"/>
+              <xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:otherwise>
@@ -151,67 +151,21 @@
 
   <xsl:template name="InsertFootnoteStyles">
     <xsl:if
-      test="/oox:package/oox:part[@oox:name='word/footnotes.xml']/w:footnotes/w:footnote/w:p/w:r/w:rPr | 
-      /oox:package/oox:part[@oox:name='word/footnotes.xml']/w:footnotes/w:footnote/w:p/w:pPr">
-      <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/footnotes.xml']/w:footnotes/w:footnote/w:p"
+      test="key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr | 
+      key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
+      <xsl:apply-templates select="key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p"
         mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertEndnoteStyles">
     <xsl:if
-      test="/oox:package/oox:part[@oox:name='word/endnotes.xml']/w:endnotes/w:endnote/w:p/w:r/w:rPr | 
-      /oox:package/oox:part[@oox:name='word/footnotes.xml']/w:footnotes/w:footnote/w:p/w:pPr">
-      <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/endnotes.xml']/w:endnotes/w:endnote/w:p"
+      test="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p/w:r/w:rPr | 
+      key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
+      <!-- divo: TODO check for copy and paste error in above test. shouldn't it be endnotes.xml twice??? -->
+      <xsl:apply-templates select="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p"
         mode="automaticstyles"/>
     </xsl:if>
-  </xsl:template>
-
-  <!--  inserts document elements-->
-  <xsl:template name="InsertDocumentBody">
-    <xsl:choose>
-      <xsl:when test="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:p/w:pPr/w:sectPr">
-        <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body"
-          mode="sections"/>
-      </xsl:when>
-    </xsl:choose>
-    <xsl:apply-templates
-      select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"
-    />
-  </xsl:template>
-
-  <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
-  <xsl:template
-    match="w:pPr[parent::w:p]|w:r[parent::w:p[not(child::w:pPr)] and (child::w:br[@w:type='page' or @w:type='column'] or contains(child::w:pict/v:shape/@style,'mso-position-horizontal-relative:char'))]"
-    mode="automaticstyles">
-    <xsl:message terminate="no">progress:w:pPr</xsl:message>
-    <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
-      <xsl:call-template name="InsertParagraphParentStyle"/>
-      <xsl:call-template name="MasterPageName"/>
-
-      <style:paragraph-properties>
-        <xsl:call-template name="InsertDefaultTabStop"/>
-        <xsl:call-template name="InsertParagraphProperties"/>
-      </style:paragraph-properties>
-      <!-- add text-properties to empty paragraphs. -->
-      <xsl:if test="parent::w:p[count(child::node()) = 1]/w:pPr/w:rPr">
-        <style:text-properties>
-          <xsl:call-template name="InsertTextProperties"/>
-        </style:text-properties>
-      </xsl:if>
-    </style:style>
-  </xsl:template>
-
-  <xsl:template
-    match="w:p[not(./w:pPr) and not(w:r/w:br[@w:type='page' or @w:type='column']) and not(descendant::w:pict)]"
-    mode="automaticstyles">
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:docDefaults/w:pPrDefault">
-      <style:style style:name="{generate-id(.)}" style:family="paragraph">
-        <xsl:call-template name="MasterPageName"/>
-        <xsl:call-template name="InsertDefaultParagraphProperties"/>
-      </style:style>
-    </xsl:if>
-    <xsl:apply-templates mode="automaticstyles"/>
   </xsl:template>
 
   <!--  when paragraph has no parent style it should be set to Normal style which contains all default paragraph properties -->
@@ -240,6 +194,53 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--  inserts document elements-->
+  <xsl:template name="InsertDocumentBody">
+    <xsl:choose>
+      <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+        <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body"
+          mode="sections"/>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:apply-templates
+      select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"
+    />
+  </xsl:template>
+
+  <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
+  <xsl:template
+    match="w:pPr[parent::w:p]|w:r[parent::w:p[not(child::w:pPr)] and (child::w:br[@w:type='page' or @w:type='column'] or contains(child::w:pict/v:shape/@style,'mso-position-horizontal-relative:char'))]"
+    mode="automaticstyles">
+    <xsl:message terminate="no">progress:w:pPr</xsl:message>
+    <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
+      <xsl:call-template name="InsertParagraphParentStyle"/>
+      <xsl:call-template name="MasterPageName"/>
+
+      <style:paragraph-properties>
+        <xsl:call-template name="InsertDefaultTabStop"/>
+        <xsl:call-template name="InsertParagraphProperties"/>
+      </style:paragraph-properties>
+      <!-- add text-properties to empty paragraphs. -->
+      <xsl:if test="parent::w:p[count(child::node()) = 1]/w:pPr/w:rPr">
+        <style:text-properties>
+          <xsl:call-template name="InsertTextProperties"/>
+        </style:text-properties>
+      </xsl:if>
+    </style:style>
+  </xsl:template>
+
+  <xsl:template
+    match="w:p[not(./w:pPr) and not(w:r/w:br[@w:type='page' or @w:type='column']) and not(descendant::w:pict)]"
+    mode="automaticstyles">
+    <xsl:if test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
+      <style:style style:name="{generate-id(.)}" style:family="paragraph">
+        <xsl:call-template name="MasterPageName"/>
+        <xsl:call-template name="InsertDefaultParagraphProperties"/>
+      </style:style>
+    </xsl:if>
+    <xsl:apply-templates mode="automaticstyles"/>
+  </xsl:template>
+
   <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. Ignore runs with no properties. -->
   <xsl:template match="w:rPr[parent::w:r and not(count(child::node())=1 and child::w:noProof)]"
     mode="automaticstyles">
@@ -264,7 +265,7 @@
   <!--  get outline level from styles hierarchy for headings -->
   <xsl:template name="GetStyleOutlineLevel">
     <xsl:param name="outline"/>
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+    <xsl:for-each select="key('Part', 'word/styles.xml')">
       <xsl:variable name="basedOn">
         <xsl:value-of select="key('StyleId', $outline)[1]/w:basedOn/@w:val"/>
       </xsl:variable>
@@ -287,7 +288,7 @@
   <!-- Get outlineLvl if the paragraf is heading -->
   <xsl:template name="GetOutlineLevel">
     <xsl:param name="node"/>
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+    <xsl:for-each select="key('Part', 'word/styles.xml')">
       <xsl:choose>
         <xsl:when test="$node/w:pPr/w:pStyle/@w:val">
           <xsl:variable name="outline">
@@ -330,7 +331,7 @@
   <!-- get outlineLvl if the paragraph's ancestor is heading -->
   <xsl:template name="GetDummyOutlineLevel">
     <xsl:param name="node"/>
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+    <xsl:for-each select="key('Part', 'word/styles.xml')">
       <xsl:choose>
         <xsl:when test="$node/w:pPr/w:pStyle/@w:val">
           <xsl:variable name="outline">
@@ -409,7 +410,7 @@
     <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
 
     <xsl:variable name="ifNormal">
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
           <xsl:if test="key('StyleId', $styleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
         </xsl:for-each>
     </xsl:variable>
@@ -426,7 +427,7 @@
         <xsl:variable name="precedingStyleId" select="w:pPr/w:pStyle/@w:val"/>
         
         <xsl:variable name="ifPrecedingNormal">
-          <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+          <xsl:for-each select="key('Part', 'word/styles.xml')">
             <xsl:if test="key('StyleId', $precedingStyleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
           </xsl:for-each>
         </xsl:variable>
@@ -441,7 +442,10 @@
       </xsl:for-each>
       </xsl:if>
     </xsl:variable>
-   
+
+    <!--xsl:variable name="test1" select="key('p', @oox:id)" />
+    <xsl:variable name="test2" select="key('p', @oox:id - 1)" />
+    <xsl:variable name="test3" select="preceding::w:p[1]" /-->
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
       <xsl:when
@@ -458,10 +462,10 @@
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
       
       <xsl:when
-        test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and /oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
+        test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
         <!--xsl:when
-          test="$numId != '' and $level &lt; 10 and /oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
-          and not(/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
+          test="$numId != '' and $level &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
+          and not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
         <xsl:apply-templates select="." mode="list">
           <xsl:with-param name="numId" select="$numId"/>
           <xsl:with-param name="level" select="$level"/>
@@ -562,7 +566,7 @@
     </xsl:variable>
 
     <!--check if there's a any numId in document-->
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+    <xsl:for-each select="key('Part', 'word/document.xml')">
       <xsl:choose>
         <xsl:when test="key('pPr','')/w:numPr/w:ins"/>
         <xsl:when test="key('pPr', '')/w:numPr/w:numId">
@@ -572,7 +576,7 @@
         </xsl:when>
         <xsl:otherwise>
           <!--check if there's a any numId in styles-->
-          <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+          <xsl:for-each select="key('Part', 'word/styles.xml')">
             <xsl:if test="key('pPr', '')/w:numPr/w:numId">
               <xsl:call-template name="InsertListHeader">
                 <xsl:with-param name="numId" select="$numId"/>
@@ -587,7 +591,7 @@
   <!--  set heading as list header (needed when number was deleted manually)-->
   <xsl:template name="InsertListHeader">
     <xsl:param name="numId"/>
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/numbering.xml']">
+    <xsl:for-each select="key('Part', 'word/numbering.xml')">
       <xsl:if test="not(key('numId', $numId))">
         <xsl:attribute name="text:is-list-header">
           <xsl:text>true</xsl:text>
@@ -633,7 +637,7 @@
         </xsl:variable>
         <text:p>
           <xsl:if
-            test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or /oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:docDefaults/w:pPrDefault">
+            test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
@@ -781,7 +785,7 @@
             </xsl:call-template>
           </xsl:variable>
           <xsl:for-each
-            select="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]//node()[name() = 'Relationship']">
+            select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
             <xsl:if test="./@Id=$relationshipId">
               <xsl:call-template name="GetLinkPath">
                 <xsl:with-param name="linkHref" select="@Target"/>
@@ -1007,6 +1011,12 @@
 
   <xsl:template match="w:noBreakHyphen">–</xsl:template>
 
+
+  <!-- 
+  *************************************************************************
+  Templates for creating Automatic Styles
+  *************************************************************************
+  -->
   <!-- page or column break must have style defined in paragraph -->
   <xsl:template match="w:br[@w:type='page' or @w:type='column']" mode="automaticstyles">
     <xsl:if test="not(ancestor::w:p/w:pPr)">
@@ -1068,11 +1078,11 @@
         whereas followingSectPr defines properties of current section -->
     <xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
     <xsl:param name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
-    <xsl:param name="mainSectPr" select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr"/>
+    <xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
     <!-- divo TODO: make this optimization work in any context -->
     <!--xsl:param name="precSectPr" select="key('sectPr', number(@oox:s) - 1)"/>
     <xsl:param name="followingSectPr" select="key('sectPr', @oox:s)"/>
-    <xsl:param name="mainSectPr" select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/w:sectPr"/-->
+    <xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/-->
 
     <xsl:choose>
       <!-- first case : current section is continuous with preceding section (test if precSectPr exist to avoid bugs) -->

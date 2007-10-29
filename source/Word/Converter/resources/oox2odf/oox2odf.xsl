@@ -49,7 +49,8 @@
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
 
-
+  <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
+  
   <!-- packages relationships -->
   <!--
   <xsl:variable name="package-rels" select="/oox:package/oox:part[@oox:name='_rels/.rels']"/>
@@ -102,15 +103,16 @@
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
           <xsl:for-each
-            select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            select="key('Part', 'word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            <xsl:call-template name="InsertManifestFileEntry"/>
+          </xsl:for-each>
+          <!-- divo TODO: does this work for more than one footer/header (i.e. if we have footer2.xml.rel etc) ??? -->
+          <xsl:for-each
+            select="key('Part', 'word/_rels/footer1.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
           <xsl:for-each
-            select="/oox:package/oox:part[@oox:name='word/_rels/footer1.xml.rels']//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
-            <xsl:call-template name="InsertManifestFileEntry"/>
-          </xsl:for-each>
-          <xsl:for-each
-            select="/oox:package/oox:part[@oox:name='word/_rels/header1.xml.rels']//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            select="key('Part', 'word/_rels/header1.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
         </manifest:manifest>

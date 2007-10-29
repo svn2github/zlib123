@@ -19,7 +19,7 @@
         test="preceding::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]
         or parent::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]">
         <xsl:apply-templates
-          select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"
+          select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"
         />
       </xsl:when>
       <xsl:otherwise>
@@ -32,7 +32,7 @@
             <xsl:value-of select="concat('S_',$id2)"/>
           </xsl:attribute>
           <xsl:apply-templates
-            select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"
+            select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"
           />
         </text:section>
       </xsl:otherwise>

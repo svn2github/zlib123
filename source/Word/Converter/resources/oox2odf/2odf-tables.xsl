@@ -398,7 +398,7 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
-  </xsl:template> 
+  </xsl:template>
 
   <!--
   Summary: insert cells properties: vertical align, margins, borders  
@@ -415,13 +415,11 @@
     <xsl:variable name="mstyleId">
       <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
-
+    
     <xsl:choose>
-      <xsl:when
-        test="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
-        <xsl:variable name="mstyle"
-          select="/oox:package/oox:part[@oox:name='word/styles.xml']/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
-        <!-- margin is defined in styles.xml -->
+      <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$mstyleId or @w:styleId=concat('CONTENT_',$mstyleId)]">
+        <xsl:variable name="mstyle" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
+        <!-- margin is specified in styles.xml -->
         <xsl:call-template name="InsertCellMargins">
           <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
@@ -648,7 +646,7 @@
       </xsl:when>
       <!-- climb style hierarchy -->
       <xsl:otherwise>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
           <xsl:choose>
             <xsl:when test="key('StyleId', $styleId)">
               <xsl:call-template name="InsertTopBottomBorderPropertiesUsingSide">
@@ -755,7 +753,7 @@
       </xsl:when>
       <!-- climb style hierarchy -->
       <xsl:otherwise>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
           <xsl:choose>
             <xsl:when test="key('StyleId', $styleId)">
               <xsl:call-template name="InsertLeftRightBorderPropertiesUsingSide">
@@ -906,7 +904,7 @@
       </xsl:when>
       <!-- climb style hierarchy -->
       <xsl:otherwise>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
           <xsl:choose>
             <xsl:when test="key('StyleId', $styleId)">
               <xsl:call-template name="GetTopBottomCellBorderColor">
@@ -989,7 +987,7 @@
       </xsl:when>
       <!-- climb style hierarchy -->
       <xsl:otherwise>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/styles.xml']">
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
           <xsl:choose>
             <xsl:when test="key('StyleId', $styleId)">
               <xsl:call-template name="GetLeftRightCellBorderColor">

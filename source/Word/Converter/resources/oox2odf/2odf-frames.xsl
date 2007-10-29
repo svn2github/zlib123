@@ -290,7 +290,7 @@
           </xsl:choose>
           <!-- image href from relationships-->
           <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" xlink:href="">
-            <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
+            <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
               <xsl:call-template name="InsertImageHref">
                 <xsl:with-param name="document" select="$document"/>
                 <xsl:with-param name="rId">
@@ -448,7 +448,7 @@
     </xsl:call-template>
 
     <draw:object-ole>
-      <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
+      <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
         <xsl:call-template name="InsertImageHref">
           <xsl:with-param name="document" select="$document"/>
           <xsl:with-param name="rId" select="@r:id"/>
@@ -488,7 +488,7 @@
       <xsl:with-param name="rId" select="@r:id"/>
     </xsl:call-template>
     <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-      <xsl:if test="/oox:package/oox:part[@oox:name=concat('word/_rels/',$document,'.rels')]">
+      <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
         <xsl:call-template name="InsertImageHref">
           <xsl:with-param name="document" select="$document"/>
           <xsl:with-param name="rId" select="@r:id"/>

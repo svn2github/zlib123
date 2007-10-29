@@ -203,35 +203,35 @@
 
   <xsl:template name="TrackChanges">
     <xsl:variable name="hasTrackChanges">
-      <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body">
+      <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body">
         <xsl:if test="key('track-changes', '')">true</xsl:if>
       </xsl:for-each>
       <xsl:for-each
-        select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
+        select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
         <xsl:variable name="file">
           <xsl:value-of select="."/>
         </xsl:variable>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name=concat('word/',$file)]">
+        <xsl:for-each select="key('Part', concat('word/',$file))">
           <xsl:if test="key('track-changes', '')">true</xsl:if>
         </xsl:for-each>
       </xsl:for-each>
     </xsl:variable>
     <xsl:if test="$hasTrackChanges = 'true' ">
       <text:tracked-changes>
-        <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body">
+        <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body">
           <xsl:if test="key('track-changes', '')">
-            <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/document.xml']/w:document/w:body"
+            <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body"
               mode="trackchanges"/>
           </xsl:if>
         </xsl:for-each>
         <xsl:for-each
-          select="/oox:package/oox:part[@oox:name='word/_rels/document.xml.rels']/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
+          select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
           <xsl:variable name="file">
             <xsl:value-of select="."/>
           </xsl:variable>
-          <xsl:for-each select="/oox:package/oox:part[@oox:name=concat('word/',$file)]">
+          <xsl:for-each select="key('Part', concat('word/',$file))">
             <xsl:if test="key('track-changes', '')">
-              <xsl:apply-templates select="/oox:package/oox:part[@oox:name=concat('word/',$file)]" mode="trackchanges"/>
+              <xsl:apply-templates select="key('Part', concat('word/',$file))" mode="trackchanges"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:for-each>

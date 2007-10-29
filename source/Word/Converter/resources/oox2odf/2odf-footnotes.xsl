@@ -22,7 +22,7 @@
     <xsl:variable name="footnoteId" select="w:footnoteReference/@w:id"/>
     <xsl:variable name="textFootnote" select="w:t"/>
     <!-- change context to get the footnote content -->
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/footnotes.xml']/w:footnotes/w:footnote[@w:id=$footnoteId]">
+    <xsl:for-each select="key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote[@w:id=$footnoteId]">
 
       <text:span>
         <text:note text:id="{concat('ftn',count(preceding-sibling::w:footnote) - 1)}"
@@ -64,7 +64,7 @@
     <xsl:variable name="endnoteId" select="w:endnoteReference/@w:id"/>
     <xsl:variable name="textEndnote" select="w:t"/>
     <!-- change context to get the footnote content -->
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/endnotes.xml']/w:endnotes/w:endnote[@w:id=$endnoteId]">
+    <xsl:for-each select="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote[@w:id=$endnoteId]">
       <text:span>
         <text:note text:id="{concat('edn',count(preceding-sibling::w:endnote) - 1)}"
           text:note-class="endnote">
@@ -103,7 +103,7 @@
   <!-- Insert text:notes-configuration element -->
 
   <xsl:template name="InsertNotesConfiguration">
-    <xsl:for-each select="/oox:package/oox:part[@oox:name='word/document.xml']">
+    <xsl:for-each select="key('Part', 'word/document.xml')">
       <xsl:if test="key('footnotes', '')">
         <xsl:call-template name="InsertNotesConfigurationContent">
           <xsl:with-param name="noteType">footnote</xsl:with-param>

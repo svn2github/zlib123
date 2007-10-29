@@ -16,17 +16,17 @@
 <xsl:template name="InsertComment">
   <xsl:param name="Id"/>
   <office:annotation>
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:author">
+    <xsl:if test="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author">
       <dc:creator>
-        <xsl:value-of select="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:author"/>
+        <xsl:value-of select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author"/>
       </dc:creator>
     </xsl:if>
-    <xsl:if test="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:date">
+    <xsl:if test="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date">
       <dc:date>
-        <xsl:value-of select="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/@w:date"/>
+        <xsl:value-of select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date"/>
       </dc:date>
     </xsl:if>
-    <xsl:apply-templates select="/oox:package/oox:part[@oox:name='word/comments.xml']/w:comments/w:comment[@w:id = $Id]/w:p"/>    
+    <xsl:apply-templates select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/w:p"/>    
   </office:annotation>  
 </xsl:template>
  </xsl:stylesheet>
