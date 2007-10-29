@@ -156,17 +156,25 @@ namespace CleverAge.OdfConverter.Word
         /// </summary>
         protected override XmlReader Source(string inputFile)
         {
-            XmlReaderSettings xrs = new XmlReaderSettings();
-            // do not look for DTD
-            xrs.ProhibitDtd = true;
-            if (this.ExternalResources == null)
+            if (this.DirectTransform)
             {
-                DocxDocument doc = new DocxDocument(inputFile);
-                return XmlReader.Create(doc.OpenXML, xrs);
+                return base.Source(inputFile);
             }
             else
             {
-                throw new NotSupportedException("External resources are not supported for DOCX -> ODT conversion");
+                XmlReaderSettings xrs = new XmlReaderSettings();
+                // do not look for DTD
+                xrs.ProhibitDtd = true;
+                if (this.ExternalResources == null)
+                {
+                    
+                    DocxDocument doc = new DocxDocument(inputFile);
+                    return XmlReader.Create(doc.OpenXML, xrs);
+                }
+                else
+                {
+                    throw new NotSupportedException("External resources are not supported for DOCX -> ODT conversion");
+                }
             }
         }
     }
