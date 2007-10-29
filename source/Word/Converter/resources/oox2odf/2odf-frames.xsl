@@ -37,12 +37,19 @@
         <xsl:message terminate="no">translation.oox2odf.dropcap.inMargin</xsl:message>
       </xsl:when>
       <xsl:otherwise>
-        <!--
-        if previous-brother node (in the same context) wasn't a text frame paragraph
-        then create another text:p else merge text with the existing previous-brother
-        BUG FIX 1642428
+        <!-- 
+        check if the preceding framePr is identically 
+        If it is, then it's w:p belongs to the same frame and 
+        this frame was already merged in to the previous.
         -->
-        <xsl:if test="not(preceding-sibling::w:p[position()=1][descendant::w:framePr])">
+        <xsl:variable name="precedingP" select="./preceding-sibling::*[1]" />
+        <xsl:variable name="identically">
+          <xsl:call-template name="CompareFrames">
+            <xsl:with-param name="frame1" select="./w:pPr/w:framePr"/>
+            <xsl:with-param name="frame2" select="$precedingP/w:pPr/w:framePr"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$identically='false'">
           <text:p>
             <xsl:attribute name="text:style-name">
               <xsl:choose>
@@ -99,29 +106,13 @@
         <style:style style:name="{generate-id(w:pPr/w:framePr)}" style:family="graphic" style:parent-style-name="Frame">
           <style:graphic-properties>
 
-            <!--<xsl:call-template name="InsertShapeStyleName">
-              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-            </xsl:call-template>-->
-
             <xsl:call-template name="InsertFramePrAnchor">
               <xsl:with-param name="oFramePr" select="w:pPr/w:framePr"/>
             </xsl:call-template>
 
-            <!--<xsl:call-template name="InsertShapeWrap">
-              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-            </xsl:call-template>-->
-
             <xsl:call-template name="InsertShapeFromTextDistance">
               <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
             </xsl:call-template>
-
-            <!--<xsl:call-template name="InsertShapeHorizontalPos">
-              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-            </xsl:call-template>-->
-
-            <!--<xsl:call-template name="InsertShapeVerticalPos">
-              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-            </xsl:call-template>-->
 
             <xsl:call-template name="InsertShapeAutomaticWidth">
               <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
@@ -212,7 +203,7 @@
           <xsl:attribute name="draw:name">
             <xsl:text>Frame1</xsl:text>
           </xsl:attribute>
-          <xsl:call-template name="InsertShapeAnchor"/>
+          <xsl:call-template name="InsertShapeAnchor"/> <!-- InsertFrameAnchor -->
           <xsl:call-template name="InsertShapeWidth"/>
           <xsl:call-template name="InsertShapeHeight"/>
           <xsl:variable name="rotation">
@@ -1431,6 +1422,7 @@
   -->
   <xsl:template name="InsertParagraphToFrame">
     <xsl:param name="paragraph" select="."/>
+    
     <text:p>
       <xsl:attribute name="text:style-name">
         <xsl:choose>
@@ -1444,15 +1436,32 @@
       </xsl:attribute>
       <xsl:apply-templates select="$paragraph/node()"/>
     </text:p>
-    <!-- if next paragraph is also a text frame paragraph then insert its content to the same text-box -->
-    <xsl:if test="$paragraph/following::*[position()=1][w:pPr/w:framePr]">
-      <xsl:call-template name="InsertParagraphToFrame">
-        <xsl:with-param name="paragraph"
-          select="$paragraph/following::*[position()=1][w:pPr/w:framePr]"/>
-      </xsl:call-template>
+    
+    <!-- if there is another paragraph with framePr -->
+    <xsl:variable name="followingP" select="$paragraph/following-sibling::*[1]" />
+    <xsl:if test="$followingP/w:pPr/w:framePr">
+      <!-- check if the folowing framePr is identically -->
+      <xsl:variable name="identically">
+        <xsl:call-template name="CompareFrames">
+          <xsl:with-param name="frame1" select="$paragraph/w:pPr/w:framePr"/>
+          <xsl:with-param name="frame2" select="$followingP/w:pPr/w:framePr"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <!-- then merge the two paragraphs -->
+      <xsl:if test="$identically='true'">
+        <xsl:call-template name="InsertParagraphToFrame">
+          <xsl:with-param name="paragraph" select="$followingP"/>
+        </xsl:call-template>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
+  <!--
+  Summary: Converts the properties of the Anchor.
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 29.10.2007
+  -->
   <xsl:template name="InsertFramePrAnchor">
     <xsl:param name="oFramePr"/>
     
@@ -1468,7 +1477,7 @@
     <xsl:variable name="xAlign"   select = "$oFramePr/@w:xAlign"/>
     <xsl:variable name="hAnchor"  select = "$oFramePr/@w:hAnchor"/>
     
-    <!-- w:wrap    =>  style:wrap -->
+    <!-- Wrap -->
     <xsl:attribute name="style:wrap">
       <xsl:choose>
         <xsl:when test="not($Wrap) or $Wrap ='none'">
@@ -1493,9 +1502,10 @@
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>
-    <!-- w:yAlign  =>  style:vertical-pos    -->
-    <!-- w:vAnchor =>  style:vertical-rel    -->
+    
     <xsl:if test ="count($yAlign)>0 or count($vAnchor)>0">
+      
+      <!-- Vertical Position -->
       <xsl:attribute name="style:vertical-pos">
         <xsl:choose>
           <xsl:when test="$yAlign='bottom'">
@@ -1512,6 +1522,8 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
+      
+      <!-- Vertical Anchor -->
       <xsl:attribute name="style:vertical-rel">
         <xsl:choose>
           <xsl:when test="$vAnchor='page'">
@@ -1525,10 +1537,12 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
+      
     </xsl:if>
-    <!-- w:xAlign  =>  style:horizontal-pos  -->
-    <!-- w:hAnchor =>  style:horizontal-rel  -->
+    
     <xsl:if test ="count($xAlign)>0 or count($hAnchor)>0">
+
+      <!-- Horizontal Position -->
       <xsl:attribute name="style:horizontal-pos">
         <xsl:choose>
           <xsl:when test="$xAlign='center'">
@@ -1551,6 +1565,8 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute >
+
+      <!-- Horizontal Anchor -->
       <xsl:attribute name="style:horizontal-rel">
         <xsl:choose>
           <xsl:when test="$hAnchor='margin'">
@@ -1582,9 +1598,46 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
+      
     </xsl:if>
   </xsl:template>
 
+  <!--
+  Summary: Compares 2 OOX frames based on their attributes
+  Author: makz (DIaLOGIKa)
+  Date: 29.10.2007
+  -->
+  <xsl:template name="CompareFrames">
+    <xsl:param name="frame1" />
+    <xsl:param name="frame2" />
+
+    <xsl:choose>
+      <xsl:when test="string($frame1/@w:anchorLock) = string($frame2/@w:anchorLock) and 
+                      string($frame1/@w:dropCap) = string($frame2/@w:dropCap) and 
+                      string($frame1/@w:h) = string($frame2/@w:h) and 
+                      string($frame1/@w:hAnchor) = string($frame2/@w:hAnchor) and 
+                      string($frame1/@w:hRule) = string($frame2/@w:hRule) and 
+                      string($frame1/@w:hSpace) = string($frame2/@w:hSpace) and 
+                      string($frame1/@w:lines) = string($frame2/@w:lines) and            
+                      string($frame1/@w:vAnchor) = string($frame2/@w:vAnchor) and 
+                      string($frame1/@w:vSpace) = string($frame2/@w:vSpace) and 
+                      string($frame1/@w:w) = string($frame2/@w:w) and 
+                      string($frame1/@w:wrap) = string($frame2/@w:wrap) and 
+                      string($frame1/@w:x) = string($frame2/@w:x) and 
+                      string($frame1/@w:xAlign) = string($frame2/@w:xAlign) and 
+                      string($frame1/@w:y) = string($frame2/@w:y) and 
+                      string($frame1/@w:yAlign) = string($frame2/@w:yAlign)">
+        <!-- return true -->
+        <xsl:text>true</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- return false -->
+        <xsl:text>false</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
   <xsl:template name="InsertCommonShapeProperties">
     <xsl:call-template name="InsertShapeStyleName"/>
     <xsl:call-template name="InsertShapeAnchor"/>
@@ -1696,16 +1749,16 @@
   -->
   <xsl:template name="InsertShapeAnchor">
     <xsl:param name="shape" select="."/>
+    
     <xsl:attribute name="text:anchor-type">
       <xsl:choose>
         
         <!-- 
-        makz: default for word inline elements.
+        makz: default for word inline shape elements.
         If no wrap is definied the style does not contain position informations
-        
         Fix #1786094
         -->
-        <xsl:when test="not(w10:wrap) and not(contains($shape/@style, 'position'))">
+        <xsl:when test="not(name($shape)='w:framePr') and not(w10:wrap) and not(contains($shape/@style, 'position'))">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
 
@@ -1735,7 +1788,6 @@
           <xsl:text>page</xsl:text>
         </xsl:when>
         
-
         <!-- 
         Clever Age: In header of footer, frames that are not in background must be anchored as character 
         because otherwise they lose their size and horizontal and vertical position 
@@ -1972,5 +2024,5 @@
     </xsl:variable>
     <xsl:value-of select="$propertyValue"/>
   </xsl:template>
-
+  
 </xsl:stylesheet>
