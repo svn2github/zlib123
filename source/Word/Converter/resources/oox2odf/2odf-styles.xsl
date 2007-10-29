@@ -2630,7 +2630,12 @@
       <xsl:when test="w:numPr/w:numId/@w:val">        
         <xsl:text>true</xsl:text>
       </xsl:when>
+      
       <!--<xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+      <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+        <xsl:text>true</xsl:text>
+      </xsl:when>
+
       <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
         <xsl:text>true</xsl:text>
       </xsl:when>
@@ -2640,7 +2645,12 @@
         <xsl:text>true</xsl:text>
       </xsl:when>
 
-      <!--math, dialogika: changed for correct indentation calculation END -->
+      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val">
+        <xsl:call-template name="CheckIfList">
+          <xsl:with-param name ="StyleId" select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val"/>
+        </xsl:call-template>          
+      </xsl:when>
+        <!--math, dialogika: changed for correct indentation calculation END -->
       
       <xsl:otherwise>
         <xsl:text>false</xsl:text>
@@ -3316,6 +3326,71 @@
 
   <!--math, dialogika: changed for correct indentation calculation BEGIN -->
 
+  <xsl:template name="GetIndirektListLevelParameter">
+    <xsl:param name="StyleId"/>
+    <xsl:param name="Parameter"/>
+    
+    <xsl:variable name="NumberingDefinitions"
+      select="document('word/numbering.xml')/w:numbering"/>    
+
+    <xsl:variable name="ParagraphStyleDefinition"
+      select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId][1]"/>
+
+    <xsl:variable name="IndirectNumId">
+      <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
+    </xsl:variable>
+
+    <xsl:variable name="IndirectAbstractNumId">
+      <xsl:value-of select="$NumberingDefinitions/w:num[$IndirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
+    </xsl:variable>
+
+    <xsl:variable name="IndirectIlvl">
+      <xsl:choose>
+        <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val">
+          <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val"/>
+        </xsl:when>
+        <xsl:when test="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]">
+          <xsl:value-of select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]/@w:ilvl"/>
+        </xsl:when>
+        <!--assume default level 0-->
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="IndirectListLevelDefinition"
+      select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
+
+    <xsl:choose>
+      <xsl:when test = "$IndirectListLevelDefinition">
+        <xsl:choose>
+          <xsl:when test = "$Parameter='NumId'" >
+            <xsl:value-of select="$IndirectNumId" />
+          </xsl:when>
+          <xsl:when test = "$Parameter='AbstractNumId'" >
+            <xsl:value-of select="$IndirectAbstractNumId" />
+          </xsl:when>
+          <xsl:when test = "$Parameter='Ilvl'" >
+            <xsl:value-of select="$IndirectIlvl" />
+          </xsl:when>          
+        </xsl:choose>        
+      </xsl:when>
+
+      <xsl:when test = "$ParagraphStyleDefinition/w:basedOn/@w:val">
+        <xsl:call-template name="GetIndirektListLevelParameter">
+          <xsl:with-param name="StyleId">
+            <xsl:value-of select="$ParagraphStyleDefinition/w:basedOn/@w:val" />
+          </xsl:with-param>
+          <xsl:with-param name="Parameter">
+            <xsl:value-of select="$Parameter" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      
+    </xsl:choose>
+    
+  </xsl:template>
+  
+
   <!-- space before/after -->
   <xsl:template name="InsertParagraphIndent">
     <xsl:param name="MarginLeft"/>
@@ -3367,15 +3442,33 @@
             <xsl:variable name="ParagraphStyleDefinition"
               select="key('StyleId', $StyleId)[1]"/>
 
-            <xsl:variable name="IndirectNumId">
+            <!--<xsl:variable name="IndirectNumId">
               <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
-            </xsl:variable>
+            </xsl:variable>-->
+
+            <xsl:variable name="IndirectNumId">              
+              <xsl:call-template name="GetIndirektListLevelParameter">
+                <xsl:with-param name="StyleId">
+                  <xsl:value-of select="$StyleId" />
+                </xsl:with-param>
+                <xsl:with-param name="Parameter">NumId</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>              
+
+            <!--<xsl:variable name="IndirectAbstractNumId">
+              <xsl:value-of select="$NumberingDefinitions/w:num[$IndirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
+            </xsl:variable>-->
 
             <xsl:variable name="IndirectAbstractNumId">
-              <xsl:value-of select="$NumberingDefinitions/w:num[$IndirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
+              <xsl:call-template name="GetIndirektListLevelParameter">
+                <xsl:with-param name="StyleId">
+                  <xsl:value-of select="$StyleId" />
+                </xsl:with-param>
+                <xsl:with-param name="Parameter">AbstractNumId</xsl:with-param>
+              </xsl:call-template>
             </xsl:variable>
 
-            <xsl:variable name="IndirectIlvl">
+            <!--<xsl:variable name="IndirectIlvl">
               <xsl:choose>
                 <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val">
                   <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val"/>
@@ -3383,14 +3476,25 @@
                 <xsl:when test="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]">
                   <xsl:value-of select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]/@w:ilvl"/>
                 </xsl:when>
-                <!--assume default level 0-->
+                --><!--assume default level 0--><!--
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
-            </xsl:variable>
+            </xsl:variable>-->
 
+            <xsl:variable name="IndirectIlvl">
+              <xsl:call-template name="GetIndirektListLevelParameter">
+                <xsl:with-param name="StyleId">
+                  <xsl:value-of select="$StyleId" />
+                </xsl:with-param>
+                <xsl:with-param name="Parameter">Ilvl</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>                        
+
+            
             <xsl:variable name="IndirectListLevelDefinition"
-               select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
+              select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
 
+            
             <xsl:variable name ="Suffix">
               <xsl:choose>
                 <xsl:when test="$DirectListLevelDefinition/w:suff/@w:val">
@@ -3401,7 +3505,16 @@
                 </xsl:when>
                 <xsl:otherwise>'tab'</xsl:otherwise>
               </xsl:choose>              
-            </xsl:variable>            
+            </xsl:variable>
+
+            <!--<xsl:variable name ="Suffix">
+              <xsl:call-template name="GetIndirektListLevelParameter">
+                <xsl:with-param name="StyleId">
+                  <xsl:value-of select="$StyleId" />
+                </xsl:with-param>
+                <xsl:with-param name="Parameter">w:suff</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>-->
 
             <xsl:variable name="Hanging">
               <xsl:choose>
