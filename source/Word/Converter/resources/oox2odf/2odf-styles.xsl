@@ -3172,9 +3172,22 @@
         <xsl:if test="parent::w:p/w:r/w:br[@w:type='page']">
           <xsl:call-template name="InsertFlagTextBeforeBreakPage2"/>
         </xsl:if>
-        <xsl:attribute name="fo:break-before">
+        <xsl:choose>
+          <xsl:when test="parent::w:p//w:t">
+            <xsl:attribute name="fo:break-before">
+              <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <!--clam: empty paragraphs with page break before insert unwanted line breaks-->
+            <xsl:attribute name="fo:break-after">
+              <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <!--<xsl:attribute name="fo:break-before">
           <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
-        </xsl:attribute>
+        </xsl:attribute>-->
       </xsl:when>
       <xsl:when test="w:r/w:br[@w:type='page' or @w:type='column']">
         <!-- if this is a break page-->
