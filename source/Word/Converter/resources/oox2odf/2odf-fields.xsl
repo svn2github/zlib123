@@ -1514,6 +1514,23 @@
       <xsl:attribute name="text:select-page">
         <xsl:text>current</xsl:text>
       </xsl:attribute>
+      <xsl:variable name="rId" select="concat('',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Target=$docName]/@Id)"/>
+      <xsl:variable name="nodesectPr" select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]"/>      
+            
+      <xsl:variable name="standardNumType">
+        <xsl:choose>
+          <xsl:when test="$nodesectPr/w:pgNumType/@w:fmt">
+            <xsl:choose>
+              <xsl:when test="$nodesectPr/w:pgNumType/@w:fmt = 'lowerRoman'">i</xsl:when>
+              <xsl:when test="$nodesectPr/w:pgNumType/@w:fmt = 'upperRoman'">I</xsl:when>
+              <xsl:when test="$nodesectPr/w:pgNumType/@w:fmt = 'lowerLetter'">a</xsl:when>
+              <xsl:when test="$nodesectPr/w:pgNumType/@w:fmt = 'upperLetter'">A</xsl:when>
+              <xsl:otherwise>1</xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>1</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:attribute name="style:num-format">
         <xsl:choose>
           <xsl:when test="contains($WInstr, 'Arabic')">1</xsl:when>
@@ -1521,6 +1538,9 @@
           <xsl:when test="contains($WInstr, 'ALPHABETIC')">A</xsl:when>
           <xsl:when test="contains($WInstr, 'roman')">i</xsl:when>
           <xsl:when test="contains($WInstr, 'ROMAN')">I</xsl:when>
+          <xsl:when test="$standardNumType">
+            <xsl:value-of select="$standardNumType"/>
+          </xsl:when>
           <xsl:otherwise>1</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
