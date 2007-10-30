@@ -1171,7 +1171,7 @@
                     <xsl:otherwise>
                       <xsl:choose>
                         <xsl:when test="following-sibling::w:r/w:lastRenderedPageBreak and $precSectPr/w:type/@w:val = 'continuous' and generate-id(..) = generate-id($precSectPr/following::w:p[1])">
-                          <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+                          <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>                          
                         </xsl:when>
                         <xsl:when test="$precSectPr and $mainSectPr/w:type/@w:val = 'continuous' ">
                           <!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
