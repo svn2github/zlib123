@@ -50,41 +50,37 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:if test="$identically='false'">
-          <text:p>
-            <xsl:attribute name="text:style-name">
-              <xsl:choose>
-                <xsl:when test="w:pPr/w:pStyle/@w:val">
-                  <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="generate-id()"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <draw:frame>
-              <xsl:attribute name="draw:style-name">
-                <xsl:value-of select="generate-id(w:pPr/w:framePr)"/>
-              </xsl:attribute>
-              <xsl:call-template name="InsertShapeAnchor">
-                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+          <!--
+          makz: If the frame is anchored to the page insert only the frame
+          else insert the paragraph and the frame.
+          
+          A frame which iss not aligned to the page (in horiz. or vert. direction) 
+          needs a paragraph due to it's anchor.
+          -->
+          <xsl:choose>
+            <xsl:when test="w:pPr/w:framePr/@w:hAnchor='page' and w:pPr/w:framePr/@w:vAnchor='page'">
+              <xsl:call-template name="InsertFrame">
+                <xsl:with-param name="framePr" select="w:pPr/w:framePr" />
               </xsl:call-template>
-              <xsl:call-template name="InsertShapeWidth">
-                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-              </xsl:call-template>
-              <xsl:call-template name="InsertShapeHeight">
-                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-              </xsl:call-template>
-              <xsl:call-template name="InsertshapeAbsolutePos">
-                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-              </xsl:call-template>
-              <draw:text-box>
-                <xsl:call-template name="InsertTextBoxAutomaticHeight">
-                  <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <text:p>
+                <xsl:attribute name="text:style-name">
+                  <xsl:choose>
+                    <xsl:when test="w:pPr/w:pStyle/@w:val">
+                      <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="generate-id()"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:call-template name="InsertFrame">
+                  <xsl:with-param name="framePr" select="w:pPr/w:framePr" />
                 </xsl:call-template>
-                <xsl:call-template name="InsertParagraphToFrame"/>
-              </draw:text-box>
-            </draw:frame>
-          </text:p>
+              </text:p>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -203,7 +199,7 @@
           <xsl:attribute name="draw:name">
             <xsl:text>Frame1</xsl:text>
           </xsl:attribute>
-          <xsl:call-template name="InsertShapeAnchor"/> <!-- InsertFrameAnchor -->
+          <xsl:call-template name="InsertAnchorType"/>
           <xsl:call-template name="InsertShapeWidth"/>
           <xsl:call-template name="InsertShapeHeight"/>
           <xsl:variable name="rotation">
@@ -313,7 +309,7 @@
             <xsl:text>Frame1</xsl:text>
           </xsl:attribute>
 
-          <xsl:call-template name="InsertShapeAnchor"/>
+          <xsl:call-template name="InsertAnchorType"/>
           <xsl:call-template name="InsertShapeWidth"/>
           <xsl:call-template name="InsertShapeHeight"/>
           <xsl:call-template name="InsertshapeAbsolutePos"/>
@@ -544,6 +540,39 @@
   CALLED TEMPLATES
   *************************************************************************
   -->
+
+  <!--
+  Summary: Inserts a draw:frame
+  Author: makz (DIaLOGIKa)
+  Date: 30.10.2007
+  -->
+  <xsl:template name="InsertFrame">
+    <xsl:param name="framePr" />
+
+    <draw:frame>
+      <xsl:attribute name="draw:style-name">
+        <xsl:value-of select="generate-id($framePr)"/>
+      </xsl:attribute>
+      <xsl:call-template name="InsertAnchorType">
+        <xsl:with-param name="shape" select="$framePr"/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertShapeWidth">
+        <xsl:with-param name="shape" select="$framePr"/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertShapeHeight">
+        <xsl:with-param name="shape" select="$framePr"/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertshapeAbsolutePos">
+        <xsl:with-param name="shape" select="$framePr"/>
+      </xsl:call-template>
+      <draw:text-box>
+        <xsl:call-template name="InsertTextBoxAutomaticHeight">
+          <xsl:with-param name="shape" select="$framePr"/>
+        </xsl:call-template>
+        <xsl:call-template name="InsertParagraphToFrame"/>
+      </draw:text-box>
+    </draw:frame>
+  </xsl:template>
   
   <xsl:template name="InsertGradientFill">
     <draw:gradient >
@@ -1509,16 +1538,30 @@
       <xsl:attribute name="style:vertical-pos">
         <xsl:choose>
           <xsl:when test="$yAlign='bottom'">
-            <xsl:value-of select="'bottom'"/>
+            <xsl:text>bottom</xsl:text>
           </xsl:when>
           <xsl:when test="$yAlign='top'">
-            <xsl:value-of select="'top'"/>
+            <xsl:choose>
+              <!--
+              makz: If there is a y coordinate then OOo needs "from-top" 
+              because "top" cannot have coordinates.
+              -->
+              <xsl:when test="$oFramePr/@w:y">
+                <xsl:text>from-top</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>top</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
           <xsl:when test="$yAlign='center'">
-            <xsl:value-of select="'middle'"/>
+            <xsl:text>middle</xsl:text>
           </xsl:when>
+          <!--
+          makz: If no yAlign is specified in OOX document use "from-top"
+          -->
           <xsl:otherwise>
-            <xsl:value-of select="'auto'"/>
+            <xsl:text>from-top</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
@@ -1527,13 +1570,13 @@
       <xsl:attribute name="style:vertical-rel">
         <xsl:choose>
           <xsl:when test="$vAnchor='page'">
-            <xsl:value-of select="'page'"/>
+            <xsl:text>page</xsl:text>
           </xsl:when>
           <xsl:when test="$vAnchor='text'">
-            <xsl:value-of select="'baseline'"/>
+            <xsl:text>baseline</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'page'"/>
+            <xsl:text>page</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
@@ -1546,22 +1589,22 @@
       <xsl:attribute name="style:horizontal-pos">
         <xsl:choose>
           <xsl:when test="$xAlign='center'">
-            <xsl:value-of select="'middle'"/>
+            <xsl:text>middle</xsl:text>
           </xsl:when>
           <xsl:when test="$xAlign='inside'">
-            <xsl:value-of select="'from-left'"/>
+            <xsl:text>left</xsl:text>
           </xsl:when>
           <xsl:when test="$xAlign='outside'">
-            <xsl:value-of select="'left'"/>
+            <xsl:text>right</xsl:text>
           </xsl:when>
           <xsl:when test="$xAlign='left'">
-            <xsl:value-of select="'left'"/>
+            <xsl:text>left</xsl:text>
           </xsl:when>
           <xsl:when test="$xAlign='right'">
-            <xsl:value-of select="'right'"/>
+            <xsl:text>right</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'from-left'"/>
+            <xsl:text>from-left</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute >
@@ -1570,31 +1613,16 @@
       <xsl:attribute name="style:horizontal-rel">
         <xsl:choose>
           <xsl:when test="$hAnchor='margin'">
-            <xsl:choose>
-              <!--
-              makz: 'margin-aligned' frames in footer or header
-              are converted to 'paragraph-aligned'
-              -->
-              <xsl:when test="count(ancestor::node()[name()='w:ftr'])>0 or count(ancestor::node()[name()='w:hdr'])>0">
-                  <xsl:value-of select="'paragraph'"/>
-              </xsl:when>
-              <!--
-              makz: margin-aligned frames everywhere else
-              in the document are converted page-start-margin
-              -->
-              <xsl:otherwise>
-                <xsl:value-of select="'page-start-margin'"/>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:text>paragraph-content</xsl:text>
           </xsl:when>
           <xsl:when test="$hAnchor='page'">
-            <xsl:value-of select="'page'"/>
+            <xsl:text>page</xsl:text>
           </xsl:when>
           <xsl:when test="$hAnchor='text'">
-            <xsl:value-of select="'page-content'"/>
+            <xsl:text>page-content</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'page-content'"/>
+            <xsl:text>page-content</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
@@ -1627,20 +1655,17 @@
                       string($frame1/@w:xAlign) = string($frame2/@w:xAlign) and 
                       string($frame1/@w:y) = string($frame2/@w:y) and 
                       string($frame1/@w:yAlign) = string($frame2/@w:yAlign)">
-        <!-- return true -->
         <xsl:text>true</xsl:text>
       </xsl:when>
       <xsl:otherwise>
-        <!-- return false -->
         <xsl:text>false</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   
-  
   <xsl:template name="InsertCommonShapeProperties">
     <xsl:call-template name="InsertShapeStyleName"/>
-    <xsl:call-template name="InsertShapeAnchor"/>
+    <xsl:call-template name="InsertAnchorType"/>
     <xsl:call-template name="InsertShapeWidth"/>
     <xsl:call-template name="InsertShapeHeight"/>
     <xsl:call-template name="InsertshapeAbsolutePos"/>
@@ -1747,12 +1772,12 @@
   Modified: makz (DIaLOGIKa)
   Date: 19.10.2007
   -->
-  <xsl:template name="InsertShapeAnchor">
+  <xsl:template name="InsertAnchorType">
     <xsl:param name="shape" select="."/>
     
     <xsl:attribute name="text:anchor-type">
       <xsl:choose>
-        
+
         <!-- 
         makz: default for word inline shape elements.
         If no wrap is definied the style does not contain position informations
@@ -1761,7 +1786,6 @@
         <xsl:when test="not(name($shape)='w:framePr') and not(w10:wrap) and not(contains($shape/@style, 'position'))">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
-
         <xsl:when test="w10:wrap/@type='none'">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
@@ -1784,32 +1808,31 @@
           <xsl:text>as-char</xsl:text>
         </xsl:when>
 
-        <xsl:when test="(w10:wrap/@anchorx='page' and w10:wrap/@anchory='page') or ($shape/@w:hAnchor='page' and $shape/@w:vAnchor='page')">
-          <xsl:text>page</xsl:text>
-        </xsl:when>
-        
-        <!-- 
-        Clever Age: In header of footer, frames that are not in background must be anchored as character 
-        because otherwise they lose their size and horizontal and vertical position 
-        (when anchored as character horizontal position is lost).
-        
-        makz: it's better to anchor the frame to the paragraph if it's in a footer.
-        ....
+        <!--
+        makz: anchors in headers and footer which are not not as-char (if the previous conditions failed) 
+        must be paragraph because because the frame/shape would no longer be in header if the 
+        anchor is not set to paragraph or as-char
         -->
         <xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and (w10:wrap/@type!='' or $shape/@w:wrap!='')">
+          <!-- Warning Messages -->
           <xsl:if test="ancestor::w:hdr">
             <xsl:message terminate="no">translation.oox2odf.frame.inHeader</xsl:message>
           </xsl:if>
           <xsl:if test="ancestor::w:ftr">
             <xsl:message terminate="no">translation.oox2odf.frame.inFooter</xsl:message>
           </xsl:if>
+
           <xsl:text>paragraph</xsl:text>
         </xsl:when>
-        
+
+        <xsl:when test="(w10:wrap/@anchorx='page' and w10:wrap/@anchory='page') or ($shape/@w:hAnchor='page' and $shape/@w:vAnchor='page')">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+
         <xsl:otherwise>
           <xsl:text>paragraph</xsl:text>
         </xsl:otherwise>
-        
+
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
@@ -1858,7 +1881,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    
     <xsl:variable name="relativeHeight">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']"/>

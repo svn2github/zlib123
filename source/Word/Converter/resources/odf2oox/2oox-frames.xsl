@@ -2530,7 +2530,7 @@
       <xsl:when test="$anchor = 'page' and $shapeProperties/@svg:x">
         <xsl:choose>
           <!-- page-content -->
-          <xsl:when test="$horizontalRel = 'page-content' ">mso-position-horizontal-relative:margin;</xsl:when>
+          <xsl:when test="$horizontalRel='page-content'">mso-position-horizontal-relative:margin;</xsl:when>
           <!-- any other case -->
           <xsl:otherwise>mso-position-horizontal-relative:page;</xsl:otherwise>
         </xsl:choose>
@@ -2538,12 +2538,11 @@
       <xsl:otherwise>
         <xsl:choose>
           <!-- page-content -->
-          <xsl:when test="$horizontalRel = 'page-content' ">mso-position-horizontal-relative:margin;</xsl:when>
+          <xsl:when test="$horizontalRel='page-content' ">mso-position-horizontal-relative:margin;</xsl:when>
           <!-- page, page-start-margin, page-end-margin -->
           <xsl:when test="contains($horizontalRel, 'page')">mso-position-horizontal-relative:page;</xsl:when>
           <!-- paragraph, paragraph-content, paragraph-start-margin, paragraph-end-margin -->
-          <xsl:when test="contains($horizontalRel, 'paragraph')"
-            >mso-position-horizontal-relative:text; </xsl:when>
+          <xsl:when test="contains($horizontalRel, 'paragraph')">mso-position-horizontal-relative:text;</xsl:when>
           <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
           <xsl:when test="contains($horizontalRel, 'frame')">mso-position-horizontal-relative:text;</xsl:when>
           <!-- char -->
@@ -2588,18 +2587,18 @@
       <xsl:otherwise>
         <xsl:choose>
           <!-- page -->
-          <xsl:when test="$verticalRel = 'page' ">mso-position-vertical-relative:page;</xsl:when>
+          <xsl:when test="$verticalRel='page'">mso-position-vertical-relative:page;</xsl:when>
           <!-- page-content -->
-          <xsl:when test="$verticalRel = 'page-content' ">mso-position-vertical-relative:margin;</xsl:when>
+          <xsl:when test="$verticalRel='page-content'">mso-position-vertical-relative:margin;</xsl:when>
           <!-- paragraph -->
-          <xsl:when test="$verticalRel = 'paragraph' ">mso-position-vertical-relative:text;</xsl:when>
+          <xsl:when test="$verticalRel='paragraph'">mso-position-vertical-relative:text;</xsl:when>
           <!-- paragraph-content -->
-          <xsl:when test="$verticalRel = 'paragraph-content' ">mso-position-vertical-relative:text;</xsl:when>
+          <xsl:when test="$verticalRel='paragraph-content'">mso-position-vertical-relative:text;</xsl:when>
           <!-- frame, frame-content -->
           <xsl:when test="contains($verticalRel, 'frame')">mso-position-vertical-relative:text;</xsl:when>
           <!-- char, line, baseline, text -->
           <xsl:when
-            test="$verticalRel = 'char' or $verticalRel = 'line' or $verticalRel = 'baseline' or $verticalRel = 'text' "
+            test="$verticalRel='char' or $verticalRel='line' or $verticalRel='baseline' or $verticalRel='text'"
             >mso-position-vertical-relative:char;</xsl:when>
           <xsl:otherwise>
             <!-- no default value suggested. use anchor -->
