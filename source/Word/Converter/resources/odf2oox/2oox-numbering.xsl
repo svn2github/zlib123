@@ -1675,8 +1675,10 @@
         <!-- /WARNING -->
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if
-          test="@text:outline-level &lt;= 9 and office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">
+        <!--math, dialogika: changed bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" BEGIN-->
+        <!--<xsl:if test="@text:outline-level &lt;= 9 and office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">-->        
+        <xsl:if test="@text:outline-level &lt;= 9 and document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">
+        <!--math, dialogika: changed bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" END-->          
           <w:numPr>
             <w:ilvl w:val="{@text:outline-level - 1}"/>
             <w:numId w:val="1"/>

@@ -474,8 +474,13 @@
     <!-- context can be style:style, style:para-props or style:text-props -->
     <xsl:choose>
       <xsl:when test="ancestor-or-self::style:style/@style:default-outline-level">
-        <w:numPr>
+        <w:numPr>          
           <w:numId w:val="1"/>
+          <!--math, dialogika: Added for bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" BEGIN-->
+          <!--Following the specification, the list level definition is not necessary here.
+              However, Word seems to need the list level definition anyway-->
+          <w:ilvl w:val="{ancestor-or-self::style:style/@style:default-outline-level - 1}"/>
+          <!--math, dialogika: Added for bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" END-->          
         </w:numPr>
       </xsl:when>
       <xsl:otherwise>
