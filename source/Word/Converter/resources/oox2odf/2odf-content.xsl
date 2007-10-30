@@ -386,7 +386,7 @@
         <xsl:with-param name="node" select="."/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="dummyOutlineLevel">
       <xsl:call-template name="GetDummyOutlineLevel">
         <xsl:with-param name="node" select="."/>
@@ -406,7 +406,7 @@
         <xsl:with-param name="property">w:ilvl</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
 
     <xsl:variable name="ifNormal">
@@ -414,7 +414,7 @@
           <xsl:if test="key('StyleId', $styleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
         </xsl:for-each>
     </xsl:variable>
-    
+
     <!-- check if preceding paragraph is a heading in order not to lose numbered paragraphs inside headings-->
     <xsl:variable name="isPrecedingHeading">
       <xsl:if test="$numId!=''">
@@ -460,7 +460,7 @@
 
       <!--  check if the paragraf is list element (it can be a heading but only if it's style is NOT linked to a list level 
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
-      
+
       <xsl:when
         test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
         <!--xsl:when
@@ -681,7 +681,7 @@
     </xsl:if>
     <xsl:apply-templates select="w:t"/>
   </xsl:template>
-  
+
   <!--tabs-->
   <xsl:template match="w:tab[not(parent::w:tabs)]">
     <xsl:choose>
@@ -816,52 +816,52 @@
 
   <!--  text bookmark-Start  -->
   <xsl:template match="w:bookmarkStart">
-<xsl:if test="ancestor::w:p">
-    <xsl:variable name="NameBookmark">
-      <xsl:value-of select="@w:name"/>
-    </xsl:variable>
+    <xsl:if test="ancestor::w:p">
+      <xsl:variable name="NameBookmark">
+        <xsl:value-of select="@w:name"/>
+      </xsl:variable>
 
-    <xsl:variable name="OutlineLvl">
-      <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
-    </xsl:variable>
+      <xsl:variable name="OutlineLvl">
+        <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
+      </xsl:variable>
 
-    <xsl:variable name="Id">
-      <xsl:value-of select="@w:id"/>
-    </xsl:variable>
+      <xsl:variable name="Id">
+        <xsl:value-of select="@w:id"/>
+      </xsl:variable>
 
-    <xsl:choose>
-      <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != ''">
-        <text:bookmark>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="$NameBookmark"/>
-          </xsl:attribute>
-        </text:bookmark>
-        <text:toc-mark-start>
-          <xsl:attribute name="text:id">
-            <xsl:value-of select="@w:id"/>
-          </xsl:attribute>
-          <xsl:attribute name="text:outline-level">
-            <xsl:value-of select="$OutlineLvl + 1"/>
-          </xsl:attribute>
-        </text:toc-mark-start>
-      </xsl:when>
-      <!-- a bookmark must begin and end in the same text flow -->
-      <xsl:when test="ancestor::w:tc and not(ancestor::w:tc//w:bookmarkEnd[@w:id=$Id])">
-        <text:bookmark>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="$NameBookmark"/>
-          </xsl:attribute>
-        </text:bookmark>
-      </xsl:when>
-      <xsl:otherwise>
-        <text:bookmark-start>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="$NameBookmark"/>
-          </xsl:attribute>
-        </text:bookmark-start>
-      </xsl:otherwise>
-    </xsl:choose>
-</xsl:if>
+      <xsl:choose>
+        <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != ''">
+          <text:bookmark>
+            <xsl:attribute name="text:name">
+              <xsl:value-of select="$NameBookmark"/>
+            </xsl:attribute>
+          </text:bookmark>
+          <text:toc-mark-start>
+            <xsl:attribute name="text:id">
+              <xsl:value-of select="@w:id"/>
+            </xsl:attribute>
+            <xsl:attribute name="text:outline-level">
+              <xsl:value-of select="$OutlineLvl + 1"/>
+            </xsl:attribute>
+          </text:toc-mark-start>
+        </xsl:when>
+        <!-- a bookmark must begin and end in the same text flow -->
+        <xsl:when test="ancestor::w:tc and not(ancestor::w:tc//w:bookmarkEnd[@w:id=$Id])">
+          <text:bookmark>
+            <xsl:attribute name="text:name">
+              <xsl:value-of select="$NameBookmark"/>
+            </xsl:attribute>
+          </text:bookmark>
+        </xsl:when>
+        <xsl:otherwise>
+          <text:bookmark-start>
+            <xsl:attribute name="text:name">
+              <xsl:value-of select="$NameBookmark"/>
+            </xsl:attribute>
+          </text:bookmark-start>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
   <xsl:template match="w:bookmarkEnd">
 
@@ -870,30 +870,30 @@
     </xsl:variable>
 
     <xsl:if test="ancestor::w:p">
-    <xsl:variable name="NameBookmark">
-      <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
-    </xsl:variable>
-    <xsl:variable name="OutlineLvl">
-      <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="contains($NameBookmark, '_Toc')  and  $OutlineLvl != ''">
-        <text:toc-mark-end>
-          <xsl:attribute name="text:id">
-            <xsl:value-of select="@w:id"/>
-          </xsl:attribute>
-        </text:toc-mark-end>
-      </xsl:when>
-      <!-- a bookmark must begin and end in the same text flow -->
-      <xsl:when test="not(ancestor::w:tc) or ancestor::w:tc//w:bookmarkStart[@w:id=$Id]">
-        <text:bookmark-end>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="$NameBookmark"/>
-          </xsl:attribute>
-        </text:bookmark-end>
-      </xsl:when>
-    </xsl:choose>
-      </xsl:if>
+      <xsl:variable name="NameBookmark">
+        <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
+      </xsl:variable>
+      <xsl:variable name="OutlineLvl">
+        <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="contains($NameBookmark, '_Toc')  and  $OutlineLvl != ''">
+          <text:toc-mark-end>
+            <xsl:attribute name="text:id">
+              <xsl:value-of select="@w:id"/>
+            </xsl:attribute>
+          </text:toc-mark-end>
+        </xsl:when>
+        <!-- a bookmark must begin and end in the same text flow -->
+        <xsl:when test="not(ancestor::w:tc) or ancestor::w:tc//w:bookmarkStart[@w:id=$Id]">
+          <text:bookmark-end>
+            <xsl:attribute name="text:name">
+              <xsl:value-of select="$NameBookmark"/>
+            </xsl:attribute>
+          </text:bookmark-end>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
 
   <!-- simple text  -->
@@ -1133,13 +1133,13 @@
       <xsl:otherwise>
         <!--clam: bugfix #1800794-->
         <!--<xsl:if test="preceding::w:p[parent::w:body|parent::w:tbl/tr/tv][1]/w:pPr/w:sectPr">-->
-          <xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr">
+        <xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr">
           <xsl:choose>
             <xsl:when
               test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
               <xsl:attribute name="style:master-page-name">
                 <!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
-                  master page names should be reviewed and unified : many names not consistent, many styles never used -->
+                master page names should be reviewed and unified : many names not consistent, many styles never used -->
                 <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
               </xsl:attribute>
             </xsl:when>
@@ -1170,15 +1170,18 @@
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:choose>
+                        <xsl:when test="following-sibling::w:r/w:lastRenderedPageBreak and $precSectPr/w:type/@w:val = 'continuous' and generate-id(..) = generate-id($precSectPr/following::w:p[1])">
+                          <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+                        </xsl:when>
                         <xsl:when test="$precSectPr and $mainSectPr/w:type/@w:val = 'continuous' ">
                           <!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
                           <xsl:if
                             test="$mainSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
-                            or $mainSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
-                            or $mainSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
-                            or $mainSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
-                            or $mainSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
-                            or $mainSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
+                              or $mainSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
+                              or $mainSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
+                              or $mainSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
+                              or $mainSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
+                              or $mainSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
                             <xsl:message terminate="no">
                               <xsl:text>feedback:Header/footer change after continuous section break.</xsl:text>
                             </xsl:message>
