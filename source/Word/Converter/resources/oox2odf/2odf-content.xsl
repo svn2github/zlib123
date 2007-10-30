@@ -751,8 +751,7 @@
   <xsl:template name="GetLinkPath">
     <xsl:param name="linkHref"/>
     <xsl:choose>
-      <xsl:when
-        test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'mailto:')">
+      <xsl:when test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'https://') or contains($linkHref, 'mailto:')">
         <xsl:value-of select="$linkHref"/>
       </xsl:when>
       <xsl:when test="contains($linkHref,'#')">
@@ -797,9 +796,7 @@
         <xsl:if test="self::w:r">
           <xsl:call-template name="GetLinkPath">
             <xsl:with-param name="linkHref">
-              <xsl:value-of
-                select="substring-before(substring-after(preceding::w:instrText[1],'&quot;'),'&quot;')"
-              />
+              <xsl:value-of select="substring-before(substring-after(preceding::w:instrText[1],'&quot;'),'&quot;')" />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>

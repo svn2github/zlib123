@@ -16,141 +16,11 @@
   xmlns:oox="urn:oox"
   exclude-result-prefixes="w number wp xlink r b oox">
 
-  <!-- Date and Time Fields -->
-  <xsl:template name="InsertDate">
-    <xsl:param name="dateText"/>
-    <text:date>
-      <xsl:call-template name="InsertDateContent">
-        <xsl:with-param name="dateText" select="$dateText"/>
-      </xsl:call-template>
-    </text:date>
-  </xsl:template>
-
-  <xsl:template name="InsertDateType">
-    <xsl:param name="fieldCode"/>
-    <xsl:param name="fieldType"/>
-    <xsl:choose>
-      <xsl:when test="$fieldType = 'DATE'">
-        <xsl:call-template name="InsertDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when
-        test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate') or contains($fieldCode, 'CreateTime')">
-        <xsl:call-template name="InsertCreationDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="$fieldType = 'PRINTDATE' or contains($fieldCode, 'PrintDate')">
-        <xsl:call-template name="InsertPrintDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when
-        test="$fieldType = 'SAVEDATE' or contains($fieldCode,'LastSavedTime') or contains($fieldCode, 'SaveDate')">
-        <xsl:call-template name="InsertModificationDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="InsertCreationDate">
-    <xsl:param name="dateText"/>
-    <text:creation-date>
-      <xsl:call-template name="InsertDateContent">
-        <xsl:with-param name="dateText" select="$dateText"/>
-      </xsl:call-template>
-    </text:creation-date>
-  </xsl:template>
-
-  <xsl:template name="InsertPrintDate">
-    <xsl:param name="dateText"/>
-    <text:print-date>
-      <xsl:call-template name="InsertDateContent">
-        <xsl:with-param name="dateText" select="$dateText"/>
-      </xsl:call-template>
-    </text:print-date>
-  </xsl:template>
-
-  <xsl:template name="InsertModificationDate">
-    <xsl:param name="dateText"/>
-    <text:modification-date>
-      <xsl:call-template name="InsertDateContent">
-        <xsl:with-param name="dateText" select="$dateText"/>
-      </xsl:call-template>
-    </text:modification-date>
-  </xsl:template>
-
-  <xsl:template name="InsertDateContent">
-    <xsl:param name="dateText"/>
-    <xsl:attribute name="style:data-style-name">
-      <xsl:value-of select="generate-id(.)"/>
-    </xsl:attribute>
-    <xsl:attribute name="text:date-value">
-      <xsl:value-of select="$dateText"/>
-    </xsl:attribute>
-    <xsl:value-of select="$dateText"/>
-  </xsl:template>
-
-  <xsl:template name="InsertTimeType">
-    <xsl:param name="fieldCode"/>
-    <xsl:param name="fieldType"/>
-
-    <xsl:choose>
-      <xsl:when test="$fieldType = 'TIME' ">
-        <xsl:call-template name="InsertTime">
-          <xsl:with-param name="timeText" select="$fieldCode"/>
-        </xsl:call-template>
-      </xsl:when>
-      <!-- EDITTIME, DOCPROPERTY TotalEditingTime-->
-      <xsl:when
-        test="$fieldType = 'EDITTIME' or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
-        <xsl:call-template name="InsertEditTime">
-          <xsl:with-param name="timeText" select="$fieldCode"/>
-        </xsl:call-template>
-      </xsl:when>
-      <!-- DOCPROPERTY CreateTime-->
-      <xsl:when test="contains($fieldCode,'CreateTime') ">
-        <xsl:call-template name="InsertCreationTime">
-          <xsl:with-param name="timeText" select="$fieldCode"/>
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="InsertCreationTime">
-    <xsl:param name="timeText"/>
-    <text:creation-time>
-      <xsl:attribute name="style:data-style-name">
-        <xsl:value-of select="generate-id(.)"/>
-      </xsl:attribute>
-      <xsl:attribute name="text:time-value">
-        <xsl:value-of select="$timeText"/>
-      </xsl:attribute>
-    </text:creation-time>
-  </xsl:template>
-
-  <xsl:template name="InsertTime">
-    <xsl:param name="timeText"/>
-    <text:time>
-      <xsl:attribute name="style:data-style-name">
-        <xsl:value-of select="generate-id(.)"/>
-      </xsl:attribute>
-      <xsl:attribute name="text:time-value">
-        <xsl:value-of select="$timeText"/>
-      </xsl:attribute>
-    </text:time>
-  </xsl:template>
-
-  <xsl:template name="InsertEditTime">
-    <xsl:param name="timeText"/>
-    <text:editing-duration>
-      <xsl:attribute name="style:data-style-name">
-        <xsl:value-of select="generate-id(.)"/>
-      </xsl:attribute>
-    </text:editing-duration>
-  </xsl:template>
+  <!-- 
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
+  -->
 
   <!-- process a field code -->
   <xsl:template match="w:instrText">
@@ -336,7 +206,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template with mode automaticpict should behave as with mode automaticstyles -->
 
   <xsl:template match="w:instrText" mode="automaticpict">
@@ -348,6 +218,333 @@
     <xsl:call-template name="InsertCrossReference">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
     </xsl:call-template>
+  </xsl:template>
+
+  <!--document title TITLE, DOCPROPERTY Title-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE') or contains(@w:instr, 'Title')]" mode="fields">
+    <xsl:call-template name="InsertTitle"/>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'USERNAME')]" mode="fields">
+    <xsl:call-template name="InsertUserName"/>
+  </xsl:template>
+
+  <!--AUTHOR and DOCPROPERTY Author-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'AUTHOR') or contains(@w:instr,' Author')]" mode="fields">
+    <xsl:call-template name="InsertAuthor"/>
+  </xsl:template>
+
+  <!--creator-name LASTSAVEDBY, DOCPROPERTY LastSavedBy-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'LASTSAVEDBY') or contains(@w:instr,'LastSavedBy')]" mode="fields">
+    <xsl:call-template name="InsertCreator"/>
+  </xsl:template>
+
+  <!--user initials-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'USERINITIALS')]" mode="fields">
+    <xsl:call-template name="InsertUserInitials"/>
+  </xsl:template>
+
+  <!--chapter name or chapter number-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'STYLEREF')]" mode="fields">
+    <text:chapter>
+      <xsl:choose>
+        <xsl:when test="self::node()[contains(@w:instr,'\n')]">
+          <xsl:attribute name="text:display">number</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="self::node()[contains(@w:instr,'\*')]">
+          <xsl:attribute name="text:display">name</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="self::node()[contains(@w:instr,'\s')]">
+          <xsl:attribute name="text:display">plain-number</xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
+        <xsl:attribute name="text:outline-level">
+          <xsl:value-of
+            select="substring(substring-before(@w:instr,' \'),string-length(substring-before(@w:instr,' \')))"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:chapter>
+  </xsl:template>
+
+  <!--document subject SUBJECT, DOCPROPERTY Subject-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT') or contains(@w:instr, 'Subject')]" mode="fields">
+    <xsl:call-template name="InsertSubject"/>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple">
+    <text:span text:style-name="{generate-id(w:r)}">
+      <xsl:choose>
+        <!-- handling text after AUTOTEXT field -->
+        <xsl:when test="contains(@w:instr,'STYLEREF') and preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
+          <xsl:value-of  select="descendant::w:t"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="." mode="fields"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </text:span>
+  </xsl:template>
+
+  <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, 
+    DOPCPROPERTY LastSavedTime, DOCPROPERTY CreateTime, INFO CreateDate, INFO PrintDate, INFO Savedate-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime') 
+                or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')] "
+                mode="fields">
+    <xsl:variable name="fieldType">
+      <xsl:call-template name="GetFieldTypeFromCode">
+        <xsl:with-param name="fieldCode" select="@w:instr"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:call-template name="InsertDateType">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+      <xsl:with-param name="fieldType" select="$fieldType"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- possible time types: TIME, EDITTIME, DOCPROPERTY TotalEditingTime, INFO EditTime-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr, 'TotalEditingTime') or 
+                contains(@w:instr, 'EditTime')]" mode="fields">
+    <xsl:variable name="fieldType">
+      <xsl:call-template name="GetFieldTypeFromCode">
+        <xsl:with-param name="fieldCode" select="@w:instr"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:call-template name="InsertTimeType">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+      <xsl:with-param name="fieldType" select="$fieldType"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!--page number-->
+  <xsl:template match="w:fldSimple[(contains(@w:instr,'PAGE') or contains(@w:instr,'page')) 
+                and not(contains(@w:instr,'NUMPAGE')) and not(contains(@w:instr,'PAGEREF'))]" mode="fields">
+    <xsl:call-template name="InsertPageNumber">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!--page-count NUMPAGE, DOCPROPERTY Pages-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGE') or contains(@w:instr,'Pages')]" mode="fields">
+    <xsl:call-template name="InsertPageCount">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+    </xsl:call-template>
+  </xsl:template>
+ 
+  <!--editing cycles number REVNUM, DOCPROPERTY RevisionNumber, INFO RevNum-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'REVNUM') or contains(@w:instr, 'RevisionNumber') or contains(@w:instr, 'RevNum')]" mode="fields">
+    <xsl:call-template name="InsertEditingCycles"/>
+  </xsl:template>
+
+  <!--FILENAME, INFO FileName-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'FILENAME') or contains(@w:instr, 'FileName')]" mode="fields">
+    <xsl:call-template name="InsertFileName"/>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime')
+    or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')]" mode="automaticstyles">
+    <xsl:call-template name="InsertDateStyle">
+      <xsl:with-param name="dateText" select="@w:instr"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!--caption field  from which Index of Figures is created -->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'SEQ')]" mode="fields">
+    <xsl:call-template name="InsertSequence">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+      <xsl:with-param name="sequenceContext" select="w:r"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr, 'TotalEditingTime') or contains(@w:instr, 'EditTime')]" mode="automaticstyles">
+    <xsl:call-template name="InsertTimeStyle">
+      <xsl:with-param name="timeText" select="@w:instr"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple" mode="automaticstyles">
+    <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles"/>
+  </xsl:template>
+
+  <xsl:template match="w:sdt/w:sdtContent/w:fldSimple">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'Company')]" mode="fields">
+    <xsl:call-template name="InsertCompany"/>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'USERADDRESS')]" mode="fields">
+    <xsl:call-template name="InsertUserAddress"/>
+  </xsl:template>
+
+  <!--TEMPLATE, DOCPROPERTY Template-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TEMPLATE')or contains(@w:instr, 'Template')]" mode="fields">
+    <xsl:call-template name="InsertTemplate"/>
+  </xsl:template>
+
+  <!--KEYWORDS and DOCPROPERTY Keywords-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'KEYWORDS') or contains(@w:instr,'Keywords')]" mode="fields">
+    <xsl:call-template name="InsertKeywords"/>
+  </xsl:template>
+
+  <!--NUMCHARS and DOCPROPERTY Characters, INFO NumChars-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMCHARS') or contains(@w:instr, 'Characters') or contains(@w:instr, 'NumChars')]" mode="fields">
+    <xsl:call-template name="InsertCharacterCount"/>
+  </xsl:template>
+
+  <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'Paragraphs')]" mode="fields">
+    <xsl:call-template name="InsertParagraphCount"/>
+  </xsl:template>
+
+  <!-- COMMENTS, DOCPROPERTY Comments-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'COMMENTS') or contains(@w:instr, 'Comments')]" mode="fields">
+    <xsl:call-template name="InsertComments"/>
+  </xsl:template>
+
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
+
+  <!-- Date and Time Fields -->
+  <xsl:template name="InsertDate">
+    <xsl:param name="dateText"/>
+    <text:date>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
+    </text:date>
+  </xsl:template>
+
+  <xsl:template name="InsertDateType">
+    <xsl:param name="fieldCode"/>
+    <xsl:param name="fieldType"/>
+    <xsl:choose>
+      <xsl:when test="$fieldType = 'DATE'">
+        <xsl:call-template name="InsertDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate') or contains($fieldCode, 'CreateTime')">
+        <xsl:call-template name="InsertCreationDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$fieldType = 'PRINTDATE' or contains($fieldCode, 'PrintDate')">
+        <xsl:call-template name="InsertPrintDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$fieldType = 'SAVEDATE' or contains($fieldCode,'LastSavedTime') or contains($fieldCode, 'SaveDate')">
+        <xsl:call-template name="InsertModificationDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertCreationDate">
+    <xsl:param name="dateText"/>
+    <text:creation-date>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
+    </text:creation-date>
+  </xsl:template>
+
+  <xsl:template name="InsertPrintDate">
+    <xsl:param name="dateText"/>
+    <text:print-date>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
+    </text:print-date>
+  </xsl:template>
+
+  <xsl:template name="InsertModificationDate">
+    <xsl:param name="dateText"/>
+    <text:modification-date>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
+    </text:modification-date>
+  </xsl:template>
+
+  <xsl:template name="InsertDateContent">
+    <xsl:param name="dateText"/>
+    <xsl:attribute name="style:data-style-name">
+      <xsl:value-of select="generate-id(.)"/>
+    </xsl:attribute>
+    <xsl:attribute name="text:date-value">
+      <xsl:value-of select="$dateText"/>
+    </xsl:attribute>
+    <xsl:value-of select="$dateText"/>
+  </xsl:template>
+
+  <xsl:template name="InsertTimeType">
+    <xsl:param name="fieldCode"/>
+    <xsl:param name="fieldType"/>
+
+    <xsl:choose>
+      <xsl:when test="$fieldType = 'TIME' ">
+        <xsl:call-template name="InsertTime">
+          <xsl:with-param name="timeText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- EDITTIME, DOCPROPERTY TotalEditingTime-->
+      <xsl:when
+        test="$fieldType = 'EDITTIME' or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
+        <xsl:call-template name="InsertEditTime">
+          <xsl:with-param name="timeText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- DOCPROPERTY CreateTime-->
+      <xsl:when test="contains($fieldCode,'CreateTime') ">
+        <xsl:call-template name="InsertCreationTime">
+          <xsl:with-param name="timeText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertCreationTime">
+    <xsl:param name="timeText"/>
+    <text:creation-time>
+      <xsl:attribute name="style:data-style-name">
+        <xsl:value-of select="generate-id(.)"/>
+      </xsl:attribute>
+      <xsl:attribute name="text:time-value">
+        <xsl:value-of select="$timeText"/>
+      </xsl:attribute>
+    </text:creation-time>
+  </xsl:template>
+
+  <xsl:template name="InsertTime">
+    <xsl:param name="timeText"/>
+    <text:time>
+      <xsl:attribute name="style:data-style-name">
+        <xsl:value-of select="generate-id(.)"/>
+      </xsl:attribute>
+      <xsl:attribute name="text:time-value">
+        <xsl:value-of select="$timeText"/>
+      </xsl:attribute>
+    </text:time>
+  </xsl:template>
+
+  <xsl:template name="InsertEditTime">
+    <xsl:param name="timeText"/>
+    <text:editing-duration>
+      <xsl:attribute name="style:data-style-name">
+        <xsl:value-of select="generate-id(.)"/>
+      </xsl:attribute>
+    </text:editing-duration>
   </xsl:template>
 
   <!-- build a field code using current instrText and recursively forward (go to next instrText) -->
@@ -582,7 +779,7 @@
     <text:bookmark-ref text:reference-format="text">
       <xsl:choose>
         <xsl:when test="contains($fieldCode,'PAGEREF')">
-          <xsl:attribute name="text:ref-name"> 
+          <xsl:attribute name="text:ref-name">
             <xsl:value-of select="substring-before(concat('_',substring-after($fieldCode,'_')),' \')"/>
           </xsl:attribute>
           <xsl:apply-templates select="w:r/w:t"/>
@@ -618,39 +815,16 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!--document title TITLE, DOCPROPERTY Title-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE') or contains(@w:instr, 'Title')]"
-    mode="fields">
-    <xsl:call-template name="InsertTitle"/>
-  </xsl:template>
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'USERNAME')]" mode="fields">
-    <xsl:call-template name="InsertUserName"/>
-  </xsl:template>
-
   <xsl:template name="InsertUserName">
     <text:author-name text:fixed="false">
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:author-name>
   </xsl:template>
 
-  <!--AUTHOR and DOCPROPERTY Author-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'AUTHOR') or contains(@w:instr,' Author')]"
-    mode="fields">
-    <xsl:call-template name="InsertAuthor"/>
-  </xsl:template>
-
   <xsl:template name="InsertAuthor">
     <text:initial-creator>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:initial-creator>
-  </xsl:template>
-
-  <!--creator-name LASTSAVEDBY, DOCPROPERTY LastSavedBy-->
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'LASTSAVEDBY') or contains(@w:instr,'LastSavedBy')]"
-    mode="fields">
-    <xsl:call-template name="InsertCreator"/>
   </xsl:template>
 
   <xsl:template name="InsertCreator">
@@ -660,45 +834,10 @@
   </xsl:template>
 
   <!--user initials-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'USERINITIALS')]" mode="fields">
-    <xsl:call-template name="InsertUserInitials"/>
-  </xsl:template>
-
-  <!--user initials-->
   <xsl:template name="InsertUserInitials">
     <text:author-initials>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:author-initials>
-  </xsl:template>
-
-  <!--chapter name or chapter number-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'STYLEREF')]" mode="fields">
-    <text:chapter>
-      <xsl:choose>
-        <xsl:when test="self::node()[contains(@w:instr,'\n')]">
-          <xsl:attribute name="text:display">number</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="self::node()[contains(@w:instr,'\*')]">
-          <xsl:attribute name="text:display">name</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="self::node()[contains(@w:instr,'\s')]">
-          <xsl:attribute name="text:display">plain-number</xsl:attribute>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
-        <xsl:attribute name="text:outline-level">
-          <xsl:value-of
-            select="substring(substring-before(@w:instr,' \'),string-length(substring-before(@w:instr,' \')))"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:apply-templates select="w:r/child::node()"/>
-    </text:chapter>
-  </xsl:template>
-
-  <!--document subject SUBJECT, DOCPROPERTY Subject-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT') or contains(@w:instr, 'Subject')]"
-    mode="fields">
-    <xsl:call-template name="InsertSubject"/>
   </xsl:template>
 
   <xsl:template name="InsertSubject">
@@ -712,90 +851,9 @@
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:title>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple">
-    <text:span text:style-name="{generate-id(w:r)}">
-      <xsl:choose>  
-        <!-- handling text after AUTOTEXT field -->
-        <xsl:when test="contains(@w:instr,'STYLEREF') and preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
-          <xsl:value-of  select="descendant::w:t"/>
-        </xsl:when>
-        <xsl:otherwise>
-      <xsl:apply-templates select="." mode="fields"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </text:span>
-  </xsl:template>
-
-  <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, 
-    DOPCPROPERTY LastSavedTime, DOCPROPERTY CreateTime, INFO CreateDate, INFO PrintDate, INFO Savedate-->
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime')
-    or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')] "
-    mode="fields">
-    <xsl:variable name="fieldType">
-      <xsl:call-template name="GetFieldTypeFromCode">
-        <xsl:with-param name="fieldCode" select="@w:instr"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:call-template name="InsertDateType">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-      <xsl:with-param name="fieldType" select="$fieldType"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!-- possible time types: TIME, EDITTIME, DOCPROPERTY TotalEditingTime, INFO EditTime-->
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr, 'TotalEditingTime') or contains(@w:instr, 'EditTime')]"
-    mode="fields">
-    <xsl:variable name="fieldType">
-      <xsl:call-template name="GetFieldTypeFromCode">
-        <xsl:with-param name="fieldCode" select="@w:instr"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:call-template name="InsertTimeType">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-      <xsl:with-param name="fieldType" select="$fieldType"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!--page number-->
-  <xsl:template
-    match="w:fldSimple[(contains(@w:instr,'PAGE') or contains(@w:instr,'page')) and not(contains(@w:instr,'NUMPAGE')) and not(contains(@w:instr,'PAGEREF'))]"
-    mode="fields">
-    <xsl:call-template name="InsertPageNumber">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!--page-count NUMPAGE, DOCPROPERTY Pages-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGE') or contains(@w:instr,'Pages')]"
-    mode="fields">
-    <xsl:call-template name="InsertPageCount">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-    </xsl:call-template>
-  </xsl:template>
 
   <xsl:template name="InsertPageCount">
     <text:page-count/>
-  </xsl:template>
-
-
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime')
-    or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')]"
-    mode="automaticstyles">
-    <xsl:call-template name="InsertDateStyle">
-      <xsl:with-param name="dateText" select="@w:instr"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!--caption field  from which Index of Figures is created -->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'SEQ')]" mode="fields">
-    <xsl:call-template name="InsertSequence">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-      <xsl:with-param name="sequenceContext" select="w:r"/>
-    </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="InsertSequence">
@@ -881,14 +939,6 @@
     </number:date-style>
   </xsl:template>
 
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr, 'TotalEditingTime') or contains(@w:instr, 'EditTime')]"
-    mode="automaticstyles">
-    <xsl:call-template name="InsertTimeStyle">
-      <xsl:with-param name="timeText" select="@w:instr"/>
-    </xsl:call-template>
-  </xsl:template>
-
   <xsl:template name="InsertTimeStyle">
     <xsl:param name="timeText"/>
     <xsl:variable name="FormatDate">
@@ -903,10 +953,6 @@
         <xsl:text>TIME</xsl:text>
       </xsl:with-param>
     </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template match="w:fldSimple" mode="automaticstyles">
-    <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles"/>
   </xsl:template>
 
   <xsl:template name="InsertFieldProperties">
@@ -1438,10 +1484,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:sdt/w:sdtContent/w:fldSimple">
-    <xsl:apply-templates/>
-  </xsl:template>
-
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumber">
     <xsl:variable name="docName">
@@ -1515,8 +1557,8 @@
         <xsl:text>current</xsl:text>
       </xsl:attribute>
       <xsl:variable name="rId" select="concat('',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Target=$docName]/@Id)"/>
-      <xsl:variable name="nodesectPr" select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]"/>      
-            
+      <xsl:variable name="nodesectPr" select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]"/>
+
       <xsl:variable name="standardNumType">
         <xsl:choose>
           <xsl:when test="$nodesectPr/w:pgNumType/@w:fmt">
@@ -1544,7 +1586,7 @@
           <xsl:otherwise>1</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-     <xsl:value-of select="./w:r/w:t"/>
+      <xsl:value-of select="./w:r/w:t"/>
     </text:page-number>
   </xsl:template>
 
@@ -1650,12 +1692,12 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="TextIdent">
-      <xsl:value-of select="$LastName"/>  
+      <xsl:value-of select="$LastName"/>
       <xsl:if test="$Path/b:Year">
-      <xsl:text>, </xsl:text>
-      <xsl:value-of select="$Path/b:Year"/>
+        <xsl:text>, </xsl:text>
+        <xsl:value-of select="$Path/b:Year"/>
       </xsl:if>
     </xsl:variable>
 
@@ -1791,29 +1833,10 @@
     </text:editing-cycles>
   </xsl:template>
 
-  <!--editing cycles number REVNUM, DOCPROPERTY RevisionNumber, INFO RevNum-->
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'REVNUM') or contains(@w:instr, 'RevisionNumber') or contains(@w:instr, 'RevNum')]"
-    mode="fields">
-    <xsl:call-template name="InsertEditingCycles"/>
-  </xsl:template>
-
-  <!--FILENAME, INFO FileName-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'FILENAME') or contains(@w:instr, 'FileName')]"
-    mode="fields">
-    <xsl:call-template name="InsertFileName"/>
-  </xsl:template>
-
   <xsl:template name="InsertFileName">
     <text:file-name text:display="name">
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:file-name>
-  </xsl:template>
-
-  <!--KEYWORDS and DOCPROPERTY Keywords-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'KEYWORDS') or contains(@w:instr,'Keywords')]"
-    mode="fields">
-    <xsl:call-template name="InsertKeywords"/>
   </xsl:template>
 
   <xsl:template name="InsertKeywords">
@@ -1822,32 +1845,16 @@
     </text:keywords>
   </xsl:template>
 
-  <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'Company')]" mode="fields">
-    <xsl:call-template name="InsertCompany"/>
-  </xsl:template>
-
   <xsl:template name="InsertCompany">
     <text:sender-company>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:sender-company>
   </xsl:template>
 
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'USERADDRESS')]" mode="fields">
-    <xsl:call-template name="InsertUserAddress"/>
-  </xsl:template>
-
   <xsl:template name="InsertUserAddress">
     <text:sender-street>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:sender-street>
-  </xsl:template>
-
-  <!--TEMPLATE, DOCPROPERTY Template-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TEMPLATE')or contains(@w:instr, 'Template')]"
-    mode="fields">
-    <xsl:call-template name="InsertTemplate"/>
   </xsl:template>
 
   <xsl:template name="InsertTemplate">
@@ -1857,8 +1864,7 @@
   </xsl:template>
 
   <!--NUMWORDS, DOCPROPERTY Words-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMWORDS') or contains(@w:instr, 'Words')]"
-    mode="fields">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMWORDS') or contains(@w:instr, 'Words')]" mode="fields">
     <xsl:call-template name="InsertWordCount"/>
   </xsl:template>
 
@@ -1868,34 +1874,16 @@
     </text:word-count>
   </xsl:template>
 
-  <!--NUMCHARS and DOCPROPERTY Characters, INFO NumChars-->
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'NUMCHARS') 
-    or contains(@w:instr, 'Characters') or contains(@w:instr, 'NumChars')]"
-    mode="fields">
-    <xsl:call-template name="InsertCharacterCount"/>
-  </xsl:template>
-
   <xsl:template name="InsertCharacterCount">
     <text:character-count>
       <xsl:apply-templates select="w:r/child::node()"/>
-    </text:character-count>> </xsl:template>
-
-  <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'Paragraphs')]" mode="fields">
-    <xsl:call-template name="InsertParagraphCount"/>
+    </text:character-count>>
   </xsl:template>
 
   <xsl:template name="InsertParagraphCount">
     <text:paragraph-count>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:paragraph-count>
-  </xsl:template>
-
-  <!-- COMMENTS, DOCPROPERTY Comments-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'COMMENTS') or contains(@w:instr, 'Comments')]"
-    mode="fields">
-    <xsl:call-template name="InsertComments"/>
   </xsl:template>
 
   <xsl:template name="InsertComments">
