@@ -84,7 +84,8 @@
           <!-- TODO : localization -->
           <xsl:message terminate="no">feedback:many alphabetical index properties</xsl:message>
           <xsl:attribute name="text:style-name">
-            <xsl:value-of select="generate-id(key('p', @oox:id+1)/descendant::w:sectPr)"/>
+            <!--<xsl:value-of select="generate-id(key('p', @oox:id+1)/descendant::w:sectPr)"/> clam bugfix #1771286 -->
+            <xsl:value-of select="generate-id(following::w:sectPr[1])"/>
           </xsl:attribute>
           <xsl:attribute name="text:protected">false</xsl:attribute>
           <xsl:attribute name="text:name">Alphabetical Index1</xsl:attribute>
@@ -748,7 +749,18 @@
             </xsl:when>
             <xsl:otherwise>
               <text:index-entry-text/>
-              <text:index-entry-span>, </text:index-entry-span>
+
+              <!--clam bugfix #1771286-->
+              <xsl:choose>
+                <xsl:when test="contains($instrText, 'INDEX \e &quot;&quot;')">
+                  <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+                  <text:index-entry-span> </text:index-entry-span>
+                </xsl:when>
+                <xsl:otherwise>
+                  <text:index-entry-span>, </text:index-entry-span>                  
+                </xsl:otherwise>
+              </xsl:choose>
+              
               <text:index-entry-page-number/>
               <xsl:if test="contains($instrText,'\h') and not(contains($instrText, '\c'))">
                 <text:index-entry-link-end/>
