@@ -33,6 +33,54 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4BA9272449165FCC6A3FCA4A4C2AEF0C"
+        "OwnerKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6590F2E810EFF3F814BE28CEE2B64128"
+        "OwnerKey" = "8:_6A5141C0B72192AAAAFB1AD57F66D885"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6590F2E810EFF3F814BE28CEE2B64128"
+        "OwnerKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6590F2E810EFF3F814BE28CEE2B64128"
+        "OwnerKey" = "8:_F3294E9DECCC66BB20DAD7FA97A6879A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6A5141C0B72192AAAAFB1AD57F66D885"
+        "OwnerKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6A5141C0B72192AAAAFB1AD57F66D885"
+        "OwnerKey" = "8:_4BA9272449165FCC6A3FCA4A4C2AEF0C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7572DF58B0093A31C8908F844AE7A3F5"
+        "OwnerKey" = "8:_4BA9272449165FCC6A3FCA4A4C2AEF0C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7572DF58B0093A31C8908F844AE7A3F5"
+        "OwnerKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -69,8 +117,62 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F3294E9DECCC66BB20DAD7FA97A6879A"
+        "OwnerKey" = "8:_6A5141C0B72192AAAAFB1AD57F66D885"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F3294E9DECCC66BB20DAD7FA97A6879A"
+        "OwnerKey" = "8:_7572DF58B0093A31C8908F844AE7A3F5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F3294E9DECCC66BB20DAD7FA97A6879A"
+        "OwnerKey" = "8:_4BA9272449165FCC6A3FCA4A4C2AEF0C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F3294E9DECCC66BB20DAD7FA97A6879A"
+        "OwnerKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_8233B145276A4A98BC9708CAE69C1AEE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_4BA9272449165FCC6A3FCA4A4C2AEF0C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7572DF58B0093A31C8908F844AE7A3F5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6A5141C0B72192AAAAFB1AD57F66D885"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F3294E9DECCC66BB20DAD7FA97A6879A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6590F2E810EFF3F814BE28CEE2B64128"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -252,6 +354,130 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4BA9272449165FCC6A3FCA4A4C2AEF0C"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:ExcelAddin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_4BA9272449165FCC6A3FCA4A4C2AEF0C"
+                    {
+                    "Name" = "8:ExcelAddin.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:ExcelAddin.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6590F2E810EFF3F814BE28CEE2B64128"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.18964, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_6590F2E810EFF3F814BE28CEE2B64128"
+                    {
+                    "Name" = "8:OdfZipUtils.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:OdfZipUtils.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6A5141C0B72192AAAAFB1AD57F66D885"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:OdfAddinLib, Version=0.2.3.18969, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_6A5141C0B72192AAAAFB1AD57F66D885"
+                    {
+                    "Name" = "8:OdfAddinLib.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:OdfAddinLib.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7572DF58B0093A31C8908F844AE7A3F5"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:SpreadsheetConverter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_7572DF58B0093A31C8908F844AE7A3F5"
+                    {
+                    "Name" = "8:SpreadsheetConverter.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:SpreadsheetConverter.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_AD6D9DFDB43D13C2E098AB2F07C68A0F"
             {
             "AssemblyRegister" = "3:1"
@@ -297,6 +523,37 @@
                     }
                 }
             "SourcePath" = "8:Microsoft.Vbe.Interop.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F3294E9DECCC66BB20DAD7FA97A6879A"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=1.0.0.18964, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_F3294E9DECCC66BB20DAD7FA97A6879A"
+                    {
+                    "Name" = "8:OdfConverterLib.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:OdfConverterLib.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_90DC11790EFE4FB9B43BEAEFBE47B4F3"
@@ -370,7 +627,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Add-in ODF pour Microsoft Excel"
         "ProductCode" = "8:{7B8C1350-91E4-408D-8070-01D2F1268E6C}"
-        "PackageCode" = "8:{A94AD4D4-9ECD-41D0-9E50-58344A96E8A2}"
+        "PackageCode" = "8:{4657CF8A-DD0B-4C8A-B0B1-BD6B62C9C9C9}"
         "UpgradeCode" = "8:{B404C630-2D11-4029-A863-75A6117BC2A2}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -500,7 +757,7 @@
                                                                     "Condition" = "8:"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Test Addin Excel"
+                                                                    "Value" = "8:ODF Add-in for Excel 2007"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A5307E8327F54C7A8D09AF3DE2C1E75B"
                                                                     {
