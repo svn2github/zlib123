@@ -25,6 +25,18 @@
     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 22-Oct-2007 Sandeep S     1812102   Added condition to check for "alignment" child element.                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-2 22-Oct-2007 Sandeep S     1810604   Changes for default page settings.
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled column with column break. Column 
+                                            breaks have 0 based indexing, where as styled columns indexing starts with 1.
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -222,7 +234,8 @@
         <xsl:when test="substring-before($manualBreakes,';') &lt;= @max">
           <xsl:call-template name="CutBreaks">
             <xsl:with-param name="breakes" select="$manualBreakes"/>
-            <xsl:with-param name="max" select="@max"/>
+            <!--RefNo-3-->
+            <xsl:with-param name="max" select="@max - 1"/>
             <xsl:with-param name="mode">
               <xsl:text>style</xsl:text>
             </xsl:with-param>
@@ -359,8 +372,35 @@
 
   <xsl:template match="e:row" mode="automaticstyles">
     <xsl:if test="@ht">
+		<xsl:variable name ="currentRow">			
+			<xsl:value-of  select ="@r"/>
+		</xsl:variable>
+		<xsl:variable name ="rowBrk">
+			<xsl:choose >
+				<xsl:when test ="parent::node()/parent::node()/e:rowBreaks">
+					<xsl:for-each select ="parent::node()/parent::node()/e:rowBreaks/e:brk">
+						<xsl:if test ="@id=$currentRow - 1">
+							<xsl:value-of select ="'page'"/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
       <style:style style:name="{generate-id(.)}" style:family="table-row">
-        <style:table-row-properties fo:break-before="auto">
+		  <style:table-row-properties>
+			  <xsl:variable name ="pageBreak">
+				  <xsl:choose >
+					  <xsl:when test ="contains($rowBrk,'page')">
+						  <xsl:value-of select ="'page'"/>
+					  </xsl:when>
+					  <xsl:otherwise >
+						  <xsl:value-of select ="'auto'"/>
+					  </xsl:otherwise>
+				  </xsl:choose>
+			  </xsl:variable>
+			  <xsl:attribute name ="fo:break-before">
+				  <xsl:value-of select ="$pageBreak"/>
+			  </xsl:attribute>
           <xsl:attribute name="style:row-height">
             <xsl:call-template name="ConvertToCentimeters">
               <xsl:with-param name="length" select="concat(@ht,'pt')"/>
@@ -682,8 +722,12 @@
       <xsl:text>Default</xsl:text>
     </xsl:attribute>
 
+    <!--RefNo-1
     <xsl:if
-      test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1">
+      test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1">-->
+	  <!--Code added by Sandeep : BugNo.1812102: 22-oct-2007 :Added condition to check for "alignment" child element-->
+	  <xsl:if
+		test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1 or e:alignment">  
       <style:table-cell-properties>
         <xsl:if test="@applyAlignment = 1">
           <!-- vertical-align -->
@@ -1068,13 +1112,27 @@
               </xsl:when>
               <!-- Letter -->
               <xsl:otherwise>
+					<!-- Start of RefNo-2-Code inseretd by Sandeep, Fix for the bug 1810604 Date:22nd Oct '07-->
+					<xsl:choose>
+						<xsl:when test="@orientation = 'landscape' ">
                 <xsl:attribute name="fo:page-width">
                   <xsl:text>27.94cm</xsl:text>
                 </xsl:attribute>
                 <xsl:attribute name="fo:page-height">
                   <xsl:text>21.59cm</xsl:text>
                 </xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="fo:page-width">
+								<xsl:text>21.59cm</xsl:text>
+							</xsl:attribute>
+							<xsl:attribute name="fo:page-height">
+								<xsl:text>27.94cm</xsl:text>
+							</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
               </xsl:otherwise>
+				<!--End of RefNo-2-End of Code inseretd by Sandeep, Fix for the bug 1810604 Date:22nd Oct '07-->
             </xsl:choose>
 
             <!-- paper orientation -->

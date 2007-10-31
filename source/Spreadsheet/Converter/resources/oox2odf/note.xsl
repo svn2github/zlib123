@@ -223,9 +223,24 @@
         <xsl:with-param name="text" select="e:text"/>
       </xsl:apply-templates>
 
+		<xsl:variable name="textContent">
+			<xsl:value-of select="e:text/e:r/e:t/child::node()"/>
+		</xsl:variable>
+
+		<xsl:choose >
+			<xsl:when test ="contains($textContent, '&#xA;')">
+				<xsl:call-template name ="getTextEnter1">
+					<xsl:with-param name ="textContent" select ="$textContent"/>
+					<xsl:with-param name="firstTime" select="'true'"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise >
       <text:p text:style-name="{generate-id(e:text)}">
         <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
       </text:p>
+			</xsl:otherwise>
+		</xsl:choose>
+
 
     </office:annotation>
 
@@ -390,6 +405,32 @@
 
   </xsl:template>
 
-
+	<xsl:template name ="getTextEnter1">
+		<xsl:param name ="textContent"/>
+		<xsl:param name ="firstTime"/>
+		<xsl:variable name ="oneLine">
+			<xsl:value-of select ="substring-before($textContent,'&#xA;')"/>
+		</xsl:variable>
+		<text:p text:style-name="{generate-id(e:text)}">
+			<text:span>
+				<xsl:attribute name="text:style-name">
+					<xsl:value-of select="generate-id(e:text/e:r)"/>
+				</xsl:attribute>
+				<xsl:if test="$firstTime='true'">
+					<xsl:value-of select="$oneLine"/>
+				</xsl:if>
+				<xsl:if test="not($firstTime)">
+					<xsl:value-of select="substring-after($textContent,'&#xA;')"/>
+				</xsl:if>
+			</text:span>
+		</text:p>
+		<xsl:if test ="substring-after($textContent,'&#xA;') !=''">
+			<xsl:call-template name ="getTextEnter1">
+				<xsl:with-param name ="textContent">
+					<xsl:value-of select ="substring-after($textContent,'&#xA;')"/>
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
 
 </xsl:stylesheet>

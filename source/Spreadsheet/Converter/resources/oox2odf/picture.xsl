@@ -46,6 +46,8 @@
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="chart.xsl"/>
+  <!-- Added by vijayeta, fix fo the bug 1760182-->
+  <xsl:import href="insert_text.xsl"/>
 
   <xsl:key name="drawing" match="e:drawing" use="''"/>
 
@@ -280,7 +282,38 @@
       <!-- insert text-box -->
       <xsl:when test="xdr:sp/xdr:nvSpPr/xdr:cNvSpPr/@txBox = 1">
         <draw:frame draw:z-index="0">
-
+			<!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+		         If the text box has Hyperlink, variables defined-->
+			<xsl:variable name ="hlinkId">
+				<xsl:if test ="xdr:sp/xdr:nvSpPr/xdr:cNvPr/a:hlinkClick">
+					<xsl:value-of select ="xdr:sp/xdr:nvSpPr/xdr:cNvPr/a:hlinkClick/@r:id"/>
+				</xsl:if>
+			</xsl:variable>
+			<xsl:variable name ="drawingRels">
+				<xsl:value-of select ="concat('xl/drawings/_rels/',$Drawing,'.rels')"/>
+			</xsl:variable>
+			<xsl:variable name ="target">
+				<xsl:value-of select ="document($drawingRels)//node()/node()[@Id=$hlinkId]/@Target"/>
+			</xsl:variable>
+			<xsl:variable name ="newTarget">
+				<xsl:choose>
+					<!-- when hyperlink leads to a file in network -->
+					<xsl:when test="starts-with($target,'file:///\\')">
+						<xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"/>
+					</xsl:when>
+					<!--when hyperlink leads to www or mailto -->
+					<xsl:when test="contains($target,':')">
+						<xsl:value-of select="$target"/>
+					</xsl:when>
+					<!--when hyperlink leads to a document -->
+					<xsl:otherwise>
+						<xsl:call-template name="Change20PercentToSpace">
+							<xsl:with-param name="string" select="$target"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07, variable definition -->
           <xsl:attribute name="draw:style-name">
             <xsl:value-of select="generate-id(.)"/>
           </xsl:attribute>
@@ -294,10 +327,36 @@
               <xsl:value-of select="$NameSheet"/>
             </xsl:with-param>
           </xsl:call-template>
-
+			<!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+		         If the text box has Hyperlink-->
+			<xsl:choose >
+				<xsl:when test ="$hlinkId!='' and $newTarget!=''">
+					<draw:text-box>
+						<text:p>
+							<xsl:if test="a:pPr">
+								<xsl:attribute name="text:style-name">
+									<xsl:value-of select="generate-id(.)"/>
+								</xsl:attribute>
+							</xsl:if>
+							<text:a>
+								<xsl:attribute name ="xlink:href">
+									<xsl:value-of select =" $newTarget"/>
+								</xsl:attribute>
+								<xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>
+							</text:a>
+						</text:p>
+					</draw:text-box>
+				</xsl:when>
+				<xsl:otherwise >
           <draw:text-box>
             <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
           </draw:text-box>
+				</xsl:otherwise>
+			</xsl:choose>
+			<!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07-->
+			<!--<draw:text-box>
+            <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
+          </draw:text-box>-->
 
         </draw:frame>
       </xsl:when>
@@ -454,7 +513,12 @@
           <xsl:value-of select="$rId"/>
         </xsl:when>
         <xsl:otherwise>
+          <xsl:if test="xdr:pic/xdr:blipFill/a:blip/@r:embed">
           <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:embed"/>
+          </xsl:if>
+          <xsl:if test="xdr:pic/xdr:blipFill/a:blip/@r:link">
+            <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:link"/>
+          </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -473,7 +537,7 @@
               <xsl:value-of select="$targetName"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-after(substring-after($pzipsource,'/'), '/')"/>
+              <xsl:value-of select="substring-after(translate(substring-after($pzipsource,'/'),'\' ,'/'),'/')"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
