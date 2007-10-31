@@ -19,74 +19,16 @@ namespace CleverAge.OdfConverter.Word
         
         protected override void CopyLevel(ZipReader archive, string relFile, XmlTextWriter xtw, List<string> namespaces)
         {
-            XmlReader reader;
-            List<RelationShip> rels;
-            XmlReaderSettings xrs = new XmlReaderSettings();
-            xrs.IgnoreWhitespace = false;
-
-            try
+            // init id counters
+            if (relFile.Equals("_rels/.rels"))
             {
-                // copy relationship part and extract relationships
-                reader = XmlReader.Create(archive.GetEntry(relFile));
-
-                xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
-                xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, relFile);
-                xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, RELATIONSHIP_NS);
-                rels = Copy(reader, xtw, true);
-                reader.Close();
-                xtw.WriteEndElement();
-                xtw.Flush();
-
-                // init id counters
-                if (relFile.Equals("_rels/.rels"))
-                {
-                    _paraId = 0;
-                    _sectPrId = 0;
-                }
-
-                // copy referenced parts
-                foreach (RelationShip rel in rels)
-                {
-                    if (namespaces.Contains(rel.Type))
-                    {
-                        try
-                        {
-                            string basePath = relFile.Substring(0, relFile.LastIndexOf("_rels/"));
-                            string path = rel.Target.Substring(0, rel.Target.LastIndexOf('/') + 1);
-                            string file = rel.Target.Substring(rel.Target.LastIndexOf('/') + 1);
-
-                            // if there is a relationship part for the current part 
-                            // copy relationships and referenced files recursively
-                            CopyLevel(archive, basePath + path + "_rels/" + file + ".rels", xtw, namespaces);
-
-                            reader = XmlReader.Create(archive.GetEntry(basePath + rel.Target));
-
-                            xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
-                            xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, basePath + rel.Target);
-                            xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, rel.Type);
-                            xtw.WriteAttributeString(NS_PREFIX, "rId", PACKAGE_NS, rel.Id);
-
-                            Copy(reader, xtw, false);
-                            _paraId++;
-                            _sectPrId++;
-
-                            reader.Close();
-
-                            xtw.WriteEndElement();
-                            xtw.Flush();
-                        }
-                        catch (ZipEntryNotFoundException)
-                        {
-                        }
-                    }
-                }
+                _paraId = 0;
+                _sectPrId = 0;
             }
-            catch (ZipEntryNotFoundException)
-            {
-            }
+            base.CopyLevel(archive, relFile, xtw, namespaces);
         }
 
-        protected List<RelationShip> Copy(XmlReader xtr, XmlTextWriter xtw, bool extractRels)
+        protected override List<RelationShip> Copy(XmlReader xtr, XmlTextWriter xtw, bool extractRels)
         {
             bool isInRel = false;
             List<RelationShip> rels = new List<RelationShip>();
@@ -189,6 +131,10 @@ namespace CleverAge.OdfConverter.Word
                         break;
                 }
             }
+
+            _paraId++;
+            _sectPrId++;
+
             return rels;
         }
 
@@ -212,10 +158,10 @@ namespace CleverAge.OdfConverter.Word
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme");
+                namespaces.Add("http://schemas.openxmlformats.org/package/2006/content-types");
 
                 return namespaces;
             }
         }
-
     }
 }
