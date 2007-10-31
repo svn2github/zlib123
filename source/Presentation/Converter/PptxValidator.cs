@@ -138,6 +138,18 @@ namespace Sonata.OdfConverter.Presentation
             }
             this.validateXml(contentTypes);
 
+            // Code to verify whether a file is valid pptx file or not
+            //bug no. 1698280
+            //Code chcanges 1 of 2
+            if (!this.validatePptx(reader))
+            {
+                throw new NotAnOoxDocumentException("The pptx package must have a Presentation.xml file");
+            }
+
+            // End
+
+
+
             // 2. _rels/.rels must be present and valid
             Stream relationShips = null;
             try
@@ -412,5 +424,33 @@ namespace Sonata.OdfConverter.Presentation
             throw new NotAnOoxDocumentException("XML Schema Validation error : " + args.Message);
             //throw new PptxValidatorException("XML Schema Validation error : " + args.Message);
         }
+
+        // Code to verify whether a file is valid pptx file or not
+        //bug no. 1698280
+        //Code chcanges 2 of 2
+        private bool validatePptx(ZipReader reader)
+        {
+
+            Stream contentTypes = reader.GetEntry(OOX_CONTENT_TYPE_FILE);
+            XmlReader r = XmlReader.Create(contentTypes);
+
+            while (r.Read())
+            {
+                if (r.NodeType == XmlNodeType.Element && r.LocalName == "Override")
+                {
+
+                    if (r.GetAttribute("ContentType").Equals("application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"))   //Contains(".presentationml."))
+                    {
+                        return true;
+                    }
+
+                }
+            }
+
+            return false;
+        }
+
+
+        // End
     }
 }
