@@ -118,7 +118,7 @@ exclude-result-prefixes="p a r xlink rels">
         <xsl:when test ="p:spPr/a:xfrm/a:off">
           <xsl:choose>
             <xsl:when test="$grpBln='true'">
-              <xsl:call-template name="tmpWriteCordinates"/>
+              <xsl:call-template name="tmpGropingWriteCordinates"/>
             </xsl:when>
             <xsl:otherwise>
           <xsl:call-template name="tmpWriteCordinates"/>

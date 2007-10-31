@@ -1681,7 +1681,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:message terminate="no">translation.oox2odf.shapesTypeChord</xsl:message>
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
-			<xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name ="grID" select ="$GraphicId" />
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
@@ -1690,10 +1690,22 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-            draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" 
-            draw:text-areas="3200 3200 18400 18400" 
-            draw:type="ellipse"/>
+          <draw:enhanced-geometry svg:viewBox="0 0 914400 914400" 
+            draw:extrusion-allowed="true" 
+            draw:text-areas="133911 133911 780489 780489" 
+            draw:glue-points="780489 780489 457201 0 618845 390244" 
+            draw:type="mso-spt100" draw:enhanced-path="M 780489 780489 W 0 0 914400 914400 780489 780489 457200 0 Z N">
+            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+              <xsl:attribute name ="draw:mirror-horizontal">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+              <xsl:attribute name ="draw:mirror-vertical">
+                <xsl:value-of select="'true'"/>
+              </xsl:attribute>
+            </xsl:if>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
@@ -3756,9 +3768,9 @@ Copyright (c) 2007, Sonata Software Limited
         <style:graphic-properties>
 
           <!-- FILL -->
-          <xsl:call-template name ="Fill" />
+          <xsl:call-template name ="Fill"/>
 
-          <!-- LINE COLOR -->
+           <!-- LINE COLOR -->
           <xsl:call-template name ="LineColor" />
 
           <!-- LINE STYLE -->
@@ -3822,14 +3834,11 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <!-- Get fill color for shape-->
   <xsl:template name="Fill">
+    <xsl:param name="var_pos"/>
+    <xsl:param name="FileType"/>
+    <xsl:param name="flagGroup"/>
+    
     <xsl:choose>
-      <!-- Code for the Brakets,Braces Bug as not to display solid fill-->
-      <xsl:when test="(p:spPr/a:prstGeom/@prst='leftBrace') or (p:spPr/a:prstGeom/@prst='leftBracket') or (p:spPr/a:prstGeom/@prst='rightBracket') or (p:spPr/a:prstGeom/@prst='rightBrace')">
-        <xsl:attribute name ="draw:fill">
-          <xsl:value-of select="'none'" />
-        </xsl:attribute>
-      </xsl:when>
-      <!-- End of code-->
       <!-- No fill -->
       <xsl:when test ="p:spPr/a:noFill">
         <xsl:attribute name ="draw:fill">
@@ -3890,70 +3899,31 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </xsl:if>
       </xsl:when>
-    
       <!--added by vipul for gradient fill-->
       <xsl:when test="p:spPr/a:gradFill">
-        <xsl:for-each select="p:spPr/a:gradFill/a:gsLst/child::node()[1]">
-          <xsl:if test="name()='a:gs'">
-            <xsl:choose>
-              <xsl:when test="a:srgbClr/@val">
-                <xsl:attribute name="draw:fill-color">
-                  <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                </xsl:attribute>
-                <xsl:attribute name="draw:fill">
-                  <xsl:value-of select="'solid'"/>
-                </xsl:attribute>
-              </xsl:when>
-              <xsl:when test="a:schemeClr/@val">
-                <xsl:attribute name="draw:fill-color">
-                  <xsl:call-template name="getColorCode">
-                    <xsl:with-param name="color">
-                      <xsl:value-of select="a:schemeClr/@val" />
-                    </xsl:with-param>
-                    <xsl:with-param name="lumMod">
-                      <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
-                    </xsl:with-param>
-                    <xsl:with-param name="lumOff">
-                      <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:attribute>
-                <xsl:attribute name="draw:fill">
-                  <xsl:value-of select="'solid'"/>
-                </xsl:attribute>
-              </xsl:when>
-            </xsl:choose>
-            <xsl:choose>
-              <xsl:when test="a:srgbClr/a:alpha/@val">
-                <xsl:variable name ="opacity">
-                  <xsl:value-of select ="a:srgbClr/a:alpha/@val"/>
-                </xsl:variable>
-                <xsl:if test="($opacity != '') or ($opacity != 0)">
-                  <xsl:attribute name ="draw:opacity">
-                    <xsl:value-of select="concat(($opacity div 1000), '%')"/>
-                  </xsl:attribute>
-                </xsl:if>
-              </xsl:when>
-              <xsl:when test="a:schemeClr/a:alpha/@val">
-                <xsl:variable name ="opacity">
-                  <xsl:value-of select ="a:schemeClr/a:alpha/@val"/>
-                </xsl:variable>
-                <xsl:if test="($opacity != '') or ($opacity != 0)">
-                  <xsl:attribute name ="draw:opacity">
-                    <xsl:value-of select="concat(($opacity div 1000), '%')"/>
-                  </xsl:attribute>
-                </xsl:if>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:when>
+        <xsl:call-template name="tmpGradFillColor">
+          <xsl:with-param name="var_pos" select="$var_pos"/>
+          <xsl:with-param name="FileType" select="$FileType"/>
+          <xsl:with-param name="flagGroup" select="$flagGroup"/>
+
+        </xsl:call-template>
+        </xsl:when>
       <xsl:when test ="p:style/a:fillRef">
         <!--Fill refernce-->
-        <xsl:if test ="p:style/a:fillRef">
-          <xsl:attribute name ="draw:fill">
-            <xsl:value-of select="'solid'" />
-          </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test ="p:style/a:fillRef/@idx = 0">
+            <xsl:attribute name ="draw:fill">
+              <xsl:value-of select="'none'" />
+            </xsl:attribute>
+            
+          </xsl:when>
+          <xsl:when test ="p:style/a:fillRef/@idx > 0">
+            <xsl:attribute name ="draw:fill">
+              <xsl:value-of select="'solid'" />
+            </xsl:attribute>
+
+          </xsl:when>
+        </xsl:choose>
           <!-- Standard color-->
           <xsl:if test ="p:style/a:fillRef/a:srgbClr/@val">
             <xsl:attribute name ="draw:fill-color">
@@ -3999,7 +3969,8 @@ Copyright (c) 2007, Sonata Software Limited
 						</xsl:if>
 					</xsl:if>-->
           </xsl:if>
-        </xsl:if>
+        
+
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name ="draw:fill">

@@ -109,6 +109,27 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:with-param name="SlideName" select="$SlideFileName">  </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
+      <xsl:variable name ="slideRel">
+        <xsl:value-of select ="concat('ppt/slides/_rels/',$SlideFileName,'.rels')"/>
+      </xsl:variable>
+      <xsl:variable name ="LayoutFileNo">
+        <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
+          <xsl:value-of select ="concat('ppt',substring(.,3))"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:variable name ="newLayout" >
+        <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
+          <xsl:value-of  select ="substring-after(.,'../slideLayouts/')"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:variable name ="LayoutRel" >
+        <xsl:value-of select ="concat('ppt/slideLayouts/_rels/',$newLayout,'.rels')"/>
+      </xsl:variable>
+      <xsl:variable name ="SMName" >
+        <xsl:for-each select ="document($LayoutRel)//node()/@Target[contains(.,'slideMasters')]">
+          <xsl:value-of  select ="substring-after(.,'../slideMasters/')"/>
+        </xsl:for-each>
+      </xsl:variable>
       <!--End-->
 
       <!-- Page settings like footer date slide number visible/Invisible-->
@@ -199,41 +220,10 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:choose>
               </xsl:when>
               <xsl:when test="p:bgPr/a:gradFill">
-                <!-- warn if gradient -->
-                <xsl:message terminate="no">translation.oox2odf.slideTypeBackgroundGradient</xsl:message>
-                <xsl:for-each select="p:bgPr/a:gradFill/a:gsLst/child::node()[1]">
-                  <xsl:if test="name()='a:gs'">
-                    <xsl:choose>
-                      <xsl:when test="a:srgbClr/@val">
-                        <xsl:attribute name="draw:fill-color">
-                          <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                        </xsl:attribute>
-                        <xsl:attribute name="draw:fill">
-                          <xsl:value-of select="'solid'"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="a:schemeClr/@val">
-                        <xsl:attribute name="draw:fill-color">
-                          <xsl:call-template name="getColorCode">
-                            <xsl:with-param name="color">
-                              <xsl:value-of select="a:schemeClr/@val" />
-                            </xsl:with-param>
-                            <xsl:with-param name="lumMod">
-                              <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
-                            </xsl:with-param>
-                            <xsl:with-param name="lumOff">
-                              <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
-                            </xsl:with-param>
+                <xsl:call-template name="tmpBackGrndGradFillColor">
+                  <xsl:with-param name="FileType" select="concat(substring-before($SlideFileName,'.xml'),'-Gradient')"/>
                           </xsl:call-template>
-                        </xsl:attribute>
-                        <xsl:attribute name="draw:fill">
-                          <xsl:value-of select="'solid'"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                    </xsl:choose>
-                  </xsl:if>
-                </xsl:for-each>
-            </xsl:when>
+                  </xsl:when>
               <xsl:when test="(p:bgPr/a:blipFill or p:bgRef/a:blipFill) and p:bgPr/a:blipFill/a:blip/@r:embed ">
                 <xsl:attribute name="draw:fill-color">
                   <xsl:value-of select="'#FFFFFF'"/>
@@ -510,40 +500,10 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:choose>
                 </xsl:when>
                 <xsl:when test="p:bgPr/a:gradFill">
-                  <xsl:message terminate="no">translation.oox2odf.slideLayoutTypeBackgroundGradient</xsl:message>
-                  <xsl:for-each select="p:bgPr/a:gradFill/a:gsLst/child::node()[1]">
-                    <xsl:if test="name()='a:gs'">
-                      <xsl:choose>
-                        <xsl:when test="a:srgbClr/@val">
-                          <xsl:attribute name="draw:fill-color">
-                            <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                          </xsl:attribute>
-                          <xsl:attribute name="draw:fill">
-                            <xsl:value-of select="'solid'"/>
-                          </xsl:attribute>
-                        </xsl:when>
-                        <xsl:when test="a:schemeClr/@val">
-                          <xsl:attribute name="draw:fill-color">
-                            <xsl:call-template name="getColorCode">
-                              <xsl:with-param name="color">
-                                <xsl:value-of select="a:schemeClr/@val" />
-                              </xsl:with-param>
-                              <xsl:with-param name="lumMod">
-                                <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
-                              </xsl:with-param>
-                              <xsl:with-param name="lumOff">
-                                <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
-                              </xsl:with-param>
+                  <xsl:call-template name="tmpBackGrndGradFillColor">
+                    <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),substring-before($Layout,'.xml'),'-Gradient')"/>
                             </xsl:call-template>
-                          </xsl:attribute>
-                          <xsl:attribute name="draw:fill">
-                            <xsl:value-of select="'solid'"/>
-                          </xsl:attribute>
-                        </xsl:when>
-                      </xsl:choose>
-                    </xsl:if>
-                  </xsl:for-each>
-                </xsl:when>
+                   </xsl:when>
                 <xsl:when test="p:bgPr/a:blipFill or p:bgRef/a:blipFill and p:bgPr/a:blipFill/a:blip/@r:embed">
                   <xsl:attribute name="draw:fill-color">
                     <xsl:value-of select="'#FFFFFF'"/>
@@ -2160,6 +2120,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:with-param name="SlideRelationId" select="$SlideRelationId"/>
                         <xsl:with-param name="var_pos" select="$var_pos"/>
                        <xsl:with-param name="grpBln" select="'true'"/>
+                    <xsl:with-param name="groupPrefix" select="'Slidegroup'"/>
                       </xsl:call-template>
                   </xsl:when>
                 </xsl:choose>
@@ -2249,31 +2210,7 @@ exclude-result-prefixes="p a r xlink rels">
     </draw:text-box >
   </xsl:template>
   <xsl:template name ="GetStylesFromSlide" >
-    <!--@ Default Font Name from PPTX -->
-    <!--<xsl:variable name ="DefFont">
-      <xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:fontScheme
-						/a:majorFont/a:latin/@typeface">
-        <xsl:value-of select ="."/>
-      </xsl:for-each>
-    </xsl:variable>-->
-    <xsl:variable name ="DefFontSizeTitle">
-      <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:txStyles/p:titleStyle/a:lvl1pPr/a:defRPr/@sz">
-        <xsl:value-of select ="."/>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:variable name ="DefFontSizeBody">
-      <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:txStyles/p:bodyStyle/a:lvl1pPr/a:defRPr/@sz">
-        <xsl:value-of select ="."/>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:variable name ="DefFontSizeOther">
-      <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:txStyles/p:otherStyle/a:lvl1pPr/a:defRPr/@sz">
-        <xsl:value-of select ="."/>
-      </xsl:for-each>
-    </xsl:variable>
-    <!--@Modified font Names -->
-
-    <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+       <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
         <xsl:variable name="SlidePos" select="position()"/>
       <xsl:variable name ="SlideNumber">
         <xsl:value-of  select ="concat('slide',position())" />
@@ -2655,6 +2592,7 @@ exclude-result-prefixes="p a r xlink rels">
                                 <xsl:with-param name="index" select="$var_index"/>
                                 <xsl:with-param name="fontscale" select="$var_fontScale"/>
                                 <xsl:with-param name="level" select="$levelForDefFont"/>
+                                <xsl:with-param name="SMName" select="$SMName"/>
                               </xsl:call-template>
                             </xsl:when>
                             <xsl:otherwise>
@@ -2664,6 +2602,8 @@ exclude-result-prefixes="p a r xlink rels">
                                 <xsl:with-param name="LayoutFileName" select="$LayoutFileName"/>
                                 <xsl:with-param name="index" select="$var_index"/>
                                 <xsl:with-param name="fontscale" select="$var_fontScale"/>
+                                <xsl:with-param name="SMName" select="$SMName"/>
+
                               </xsl:call-template>
                             </xsl:otherwise>
                           </xsl:choose>
@@ -2936,7 +2876,12 @@ exclude-result-prefixes="p a r xlink rels">
                       </xsl:attribute >
                       <style:graphic-properties draw:stroke="none">
                         <!--FILL-->
-                        <xsl:call-template name ="Fill" />
+                    <xsl:call-template name ="Fill">
+                         <xsl:with-param name="var_pos" select="concat($var_pos,'-',$pos)"/>
+                         <xsl:with-param name="FileType" select="$SlideNumber"/>
+                         <xsl:with-param name="flagGroup" select="'True'"/>
+                    </xsl:call-template>
+                        
                         <!--LINE COLOR-->
                         <xsl:call-template name ="LineColor" />
                         <!--LINE STYLE-->
@@ -3296,7 +3241,10 @@ exclude-result-prefixes="p a r xlink rels">
                       </xsl:attribute >
                       <style:graphic-properties>
                         <!--FILL-->
-                        <xsl:call-template name ="Fill" />
+                        <xsl:call-template name ="Fill">
+                          <xsl:with-param name="var_pos" select="$var_pos"/>
+                          <xsl:with-param name="FileType" select="concat('Slide',$SlidePos)"/>
+                        </xsl:call-template>
                         <!--LINE COLOR-->
                         <xsl:call-template name ="LineColor" />
                         <!--LINE STYLE-->
@@ -3325,6 +3273,7 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:with-param name="TypeId" select="$SlideID"/>
                       <xsl:with-param name="DefFont" select="$DefFont"/>
                       <xsl:with-param name="SMName" select="$SMName"/>
+                     
                     </xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
@@ -3336,7 +3285,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='subTitle'">
                           <xsl:value-of select="'subtitle'"/>
                         </xsl:when>
-                        <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph/@type) and ./parent::node()/p:nvSpPr/p:nvPr/p:ph/@idx">
+                        <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph/@type) and p:nvSpPr/p:nvPr/p:ph/@idx">
                           <xsl:value-of select="'outline'"/>
                         </xsl:when>
                         <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='body'">
@@ -3367,6 +3316,10 @@ exclude-result-prefixes="p a r xlink rels">
                           <xsl:with-param name="LayoutFileName" select="$LayoutFileName"/>
                           <xsl:with-param name="index" select="$var_index"/>
                           <xsl:with-param name="ThemeName" select="$ThemeName"/>
+                          <xsl:with-param name="SMName" select="$SMName"/>
+                          <xsl:with-param name="var_pos" select="$var_pos"/>
+                          <xsl:with-param name="FileType" select="'slide'"/>
+                          <xsl:with-param name="slideNo" select="$SlidePos"/>
                         </xsl:call-template>
                       </style:graphic-properties>
                       <style:paragraph-properties>
@@ -3491,7 +3444,10 @@ exclude-result-prefixes="p a r xlink rels">
                     </xsl:attribute >
                     <style:graphic-properties>
                       <!--FILL-->
-                      <xsl:call-template name ="Fill" />
+                      <xsl:call-template name ="Fill">
+                        <xsl:with-param name="var_pos" select="$var_pos"/>
+                        <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'))"/>
+                      </xsl:call-template>
                       <!--LINE COLOR-->
                       <xsl:call-template name ="LineColor" />
                       <!--LINE STYLE-->
@@ -4913,11 +4869,13 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name="index"/>
     <xsl:param name ="DefFont" />
     <xsl:param name ="fontscale"/>
+    <xsl:param name ="SMName"/>
     
     <xsl:call-template name="tmpSlideTextProperty">
       <xsl:with-param name="DefFont" select="$DefFont"/>
       <xsl:with-param name="fontscale" select="$fontscale"/>
       <xsl:with-param name="index" select ="$index"/>
+      <xsl:with-param name="SMName" select ="$SMName"/>
     </xsl:call-template>
     
     <xsl:if test ="not(a:rPr/@sz)">
@@ -5572,24 +5530,14 @@ exclude-result-prefixes="p a r xlink rels">
 		  <xsl:variable name="baseData">
 			  <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 		  </xsl:variable>
-		  <xsl:choose>
-			  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-				  <xsl:variable name="superCont">
-					  <xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+        <xsl:variable name="subSuperScriptValue">
+          <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 				  </xsl:variable>
-				  <xsl:attribute name="style:text-position">
-					  <xsl:value-of select="$superCont"/>
-				  </xsl:attribute>
-			  </xsl:when>
-			  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-				  <xsl:variable name="subCont">
-					  <xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-				  </xsl:variable>
-				  <xsl:attribute name="style:text-position">
-					  <xsl:value-of select="$subCont"/>
-				  </xsl:attribute>
-			  </xsl:when>
-		  </xsl:choose>
+
+        <xsl:call-template name="tmpSubSuperScript">
+          <xsl:with-param name="baseline" select="$baseData"/>
+          <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+        </xsl:call-template>
 	  </xsl:if>
       </xsl:when>
     </xsl:choose>
@@ -5601,10 +5549,11 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="DefFont" />
     <xsl:param name ="fontscale"/>
     <xsl:param name ="level"/>
-    
+    <xsl:param name ="SMName"/>
     <xsl:call-template name="tmpSlideTextProperty">
       <xsl:with-param name="DefFont" select="$DefFont"/>
       <xsl:with-param name="fontscale" select="$fontscale"/>
+      <xsl:with-param name="SMName" select="$SMName"/>
     </xsl:call-template>
 
         <xsl:if test ="not(a:rPr/@sz)">
@@ -6586,24 +6535,13 @@ exclude-result-prefixes="p a r xlink rels">
 				  <xsl:variable name="baseData">
 					  <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 				  </xsl:variable>
-				  <xsl:choose>
-					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-						  <xsl:variable name="superCont">
-							  <xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 						  </xsl:variable>
-						  <xsl:attribute name="style:text-position">
-							  <xsl:value-of select="$superCont"/>
-						  </xsl:attribute>
-					  </xsl:when>
-					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-						  <xsl:variable name="subCont">
-							  <xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-						  </xsl:variable>
-						  <xsl:attribute name="style:text-position">
-							  <xsl:value-of select="$subCont"/>
-						  </xsl:attribute>
-					  </xsl:when>
-				  </xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 			  </xsl:if>
 		  </xsl:when>
 			
@@ -6803,24 +6741,13 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:variable name="baseData">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-							<xsl:variable name="superCont">
-								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$superCont"/>
-							</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-							<xsl:variable name="subCont">
-								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$subCont"/>
-							</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 				</xsl:if>
 			</xsl:when>
 			
@@ -7020,24 +6947,13 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:variable name="baseData">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-							<xsl:variable name="superCont">
-								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$superCont"/>
-							</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-							<xsl:variable name="subCont">
-								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$subCont"/>
-							</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 				</xsl:if>
 			</xsl:when>		
         
@@ -7237,24 +7153,13 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:variable name="baseData">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-							<xsl:variable name="superCont">
-								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$superCont"/>
-							</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-							<xsl:variable name="subCont">
-								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$subCont"/>
-							</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 				</xsl:if>
 			</xsl:when>
 			
@@ -7454,24 +7359,13 @@ exclude-result-prefixes="p a r xlink rels">
 				  <xsl:variable name="baseData">
 					  <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 				  </xsl:variable>
-				  <xsl:choose>
-					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-						  <xsl:variable name="superCont">
-							  <xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 						  </xsl:variable>
-						  <xsl:attribute name="style:text-position">
-							  <xsl:value-of select="$superCont"/>
-						  </xsl:attribute>
-					  </xsl:when>
-					  <xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-						  <xsl:variable name="subCont">
-							  <xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-						  </xsl:variable>
-						  <xsl:attribute name="style:text-position">
-							  <xsl:value-of select="$subCont"/>
-						  </xsl:attribute>
-					  </xsl:when>
-				  </xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 			  </xsl:if>
 		  </xsl:when>	
 	  
@@ -7888,24 +7782,13 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:variable name="baseData">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-							<xsl:variable name="superCont">
-								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$superCont"/>
-							</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-							<xsl:variable name="subCont">
-								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$subCont"/>
-							</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 				</xsl:if>
 			</xsl:when>
 			
@@ -8105,24 +7988,13 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:variable name="baseData">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-							<xsl:variable name="superCont">
-								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$superCont"/>
-							</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-							<xsl:variable name="subCont">
-								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$subCont"/>
-							</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 				</xsl:if>
 			</xsl:when>
 			
@@ -8322,24 +8194,13 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:variable name="baseData">
 						<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline"/>
 					</xsl:variable>
-					<xsl:choose>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &gt; 0)">
-							<xsl:variable name="superCont">
-								<xsl:value-of select="concat('super ',format-number($baseData div 1000,'#.###'),'%')"/>
+          <xsl:variable name="subSuperScriptValue">
+            <xsl:value-of select="number(format-number($baseData div 1000,'#'))"/>
 							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$superCont"/>
-							</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="(parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@baseline &lt; 0)">
-							<xsl:variable name="subCont">
-								<xsl:value-of select="concat('sub ',format-number(substring-after($baseData,'-') div 1000,'#.###'),'%')"/>
-							</xsl:variable>
-							<xsl:attribute name="style:text-position">
-								<xsl:value-of select="$subCont"/>
-							</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
+          <xsl:call-template name="tmpSubSuperScript">
+            <xsl:with-param name="baseline" select="$baseData"/>
+            <xsl:with-param name="subSuperScriptValue" select="$subSuperScriptValue"/>
+          </xsl:call-template>
 				</xsl:if>
 			</xsl:when>
 			
@@ -11779,8 +11640,15 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name="spType"/>
     <xsl:param name="index"/>
     <xsl:param name="ThemeName"/>
+    <xsl:param name="SMName"/>
+    <xsl:param name="var_pos"/>
+    <xsl:param name="FileType"/>
+    <xsl:param name="slideNo"/>
     <xsl:call-template name="tmpSlideGrahicProp">
       <xsl:with-param name="ThemeName" select="$ThemeName"/>
+      <xsl:with-param name="var_pos" select="$var_pos"/>
+      <xsl:with-param name="FileType" select="$FileType"/>
+      <xsl:with-param name="slideNo" select="$slideNo"/>
     </xsl:call-template>
     <xsl:if test ="not(p:spPr/a:noFill) and not(p:spPr/a:solidFill) and not(p:style/a:fillRef) and not(p:spPr/a:gradFill)">
       <xsl:message terminate="no">translation.oox2odf.slideTypeGraphicGradient</xsl:message>
@@ -11789,6 +11657,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
             <xsl:call-template name ="tmpLayoutGraphicProperty">
               <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
+              <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-',$spType)"/>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -11796,6 +11665,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='subTitle']">
             <xsl:call-template name ="tmpLayoutGraphicProperty">
               <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
+              <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-',$spType)"/>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -11803,6 +11673,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='body' and @idx=$index]">
             <xsl:call-template name ="tmpLayoutGraphicProperty">
               <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
+              <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-outline',$index)"/>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -11812,6 +11683,7 @@ exclude-result-prefixes="p a r xlink rels">
               <xsl:if test="not(./@type) or ./@type='body'">
               <xsl:call-template name ="tmpLayoutGraphicProperty">
                 <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
+                  <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-outline',$index)"/>
               </xsl:call-template>
             </xsl:if>
             </xsl:if>
@@ -12182,6 +12054,9 @@ exclude-result-prefixes="p a r xlink rels">
   </xsl:template>
   <xsl:template name="tmpLayoutGraphicProperty">
     <xsl:param name ="AttrType" />
+    <xsl:param name="var_pos"/>
+    <xsl:param name="slideNo"/>
+    <xsl:param name="FileType"/>
     <xsl:choose>
       <xsl:when test="$AttrType='Backcolor'">
         <xsl:choose>
@@ -12247,15 +12122,18 @@ exclude-result-prefixes="p a r xlink rels">
           <!-- gradient color-->
           <xsl:when test="parent::node()/parent::node()/parent::node()/p:spPr/a:gradFill">
             <xsl:message terminate="no">translation.oox2odf.slideLayoutTypeGraphicGradient</xsl:message>
+            <xsl:attribute name="draw:fill-gradient-name">
+              <xsl:value-of select="concat($FileType,'Gradient')" />
+            </xsl:attribute>
+            <xsl:attribute name="draw:fill">
+              <xsl:value-of select="'gradient'"/>
+            </xsl:attribute>
             <xsl:for-each select="parent::node()/parent::node()/parent::node()/p:spPr/a:gradFill/a:gsLst/child::node()[1]">
               <xsl:if test="name()='a:gs'">
                 <xsl:choose>
                   <xsl:when test="a:srgbClr/@val">
                     <xsl:attribute name="draw:fill-color">
                       <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                    </xsl:attribute>
-                    <xsl:attribute name="draw:fill">
-                      <xsl:value-of select="'solid'"/>
                     </xsl:attribute>
                   </xsl:when>
                   <xsl:when test="a:schemeClr/@val">
@@ -12272,10 +12150,7 @@ exclude-result-prefixes="p a r xlink rels">
                         </xsl:with-param>
                       </xsl:call-template>
                     </xsl:attribute>
-                    <xsl:attribute name="draw:fill">
-                      <xsl:value-of select="'solid'"/>
-                    </xsl:attribute>
-                  </xsl:when>
+                   </xsl:when>
                 </xsl:choose>
               </xsl:if>
             </xsl:for-each>

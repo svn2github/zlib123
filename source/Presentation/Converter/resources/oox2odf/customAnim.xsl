@@ -125,8 +125,9 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						<anim:par smil:fill="hold">
               <xsl:attribute name ="smil:begin">
                 <xsl:choose >
-                  <xsl:when test ="./parent::node()/parent::node()/p:stCondLst/p:cond/@delay"  >
-                    <xsl:value-of select ="concat(./parent::node()/parent::node()/p:stCondLst/p:cond/@delay div 1000,'s')"/>
+                  <xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay">
+                    <xsl:value-of select ="concat(./p:cTn/p:stCondLst/p:cond/@delay div 1000,'s')"/>
+                    <!--<xsl:value-of select ="concat(./parent::node()/parent::node()/p:stCondLst/p:cond/@delay div 1000,'s')"/>-->
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select ="'0s'"/>
@@ -134,11 +135,14 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                 </xsl:choose>
               </xsl:attribute>
 							<xsl:attribute name ="presentation:node-type">
-								<xsl:if test ="position()=1">
+								<xsl:if test ="./p:cTn/@nodeType='withEffect'">
+									<xsl:value-of select ="'with-previous'"/>
+								</xsl:if>
+                <xsl:if test ="./p:cTn/@nodeType='clickEffect'">
 									<xsl:value-of select ="'on-click'"/>
 								</xsl:if>
-								<xsl:if test ="position()!=1">
-									<xsl:value-of select ="'with-previous'"/>
+                <xsl:if test ="./p:cTn/@nodeType='afterEffect'">
+                  <xsl:value-of select ="'after-previous'"/>
 								</xsl:if>
 							</xsl:attribute>
 							<xsl:call-template name ="animationType">
@@ -472,7 +476,8 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 			<xsl:variable name ="smilDur">
 				<xsl:choose >
 					<xsl:when test ="p:cBhvr/p:cTn/@dur &gt; 0">
-						<xsl:value-of select ="concat(round(p:cBhvr/p:cTn/@dur div 1000),'s')"/>
+            <xsl:value-of select ="concat(p:cBhvr/p:cTn/@dur div 1000,'s')"/>
+            <!-- (round(p:cBhvr/p:cTn/@dur div 1000),'s')-->
 					</xsl:when>
 					<xsl:when test ="p:cBhvr/p:cTn/@dur ='indefinite'">
 						<xsl:value-of select ="'indefinite'"/>
@@ -1484,6 +1489,19 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 								</xsl:when>
 							</xsl:choose>
 						</xsl:when>
+            <xsl:when test ="$animType =3">
+              <xsl:choose>
+                <xsl:when test ="./p:cTn/@presetSubtype ='10'">
+                  <xsl:value-of select ="'horizontal'"/>
+                </xsl:when>
+                <xsl:when test ="./p:cTn/@presetSubtype ='5'">
+                  <xsl:value-of select ="'vertical'"/>
+                </xsl:when>
+                <xsl:otherwise >
+                  <xsl:value-of select ="'vertical'"/>
+                </xsl:otherwise>
+              </xsl:choose >
+              </xsl:when >
 						<xsl:otherwise>
 							<xsl:choose>
 								<xsl:when test ="./p:cTn/@presetSubtype ='4'">

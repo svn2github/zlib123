@@ -77,6 +77,24 @@ Copyright (c) 2007, Sonata Software Limited
 			</office:font-face-decls>
 			<xsl:text>document styles</xsl:text>
 			<office:styles>
+        <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+          <xsl:variable name ="pageSlide">
+            <xsl:value-of select ="concat(concat('ppt/slides/slide',position()),'.xml')"/>
+          </xsl:variable>
+          <xsl:variable name ="SlideFileName">
+            <xsl:value-of select ="concat(concat('slide',position()),'.xml')"/>
+          </xsl:variable>
+          <xsl:call-template name="tmpGradientFillStyle">
+            <xsl:with-param name="FilePath" select="$pageSlide"/>
+            <xsl:with-param name="FileName" select="$SlideFileName"/>
+            <xsl:with-param name="FileType" select="concat('slide',position())"/>
+          </xsl:call-template>
+          <xsl:call-template name="tmpBGgradientFillStyle">
+            <xsl:with-param name="FilePath" select="$pageSlide"/>
+            <xsl:with-param name="FileName" select="$SlideFileName"/>
+            <xsl:with-param name="FileType" select="concat('slide',position())"/>
+          </xsl:call-template>
+        </xsl:for-each>
 				<xsl:call-template name ="InsertDefaultStyles" />
         <xsl:call-template name="SlideMaster"/>
 				<xsl:call-template name="InsertShapeStyles"/>

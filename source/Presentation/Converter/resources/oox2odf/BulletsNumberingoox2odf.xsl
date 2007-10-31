@@ -176,8 +176,21 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 		<xsl:param name ="var_TextBoxType" />
 		<xsl:param name ="var_index" />
 		<xsl:param name ="slideLayout"/>
+    <xsl:param name ="flageShape"/>
+    
 		<xsl:if test ="./a:p/a:pPr/@lvl">
 			<xsl:for-each select ="./a:p">
+        <xsl:variable name ="nodeName">
+        <xsl:choose>
+          <xsl:when test="a:pPr/@lvl">
+            <xsl:value-of select ="concat('a:lvl',a:pPr/@lvl,'pPr')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select ="'a:lvl1pPr'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+     
 				<xsl:variable name ="textColor">
 					<xsl:for-each select ="a:r">
 						<xsl:if test ="position()= '1'">
@@ -213,6 +226,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 						</xsl:variable>
 						<xsl:variable name ="textLevel" select ="a:pPr/@lvl"/>
 						<xsl:variable name ="newTextLvl" select ="$textLevel+1"/>
+           
 						<xsl:choose >
 							<xsl:when test ="a:pPr/a:buChar">
 								<text:list-style>
@@ -224,16 +238,25 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 											<xsl:value-of select ="$textLevel + 1"/>
 										</xsl:attribute >
 										<xsl:attribute name ="text:bullet-char">
-											<xsl:call-template name ="insertBulletCharacter">
+                      <xsl:value-of select="a:pPr/a:buChar/@char"/>
+                      <!--<xsl:value-of select="concat(':::UniCode:::',a:pPr/a:buChar/@char)"/>-->
+											<!--<xsl:call-template name ="insertBulletCharacter">
 												<xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-											</xsl:call-template>
+											</xsl:call-template>-->
 										</xsl:attribute >
-										<style:list-level-properties text:min-label-width="0.8cm">
-											<xsl:attribute name ="text:space-before">
-												<xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-													<xsl:value-of select="concat(format-number(child::node()[$newTextLvl]/@marL div 360000,'#.##'),'cm')"/>
+                    <style:list-level-properties>
+                    <xsl:choose>
+                      <xsl:when test="flageShape='True'">
+                          <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
+                            <xsl:call-template name="tmpListlevelProp"/>
 												</xsl:for-each>
-											</xsl:attribute>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+                          <xsl:call-template name="tmpListlevelProp"/>
+                        </xsl:for-each >
+                      </xsl:otherwise>
+                    </xsl:choose>
 										</style:list-level-properties>
 										<style:text-properties style:font-charset="x-symbol">
 											<xsl:if test ="a:pPr/a:buFont/@typeface">
@@ -336,7 +359,20 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 											<xsl:with-param name ="number" select ="a:pPr/a:buAutoNum/@type"/>
 											<xsl:with-param name ="startAt" select ="$startAt"/>
 										</xsl:call-template>
-										<style:list-level-properties text:min-label-width="0.952cm" />
+                    <style:list-level-properties>
+                      <xsl:choose>
+                        <xsl:when test="flageShape='True'">
+                          <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
+                            <xsl:call-template name="tmpListlevelProp"/>
+                          </xsl:for-each >
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+                            <xsl:call-template name="tmpListlevelProp"/>
+                          </xsl:for-each >
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </style:list-level-properties>
 										<style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
 											<xsl:if test ="a:pPr/a:buFont/@typeface">
 												<xsl:attribute name ="fo:font-family">
@@ -465,16 +501,24 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="1"/>
                     </xsl:attribute >
                     <xsl:attribute name ="text:bullet-char">
-                      <xsl:call-template name ="insertBulletCharacter">
+                      <xsl:value-of select="a:pPr/a:buChar/@char"/>
+                      <!--<xsl:call-template name ="insertBulletCharacter">
                         <xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-                      </xsl:call-template>
+                      </xsl:call-template>-->
                     </xsl:attribute >
-                    <style:list-level-properties text:min-label-width="0.8cm">
-                      <xsl:attribute name ="text:space-before">
-                        <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle">
-                          <xsl:value-of select="concat(format-number(child::node()[1]/@marL div 360000,'#.##'),'cm')"/>
+                    <style:list-level-properties>
+                      <xsl:choose>
+                        <xsl:when test="flageShape='True'">
+                          <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
+                            <xsl:call-template name="tmpListlevelProp"/>
                         </xsl:for-each>
-                      </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+                            <xsl:call-template name="tmpListlevelProp"/>
+                          </xsl:for-each >
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </style:list-level-properties>
                     <style:text-properties style:font-charset="x-symbol" >
                       <xsl:if test ="a:pPr/a:buFont/@typeface">
@@ -576,7 +620,20 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 											<xsl:with-param name ="number" select ="a:pPr/a:buAutoNum/@type"/>
 											<xsl:with-param name ="startAt" select ="$startAt"/>
 										</xsl:call-template>
-										<style:list-level-properties text:min-label-width="0.952cm" />
+                    <style:list-level-properties>
+                      <xsl:choose>
+                        <xsl:when test="flageShape='True'">
+                          <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
+                            <xsl:call-template name="tmpListlevelProp"/>
+                          </xsl:for-each >
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+                            <xsl:call-template name="tmpListlevelProp"/>
+                          </xsl:for-each >
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </style:list-level-properties>
 										<style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
 											<xsl:if test ="a:pPr/a:buFont/@typeface">
 												<xsl:attribute name ="fo:font-family">
@@ -703,6 +760,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
     <xsl:if test ="not(./a:p/a:pPr/@lvl)">
       <xsl:for-each select ="./a:p">
+        <xsl:variable name ="nodeName">
+          <xsl:value-of select ="'a:lvl1pPr'"/>
+        </xsl:variable>
         <!-- Addded by vijayeta on 18th june,to check for bunone-->
         <xsl:if test ="not(a:pPr/a:buNone)">
           <!-- Addded by vijayeta on 18th june,to check for bunone-->
@@ -744,11 +804,25 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 										<xsl:value-of select ="1"/>
 									</xsl:attribute >
 									<xsl:attribute name ="text:bullet-char">
-										<xsl:call-template name ="insertBulletCharacter">
+                    <xsl:value-of select="a:pPr/a:buChar/@char"/>
+										<!--<xsl:call-template name ="insertBulletCharacter">
 											<xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-										</xsl:call-template>
+										</xsl:call-template>-->
 									</xsl:attribute >
-									<style:list-level-properties text:min-label-width="0.952cm" />
+                  <style:list-level-properties>
+                    <xsl:choose>
+                      <xsl:when test="flageShape='True'">
+                        <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
+                          <xsl:call-template name="tmpListlevelProp"/>
+                        </xsl:for-each >
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+                          <xsl:call-template name="tmpListlevelProp"/>
+                        </xsl:for-each >
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </style:list-level-properties>
 									<style:text-properties style:font-charset="x-symbol">
 										<xsl:if test ="a:pPr/a:buFont/@typeface">
 											<xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
@@ -851,7 +925,20 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 										<xsl:with-param name ="number" select ="a:pPr/a:buAutoNum/@type"/>
 										<xsl:with-param name ="startAt" select ="$startAt"/>
 									</xsl:call-template>
-									<style:list-level-properties text:min-label-width="0.952cm" />
+                  <style:list-level-properties>
+                    <xsl:choose>
+                      <xsl:when test="flageShape='True'">
+                        <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
+                          <xsl:call-template name="tmpListlevelProp"/>
+                        </xsl:for-each >
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+                          <xsl:call-template name="tmpListlevelProp"/>
+                        </xsl:for-each>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </style:list-level-properties>
 									<style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
 										<xsl:if test ="a:pPr/a:buFont/@typeface">
 											<xsl:attribute name ="fo:font-family">
@@ -973,6 +1060,25 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
       </xsl:for-each>
     </xsl:if>
     <!--End  of Condition if levels are not present-->
+  </xsl:template>
+  <xsl:template name="tmpListlevelProp">
+    <xsl:choose>
+      <xsl:when test="@indent &lt; 0">
+        <xsl:attribute name ="text:min-label-width">
+          <xsl:value-of select="concat(format-number((0 - @indent) div 360000, '#.##'), 'cm')"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name ="text:min-label-width">
+          <xsl:value-of select="concat(format-number(@indent div 360000, '#.##'), 'cm')"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test ="@marL">
+      <xsl:attribute name ="text:space-before">
+        <xsl:value-of select="concat(format-number( (@marL + @indent) div 360000, '#.##'), 'cm')"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
   <xsl:template name ="insertDefaultBulletNumberStyle">
     <xsl:param name ="listStyleName"/>
@@ -2734,9 +2840,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							<xsl:value-of select ="$newTextLvl"/>
 						</xsl:attribute >
 						<xsl:attribute name ="text:bullet-char">
-							<xsl:call-template name ="insertBulletCharacter">
+              <xsl:value-of select="a:buChar/@char"/>
+							<!--<xsl:call-template name ="insertBulletCharacter">
 								<xsl:with-param name ="character" select ="a:buChar/@char" />
-							</xsl:call-template>
+							</xsl:call-template>-->
 						</xsl:attribute >
 						<style:list-level-properties>
 							<xsl:if test ="./@indent">
@@ -3099,9 +3206,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
               <xsl:value-of select ="$newTextLvl"/>
             </xsl:attribute >
             <xsl:attribute name ="text:bullet-char">
-              <xsl:call-template name ="insertBulletCharacter">
+              <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buChar/@char"/>
+              <!--<xsl:call-template name ="insertBulletCharacter">
                 <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buChar/@char" />
-              </xsl:call-template>
+              </xsl:call-template>-->
             </xsl:attribute >
             <style:list-level-properties>
               <xsl:if test ="./parent::node()/@indent">
@@ -3389,9 +3497,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buChar/@char"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
@@ -3679,9 +3788,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buChar"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
@@ -3961,9 +4071,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buChar/@char"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
@@ -4251,9 +4362,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buChar/@char"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
@@ -4538,9 +4650,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:buChar/@char"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
@@ -4822,9 +4935,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar/@char"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
@@ -5108,9 +5222,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buChar/@char"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
@@ -5395,9 +5510,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name ="insertBulletCharacter">
+                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buChar/@char"/>
+                <!--<xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buChar/@char" />
-                </xsl:call-template>
+                </xsl:call-template>-->
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./parent::node()/@indent">
