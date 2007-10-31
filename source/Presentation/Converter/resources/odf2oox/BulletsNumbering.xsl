@@ -76,23 +76,35 @@
       </xsl:if>
       </xsl:if>      
       <!--End Fix for the bug 1794640-->
+
+      <xsl:for-each select="text:list-level-style-bullet[@text:level=$level]/style:text-properties">
+        <xsl:if test="position()=1">
+          <xsl:if test="@fo:font-family">
       <a:buFont>
         <xsl:attribute name ="typeface">
+              <xsl:value-of select="@fo:font-family"/>
+            </xsl:attribute>
+            </a:buFont>
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
+      <!--<xsl:attribute name ="typeface">
           <xsl:call-template name ="getBulletType">
             <xsl:with-param name ="character" select ="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
             <xsl:with-param name ="typeFace"/>
           </xsl:call-template>
-        </xsl:attribute>
-      </a:buFont>
+        </xsl:attribute>-->
+      
       <xsl:if test ="text:list-level-style-bullet">
         <!--<xsl:for-each select ="./child::node()[1]">-->
         <xsl:if test ="text:list-level-style-bullet[@text:level=$level]">
           <a:buChar>
             <xsl:attribute name ="char">
-              <xsl:call-template name="insertBulletChar">
+              <xsl:value-of select="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
+              <!--<xsl:call-template name="insertBulletChar">
                 <xsl:with-param name ="character" select ="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
-                <!--<xsl:with-param name="character" select="./child::node()[$level]/@text:bullet-char"/>-->
-              </xsl:call-template>
+                <xsl:with-param name="character" select="./child::node()[$level]/@text:bullet-char"/>
+              </xsl:call-template>-->
             </xsl:attribute>
           </a:buChar>
         </xsl:if>

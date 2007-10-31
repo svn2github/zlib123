@@ -827,24 +827,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
       <!--Superscript and SubScript for Text added by Mathi on 31st Jul 2007-->
       <xsl:if test="style:text-properties/@style:text-position">
-        <xsl:choose>
-          <xsl:when test="(substring-before(style:text-properties/@style:text-position,' ') = 'super')">
-            <xsl:attribute name="baseline">
-              <xsl:variable name="blsuper">
-                <xsl:value-of select="substring-before(substring-after(style:text-properties/@style:text-position,'super '),'%')"/>
-              </xsl:variable>
-              <xsl:value-of select="($blsuper * 1000)"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="(substring-before(style:text-properties/@style:text-position,' ') = 'sub')">
-            <xsl:attribute name="baseline">
-              <xsl:variable name="blsub">
-                <xsl:value-of select="substring-before(substring-after(style:text-properties/@style:text-position,'sub '),'%')"/>
-              </xsl:variable>
-              <xsl:value-of select="($blsub * (-1000))"/>
-            </xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
+        <xsl:call-template name="tmpSuperSubScriptForward"/>
       </xsl:if>
       <!--Font bold attribute -->
       <xsl:if test="style:text-properties/@fo:font-weight[contains(.,'bold')]">

@@ -270,6 +270,7 @@ Copyright (c) 2007, Sonata Software Limited
     </p:sldLayout>
   </xsl:template>
 
+
   <xsl:template name="InsertSlideLayout2">
     <xsl:param name ="MasterName" />
     <p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
@@ -300,12 +301,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="274638" />
-                <a:ext cx="8229600" cy="1143000" />
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -328,13 +324,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph idx="1"/>
               </p:nvPr>
             </p:nvSpPr>
-            <!--<p:spPr/>-->
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="1600200" />
-                <a:ext cx="8229600" cy="4525963" />
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -602,12 +592,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="274638"/>
-                <a:ext cx="8229600" cy="1143000"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -833,12 +818,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="274638"/>
-                <a:ext cx="8229600" cy="1143000"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle>
@@ -1198,12 +1178,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="274638" />
-                <a:ext cx="8229600" cy="1143000" />
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -1292,13 +1267,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-
-              <a:xfrm>
-                <a:off x="457200" y="273050"/>
-                <a:ext cx="3008313" cy="1162050"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle>
@@ -1507,13 +1476,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-
-              <a:xfrm>
-                <a:off x="1792288" y="4800600"/>
-                <a:ext cx="5486400" cy="566738"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle>
@@ -1699,12 +1662,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="274638"/>
-                <a:ext cx="8229600" cy="1143000"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -1727,12 +1685,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="body" orient="vert" idx="1"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="274638"/>
-                <a:ext cx="6019800" cy="5851525"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr vert="eaVert"/>
               <a:lstStyle/>
@@ -1817,12 +1770,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title" orient="vert"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="6629400" y="274638"/>
-                <a:ext cx="2057400" cy="5851525"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr vert="eaVert"/>
               <a:lstStyle/>
@@ -1845,12 +1793,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="body" orient="vert" idx="1"/>
               </p:nvPr>
             </p:nvSpPr>
-            <p:spPr>
-              <a:xfrm>
-                <a:off x="457200" y="274638"/>
-                <a:ext cx="6019800" cy="5851525"/>
-              </a:xfrm>
-            </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr vert="eaVert"/>
               <a:lstStyle/>

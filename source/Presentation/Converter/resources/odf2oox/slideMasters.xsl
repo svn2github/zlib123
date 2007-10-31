@@ -142,23 +142,12 @@ Copyright (c) 2007, Sonata Software Limited
                 </p:bg>
               </xsl:when>
                <xsl:when test="@draw:fill='gradient'">
-              <xsl:variable name="gradStyleName" select="@draw:fill-gradient-name"/>
-              <p:bg>
+                <p:bg>
                 <p:bgPr>
-                  <a:solidFill>
-                    <a:srgbClr>
-                      <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
-                      <xsl:attribute name="val">
-                        <xsl:if test="@draw:start-color">
-                          <xsl:value-of select="substring-after(@draw:start-color,'#')" />
-                        </xsl:if>
-                        <xsl:if test="not(@draw:start-color)">
-                          <xsl:value-of select="'ffffff'" />
-                        </xsl:if>
-                      </xsl:attribute>
-                      </xsl:for-each>
-                    </a:srgbClr>
-                  </a:solidFill>
+                  <xsl:call-template name="tmpGradientFill">
+                    <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+                    <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+                  </xsl:call-template>
                   <a:effectLst />
                 </p:bgPr>
               </p:bg>
@@ -286,33 +275,10 @@ Copyright (c) 2007, Sonata Software Limited
                                         <a:noFill/>
                                       </xsl:when>
                                       <xsl:when test="@draw:fill='gradient'">
-                                        <xsl:variable name="gradStyleName" select="@draw:fill-gradient-name"/>
-                                        <a:solidFill>
-                                          <a:srgbClr>
-                                            <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
-                                              <xsl:attribute name="val">
-                                                <xsl:if test="@draw:start-color">
-                                                  <xsl:value-of select="substring-after(@draw:start-color,'#')" />
-                                                </xsl:if>
-                                                <xsl:if test="not(@draw:start-color)">
-                                                  <xsl:value-of select="'ffffff'" />
-                                                </xsl:if>
-                                              </xsl:attribute>
-                                            </xsl:for-each>
-                                            <xsl:if test ="@draw:opacity">
-                                              <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-                                              <xsl:choose>
-                                                <xsl:when test="$tranparency !=''">
-                                                  <a:alpha>
-                                                    <xsl:attribute name="val">
-                                                      <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                                                    </xsl:attribute>
-                                                  </a:alpha>
-                                                </xsl:when>
-                                              </xsl:choose>
-                                            </xsl:if>
-                                          </a:srgbClr >
-                                        </a:solidFill>
+                                        <xsl:call-template name="tmpGradientFill">
+                                          <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+                                          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+                                        </xsl:call-template>
                                       </xsl:when>
                                     </xsl:choose>
                                   </xsl:for-each>
@@ -337,33 +303,10 @@ Copyright (c) 2007, Sonata Software Limited
                                       <a:noFill/>
                                     </xsl:when>
                                     <xsl:when test="@draw:fill='gradient'">
-                                      <xsl:variable name="gradStyleName" select="@draw:fill-gradient-name"/>
-                                      <a:solidFill>
-                                        <a:srgbClr>
-                                          <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
-                                            <xsl:attribute name="val">
-                                              <xsl:if test="@draw:start-color">
-                                                <xsl:value-of select="substring-after(@draw:start-color,'#')" />
-                                              </xsl:if>
-                                              <xsl:if test="not(@draw:start-color)">
-                                                <xsl:value-of select="'ffffff'" />
-                                              </xsl:if>
-                                            </xsl:attribute>
-                                          </xsl:for-each>
-                                          <xsl:if test ="@draw:opacity">
-                                            <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-                                            <xsl:choose>
-                                              <xsl:when test="$tranparency !=''">
-                                                <a:alpha>
-                                                  <xsl:attribute name="val">
-                                                    <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                                                  </xsl:attribute>
-                                                </a:alpha>
-                                              </xsl:when>
-                                            </xsl:choose>
-                                          </xsl:if>
-                                        </a:srgbClr >
-                                      </a:solidFill>
+                                      <xsl:call-template name="tmpGradientFill">
+                                        <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+                                        <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+                                      </xsl:call-template>
                                     </xsl:when>
                                   </xsl:choose>
                                 </xsl:for-each>
@@ -5696,33 +5639,10 @@ Copyright (c) 2007, Sonata Software Limited
               <a:noFill/>
             </xsl:when>
             <xsl:when test="@draw:fill='gradient'">
-              <xsl:variable name="gradStyleName" select="@draw:fill-gradient-name"/>
-              <a:solidFill>
-                <a:srgbClr>
-                  <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
-                    <xsl:attribute name="val">
-                      <xsl:if test="@draw:start-color">
-                        <xsl:value-of select="substring-after(@draw:start-color,'#')" />
-                      </xsl:if>
-                      <xsl:if test="not(@draw:start-color)">
-                        <xsl:value-of select="'ffffff'" />
-                      </xsl:if>
-                    </xsl:attribute>
-                  </xsl:for-each>
-                  <xsl:if test ="@draw:opacity">
-                    <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-                    <xsl:choose>
-                      <xsl:when test="$tranparency !=''">
-                        <a:alpha>
-                          <xsl:attribute name="val">
-                            <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                          </xsl:attribute>
-                        </a:alpha>
-                      </xsl:when>
-                    </xsl:choose>
-                  </xsl:if>
-                </a:srgbClr >
-              </a:solidFill>
+              <xsl:call-template name="tmpGradientFill">
+                <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+                <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+              </xsl:call-template>
             </xsl:when>
           </xsl:choose>
 				</xsl:for-each>
@@ -6043,33 +5963,9 @@ Copyright (c) 2007, Sonata Software Limited
                 <a:noFill/>
               </xsl:when>
               <xsl:when test="@draw:fill='gradient'">
-                <xsl:variable name="gradStyleName" select="@draw:fill-gradient-name"/>
-                <a:solidFill>
-                  <a:srgbClr>
-                    <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
-                      <xsl:attribute name="val">
-                        <xsl:if test="@draw:start-color">
-                          <xsl:value-of select="substring-after(@draw:start-color,'#')" />
-                        </xsl:if>
-                        <xsl:if test="not(@draw:start-color)">
-                          <xsl:value-of select="'ffffff'" />
-                        </xsl:if>
-                      </xsl:attribute>
-                    </xsl:for-each>
-                    <xsl:if test ="@draw:opacity">
-                      <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-                      <xsl:choose>
-                        <xsl:when test="$tranparency !=''">
-                          <a:alpha>
-                            <xsl:attribute name="val">
-                              <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                            </xsl:attribute>
-                          </a:alpha>
-                        </xsl:when>
-                      </xsl:choose>
-                    </xsl:if>
-                  </a:srgbClr >
-                </a:solidFill>
+                <xsl:call-template name="tmpGradientFill">
+                  <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+                </xsl:call-template>
               </xsl:when>
             </xsl:choose>
 				</xsl:for-each>
@@ -6367,33 +6263,10 @@ Copyright (c) 2007, Sonata Software Limited
               <a:noFill/>
             </xsl:when>
             <xsl:when test="@draw:fill='gradient'">
-              <xsl:variable name="gradStyleName" select="@draw:fill-gradient-name"/>
-              <a:solidFill>
-                <a:srgbClr>
-                  <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
-                    <xsl:attribute name="val">
-                      <xsl:if test="@draw:start-color">
-                        <xsl:value-of select="substring-after(@draw:start-color,'#')" />
-                      </xsl:if>
-                      <xsl:if test="not(@draw:start-color)">
-                        <xsl:value-of select="'ffffff'" />
-                      </xsl:if>
-                    </xsl:attribute>
-                  </xsl:for-each>
-                  <xsl:if test ="@draw:opacity">
-                    <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-                    <xsl:choose>
-                      <xsl:when test="$tranparency !=''">
-                        <a:alpha>
-                          <xsl:attribute name="val">
-                            <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                          </xsl:attribute>
-                        </a:alpha>
-                      </xsl:when>
-                    </xsl:choose>
-                  </xsl:if>
-                </a:srgbClr >
-              </a:solidFill>
+              <xsl:call-template name="tmpGradientFill">
+                <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+                <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+              </xsl:call-template>
             </xsl:when>
           </xsl:choose>
 				</xsl:for-each>
@@ -7389,21 +7262,30 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:if>
+          <xsl:for-each select="style:graphic-properties/text:list-style/text:list-level-style-bullet[@text:level=$level]/style:text-properties">
+            <xsl:if test="position()=1">
+              <xsl:if test="@fo:font-family">
 			<a:buFont>
 				<xsl:attribute name ="typeface">
-					<xsl:call-template name ="getBulletTypes">
+                    <xsl:value-of select="@fo:font-family"/>
+                  </xsl:attribute>
+                </a:buFont>
+              </xsl:if>
+            </xsl:if>
+          </xsl:for-each>
+					<!--<xsl:call-template name ="getBulletTypes">
 						<xsl:with-param name="character" select="style:graphic-properties/text:list-style/text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
 						<xsl:with-param name ="typeFace"/>
 					</xsl:call-template>
-				</xsl:attribute>
-			</a:buFont>
+				</xsl:attribute>-->
 			<xsl:choose>
 				<xsl:when test="style:graphic-properties/text:list-style/text:list-level-style-bullet[@text:level=$level]">
 					<a:buChar>
 						<xsl:attribute name ="char">
-							<xsl:call-template name="bulletChar">
+              <xsl:value-of select="style:graphic-properties/text:list-style/text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
+							<!--<xsl:call-template name="bulletChar">
 								<xsl:with-param name="character" select="style:graphic-properties/text:list-style/text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
-							</xsl:call-template>
+							</xsl:call-template>-->
 						</xsl:attribute>
 					</a:buChar>
 				</xsl:when>
@@ -8216,7 +8098,7 @@ Copyright (c) 2007, Sonata Software Limited
                         <xsl:if test="$PresentationClass = 0">
                           <xsl:for-each select ="office:event-listeners/presentation:event-listener">
                             <xsl:if test="@xlink:href">
-                              <Relationship>
+
                                 <xsl:choose>
                                   <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
                                     <xsl:variable name="pageID">
@@ -8225,6 +8107,7 @@ Copyright (c) 2007, Sonata Software Limited
                                       </xsl:call-template>
                                     </xsl:variable>
                                     <xsl:if test="$pageID > 0">
+                                    <Relationship>
                                       <xsl:attribute name="Id">
                                         <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
                                       </xsl:attribute>
@@ -8234,9 +8117,11 @@ Copyright (c) 2007, Sonata Software Limited
                                       <xsl:attribute name="Target">
                                         <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
                                       </xsl:attribute>
+                                    </Relationship>
                                     </xsl:if>
                                   </xsl:when>
                                   <xsl:when test="@xlink:href">
+                                  <Relationship>
                                     <xsl:attribute name="Id">
                                       <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
                                     </xsl:attribute>
@@ -8259,9 +8144,10 @@ Copyright (c) 2007, Sonata Software Limited
                                     <xsl:attribute name="TargetMode">
                                       <xsl:value-of select="'External'"/>
                                     </xsl:attribute>
+                                  </Relationship>
                                   </xsl:when>
                                 </xsl:choose>
-                              </Relationship>
+                            
                             </xsl:if>
                             <xsl:if test="presentation:sound">
                               <xsl:variable name="varblnDuplicateRelation">
@@ -8306,7 +8192,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:for-each select="./@presentation:class">
                         <xsl:for-each select ="parent::node()/office:event-listeners/presentation:event-listener">
                           <xsl:if test="@xlink:href">
-                            <Relationship>
+
                               <xsl:choose>
                                 <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
                                   <xsl:variable name="pageID">
@@ -8315,6 +8201,7 @@ Copyright (c) 2007, Sonata Software Limited
                                     </xsl:call-template>
                                   </xsl:variable>
                                   <xsl:if test="$pageID > 0">
+                                  <Relationship>
                                     <xsl:attribute name="Id">
                                       <xsl:value-of select="concat('AtchFileId',$PostionCount)"/>
                                     </xsl:attribute>
@@ -8324,9 +8211,12 @@ Copyright (c) 2007, Sonata Software Limited
                                     <xsl:attribute name="Target">
                                       <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
                                     </xsl:attribute>
+                                  </Relationship>
                                   </xsl:if>
+                                
                                 </xsl:when>
                                 <xsl:when test="@xlink:href">
+                                  <Relationship>
                                   <xsl:attribute name="Id">
                                     <xsl:value-of select="concat('AtchFileId',$PostionCount)"/>
                                   </xsl:attribute>
@@ -8349,9 +8239,10 @@ Copyright (c) 2007, Sonata Software Limited
                                   <xsl:attribute name="TargetMode">
                                     <xsl:value-of select="'External'"/>
                                   </xsl:attribute>
+                                  </Relationship>
                                 </xsl:when>
                               </xsl:choose>
-                            </Relationship>
+                           
                           </xsl:if>
                           <xsl:if test="presentation:sound">
                             <xsl:variable name="varblnDuplicateRelation">
@@ -8690,7 +8581,7 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:variable>
                     <xsl:for-each select ="office:event-listeners/presentation:event-listener">
                       <xsl:if test="@xlink:href">
-                        <Relationship>
+                        
                           <xsl:choose>
                             <!--<xsl:when test="@xlink:href[contains(.,'#page')]">
                     <xsl:attribute name="Type">
@@ -8707,6 +8598,7 @@ Copyright (c) 2007, Sonata Software Limited
                                 </xsl:call-template>
                               </xsl:variable>
                               <xsl:if test="$pageID > 0">
+                                <Relationship>
                                 <xsl:attribute name="Id">
                                   <xsl:value-of select="concat('RectAtachFileId',$ShapePostionCount)"/>
                                 </xsl:attribute>
@@ -8716,9 +8608,11 @@ Copyright (c) 2007, Sonata Software Limited
                                 <xsl:attribute name="Target">
                                   <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
                                 </xsl:attribute>
+                                </Relationship>
                               </xsl:if>
                             </xsl:when>
                             <xsl:when test="@xlink:href">
+                              <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat('RectAtachFileId',$ShapePostionCount)"/>
                               </xsl:attribute>
@@ -8741,9 +8635,10 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:attribute name="TargetMode">
                                 <xsl:value-of select="'External'"/>
                               </xsl:attribute>
+                              </Relationship>
                             </xsl:when>
                           </xsl:choose>
-                        </Relationship>
+                        
                       </xsl:if>
                       <xsl:if test="presentation:sound">
                         <xsl:variable name="varblnDuplicateRelation">
@@ -9167,7 +9062,7 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:variable>
                   <xsl:for-each select ="office:event-listeners/presentation:event-listener">
                     <xsl:if test="@xlink:href">
-                      <Relationship>
+                    
                         <xsl:choose>
                           <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
                             <xsl:variable name="pageID">
@@ -9176,6 +9071,7 @@ Copyright (c) 2007, Sonata Software Limited
                               </xsl:call-template>
                             </xsl:variable>
                             <xsl:if test="$pageID > 0">
+                              <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
                               </xsl:attribute>
@@ -9185,9 +9081,11 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:attribute name="Target">
                                 <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
                               </xsl:attribute>
+                              </Relationship>
                             </xsl:if>
                           </xsl:when>
                           <xsl:when test="@xlink:href">
+                            <Relationship>
                             <xsl:attribute name="Id">
                               <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
                             </xsl:attribute>
@@ -9210,9 +9108,10 @@ Copyright (c) 2007, Sonata Software Limited
                             <xsl:attribute name="TargetMode">
                               <xsl:value-of select="'External'"/>
                             </xsl:attribute>
+                            </Relationship>
                           </xsl:when>
                         </xsl:choose>
-                      </Relationship>
+                     
                     </xsl:if>
                     <xsl:if test="presentation:sound">
                       <xsl:variable name="varblnDuplicateRelation">
@@ -9264,7 +9163,7 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:variable>
                   <xsl:for-each select ="office:event-listeners/presentation:event-listener">
                     <xsl:if test="@xlink:href">
-                      <Relationship>
+
                         <xsl:choose>
                           <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
                             <xsl:variable name="pageID">
@@ -9273,6 +9172,7 @@ Copyright (c) 2007, Sonata Software Limited
                               </xsl:call-template>
                             </xsl:variable>
                             <xsl:if test="$pageID > 0">
+                            <Relationship>
                               <xsl:attribute name="Id">
                                 <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
                               </xsl:attribute>
@@ -9282,9 +9182,11 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:attribute name="Target">
                                 <xsl:value-of select="concat('slide',$pageID,'.xml')"/>
                               </xsl:attribute>
+                            </Relationship>
                             </xsl:if>
                           </xsl:when>
                           <xsl:when test="@xlink:href">
+                          <Relationship>
                             <xsl:attribute name="Id">
                               <xsl:value-of select="concat('LineFileId',$ShapePostionCount)"/>
                             </xsl:attribute>
@@ -9307,9 +9209,10 @@ Copyright (c) 2007, Sonata Software Limited
                             <xsl:attribute name="TargetMode">
                               <xsl:value-of select="'External'"/>
                             </xsl:attribute>
+                          </Relationship>
                           </xsl:when>
                         </xsl:choose>
-                      </Relationship>
+                     
                     </xsl:if>
                     <xsl:if test="presentation:sound">
                       <xsl:variable name="varblnDuplicateRelation">

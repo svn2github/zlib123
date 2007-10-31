@@ -97,7 +97,24 @@ Copyright (c) 2007, Sonata Software Limited
 															<xsl:value-of select ="$animationSubId"/>
 														</xsl:attribute>
 														<p:stCondLst>
-															<p:cond delay="0"/>
+                              <p:cond>
+                                <xsl:attribute name ="delay">
+                                  <xsl:choose >
+                                    <!-- commented by chhavi-->
+                                    <!--<xsl:when test ="substring-before(@smil:begin,'s') &gt; 0">
+                                      <xsl:value-of select ="round(substring-before(@smil:begin,'s')* 1000)"/>-->
+                                    <!-- ending here-->
+                                    <!-- added by chhavi for delay in custom animation-->
+                                    <xsl:when test ="substring-before(anim:par/child::node()[1]/@smil:begin,'s') &gt; 0">
+                                      <xsl:value-of select ="round(substring-before(anim:par/child::node()[1]/@smil:begin,'s')* 1000)"/>
+                                      <!--ending here-->
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                      <xsl:value-of select ="'0'"/>
+                                    </xsl:otherwise>
+                                  </xsl:choose>
+                                </xsl:attribute>
+                              </p:cond>
 														</p:stCondLst>
 														<xsl:if test ="name(anim:par/child::node()[1])='anim:iterate'">
 															<p:iterate >
@@ -190,10 +207,19 @@ Copyright (c) 2007, Sonata Software Limited
 											<xsl:when test ="@smil:dur='indefinite'">
 												<xsl:value-of select ="'indefinite'"/>
 											</xsl:when>
-											<xsl:otherwise>
+                        <xsl:otherwise>
+                          <!-- Added by chhavi for duration -->
+                          <xsl:choose >
+                            <xsl:when test ="number(substring-before(./@smil:dur,'s')) &gt; 0 ">
 												<xsl:value-of select ="round(substring-before(@smil:dur,'s') * 1000)"/>
+                      </xsl:when>
+											<xsl:otherwise>
+												<xsl:value-of select ="'0'"/>
 											</xsl:otherwise>
 										</xsl:choose>
+                          <!-- ending here-->
+                        </xsl:otherwise>
+                      </xsl:choose>
 									</xsl:attribute>
 									<xsl:call-template name ="smilBegin"/>
 								</p:cTn>

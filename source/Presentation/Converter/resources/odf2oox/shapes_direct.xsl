@@ -443,12 +443,14 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name ="getGraphicProperties">
           <xsl:with-param name ="fileName" select ="$fileName" />
           <xsl:with-param name ="gr" >
-            <xsl:if test ="@draw:style-name">
+            <xsl:choose>
+              <xsl:when test="@draw:style-name">
               <xsl:value-of select ="@draw:style-name"/>
-            </xsl:if>
-            <xsl:if test ="@presentation:style-name">
+              </xsl:when>
+              <xsl:when test="@presentation:style-name">
               <xsl:value-of select ="@presentation:style-name"/>
-            </xsl:if >
+              </xsl:when>
+            </xsl:choose>
           </xsl:with-param >
         </xsl:call-template>
       </p:spPr>
@@ -456,7 +458,7 @@ Copyright (c) 2007, Sonata Software Limited
         <a:lnRef idx="2">
           <a:schemeClr val="dk1" />
         </a:lnRef>
-        <a:fillRef idx="1">
+        <a:fillRef idx="0">
           <a:srgbClr val="99ccff">
             <xsl:call-template name ="getShade">
               <xsl:with-param name ="fileName" select ="$fileName" />
@@ -1035,13 +1037,11 @@ Copyright (c) 2007, Sonata Software Limited
 
     <xsl:for-each select ="document($fileName)//office:automatic-styles/style:style[@style:name=$gr]/style:graphic-properties">
       <!-- Parent style name-->
-      <xsl:variable name ="parentStyle">
-        <xsl:value-of select ="parent::node()/@style:parent-style-name"/>
-      </xsl:variable>
-
       <!--FILL-->
-      <xsl:call-template name ="getFillDetails">
+      <xsl:variable name="parentStyle" select="./parent::node()/@style:parent-style-name"/>
+      <xsl:call-template name ="tmpshapefillColor">
         <xsl:with-param name ="parentStyle" select="$parentStyle" />
+        <xsl:with-param name ="gr" select="$gr" />
       </xsl:call-template >
 
       <!--LINE COLOR AND STYLE-->
@@ -1050,7 +1050,27 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:call-template >
 
 		<!-- SHADOW IMPLEMENTATION -->
-		<xsl:if test="document($fileName)//office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties[@draw:shadow='visible'] or (@draw:shadow='visible')">
+      <xsl:choose>
+        <xsl:when test="@draw:shadow='visible'">
+          <xsl:call-template name ="tmpShapeShadow">
+            <xsl:with-param name ="parentStyle" select="$parentStyle" />
+          </xsl:call-template >
+        </xsl:when>
+        <xsl:when test="not(@draw:shadow) and $parentStyle !=''">
+          <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties[@draw:shadow='visible']">
+          <xsl:call-template name ="tmpShapeShadow">
+            <xsl:with-param name ="parentStyle" select="$parentStyle" />
+          </xsl:call-template >
+            </xsl:if>
+        </xsl:when>
+      </xsl:choose>
+	
+    </xsl:for-each>
+
+  </xsl:template>
+  <xsl:template name="tmpShapeShadow">
+    <xsl:param name="parentStyle"/>
+    <xsl:param name="filename"/>
 			<xsl:variable name="shadowOffsetX">
 				<xsl:if test="@draw:shadow-offset-x">
 					<xsl:value-of select="substring-before(@draw:shadow-offset-x,'cm')"/>
@@ -1134,9 +1154,6 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:with-param name ="shadowColor" select="$shadowColor"/>
 				<xsl:with-param name ="shadowOpacity" select="$shadowOpacity"/>
 			</xsl:call-template>
-		</xsl:if>
-    </xsl:for-each>
-
   </xsl:template>
   <!-- Get preset geometry-->
   <xsl:template name ="getPresetGeom">
@@ -1244,6 +1261,12 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Can -->
       <xsl:when test ="contains($prstGeom, 'Can')">
         <a:prstGeom prst="can">
+          <a:avLst/>
+        </a:prstGeom>
+      </xsl:when>
+      <!-- Chord (Added by Mathi on 17/10/2007)-->
+      <xsl:when test ="contains($prstGeom, 'Chord')">
+        <a:prstGeom prst="chord">
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
@@ -1617,6 +1640,81 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:choose>
   </xsl:template>
   <!-- Get fill details-->
+  <xsl:template name ="tmpshapefillColor">
+    <xsl:param name ="parentStyle" />
+    <xsl:param name ="gr" />
+    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:choose>
+      <xsl:when test="@draw:fill or @draw:fill-color ">
+        <xsl:call-template name ="tmpFill"/>
+      </xsl:when>
+      <xsl:when test="$parentStyle !='' and not(@draw:fill or @draw:fill-color)">
+        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
+          <xsl:call-template name ="tmpFill"/>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+      
+  </xsl:template>
+  <xsl:template name="tmpFill">
+    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:choose>
+      <xsl:when test ="@draw:fill='solid'">
+        <a:solidFill>
+          <a:srgbClr  >
+            <xsl:attribute name ="val">
+              <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+            </xsl:attribute>
+            <xsl:if test ="@draw:opacity">
+              <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
+              <xsl:choose>
+                <xsl:when test="$tranparency !=''">
+                  <a:alpha>
+                    <xsl:attribute name="val">
+                      <xsl:value-of select="format-number($tranparency * 1000,'#')" />
+                    </xsl:attribute>
+                  </a:alpha>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:if>
+          </a:srgbClr >
+        </a:solidFill>
+      </xsl:when>
+      <xsl:when test ="@draw:fill='none'">
+        <a:noFill/>
+      </xsl:when>
+      <xsl:when test ="@draw:fill='gradient'">
+        <xsl:call-template name="tmpGradientFill">
+          <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="@draw:fill-color">
+        <a:solidFill>
+          <a:srgbClr  >
+            <xsl:attribute name ="val">
+              <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
+            </xsl:attribute>
+            <xsl:if test ="@draw:opacity">
+              <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
+              <xsl:choose>
+                <xsl:when test="$tranparency !=''">
+                  <a:alpha>
+                    <xsl:attribute name="val">
+                      <xsl:value-of select="format-number($tranparency * 1000,'#')" />
+                    </xsl:attribute>
+                  </a:alpha>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:if>
+          </a:srgbClr >
+        </a:solidFill>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+ 
   <xsl:template name ="getFillDetails">
     <xsl:param name ="parentStyle" />
     <xsl:variable name ="opacity" >
@@ -1707,6 +1805,19 @@ Copyright (c) 2007, Sonata Software Limited
         <!-- Invisible line-->
         <xsl:when test ="@draw:stroke='none'">
           <a:noFill />
+        </xsl:when>
+        <xsl:when test ="@draw:stroke='solid' and not(@svg:stroke-color) and $parentStyle != ''">
+          <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
+            <xsl:choose>
+              <!-- Solid color -->
+              <xsl:when test ="@svg:stroke-color">
+                <xsl:call-template name ="getFillColor">
+                  <xsl:with-param name ="fill-color" select ="@svg:stroke-color" />
+                  <xsl:with-param name ="opacity" select ="$lineOpacity" />
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
         </xsl:when>
         <xsl:when test ="@draw:stroke='solid' and not(@svg:stroke-color)">
           <a:solidFill>
@@ -2624,6 +2735,7 @@ Copyright (c) 2007, Sonata Software Limited
                             <xsl:with-param name ="fileName" select ="$fileName"/>
                             <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                             <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+                            <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
                           </xsl:call-template>
                         </xsl:if>
 						<xsl:if test ="$textId =''">
@@ -2680,6 +2792,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name ="prClassName" select ="$prClsName"/>
                           <xsl:with-param name ="slideMaster" select ="$fileName"/>
                           <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+                          <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
                         </xsl:call-template>
                       </xsl:if>
                     </a:endParaRPr>
@@ -2705,6 +2818,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:with-param name ="slideMaster" select ="$fileName"/>
                           <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                           <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+                          <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
                         </xsl:call-template>						  
                       </xsl:if>
 						<xsl:if test ="$textId =''">
@@ -2730,7 +2844,9 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:attribute>
                         </a:latin >
                       </xsl:if >
-                      <!--<xsl:copy-of select="$aColonhlinkClick"/>-->
+                      <xsl:if test="not(parent::node()/parent::node()/office:event-listeners/presentation:event-listener)">
+                        <xsl:copy-of select="$aColonhlinkClick"/>
+                      </xsl:if>
                       <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
                     
                     </a:rPr >
