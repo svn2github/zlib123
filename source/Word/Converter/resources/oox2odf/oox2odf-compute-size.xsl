@@ -53,8 +53,10 @@
 
   <xsl:template name="VisitPart">
     <xsl:param name="content-type"/>
+    
     <xsl:for-each
-      select="document('[Content_types].xml')/ct:Types/ct:Override[contains(@ContentType, $content-type)]">
+      select="/oox:package/oox:part[@oox:name='[Content_Types].xml']/ct:Types/ct:Override[contains(@ContentType, $content-type)]">
+      
       <xsl:variable name="path" select="substring-after(@PartName, '/')"/>
       <xsl:for-each select="/oox:package/oox:part[@oox:name=$path]">
         <xsl:apply-templates/>

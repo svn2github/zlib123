@@ -7,26 +7,27 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:oox="urn:oox"
   exclude-result-prefixes="office text  fo style dc meta pzip xlink w oox">
+
   
-<xsl:template name="InsertComment">
-  <xsl:param name="Id"/>
-  <office:annotation>
-    <xsl:if test="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author">
-      <dc:creator>
-        <xsl:value-of select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author"/>
-      </dc:creator>
-    </xsl:if>
-    <xsl:if test="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date">
-      <dc:date>
-        <xsl:value-of select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date"/>
-      </dc:date>
-    </xsl:if>
-    <xsl:apply-templates select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/w:p"/>    
-  </office:annotation>  
-</xsl:template>
- </xsl:stylesheet>
+  <xsl:template name="InsertComment">
+    <xsl:param name="Id"/>
+    <office:annotation>
+      <xsl:if test="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author">
+        <dc:creator>
+          <xsl:value-of select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author"/>
+        </dc:creator>
+      </xsl:if>
+      <xsl:if test="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date">
+        <dc:date>
+          <xsl:value-of select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:date"/>
+        </dc:date>
+      </xsl:if>
+      <xsl:apply-templates select="key('Part', 'word/comments.xml')/w:comments/w:comment[@w:id = $Id]/w:p"/>
+    </office:annotation>
+  </xsl:template>
+</xsl:stylesheet>

@@ -54,7 +54,7 @@
   <xsl:import href="2odf-track.xsl"/>
   <xsl:import href="2odf-frames.xsl"/>
   <xsl:import href="2odf-sections.xsl"/>
-  <xsl:import href="2odf-comments.xsl"/>
+  <!--xsl:import href="2odf-comments.xsl"/-->
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="w:p"/>
@@ -201,6 +201,7 @@
         <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body"
           mode="sections"/>
       </xsl:when>
+      <!-- divo: what is the else case here??? -->
     </xsl:choose>
     <xsl:apply-templates
       select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"
