@@ -36,6 +36,7 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" exclude-result-prefixes="a">
 
   <xsl:import href="cell.xsl"/>
@@ -43,9 +44,6 @@
 
   <!-- Insert Drawing (picture, chart)  -->
   <xsl:template name="InsertDrawing">
-
-
-
     <xdr:wsDr>
       <!--Insert Chart -->
       <xsl:for-each select="descendant::draw:frame">
@@ -104,70 +102,98 @@
           <!-- insert picture -->
           <xsl:when
             test="draw:image[not(name(parent::node()/parent::node()) = 'draw:g' ) and not(parent::node()/draw:object)]">
-            <xdr:twoCellAnchor>
-              <xsl:call-template name="SetPosition"/>
-              <xdr:pic>
-                <xdr:nvPicPr>
-                  <xdr:cNvPr>
-                    <xsl:attribute name="id">
-                      <xsl:value-of select="position()"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="name">
-                      <xsl:value-of select="@draw:name"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="descr">
-                      <xsl:value-of select="@draw:name"/>
-                    </xsl:attribute>
-                  </xdr:cNvPr>
-                  <xdr:cNvPicPr>
-                    <a:picLocks noChangeAspect="0"/>
-                  </xdr:cNvPicPr>
-                </xdr:nvPicPr>
+            <!-- Code added by vijayeta, fix for the bug 1806778
+				  check image is of type .svm, as OOX does not support image of type .svm
+				  Date:23rd Oct '07-->
+            <xsl:variable name ="imageExt">
+              <xsl:value-of select ="substring-after(draw:image/@xlink:href,'Pictures/')"/>
+            </xsl:variable>
+            <xsl:if test ="not(contains($imageExt,'.svm'))">
+              <xdr:twoCellAnchor>
+                <xsl:call-template name="SetPosition"/>
+                <xdr:pic>
+                  <xdr:nvPicPr>
+                    <xdr:cNvPr>
+                      <xsl:attribute name="id">
+                        <xsl:value-of select="position()"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="name">
+                        <xsl:value-of select="@draw:name"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="descr">
+                        <xsl:value-of select="@draw:name"/>
+                      </xsl:attribute>
+                    </xdr:cNvPr>
+                    <xdr:cNvPicPr>
+                      <a:picLocks noChangeAspect="0"/>
+                    </xdr:cNvPicPr>
+                  </xdr:nvPicPr>
 
-                <xdr:blipFill>
-                  <a:blip
-                    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-                    <xsl:choose>
-                      <!-- embeded picture -->
-                      <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
-                        <xsl:attribute name="r:embed">
-                          <xsl:value-of select="generate-id()"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <!-- linked picture -->
-                      <xsl:otherwise>
-                        <xsl:attribute name="r:link">
-                          <xsl:value-of select="generate-id()"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </a:blip>
-                  <a:stretch>
-                    <a:fillRect/>
-                  </a:stretch>
-                </xdr:blipFill>
+                  <xdr:blipFill>
+                    <a:blip
+                      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+                      <xsl:choose>
+                        <!-- embeded picture -->
+                        <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
+                          <xsl:attribute name="r:embed">
+                            <xsl:value-of select="generate-id()"/>
+                          </xsl:attribute>
+                        </xsl:when>
+                        <!-- linked picture -->
+                        <xsl:otherwise>
+                          <xsl:attribute name="r:link">
+                            <xsl:value-of select="generate-id()"/>
+                          </xsl:attribute>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </a:blip>
+                    <a:stretch>
+                      <a:fillRect/>
+                    </a:stretch>
+                  </xdr:blipFill>
 
-                <xsl:call-template name="InsertFrameProperties"/>
+                  <xsl:call-template name="InsertFrameProperties"/>
 
-              </xdr:pic>
-              <xdr:clientData/>
-            </xdr:twoCellAnchor>
+                </xdr:pic>
+                <xdr:clientData/>
+              </xdr:twoCellAnchor>
+            </xsl:if>
+            <!--End of Code added by vijayeta, for the bug 1806778 -->
           </xsl:when>
 
           <!-- insert text-box -->
           <xsl:when test="draw:text-box">
             <xdr:twoCellAnchor>
-
               <xsl:call-template name="SetPosition"/>
-
               <xdr:sp macro="" textlink="">
                 <xdr:nvSpPr>
-                  <xdr:cNvPr id="{position()}" name="{concat('TextBox ',position())}"/>
+                  <xdr:cNvPr id="{position()}" name="{concat('TextBox ',position())}">
+                    <!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+		                     If the text box has Hyperlink-->
+                    <xsl:if test ="draw:text-box/text:p/text:a">
+                      <xsl:for-each select ="draw:text-box/text:p/text:a">
+                        <xsl:variable name ="hlinkPos">
+                          <xsl:value-of select ="generate-id(.)"/>
+                        </xsl:variable>
+                        <a:hlinkClick>
+                          <xsl:if test="@xlink:href[ contains(.,'http://') or contains(.,'mailto:')]">
+                            <xsl:attribute name="r:id">
+                              <xsl:value-of select ="concat('mailLinkTextBox',$hlinkPos)"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test="not(@xlink:href[ contains(.,'http://') or contains(.,'mailto:')]) and @xlink:href[ contains(.,':') or contains(.,'../')]">
+                            <xsl:attribute name="r:id">
+                              <xsl:value-of select="concat('fileTextBox',$hlinkPos)"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </a:hlinkClick>
+                      </xsl:for-each>
+                    </xsl:if>
+                    <!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07-->
+                  </xdr:cNvPr>
                   <xdr:cNvSpPr txBox="1"/>
                 </xdr:nvSpPr>
-
                 <xsl:call-template name="InsertFrameProperties"/>
-
                 <xdr:txBody>
 
                   <xsl:call-template name="InsertTextBoxProperties"/>
@@ -178,11 +204,9 @@
                   <xsl:apply-templates mode="text-box"/>
 
                 </xdr:txBody>
-
               </xdr:sp>
               <xdr:clientData/>
             </xdr:twoCellAnchor>
-
           </xsl:when>
         </xsl:choose>
       </xsl:for-each>
@@ -845,6 +869,13 @@
           <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
         </xsl:attribute>
       </xsl:if>
+      <!-- Code added by Vijayeta, fix for the bug 1806752, date: 12th Oct '07-->
+      <xsl:if test="@style:font-name">
+        <xsl:attribute name="typeface">
+          <xsl:value-of select="translate(@style:font-name, &quot;'&quot;,'')"/>
+        </xsl:attribute>
+      </xsl:if>
+      <!--End of Code added by Vijayeta, fix for the bug 1806752-->
     </a:latin>
 
   </xsl:template>
@@ -1057,21 +1088,21 @@
   </xsl:template>
 
   <xsl:template name="InsertDrawingBorder">
-
     <!-- line style -->
     <a:ln>
-      <xsl:attribute name="w">
-        <xsl:call-template name="emu-measure">
-          <xsl:with-param name="length" select="@svg:stroke-width"/>
-          <xsl:with-param name="unit">emu</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-
+      <xsl:if test="@svg:stroke-width">
+        <xsl:attribute name="w">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="@svg:stroke-width"/>
+            <xsl:with-param name="unit">emu</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:choose>
         <xsl:when test="not(@draw:stroke = 'none' )">
+          <xsl:if test="@svg:stroke-color != ''">
           <a:solidFill>
             <a:srgbClr>
-
               <xsl:attribute name="val">
                 <xsl:choose>
                   <xsl:when test="@svg:stroke-color != '' ">
@@ -1082,7 +1113,6 @@
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
-
               <xsl:if test="@svg:stroke-opacity != ''">
                 <xsl:variable name="transparency">
                   <xsl:value-of select="substring-before(@svg:stroke-opacity, '%')"/>
@@ -1093,21 +1123,18 @@
                   </xsl:attribute>
                 </a:alpha>
               </xsl:if>
-
             </a:srgbClr>
           </a:solidFill>
+          </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <a:noFill/>
         </xsl:otherwise>
       </xsl:choose>
-
     </a:ln>
   </xsl:template>
-
   <xsl:template name="InsertBitmapFill">
     <xsl:param name="chartDirectory"/>
-
     <xsl:variable name="fillImage">
       <xsl:value-of select="@draw:fill-image-name"/>
     </xsl:variable>
@@ -1190,7 +1217,7 @@
   </xsl:template>
 
   <xsl:template name="InsertTextRotation">
-    
+
     <!-- rotation -->
     <xsl:if test="@style:rotation-angle">
       <xsl:attribute name="rot">
@@ -1212,14 +1239,14 @@
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
-    
+
     <!-- vertically stacked -->
     <xsl:if test="@style:direction = 'ttb' ">
       <xsl:attribute name="vert">
         <xsl:text>wordArtVert</xsl:text>
       </xsl:attribute>
     </xsl:if>
-    
+
   </xsl:template>
 
 </xsl:stylesheet>

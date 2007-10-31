@@ -72,84 +72,95 @@
     </comment>
   </xsl:template>
 
-
-
   <xsl:template name="InsertTextBox">
+    <!--Added by Vijayeta, fix for bugs, 1802491,1788390 and 1797047 date:15th Oct '07-->
+    <xsl:variable name="VisibleOrHidden">
+      <xsl:choose>
+        <xsl:when test="@office:display">
+          <xsl:if test ="@office:display='true'">
+            <xsl:value-of select ="'visible'"/>
+          </xsl:if>
+          <xsl:if test ="@office:display='false'">
+            <xsl:value-of select ="'hidden'"/>
+          </xsl:if>
+          <!--<xsl:text>visible</xsl:text>-->
+        </xsl:when>
+        <xsl:otherwise>
+          <!--<xsl:text>hidden</xsl:text>-->
+          <xsl:value-of select ="'hidden'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!--End of code by Vijayeta, fix for bugs, 1802491,1788390 and 1797047 date:15th Oct '07-->
+    <xsl:variable name="id">
+      <xsl:value-of select="1025 + count(preceding::office:annotation) + 1"/>
+    </xsl:variable>
 
-      <xsl:variable name="VisibleOrHidden">
+    <xsl:variable name="height">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:height"/>
+      </xsl:call-template>
+    </xsl:variable>
 
-        <xsl:choose>
-          <xsl:when test="@office:display">
-            <xsl:text>visible</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>hidden</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
+    <xsl:variable name="width">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="margin-left">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:x"/>
+      </xsl:call-template>
+    </xsl:variable>
 
-      <xsl:variable name="id">
-        <xsl:value-of select="1025 + count(preceding::office:annotation) + 1"/>
-      </xsl:variable>
+    <xsl:variable name="margin-top">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:y"/>
+      </xsl:call-template>
+    </xsl:variable>
 
-      <xsl:variable name="height">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="@svg:height"/>
-        </xsl:call-template>
-      </xsl:variable>
+    <xsl:variable name="z-index">
+      <xsl:value-of select="position()"/>
+    </xsl:variable>
 
-      <xsl:variable name="width">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="@svg:width"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="margin-left">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="@svg:x"/>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="margin-top">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="@svg:y"/>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="z-index">
-        <xsl:value-of select="position()"/>
-      </xsl:variable>
-
-      <v:shape noteId="{count(preceding::office:annotation)+1}" id="{concat('_x0000_s',$id)}"
-        type="#_x0000_t202"
-        style="position:absolute;
+    <v:shape noteId="{count(preceding::office:annotation)+1}" id="{concat('_x0000_s',$id)}"
+		  type="#_x0000_t202"
+		  style="position:absolute;
         margin-left:{$margin-left}pt;margin-top:{$margin-top};width:{$width}pt;height:{$height}pt;z-index:{$z-index};
         visibility:{$VisibleOrHidden};mso-wrap-style:none;v-text-anchor:middle"
-        fillcolor="#ffffc0" o:insetmode="auto">
+		  fillcolor="#ffffc0" o:insetmode="auto">
 
-        <v:fill color2="#00003f"/>
-        <v:stroke startarrow="block" joinstyle="round"/>
-        <v:shadow on="t" color="black" obscured="t"/>
-        <v:path arrowok="t" o:connecttype="none"/>
-        <v:textbox>
-          <div style="text-align:left"/>
-        </v:textbox>
-        <x:ClientData ObjectType="Note">
+      <v:fill color2="#00003f"/>
+      <v:stroke startarrow="block" joinstyle="round"/>
+      <v:shadow on="t" color="black" obscured="t"/>
+      <v:path arrowok="t" o:connecttype="none"/>
+      <v:textbox>
+        <div style="text-align:left"/>
+      </v:textbox>
+      <x:ClientData ObjectType="Note">
 
-          <x:SizeWithCells/>
+        <x:SizeWithCells/>
 
-          <x:Locked>False</x:Locked>
-          <x:PrintObject>False</x:PrintObject>
-          <x:AutoFill>False</x:AutoFill>
-          <x:AutoLine>False</x:AutoLine>
-          <x:LockText>False</x:LockText>
-          <!--  <x:Row>2</x:Row>
+        <x:Locked>False</x:Locked>
+        <x:PrintObject>False</x:PrintObject>
+        <x:AutoFill>False</x:AutoFill>
+        <x:AutoLine>False</x:AutoLine>
+        <x:LockText>False</x:LockText>
+        <!--  <x:Row>2</x:Row>
           <x:Column>2</x:Column>-->
-          <xsl:if test="@office:display">
+        <!--Added by Vijayeta, fix for bugs, 1802491,1788390 and 1797047 date:15th Oct '07-->
+        <xsl:if test="@office:display='true' or not(@office:display)">
+          <x:Visible/>
+        </xsl:if>
+        <xsl:if test="@office:display='false'">
+          <x:Hidden/>
+        </xsl:if>
+        <!--<xsl:if test="@office:display">
             <x:Visible/>
-          </xsl:if>
-
-        </x:ClientData>
-      </v:shape>
+          </xsl:if>-->
+        <!--End of code by Vijayeta, fix for bugs, 1802491,1788390 and 1797047 date:15th Oct '07-->
+      </x:ClientData>
+    </v:shape>
   </xsl:template>
 
   <xsl:template match="dc:date"/>

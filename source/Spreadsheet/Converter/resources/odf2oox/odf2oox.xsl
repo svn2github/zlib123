@@ -272,7 +272,7 @@
         <xsl:variable name="hyperlink">
           <xsl:choose>
             <xsl:when
-              test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+              test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)] or (ancestor::draw:text-box)">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -384,7 +384,7 @@
         <xsl:if test="contains($chart,'true') or $picture='true' or $textBox = 'true' ">
           <xsl:call-template name="CreateDrawing"/>
 
-          <xsl:if test="contains($chart,'true') or $picture='true'">
+          <xsl:if test="contains($chart,'true') or $picture='true' or $hyperlink = 'true'">
             <xsl:call-template name="CreateDrawingRelationships"/>
           </xsl:if>
 

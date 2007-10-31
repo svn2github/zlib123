@@ -423,11 +423,17 @@
           <!-- embeded pictures -->
           <xsl:when test="starts-with(@xlink:href, 'Pictures/')">
             <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
+			  <!-- Code added by vijayeta, fix for the bug 1806778
+				   check image is of type .svm, as OOX does not support image of type .svm
+				   Date:23rd Oct '07-->
+			  <xsl:if test ="not(contains($imageName,'.svm'))">
             <pzip:copy pzip:source="{@xlink:href}" pzip:target="xl/media/{$imageName}"/>
             <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
               Id="{generate-id(parent::node())}"
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
               Target="../media/{$imageName}"/>
+			  </xsl:if>
+			  <!--End of Code added by vijayeta, for the bug 1806778 -->
           </xsl:when>
           <!-- linked pictures -->
           <xsl:otherwise>
@@ -442,17 +448,19 @@
             <xsl:choose>
               <!-- picture is located in the same disk -->
               <xsl:when test="starts-with($translatedTarget,'../')">
-                <pxsi:physicalPath xmlns:pxsi="urn:cleverage:xmlns:post-processings:path">
+                <!--<pxsi:physicalPath xmlns:pxsi="urn:cleverage:xmlns:post-processings:path">-->
                   <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                     Id="{generate-id(parent::node())}"
                     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                     TargetMode="External">
                     <xsl:attribute name="Target">
-                      <xsl:value-of
-                        select="translate(substring-after($translatedTarget,'../'),'/','\')"/>
+                          <!--Absolute path -->
+				<xsl:value-of select ="concat('Image-Path:',@xlink:href)"/>
+                      <!--<xsl:value-of
+                        select="translate(substring-after($translatedTarget,'../'),'/','\')"/>-->
                     </xsl:attribute>
                   </Relationship>
-                </pxsi:physicalPath>
+                <!--</pxsi:physicalPath>-->
               </xsl:when>
 
               <!-- when file is on another disk -->
@@ -500,7 +508,68 @@
         </Relationship>
 
       </xsl:for-each>
-
+		<!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+		     If the text box has Hyperlink-->
+		<xsl:if test ="descendant::draw:frame/draw:text-box/text:p/text:a">
+			<xsl:for-each select="descendant::draw:frame/draw:text-box/text:p/text:a">
+				<xsl:variable name ="hlinkPos">
+					<xsl:value-of select ="generate-id(.)"/>
+				</xsl:variable>
+				<Relationship>
+					<xsl:choose >
+						<xsl:when test="@xlink:href[contains(.,'http://') or contains(.,'mailto:')]">
+							<xsl:attribute name ="Id">
+								<xsl:value-of select ="concat('mailLinkTextBox',$hlinkPos)"/>
+							</xsl:attribute>
+							<xsl:attribute name="Type">
+								<xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+							</xsl:attribute>
+							<xsl:attribute name="Target">
+								<xsl:value-of select="@xlink:href"/>
+							</xsl:attribute>
+							<xsl:attribute name="TargetMode">
+								<xsl:value-of select="'External'"/>
+							</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="@xlink:href[ contains (.,':') ]">
+								<xsl:attribute name="Id">
+									<xsl:value-of select="concat('fileTextBox',$hlinkPos)"/>
+								</xsl:attribute>
+								<xsl:attribute name="Type">
+									<xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+								</xsl:attribute>
+								<xsl:attribute name="Target">
+									<xsl:value-of select="concat('file:///',translate(substring-after(@xlink:href,'/'),'/','\'))"/>
+								</xsl:attribute>
+								<xsl:attribute name="TargetMode">
+									<xsl:value-of select="'External'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test="not(@xlink:href[ contains (.,':') ])">
+								<xsl:attribute name="Id">
+									<xsl:value-of select="concat('fileTextBox',$hlinkPos)"/>
+								</xsl:attribute>
+								<xsl:attribute name="Type">
+									<xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
+								</xsl:attribute>
+								<xsl:attribute name="Target">
+									<!--links Absolute Path-->
+									<xsl:variable name ="xlinkPath" >
+										<xsl:value-of select ="@xlink:href"/>
+									</xsl:variable>
+									<xsl:value-of select ="concat('hyperlink-path:',$xlinkPath)"/>
+								</xsl:attribute>
+								<xsl:attribute name="TargetMode">
+									<xsl:value-of select="'External'"/>
+								</xsl:attribute>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</Relationship>
+			</xsl:for-each>
+		</xsl:if>
+		<!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07-->
     </Relationships>
   </xsl:template>
 

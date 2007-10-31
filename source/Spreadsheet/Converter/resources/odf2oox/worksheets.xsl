@@ -1324,7 +1324,9 @@
 
     <xsl:variable name="CheckIfHyperlink">
     <xsl:choose>
-      <xsl:when test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+		<!-- Condition added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+		     If the text box has Hyperlink i.e. not(ancestor::draw:text-box) -->
+		<xsl:when test="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)and not(ancestor::draw:text-box)]">
         <xsl:call-template name="CheckIfHyperlink"/>
       </xsl:when>
       <xsl:otherwise>
