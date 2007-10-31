@@ -142,8 +142,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             //    }
             //}
             //End
-            
-            if (InSpan())
+          
+           //for getting system date  (text ==":::current:::")
+           if (InSpan() && (!(text ==":::current:::")))
             {
                 StoreString(text);
             }
@@ -151,6 +152,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
 
                 this.nextWriter.WriteString(EvalExpression(text));
+
+            }
+           
+           else if (text ==":::current:::")
+            {
+
+                this.nextWriter.WriteString(EvalgetCurrentSysDate(text));
 
             }
             // added by vipul for Shape Rotation
@@ -175,6 +183,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         /*
          * General methods */
+        private string EvalgetCurrentSysDate(string text)
+        {
+            string str = "";
+            str = DateTime.Now.ToShortDateString();
+            return str;
+
+        }
         private string EvalExpression(string text)
         {
             string[] arrVal = new string[4];
