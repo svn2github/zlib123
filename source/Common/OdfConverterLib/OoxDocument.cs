@@ -50,6 +50,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected const string NS_PREFIX = "oox";
         protected const string RELATIONSHIP_NS = "http://schemas.openxmlformats.org/package/2006/relationships";
 
+        protected const string CONTENT_TYPES = "[Content_Types].xml";
+        protected const string CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"; 
+
         public OoxDocument(string fileName)
         {
             this._fileName = fileName;
@@ -88,25 +91,42 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 try
                 {
-                    ZipReader archive = ZipFactory.OpenArchive(_fileName);
-                    
-                    MemoryStream ms = new MemoryStream();
-                    XmlTextWriter xtw = new XmlTextWriter(new StreamWriter(ms, Encoding.UTF8));
-                    
-                    xtw.WriteStartDocument(true);
-                    //xtw.WriteProcessingInstruction("mso-application", "progid='Word.Document'");
-                    xtw.WriteStartElement(NS_PREFIX, "package", PACKAGE_NS);
+                    if (_stream != null)
+                    {
+                        _stream.Seek(0L, SeekOrigin.Begin);
+                    }
+                    else
+                    {
+                        ZipReader archive = ZipFactory.OpenArchive(_fileName);
 
-                    // copy the whole document from its root
-                    CopyLevel(archive, "_rels/.rels", xtw, this.Namespaces);
-                    
-                    xtw.WriteEndDocument();
-                    xtw.Flush();
+                        _stream = new MemoryStream();
+                        XmlTextWriter xtw = new XmlTextWriter(new StreamWriter(_stream, Encoding.UTF8));
 
-                    // reset stream
-                    ms.Seek(0L, SeekOrigin.Begin);
-                    
-                    return ms;
+                        xtw.WriteStartDocument(true);
+                        //xtw.WriteProcessingInstruction("mso-application", "progid='Word.Document'");
+                        xtw.WriteStartElement(NS_PREFIX, "package", PACKAGE_NS);
+
+                        // copy [Content_Types].xml
+                        XmlReader reader = XmlReader.Create(archive.GetEntry(CONTENT_TYPES));
+                        xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
+                        xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, CONTENT_TYPES);
+                        xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, CONTENT_TYPES_NS);
+                        Copy(reader, xtw, true);
+                        reader.Close();
+                        xtw.WriteEndElement();
+                        xtw.Flush();
+
+                        // copy the whole document from its root
+                        CopyLevel(archive, "_rels/.rels", xtw, this.Namespaces);
+
+                        xtw.WriteEndDocument();
+                        xtw.Flush();
+
+                        // reset stream
+                        _stream.Seek(0L, SeekOrigin.Begin);
+                    }
+
+                    return _stream;
                 }
                 catch (Exception ex)
                 {
@@ -115,7 +135,159 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        protected abstract void CopyLevel(ZipReader archive, string relFile, XmlTextWriter xtw, List<string> namespaces);
+        protected virtual void CopyLevel(ZipReader archive, string relFile, XmlTextWriter xtw, List<string> namespaces)
+        {
+            XmlReader reader;
+            List<RelationShip> rels;
+            XmlReaderSettings xrs = new XmlReaderSettings();
+            xrs.IgnoreWhitespace = false;
+
+            try
+            {
+                // copy relationship part and extract relationships
+                reader = XmlReader.Create(archive.GetEntry(relFile));
+
+                xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
+                xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, relFile);
+                xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, RELATIONSHIP_NS);
+                rels = Copy(reader, xtw, true);
+                reader.Close();
+                xtw.WriteEndElement();
+                xtw.Flush();
+
+                // copy referenced parts
+                foreach (RelationShip rel in rels)
+                {
+                    if (namespaces.Contains(rel.Type))
+                    {
+                        try
+                        {
+                            string basePath = relFile.Substring(0, relFile.LastIndexOf("_rels/"));
+                            string path = rel.Target.Substring(0, rel.Target.LastIndexOf('/') + 1);
+                            string file = rel.Target.Substring(rel.Target.LastIndexOf('/') + 1);
+
+                            // if there is a relationship part for the current part 
+                            // copy relationships and referenced files recursively
+                            CopyLevel(archive, basePath + path + "_rels/" + file + ".rels", xtw, namespaces);
+
+                            reader = XmlReader.Create(archive.GetEntry(basePath + rel.Target));
+
+                            xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
+                            xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, basePath + rel.Target);
+                            xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, rel.Type);
+                            xtw.WriteAttributeString(NS_PREFIX, "rId", PACKAGE_NS, rel.Id);
+
+                            Copy(reader, xtw, false);
+                            
+                            reader.Close();
+
+                            xtw.WriteEndElement();
+                            xtw.Flush();
+                        }
+                        catch (ZipEntryNotFoundException)
+                        {
+                        }
+                    }
+                }
+            }
+            catch (ZipEntryNotFoundException)
+            {
+            }
+        }
+
+        protected virtual List<RelationShip> Copy(XmlReader xtr, XmlTextWriter xtw, bool extractRels)
+        {
+            bool isInRel = false;
+            List<RelationShip> rels = new List<RelationShip>();
+
+            RelationShip rel = new RelationShip();
+
+            while (xtr.Read())
+            {
+                switch (xtr.NodeType)
+                {
+                    case XmlNodeType.Attribute:
+                        break;
+                    case XmlNodeType.CDATA:
+                        xtw.WriteCData(xtr.Value);
+                        break;
+                    case XmlNodeType.Comment:
+                        xtw.WriteComment(xtr.Value);
+                        break;
+                    case XmlNodeType.DocumentType:
+                        xtw.WriteDocType(xtr.Name, null, null, null);
+                        break;
+                    case XmlNodeType.Element:
+                        if (extractRels && xtr.LocalName == "Relationship" && xtr.NamespaceURI == RELATIONSHIP_NS)
+                        {
+                            isInRel = true;
+                            rel = new RelationShip();
+                        }
+
+                        xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
+
+                        if (xtr.HasAttributes)
+                        {
+                            while (xtr.MoveToNextAttribute())
+                            {
+                                if (extractRels && isInRel)
+                                {
+                                    if (xtr.LocalName == "Type")
+                                        rel.Type = xtr.Value;
+                                    else if (xtr.LocalName == "Target")
+                                        rel.Target = xtr.Value;
+                                    else if (xtr.LocalName == "Id")
+                                        rel.Id = xtr.Value;
+
+                                }
+
+                                if (!xtr.LocalName.StartsWith("rsid"))
+                                {
+                                    xtw.WriteAttributeString(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI, xtr.Value);
+                                }
+                            }
+                            xtr.MoveToElement();
+                        }
+
+                        if (isInRel)
+                        {
+                            isInRel = false;
+                            rels.Add(rel);
+                        }
+
+                        if (xtr.IsEmptyElement)
+                        {
+                            xtw.WriteEndElement();
+                        }
+                        break;
+                    case XmlNodeType.EndElement:
+                        xtw.WriteEndElement();
+                        break;
+                    case XmlNodeType.EntityReference:
+                        xtw.WriteEntityRef(xtr.Name);
+                        break;
+                    case XmlNodeType.ProcessingInstruction:
+                        xtw.WriteProcessingInstruction(xtr.Name, xtr.Value);
+                        break;
+                    case XmlNodeType.SignificantWhitespace:
+                        xtw.WriteWhitespace(xtr.Value);
+                        break;
+                    case XmlNodeType.Text:
+                        xtw.WriteString(xtr.Value);
+                        break;
+                    case XmlNodeType.Whitespace:
+                        xtw.WriteWhitespace(xtr.Value);
+                        break;
+                    case XmlNodeType.XmlDeclaration:
+                        // omit XML declaration
+                        break;
+                    default:
+                        Debug.Assert(false);
+                        break;
+                }
+            }
+            return rels;
+        }
 
         /// <summary>
         /// A list of namespaces to be copied from the archive into the intermediate XML format
