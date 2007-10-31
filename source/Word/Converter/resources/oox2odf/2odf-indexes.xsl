@@ -802,7 +802,13 @@
   <xsl:template name="InsertHyperlinkStartToTOC">
     <text:index-entry-link-start>
       <xsl:attribute name="text:style-name">
-        <xsl:value-of select="w:hyperlink/w:r/w:rPr/w:rStyle/@w:val"/>
+        <!--clam: bugfix 1806204-->
+        <xsl:choose>
+          <xsl:when test="w:hyperlink/w:r/w:rPr/w:rStyle/@w:val = 'Hyperlink'">X3AS7TOCHyperlink</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="w:hyperlink/w:r/w:rPr/w:rStyle/@w:val"/>    
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
     </text:index-entry-link-start>
   </xsl:template>
