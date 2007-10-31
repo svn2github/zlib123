@@ -249,7 +249,13 @@
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
       <xsl:if test="w:rStyle">
         <xsl:attribute name="style:parent-style-name">
-          <xsl:value-of select="w:rStyle/@w:val"/>
+          <!--clam bugfix #1806204-->
+          <xsl:choose>
+            <xsl:when test="../../preceding::w:r[contains(w:instrText,'TOC')] and w:rStyle/@w:val='Hyperlink'">X3AS7TOCHyperlink</xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="w:rStyle/@w:val"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </xsl:if>
       <style:text-properties>
