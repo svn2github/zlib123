@@ -898,6 +898,12 @@
         <!-- document styles -->
         <xsl:call-template name="InsertDefaultStyles"/>
         <xsl:apply-templates select="key('Part', 'word/styles.xml')/w:styles"/>
+        
+        <!--clam: special hyperlink style for toc (bug #1806204 )-->
+        <style:style style:name="X3AS7TOCHyperlink" style:display-name="X3AS7TOCHyperlink" style:family="text" style:parent-style-name="DefaultParagraphFont">
+          <style:text-properties fo:color="#000000" style:text-underline-style="none" />
+        </style:style>
+
         <xsl:call-template name="InsertNotesConfiguration"/>
         <xsl:if
           test="key('Part', 'word/document.xml')/w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
