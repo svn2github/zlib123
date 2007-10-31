@@ -517,6 +517,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     || transformDirection == Direction.OdsToXlsx;
                 converter.Packaging = this.packaging;
 
+                // TODO: optionally we could also add a progress bar to the command line
+                // then we would need to count the paragraphs, runs, etc.
+                //converter.ComputeSize(input);
+                
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
                 this.report.AddLog(input, "Conversion succeeded", Report.INFO_LEVEL);
@@ -655,17 +659,17 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private static void usage()
         {
-            Console.WriteLine("Usage: OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level] ");
+            Console.WriteLine("Usage: OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level] ");
             Console.WriteLine("  Where options are:");
             Console.WriteLine("     /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)");
             Console.WriteLine("     /O PathOrFilename  Name of the output file (or output folder)");
             Console.WriteLine("     /F                 Replace existing file");
-            Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)");
-            Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)");
-            Console.WriteLine("     /BATCH-ODP         Do a batch conversion over every ODP file in the input folder (note: existing files will be replaced)");
-            Console.WriteLine("     /BATCH-PPTX        Do a batch conversion over every PPTX file in the input folder (note: existing files will be replaced)");
-            Console.WriteLine("     /BATCH-ODS         Do a batch conversion over every ODS file in the input folder (note: existing files will be replaced)");
-            Console.WriteLine("     /BATCH-XLSX        Do a batch conversion over every XLSX file in the input folder (note: existing files will be replaced)");
+            Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (Note: use /F to replace existing files)");
+            Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (Note: use /F to replace existing files)");
+            Console.WriteLine("     /BATCH-ODP         Do a batch conversion over every ODP file in the input folder (Note: use /F to replace existing files)");
+            Console.WriteLine("     /BATCH-PPTX        Do a batch conversion over every PPTX file in the input folder (Note: use /F to replace existing files)");
+            Console.WriteLine("     /BATCH-ODS         Do a batch conversion over every ODS file in the input folder (Note: use /F to replace existing files)");
+            Console.WriteLine("     /BATCH-XLSX        Do a batch conversion over every XLSX file in the input folder (Note: use /F to replace existing files)");
             Console.WriteLine("     /V                 Validate the result of the transformation against the schemas");
             Console.WriteLine("     /OPEN              Try to open the converted files (works only for ODF->OOX, Microsoft Word required)");
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
@@ -691,7 +695,8 @@ namespace CleverAge.OdfConverter.CommandLineTool
         {
             for (int i = 0; i < args.Length; i++)
             {
-                switch (args[i])
+                // FIX: 20071030/divo: accept lower case parameters
+                switch (args[i].ToUpperInvariant())
                 {
                     case "/I":
                         if (++i == args.Length)
