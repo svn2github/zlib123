@@ -28,6 +28,7 @@
 
 using System;
 using System.Xml;
+using System.IO;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 
@@ -128,6 +129,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
               this.noteId = text;
             }
+            // This condition is to check for Image Path(Link to file option) 
+            else if (text.Contains("Image-Path"))
+            {
+                string imagePathLocation = ImagePath(text);
+                this.nextWriter.WriteString(imagePathLocation);
+            }
             else
             {
                 this.nextWriter.WriteString(text);
@@ -191,6 +198,40 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.nextWriter.WriteEndElement();
             }
         }
+
+        //Resolve relative path to absolute path
+        private string ImagePath(string text)
+        {
+            string[] arrVal = new string[2];
+            arrVal = text.Split(':');
+            string source = arrVal[1].ToString();
+            string address = "";
+
+            if (arrVal.Length == 2)
+            {
+                string returnInputFilePath = "";
+
+                // for Commandline tool
+                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                {
+                    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                        returnInputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                }
+
+                //for addins
+                if (returnInputFilePath == "")
+                {
+                    returnInputFilePath = Environment.CurrentDirectory;
+                }
+               
+                string linkPathLocation = Path.GetFullPath(Path.Combine(returnInputFilePath, source)).Replace("\\", "/").Replace(" ", "%20");
+                address = "file:///" + linkPathLocation;
+
+            }
+            return address.ToString();
+
+        }
+        //End
 
     }
 }
