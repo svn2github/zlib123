@@ -94,7 +94,7 @@
   Modified: makz (DIaLOGIKa)
   Date: 26.10.2007
   -->
-  <xsl:template match="table:table-cell | table:covered-table-cell">
+  <xsl:template match="table:table-cell">
     <xsl:param name="isFirstRow"/>
     <w:tc>
       <w:tcPr>
@@ -108,11 +108,6 @@
         <xsl:call-template name="InsertEmptyParagraph"/>
       </xsl:if>
     </w:tc>
-  </xsl:template>
-  
-  
-  <xsl:template match="table:convered-table-cell">
-    
   </xsl:template>
 
   <!-- match columns for gridCols -->
@@ -679,10 +674,14 @@
   -->
   <xsl:template name="InsertCellSpan">
     <xsl:if test="@table:number-rows-spanned">
-      <w:vMerge w:val="restart" />
-    </xsl:if>
-    <xsl:if test="name()='table:covered-table-cell'">
-      <w:vMerge />
+      <xsl:choose>
+        <xsl:when test="name()='table:covered-table-cell'">
+          <w:vMerge />
+        </xsl:when>
+        <xsl:otherwise>
+          <w:vMerge w:val="restart" />
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
     <xsl:if test="@table:number-columns-spanned">
       <w:gridSpan w:val="{@table:number-columns-spanned}"/>
