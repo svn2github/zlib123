@@ -1645,9 +1645,24 @@
         <xsl:with-param name="styleName" select="$styleName"/>
       </xsl:call-template>
     </xsl:variable>
-
+       
     <xsl:choose>
       <!-- Headings in lists are treated as basic list items -->
+
+      <!--clam: bugfix #1788407: there can be lists inside lists-->
+      <xsl:when test="self::text:list-item and count(ancestor::text:list) > 1">
+        <w:numPr>
+          <!--clam: one more for each additional list-ancestor-->
+          <w:ilvl w:val="{number(text:h/@text:outline-level) + count(ancestor::text:list) - 2}"/>
+          <w:numId>
+            <xsl:attribute name="w:val">
+              <xsl:call-template name="GetNumberingId">
+                <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:numId>
+        </w:numPr>
+      </xsl:when>
       <xsl:when test="self::text:list-item">
         <w:numPr>
           <w:ilvl w:val="{number(text:h/@text:outline-level) - 1}"/>
