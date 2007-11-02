@@ -3405,17 +3405,26 @@
           <!-- comment : OpenOffice will rather use fo:min-width when parent style defined, and draw:auto-grow-width if not -->
           <xsl:choose>
             <xsl:when test="$shapeStyle/@style:parent-style-name">
+              <!--
+                makz: commented due to bug 1669046. Regression could be possible.
+                
+                <xsl:if
+                  test="@fo:min-height 
+                  or parent::draw:frame/@fo:min-width
+                  or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
+                  or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
+                -->
               <xsl:if
-                test="@fo:min-height or parent::draw:frame/@fo:min-width
+                test="parent::draw:frame/@fo:min-width
                 or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                 or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
               </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:if
-                test="not($shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
-                or not($shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'false')">
+              <xsl:if test="not(parent::node()='draw:frame') 
+                and (not($shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
+                or not($shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
               </xsl:if>
             </xsl:otherwise>
