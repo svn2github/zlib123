@@ -34,10 +34,15 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="style text office number">
 
-
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
 
 
+  <!-- 
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
+  -->
+  
   <xsl:template match="text:page-number" mode="paragraph">
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
@@ -76,7 +81,6 @@
     </w:r>
   </xsl:template>
 
-  <!--  STATISTICS FIELDS  -->
   <xsl:template match="text:page-count" mode="paragraph">
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
@@ -109,9 +113,7 @@
     </w:fldSimple>
   </xsl:template>
 
-  <!-- Date Fields -->
-  <xsl:template match="text:date|text:creation-date|text:print-date|text:modification-date"
-    mode="paragraph">
+  <xsl:template match="text:date|text:creation-date|text:print-date|text:modification-date" mode="paragraph">
     <xsl:choose>
       <xsl:when test="@text:fixed='true'">
         <w:r>
@@ -188,10 +190,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Time Fields -->
-  <xsl:template
-    match="text:time|text:creation-time|text:editing-duration|text:print-time|text:modification-time"
-    mode="paragraph">
+  <xsl:template match="text:time|text:creation-time|text:editing-duration|text:print-time|text:modification-time" mode="paragraph">
     <xsl:choose>
       <xsl:when test="@text:fixed='true'">
         <w:r>
@@ -319,9 +318,7 @@
   </xsl:template>
 
   <!-- Sender Fields -->
-  <xsl:template
-    match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]"
-    mode="paragraph">
+  <xsl:template match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]" mode="paragraph">
     <xsl:variable name="username">
       <xsl:value-of select="."/>
     </xsl:variable>
@@ -345,9 +342,7 @@
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template
-    match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]"
-    mode="paragraph">
+  <xsl:template match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]" mode="paragraph">
     <xsl:variable name="adress">
       <xsl:value-of select="."/>
     </xsl:variable>
@@ -382,7 +377,6 @@
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-
 
   <xsl:template match="text:editing-cycles[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" REVNUM ">
@@ -489,20 +483,19 @@
     </w:fldSimple>
   </xsl:template>
 
-
   <!-- simple variables and user variables-->
   <xsl:template match="text:variable-set" mode="paragraph">
     <xsl:call-template name="InsertVariableField"/>
   </xsl:template>
 
-  <!-- insert field declarations only in the first paragraph -->
+  <!-- 
+  Summary: inserts field declarations
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
   <xsl:template name="InsertUserFieldDeclaration">
-    <xsl:if test="parent::office:text">
-      <xsl:if test="not(preceding-sibling::*[1][self::text:p or self::text:h])">
-        <xsl:apply-templates select="preceding-sibling::text:user-field-decls/text:user-field-decl"
-          mode="user-field-decl"/>
-      </xsl:if>
-    </xsl:if>
+    <xsl:apply-templates select="preceding-sibling::text:user-field-decls/text:user-field-decl" mode="user-field-decl"/>
   </xsl:template>
 
   <!-- convert user-field-decl into regular variable field. -->
@@ -510,62 +503,10 @@
     <xsl:call-template name="InsertVariableField"/>
   </xsl:template>
 
-  <!-- insert declaration of variable, and potentially a reference to display it. -->
-  <xsl:template name="InsertVariableField">
-    <xsl:variable name="varName">
-      <xsl:call-template name="SuppressForbiddenChars">
-        <xsl:with-param name="string" select="@text:name"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <w:r>
-      <w:fldChar w:fldCharType="begin"/>
-    </w:r>
-    <w:r>
-      <w:instrText xml:space="preserve"> SET </w:instrText>
-      <w:instrText>
-        <xsl:value-of select="$varName"/>
-      </w:instrText>
-      <w:instrText xml:space="preserve"> "</w:instrText>
-      <w:instrText>
-        <xsl:choose>
-          <xsl:when
-            test="(@office:value-type = 'float' or @office:value-type = 'percentage') and @office:value">
-            <xsl:value-of select="@office:value"/>
-          </xsl:when>
-          <xsl:when test="@office:value-type = 'currency' and (@office:value and @office:currency)">
-            <xsl:value-of select="concat(@office:value, @office:currency)"/>
-          </xsl:when>
-          <xsl:when test="@office:value-type = 'date' and @office:date-value">
-            <xsl:value-of select="@office:date-value"/>
-          </xsl:when>
-          <xsl:when test="@office:value-type = 'time' and @office:time-value">
-            <xsl:value-of select="@office:time-value"/>
-          </xsl:when>
-          <xsl:when test="@office:value-type = 'boolean' and @office:boolean-value">
-            <xsl:value-of select="@office:boolean-value"/>
-          </xsl:when>
-          <xsl:when test="@office:value-type = 'string' and @office:string-value">
-            <xsl:value-of select="@office:string-value"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="child::text()"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </w:instrText>
-      <w:instrText xml:space="preserve">" \* MERGEFORMAT </w:instrText>
-    </w:r>
-    <w:r>
-      <w:fldChar w:fldCharType="end"/>
-    </w:r>
-    <xsl:if test="not(@text:display='none' or self::text:user-field-decl)">
-      <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
-        <w:r>
-          <xsl:apply-templates mode="text"/>
-        </w:r>
-      </w:fldSimple>
-    </xsl:if>
-  </xsl:template>
-
+  <!--
+  Summary: Templates converts fields which refers to declarations
+  Author: Clever Age
+  -->
   <xsl:template match="text:variable-get | text:user-field-get" mode="paragraph">
     <xsl:variable name="varName">
       <xsl:call-template name="SuppressForbiddenChars">
@@ -587,8 +528,7 @@
         <xsl:with-param name="string" select="@text:name"/>
       </xsl:call-template>
     </xsl:variable>
-    <w:fldSimple
-      w:instr="{concat(' ASK ', $varName, ' &quot;', @text:description, '&quot; ')}"/>
+    <w:fldSimple w:instr="{concat(' ASK ', $varName, ' &quot;', @text:description, '&quot; ')}"/>
     <xsl:if test="not(@text:display='none')">
       <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
         <w:r>
@@ -597,7 +537,6 @@
       </w:fldSimple>
     </xsl:if>
   </xsl:template>
-
 
   <!-- report lost fields -->
   <xsl:template match="text:description" mode="paragraph">
@@ -623,7 +562,11 @@
     <xsl:apply-templates mode="paragraph"/>
   </xsl:template>
 
-
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
 
   <xsl:template name="InsertLanguage">
     <xsl:choose>
@@ -636,5 +579,79 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- 
+  Summary: insert declaration of variable, and potentially a reference to display it.
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 31.10.2007
+  -->
+  <xsl:template name="InsertVariableField">
+    <xsl:variable name="varName">
+      <xsl:call-template name="SuppressForbiddenChars">
+        <xsl:with-param name="string" select="@text:name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="varValue">
+      <xsl:choose>
+        <xsl:when test="(@office:value-type = 'float' or @office:value-type = 'percentage') and @office:value">
+          <xsl:value-of select="@office:value"/>
+        </xsl:when>
+        <xsl:when test="@office:value-type = 'currency' and (@office:value and @office:currency)">
+          <xsl:value-of select="concat(@office:value, @office:currency)"/>
+        </xsl:when>
+        <xsl:when test="@office:value-type = 'date' and @office:date-value">
+          <xsl:value-of select="@office:date-value"/>
+        </xsl:when>
+        <xsl:when test="@office:value-type = 'time' and @office:time-value">
+          <xsl:value-of select="@office:time-value"/>
+        </xsl:when>
+        <xsl:when test="@office:value-type = 'boolean' and @office:boolean-value">
+          <xsl:value-of select="@office:boolean-value"/>
+        </xsl:when>
+        <xsl:when test="@office:value-type = 'string' and @office:string-value">
+          <xsl:value-of select="@office:string-value"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="child::text()"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="bookmarkID">
+      <xsl:call-template name="GenerateBookmarkId">
+        <xsl:with-param name="TextName">
+          <xsl:value-of select="@text:name"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <w:instrText xml:space="preserve"> SET <xsl:value-of select="$varName"/> "<xsl:value-of select="$varValue"/>" \* MERGEFORMAT </w:instrText>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="seperate"/>
+    </w:r>
+    <w:bookmarkStart w:id="{bookmarkID}" w:name="{$varName}" />
+    <w:r>
+      <w:rPr>
+        <w:noProof/>
+      </w:rPr>
+      <w:t>
+        <xsl:value-of select="$varValue"/>
+      </w:t>
+    </w:r>
+    <w:bookmarkEnd w:id="{bookmarkID}"/>
+    <w:r>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+    <xsl:if test="not(@text:display='none' or self::text:user-field-decl)">
+      <w:fldSimple w:instr="{concat(' REF ', $varName, ' ')}">
+        <w:r>
+          <xsl:apply-templates mode="text"/>
+        </w:r>
+      </w:fldSimple>
+    </xsl:if>
+  </xsl:template>
 
 </xsl:stylesheet>

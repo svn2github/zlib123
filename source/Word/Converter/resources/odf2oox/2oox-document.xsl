@@ -110,6 +110,7 @@
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
     <xsl:param name="isFirstRow" select="'false'"/>
+    
     <xsl:message terminate="no">progress:text:p</xsl:message>
     <!-- insert frames for first paragraph of document if we are in an envelope  -->
     <xsl:call-template name="InsertEnvelopeFrames"/>
@@ -133,7 +134,9 @@
       </w:pPr>
 
       <!-- if paragraph is the very first of page, declare user variables -->
-      <xsl:call-template name="InsertUserFieldDeclaration"/>
+      <xsl:if test="parent::office:text and count(preceding::text:p) = 0">
+        <xsl:call-template name="InsertUserFieldDeclaration"/>
+      </xsl:if>
 
       <!-- insert drawing objects that are preceding-sibling of current. -->
       <xsl:call-template name="InsertPrecedingDrawingObject"/>

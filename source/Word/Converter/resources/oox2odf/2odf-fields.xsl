@@ -633,6 +633,7 @@
   <!-- user field declaration -->
   <xsl:template name="InsertUserVariable">
     <xsl:param name="fieldCode"/>
+    
     <!-- troncate field to find arguments -->
     <xsl:variable name="fieldName">
       <xsl:variable name="newFieldCode">
@@ -652,15 +653,12 @@
     <xsl:variable name="fieldValue">
       <xsl:variable name="newFieldCode">
         <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
-          <xsl:with-param name="string"
-            select="substring-after(substring-after($fieldCode, 'SET'), $fieldName)"/>
+          <xsl:with-param name="string" select="substring-after(substring-after($fieldCode, 'SET'), $fieldName)" />
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="substring($newFieldCode, 1,1) = &apos;&quot;&apos;">
-          <xsl:value-of
-            select="substring-before(substring-after($newFieldCode, &apos;&quot;&apos;), &apos;&quot;&apos;)"
-          />
+          <xsl:value-of select="substring-before(substring-after($newFieldCode, &apos;&quot;&apos;), &apos;&quot;&apos;)" />
         </xsl:when>
         <xsl:when test="contains($newFieldCode, ' ')">
           <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
@@ -723,7 +721,11 @@
             <xsl:value-of select="$fieldValue"/>
           </xsl:attribute>
         </xsl:when>
-        <xsl:otherwise/>
+        <xsl:otherwise>
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:otherwise>
       </xsl:choose>
       <xsl:attribute name="text:display">none</xsl:attribute>
     </text:variable-set>
@@ -733,8 +735,7 @@
   <xsl:template name="InsertIndexMark">
     <xsl:param name="instrText"/>
     <xsl:variable name="Value">
-      <xsl:value-of select="substring-before(substring-after($instrText,'&quot;'),'&quot;')"
-      />
+      <xsl:value-of select="substring-before(substring-after($instrText,'&quot;'),'&quot;')" />
     </xsl:variable>
 
     <text:alphabetical-index-mark>
@@ -774,21 +775,43 @@
     </text:alphabetical-index-mark>
   </xsl:template>
 
+  <!--
+  Summary: inserts a reference to another field
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
   <xsl:template name="InsertCrossReference">
     <xsl:param name="fieldCode"/>
+    
     <text:bookmark-ref text:reference-format="text">
       <xsl:choose>
-        <xsl:when test="contains($fieldCode,'PAGEREF')">
+        <xsl:when test="contains($fieldCode, 'PAGEREF')">
           <xsl:attribute name="text:ref-name">
-            <xsl:value-of select="substring-before(concat('_',substring-after($fieldCode,'_')),' \')"/>
+            <xsl:choose>
+              <xsl:when test="contains($fieldCode, ' \')">
+                <xsl:value-of select="substring-before(concat('_',substring-after($fieldCode,'_')), ' \')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat('_',substring-after($fieldCode,'_'))"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
           <xsl:apply-templates select="w:r/w:t"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:attribute name="text:ref-name">
-            <xsl:value-of select="substring-before(substring-after($fieldCode,'REF '),' \')"/>
+            <xsl:choose>
+              <xsl:when test="contains($fieldCode, ' \')">
+                <xsl:value-of select="substring-before(substring-after($fieldCode, 'REF '), ' \')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-after($fieldCode, 'REF ')"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
-          <xsl:apply-templates select="ancestor::w:p/descendant::w:t"/>
+          <xsl:apply-templates select="w:r/w:t"/>
+          <!--<xsl:apply-templates select="ancestor::w:p/descendant::w:t"/>-->
         </xsl:otherwise>
       </xsl:choose>
     </text:bookmark-ref>
@@ -1518,9 +1541,7 @@
       <xsl:otherwise>
 
         <xsl:variable name="rId">
-          <xsl:value-of
-            select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship[@Target = $docName]/@Id"
-          />
+          <xsl:value-of select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship[@Target = $docName]/@Id" />
         </xsl:variable>
         <xsl:for-each select="key('Part', 'word/document.xml')">
           <xsl:for-each

@@ -152,10 +152,8 @@
             <v:shape id="{$imageId}" type="#_x0000_t75">
 
               <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name"/>
-              <xsl:variable name="automaticStyle"
-                select="key('automatic-styles', parent::draw:frame/@draw:style-name)"/>
-              <xsl:variable name="officeStyle"
-                select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+              <xsl:variable name="automaticStyle" select="key('automatic-styles', parent::draw:frame/@draw:style-name)"/>
+              <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
 
               <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
 
