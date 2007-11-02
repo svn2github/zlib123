@@ -13,6 +13,8 @@ namespace CleverAge.OdfConverter.Word
         protected int _paraId = 0;
         protected int _sectPrId = 0;
 
+        protected int _insideField = 0;
+
         public DocxDocument(string fileName) : base(fileName)
         {
         }
@@ -78,6 +80,16 @@ namespace CleverAge.OdfConverter.Word
                                 {
                                     xtw.WriteAttributeString(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI, xtr.Value);
                                 }
+
+                                switch (xtr.LocalName)
+                                {
+                                    case "fldCharType": 
+                                        if (xtr.Value.Equals("begin"))
+                                            _insideField++;
+                                        if (xtr.Value.Equals("end"))
+                                            _insideField--;
+                                        break;
+                                }
                             }
                             xtr.MoveToElement();
                         }
@@ -88,16 +100,45 @@ namespace CleverAge.OdfConverter.Word
                             rels.Add(rel);
                         }
 
-                        if (xtr.LocalName.Equals("p"))
+                        switch (xtr.LocalName)
                         {
-                            xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, _paraId.ToString());
-                            xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
-                            _paraId++;
-                        }
-                        else if (xtr.LocalName.Equals("sectPr"))
-                        {
-                            xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, _sectPrId.ToString());
-                            _sectPrId++;
+                            case "p":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, _paraId.ToString());
+                                xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
+                                _paraId++;
+                                break;
+                            case "altChunk":
+                            case "bookmarkEnd":
+                            case "bookmarkStart":
+                            case "commentRangeEnd":
+                            case "commentRangeStart":
+                            case "del":
+                            case "ins":
+                            case "moveFrom":
+                            case "moveFromRangeEnd":
+                            case "moveFromRangeStart":
+                            case "moveToRangeEnd":
+                            case "moveToRangeStart":
+                            case "oMath":
+                            case "oMathPara":
+                            case "permEnd":
+                            case "permStart":
+                            case "proofErr":
+                            case "sdt":
+                            case "tbl":
+                                xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
+                                break;
+                            case "r":
+                                if (_insideField > 0)
+                                {
+                                    // add an attribute if we are inside a field definition
+                                    xtw.WriteAttributeString(NS_PREFIX, "f", PACKAGE_NS, _insideField.ToString());
+                                }
+                                break;
+                            case "sectPr":
+                                xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
+                                _sectPrId++;
+                                break;
                         }
 
                         if (xtr.IsEmptyElement)

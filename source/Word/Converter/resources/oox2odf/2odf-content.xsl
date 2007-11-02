@@ -66,7 +66,7 @@
   <xsl:key name="sectPr" match="w:sectPr" use="''"/>
   
   <xsl:key name="p" match="w:p" use="@oox:id" />
-  <xsl:key name="sectPr" match="w:sectPr" use="@oox:id" />
+  <xsl:key name="sectPr" match="w:sectPr" use="@oox:s" />
 
   <!--main document-->
   <xsl:template name="content">
@@ -450,9 +450,6 @@
       </xsl:if>
     </xsl:variable>
 
-    <!--xsl:variable name="test1" select="key('p', @oox:id)" />
-    <xsl:variable name="test2" select="key('p', @oox:id - 1)" />
-    <xsl:variable name="test3" select="preceding::w:p[1]" /-->
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
       <xsl:when
@@ -716,7 +713,8 @@
     <xsl:choose>
 
       <!--fields-->
-      <xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate']">
+      <!--xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate']"-->
+      <xsl:when test="@oox:f">
         <xsl:call-template name="InsertField"/>
       </xsl:when>
 
@@ -1080,14 +1078,14 @@
   <xsl:template name="ComputeMasterPageName">
     <!-- NB : precSectPr defines properties of preceding section,
         whereas followingSectPr defines properties of current section -->
-    <xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
+    <!--xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
     <xsl:param name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
-    <xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
-    <!-- divo TODO: make this optimization work in any context -->
-    <!--xsl:param name="precSectPr" select="key('sectPr', number(@oox:s) - 1)"/>
-    <xsl:param name="followingSectPr" select="key('sectPr', @oox:s)"/>
     <xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/-->
-
+    
+    <xsl:param name="precSectPr" select="key('sectPr', number(ancestor::node()/@oox:s) - 1)"/>
+    <xsl:param name="followingSectPr" select="key('sectPr', number(ancestor::node()/@oox:s))"/>
+    <xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
+    
     <xsl:choose>
       <!-- first case : current section is continuous with preceding section (test if precSectPr exist to avoid bugs) -->
       <xsl:when test="$precSectPr and $followingSectPr/w:type/@w:val = 'continuous' ">

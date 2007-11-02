@@ -96,61 +96,6 @@ namespace CleverAge.OdfConverter.Word
             }
         }
 
-        //protected override void _Transform(string inputFile, string outputFile)
-        //{
-        //    // this throws an exception in the the following cases:
-        //    // - input file is not a valid file
-        //    // - input file is an encrypted file
-        //    CheckFile(inputFile);
-
-        //    XmlReader source = null;
-        //    XmlWriter writer = null;
-        //    ZipResolver zipResolver = null;
-
-        //    try
-        //    {
-        //        XslCompiledTransform xslt = this.Load(outputFile == null);
-        //        zipResolver = new ZipResolver(inputFile);
-        //        XsltArgumentList parameters = new XsltArgumentList();
-        //        parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
-
-        //        if (outputFile != null)
-        //        {
-        //            parameters.AddParam("outputFile", "", outputFile);
-        //            XmlWriter finalWriter;
-        //            if (this.packaging)
-        //            {
-        //                finalWriter = new ZipArchiveWriter(zipResolver);
-        //            }
-        //            else
-        //            {
-        //                finalWriter = new XmlTextWriter(outputFile, System.Text.Encoding.UTF8);
-        //            }
-        //            writer = GetWriter(finalWriter);
-        //        }
-        //        else
-        //        {
-        //            writer = new XmlTextWriter(new StringWriter());
-        //        }
-        //        OoxDocument doc = new OoxDocument(inputFile);
-        //        source = XmlReader.Create(doc.OpenXML);
-        //        // Apply the transformation
-        //        xslt.Transform(source, parameters, writer, zipResolver);
-
-        //        //XPathDocument xpd = new XPathDocument(doc.OpenXML);
-        //        //xslt.Transform(xpd, parameters, writer);
-        //    }
-        //    finally
-        //    {
-        //        if (writer != null)
-        //            writer.Close();
-        //        if (source != null)
-        //            source.Close();
-        //        if (zipResolver != null)
-        //            zipResolver.Dispose();
-        //    }
-        //}
-
         /// <summary>
         /// Pull the input xml document to the xsl transformation
         /// </summary>
@@ -174,13 +119,13 @@ namespace CleverAge.OdfConverter.Word
                     DocxDocument doc = new DocxDocument(inputFile);
 
                     // uncomment for testing
-                    //Stream package = doc.OpenXML;
-                    //FileInfo fi = new FileInfo(@"C:\tmp\test_dump2.xml");
-                    //Stream s = fi.OpenWrite();
-                    //byte[] buffer = new byte[package.Length];
-                    //package.Read(buffer, 0, (int)package.Length);
-                    //s.Write(buffer, 0, (int)package.Length);
-                    //s.Close();
+                    Stream package = doc.OpenXML;
+                    FileInfo fi = new FileInfo(@"C:\tmp\test_dump2.xml");
+                    Stream s = fi.OpenWrite();
+                    byte[] buffer = new byte[package.Length];
+                    package.Read(buffer, 0, (int)package.Length);
+                    s.Write(buffer, 0, (int)package.Length);
+                    s.Close();
                     
                     return XmlReader.Create(doc.OpenXML, xrs);
                 }
