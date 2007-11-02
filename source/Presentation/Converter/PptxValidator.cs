@@ -426,7 +426,7 @@ namespace Sonata.OdfConverter.Presentation
         }
 
         // Code to verify whether a file is valid pptx file or not
-        //bug no. 1698280
+        //bug number:1698280
         //Code chcanges 2 of 2
         private bool validatePptx(ZipReader reader)
         {
