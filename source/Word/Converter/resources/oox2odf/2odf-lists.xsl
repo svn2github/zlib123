@@ -1164,6 +1164,7 @@
       <!--      if this paragraph is attached to preceding in track changes mode-->
       <xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
 
+           
       <xsl:otherwise>
         <text:list-item>
           <xsl:variable name="followingParagraph" select="self::node()[1]/following-sibling::w:p[1]"/>
@@ -1285,12 +1286,18 @@
       <xsl:variable name="followingParagraphOnLevel"
         select="$node/following-sibling::w:p[generate-id() = $followingParagraphId]"/>
 
-      <xsl:call-template name="InsertListLevel">
-        <xsl:with-param name="node" select="$followingParagraphOnLevel"/>
-        <xsl:with-param name="level" select="$listLevel"/>
-        <xsl:with-param name="numId" select="$numId"/>
-        <xsl:with-param name="listLevel" select="$listLevel"/>
-      </xsl:call-template>
+      <!--clam: bugfix #1788550
+      the list has to stop if the following paragraph is a numbered heading
+      -->
+      <xsl:if test="not(contains($followingParagraphOnLevel/w:pPr/w:pStyle/@w:val,'Heading') and not(contains(./w:pPr/w:pStyle/@w:val,'Heading')))">
+        <xsl:call-template name="InsertListLevel">
+          <xsl:with-param name="node" select="$followingParagraphOnLevel"/>
+          <xsl:with-param name="level" select="$listLevel"/>
+          <xsl:with-param name="numId" select="$numId"/>
+          <xsl:with-param name="listLevel" select="$listLevel"/>
+        </xsl:call-template>
+      </xsl:if>
+      
     </xsl:if>
   </xsl:template>
 
