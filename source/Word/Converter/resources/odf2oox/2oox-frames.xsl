@@ -881,10 +881,23 @@
           <xsl:with-param name="length" select="@svg:width"/>
         </xsl:call-template>
       </xsl:variable>
+
+      <xsl:variable name="filename" select="node()/@xlink:href"></xsl:variable>
+     
+      <!--clam: compute cropping on postprocessor-->
       <xsl:attribute name="t">
-        <xsl:value-of select=" round(($t * 100 div ($t + $b + $height)) * 1000)"/>
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $firstVal, ',' , $filename,  ',t,' , round(($t * 100 div ($t + $b + $height)) * 1000))"/>
       </xsl:attribute>
       <xsl:attribute name="b">
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $thirdVal, ',' , $filename,  ',b,', round(($b * 100 div ($t + $b + $height)) * 1000))"/>
+      </xsl:attribute>
+      <xsl:attribute name="r">
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $secondVal, ',' , $filename,  ',r,', round(($r * 100 div ($r + $l + $width)) * 1000))"/>
+      </xsl:attribute>
+      <xsl:attribute name="l">
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $fourthVal, ',' , $filename,  ',l,', round(($l * 100 div ($l + $r + $width)) * 1000))"/>
+      </xsl:attribute>
+      <!--<xsl:attribute name="b">
         <xsl:value-of select=" round(($b * 100 div ($t + $b + $height)) * 1000)"/>
       </xsl:attribute>
       <xsl:attribute name="r">
@@ -892,7 +905,7 @@
       </xsl:attribute>
       <xsl:attribute name="l">
         <xsl:value-of select=" round(($l * 100 div ($l + $r + $width)) * 1000)"/>
-      </xsl:attribute>
+      </xsl:attribute>-->
     </a:srcRect>
   </xsl:template>
 
