@@ -86,6 +86,7 @@
       </office:automatic-styles>
       <office:body>
         <office:text>
+          <xsl:call-template name="InsertUserFieldDecls" />
           <xsl:call-template name="TrackChanges"/>
           <xsl:call-template name="InsertDocumentBody"/>
         </office:text>
@@ -106,8 +107,17 @@
       <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict"
         mode="automaticpict"/>
     </xsl:if>
-
-
+  </xsl:template>
+  
+  <!--
+  Summary: Inserst the declarations of all SET fields
+  Author: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
+  <xsl:template name="InsertUserFieldDecls">
+    <text:user-field-decls>
+      <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//w:instrText" mode="UserFieldDecls" />
+    </text:user-field-decls>
   </xsl:template>
 
   <!--  generates automatic styles for sections-->
@@ -855,15 +865,18 @@
 
   <!--  text bookmark-Start  -->
   <xsl:template match="w:bookmarkStart">
-    <xsl:if test="ancestor::w:p">
+    <!--
+    makz: check if the w:bookmarkStart doesn't belong to a user field.
+    user fields are translated to user-field-decl
+    -->
+    <xsl:if test="ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='seperate')">
+      
       <xsl:variable name="NameBookmark">
         <xsl:value-of select="@w:name"/>
       </xsl:variable>
-
       <xsl:variable name="OutlineLvl">
         <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
       </xsl:variable>
-
       <xsl:variable name="Id">
         <xsl:value-of select="@w:id"/>
       </xsl:variable>
@@ -902,13 +915,17 @@
       </xsl:choose>
     </xsl:if>
   </xsl:template>
+  
   <xsl:template match="w:bookmarkEnd">
-
     <xsl:variable name="Id">
       <xsl:value-of select="@w:id"/>
     </xsl:variable>
-
-    <xsl:if test="ancestor::w:p">
+    
+    <!--
+    makz: check if the w:bookmarkStart doesn't belong to a user field.
+    user fields are translated to user-field-decl
+    -->
+    <xsl:if test="ancestor::w:p and not(following-sibling::w:r[1]/w:fldChar/@w:fldCharType='end')">
       <xsl:variable name="NameBookmark">
         <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
       </xsl:variable>

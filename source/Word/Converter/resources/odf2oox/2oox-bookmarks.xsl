@@ -35,7 +35,6 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   exclude-result-prefixes="text fo style office draw">
 
-
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p"/>
   <xsl:preserve-space elements="text:span"/>
@@ -44,6 +43,89 @@
   <xsl:key name="bookmark-reference-start"
     match="text:bookmark|text:bookmark-start|text:reference-mark-start|text:sequence"
     use="@text:name|@text:ref-name"/>
+
+  <!-- 
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
+  -->
+
+  <!-- Insert BookmarkStart or ReferenceMarkStart-->
+  <xsl:template match="text:bookmark-start | text:reference-mark-start | text:bookmark" mode="paragraph">
+      <w:bookmarkStart>
+        <xsl:attribute name="w:id">
+          <xsl:call-template name="GenerateBookmarkId">
+            <xsl:with-param name="TextName">
+              <xsl:value-of select="@text:name"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="w:name">
+          <xsl:call-template name="SuppressForbiddenChars">
+            <xsl:with-param name="string" select="@text:name"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </w:bookmarkStart>
+      <xsl:if test="name()='text:bookmark'">
+        <w:bookmarkEnd>
+          <xsl:attribute name="w:id">
+            <xsl:call-template name="GenerateBookmarkId">
+              <xsl:with-param name="TextName">
+                <xsl:value-of select="@text:name"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </w:bookmarkEnd>
+      </xsl:if>
+  </xsl:template>
+
+  <!-- Insert BookmarkEnd -->
+  <xsl:template match="text:bookmark-end | text:reference-mark-end" mode="paragraph">
+      <w:bookmarkEnd>
+        <xsl:attribute name="w:id">
+          <xsl:call-template name="GenerateBookmarkId">
+            <xsl:with-param name="TextName">
+              <xsl:value-of select="@text:name"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </w:bookmarkEnd>
+  </xsl:template>
+
+  <!-- Insert Cross References (Bookmark) -->
+  <xsl:template match="text:bookmark-ref | text:reference-ref | text:sequence-ref" mode="paragraph">
+    <xsl:variable name="TextName" select="@text:ref-name"/>
+    <xsl:variable name="masterPage"
+      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header/text:p"/>
+    <xsl:if
+      test="key('bookmark-reference-start', $TextName) or $masterPage/text:reference-mark-start[@text:name=$TextName] or $masterPage/text:bookmark-start[@text:name=$TextName]">
+      <w:r>
+        <w:fldChar w:fldCharType="begin"/>
+      </w:r>
+      <w:r>
+        <xsl:call-template name="InsertRunProperties"/>
+        <xsl:call-template name="InsertCrossReferences">
+          <xsl:with-param name="TextName" select="$TextName"/>
+        </xsl:call-template>
+      </w:r>
+      <w:r>
+        <w:fldChar w:fldCharType="separate"/>
+      </w:r>
+      <w:r>
+        <xsl:call-template name="InsertRunProperties"/>
+        <xsl:apply-templates mode="text"/>
+      </w:r>
+      <w:r>
+        <w:fldChar w:fldCharType="end"/>
+      </w:r>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
 
   <!--checks if element has style used to generate table of contents in document  -->
   <xsl:template name="IsTOCBookmark">
@@ -108,8 +190,6 @@
     </xsl:choose>
   </xsl:template>
 
-
-
   <!-- Insert BookmarkStart Id or BookmarkEnd Id -->
   <xsl:template name="GenerateBookmarkId">
     <xsl:param name="TextName"/>
@@ -129,77 +209,6 @@
       />
     </xsl:variable>
     <xsl:value-of select="$ReferenceMarkStart+$BookmarkStart+$Bookmark"/>
-  </xsl:template>
-
-  <!-- Insert BookmarkStart or ReferenceMarkStart-->
-  <xsl:template match="text:bookmark-start|text:reference-mark-start|text:bookmark" mode="paragraph">
-    <w:bookmarkStart>
-      <xsl:attribute name="w:id">
-        <xsl:call-template name="GenerateBookmarkId">
-          <xsl:with-param name="TextName">
-            <xsl:value-of select="@text:name"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-      <xsl:attribute name="w:name">
-        <xsl:call-template name="SuppressForbiddenChars">
-          <xsl:with-param name="string" select="@text:name"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </w:bookmarkStart>
-    <xsl:if test="name()='text:bookmark'">
-      <w:bookmarkEnd>
-        <xsl:attribute name="w:id">
-          <xsl:call-template name="GenerateBookmarkId">
-            <xsl:with-param name="TextName">
-              <xsl:value-of select="@text:name"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:bookmarkEnd>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- Insert BookmarkEnd-->
-  <xsl:template match="text:bookmark-end|text:reference-mark-end" mode="paragraph">
-    <w:bookmarkEnd>
-      <xsl:attribute name="w:id">
-        <xsl:call-template name="GenerateBookmarkId">
-          <xsl:with-param name="TextName">
-            <xsl:value-of select="@text:name"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </w:bookmarkEnd>
-  </xsl:template>
-
-  <!-- Insert Cross References (Bookmark) -->
-  <xsl:template match="text:bookmark-ref|text:reference-ref|text:sequence-ref" mode="paragraph">
-    <xsl:variable name="TextName" select="@text:ref-name"/>
-    <xsl:variable name="masterPage"
-      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header/text:p"/>
-    <xsl:if
-      test="key('bookmark-reference-start', $TextName) or $masterPage/text:reference-mark-start[@text:name=$TextName] or $masterPage/text:bookmark-start[@text:name=$TextName]">
-      <w:r>
-        <w:fldChar w:fldCharType="begin"/>
-      </w:r>
-      <w:r>
-        <xsl:call-template name="InsertRunProperties"/>
-        <xsl:call-template name="InsertCrossReferences">
-          <xsl:with-param name="TextName" select="$TextName"/>
-        </xsl:call-template>
-      </w:r>
-      <w:r>
-        <w:fldChar w:fldCharType="separate"/>
-      </w:r>
-      <w:r>
-        <xsl:call-template name="InsertRunProperties"/>
-        <xsl:apply-templates mode="text"/>
-      </w:r>
-      <w:r>
-        <w:fldChar w:fldCharType="end"/>
-      </w:r>
-    </xsl:if>
   </xsl:template>
 
   <!-- insert reference field -->
@@ -369,8 +378,6 @@
     </xsl:choose>
   </xsl:template>
 
-
-
   <!-- index bookmark-->
   <xsl:template name="InsertIndexOfFiguresBookmark">
 
@@ -389,7 +396,6 @@
     </w:r>
     <w:bookmarkEnd w:id="{$id}"/>
   </xsl:template>
-
 
   <!-- compute a string to get an acceptable sting in OOX -->
   <xsl:template name="SuppressForbiddenChars">
@@ -440,6 +446,5 @@
     </xsl:choose>
 
   </xsl:template>
-
 
 </xsl:stylesheet>

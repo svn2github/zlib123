@@ -22,9 +22,34 @@
   *************************************************************************
   -->
 
+  <!--
+  Summary: Inserts a declaration for every SET field
+  Author: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
+  <xsl:template match="w:instrText" mode="UserFieldDecls">
+    <!-- rebuild the field code using a series of instrText, in current run or followings -->
+    <xsl:variable name="fieldCode">
+      <xsl:call-template name="BuildFieldCode"/>
+    </xsl:variable>
+    <!-- first field instruction. Should contains field type. If not, switch to next instruction -->
+    <xsl:variable name="fieldType">
+      <xsl:call-template name="GetFieldTypeFromCode">
+        <xsl:with-param name="fieldCode" select="$fieldCode"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:if test="$fieldType = 'SET' or $fieldType = 'set' ">
+      <xsl:call-template name="InsertUserVariableDecl">
+        <xsl:with-param name="fieldCode" select="$fieldCode"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
   <!-- process a field code -->
   <xsl:template match="w:instrText">
     <xsl:param name="parentRunNode"/>
+    
     <text:span text:style-name="{generate-id(parent::w:r)}">
       <!-- rebuild the field code using a series of instrText, in current run or followings -->
       <xsl:variable name="fieldCode">
@@ -36,6 +61,7 @@
           <xsl:with-param name="fieldCode" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:variable>
+      
       <xsl:choose>
         <!-- handling text after AUTOTEXT field -->
         <xsl:when test="contains($fieldCode,'STYLEREF') and preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
@@ -46,20 +72,31 @@
             <xsl:with-param name="instrText" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
+        <!--
+        makz: SET fields are converted in UserFieldDecls mode, they can be ignored
+        
         <xsl:when test="$fieldType = 'SET' or $fieldType = 'set' ">
           <xsl:call-template name="InsertUserVariable">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
+        -->
         <xsl:when test="$fieldType = 'HYPERLINK' or $fieldType = 'hyperlink' ">
           <xsl:call-template name="InsertHyperlinkField">
             <xsl:with-param name="parentRunNode" select="$parentRunNode"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="$fieldType = 'REF' or $fieldType = 'ref' ">
+          <xsl:call-template name="InsertUserVariable">
+            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+          </xsl:call-template>
+          <!--
+          makz: REF fields are references to user variables
+          
           <xsl:call-template name="InsertCrossReference">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
           </xsl:call-template>
+          -->
         </xsl:when>
         <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, INFO CreateDate, INFO PrintDate, INFO Savedate-->
         <xsl:when
@@ -94,8 +131,7 @@
           <xsl:call-template name="InsertUserName"/>
         </xsl:when>
         <!--initiial creator name   AUTHOR and DOCPROPERTY Author-->
-        <xsl:when
-          test="$fieldType = 'AUTHOR' or $fieldType = 'author'  or contains($fieldCode,'Author')">
+        <xsl:when test="$fieldType = 'AUTHOR' or $fieldType = 'author'  or contains($fieldCode,'Author')">
           <xsl:call-template name="InsertAuthor"/>
         </xsl:when>
         <!--caption field  from which Index of Figures is created -->
@@ -157,9 +193,10 @@
         <xsl:when test="contains($fieldCode,'COMMENTS') or contains($fieldCode,'Comments') ">
           <xsl:call-template name="InsertComments"/>
         </xsl:when>
-        <!--document title TITLE, DOCPROPERTY Title-->
-        <xsl:when
-          test="contains($fieldCode,'TITLE') or contains($fieldCode,'Title') or contains($fieldCode,'title')">
+        <!--
+        document title TITLE, DOCPROPERTY Title
+        -->
+        <xsl:when test="$fieldType = 'TITLE' or $fieldType = 'title' or $fieldType = 'Title'">
           <xsl:call-template name="InsertTitle"/>
         </xsl:when>
         <!--document subject SUBJECT, DOCPROPERTY Subject-->
@@ -193,13 +230,13 @@
     </xsl:variable>
     <xsl:choose>
       <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
-      <xsl:when test="contains($fieldType,'DATE')">
+      <xsl:when test="contains($fieldType, 'DATE')">
         <xsl:call-template name="InsertDateStyle">
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
       <!-- possible time types: TIME, EDITTIME-->
-      <xsl:when test="contains($fieldType,'TIME')">
+      <xsl:when test="contains($fieldType, 'TIME')">
         <xsl:call-template name="InsertTimeStyle">
           <xsl:with-param name="timeText" select="$fieldCode"/>
         </xsl:call-template>
@@ -213,11 +250,21 @@
     <xsl:apply-templates select="." mode="automaticstyles"/>
   </xsl:template>
 
-  <!--cross-reference-->
+  <!--
+  Summary: Converts references to fields
+  Author: Clever Age
+  Modified: makz (DIaLOGIka)
+  Date: 2.11.2007
+  -->
   <xsl:template match="w:fldSimple[contains(@w:instr,'REF')]" mode="fields">
+    <xsl:call-template name="InsertUserVariable">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+    </xsl:call-template>
+    <!--
     <xsl:call-template name="InsertCrossReference">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
     </xsl:call-template>
+    -->
   </xsl:template>
 
   <!--document title TITLE, DOCPROPERTY Title-->
@@ -410,7 +457,7 @@
   CALLED TEMPLATES
   *************************************************************************
   -->
-
+  
   <!-- Date and Time Fields -->
   <xsl:template name="InsertDate">
     <xsl:param name="dateText"/>
@@ -629,52 +676,118 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <!--
+  Summary: writes the declaration of a user field
+  Author: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
+  <xsl:template name="InsertUserVariableDecl">
+    <xsl:param name="fieldCode"/>
 
-  <!-- user field declaration -->
+    <xsl:variable name="fieldName">
+      <xsl:call-template name="ExtractFieldName">
+        <xsl:with-param name="fieldCode" select="$fieldCode" />
+        <xsl:with-param name="fieldType" select="'SET'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="fieldValue">
+      <xsl:call-template name="ExtractFieldValue">
+        <xsl:with-param name="fieldCode" select="$fieldCode" />
+        <xsl:with-param name="fieldName" select="$fieldName" />
+        <xsl:with-param name="fieldType" select="'SET'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="valueType">
+      <xsl:choose>
+        <xsl:when test="number($fieldValue)">float</xsl:when>
+        <xsl:otherwise>string</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <text:user-field-decl>
+      <xsl:attribute name="text:name">
+        <xsl:value-of select="$fieldName"/>
+      </xsl:attribute>
+      <xsl:attribute name="office:value-type">
+        <xsl:value-of select="$valueType"/>
+      </xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="$valueType = 'float' or $valueType = 'percentage' ">
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'currency' ">
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+          <xsl:attribute name="office:currency"/>
+        </xsl:when>
+        <xsl:when test="$valueType = 'date' ">
+          <xsl:attribute name="office:date-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'time' ">
+          <xsl:attribute name="office:time-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'boolean' ">
+          <xsl:attribute name="office:boolean-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'string' ">
+          <xsl:attribute name="office:string-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+    </text:user-field-decl>
+  </xsl:template>
+
+  <!--
+  Summary: writes the user field
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
   <xsl:template name="InsertUserVariable">
     <xsl:param name="fieldCode"/>
     
     <!-- troncate field to find arguments -->
     <xsl:variable name="fieldName">
-      <xsl:variable name="newFieldCode">
-        <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
-          <xsl:with-param name="string" select="substring-after($fieldCode, 'SET')"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="contains($newFieldCode, ' ')">
-          <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$newFieldCode"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="fieldValue">
-      <xsl:variable name="newFieldCode">
-        <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
-          <xsl:with-param name="string" select="substring-after(substring-after($fieldCode, 'SET'), $fieldName)" />
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="substring($newFieldCode, 1,1) = &apos;&quot;&apos;">
-          <xsl:value-of select="substring-before(substring-after($newFieldCode, &apos;&quot;&apos;), &apos;&quot;&apos;)" />
-        </xsl:when>
-        <xsl:when test="contains($newFieldCode, ' ')">
-          <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
-        </xsl:when>
-        <!--xsl:when test="$newFieldCode = '' ">
-          < at least a blank space >
-          <xsl:text xml:space="preserve"> </xsl:text>
-          </xsl:when-->
-        <xsl:otherwise>
-          <xsl:value-of select="$newFieldCode"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="ExtractFieldName">
+        <xsl:with-param name="fieldCode" select="$fieldCode" />
+        <xsl:with-param name="fieldType" select="'REF'" />
+      </xsl:call-template>
     </xsl:variable>
 
+    <text:user-field-get>
+      <xsl:attribute name="text:name">
+        <xsl:value-of select="$fieldName"/>
+      </xsl:attribute>
+      <xsl:value-of select="w:r/w:t"/>
+    </text:user-field-get>
+    
+    <!--
+    <xsl:variable name="fieldValue">
+      <xsl:call-template name="ExtractFieldValue">
+        <xsl:with-param name="fieldCode" select="$fieldCode" />
+        <xsl:with-param name="fieldName" select="$fieldName" />
+      </xsl:call-template>
+    </xsl:variable>
+    -->
+
     <!-- COMMENT : variable fields should be declared before set, but application should support direct set before declaration,
-      and it is too complex to find wether the field has already been declared. So no declaration is performed. -->
+      and it is too complex to find wether the field has already been declared. So no declaration is performed. 
     <text:variable-set>
       <xsl:attribute name="text:name">
         <xsl:value-of select="$fieldName"/>
@@ -688,7 +801,7 @@
       <xsl:attribute name="office:value-type">
         <xsl:value-of select="$valueType"/>
       </xsl:attribute>
-      <!-- TODO : find the best matching type for the value -->
+      
       <xsl:choose>
         <xsl:when test="$valueType = 'float' or $valueType = 'percentage' ">
           <xsl:attribute name="office:value">
@@ -729,6 +842,73 @@
       </xsl:choose>
       <xsl:attribute name="text:display">none</xsl:attribute>
     </text:variable-set>
+    -->
+  </xsl:template>
+
+  <!--
+  Summary: extracts the field name out of a field code
+  Author: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
+  <xsl:template name="ExtractFieldName">
+    <xsl:param name="fieldCode" />
+    <xsl:param name="fieldType" />
+
+    <xsl:variable name="newFieldCode">
+      <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
+        <xsl:with-param name="string" select="substring-after($fieldCode, $fieldType)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="fieldName">
+      <xsl:choose>
+        <xsl:when test="contains($newFieldCode, ' ')">
+          <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$newFieldCode"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="contains($fieldName, '&quot;')">
+        <xsl:value-of select="substring-before(substring-after($fieldName, '&quot;'), '&quot;')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$fieldName"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!--
+  Summary: extracts the field value out of a field code
+  Author: makz (DIaLOGIKa)
+  Date: 2.11.2007
+  -->
+  <xsl:template name="ExtractFieldValue">
+    <xsl:param name="fieldCode" />
+    <xsl:param name="fieldName" />
+    <xsl:param name="fieldType" />
+
+    <xsl:variable name="newFieldCode">
+      <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
+        <xsl:with-param name="string" select="substring-after(substring-after($fieldCode, $fieldType), $fieldName)" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="substring($newFieldCode, 1,1) = &apos;&quot;&apos;">
+        <xsl:value-of select="substring-before(substring-after($newFieldCode, &apos;&quot;&apos;), &apos;&quot;&apos;)" />
+      </xsl:when>
+      <xsl:when test="contains($newFieldCode, ' ')">
+        <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
+      </xsl:when>
+      <!--xsl:when test="$newFieldCode = '' ">
+          < at least a blank space >
+          <xsl:text xml:space="preserve"> </xsl:text>
+          </xsl:when-->
+      <xsl:otherwise>
+        <xsl:value-of select="$newFieldCode"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- alphabetical index mark -->
