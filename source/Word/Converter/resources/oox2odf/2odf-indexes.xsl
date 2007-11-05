@@ -154,13 +154,26 @@
     <xsl:variable name="thisLevel">
       <xsl:value-of select="substring(w:pPr/w:pStyle/@w:val,string-length(w:pPr/w:pStyle/@w:val))"/>
     </xsl:variable>
+
+    <!--math, dialogika: added for bugfix #1802258 BEGIN -->
+    <xsl:variable name="IsDefaultHeading">
+      <xsl:call-template name="CheckDefaultHeading">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:name/@w:val" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!--math, dialogika: changed for bugfix #1802258 END -->
     
     <xsl:choose>
       <xsl:when test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
         <xsl:apply-templates select="following-sibling::w:p[1]" mode="stylesOfTOC">
           <xsl:with-param name="stylesWithLevel">
             <xsl:choose>
-              <xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">
+              <!--math, dialogika: changed for bugfix #1802258 BEGIN -->
+              <!--<xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">-->
+              <xsl:when test="$IsDefaultHeading='true'">
+              <!--math, dialogika: changed for bugfix #1802258 END -->                
                 <xsl:value-of select="$stylesWithLevel"/>
               </xsl:when>
               <xsl:otherwise>
@@ -174,7 +187,10 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">
+          <!--math, dialogika: changed for bugfix #1802258 BEGIN -->          
+          <!--<xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">-->
+          <xsl:when test="$IsDefaultHeading='true'">
+          <!--math, dialogika: changed for bugfix #1802258 END -->            
             <xsl:value-of select="$stylesWithLevel"/>
           </xsl:when>
           <xsl:otherwise>

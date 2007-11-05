@@ -703,11 +703,22 @@
             </xsl:attribute>
           </xsl:if>
 
-
+          <!--math, dialogika: added for bugfix #1802258 BEGIN -->
+          <xsl:variable name="IsDefaultHeading">
+            <xsl:call-template name="CheckDefaultHeading">
+              <xsl:with-param name="Name">
+                <xsl:value-of select="w:name/@w:val" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <!--math, dialogika: added for bugfix #1802258 END -->
 
           <xsl:choose>
             <!--Begin part responsible for numbering paragrafs -->
-            <xsl:when test="w:pPr/w:outlineLvl/@w:val&lt;9 and contains($currentStyleId,'Heading')">
+            <!--math, dialogika: changed for bugfix #1802258 BEGIN -->
+            <xsl:when test="w:pPr/w:outlineLvl/@w:val&lt;9 and $IsDefaultHeading='true'">
+            <!--<xsl:when test="w:pPr/w:outlineLvl/@w:val&lt;9 and contains($currentStyleId,'Heading')">-->
+            <!--math, dialogika: changed for bugfix #1802258 END -->
               <xsl:attribute name="style:default-outline-level">
                 <xsl:value-of select="number(w:pPr/w:outlineLvl/@w:val)+1"/>
               </xsl:attribute>
@@ -729,7 +740,7 @@
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose> 
   </xsl:template>
 
   <!-- avoid inserting text in paragraph properties -->

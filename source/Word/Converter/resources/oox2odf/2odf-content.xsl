@@ -384,6 +384,29 @@
     </xsl:for-each>
   </xsl:template>
 
+
+  <!--math, dialogika: added for bugfix #1802258 BEGIN -->  
+  <!--Checks recursively whether given style is default heading (must start with Counter = 1)-->
+  <xsl:template name ="CheckDefaultHeading">
+    <xsl:param name="Name" />
+    <xsl:param name="Counter" select="1"/>
+
+    <xsl:choose>
+      <xsl:when test="$Counter &gt; 9" >false</xsl:when>
+      <xsl:when test="concat('heading ',$Counter) = $Name">true</xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="CheckDefaultHeading">
+          <xsl:with-param name="Name" select="$Name" />
+          <xsl:with-param name="Counter">
+            <xsl:value-of select="$Counter + 1" />
+          </xsl:with-param>
+        </xsl:call-template>        
+      </xsl:otherwise>      
+    </xsl:choose>
+  </xsl:template>
+  <!--math, dialogika: added for bugfix #1802258 END -->
+
+
   <!--  paragraphs, lists, headings-->
   <xsl:template match="w:p">
     <xsl:message terminate="no">progress:w:p</xsl:message>
@@ -417,38 +440,49 @@
     <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
 
     <xsl:variable name="ifNormal">
-        <xsl:for-each select="key('Part', 'word/styles.xml')">
-          <xsl:if test="key('StyleId', $styleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
-        </xsl:for-each>
+      <xsl:for-each select="key('Part', 'word/styles.xml')">
+        <xsl:if test="key('StyleId', $styleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
+      </xsl:for-each>
     </xsl:variable>
 
     <!-- check if preceding paragraph is a heading in order not to lose numbered paragraphs inside headings-->
     <xsl:variable name="isPrecedingHeading">
       <xsl:if test="$numId!=''">
-      <xsl:for-each select="key('p', number(@oox:id)-1)">
-        <xsl:variable name="precedingOutlineLevel">
-          <xsl:call-template name="GetOutlineLevel">
-            <xsl:with-param name="node" select="."/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="precedingStyleId" select="w:pPr/w:pStyle/@w:val"/>
-        
-        <xsl:variable name="ifPrecedingNormal">
-          <xsl:for-each select="key('Part', 'word/styles.xml')">
-            <xsl:if test="key('StyleId', $precedingStyleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
-          </xsl:for-each>
-        </xsl:variable>
-        <xsl:variable name="precedingNumId">
-          <xsl:call-template name="GetListProperty">
-            <xsl:with-param name="node" select="."/>
-            <xsl:with-param name="property">w:numId</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        
-        <xsl:if test="$precedingOutlineLevel != '' and not(w:pPr/w:numPr) and $ifPrecedingNormal='true' and contains($precedingStyleId,'Heading') and $precedingNumId !=''">true</xsl:if>
-      </xsl:for-each>
+        <xsl:for-each select="key('p', number(@oox:id)-1)">
+          <xsl:variable name="precedingOutlineLevel">
+            <xsl:call-template name="GetOutlineLevel">
+              <xsl:with-param name="node" select="."/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="precedingStyleId" select="w:pPr/w:pStyle/@w:val"/>
+
+          <xsl:variable name="ifPrecedingNormal">
+            <xsl:for-each select="key('Part', 'word/styles.xml')">
+              <xsl:if test="key('StyleId', $precedingStyleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:variable name="precedingNumId">
+            <xsl:call-template name="GetListProperty">
+              <xsl:with-param name="node" select="."/>
+              <xsl:with-param name="property">w:numId</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <xsl:if test="$precedingOutlineLevel != '' and not(w:pPr/w:numPr) and $ifPrecedingNormal='true' and contains($precedingStyleId,'Heading') and $precedingNumId !=''">true</xsl:if>
+        </xsl:for-each>
       </xsl:if>
     </xsl:variable>
+
+
+    <!--math, dialogika: added for bugfix #1802258 BEGIN -->
+    <xsl:variable name="IsDefaultHeading">
+      <xsl:call-template name="CheckDefaultHeading">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId]/w:name/@w:val" />
+        </xsl:with-param>    
+      </xsl:call-template>
+    </xsl:variable>
+    <!--math, dialogika: added for bugfix #1802258 END -->
 
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
@@ -478,8 +512,11 @@
         </xsl:apply-templates>
       </xsl:when>
 
+      <!--math, dialogika: changed for bugfix #1802258 BEGIN -->
       <!--  check if the paragraf is heading -->
-      <xsl:when test="$outlineLevel != ''">
+      <!--<xsl:when test="$outlineLevel != ''">-->
+      <xsl:when test="$outlineLevel != '' and $IsDefaultHeading='true'">
+      <!--math, dialogika: changed for bugfix #1802258 END -->        
         <xsl:apply-templates select="." mode="heading">
           <xsl:with-param name="outlineLevel">
             <xsl:value-of select="$outlineLevel"/>
