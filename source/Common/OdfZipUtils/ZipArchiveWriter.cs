@@ -81,7 +81,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         private const string EXTRACT_ELEMENT = "extract";
         private const string IMPORT_ELEMENT = "import";
 
-
         /// <summary>
         /// The zip archive
         /// </summary>
@@ -110,6 +109,16 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// Table of binary files to be added to the package
         /// </summary>
         private Hashtable binaries;
+
+        private struct ImageValue
+        {
+            public int Width;
+            public int Height;
+            public float VerticalResolution;
+            public float HorizontalResolution;
+        }
+
+        private System.Collections.Generic.Dictionary<string,ImageValue> ImageValues = new System.Collections.Generic.Dictionary<string,ImageValue>();
 
         #region New Coding for Import and Extract sound files
 
@@ -336,6 +345,93 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         // TODO: throw an exception if "target" attribute not set
         public override void WriteString(string text)
         {
+            string strDefaultValue = "0";
+            //clam: compute correct cropping size
+            try
+            {
+                if (text.Contains("COMPUTEOOXCROPPING"))
+                {
+                    char[] sep = { ',' };
+                    string[] arrValues = text.Split(sep);
+                    string filename = arrValues[2];
+                    string strValue = arrValues[1];
+                    string strType = arrValues[3];
+                    strDefaultValue = arrValues[4];
+                    double value = 0;
+
+                    System.Globalization.CultureInfo c = System.Threading.Thread.CurrentThread.CurrentCulture;
+                    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-us");
+
+                    if (strValue.Contains("cm")) value = Double.Parse(strValue.Replace("cm", ""));
+
+                    System.Threading.Thread.CurrentThread.CurrentCulture = c;
+
+
+                    if (value != 0)
+                    {
+                        ImageValue iv;
+                        if (ImageValues.ContainsKey(filename))
+                        {
+                            iv = ImageValues[filename];
+                        }
+                        else
+                        {
+                            Stream sourceStream = GetStream(filename);
+                            System.Drawing.Bitmap im = new System.Drawing.Bitmap(sourceStream);
+
+                            iv = new ImageValue();
+                            iv.Width = im.Width;
+                            iv.Height = im.Height;
+                            iv.HorizontalResolution = im.HorizontalResolution;
+                            iv.VerticalResolution = im.VerticalResolution;
+
+                            ImageValues.Add(filename, iv);
+                        }
+
+                        try
+                        {
+                            switch (strType)
+                            {
+                                case "t":
+                                    text = Math.Floor(value / 2.54 / iv.Height * iv.VerticalResolution * 1000 * 100).ToString();
+                                    break;
+
+                                case "b":
+                                    text = Math.Floor(value / 2.54 / iv.Height * iv.VerticalResolution * 1000 * 100).ToString();
+                                    break;
+
+                                case "l":
+                                    text = Math.Floor(value / 2.54 / iv.Width * iv.HorizontalResolution * 1000 * 100).ToString();
+                                    break;
+
+                                case "r":
+                                    text = Math.Floor(value / 2.54 / iv.Width * iv.HorizontalResolution * 1000 * 100).ToString();
+                                    break;
+
+                                default:
+                                    break;
+
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            text = strDefaultValue;
+                        }
+
+                    }
+                    else
+                    {
+                        text = "0";
+                    }
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                text = strDefaultValue;
+            }
+
             Node elt = (Node)elements.Peek();
 
             if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
