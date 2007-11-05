@@ -1381,6 +1381,10 @@
                 <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
                 <xsl:with-param name="shapeProperties" select="."/>
               </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+              </xsl:call-template>
             </v:oval>
           </xsl:when>
 
@@ -1391,6 +1395,10 @@
               <xsl:call-template name="SimpleShape">
                 <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
                 <xsl:with-param name="shapeProperties" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
               </xsl:call-template>
             </v:roundrect>
           </xsl:when>
