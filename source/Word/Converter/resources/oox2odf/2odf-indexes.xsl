@@ -170,16 +170,34 @@
         <xsl:apply-templates select="following-sibling::w:p[1]" mode="stylesOfTOC">
           <xsl:with-param name="stylesWithLevel">
             <xsl:choose>
+              
               <!--math, dialogika: changed for bugfix #1802258 BEGIN -->
               <!--<xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">-->
               <xsl:when test="$IsDefaultHeading='true'">
-              <!--math, dialogika: changed for bugfix #1802258 END -->                
+              <!--math, dialogika: changed for bugfix #1802258 END -->
+                
                 <xsl:value-of select="$stylesWithLevel"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:if test="$thisStyle and $thisStyle!=''">
+
+                <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+                    where an outline level is directly applied (not via style) are added to TOC. BEGIN -->
+                
+                <!--<xsl:if test="$thisStyle and $thisStyle!=''">
                   <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
-                </xsl:if>
+                </xsl:if>-->
+                <xsl:choose>
+                  <xsl:when test="$thisStyle and $thisStyle!='' and key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9">
+                    <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
+                  </xsl:when>                
+                  <xsl:otherwise>
+                    <xsl:value-of select="$stylesWithLevel"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+
+                <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+                    where an outline level is directly applied (not via style) are added to TOC. END -->                
+                
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
@@ -187,15 +205,33 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
+          
           <!--math, dialogika: changed for bugfix #1802258 BEGIN -->          
           <!--<xsl:when test="contains($thisStyle,'Heading') and not(contains($thisStyle,'Annex'))">-->
           <xsl:when test="$IsDefaultHeading='true'">
-          <!--math, dialogika: changed for bugfix #1802258 END -->            
+          <!--math, dialogika: changed for bugfix #1802258 END -->
+            
             <xsl:value-of select="$stylesWithLevel"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
+
+            <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+                where an outline level is directly applied (not via style) are added to TOC. BEGIN -->
+            
+            <!--<xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>-->
+            <xsl:choose>
+              <xsl:when test="$thisStyle and $thisStyle!='' and key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9">
+                <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$stylesWithLevel"/>
+              </xsl:otherwise>
+            </xsl:choose>            
           </xsl:otherwise>
+
+          <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+              where an outline level is directly applied (not via style) are added to TOC. END -->
+
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
