@@ -895,15 +895,12 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
+        
         <!--gradient fill -->
-        <xsl:for-each select="key('Part', 'word/document.xml')/w:document/descendant::v:rect">
-          <xsl:if test="v:fill/@type = 'gradient'">
-            <xsl:call-template name="InsertGradientFill"/>
-          </xsl:if>
-        </xsl:for-each>
+        <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//v:fill[@type='gradient']" mode="officestyles" />
+        
         <!--heading numbering style, insert outline numbering style only if heading style is linked to level in Word (numId and outlineLvl are in styles.xml Heading style defintion) -->
-        <xsl:if
-          test="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
+        <xsl:if test="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
           <xsl:call-template name="InsertOutlineListStyle"/>
         </xsl:if>
         <!-- document styles -->

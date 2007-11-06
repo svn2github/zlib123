@@ -3223,8 +3223,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:for-each
-      select="document('styles.xml')/office:document-styles/office:styles/draw:gradient[@draw:name = $gradientName]">
+    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:gradient[@draw:name = $gradientName]">
       <!-- radial gradients not handled yet -->
       <xsl:attribute name="type">gradient</xsl:attribute>
       <xsl:if test="@draw:angle">

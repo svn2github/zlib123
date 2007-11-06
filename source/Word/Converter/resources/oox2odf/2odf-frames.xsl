@@ -192,7 +192,7 @@
         <draw:frame>
           <xsl:attribute name="draw:style-name">
             <xsl:call-template name="GenerateStyleName">
-              <xsl:with-param name="node" select="."/>
+              <xsl:with-param name="node" select=".."/>
             </xsl:call-template>
           </xsl:attribute>
           <!--TODO-->
@@ -301,7 +301,7 @@
         <draw:rect>
           <xsl:attribute name="draw:style-name">
             <xsl:call-template name="GenerateStyleName">
-              <xsl:with-param name="node" select="."/>
+              <xsl:with-param name="node" select=".."/>
             </xsl:call-template>
           </xsl:attribute>
           <!--TODO-->
@@ -321,41 +321,115 @@
   </xsl:template>
 
   <!--
-  Summary: Template writes the style of a rectangles.
-  Author: Clever Age
-  -->
+  makz: There is no need to generate a style for every v:rect 
+  because there is already a style generates for the rect's pict
+  
   <xsl:template match="v:rect" mode="automaticpict">
     <style:style>
-      <xsl:attribute name="style:name">
-        <xsl:call-template name="GenerateStyleName">
-          <xsl:with-param name="node" select="self::node()"/>
-        </xsl:call-template>
-      </xsl:attribute>
-      <xsl:attribute name="style:parent-style-name">
-        <xsl:text>Graphics</xsl:text>
-      </xsl:attribute>
-      <xsl:attribute name="style:family">
-        <xsl:text>graphic</xsl:text>
-      </xsl:attribute>
-      <style:graphic-properties>
-        <xsl:choose>
-          <xsl:when test="v:fill/@type = 'gradient'">
-            <xsl:attribute name="draw:fill">gradient</xsl:attribute>
-            <xsl:attribute name="draw:fill-gradient-name">
-              <xsl:value-of select="concat('Gradient_',generate-id(.))"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="v:imagedata">
-
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="InsertShapeBackgroundColor"/>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:call-template name="InsertShapeShadow"/>
-      </style:graphic-properties>
+    <xsl:attribute name="style:name">
+    <xsl:call-template name="GenerateStyleName">
+    <xsl:with-param name="node" select="self::node()"/>
+    </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="style:parent-style-name">
+    <xsl:text>Graphics</xsl:text>
+    </xsl:attribute>
+    <xsl:attribute name="style:family">
+    <xsl:text>graphic</xsl:text>
+    </xsl:attribute>
+    <style:graphic-properties>
+    <xsl:choose>
+    <xsl:when test="v:imagedata">
+    </xsl:when>
+    </xsl:choose>
+    <xsl:call-template name="InsertShapeShadow"/>
+    </style:graphic-properties>
     </style:style>
     <xsl:apply-templates mode="automaticpict"/>
+  </xsl:template>
+  -->
+
+  <!--
+  Summary: Writes gradient fill style
+  Author: makz
+  Date: 6.11.2007
+  -->
+  <xsl:template match="v:fill[@type='gradient']" mode="officestyles">
+    <xsl:variable name="parentShape" select="parent::node()" />
+    <xsl:variable name="gradientName" select="concat('Gradient_', generate-id(.))" />
+    <xsl:variable name="focusValue">
+      <xsl:value-of select="substring-before(@focus, '%')"/>
+    </xsl:variable>
+    
+    <draw:gradient>
+      <xsl:attribute name="draw:name">
+        <xsl:value-of select="$gradientName"/>
+      </xsl:attribute>
+      <xsl:attribute name="draw:display-name">
+        <xsl:value-of select="$gradientName"/>
+      </xsl:attribute>
+      <xsl:attribute name="draw:style">
+        <xsl:choose>
+          <xsl:when test="not($focusValue) or $focusValue='100' or $focusValue='-100'">
+            <xsl:text>linear</xsl:text>
+          </xsl:when>
+          <xsl:when test="$focusValue='50' or $focusValue='-50'">
+            <xsl:text>axial</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="draw:start-color">
+        <xsl:choose>
+          <xsl:when test="(@rotate='t' or @rotate='true') and $focusValue>0">
+            <xsl:call-template name="InsertEndColor" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertStartColor" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="draw:end-color">
+        <xsl:choose>
+          <xsl:when test="(@rotate='t' or @rotate='true') and $focusValue>0">
+            <xsl:call-template name="InsertStartColor" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertEndColor" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="draw:start-intensity">
+        <xsl:choose>
+          <xsl:when test="@opacity">
+            <!-- calculate opacity -->
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>100%</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="draw:end-intensity">
+        <xsl:choose>
+          <xsl:when test="@o:opacity2">
+            <!-- calculate opacity -->
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>100%</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="draw:angle">
+        <xsl:choose>
+          <xsl:when test="@angle">
+            <xsl:value-of select="@angle"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="draw:border">0%</xsl:attribute>
+    </draw:gradient>
   </xsl:template>
 
   <!--
@@ -534,13 +608,56 @@
   <xsl:template match="o:extrusion">
     <xsl:message terminate="no">translation.oox2odf.shape.3dEffect</xsl:message>
   </xsl:template>
-  
+
   <!-- 
   *************************************************************************
   CALLED TEMPLATES
   *************************************************************************
   -->
 
+  <!--
+  Summary: Inserts the Start color of a gradiant fill
+  Author: makz (DIaLOGIKa)
+  Date: 6.11.2007
+  -->
+  <xsl:template name="InsertStartColor">
+    <xsl:variable name="parentShape" select="parent::node()" />
+    <xsl:choose>
+    <xsl:when test="@color">
+      <xsl:call-template name="InsertColor">
+        <xsl:with-param name="color" select="@color"/>
+      </xsl:call-template>
+    </xsl:when>
+      <xsl:when test="$parentShape/@fillcolor">
+        <xsl:call-template name="InsertColor">
+          <xsl:with-param name="color" select="$parentShape/@fillcolor"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>#ffffff</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--
+  Summary: Inserts the End color of a gradiant fill
+  Author: makz (DIaLOGIKa)
+  Date: 6.11.2007
+  -->
+  <xsl:template name="InsertEndColor">
+    <xsl:variable name="parentShape" select="parent::node()" />
+    <xsl:choose>
+      <xsl:when test="@color2">
+        <xsl:call-template name="InsertColor">
+          <xsl:with-param name="color" select="@color2"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>#ffffff</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!--
   Summary: Inserts a draw:frame
   Author: makz (DIaLOGIKa)
@@ -573,39 +690,6 @@
       </draw:text-box>
     </draw:frame>
   </xsl:template>
-  
-  <xsl:template name="InsertGradientFill">
-    <draw:gradient >
-      <xsl:attribute name="draw:name">
-        <xsl:value-of select="concat('Gradient_',generate-id(.))"/>
-      </xsl:attribute>
-      <xsl:attribute name="draw:style">linear</xsl:attribute>
-      <xsl:attribute name="draw:start-color">
-        <xsl:choose>
-          <xsl:when test="v:fill/@color">
-            <xsl:value-of select="v:fill/@color"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="./@fillcolor"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <xsl:attribute name="draw:end-color">
-        <xsl:choose>
-          <xsl:when test="v:fill/@color2">
-            <xsl:value-of select="v:fill/@color2"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>#ffffff</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <xsl:attribute name="draw:start-intensity">100%</xsl:attribute>
-      <xsl:attribute name="draw:end-intensity">100%</xsl:attribute>
-      <xsl:attribute name="draw:angle">0</xsl:attribute>
-      <xsl:attribute name="draw:border">0%</xsl:attribute>
-    </draw:gradient>
-  </xsl:template>
 
   <xsl:template name="GenerateStyleName">
     <xsl:param name="node"/>
@@ -620,7 +704,7 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeStyleProperties">
-    <xsl:for-each select="v:shape | v:rect|v:group">
+    <xsl:for-each select="v:shape | v:rect | v:group">
       <!--<xsl:if test="parent::node()[name()='v:group']">
          TO DO v:shapes in v:group 
       </xsl:if>-->
@@ -789,27 +873,33 @@
     <xsl:text>cm</xsl:text>
   </xsl:template>
 
+  <!--
+  Summary: writes the background and fill color of a shape
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 6.11.2007
+  -->
   <xsl:template name="InsertShapeBackgroundColor">
     <xsl:param name="shape" select="."/>
-    <xsl:variable name="bgColor">
+    <xsl:variable name="fillcolor">
       <xsl:choose>
-        <xsl:when test="$shape/@fillcolor != '' and $shape/@fillcolor != 'window'">
+        <xsl:when test="not($shape/@fillcolor='') and not($shape/@fillcolor='window') and not($shape/@fillcolor='gradient')">
           <xsl:value-of select="$shape/@fillcolor"/>
         </xsl:when>
         <xsl:otherwise>#ffffff</xsl:otherwise>
       </xsl:choose>
-
     </xsl:variable>
-
     <xsl:variable name="isFilled" select="$shape/@filled"/>
-    <xsl:if test="(not($isFilled) or $isFilled != 'f') and $bgColor != ''">
+    
+    <!-- Insert background-color -->
+    <xsl:if test="(not($isFilled) or $isFilled != 'f') and $fillcolor != ''">
       <xsl:attribute name="fo:background-color">
         <xsl:call-template name="InsertColor">
-          <xsl:with-param name="color" select="$bgColor"/>
+          <xsl:with-param name="color" select="$fillcolor"/>
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test="(not($isFilled) or $isFilled != 'f') and ($bgColor = '' or not($bgColor))">
+    <xsl:if test="(not($isFilled) or $isFilled != 'f') and ($fillcolor = '' or not($fillcolor))">
       <xsl:attribute name="fo:background-color">
         <xsl:call-template name="InsertColor">
           <xsl:with-param name="color">#ffffff</xsl:with-param>
@@ -817,11 +907,22 @@
       </xsl:attribute>
     </xsl:if>
 
+    <!-- insert fill-color -->
     <xsl:attribute name="draw:fill-color">
       <xsl:call-template name="InsertColor">
-        <xsl:with-param name="color" select="$bgColor"/>
+        <xsl:with-param name="color" select="$fillcolor"/>
       </xsl:call-template>
     </xsl:attribute>
+
+    <!-- If the shape has a gradient fill -->
+    <xsl:if test="$shape/v:fill[@type='gradient']">
+      <xsl:attribute name="draw:fill">
+        <xsl:text>gradient</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="draw:fill-gradient-name">
+        <xsl:value-of select="concat('Gradient_', generate-id($shape/v:fill))"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertShapeFlowWithText">
@@ -1331,83 +1432,97 @@
     <!-- current context is <v:shape> -->
     <xsl:param name="shape" select="."/>
 
-    <!-- calculate border color -->
-    <xsl:variable name="borderColor">
-      <xsl:choose>
-        <xsl:when test="$shape/@strokecolor">
-          <xsl:call-template name="InsertColor">
-            <xsl:with-param name="color" select="$shape/@strokecolor"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>#000000</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <!-- 
+    Shapes can have stroke attributes and a stroke element without having a border.
+    In this case the stroked attribute is set to false.
+    -->
+    <xsl:choose>
+      <xsl:when test="not($shape/@stroked='false') and not($shape/@stroked='f')">
+        <!-- calculate border color -->
+        <xsl:variable name="borderColor">
+          <xsl:choose>
+            <xsl:when test="$shape/@strokecolor">
+              <xsl:call-template name="InsertColor">
+                <xsl:with-param name="color" select="$shape/@strokecolor"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>#000000</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
 
-    <!-- calculate border weight -->
-    <xsl:variable name="borderWeight">
-      <xsl:choose>
-        <xsl:when test="$shape/@strokeweight">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length" select="$shape/@strokeweight"/>
-            <xsl:with-param name="destUnit" select="'cm'"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0.0176cm</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+        <!-- calculate border weight -->
+        <xsl:variable name="borderWeight">
+          <xsl:choose>
+            <xsl:when test="$shape/@strokeweight">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="$shape/@strokeweight"/>
+                <xsl:with-param name="destUnit" select="'cm'"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0.0176cm</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
 
-    <xsl:variable name="dashStyle" select="$shape/v:stroke/@dashstyle" />
-    <xsl:variable name="lineStyle" select="$shape/v:stroke/@linestyle" />
+        <xsl:variable name="dashStyle" select="$shape/v:stroke/@dashstyle" />
+        <xsl:variable name="lineStyle" select="$shape/v:stroke/@linestyle" />
 
-    <!-- get border style -->
-    <xsl:variable name="borderStyle">
-      <xsl:choose>
-        <xsl:when test="$lineStyle">
-          <xsl:text>double</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>solid</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+        <!-- get border style -->
+        <xsl:variable name="borderStyle">
+          <xsl:choose>
+            <xsl:when test="$lineStyle">
+              <xsl:text>double</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>solid</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
 
-    <!-- write attributes -->
-    <xsl:attribute name="fo:border">
-      <xsl:value-of select="concat($borderWeight,' ',$borderStyle,' ',$borderColor)"/>
-    </xsl:attribute>
+        <!-- write attributes -->
+        <xsl:attribute name="fo:border">
+          <xsl:value-of select="concat($borderWeight,' ',$borderStyle,' ',$borderColor)"/>
+        </xsl:attribute>
 
-    <xsl:attribute name="svg:stroke-color">
-      <xsl:value-of select="$borderColor"/>
-    </xsl:attribute>
+        <xsl:attribute name="svg:stroke-color">
+          <xsl:value-of select="$borderColor"/>
+        </xsl:attribute>
 
-    <!-- the border is double -->
-    <xsl:if test="$lineStyle">
-      <xsl:attribute name="style:border-line-width">
-        <xsl:choose>
-          <xsl:when test="$lineStyle='thinThin' or $lineStyle='thickBetweenThin'">
-            <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"/>
-          </xsl:when>
-          <xsl:when test="$lineStyle='thinThick'">
-            <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"/>
-          </xsl:when>
-          <xsl:when test="$lineStyle='thickThin'">
-            <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"/>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
+        <!-- the border is double -->
+        <xsl:if test="$lineStyle">
+          <xsl:attribute name="style:border-line-width">
+            <xsl:choose>
+              <xsl:when test="$lineStyle='thinThin' or $lineStyle='thickBetweenThin'">
+                <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"/>
+              </xsl:when>
+              <xsl:when test="$lineStyle='thinThick'">
+                <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"/>
+              </xsl:when>
+              <xsl:when test="$lineStyle='thickThin'">
+                <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"/>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
 
-    <!-- the border is dashed -->
-    <xsl:if test="$dashStyle">
-      <xsl:attribute name="draw:stroke">
-        <xsl:text>dash</xsl:text>
-      </xsl:attribute>
-    </xsl:if>
-
+        <!-- the border is dashed -->
+        <xsl:if test="$dashStyle">
+          <xsl:attribute name="draw:stroke">
+            <xsl:text>dash</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- if the stroke attributes come from something other then a border, write explicit none border -->
+        <xsl:attribute name="draw:stroke">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
+    </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
 
   <xsl:template name="InsertTextBoxAutomaticHeight">

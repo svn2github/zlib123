@@ -51,56 +51,72 @@
     <xsl:param name="parentRunNode"/>
     
     <text:span text:style-name="{generate-id(parent::w:r)}">
+      
       <!-- rebuild the field code using a series of instrText, in current run or followings -->
       <xsl:variable name="fieldCode">
         <xsl:call-template name="BuildFieldCode"/>
       </xsl:variable>
+      
       <!-- first field instruction. Should contains field type. If not, switch to next instruction -->
       <xsl:variable name="fieldType">
-        <xsl:call-template name="GetFieldTypeFromCode">
-          <xsl:with-param name="fieldCode" select="$fieldCode"/>
-        </xsl:call-template>
+        <xsl:variable name="field">
+          <xsl:call-template name="GetFieldTypeFromCode">
+            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="translate($field, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
       </xsl:variable>
       
       <xsl:choose>
-        <!-- handling text after AUTOTEXT field -->
-        <xsl:when test="contains($fieldCode,'STYLEREF') and preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
-          <xsl:value-of select="following::w:r[w:t][1]"/>
-        </xsl:when>
-        <xsl:when test="$fieldType = 'XE' or $fieldType = 'xe' ">
+        <!-- XE -->
+        <xsl:when test="$fieldType='XE'">
           <xsl:call-template name="InsertIndexMark">
             <xsl:with-param name="instrText" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
-        <!--
-        makz: SET fields are converted in UserFieldDecls mode, they can be ignored
-        
-        <xsl:when test="$fieldType = 'SET' or $fieldType = 'set' ">
-          <xsl:call-template name="InsertUserVariable">
-            <xsl:with-param name="fieldCode" select="$fieldCode"/>
-          </xsl:call-template>
+        <!-- TITLE -->
+        <xsl:when test="$fieldType='TITLE'">
+          <xsl:call-template name="InsertTitle"/>
         </xsl:when>
-        -->
-        <xsl:when test="$fieldType = 'HYPERLINK' or $fieldType = 'hyperlink' ">
+        <!-- HYPERLINK -->
+        <xsl:when test="$fieldType='HYPERLINK'">
           <xsl:call-template name="InsertHyperlinkField">
             <xsl:with-param name="parentRunNode" select="$parentRunNode"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'REF' or $fieldType = 'ref' ">
+        <!-- REF -->
+        <xsl:when test="$fieldType='REF'">
           <xsl:call-template name="InsertUserVariable">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
           </xsl:call-template>
-          <!--
-          makz: REF fields are references to user variables
-          
-          <xsl:call-template name="InsertCrossReference">
-            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+        </xsl:when>
+        <!-- USERINITIALS -->
+        <xsl:when test="$fieldType='USERINITIALS'">
+          <xsl:call-template name="InsertUserInitials"/>
+        </xsl:when>
+        <!-- USERNAME -->
+        <xsl:when test="$fieldType='USERNAME'">
+          <xsl:call-template name="InsertUserName"/>
+        </xsl:when>
+        <!-- USERADDRESS -->
+        <xsl:when test="$fieldType='USERADDRESS'">
+          <xsl:call-template name="InsertUserAddress"/>
+        </xsl:when>
+        <!-- CITATION -->
+        <xsl:when test="$fieldType='CITATION'">
+          <xsl:call-template name="InsertTextBibliographyMark">
+            <xsl:with-param name="TextIdentifier">
+              <xsl:value-of
+                select="substring-before(substring-after(self::node(), 'CITATION '), ' \')"/>
+            </xsl:with-param>
           </xsl:call-template>
-          -->
+        </xsl:when>
+        <!-- handling text after AUTOTEXT field -->
+        <xsl:when test="contains($fieldCode,'STYLEREF') and preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
+          <xsl:value-of select="following::w:r[w:t][1]"/>
         </xsl:when>
         <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, INFO CreateDate, INFO PrintDate, INFO Savedate-->
-        <xsl:when
-          test="contains($fieldCode, 'DATE' ) or contains($fieldCode,  'date') 
+        <xsl:when test="contains($fieldCode, 'DATE' ) or contains($fieldCode,  'date') 
           or contains($fieldCode,'LastSavedTime') or contains($fieldCode,'CreateDate')
           or contains($fieldCode, 'PrintDate') or contains($fieldCode,'SaveDate') or contains($fieldCode,'CreateTime')">
           <xsl:call-template name="InsertDateType">
@@ -109,80 +125,60 @@
           </xsl:call-template>
         </xsl:when>
         <!--page-count NUMPAGE, DOCPROPERTY Pages-->
-        <xsl:when
-          test="($fieldType = 'NUMPAGE' or  contains(.,'NUMPAGES') or $fieldType = 'numpage' or contains($fieldCode,'Pages')) and not(contains(.,'PAGE/NUMPAGES'))  and not(contains(.,'PAGE/NumPages'))">
+        <xsl:when test="($fieldType = 'NUMPAGE' or  contains(.,'NUMPAGES') or $fieldType = 'numpage' or contains($fieldCode,'Pages')) and not(contains(.,'PAGE/NUMPAGES'))  and not(contains(.,'PAGE/NumPages'))">
           <xsl:call-template name="InsertPageCount"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page'  and not(contains(.,'PAGE/NUMPAGES'))  and not(contains(.,'PAGE/NumPages'))">
+        <xsl:when test="$fieldType='PAGE' and not(contains(.,'PAGE/NUMPAGES')) and not(contains(.,'PAGE/NumPages'))">
           <xsl:call-template name="InsertPageNumber"/>
         </xsl:when>
         <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime, DOCPROPERTY TotalEditingTime,  INFO EditTime-->
-        <xsl:when
-          test="$fieldType = 'TIME' or $fieldType = 'time' or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
+        <xsl:when test="$fieldType='TIME' or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
           <xsl:call-template name="InsertTimeType">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="fieldType" select="$fieldType"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'USERINITIALS' or $fieldType = 'userinitials' ">
-          <xsl:call-template name="InsertUserInitials"/>
-        </xsl:when>
-        <xsl:when test="$fieldType = 'USERNAME' or $fieldType = 'username' ">
-          <xsl:call-template name="InsertUserName"/>
-        </xsl:when>
         <!--initiial creator name   AUTHOR and DOCPROPERTY Author-->
-        <xsl:when test="$fieldType = 'AUTHOR' or $fieldType = 'author'  or contains($fieldCode,'Author')">
+        <xsl:when test="$fieldType='AUTHOR' or contains($fieldCode,'Author')">
           <xsl:call-template name="InsertAuthor"/>
         </xsl:when>
         <!--caption field  from which Index of Figures is created -->
-        <xsl:when test="$fieldType = 'SEQ' or $fieldType = 'seq' ">
+        <xsl:when test="$fieldType='SEQ'">
           <xsl:call-template name="InsertSequence">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="sequenceContext" select="following::w:r[w:t][1]"/>
           </xsl:call-template>
         </xsl:when>
         <!--creator name LASTSAVEDBY, DOCPROPERTY LastSavedBy-->
-        <xsl:when
-          test="$fieldType = 'LASTSAVEDBY' or $fieldType = 'lastsavedby'  or  contains($fieldCode,'LastSavedBy')">
+        <xsl:when test="$fieldType='LASTSAVEDBY' or  contains($fieldCode,'LastSavedBy')">
           <xsl:call-template name="InsertCreator"/>
         </xsl:when>
         <!--editing cycles number REVNUM, DOCPROPERTY RevisionNumber, INFO RevNum-->
-        <xsl:when
-          test="$fieldType = 'REVNUM' or $fieldType = 'revnum' 
-          or contains($fieldCode,'RevisionNumber') or contains($fieldCode, 'RevNum')">
+        <xsl:when test="$fieldType='REVNUM' or contains($fieldCode,'RevisionNumber') or contains($fieldCode, 'RevNum')">
           <xsl:call-template name="InsertEditingCycles"/>
         </xsl:when>
         <!--FILENAME, INFO FileName-->
-        <xsl:when
-          test="$fieldType = 'FILENAME' or $fieldType = 'filename' or contains($fieldCode,'FileName')">
+        <xsl:when test="$fieldType='FILENAME' or contains($fieldCode,'FileName')">
           <xsl:call-template name="InsertFileName"/>
         </xsl:when>
         <!-- KEYWORDS, DOCPROPERTY Keywords -->
-        <xsl:when
-          test="contains($fieldCode,'KEYWORDS') or contains($fieldCode,'keywords') or contains($fieldCode,'Keywords')">
+        <xsl:when test="contains($fieldCode,'KEYWORDS') or contains($fieldCode,'keywords') or contains($fieldCode,'Keywords')">
           <xsl:call-template name="InsertKeywords"/>
         </xsl:when>
         <!-- DOCPROPERTY Company, INFO Company-->
         <xsl:when test="contains($fieldCode,'Company') or contains($fieldCode, 'company')">
           <xsl:call-template name="InsertCompany"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'USERADDRESS' or $fieldType = 'useraddress' ">
-          <xsl:call-template name="InsertUserAddress"/>
-        </xsl:when>
         <!--TEMPLATE, DOCPROPERTY Template-->
-        <xsl:when
-          test="$fieldType = 'TEMPLATE' or $fieldType = 'template'  or contains($fieldCode,'Template')">
+        <xsl:when test="$fieldType='TEMPLATE' or contains($fieldCode,'Template')">
           <xsl:call-template name="InsertTemplate"/>
         </xsl:when>
         <!--NUMWORDS, DOCPROPERTY Words-->
-        <xsl:when
-          test="$fieldType = 'NUMWORDS' or $fieldType = 'numwords' or contains($fieldCode,'Words')">
+        <xsl:when test="$fieldType='NUMWORDS' or contains($fieldCode,'Words')">
           <xsl:call-template name="InsertWordCount"/>
         </xsl:when>
         <!--NUMCHARS and DOCPROPERTY Characters,  INFO NumChars-->
-        <xsl:when
-          test="$fieldType = 'NUMCHARS' or $fieldType = 'numchars' 
-          or contains($fieldCode,'Characters') or contains($fieldCode, 'NumChars')">
+        <xsl:when test="$fieldType='NUMCHARS' or contains($fieldCode,'Characters') or contains($fieldCode, 'NumChars')">
           <xsl:call-template name="InsertCharacterCount"/>
         </xsl:when>
         <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
@@ -193,25 +189,9 @@
         <xsl:when test="contains($fieldCode,'COMMENTS') or contains($fieldCode,'Comments') ">
           <xsl:call-template name="InsertComments"/>
         </xsl:when>
-        <!--
-        document title TITLE, DOCPROPERTY Title
-        -->
-        <xsl:when test="$fieldType = 'TITLE' or $fieldType = 'title' or $fieldType = 'Title'">
-          <xsl:call-template name="InsertTitle"/>
-        </xsl:when>
         <!--document subject SUBJECT, DOCPROPERTY Subject-->
-        <xsl:when
-          test="contains($fieldCode,'SUBJECT') or contains($fieldCode,'Subject') or contains($fieldCode,'subject')">
+        <xsl:when test="contains($fieldCode,'SUBJECT') or contains($fieldCode,'Subject') or contains($fieldCode,'subject')">
           <xsl:call-template name="InsertSubject"/>
-        </xsl:when>
-        <!--bibliography citation-->
-        <xsl:when test="$fieldType = 'CITATION' or $fieldType = 'citation' ">
-          <xsl:call-template name="InsertTextBibliographyMark">
-            <xsl:with-param name="TextIdentifier">
-              <xsl:value-of
-                select="substring-before(substring-after(self::node(), 'CITATION '), ' \')"/>
-            </xsl:with-param>
-          </xsl:call-template>
         </xsl:when>
       </xsl:choose>
     </text:span>
@@ -260,11 +240,6 @@
     <xsl:call-template name="InsertUserVariable">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
     </xsl:call-template>
-    <!--
-    <xsl:call-template name="InsertCrossReference">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-    </xsl:call-template>
-    -->
   </xsl:template>
 
   <!--document title TITLE, DOCPROPERTY Title-->
