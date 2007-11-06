@@ -46,6 +46,7 @@
     match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''"/>
   <xsl:key name="frames" match="draw:frame" use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
+  <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
 
   <!-- 
   *************************************************************************
@@ -886,16 +887,16 @@
      
       <!--clam: compute cropping on postprocessor-->
       <xsl:attribute name="t">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $firstVal, ',' , $filename,  ',t,' , round(($t * 100 div ($t + $b + $height)) * 1000))"/>
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $firstVal, ',' , $filename,  ',t,' , round(($t * 100 div ($t + $b + $height)) * 1000), ']')"/>
       </xsl:attribute>
       <xsl:attribute name="b">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $thirdVal, ',' , $filename,  ',b,', round(($b * 100 div ($t + $b + $height)) * 1000))"/>
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $thirdVal, ',' , $filename,  ',b,' , round(($b * 100 div ($t + $b + $height)) * 1000), ']')"/>
       </xsl:attribute>
       <xsl:attribute name="r">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $secondVal, ',' , $filename,  ',r,', round(($r * 100 div ($r + $l + $width)) * 1000))"/>
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $secondVal, ',' , $filename,  ',r,', round(($r * 100 div ($r + $l + $width)) * 1000), ']')"/>
       </xsl:attribute>
       <xsl:attribute name="l">
-        <xsl:value-of select="concat('COMPUTEOOXCROPPING', ',' , $fourthVal, ',' , $filename,  ',l,', round(($l * 100 div ($l + $r + $width)) * 1000))"/>
+        <xsl:value-of select="concat('COMPUTEOOXCROPPING[', $fourthVal, ',' , $filename,  ',l,', round(($l * 100 div ($l + $r + $width)) * 1000), ']')"/>
       </xsl:attribute>
       <!--<xsl:attribute name="b">
         <xsl:value-of select=" round(($b * 100 div ($t + $b + $height)) * 1000)"/>
