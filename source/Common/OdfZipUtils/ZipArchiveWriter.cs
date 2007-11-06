@@ -349,9 +349,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             //clam: compute correct cropping size
             try
             {
-                if (text.Contains("COMPUTEOOXCROPPING"))
+                if (text.Contains("COMPUTEOOXCROPPING["))
                 {
-                    char[] sep = { ',' };
+                    char[] sep = { ',', ']', '[' };
                     string[] arrValues = text.Split(sep);
                     string filename = arrValues[2];
                     string strValue = arrValues[1];
@@ -423,6 +423,62 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     else
                     {
                         text = "0";
+                    }
+                    
+                } else if (text.Contains("COMPUTEODFCROPPING[")) {
+
+                    string strDefault = "0cm 0cm 0cm 0cm";
+
+                    System.Globalization.CultureInfo c = System.Threading.Thread.CurrentThread.CurrentCulture;
+                    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-us");
+
+                    try
+                    {
+                        char[] sep = { ',', ']', '[' };
+                        string[] arrValues = text.Split(sep);
+                        string filename = arrValues[5];
+                        strDefault = arrValues[6];
+                        
+                        double r = Double.Parse(arrValues[1]);
+                        double l = Double.Parse(arrValues[2]);
+                        double t = Double.Parse(arrValues[3]);
+                        double b = Double.Parse(arrValues[4]);
+                        double r2, l2, t2, b2;
+
+                        ImageValue iv;
+                        if (ImageValues.ContainsKey(filename))
+                        {
+                            iv = ImageValues[filename];
+                        }
+                        else
+                        {
+                            Stream sourceStream = GetStream(filename);
+                            System.Drawing.Bitmap im = new System.Drawing.Bitmap(sourceStream);
+
+                            iv = new ImageValue();
+                            iv.Width = im.Width;
+                            iv.Height = im.Height;
+                            iv.HorizontalResolution = im.HorizontalResolution;
+                            iv.VerticalResolution = im.VerticalResolution;
+
+                            ImageValues.Add(filename, iv);
+                        }
+
+                        r2 = r * 2.54 * iv.Width / iv.HorizontalResolution / 1000 / 100;
+                        l2 = l * 2.54 * iv.Width / iv.HorizontalResolution / 1000 / 100;
+                        t2 = t * 2.54 * iv.Height / iv.VerticalResolution / 1000 / 100;
+                        b2 = b * 2.54 * iv.Height / iv.VerticalResolution / 1000 / 100;
+
+                        text = String.Concat("rect(", t2.ToString(), "cm ", r2.ToString(), "cm ", b2.ToString(), "cm ", l2.ToString(), "cm)");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        text = strDefault;
+                    }
+                    finally
+                    {
+                        System.Threading.Thread.CurrentThread.CurrentCulture = c;
                     }
                     
                 }
