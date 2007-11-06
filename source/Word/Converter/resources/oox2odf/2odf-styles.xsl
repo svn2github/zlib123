@@ -2637,18 +2637,60 @@
 
   </xsl:template>
 
+
+  <!--math, dialogika: changed for correct indentation calculation BEGIN -->   
   <xsl:template name="CheckIfList">
     <xsl:param name="StyleId"/>
+
+    
+    <xsl:variable name="numId">
+      <xsl:choose>
+        
+        <!--<xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">-->
+        <xsl:when test="w:numPr/w:numId/@w:val">
+          <xsl:value-of select ="w:numPr/w:numId/@w:val" />
+        </xsl:when>
+        
+        <!--<xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+        <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+          <xsl:value-of select ="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val" />
+        </xsl:when>
+
+        <!--<xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+        <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val">
+          <xsl:value-of select ="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val" />
+        </xsl:when>
+        
+        <xsl:otherwise>NaN</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
     <xsl:choose>
+      <xsl:when test="$numId != 'NaN' and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId = $numId]">true</xsl:when>
+      <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val">
+        <xsl:call-template name="CheckIfList">
+          <xsl:with-param name ="StyleId" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val"/>
+        </xsl:call-template>
+      </xsl:when>      
+      <xsl:otherwise>false</xsl:otherwise>
+    </xsl:choose>
 
-      <!--math, dialogika: changed for correct indentation calculation BEGIN -->
-      
-      <!--<xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">-->
-      <xsl:when test="w:numPr/w:numId/@w:val">        
+    <!--<xsl:choose>
+
+      -->
+    <!--math, dialogika: changed for correct indentation calculation BEGIN -->
+    <!--
+
+      -->
+    <!--<xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">-->
+    <!--
+      <xsl:when test="w:numPr/w:numId/@w:val">
         <xsl:text>true</xsl:text>
       </xsl:when>
-      
-      <!--<xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+
+      -->
+    <!--<xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+    <!--
       <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
         <xsl:text>true</xsl:text>
       </xsl:when>
@@ -2657,23 +2699,32 @@
         <xsl:text>true</xsl:text>
       </xsl:when>
 
-      <!--<xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
-      <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val">        
+      -->
+    <!--<xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">-->
+    <!--
+      <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:numPr/w:numId/@w:val">
         <xsl:text>true</xsl:text>
       </xsl:when>
 
       <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val">
         <xsl:call-template name="CheckIfList">
           <xsl:with-param name ="StyleId" select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val"/>
-        </xsl:call-template>          
+        </xsl:call-template>
       </xsl:when>
-        <!--math, dialogika: changed for correct indentation calculation END -->
-      
+      -->
+    <!--math, dialogika: changed for correct indentation calculation END -->
+    <!--
+
       <xsl:otherwise>
         <xsl:text>false</xsl:text>
       </xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose>-->
+
   </xsl:template>
+
+  <!--math, dialogika: changed for correct indentation calculation END -->
+  
+  
 
   <xsl:template name="FirstLine">
 
