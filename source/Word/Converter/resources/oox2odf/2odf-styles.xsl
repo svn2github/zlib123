@@ -4478,6 +4478,13 @@
   <xsl:template name="InsertTextProperties">
     <!-- attributes using match -->
     <xsl:apply-templates mode="rPrChildren"/>
+
+    <!--clam bugfix #1806204 special case: hyperlink without style-->
+    <xsl:if test="ancestor::w:hyperlink and not(./w:rStyle) and not(./w:u) and not(w:color)">
+      <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
+      <xsl:attribute name="style:text-underline-type">none</xsl:attribute> 
+    </xsl:if>
+    
     <!-- other attributes forbidden in drop cap text style -->
     <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
       <xsl:apply-templates mode="rPrChildren-dropcap-forbidden"/>
