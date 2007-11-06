@@ -162,8 +162,17 @@
           <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:name/@w:val" />
         </xsl:with-param>
       </xsl:call-template>
+    </xsl:variable>    
+    <!--math, dialogika: added for bugfix #1802258 END -->
+
+    <!--math, dialogika: added to avoid regression on solution for directly applied outline levels BEGIN -->
+    <xsl:variable name="FromInstrTextContent">
+      <xsl:choose>
+        <xsl:when test="w:hyperlink">false</xsl:when>
+        <xsl:otherwise>true</xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-    <!--math, dialogika: changed for bugfix #1802258 END -->
+    <!--math, dialogika: added to avoid regression on solution for directly applied outline levels END -->
     
     <xsl:choose>
       <xsl:when test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
@@ -187,7 +196,10 @@
                   <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
                 </xsl:if>-->
                 <xsl:choose>
-                  <xsl:when test="$thisStyle and $thisStyle!='' and key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9">
+                  <!--math, dialogika: Changed to avoid regression on solution for directly applied outline levels -->
+                  <xsl:when test="$thisStyle and $thisStyle!=''
+                            and ($FromInstrTextContent = 'true'
+                            or key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9)">
                     <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
                   </xsl:when>                
                   <xsl:otherwise>
@@ -220,7 +232,10 @@
             
             <!--<xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>-->
             <xsl:choose>
-              <xsl:when test="$thisStyle and $thisStyle!='' and key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9">
+              <!--math, dialogika: Changed to avoid regression on solution for directly applied outline levels -->
+              <xsl:when test="$thisStyle and $thisStyle!=''
+                            and ($FromInstrTextContent = 'true'
+                            or key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9)">
                 <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
               </xsl:when>
               <xsl:otherwise>
