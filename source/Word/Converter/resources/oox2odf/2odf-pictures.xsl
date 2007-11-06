@@ -44,7 +44,10 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   exclude-result-prefixes="w uri draw a pic r wp w xlink oox">
+
+  <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
   
   <!-- 
   *************************************************************************
@@ -791,7 +794,7 @@
 
   <xsl:template name="InsertImageCrop">
     <!-- crop -->
-    <xsl:if test="pic:blipFill/a:srcRect/attribute::node()">
+    <xsl:if test="descendant::pic:blipFill/a:srcRect/attribute::node()">
       <xsl:for-each select="descendant::pic:pic">
         <xsl:variable name="width">
           <xsl:variable name="widthText">
@@ -814,11 +817,11 @@
         </xsl:variable>
 
         <xsl:variable name="leftCrop">
-          <xsl:call-template name="GetCropSize">
-            <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@l"/>
-            <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@r"/>
-            <xsl:with-param name="resultSize" select="$width"/>
-          </xsl:call-template>
+            <xsl:call-template name="GetCropSize">
+              <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@l"/>
+              <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@r"/>
+              <xsl:with-param name="resultSize" select="$width"/>
+            </xsl:call-template>
         </xsl:variable>
 
         <xsl:variable name="rightCrop">
@@ -846,9 +849,16 @@
         </xsl:variable>
 
         <xsl:attribute name="fo:clip">
-          <xsl:value-of
-            select="concat('rect(',$topCrop,'cm ',$rightCrop,'cm ',$bottomCrop,'cm ',$leftCrop,'cm',')')"
-          />
+
+          <xsl:variable name="oldValue">
+            <xsl:value-of
+              select="concat('rect(',$topCrop,'cm ',$rightCrop,'cm ',$bottomCrop,'cm ',$leftCrop,'cm',')')"
+            />
+          </xsl:variable>
+          
+          <xsl:variable name="filecode" select="pic:blipFill/a:blip/@r:embed"></xsl:variable>
+          <xsl:variable name="filename" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id = $filecode]/@Target"></xsl:variable>
+          <xsl:value-of select="concat('COMPUTEODFCROPPING[', pic:blipFill/a:srcRect/@r, ',' ,pic:blipFill/a:srcRect/@l, ',' , pic:blipFill/a:srcRect/@t, ',' ,pic:blipFill/a:srcRect/@b, ',word/' , $filename,  ',' , $oldValue, ']')"/>
         </xsl:attribute>
       </xsl:for-each>
     </xsl:if>
