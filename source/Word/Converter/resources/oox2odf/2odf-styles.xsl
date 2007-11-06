@@ -2967,8 +2967,17 @@
           <xsl:otherwise>
             <!-- Regression JP 24.08.2007 <xsl:variable name="context" select="self::node()"/>-->
             <xsl:for-each select="key('Part', 'word/styles.xml')">
-              <xsl:choose>
-                <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
+
+              <!--math, dialogika bugfix #1751701 indentation problem BEGIN-->
+
+              <xsl:call-template name="getStyleLeftInd">
+                <xsl:with-param name="StyleId">
+                  <xsl:value-of select="$StyleId" />
+                </xsl:with-param>
+              </xsl:call-template>
+
+              <!--<xsl:choose>
+                --><!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">--><!--
                 <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
                   <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
                 </xsl:when>
@@ -2988,7 +2997,10 @@
                   <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
+              </xsl:choose>-->
+
+              <!--math, dialogika bugfix #1751701 indentation problem END-->
+              
             </xsl:for-each>
           </xsl:otherwise>
         </xsl:choose>
@@ -2996,6 +3008,44 @@
     </xsl:choose>
   </xsl:template>
 
+
+
+  <!--math, dialogika bugfix #1751701 indentation problem BEGIN-->
+<xsl:template name="getStyleLeftInd">
+  <xsl:param name="StyleId" />
+
+  <xsl:choose>
+    <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
+    <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
+      <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
+    </xsl:when>
+
+    <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
+      <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left" />
+    </xsl:when>
+
+    <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
+      <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
+    </xsl:when>
+
+    <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
+      <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+    </xsl:when>
+
+    <xsl:when test="key('StyleId',$StyleId)/w:basedOn/@w:val">
+      <xsl:call-template name="getStyleLeftInd">
+        <xsl:with-param name="StyleId">
+          <xsl:value-of select="key('StyleId',$StyleId)/w:basedOn/@w:val" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:when>
+
+    <xsl:otherwise>0</xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+<!--math, dialogika bugfix #1751701 indentation problem END-->
+  
+  
   <xsl:template name="InsertParagraphPropertiesDefault">
     <xsl:call-template name="InsertParagraphBreakBefore"/>
     <xsl:call-template name="InsertParagraphAutoSpace"/>
