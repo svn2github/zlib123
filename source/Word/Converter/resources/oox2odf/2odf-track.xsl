@@ -245,7 +245,12 @@
         <xsl:value-of select="generate-id(.)"/>
       </xsl:attribute>
     </text:change-start>
-    <xsl:apply-templates/>
+    <text:span>
+      <xsl:attribute name="text:style-name">
+        <xsl:value-of select="generate-id(.)"/>
+      </xsl:attribute>
+      <xsl:apply-templates/>
+    </text:span>
     <text:change-end>
       <xsl:attribute name="text:change-id">
         <xsl:value-of select="generate-id(.)"/>
