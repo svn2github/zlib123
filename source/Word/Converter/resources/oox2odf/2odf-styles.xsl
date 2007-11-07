@@ -1740,7 +1740,42 @@
 
     <!-- create default value for relwidth and width -->
     <xsl:variable name="width">0.005cm</xsl:variable>
-    <xsl:variable name="relwidth">30</xsl:variable>
+    <xsl:variable name="relwidth">
+      <xsl:variable name="pageWidthStr">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="w:pgSz/@w:w"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="pageWidth" select="substring-before($pageWidthStr, 'cm')" />
+      <xsl:variable name="marLeftStr">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="w:pgMar/@w:left"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="marLeft" select="substring-before($marLeftStr, 'cm')" />
+      <xsl:variable name="marRightStr">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="w:pgMar/@w:right"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="marRight" select="substring-before($marRightStr, 'cm')" />
+      <xsl:variable name="areaWidth" select="$pageWidth - $marLeft - $marRight" />
+      <xsl:variable name="wordSepWidth">
+        <xsl:text>5.1</xsl:text>
+      </xsl:variable>
+
+      <xsl:value-of select="($wordSepWidth * 100) div $areaWidth"/>
+      
+    </xsl:variable>
 
     <style:footnote-sep>
       <xsl:attribute name="style:distance-before-sep">
