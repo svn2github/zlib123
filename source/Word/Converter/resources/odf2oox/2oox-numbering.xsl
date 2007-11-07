@@ -1586,6 +1586,16 @@
             </w:numId>
           </w:numPr>
         </xsl:if>
+
+        <!--math, dialogika: bugfix #1787105 BEGIN-->
+        <xsl:if test="self::text:list-header and (.//text:p/@text:is-list-header='true' or .//text:h/@text:is-list-header='true')">
+          <!-- Disable numbering -->
+          <w:numPr>
+            <w:numId w:val="0"/>
+          </w:numPr>
+        </xsl:if>
+        <!--math, dialogika: bugfix #1787105 END-->
+        
       </xsl:when>
       <xsl:otherwise>
         <!-- if element is a header, or list element with header properties (outline) -->
