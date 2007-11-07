@@ -430,6 +430,9 @@
         <xsl:when test="contains($string, '§')">
           <xsl:value-of select="translate($string, '§', '')"/>
         </xsl:when>
+        <xsl:when test="contains($string, '&quot;')">
+          <xsl:value-of select="translate($string, '&quot;', '')"/>
+        </xsl:when>
         <xsl:otherwise>clean</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>

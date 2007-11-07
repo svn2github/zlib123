@@ -102,12 +102,15 @@
         <xsl:when test="$fieldType='USERADDRESS'">
           <xsl:call-template name="InsertUserAddress"/>
         </xsl:when>
+        <!-- USERADDRESS -->
+        <xsl:when test="$fieldType='SET'">
+          <!-- do nothing -->
+        </xsl:when>
         <!-- CITATION -->
         <xsl:when test="$fieldType='CITATION'">
           <xsl:call-template name="InsertTextBibliographyMark">
             <xsl:with-param name="TextIdentifier">
-              <xsl:value-of
-                select="substring-before(substring-after(self::node(), 'CITATION '), ' \')"/>
+              <xsl:value-of select="substring-before(substring-after(self::node(), 'CITATION '), ' \')"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
@@ -125,7 +128,7 @@
           </xsl:call-template>
         </xsl:when>
         <!--page-count NUMPAGE, DOCPROPERTY Pages-->
-        <xsl:when test="($fieldType = 'NUMPAGE' or  contains(.,'NUMPAGES') or $fieldType = 'numpage' or contains($fieldCode,'Pages')) and not(contains(.,'PAGE/NUMPAGES'))  and not(contains(.,'PAGE/NumPages'))">
+        <xsl:when test="($fieldType='NUMPAGE' or  contains(.,'NUMPAGES') or $fieldType='numpage' or contains($fieldCode,'Pages')) and not(contains(.,'PAGE/NUMPAGES'))  and not(contains(.,'PAGE/NumPages'))">
           <xsl:call-template name="InsertPageCount"/>
         </xsl:when>
         <xsl:when test="$fieldType='PAGE' and not(contains(.,'PAGE/NUMPAGES')) and not(contains(.,'PAGE/NumPages'))">
@@ -138,8 +141,8 @@
             <xsl:with-param name="fieldType" select="$fieldType"/>
           </xsl:call-template>
         </xsl:when>
-        <!--initiial creator name   AUTHOR and DOCPROPERTY Author-->
-        <xsl:when test="$fieldType='AUTHOR' or contains($fieldCode,'Author')">
+        <!--initiial creator name AUTHOR and DOCPROPERTY Author-->
+        <xsl:when test="$fieldType='AUTHOR'">
           <xsl:call-template name="InsertAuthor"/>
         </xsl:when>
         <!--caption field  from which Index of Figures is created -->
