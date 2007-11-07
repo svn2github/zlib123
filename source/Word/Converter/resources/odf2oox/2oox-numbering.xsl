@@ -1663,7 +1663,7 @@
       <xsl:when test="self::text:list-item and count(ancestor::text:list) > 1">
         <w:numPr>
           <!--clam: one more for each additional list-ancestor-->
-          <w:ilvl w:val="{number(text:h/@text:outline-level) + count(ancestor::text:list) - 2}"/>
+          <w:ilvl w:val="{number(text:h/@text:outline-level) + count(ancestor::text:list[text:list-item/text:h/@text:outline-level]) + count(ancestor::text:list[text:list-item/text:p/@text:outline-level]) - 2}"/>
           <w:numId>
             <xsl:attribute name="w:val">
               <xsl:call-template name="GetNumberingId">
