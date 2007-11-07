@@ -690,7 +690,14 @@
           <xsl:if
             test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
             <xsl:attribute name="text:style-name">
-              <xsl:value-of select="generate-id(self::node())"/>
+              <xsl:choose>
+                <xsl:when test="./w:r/w:ptab/@w:alignment = 'right' and ./w:pPr/w:pStyle/@w:val = 'Footer'">
+                  <xsl:text>X3AS7TABSTYLE</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="generate-id(self::node())"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:if>
           <xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
@@ -752,6 +759,12 @@
         <text:tab/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <!--clam, dialogika: bugfix #1803097-->
+  <!--<xsl:template match="w:ptab[@w:relativeTo='margin' and @w:alignment='right' and @w:leader='none']">-->
+    <xsl:template match="w:ptab">
+    <text:tab/>
   </xsl:template>
 
   <!-- run -->
