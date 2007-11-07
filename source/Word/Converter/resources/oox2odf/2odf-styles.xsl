@@ -1696,22 +1696,46 @@
 
     <!-- Get the space-before from ooxml -->
     <xsl:variable name="spaceBefore">
-      <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length">
-          <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <!-- Get the space-after from ooxml -->
     <xsl:variable name="spaceAfter">
-      <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length">
-          <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>     
     </xsl:variable>
 
     <!-- create default value for relwidth and width -->
