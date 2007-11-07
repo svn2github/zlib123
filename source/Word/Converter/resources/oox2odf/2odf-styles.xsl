@@ -907,9 +907,18 @@
         <xsl:call-template name="InsertDefaultStyles"/>
         <xsl:apply-templates select="key('Part', 'word/styles.xml')/w:styles"/>
         
-        <!--clam: special hyperlink style for toc (bug #1806204 )-->
+        <!--clam: special hyperlink style for toc (bug #1806204)-->
         <style:style style:name="X3AS7TOCHyperlink" style:display-name="X3AS7TOCHyperlink" style:family="text" style:parent-style-name="DefaultParagraphFont">
           <style:text-properties fo:color="#000000" style:text-underline-style="none" />
+        </style:style>
+
+        <!--clam: special style for tabs in footer (bug #1803097)-->
+        <style:style style:name="X3AS7TABSTYLE" style:family="paragraph" style:parent-style-name="Footer" xmlns:pchar="urn:cleverage:xmlns:post-processings:characters" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns="http://schemas.openxmlformats.org/package/2006/relationships" xmlns:v="urn:schemas-microsoft-com:vml">
+          <style:paragraph-properties>
+            <style:tab-stops>
+              <style:tab-stop style:type="right" style:position="25cm" />
+            </style:tab-stops>
+          </style:paragraph-properties>
         </style:style>
 
         <xsl:call-template name="InsertNotesConfiguration"/>
