@@ -1533,7 +1533,7 @@
                     <xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
                     </xsl:attribute>-->
 
-                  <!--math, dialogika: changed for correct indentation calculation END -->
+                  <!--math, dialogika: changed for correct indentation calculation BEGIN -->
                   <!--added parameter <xsl:with-param name="numId">-->                  
 
                   <xsl:call-template name="InsertListLevelProperties">

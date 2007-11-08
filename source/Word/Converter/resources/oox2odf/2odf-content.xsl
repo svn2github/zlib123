@@ -404,6 +404,9 @@
     <xsl:choose>
       <xsl:when test="$Counter &gt; 9" >false</xsl:when>
       <xsl:when test="concat('heading ',$Counter) = $Name">true</xsl:when>
+      <!--math, dialogika: added for bugfix #1792424 BEGIN -->
+      <xsl:when test="concat('Heading ',$Counter) = $Name">true</xsl:when>
+      <!--math, dialogika: added for bugfix #1792424 END -->
       <xsl:otherwise>
         <xsl:call-template name="CheckDefaultHeading">
           <xsl:with-param name="Name" select="$Name" />
