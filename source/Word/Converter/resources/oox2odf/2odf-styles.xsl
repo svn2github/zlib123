@@ -1645,6 +1645,29 @@
       </xsl:if>
     </xsl:if>
 
+    <!--clam, dialogika: document grids should be implemented (this is only a basic conversion to deal with bug #1791570-->
+    <xsl:if test="w:docGrid">
+      <!--<xsl:attribute name="style:layout-grid-lines">
+        <xsl:text>30</xsl:text>
+      </xsl:attribute>-->
+      <xsl:if test="w:docGrid/@w:linePitch">
+        <xsl:attribute name="style:layout-grid-base-height">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length" select="w:docGrid/@w:linePitch"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>      
+      <!--<xsl:attribute name="style:layout-grid-ruby-height">
+        <xsl:text>0.6cm</xsl:text>
+      </xsl:attribute>-->
+      <xsl:attribute name="style:layout-grid-mode">
+        <xsl:text>line</xsl:text>
+      </xsl:attribute>
+      <!--<xsl:attribute name="style:layout-grid-ruby-below">
+        <xsl:text>false</xsl:text>
+      </xsl:attribute>-->
+    </xsl:if>
 
     <xsl:if test="w:pgBorders">
       <xsl:call-template name="InsertPageBorders"/>
@@ -1671,7 +1694,7 @@
     </xsl:if>
 
     <!-- footnote seperators -->
-    <xsl:call-template name="InsertCustomFootnoteSeperator"/>
+    <xsl:call-template name="InsertCustomFootnoteSeperator"/>   
 
   </xsl:template>
 
