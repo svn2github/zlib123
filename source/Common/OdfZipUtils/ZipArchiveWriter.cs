@@ -349,7 +349,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             //clam: compute correct cropping size
             try
             {
-                if (text.Contains("COMPUTEOOXCROPPING["))
+                if (text.Contains("COMPUTEOOXCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "srcRect"))
                 {
                     char[] sep = { ',', ']', '[' };
                     string[] arrValues = text.Split(sep);
@@ -424,8 +424,10 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     {
                         text = "0";
                     }
-                    
-                } else if (text.Contains("COMPUTEODFCROPPING[")) {
+
+                }
+                else if (text.Contains("COMPUTEODFCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "graphic-properties"))
+                {
 
                     string strDefault = "0cm 0cm 0cm 0cm";
 
