@@ -42,10 +42,15 @@
           -->
         
         <config:config-item-set config:name="ooo:configuration-settings">
-          <config:config-item config:name="AddParaTableSpacing" config:type="boolean">
-            <xsl:value-of select="'false'"/>
-          </config:config-item>
 
+          <!--clam, dialogika: re-inserted "true" part (bug #1787090)-->
+          <config:config-item config:name="AddParaTableSpacing" config:type="boolean">
+            <xsl:choose>
+              <xsl:when test="key('Part', 'word/settings.xml')/w:settings/w:compat/w:doNotUseHTMLParagraphAutoSpacing">true</xsl:when>
+              <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>
+          </config:config-item>
+          
           <!--math, dialogika: Added for correct indentation calculation BEGIN -->
           
           <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">
