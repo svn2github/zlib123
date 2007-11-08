@@ -146,7 +146,7 @@
             <xsl:variable name="foMarginBottomToWrite">
               <xsl:call-template name="getMarginBottomForParagraph">
                 <xsl:with-param name="StyleParagraphId" select="$NodeStyleFromContent"/>
-                <xsl:with-param name="documentParagraphWAfter" select="@w:after"/>
+                <!--<xsl:with-param name="documentParagraphWAfter" select="@w:after"/>-->
               </xsl:call-template>
             </xsl:variable>
             <!--Write the margins-->
@@ -162,7 +162,7 @@
             <xsl:variable name="foMarginTopToWrite">
               <xsl:call-template name="getMarginTopForParagraph">
                 <xsl:with-param name="StyleParagraphId" select="$NodeStyleFromContent"/>
-                <xsl:with-param name="documentParagraphWBefore" select="@w:before"/>
+                <!--<xsl:with-param name="documentParagraphWBefore" select="@w:before"/>-->
               </xsl:call-template>
             </xsl:variable>
             <!--Write the margins-->
