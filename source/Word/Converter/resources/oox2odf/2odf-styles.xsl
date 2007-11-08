@@ -1650,20 +1650,20 @@
       <!--<xsl:attribute name="style:layout-grid-lines">
         <xsl:text>30</xsl:text>
       </xsl:attribute>-->
-      <xsl:if test="w:docGrid/@w:linePitch">
+      <xsl:if test="w:docGrid[@w:type='lines' or @w:type='linesAndChars']/@w:linePitch">
         <xsl:attribute name="style:layout-grid-base-height">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length" select="w:docGrid/@w:linePitch"/>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
+        <xsl:attribute name="style:layout-grid-mode">
+          <xsl:text>line</xsl:text>
+        </xsl:attribute>      
       </xsl:if>      
       <!--<xsl:attribute name="style:layout-grid-ruby-height">
         <xsl:text>0.6cm</xsl:text>
-      </xsl:attribute>-->
-      <xsl:attribute name="style:layout-grid-mode">
-        <xsl:text>line</xsl:text>
-      </xsl:attribute>
+      </xsl:attribute>-->     
       <!--<xsl:attribute name="style:layout-grid-ruby-below">
         <xsl:text>false</xsl:text>
       </xsl:attribute>-->
