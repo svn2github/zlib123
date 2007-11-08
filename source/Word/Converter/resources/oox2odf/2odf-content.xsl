@@ -1148,12 +1148,12 @@
   <xsl:template name="ComputeMasterPageName">
     <!-- NB : precSectPr defines properties of preceding section,
         whereas followingSectPr defines properties of current section -->
-    <!--xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
+    <xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
     <xsl:param name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
-    <xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/-->
+    <!--<xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>-->
     
-    <xsl:param name="precSectPr" select="key('sectPr', number(ancestor::node()/@oox:s) - 1)"/>
-    <xsl:param name="followingSectPr" select="key('sectPr', number(ancestor::node()/@oox:s))"/>
+    <!--<xsl:param name="precSectPr" select="key('sectPr', number(ancestor::node()/@oox:s) - 1)"/>
+    <xsl:param name="followingSectPr" select="key('sectPr', number(ancestor::node()/@oox:s))"/>-->
     <xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
     
     <xsl:choose>
