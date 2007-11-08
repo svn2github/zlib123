@@ -167,10 +167,10 @@
   </xsl:template>
 
   <!--
-  Summary: Template writes rectangles.
+  Summary: Template writes rectangles/lines.
   Author: Clever Age
   -->
-  <xsl:template match="v:rect">
+  <xsl:template match="v:rect|v:line">
     <!-- version 1.1-->
     <xsl:choose>
       <xsl:when test="v:imagedata">
@@ -298,24 +298,61 @@
         </draw:frame>
       </xsl:when>
       <xsl:otherwise>
-        <draw:rect>
-          <xsl:attribute name="draw:style-name">
-            <xsl:call-template name="GenerateStyleName">
-              <xsl:with-param name="node" select=".."/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <!--TODO-->
-          <xsl:attribute name="draw:name">
-            <xsl:text>Frame1</xsl:text>
-          </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="self::v:line">
+            <draw:line>
+              <xsl:attribute name="draw:style-name">
+                <xsl:call-template name="GenerateStyleName">
+                  <xsl:with-param name="node" select="."/>
+                </xsl:call-template>
+              </xsl:attribute>
+              <!--TODO-->
+              <xsl:attribute name="draw:name">
+                <xsl:text>Frame1</xsl:text>
+              </xsl:attribute>
+              <xsl:variable name="flip">
+                <xsl:if test="contains(@style,'flip')">
+                  <xsl:value-of select="substring-before(substring-after(@style,'flip:'),';')"/>
+                </xsl:if>
+              </xsl:variable>
+              <xsl:call-template name="InsertAnchorType"/>
+              <xsl:call-template name="InsertShapeZindex"/>
+              <xsl:call-template name="InsertLinePos1">
+                <xsl:with-param name="flip">
+                  <xsl:value-of select="$flip"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <xsl:call-template name="InsertLinePos2">
+                <xsl:with-param name="flip">
+                  <xsl:value-of select="$flip"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              
+              <!--<xsl:call-template name="InsertParagraphToFrame"/>-->
+            </draw:line>
+          </xsl:when>
+          <xsl:otherwise>
+            <draw:rect>
+              <xsl:attribute name="draw:style-name">
+                <xsl:call-template name="GenerateStyleName">
+                  <xsl:with-param name="node" select="."/>
+                </xsl:call-template>
+              </xsl:attribute>
+              <!--TODO-->
+              <xsl:attribute name="draw:name">
+                <xsl:text>Frame1</xsl:text>
+              </xsl:attribute>
+              
+              <xsl:call-template name="InsertAnchorType"/>
+              <xsl:call-template name="InsertShapeWidth"/>
+              <xsl:call-template name="InsertShapeHeight"/>
+              <xsl:call-template name="InsertshapeAbsolutePos"/>
+              
+              <!--<xsl:call-template name="InsertParagraphToFrame"/>-->
+            </draw:rect>
+          </xsl:otherwise>
+        </xsl:choose>
 
-          <xsl:call-template name="InsertAnchorType"/>
-          <xsl:call-template name="InsertShapeWidth"/>
-          <xsl:call-template name="InsertShapeHeight"/>
-          <xsl:call-template name="InsertshapeAbsolutePos"/>
-
-          <!--<xsl:call-template name="InsertParagraphToFrame"/>-->
-        </draw:rect>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -324,7 +361,7 @@
   makz: There is no need to generate a style for every v:rect 
   because there is already a style generates for the rect's pict
   
-  <xsl:template match="v:rect" mode="automaticpict">
+  <xsl:template match="v:rect|v:line" mode="automaticpict">
     <style:style>
     <xsl:attribute name="style:name">
     <xsl:call-template name="GenerateStyleName">
@@ -704,7 +741,8 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeStyleProperties">
-    <xsl:for-each select="v:shape | v:rect | v:group">
+    <xsl:for-each select="v:shape | v:rect|v:line|v:group">
+
       <!--<xsl:if test="parent::node()[name()='v:group']">
          TO DO v:shapes in v:group 
       </xsl:if>-->
@@ -906,7 +944,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-
+    
     <!-- insert fill-color -->
     <xsl:attribute name="draw:fill-color">
       <xsl:call-template name="InsertColor">
@@ -1786,6 +1824,84 @@
     <xsl:call-template name="InsertshapeAbsolutePos"/>
   </xsl:template>
 
+  <!--
+    Summary: Inserts position of first end of line 
+    Author:  Tomasz Mueller (Clever Age)
+    Date: 29.10.2007
+  -->
+  <xsl:template name="InsertLinePos1">
+    <xsl:param name="flip"/>
+    <xsl:attribute name="svg:x1">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="contains($flip,'x')">
+              <xsl:value-of select="substring-before(@to,',')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(@from,',')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="svg:y1">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="contains($flip,'y')">
+              <xsl:value-of select="substring-after(@to,',')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(@from,',')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <!--
+    Summary: Inserts position of second end of line 
+    Author:  Tomasz Mueller (Clever Age)
+    Date: 29.10.2007
+  -->
+  <xsl:template name="InsertLinePos2">
+    <xsl:param name="flip"/>
+    <xsl:attribute name="svg:x2">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="contains($flip,'x')">
+              <xsl:value-of select="substring-before(@from,',')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(@to,',')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="svg:y2">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="contains($flip,'y')">
+              <xsl:value-of select="substring-after(@from,',')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(@to,',')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+  </xsl:template>
+  
   <xsl:template name="InsertshapeAbsolutePos">
     <xsl:param name="shape" select="."/>
 
@@ -1830,7 +1946,7 @@
           <xsl:when test="$LeftPercent  &gt; 0">
             <xsl:value-of select="$HorizontalWidth * $LeftPercent  div 1000"/>
           </xsl:when>
-          <xsl:when test="$shape[name()='v:rect']">
+          <xsl:when test="$shape[name()='v:rect' or name()='v:line']">
             <xsl:call-template name="GetShapeProperty">
               <xsl:with-param name="shape" select="$shape"/>
               <xsl:with-param name="propertyName" select="'left'"/>
@@ -1857,7 +1973,7 @@
           <xsl:when test="$shape[name()='w:framePr']">
             <xsl:value-of select="$shape/@w:y"/>
           </xsl:when>
-          <xsl:when test="$shape[name()='v:rect']">
+          <xsl:when test="$shape[name()='v:rect' or name()='v:line']">
             <xsl:call-template name="GetShapeProperty">
               <xsl:with-param name="shape" select="$shape"/>
               <xsl:with-param name="propertyName" select="'top'"/>
