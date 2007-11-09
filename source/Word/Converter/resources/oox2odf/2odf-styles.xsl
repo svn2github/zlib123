@@ -3099,41 +3099,174 @@
 
 
   <!--math, dialogika bugfix #1751701 indentation problem BEGIN-->
-<xsl:template name="getStyleLeftInd">
-  <xsl:param name="StyleId" />
+  <xsl:template name="getStyleLeftInd">
+    <xsl:param name="StyleId" />
 
-  <xsl:choose>
-    <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
-    <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
-      <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
-    </xsl:when>
+    <xsl:choose>
+      <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
+      <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
+        <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
+      </xsl:when>
 
-    <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
-      <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left" />
-    </xsl:when>
+      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
+        <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left" />
+      </xsl:when>
 
-    <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
-      <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
-    </xsl:when>
+      <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
+        <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
+      </xsl:when>
 
-    <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
-      <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
-    </xsl:when>
+      <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
+        <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+      </xsl:when>
 
-    <xsl:when test="key('StyleId',$StyleId)/w:basedOn/@w:val">
-      <xsl:call-template name="getStyleLeftInd">
-        <xsl:with-param name="StyleId">
-          <xsl:value-of select="key('StyleId',$StyleId)/w:basedOn/@w:val" />
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:when>
+      <xsl:when test="key('StyleId',$StyleId)/w:basedOn/@w:val">
+        <xsl:call-template name="getStyleLeftInd">
+          <xsl:with-param name="StyleId">
+            <xsl:value-of select="key('StyleId',$StyleId)/w:basedOn/@w:val" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
 
-    <xsl:otherwise>0</xsl:otherwise>
-  </xsl:choose>
-</xsl:template>
-<!--math, dialogika bugfix #1751701 indentation problem END-->
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!--math, dialogika bugfix #1751701 indentation problem END-->
   
+
+  <!--math, dialogika bugfix #1744208 and #1645291 BEGIN-->
+
+  <xsl:template name="CalculateMarginRight">
+    <xsl:param name="StyleId" />
+    
+    <xsl:choose>
+      <xsl:when test="w:ind/@w:right != ''">
+        <xsl:value-of select="w:ind/@w:right"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
+          <xsl:call-template name="getStyleRightInd">
+            <xsl:with-param name="StyleId">
+              <xsl:value-of select="$StyleId" />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>                
   
+  <xsl:template name="getStyleRightInd">
+    <xsl:param name="StyleId" />
+
+    <xsl:choose>
+      <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right != ''">
+        <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right "/>
+      </xsl:when>
+
+      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right != ''">
+        <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right" />
+      </xsl:when>
+
+      <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right">
+        <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right" />
+      </xsl:when>
+
+      <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
+        <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
+      </xsl:when>
+
+      <xsl:when test="key('StyleId',$StyleId)/w:basedOn/@w:val">
+        <xsl:call-template name="getStyleRightInd">
+          <xsl:with-param name="StyleId">
+            <xsl:value-of select="key('StyleId',$StyleId)/w:basedOn/@w:val" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <xsl:template name="CalculateTextIndent">
+    <xsl:param name="StyleId" />
+
+    <xsl:choose>
+      <xsl:when test="w:ind/@w:hanging">
+        <xsl:value-of select="-w:ind/@w:hanging"/>
+      </xsl:when>
+      <xsl:when test="w:ind/@w:firstLine">
+        <xsl:value-of select="w:ind/@w:firstLine"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="key('Part', 'word/styles.xml')">
+          <xsl:call-template name="getStyleTextInd">
+            <xsl:with-param name="StyleId">
+              <xsl:value-of select="$StyleId" />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+
+  <xsl:template name="getStyleTextInd">
+    <xsl:param name="StyleId" />
+
+    <xsl:choose>
+      
+      <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''">
+        <xsl:value-of select="-key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging "/>
+      </xsl:when>
+
+      <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:firstLine != ''">
+        <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:firstLine"/>
+      </xsl:when>
+      
+
+      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hanging != ''">
+        <xsl:value-of select="-key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hanging" />
+      </xsl:when>
+
+      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLine != ''">
+        <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLine" />
+      </xsl:when>      
+      
+      
+      <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:hanging">
+        <xsl:value-of select="-w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:hanging" />
+      </xsl:when>
+
+      <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:firstLine">
+        <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:firstLine" />
+      </xsl:when>      
+      
+
+      <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging != ''">
+        <xsl:value-of select="-w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging"/>
+      </xsl:when>
+
+      <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:firstLine != ''">
+        <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:firstLine"/>
+      </xsl:when>
+ 
+
+      <xsl:when test="key('StyleId',$StyleId)/w:basedOn/@w:val">
+        <xsl:call-template name="getStyleTextInd">
+          <xsl:with-param name="StyleId">
+            <xsl:value-of select="key('StyleId',$StyleId)/w:basedOn/@w:val" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--math, dialogika bugfix #1744208 and #1645291 END-->
+
+
   <xsl:template name="InsertParagraphPropertiesDefault">
     <xsl:call-template name="InsertParagraphBreakBefore"/>
     <xsl:call-template name="InsertParagraphAutoSpace"/>
@@ -3212,6 +3345,29 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <!--math, dialogika bugfix #1744208 and #1645291 BEGIN-->
+
+    <!-- margin right -->
+    <xsl:variable name="MarginRight">
+      <xsl:call-template name="CalculateMarginRight">
+        <xsl:with-param name="StyleId">
+          <xsl:value-of select="$StyleId"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!-- text indent -->
+    <xsl:variable name="TextIndent">
+      <xsl:call-template name="CalculateTextIndent">
+        <xsl:with-param name="StyleId">
+          <xsl:value-of select="$StyleId"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!--math, dialogika bugfix #1744208 and #1645291 END-->
+
+
     <!-- handle frames in text used as char-->
     <xsl:if test="contains(parent::w:p/w:r/w:pict/v:shape/@style,'mso-position-horizontal-relative:char') and not(w:textAlignment)">
       <xsl:attribute name="style:vertical-align">bottom</xsl:attribute>
@@ -3248,6 +3404,10 @@
     
     <xsl:call-template name="InsertParagraphIndent">
       <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
+      <!--math, dialogika bugfix #1744208 and #1645291 BEGIN-->
+      <xsl:with-param name="MarginRight" select="$MarginRight"/>
+      <xsl:with-param name="TextIndent" select="$TextIndent"/>
+      <!--math, dialogika bugfix #1744208 and #1645291 END-->      
       <xsl:with-param name="CheckIfList" select="$CheckIfList"/>
       <xsl:with-param name="IndHanging" select="$IndHanging"/>
       <xsl:with-param name="IndLeft" select="$IndLeft"/>
@@ -3600,6 +3760,10 @@
   <!-- space before/after -->
   <xsl:template name="InsertParagraphIndent">
     <xsl:param name="MarginLeft"/>
+    <!--math, dialogika bugfix #1744208 and #1645291 BEGIN-->
+    <xsl:param name="MarginRight"/>
+    <xsl:param name="TextIndent"/>
+    <!--math, dialogika bugfix #1744208 and #1645291 END-->    
     <xsl:param name="CheckIfList"/>
     <xsl:param name="IndHanging"/>
     <xsl:param name="IndLeft"/>
@@ -4013,8 +4177,10 @@
         </xsl:attribute>
 
         <!-- text indent -->
-
-        <xsl:variable name="FirstLine">
+        
+        <!--math, dialogika bugfix #1744208 and #1645291 BEGIN-->
+        
+        <!--<xsl:variable name="FirstLine">
           <xsl:call-template name="FirstLine"/>
         </xsl:variable>
 
@@ -4032,7 +4198,9 @@
               <xsl:value-of select="-$IndHanging"/>
             </xsl:when>
           </xsl:choose>
-        </xsl:variable>
+        </xsl:variable>-->
+        
+        <!--math, dialogika bugfix #1744208 and #1645291 END-->        
 
         <xsl:if test="$TextIndent != ''">
           <xsl:attribute name="fo:text-indent">
@@ -4081,17 +4249,26 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>-->
+
     <!-- margin right -->
-    <xsl:if test="w:ind/@w:right">
-      <xsl:attribute name="fo:margin-right">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:ind/@w:right"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
+
+    <!--math, dialogika bugfix #1744208 and #1645291 BEGIN-->    
+    <xsl:attribute name="fo:margin-right">
+      <xsl:choose>
+        <xsl:when test="$MarginRight != '' and $MarginRight != 'NaN' and $MarginRight != 0">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="$MarginRight"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>0cm</xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+
+    <!--math, dialogika bugfix #1744208 and #1645291 END-->
+    
     <!-- text indent -->
     <!--<xsl:if test="$TextIndent != ''">
       <xsl:attribute name="fo:text-indent">
