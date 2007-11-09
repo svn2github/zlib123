@@ -272,27 +272,31 @@
       <xsl:if
         test="($next-page-break='true' or $next-master-page != '' or $next-new-section = 'true' or $next-end-section = 'true' ) 
         and not(ancestor::text:note-body or ancestor::table:table)">
-        <w:sectPr>
-          <xsl:if test="$next-master-page != '' ">
-            <xsl:attribute name="psect:next-master-page">true</xsl:attribute>
-          </xsl:if>
-          <xsl:if test="$next-page-break = 'true' ">
-            <xsl:attribute name="psect:next-page-break">true</xsl:attribute>
-          </xsl:if>
-          <xsl:if test="$next-new-section = 'true' ">
-            <xsl:attribute name="psect:next-new-section">true</xsl:attribute>
-          </xsl:if>
-          <xsl:if test="$next-end-section = 'true' ">
-            <xsl:attribute name="psect:next-end-section">true</xsl:attribute>
-            <xsl:apply-templates
-              select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"
-              mode="note"/>
-            <xsl:apply-templates
-              select="key('sections', $previous-section/@text:style-name)/style:section-properties"
-              mode="section"/>
-          </xsl:if>
-        </w:sectPr>
-
+        <!--dialogika, clam: section breaks have their own paragraphs now (bug #1615686)-->
+        <w:p>
+          <w:pPr>
+            <w:sectPr>
+              <xsl:if test="$next-master-page != '' ">
+                <xsl:attribute name="psect:next-master-page">true</xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$next-page-break = 'true' ">
+                <xsl:attribute name="psect:next-page-break">true</xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$next-new-section = 'true' ">
+                <xsl:attribute name="psect:next-new-section">true</xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$next-end-section = 'true' ">
+                <xsl:attribute name="psect:next-end-section">true</xsl:attribute>
+                <xsl:apply-templates
+                  select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"
+                  mode="note"/>
+                <xsl:apply-templates
+                  select="key('sections', $previous-section/@text:style-name)/style:section-properties"
+                  mode="section"/>
+              </xsl:if>
+            </w:sectPr>
+          </w:pPr>
+        </w:p>
       </xsl:if>
     </xsl:if>
   </xsl:template>
