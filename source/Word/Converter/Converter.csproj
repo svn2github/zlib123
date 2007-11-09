@@ -105,5 +105,14 @@
     <EmbeddedResource Include="resources\oox2odf\2odf-tables.xsl" />
     <EmbeddedResource Include="resources\oox2odf\2odf-track.xsl" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\2oox-ole.xsl">
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="resources\OLEplaceholder.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

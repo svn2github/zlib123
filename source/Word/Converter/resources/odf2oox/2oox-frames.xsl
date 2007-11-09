@@ -42,8 +42,7 @@
   xmlns:w10="urn:schemas-microsoft-com:office:word"
   exclude-result-prefixes="xlink draw svg fo office style text">
 
-  <xsl:key name="images"
-    match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''"/>
+  <xsl:key name="images" match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''"/>
   <xsl:key name="frames" match="draw:frame" use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
@@ -62,44 +61,6 @@
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
     <xsl:call-template name="InsertEmbeddedTextboxes"/>
-  </xsl:template>
-
-  <!--
-  Summary: OLE objects in frames 
-  Author: Clever Age
-  -->
-  <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
-    <!-- insert link to TOC field when required (user indexes) -->
-    <xsl:call-template name="InsertTCField"/>
-
-    <xsl:variable name="imageId">
-      <xsl:call-template name="GetPosition"/>
-    </xsl:variable>
-    <xsl:variable name="width">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="@svg:width"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="height">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="@svg:height"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="OleObjType">
-      <xsl:if test="draw:object-ole/@xlink:show='embed'">Embed</xsl:if>
-    </xsl:variable>
-
-    <w:r>
-      <w:object>
-        <v:shape id="{$imageId}" type="#_x0000_t75" style="width:{$width}pt;height:{$height}pt"
-          o:ole="" filled="t">
-          <v:fill color2="black"/>
-          <v:imagedata r:id="{generate-id(./draw:image)}" o:title=""/>
-        </v:shape>
-        <o:OLEObject Type="{$OleObjType}" ProgID="" ShapeID="{$imageId}" DrawAspect="Content"
-          ObjectID="" r:id="{generate-id(draw:object-ole)}"/>
-      </w:object>
-    </w:r>
   </xsl:template>
 
   <!-- 
@@ -221,8 +182,7 @@
         <v:shape type="#_x0000_t202">
           <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name"/>
           <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
-          <xsl:variable name="officeStyle"
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+          <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
           <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
 
           <xsl:call-template name="InsertShapeProperties">

@@ -30,6 +30,7 @@ using System;
 using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.IO;
 
 namespace CleverAge.OdfConverter.Word
 {
@@ -211,6 +212,7 @@ namespace CleverAge.OdfConverter.Word
                 this.nextWriter.WriteString(text);
             }
         }
+
 
         /*
          * Styles declaration

@@ -45,6 +45,7 @@
   <xsl:import href="2oox-styles.xsl"/>
   <xsl:import href="2oox-dataStyles.xsl"/>
   <xsl:import href="2oox-frames.xsl"/>
+  <xsl:import href="2oox-ole.xsl"/>
   <xsl:import href="2oox-settings.xsl"/>
   <xsl:import href="2oox-sections.xsl"/>
   <xsl:import href="2oox-part_relationships.xsl"/>

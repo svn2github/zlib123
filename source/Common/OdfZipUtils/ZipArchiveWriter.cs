@@ -32,6 +32,7 @@ using System.IO;
 using System.Xml;
 using System.Text;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace CleverAge.OdfConverter.OdfZipUtils
 {
@@ -169,7 +170,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             resolver = res;
 
             //Debug.Listeners.Add(new TextWriterTraceListener("debug.txt"));
-
         }
 
         protected override void Dispose(bool disposing)
@@ -426,6 +426,14 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     }
 
                 }
+                else if (IsOLERelationship(text))
+                {
+                    text = MakeRelPathToAbs(text);
+                }
+                else if(IsOLEPicturePlaceholder(text))
+                {
+                    text = GetPicturePlaceholder();
+                }
                 else if (text.Contains("COMPUTEODFCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "graphic-properties"))
                 {
 
@@ -583,6 +591,33 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     }
                 }
             }
+        }
+
+        private bool IsOLEPicturePlaceholder(string text)
+        {
+            return text.StartsWith("http://www.dialogika.de/odf-converter/copyplaceholder#");
+        }
+
+        private string GetPicturePlaceholder()
+        {
+            string appDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
+            return appDir + "\\resources\\OLEplaceholder.png";
+        }
+
+        private bool IsOLERelationship(string text)
+        {
+            return text.StartsWith("http://www.dialogika.de/odf-converter/makeabspath#");
+        }
+
+        private string MakeRelPathToAbs(string text)
+        {
+            string convertingFile = this.zipOutputStream.Filename;
+            string path = convertingFile.Remove(convertingFile.LastIndexOf("\\"));
+
+            int pos = "http://www.dialogika.de/odf-converter/makeabspath#".Length;
+            string relativePath = text.Remove(0, pos);
+            string absolutePath = Path.GetFullPath(path + relativePath).Replace(" ", "%20");
+            return "file:///" + absolutePath;
         }
 
         public override void WriteFullEndElement()
@@ -774,9 +809,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 int bytesCopied = StreamCopy(sourceStream, zipOutputStream);
                 Debug.WriteLine("CopyBinary : " + source + " --> " + target + ", bytes copied = " + bytesCopied);
             }
-
         }
-
 
         #region new code for Extract and Import
 
@@ -943,8 +976,16 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         private Stream GetStream(string relativeUri)
         {
-            Uri absoluteUri = resolver.ResolveUri(null, relativeUri);
-            return (Stream)resolver.GetEntity(absoluteUri, null, Type.GetType("System.IO.Stream"));
+            if (relativeUri.EndsWith("resources\\OLEplaceholder.png"))
+            {
+                return new FileStream(relativeUri, FileMode.Open);
+            }
+            else
+            {
+                Uri absoluteUri = resolver.ResolveUri(null, relativeUri);
+                return (Stream)resolver.GetEntity(absoluteUri, null, Type.GetType("System.IO.Stream"));
+            }
+            
         }
 
 

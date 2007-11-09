@@ -38,6 +38,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         internal ZlibZipWriter(string path)
         {
+            this.Filename = path;
             string resolvedPath = ZipLib.ResolvePath(path);
             this.handle = ZipLib.zipOpen(resolvedPath, 0);
             if (this.handle == IntPtr.Zero)

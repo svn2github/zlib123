@@ -38,6 +38,8 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 	/// </summary>
 	public abstract class ZipWriter : Stream
 	{
+        public string Filename = "";
+
 	    /// <summary>
 	    /// Adds an entry to the ZIP file (only writes the header, to write
 	    /// the content use Stream methods).
