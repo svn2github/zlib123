@@ -142,6 +142,23 @@
         </xsl:if>
       </w:pPr>
 
+      <!--dialogika, clam: empty paragraphs cannot have a border in word,
+      so we insert a blank in this case (bug #1569267)-->
+      <xsl:if test="not(node())">
+        <xsl:variable name="styleName">
+          <xsl:value-of select="@text:style-name"/>
+        </xsl:variable>
+        <xsl:variable name="myStyle" select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]"></xsl:variable>
+        <xsl:variable name="myStyleParent" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $myStyle/@style:parent-style-name]"></xsl:variable>
+        <xsl:if test="$myStyle/style:paragraph-properties/@fo:border-bottom or $myStyleParent/style:paragraph-properties/@fo:border-bottom">
+          <w:r>
+            <w:t xml:space="preserve">
+              <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces"/>
+            </w:t>
+          </w:r>
+          </xsl:if>
+      </xsl:if>
+
       <!-- if paragraph is the very first of page, declare user variables -->
       <xsl:if test="parent::office:text and count(preceding::text:p) = 0">
         <xsl:call-template name="InsertUserFieldDeclaration"/>
