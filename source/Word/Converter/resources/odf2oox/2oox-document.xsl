@@ -115,13 +115,14 @@
     <!-- insert frames for first paragraph of document if we are in an envelope  -->
     <xsl:call-template name="InsertEnvelopeFrames"/>
 
+    <!--dialogika, clam: bugfix not neccessary anymore because each section break has its own paragraph now-->
     <!--clam bugfix #1615689-->
-    <xsl:variable name="followings" select="following::*[name()='text:p' or name()='text:h' or name()='table:table'][1]"/>
+    <!--<xsl:variable name="followings" select="following::*[name()='text:p' or name()='text:h' or name()='table:table'][1]"/>
     <xsl:variable name="next-end-section" select="ancestor::text:section[1] and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id(ancestor::text:section[1]))"/>
     <xsl:variable name="next-new-section" select="following::text:section[1] and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id(following::text:section[1]))"/>
     <xsl:if test="($next-end-section or $next-new-section) and not(node())">
       <w:p></w:p>
-    </xsl:if>
+    </xsl:if>-->
     
     <w:p>
       <xsl:if test="not(parent::table:table-cell)">
