@@ -214,17 +214,141 @@
     <w:instrText xml:space="preserve">" </w:instrText>
   </xsl:template>
 
+
+  <!--math, dialogika: Added to calculate range for TOC entries (for /o) BEGIN-->
+  
+  <xsl:template name="GetMinOutlineLvlDefined">
+    <xsl:param name="min" select="1" />
+
+    <xsl:choose>
+      <!--style with outline-level = min found-->
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style/@style:default-outline-level = $min">
+        <xsl:value-of select="$min" />
+      </xsl:when>
+
+      <!--no style with outline-level = min found -> increment-->
+      <xsl:when test="$min &lt; 10">
+        <xsl:call-template name="GetMinOutlineLvlDefined">
+          <xsl:with-param name="min">
+            <xsl:value-of select="$min + 1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:otherwise>0</xsl:otherwise>
+
+    </xsl:choose>
+  </xsl:template>
+
+  <!--Returns the maximum consecutive outline level that is defined in a paragraph starting from min up to max-->
+  <xsl:template name="GetMaxConsecutiveOutlineLvlDefined">
+    <xsl:param name="min" select="1" />
+    <xsl:param name="max" select="9" />
+
+    <xsl:choose>
+
+      <xsl:when test="$min &gt; $max">
+        <xsl:value-of select="$max" />        
+      </xsl:when>
+      
+      <!--style with outline-level = min found-->            
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style/@style:default-outline-level = $min">
+        <xsl:call-template name="GetMaxConsecutiveOutlineLvlDefined">
+          <xsl:with-param name="min">
+            <xsl:value-of select="$min + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="max">
+            <xsl:value-of select="$max"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:value-of select="$min - 1" />
+      </xsl:otherwise>
+
+    </xsl:choose>
+  </xsl:template>
+  <!--math, dialogika: Added to calculate range of TOC entries (for /o) END-->
+
+
   <!-- table of content -->
   <xsl:template name="InsertTocPrefs">
     <xsl:variable name="tocSource"
       select="ancestor::text:table-of-content/text:table-of-content-source"/>
+    
+    
 
     <w:instrText xml:space="preserve"> TOC </w:instrText>
     <!-- outline level -->
-    <xsl:if test="$tocSource/@text:outline-level">
-      <w:instrText xml:space="preserve">\o "1-</w:instrText>
+
+    <!--math, dialogika: changed to include styles form outline numbering correctly BEGIN-->
+
+    <!--<xsl:if test="$tocSource/@text:outline-level">-->
+    <xsl:if test="$tocSource/@text:outline-level and not($tocSource/@text:use-outline-level='false')">
+
+      <xsl:variable name="MinOutline">
+        <xsl:call-template name="GetMinOutlineLvlDefined" />
+      </xsl:variable>
+      
+      <xsl:variable name="MaxConsideredOutline">
+      <xsl:choose>
+        <xsl:when test="$tocSource/@text:outline-level=10">9</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$tocSource/@text:outline-level"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      </xsl:variable>
+      
+      <xsl:variable name="MaxConsecutiveOutline">
+        <xsl:call-template name="GetMaxConsecutiveOutlineLvlDefined" >
+          <xsl:with-param name="min">
+            <xsl:value-of select="$MinOutline"/>
+          </xsl:with-param>          
+          <xsl:with-param name="max">
+            <xsl:value-of select="$MaxConsideredOutline"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+
+      <!--Specify the range of outline levels that is to be used in TOC-->
+      <xsl:if test="$MinOutline != '0' and not($MinOutline &gt; $MaxConsecutiveOutline)">
+        <w:instrText xml:space="preserve">\o "</w:instrText>
+        <w:instrText><xsl:value-of select="$MinOutline"/></w:instrText>
+        <w:instrText xml:space="preserve">-</w:instrText>
+        <w:instrText><xsl:value-of select="$MaxConsecutiveOutline"/></w:instrText>
+        <w:instrText xml:space="preserve">" </w:instrText>
+      </xsl:if>
+
+      <!--Add additional outline levels that cannot be included in the range (only one possible)
+          due to gaps in the list of defined outline levels-->      
+      <w:instrText xml:space="preserve">\t "</w:instrText>
       <w:instrText>
-        <!-- include elements with outline styles up to selected level  -->
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level &gt; $MaxConsecutiveOutline and not(@style:default-outline-level &gt; MaxConsideredOutline)]" >
+          <xsl:choose>
+            <xsl:when test="@style:display-name">
+              <xsl:value-of select="@style:display-name"/>
+              <xsl:text>;</xsl:text>
+              <xsl:value-of select="@style:default-outline-level"/>
+              <xsl:text>;</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="@style:name">
+                <xsl:value-of select="@style:name"/>
+                <xsl:text>;</xsl:text>
+                <xsl:value-of select="@style:default-outline-level"/>
+                <xsl:text>;</xsl:text>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:for-each>
+      </w:instrText>
+      <w:instrText xml:space="preserve">" </w:instrText>
+
+      <!--<w:instrText xml:space="preserve">\o "1-</w:instrText>
+      <w:instrText>
+        --><!-- include elements with outline styles up to selected level  --><!--
         <xsl:choose>
           <xsl:when test="$tocSource/@text:outline-level=10">9</xsl:when>
           <xsl:otherwise>
@@ -232,9 +356,12 @@
           </xsl:otherwise>
         </xsl:choose>
       </w:instrText>
-      <w:instrText xml:space="preserve">" </w:instrText>
+      <w:instrText xml:space="preserve">" </w:instrText>-->
+      
     </xsl:if>
+    <!--math, dialogika: changed to include styles form outline numbering correctly END-->    
 
+    
     <!-- separator before page numbering. default is right align, null if no tab-stop defined -->
     <xsl:if test="$tocSource/text:table-of-content-entry-template and not($tocSource/text:table-of-content-entry-template/text:index-entry-tab-stop[@style:type = 'right'])">
       <w:instrText xml:space="preserve">\p " " </w:instrText>
@@ -251,7 +378,11 @@
     </xsl:if>
 
     <!-- include elements with additional styles-->
-    <xsl:if test="$tocSource/text:index-source-styles">
+
+    <!--math, dialogika: changed to include additional styles only if enabled BEGIN-->
+    <xsl:if test="$tocSource/text:index-source-styles and $tocSource/@text:use-index-source-styles='true'">
+    <!--<xsl:if test="$tocSource/text:index-source-styles">-->
+    <!--math, dialogika: changed to include additional styles only if enabled END-->
       <w:instrText xml:space="preserve">\t "</w:instrText>
       <w:instrText>
         <xsl:call-template name="InsertTOCLevelStyle">
