@@ -1031,30 +1031,75 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:if test="$styleType != '' and $styleType != 'clear'">
-    <text:index-entry-tab-stop style:type="{$styleType}">
-      <!--if style type is left, there must be style:position attribute -->
-      
-      <xsl:if test="$styleType = 'left'">
-        <xsl:attribute name="style:position">
-          <xsl:variable name="position">
-            <xsl:call-template name="GetTabParams">
-              <xsl:with-param name="param">w:pos</xsl:with-param>
-              <xsl:with-param name="tabCount" select="$tabCount"/>
-              <xsl:with-param name="maxtabCount" select="$tabCount"/>
+
+      <!--math, dialogika: bugfix #1804154 BEGIN-->
+
+      <xsl:variable name="InstrText">        
+        <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:instrText" />
+      </xsl:variable>
+      <xsl:choose>
+        
+        <!--if \p is not contained, word always uses right align. Propably, use of '\p' can not be correctly converted to ODT
+            The existing code in this bugfix has not been changed for this case-->
+        <xsl:when test="not(contains($InstrText,'\p'))">
+          <text:index-entry-tab-stop style:type="right" >
+            <xsl:variable name="StyleId">
+              <xsl:value-of select="../../w:pPr/w:pStyle/@w:val" />
+            </xsl:variable>
+            
+            <xsl:variable name="StyleLeaderChar">
+              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId]/w:pPr/w:tabs/w:tab/@w:leader" />
+            </xsl:variable>
+            
+            <!--default: 'dot'-->
+            <xsl:if test="$StyleLeaderChar=''">
+              <xsl:call-template name="InsertStyleLeaderChar">
+                <xsl:with-param name="leaderChar">dot</xsl:with-param> 
+              </xsl:call-template>
+            </xsl:if>
+            
+            <xsl:if test="$StyleLeaderChar and $StyleLeaderChar!='' and $StyleLeaderChar!='heavy' and $StyleLeaderChar!='middleDot' and $StyleLeaderChar!='none'">
+              <xsl:call-template name="InsertStyleLeaderChar">
+                <xsl:with-param name="leaderChar" select="$StyleLeaderChar"/>
+              </xsl:call-template>
+            </xsl:if>            
+          </text:index-entry-tab-stop>       
+        </xsl:when>
+
+        <!--math, dialogika: bugfix #1804154 END-->
+        
+        
+        <xsl:otherwise>
+
+          <text:index-entry-tab-stop style:type="{$styleType}">
+          <!--if style type is left, there must be style:position attribute -->
+
+          <xsl:if test="$styleType = 'left'">
+            <xsl:attribute name="style:position">
+              <xsl:variable name="position">
+                <xsl:call-template name="GetTabParams">
+                  <xsl:with-param name="param">w:pos</xsl:with-param>
+                  <xsl:with-param name="tabCount" select="$tabCount"/>
+                  <xsl:with-param name="maxtabCount" select="$tabCount"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length" select="$position"/>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="$leaderChar and $leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">
+            <xsl:call-template name="InsertStyleLeaderChar">
+              <xsl:with-param name="leaderChar" select="$leaderChar"/>
             </xsl:call-template>
-          </xsl:variable>
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="$position"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="$leaderChar and $leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">
-        <xsl:call-template name="InsertStyleLeaderChar">
-          <xsl:with-param name="leaderChar" select="$leaderChar"/>
-        </xsl:call-template>
-      </xsl:if>
-    </text:index-entry-tab-stop>
+          </xsl:if>
+          </text:index-entry-tab-stop>          
+          
+        </xsl:otherwise>
+        
+      </xsl:choose>
+     
     </xsl:if>
   </xsl:template>
   
