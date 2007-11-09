@@ -125,7 +125,7 @@
         
         <!-- scenario width measured in cells -->
         <xsl:variable name="scenarioWidth">
-          <xsl:value-of select="number($lastColumnNumber) - number($firstColumnNumber)"/>
+          <xsl:value-of select="number($lastColumnNumber) - number($firstColumnNumber) + 1"/>
         </xsl:variable>
         
         <xsl:variable name="firstRowNumber">
