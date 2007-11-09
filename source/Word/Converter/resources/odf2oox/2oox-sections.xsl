@@ -387,6 +387,16 @@
     <xsl:param name="self-style-name"/>
 
     <xsl:for-each select="document('content.xml')">
+      <xsl:variable name="myMasterPageName">
+        <xsl:call-template name="GetMasterPageNameFromHierarchy">
+          <xsl:with-param name="style-name" select="$self-style-name"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="nextPageName">
+        <xsl:call-template name="GetMasterPageNameFromHierarchy">
+          <xsl:with-param name="style-name" select="$following-elt/@text:style-name"/>
+        </xsl:call-template>
+      </xsl:variable>
       <xsl:choose>
         <xsl:when
           test="key('automatic-styles', $self-style-name)[1]/child::*/@fo:break-after = 'page' "
@@ -395,7 +405,9 @@
           test="$following-elt and key('automatic-styles', $following-elt/@text:style-name|$following-elt/@table:style-name)[1]/child::*/@fo:break-before = 'page'"
           >true</xsl:when>
         <!--clam bugfix #1802267-->
-        <xsl:when test="$following-elt and key('automatic-styles', $following-elt/@text:style-name)[1]/@style:master-page-name">true</xsl:when>
+        <xsl:when test="$following-elt and not($nextPageName = '') and not($nextPageName = $myMasterPageName)">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
