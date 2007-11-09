@@ -136,7 +136,8 @@
           <xsl:with-param name="level" select="$level"/>
           <xsl:with-param name="isFirstRow" select="$isFirstRow"/>
         </xsl:call-template>
-        <xsl:call-template name="InsertParagraphSectionProperties"/>
+        <!--dialogika, clam: section breaks have their own paragraphs now (bug #1615686)-->
+        <!--<xsl:call-template name="InsertParagraphSectionProperties"/>-->
         <xsl:if test="parent::text:index-body">
           <xsl:call-template name="InsertIndexTabs"/>
         </xsl:if>
@@ -189,6 +190,8 @@
       <!-- If there is a page-break-after in the paragraph style -->
       <xsl:call-template name="InsertPageBreakAfter"/>
     </w:p>
+    <!--dialogika, clam: section breaks have their own paragraphs now (bug #1615686)-->
+    <xsl:call-template name="InsertParagraphSectionProperties"/>
   </xsl:template>
 
 
