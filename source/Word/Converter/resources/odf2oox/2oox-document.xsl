@@ -378,11 +378,33 @@
       <w:ind>
         
         <xsl:attribute name="w:left">
-          <xsl:call-template name="twips-measure">
+          <xsl:variable name="myMarginLeft">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$MarginLeft" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="mySpaceBefore">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$SpaceBefore" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="myMinLabelWidth">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$MinLabelWidth" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$myMarginLeft + $mySpaceBefore + $myMinLabelWidth"/>
+          <!--<xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
               <xsl:value-of select="concat(substring-before($MarginLeft, 'cm') + substring-before($SpaceBefore, 'cm') + substring-before($MinLabelWidth, 'cm'),'cm')" />
             </xsl:with-param>
-          </xsl:call-template>
+          </xsl:call-template>-->
         </xsl:attribute>
 
         <xsl:attribute name="w:right">
@@ -394,7 +416,22 @@
         </xsl:attribute>
 
         <xsl:variable name="FirstLineIndent">
-          <xsl:value-of select="substring-before($TextIndent, 'cm') - substring-before($MinLabelWidth, 'cm')" />                      
+          <xsl:variable name="myTextIndent">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$TextIndent" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="myMinLabelWidth">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$MinLabelWidth" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <!--<xsl:value-of select="substring-before($TextIndent, 'cm') - substring-before($MinLabelWidth, 'cm')" />-->
+          <xsl:value-of select="$myTextIndent - $myMinLabelWidth"/>
         </xsl:variable>
 
         <xsl:choose>
