@@ -985,7 +985,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 Uri absoluteUri = resolver.ResolveUri(null, relativeUri);
                 return (Stream)resolver.GetEntity(absoluteUri, null, Type.GetType("System.IO.Stream"));
             }
-            
         }
 
 
@@ -1011,6 +1010,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     destination.Write(data, 0, read);
                 }
 
+                source.Close();
                 return bytesCopied;
             }
 
