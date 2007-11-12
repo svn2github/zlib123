@@ -313,7 +313,8 @@
           </xsl:variable>
           <!--Search outlineLvl in styles.xml  -->
           <xsl:choose>
-            <xsl:when test="key('StyleId', $outline)[1][w:pPr/w:outlineLvl/@w:val and w:basedOn/@w:val='Normal']">
+            <!--clam: "or w:basedOn/@w:val='Heading'" added because of bug #1785483-->
+            <xsl:when test="key('StyleId', $outline)[1][w:pPr/w:outlineLvl/@w:val and (w:basedOn/@w:val='Normal' or w:basedOn/@w:val='Heading')]">
               <xsl:value-of select="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val"/>
             </xsl:when>
             <xsl:otherwise/>
