@@ -334,7 +334,12 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:otherwise>0</xsl:otherwise>
+      <!--math, dialogika: bugfix #1785483 BEGIN-->      
+      <!--<xsl:otherwise>0</xsl:otherwise>-->
+      <xsl:otherwise>
+        <xsl:value-of select="$defaultLevel" />
+      </xsl:otherwise>
+      <!--math, dialogika: bugfix #1785483 END-->      
     </xsl:choose>
   </xsl:template>
   

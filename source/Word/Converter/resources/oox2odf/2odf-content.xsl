@@ -904,14 +904,21 @@
               <xsl:value-of select="$NameBookmark"/>
             </xsl:attribute>
           </text:bookmark>
-          <text:toc-mark-start>
-            <xsl:attribute name="text:id">
-              <xsl:value-of select="@w:id"/>
-            </xsl:attribute>
-            <xsl:attribute name="text:outline-level">
-              <xsl:value-of select="$OutlineLvl + 1"/>
-            </xsl:attribute>
-          </text:toc-mark-start>
+
+          <!--math, dialogika: bugfix #1785483 BEGIN-->
+          <!--only insert index marks for non-empty w:bookmarks-->
+          <xsl:if test="not(following-sibling::node()[1] = following-sibling::w:bookmarkEnd)">
+            <text:toc-mark-start>
+              <xsl:attribute name="text:id">
+                <xsl:value-of select="@w:id"/>
+              </xsl:attribute>
+              <xsl:attribute name="text:outline-level">
+                <xsl:value-of select="$OutlineLvl + 1"/>
+              </xsl:attribute>
+            </text:toc-mark-start>
+          </xsl:if>
+          <!--math, dialogika: bugfix #1785483 END-->
+          
         </xsl:when>
         <!-- a bookmark must begin and end in the same text flow -->
         <xsl:when test="ancestor::w:tc and not(ancestor::w:tc//w:bookmarkEnd[@w:id=$Id])">
