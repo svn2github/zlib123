@@ -324,8 +324,8 @@
       <!--Add additional outline levels that cannot be included in the range (only one possible)
           due to gaps in the list of defined outline levels-->      
       <w:instrText xml:space="preserve">\t "</w:instrText>
-      <w:instrText>
-        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level &gt; $MaxConsecutiveOutline and not(@style:default-outline-level &gt; MaxConsideredOutline)]" >
+      <w:instrText>        
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level &gt; $MaxConsecutiveOutline and not(@style:default-outline-level &gt; $MaxConsideredOutline)]" >
           <xsl:choose>
             <xsl:when test="@style:display-name">
               <xsl:value-of select="@style:display-name"/>

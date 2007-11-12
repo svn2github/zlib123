@@ -898,26 +898,25 @@
       </xsl:variable>
 
       <xsl:choose>
-        <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != ''">
+        <!--math, dialogika: bugfix #1785483 BEGIN-->
+        <!--<xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != ''">-->
+        <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != '' and $OutlineLvl !='9'">        
+        <!--math, dialogika: bugfix #1785483 END-->
           <text:bookmark>
             <xsl:attribute name="text:name">
               <xsl:value-of select="$NameBookmark"/>
             </xsl:attribute>
           </text:bookmark>
 
-          <!--math, dialogika: bugfix #1785483 BEGIN-->
-          <!--only insert index marks for non-empty w:bookmarks-->
-          <xsl:if test="not(following-sibling::node()[1] = following-sibling::w:bookmarkEnd)">
-            <text:toc-mark-start>
-              <xsl:attribute name="text:id">
-                <xsl:value-of select="@w:id"/>
-              </xsl:attribute>
-              <xsl:attribute name="text:outline-level">
-                <xsl:value-of select="$OutlineLvl + 1"/>
-              </xsl:attribute>
-            </text:toc-mark-start>
-          </xsl:if>
-          <!--math, dialogika: bugfix #1785483 END-->
+
+          <text:toc-mark-start>
+            <xsl:attribute name="text:id">
+              <xsl:value-of select="@w:id"/>
+            </xsl:attribute>
+            <xsl:attribute name="text:outline-level">
+              <xsl:value-of select="$OutlineLvl + 1"/>
+            </xsl:attribute>
+          </text:toc-mark-start>
           
         </xsl:when>
         <!-- a bookmark must begin and end in the same text flow -->
