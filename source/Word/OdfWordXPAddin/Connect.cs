@@ -335,7 +335,12 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
 
             // the second test deals with blank documents 
             // (which are in a 'saved' state and have no extension yet(?))
-            if (!doc.Saved || doc.FullName.IndexOf('.') < 0)
+            if (!doc.Saved
+                || doc.FullName.IndexOf('.') < 0
+                || doc.FullName.IndexOf("http://") == 0
+                || doc.FullName.IndexOf("https://") == 0
+                || doc.FullName.IndexOf("ftp://") == 0
+                )
             {
                 System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
             }
