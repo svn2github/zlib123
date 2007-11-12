@@ -118,14 +118,16 @@
           internal ODF ole's have application type eg.
           application/vnd.oasis.opendocument.spreadsheet
           -->
-          <xsl:if test="$oleType='application/vnd.sun.star.oleobject'">
-            <pzip:copy pzip:source="{$oleFile}" pzip:target="word/embeddings/{$oleId}.bin"/>
-            <xsl:call-template name="HandleOleObject">
-              <xsl:with-param name="oleId" select="$oleId" />
-              <xsl:with-param name="target" select="concat('embeddings/', $oleId, '.bin')" />
-              <xsl:with-param name="mode" select="'Internal'" />
-            </xsl:call-template>
-          </xsl:if>
+          <xsl:choose>
+            <xsl:when test="$oleType='application/vnd.sun.star.oleobject'">
+              <pzip:copy pzip:source="{$oleFile}" pzip:target="word/embeddings/{$oleId}.bin"/>
+              <xsl:call-template name="HandleOleObject">
+                <xsl:with-param name="oleId" select="$oleId" />
+                <xsl:with-param name="target" select="concat('embeddings/', $oleId, '.bin')" />
+                <xsl:with-param name="mode" select="'Internal'" />
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
 
           <xsl:call-template name="HandleOlePreview">
             <xsl:with-param name="olePicture" select="$olePicture" />
@@ -226,7 +228,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- copy placeholder picture -->
-        <pzip:copy pzip:source="http://www.dialogika.de/odf-converter/copyplaceholder#"
+        <pzip:copy pzip:source="#CER#WordConverter.dll#CleverAge.OdfConverter.Word.resources.OLEplaceholder.png#"
                    pzip:target="word/media/{$olePictureId}.png"/>
         <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
           <xsl:attribute name="Id">

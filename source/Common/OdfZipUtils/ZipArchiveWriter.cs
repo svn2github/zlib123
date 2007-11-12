@@ -430,10 +430,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 {
                     text = MakeRelPathToAbs(text);
                 }
-                else if(IsOLEPicturePlaceholder(text))
-                {
-                    text = GetPicturePlaceholder();
-                }
                 else if (text.Contains("COMPUTEODFCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "graphic-properties"))
                 {
 
@@ -593,17 +589,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
         }
 
-        private bool IsOLEPicturePlaceholder(string text)
-        {
-            return text.StartsWith("http://www.dialogika.de/odf-converter/copyplaceholder#");
-        }
-
-        private string GetPicturePlaceholder()
-        {
-            string appDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName);
-            return appDir + "\\resources\\OLEplaceholder.png";
-        }
-
         private bool IsOLERelationship(string text)
         {
             return text.StartsWith("http://www.dialogika.de/odf-converter/makeabspath#");
@@ -611,11 +596,24 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         private string MakeRelPathToAbs(string text)
         {
-            string convertingFile = this.zipOutputStream.Filename;
-            string path = convertingFile.Remove(convertingFile.LastIndexOf("\\"));
-
             int pos = "http://www.dialogika.de/odf-converter/makeabspath#".Length;
             string relativePath = text.Remove(0, pos);
+            string path = "";
+
+            // for Commandline tool
+            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            {
+                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                    path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+            }
+
+            //for addins
+            if (path == "")
+            {
+                path = Environment.CurrentDirectory;
+            }
+
+
             string absolutePath = Path.GetFullPath(path + relativePath).Replace(" ", "%20");
             return "file:///" + absolutePath;
         }
@@ -974,19 +972,29 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         #endregion
 
-        private Stream GetStream(string relativeUri)
+        private Stream GetStream(string source)
         {
-            if (relativeUri.EndsWith("resources\\OLEplaceholder.png"))
+            //get stream to embedded resource
+            if (source.StartsWith("#CER#") && source.EndsWith("#"))
             {
-                return new FileStream(relativeUri, FileMode.Open);
+                int len = source.Length;
+                int pos1 = 5;
+                int pos2 = source.IndexOf("#", 5, len - 5) + 1;
+
+                Assembly exeAssem = Assembly.GetExecutingAssembly();
+                string targetAssemPath = Path.GetDirectoryName(exeAssem.GetModules()[0].FullyQualifiedName) + "\\" + source.Substring(pos1, pos2 - pos1 -1);
+                Assembly targetAssem = System.Reflection.Assembly.LoadFile(targetAssemPath);
+                string res = source.Substring(pos2, len - pos2 - 1);
+
+                return targetAssem.GetManifestResourceStream(res);
             }
+            //get stream to file in zip
             else
             {
-                Uri absoluteUri = resolver.ResolveUri(null, relativeUri);
+                Uri absoluteUri = resolver.ResolveUri(null, source);
                 return (Stream)resolver.GetEntity(absoluteUri, null, Type.GetType("System.IO.Stream"));
             }
         }
-
 
         private int StreamCopy(Stream source, Stream destination)
         {

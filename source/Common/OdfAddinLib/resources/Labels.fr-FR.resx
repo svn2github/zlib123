@@ -184,5 +184,10 @@
     <value>Impossible de créer le fichier cible : vérifiez que le chemin est correct et que le fichier n'est
 pas en cours d'utilisation par une autre application.</value>
   </data>
-  
+  <data name="CorruptedInputFileDetail" xml:space="preserve">
+    <value>Si vous pensez que ce document est un document ODF valide, vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
+  </data>
+  <data name="CorruptedInputFileLabel" xml:space="preserve">
+    <value>Ce document ne semble pas être un fichier OASIS  OpenDocument valide.</value>
+  </data>
 </root>

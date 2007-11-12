@@ -11,7 +11,7 @@
     associated with the data types.
     
     Example:
-
+    
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -180,5 +180,10 @@
   <data name="UnableToCreateOutputLabel" xml:space="preserve">
     <value>Die Datei kann nicht angelegt werden</value>
   </data>
-  
+  <data name="CorruptedInputFileDetail" xml:space="preserve">
+    <value>Falls Sie ein valides ODF Dokument konvertieren wollten, melden Sie bitte den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net)</value>
+  </data>
+  <data name="CorruptedInputFileLabel" xml:space="preserve">
+    <value>Das Dokument scheint keine valide OASIS OpenDocument Datei zu sein.</value>
+  </data>
 </root>

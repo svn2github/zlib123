@@ -11,7 +11,7 @@
     associated with the data types.
     
     Example:
-
+    
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -120,7 +120,6 @@
   <data name="OdfImportLabel" xml:space="preserve">
     <value>ODF Dateien öffnen</value>
   </data>
-  
   <data name="translation.odf2oox.paddingShortened" xml:space="preserve">
     <value>Zeilenfüllwert gekürzt</value>
   </data>
@@ -438,5 +437,8 @@
   </data>
   <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
     <value>Eigenschaft "Neustart der Zeilennummerierung bei jedem Abschnitt"</value>
+  </data>
+  <data name="translation.odf2oox.odfolelost" xml:space="preserve">
+    <value>Eingebettetes ODF-Objekt</value>
   </data>
 </root>

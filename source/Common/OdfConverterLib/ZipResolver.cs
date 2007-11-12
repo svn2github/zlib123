@@ -45,7 +45,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     {
         private const string ZIP_URI_SCHEME = "zip";
         private const string ZIP_URI_HOST = "localhost";
-
+        public const string ASSEMBLY_URI_SCHEME = "assembly";
+        
 		private ZipReader archive;
 		private Hashtable entries;
 		
@@ -90,6 +91,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     return uri;
                 }
             }
+            else if (relativeUri.Contains("DTD"))
+            {
+                return new Uri(ASSEMBLY_URI_SCHEME + "://" + ZIP_URI_HOST + "/dummy.dtd");
+            }
             else
             {
                 return base.ResolveUri(baseUri, relativeUri);
@@ -98,26 +103,26 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		
 		public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
 		{
-			try {
-				
-				Stream stream = null;
-				
-				if (entries.Contains(absoluteUri.AbsoluteUri))
-				{
-					stream = archive.GetEntry((string) entries[absoluteUri.AbsoluteUri]);
-                    
-				}
-				
-				if (stream == null)
-				{
-					stream = new MemoryStream();
-				}
+			try 
+            {
+                Stream stream = null;
+
+                if (entries.Contains(absoluteUri.AbsoluteUri))
+                {
+                    stream = archive.GetEntry((string)entries[absoluteUri.AbsoluteUri]);
+
+                }
+                if (stream == null)
+                {
+                    stream = new MemoryStream();
+                }
                 // Cannot have a 0 byte xml document !
                 else if (stream.Length == 0)
-                { 
+                {
                     throw new IOException(entries[absoluteUri.AbsoluteUri] + " is 0 length");
                 }
                 return stream;
+
 			} 
 			catch (Exception) 
 			{

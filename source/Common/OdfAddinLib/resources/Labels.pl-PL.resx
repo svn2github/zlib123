@@ -180,5 +180,10 @@
   <data name="UnableToCreateOutputLabel" xml:space="preserve">
     <value>Stworzenie pliku okazało się niemożliwe</value>
   </data>
- 
+  <data name="CorruptedInputFileDetail" xml:space="preserve">
+    <value>Jeżeli walidacja pliku jest niepoprawna, wypełnij raport o powstałym błędzie na stronie http://odf-converter.sourceforge.net i załącz ten plik.</value>
+  </data>
+  <data name="CorruptedInputFileLabel" xml:space="preserve">
+    <value>Ten dokument wydaje się nie być plikiem formatu OpenDocument.</value>
+  </data>
 </root>

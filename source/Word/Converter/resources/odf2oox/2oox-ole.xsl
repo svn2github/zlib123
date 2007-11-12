@@ -128,7 +128,7 @@
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
       <xsl:call-template name="InsertObjectPreview" />
-
+      
     </v:shape>
   </xsl:template>
 
@@ -192,31 +192,35 @@
     internal ODF ole's have application type eg.
     application/vnd.oasis.opendocument.spreadsheet
     -->
-    <xsl:if test="$oleType='application/vnd.sun.star.oleobject'" >
-      
-      <o:OLEObject Type="Embed" ProgID="Package" ObjectID="_1256106730" >
-        <!-- shape id -->
-        <xsl:attribute name="ShapeID">
-          <xsl:value-of select="$shapeId"/>
-        </xsl:attribute>
-        <!-- attribute type DrawAspect -->
-        <xsl:attribute name="DrawAspect">
-          <xsl:choose>
-            <xsl:when test="$olePictureType=''">
-              <xsl:text>Icon</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>Content</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <!-- r:id -->
-        <xsl:attribute name="r:id">
-          <xsl:value-of select="generate-id(draw:object-ole)"/>
-        </xsl:attribute>
-      </o:OLEObject>
-      
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="$oleType='application/vnd.sun.star.oleobject'">
+        <o:OLEObject Type="Embed" ProgID="Package" ObjectID="_1256106730" >
+          <!-- shape id -->
+          <xsl:attribute name="ShapeID">
+            <xsl:value-of select="$shapeId"/>
+          </xsl:attribute>
+          <!-- attribute type DrawAspect -->
+          <xsl:attribute name="DrawAspect">
+            <xsl:choose>
+              <xsl:when test="$olePictureType=''">
+                <xsl:text>Icon</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>Content</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <!-- r:id -->
+          <xsl:attribute name="r:id">
+            <xsl:value-of select="generate-id(draw:object-ole)"/>
+          </xsl:attribute>
+        </o:OLEObject>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message terminate="no">translation.odf2oox.odfolelost</xsl:message>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
   <!--
