@@ -1,158 +1,104 @@
-<html>
-    <head>
-        <title>ODF Add-in pour Microsoft Word</title>
-    </head>
-    <body>
-        <h1>
-            <a name="top">ODF Add-in pour Microsoft Word</a>
-        </h1>        
-        <p>Merci d'avoir t&eacute;l&eacute;charg&eacute; l'add-in ODF pour Microsoft Word. Le but de cette extension est de 
-            permettre aux utilisateurs d'ouvrir des documents au format ODF directement depuis 
-            Microsoft Word, d&eacute;montrant ainsi l'interop&eacute;rabilit&eacute; entre les formats OpenXML et ODF.
-            Le projet est h&eacute;berg&eacute; sur <a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>.
-            Pour plus d'informations sur le projet ainsi que pour les prochaines versions, merci de bien vouloir 
-            consulter notre feuille de route.
-        </p>
-        <p>Cet add-in a ï¿½tï¿½ financï¿½ par <a href="http://www.microsoft.com/">Microsoft</a> et dï¿½veloppï¿½ par la sociï¿½tï¿½ franï¿½aise
-		<a href="http://www.clever-age.com/">Clever Age</a>, avec l'aide des sociï¿½tï¿½s <a href="http://www.dialogika.de/">DIaLOGIKa</a> et <a href="http://www.aztecsoft.com/">Aztecsoft</a> (pour plus d'informations, rendez-vous sur le
-<a href="http://odf-converter.sourceforge.net/">site web</a> du projet).</p>
-        
-        <h2>Table des mati&eacute;res</h2>
-        <ul>
-            <li>
-                <a href="#hRequirements">Pre-Requis</a>
-            </li>
-            <li>
-                <a href="#hInstall">Installation de l'add-in</a>                
-            </li>
-            <li>
-                <a href="#hTroobleshooting">R&eacute;solution des probl&egrave;mes</a>
-                <ul>
-                    <li><a href="#hTroobleshootingXP2003">Microsoft Word 2000/XP/2003</a></li>
-                    <li><a href="#hTroobleshooting2007">Microsoft Word 2007</a></li>
-                </ul>
-            </li>
-            <li><a href="#hFeatures">Fonctionnalit&eacute;s non support&eacute;es</a></li>
-        </ul>
-        
-        <h2><a name="hRequirements">Pre-Requis</a></h2>
-        <p>Avant d'installer le produit, veuillez vous assurer de bien respecter la liste des pr&eacute;-requis suivante :</p>
-        <ul>
-            <li>Microsoft Word 2000</li>
-            <li>
-                <a href="http://www.microsoft.com/downloads/details.aspx?displaylang=fr&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office
-                    Compatibility Pack</a>
-            </li>
-            <li>
-                <a
-                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
-                    >.NET framework 2.0</a>
-            </li>
-        </ul>      
-        <p><strong>ou</strong></p>        
-        <ul>
-            <li>Microsoft Word XP</li>
-            <li>
-                <a href="http://www.microsoft.com/downloads/details.aspx?displaylang=fr&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office
-                    Compatibility Pack</a>
-            </li>
-            <li>
-                <a
-                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
-                    >.NET framework 2.0</a>
-            </li>
-        </ul>      
-        <p><strong>ou</strong></p>        
-        <ul>
-            <li>Microsoft Word 2003</li>
-            <li><a href="http://www.microsoft.com/downloads/details.aspx?displaylang=fr&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office Compatibility Pack</a></li>
-            <li>
-                <a
-                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
-                    >.NET framework 2.0*</a>
-            </li>
-        </ul>
-        <p><strong>ou</strong></p>
-        <ul>
-            <li><a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word 2007</a>
-                avec activation du support programmable .NET</li>
-            <li>
-                <a
-                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
-                    >.NET framework 2.0*</a>
-            </li>
-        </ul>
-        
-        
-        <p><strong>(*) Attention:</strong> si vous avez install&eacute; Microsoft Word avant le framework .NET, il vous 
-            faudra  mettre &agrave; jour votre installation de Microsoft Word en suivant les instructions suivantes :</p>
-        <ol>
-            <li>Dans le panneau de configuration, ouvrir &quot;Ajout/Suppression de programmes&quot;</li>
-            <li>Dans la liste, s&eacute;lectionez &quot;Microsoft Office&quot; et cliquez sur "Modifier"</li>
-            <li>Dans la bo&icirc;te de dialogue s&eacute;lectionnez  "Ajouter ou supprimer des fonctionnalit&eacute;s".</li>
-            <li>S&eacute;lectionnez ensuite  ".NET Programmability Support" dans la section "Microsoft Office Word". </li>
-        </ol>
-        <p>
-            <a href="#top" class="back">Retour au d&eacute;but</a>
-        </p>
-        
-        <h2>
-            <a name="hInstall">Installation de l'add-in</a>
-        </h2>
-        <p>Double-cliquez sur le fichier <strong>&quot;OdfAddInForWordSetup-fr-1.0.exe&quot;</strong></p>
-        <p>
-             Si l'installation s'est correctement d&eacute;roul&eacute;e, vous devriez pouvoir ouvrir un fichier
-            &quot;.ODT&quot; depuis Microsoft Word (depuis le menu &quot;Fichier&gt;ODF...&gt;Ouvrir un fichier au format 
-            OpenDocument (ODF)&quot;). De plus, l'explorateur Windows 
-            devrait afficher l'option &quot;Ouvrir avec Micosoft Word&quot; dans son menu contextuel.
-        </p>
-        <p>
-            <strong>Important :</strong> les fichiers au format ODF sont ouverts dans Microsoft Word en lecture 
-            seule et au format OpenXML (&quot;.DOCX&quot;). Si vous voulez modifier le contenu du fichier il vous faudra au pr&eacute;alable faire une copie
-            du document (menu &quot;Fichier&gt;Enregister Sous&quot;). La sauvegarde au format ODF s&apos;effectue
-            en s&eacute;lectionnant le menu &quot;Fichier&gt;ODF...&gt;Enregistrer au format ODF...&quot;. </p>
-        <p>
-            <a href="#top" class="back">Retour au d&eacute;but</a>
-        </p>
-        
-        <h2>
-            <a name="hTroobleshooting">R&eacute;solution des probl&egrave;mes</a>
-        </h2>
-        <p>
-            Si le menu &quot;ODF...&quot; n'appara&icirc;t pas sous Word, il est possible que certains pr&eacute;-requis ne soient 
-            pas v&eacute;rifi&eacute;s (voir la section  <a href="#hRequirements">Pr&eacute;-requis</a>)
-            ou bien que l&apos;installation de certains composants ait &eacute;chou&eacute;. Il vous faudra alors
-            activer l'add-in manuellement dans Word :
-        </p>
-        <h3><a name="hTroobleshootingXP2003">Microsoft Word 2000/XP/2003</a></h3>
-        <ol>
-            <li>S&eacute;lectionnez le menu &quot;Outils&gt;Personnaliser...&quot;.</li>
-            <li>Sous l&apos;onglet &quot;Commandes&quot;, s&eacute;lectionnez &quot;Outils&quot;
-                dans la liste &quot;Cat&eacute;gories&quot;.</li>
-            <li>Glissez-d&eacute;posez le composant &quot;Modules compl&eacute;mentaires COM...&quot; 
-                    depuis la liste &quot;Commandes&quot; vers le menu &quot;Outils&quot;.</li>
-            <li>Cliquez sur &quot;Fermer&quot;.</li>
-            <li>Dans le menu &quot;Outils&quot;, s&eacute;lectionnez &quot;Modules compl&eacute;mentaires COM...&quot; </li>
-            <li>S&eacute;lectionnez ensuite le module &quot;ODF Add-In for Word XP (ou 2003)&quot;.</li>
-        </ol>
-        <h3><a name="hTroobleshooting2007">Microsoft Word 2007</a></h3>
-        <ol>
-            <li>Cliquez sur &quot;Options pour Word&quot; dans le menu &quot;Fichier&quot;</li>
-            <li>Dans la section &quot;Add-ins&quot;, s&eacute;lectionnez dans la liste &quot;Modules compl&eacute;mentaires COM...&quot;.
-                Cliquez ensuite sur le bouton &quot;Aller&quot;.</li>
-            <li>S&eacute;lectionnez ensuite le module &quot;ODF Word 2007 Add-in&quot; et cliquez sur &quot;OK&quot;.</li>
-        </ol>
-        <p><a href="#top" class="back">Retour au d&eacute;but</a></p>
-        
-        <h2>
-            <a name="hFeatures">Fonctionnalit&eacute;s non support&eacute;es</a>
-        </h2>
-        <p>
-            La liste compl&egrave;te des fonctionnalit&eacute;s non support&eacute;es est maintenue sur notre site web. Vous pouvez la consulter sur <a href="http://odf-converter.sourceforge.net/features.html">cette page</a>.
-        </p>
-        <p>
-            <a href="#top" class="back">Retour au d&eacute;but</a>
-        </p>
-    </body>
-</html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" dir="ltr">
+<head>
+	<title>OpenXML/ODF Translator Add-in for Microsoft Word</title>
+</head>
 
+<body style="font-family: 'Arial';font-size: 10pt;">
+
+
+<h1><a name="top">OpenXML/ODF Translator Add-in for Microsoft Word</a></h1>        
+
+<p>Thank you for downloading the OpenXML/ODF Translator Add-in for Word. The add-in enables you
+	to open documents based on the ODF specification in Microsoft Word, thus, demonstrating the
+	interoperability between Office Open XML &amp; ODF.  This interoperability project is hosted on
+	<a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. For more details and future updates on 
+	the project, please see the RoadMap document.</p>
+
+<p>Funded by <a href="http://www.microsoft.com/">Microsoft</a> the OpenXML/ODF Translator has been developed by 
+	<a href="http://www.clever-age.com/">Clever Age</a>, 
+	<a href="http://www.aztecsoft.com/">Aztecsoft</a>, 
+	<a href="http://www.sonata-software.com/">Sonata</a> and 
+	<a href="http://www.dialogika.de/">DIaLOGIKa</a>
+	(for more information, see the project <a href="http://odf-converter.sourceforge.net/">web site</a>).</p>
+        
+<h2><hr>Table of Contents</h2>
+	<ul>
+    	<li><a href="#hRequirements">Software Requirements</a></li>
+		<li><a href="#hInstall">Installing the Add-in</a></li>
+		<li><a href="#hTroobleshooting">Troubleshooting Guide</a></li>
+		<li><a href="#hFeatures">Features/Options Not Supported</a></li>
+	</ul>
+        
+<h2><hr><a name="hRequirements"> Software Requirements</a></h2>
+
+	<p>Before installing the add-in, make sure you have one of the following ...</p>
+	<ul>
+		<li>Microsoft Word 2000</li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office Compatibility Pack</a></li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET Framework 2.0</a></li>
+	</ul>      
+        
+	<p><strong>or</strong></p> <ul>
+		<li>Microsoft Word XP</li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office Compatibility Pack</a></li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET Framework 2.0</a></li>
+	</ul>      
+        
+	<p><strong>or</strong></p>        
+	<ul>
+		<li>Microsoft Word 2003</li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Office Compatibility Pack</a></li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET Framework 2.0*</a></li>
+	</ul>
+
+	<p><strong>or</strong></p>
+	<ul>
+		<li>Microsoft Word 2007 (with .NET Programmability Support activated)</li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET Framework 2.0*</a></li>
+	</ul>
+	
+	<p><strong>(*) Note:</strong> if you installed Microsoft Word before .NET Framework, you will
+            need to update your Word installation by doing the following:</p>
+
+	<ol>
+		<li>Open <i>Add or Remove Programs</i> from the Control Panel</li>
+		<li>Find the Microsoft Word entry and choose <i>Modify</i></li>
+		<li>In the installation process, choose <i>Add or remove features</i> then add <i>.NET
+                Programmability Support</i> in the <i>Microsoft Office Word</i> section. </li>
+	</ol>
+
+	<p><a href="#top" class="back">Back to top</a></p>
+        
+<h2><hr><a name="hInstall">Installing the Add-in</a></h2>
+
+	<p>Double click the <strong>&quot;OdfAddInForWordSetup-en.exe&quot;</strong> file</p>
+	<p> If the installation is successful, you should be able to open an .ODT file (ODT is the standard file extension
+	     	for ODF text documents) using Microsoft Word (see <i>File>ODF...</i> menu). Also, when
+            right-clicking on an .ODT file in Explorer, you should have the
+            option of opening the document in Microsoft Word (<i>Open with Word</i> menu). </p>
+	<p>
+            <strong>Important note:</strong> The .ODT file opened by the add-in is imported in Microsoft Word as a read-only 
+            .DOCX file. Consequently, if you have made changes to it and want to save it back as an .ODT file, you will have first to save it with a 
+            new name (<i>File>Save As</i>) and then use the <i>File>ODF…-Save as ODF…</i> command.</p>
+
+	<p><a href="#top" class="back">Back to top</a></p>
+        
+<h2><hr><a name="hTroobleshooting">Troubleshooting</a></h2>
+
+	<p> If you don't see the ODF entry in the Microsoft Word <i>File</i> menu, this might be due to missing
+            features in Word (see <a href="#hRequirements">Software Requirements</a> section) or a
+            failure during the installation of the Word Primary Interop Assemblies.</p>
+	<p>Please check our <a href="http://downloads.sourceforge.net/odf-converter/Add-In_installation_checklist_V1.1.docx?use_mirror=osdn">troubleshooting guide</a> for more information.</p>
+	
+	<p><a href="#top" class="back">Back to top</a></p>
+        
+<h2><hr><a name="hFeatures">Features/Options Not Supported</a></h2>
+
+	<p>For a complete list of unsupported features see our <a href="http://odf-converter.sourceforge.net/features.html">web site</a>.
+        </p>
+
+	<p><a href="#top" class="back">Back to top</a></p>
+
+</body>
+</html>
