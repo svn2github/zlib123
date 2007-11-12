@@ -112,7 +112,7 @@ namespace CleverAge.OdfConverter.Word
                 // DOCX -> ODT conversion
                 XmlReaderSettings xrs = new XmlReaderSettings();
                 // do not look for DTD
-                xrs.ProhibitDtd = true;
+                xrs.ProhibitDtd = false;
                     
                 DocxDocument doc = new DocxDocument(inputFile);
 

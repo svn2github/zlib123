@@ -127,7 +127,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             XmlReaderSettings xrs = new XmlReaderSettings();
             // do not look for DTD
-            xrs.ProhibitDtd = true;
+            xrs.ProhibitDtd = false;
             if (this.ExternalResources == null)
             {
                 xrs.XmlResolver = this.ResourceResolver;
