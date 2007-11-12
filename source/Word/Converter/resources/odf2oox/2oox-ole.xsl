@@ -65,6 +65,9 @@
         </xsl:call-template>
 
         <xsl:choose>
+          <!-- 
+          Insert embedded binary objects 
+          -->
           <xsl:when test="draw:object-ole">
             <xsl:call-template name="InsertInternalObject">
               <xsl:with-param name="shapeId" select="$shapeId" />
@@ -72,7 +75,11 @@
               <xsl:with-param name="olePictureType" select="$olePictureType" />
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="draw:object">
+          <!-- 
+          Insert linked object but not embedded ODF object.
+          (embedded ODF objects are also draw:object elements)
+          -->
+          <xsl:when test="draw:object and substring-after(draw:object/@xlink:href, './')=''">
             <xsl:call-template name="InsertExternalObject">
               <xsl:with-param name="shapeId" select="$shapeId" />
               <xsl:with-param name="object" select="draw:object" />
@@ -178,9 +185,14 @@
     <xsl:param name="olePictureType" />
 
     <xsl:variable name="oleFile" select="substring-after(draw:object-ole/@xlink:href, './')" />
-
-    <!-- don't insert internal ODF OLEs -->
-    <xsl:if test="not(document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile])" >
+    <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
+    
+    <!-- 
+    don't insert internal ODF OLEs 
+    internal ODF ole's have application type eg.
+    application/vnd.oasis.opendocument.spreadsheet
+    -->
+    <xsl:if test="$oleType='application/vnd.sun.star.oleobject'" >
       
       <o:OLEObject Type="Embed" ProgID="Package" ObjectID="_1256106730" >
         <!-- shape id -->
@@ -213,9 +225,10 @@
   Date: 8.11.2007
   -->
   <xsl:template name="InsertObjectPreview">
+    <xsl:variable name="myId" select="generate-id(draw:image)" />
     <v:imagedata o:title="">
       <xsl:attribute name="r:id">
-        <xsl:value-of select="generate-id(draw:image)"/>
+        <xsl:value-of select="$myId"/>
       </xsl:attribute>
     </v:imagedata>
   </xsl:template>

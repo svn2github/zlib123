@@ -75,15 +75,14 @@
       <!-- Images relationships -->
       <xsl:for-each select="document('content.xml')">
         <xsl:call-template name="InsertImagesRelationships">
-          <xsl:with-param name="images" select="key('images', '')[not(ancestor::text:note)]"/>
+          <xsl:with-param name="images" select="key('images', '')[not(ancestor::text:note)]" />
         </xsl:call-template>
       </xsl:for-each>
 
       <!-- Hyperlinks relationships -->
       <xsl:for-each select="document('content.xml')">
         <xsl:call-template name="InsertHyperlinksRelationships">
-          <xsl:with-param name="hyperlinks" select="key('hyperlinks', '')[not(ancestor::text:note)]"
-          />
+          <xsl:with-param name="hyperlinks" select="key('hyperlinks', '')[not(ancestor::text:note)]" />
         </xsl:call-template>
       </xsl:for-each>
     </Relationships>
@@ -109,99 +108,95 @@
         </xsl:call-template>
       </xsl:variable>
 
-
       <xsl:choose>
         <!-- internal OLE -->
         <xsl:when test="substring-before(@xlink:href, '/')='.'">
-            <xsl:choose>
-              <!-- internal binary OLE -->
-              <xsl:when test="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]">
+          <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
 
-                <pzip:copy pzip:source="{$oleFile}" pzip:target="word/embeddings/{$oleId}.bin"/>
-                <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-                  <xsl:attribute name="Id">
-                    <xsl:value-of select="$oleId"/>
-                  </xsl:attribute>
-                  <xsl:attribute name="Type">
-                    <xsl:text>http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject</xsl:text>
-                  </xsl:attribute>
-                  <xsl:attribute name="Target">
-                    <xsl:value-of select="concat('embeddings/', $oleId, '.bin')"/>
-                  </xsl:attribute>
-                </Relationship>
-
-                <xsl:call-template name="HandleOlePreview">
-                  <xsl:with-param name="olePicture" select="$olePicture" />
-                  <xsl:with-param name="olePictureId" select="$olePictureId" />
-                  <xsl:with-param name="olePictureType" select="$olePictureType" />
-                </xsl:call-template>
-
-              </xsl:when>
-              <!-- internal ODF OLE -->
-              <xsl:otherwise>
-                
-                <!-- do nothing -->
-                
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <!-- external OLE on network or driver -->
-          <xsl:when test="substring-before(@xlink:href, '/')=''">
-            
-            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-              <xsl:attribute name="Id">
-                <xsl:value-of select="$oleId"/>
-              </xsl:attribute>
-              <xsl:attribute name="Type">
-                <xsl:text>http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="Target">
-                <xsl:value-of select="@xlink:href"/>
-              </xsl:attribute>
-              <xsl:attribute name="TargetMode">
-                <xsl:text>External</xsl:text>
-              </xsl:attribute>
-            </Relationship>
-
-            <xsl:call-template name="HandleOlePreview">
-              <xsl:with-param name="olePicture" select="$olePicture" />
-              <xsl:with-param name="olePictureId" select="$olePictureId" />
-              <xsl:with-param name="olePictureType" select="$olePictureType" />
+          <!-- 
+          don't insert internal ODF OLEs 
+          internal ODF ole's have application type eg.
+          application/vnd.oasis.opendocument.spreadsheet
+          -->
+          <xsl:if test="$oleType='application/vnd.sun.star.oleobject'">
+            <pzip:copy pzip:source="{$oleFile}" pzip:target="word/embeddings/{$oleId}.bin"/>
+            <xsl:call-template name="HandleOleObject">
+              <xsl:with-param name="oleId" select="$oleId" />
+              <xsl:with-param name="target" select="concat('embeddings/', $oleId, '.bin')" />
+              <xsl:with-param name="mode" select="'Internal'" />
             </xsl:call-template>
-            
-          </xsl:when>
-          <!-- external OLE in folder -->
-          <xsl:when test="substring-before(@xlink:href, '/')='..'">
+          </xsl:if>
 
-            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-              <xsl:attribute name="Id">
-                <xsl:value-of select="$oleId"/>
-              </xsl:attribute>
-              <xsl:attribute name="Type">
-                <xsl:text>http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="Target">
-                <xsl:value-of select="concat('http://www.dialogika.de/odf-converter/makeabspath#', @xlink:href)"/>
-              </xsl:attribute>
-              <xsl:attribute name="TargetMode">
-                <xsl:text>External</xsl:text>
-              </xsl:attribute>
-            </Relationship>
+          <xsl:call-template name="HandleOlePreview">
+            <xsl:with-param name="olePicture" select="$olePicture" />
+            <xsl:with-param name="olePictureId" select="$olePictureId" />
+            <xsl:with-param name="olePictureType" select="$olePictureType" />
+          </xsl:call-template>
 
-            <xsl:call-template name="HandleOlePreview">
-              <xsl:with-param name="olePicture" select="$olePicture" />
-              <xsl:with-param name="olePictureId" select="$olePictureId" />
-              <xsl:with-param name="olePictureType" select="$olePictureType" />
-            </xsl:call-template>
-            
-          </xsl:when>
-        </xsl:choose>
+        </xsl:when>
+        <!-- external OLE on network or driver -->
+        <xsl:when test="substring-before(@xlink:href, '/')=''">
 
-      <!-- Handle the preview picture -->
+          <xsl:call-template name="HandleOleObject">
+            <xsl:with-param name="oleId" select="$oleId" />
+            <xsl:with-param name="target" select="@xlink:href" />
+            <xsl:with-param name="mode" select="'External'" />
+          </xsl:call-template>
+
+          <xsl:call-template name="HandleOlePreview">
+            <xsl:with-param name="olePicture" select="$olePicture" />
+            <xsl:with-param name="olePictureId" select="$olePictureId" />
+            <xsl:with-param name="olePictureType" select="$olePictureType" />
+          </xsl:call-template>
+
+        </xsl:when>
+        <!-- external OLE in folder -->
+        <xsl:when test="substring-before(@xlink:href, '/')='..'">
+
+          <xsl:call-template name="HandleOleObject">
+            <xsl:with-param name="oleId" select="$oleId" />
+            <xsl:with-param name="target" select="concat('http://www.dialogika.de/odf-converter/makeabspath#', @xlink:href)" />
+            <xsl:with-param name="mode" select="'External'" />
+          </xsl:call-template>
+
+          <xsl:call-template name="HandleOlePreview">
+            <xsl:with-param name="olePicture" select="$olePicture" />
+            <xsl:with-param name="olePictureId" select="$olePictureId" />
+            <xsl:with-param name="olePictureType" select="$olePictureType" />
+          </xsl:call-template>
+
+        </xsl:when>
+      </xsl:choose>
 
     </xsl:for-each>
   </xsl:template>
 
+  <!-- 
+  Summary: copies the OLE object and inserts the relationshio
+  Author: makz (DIaLOGIKa)
+  Date: 12.11.2007
+  -->
+  <xsl:template name="HandleOleObject">
+    <xsl:param name="oleId" />
+    <xsl:param name="target" />
+    <xsl:param name="mode" />
+    
+    <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <xsl:attribute name="Id">
+        <xsl:value-of select="$oleId"/>
+      </xsl:attribute>
+      <xsl:attribute name="Type">
+        <xsl:text>http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="Target">
+        <xsl:value-of select="$target"/>
+      </xsl:attribute>
+      <xsl:attribute name="TargetMode">
+        <xsl:value-of select="$mode"/>
+      </xsl:attribute>
+    </Relationship>
+  </xsl:template>
+  
   <!-- 
   Summary: copies the preview image of a OLE object and inserts the relationship
   Author: makz (DIaLOGIKa)
@@ -249,7 +244,6 @@
 
   </xsl:template>
 
-
   <!--
   Summary: Returns the type of the image.
   Returns '' if type is not supported
@@ -258,7 +252,8 @@
   -->
   <xsl:template name="GetOLEPictureType">
     <xsl:param name="olePicture" />
-    <xsl:variable name="type" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$olePicture]/@manifest:media-type" />
+    <xsl:variable name="allManifestEntries" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry" />
+    <xsl:variable name="type" select="$allManifestEntries[@manifest:full-path=$olePicture]/@manifest:media-type" />
 
     <xsl:choose>
       <!-- picture is a WMF -->
