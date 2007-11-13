@@ -170,7 +170,7 @@
   Summary: Template writes rectangles/lines.
   Author: Clever Age
   -->
-  <xsl:template match="v:rect|v:line">
+  <xsl:template match="v:rect | v:line">
     <!-- version 1.1-->
     <xsl:choose>
       <xsl:when test="v:imagedata">
@@ -347,6 +347,8 @@
               <xsl:call-template name="InsertShapeWidth"/>
               <xsl:call-template name="InsertShapeHeight"/>
               <xsl:call-template name="InsertshapeAbsolutePos"/>
+
+              <xsl:apply-templates select="v:textbox"/>
               
               <!--<xsl:call-template name="InsertParagraphToFrame"/>-->
             </draw:rect>

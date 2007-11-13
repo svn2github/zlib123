@@ -3151,7 +3151,12 @@
 
   </xsl:template>
 
-  <!-- text vertical anchor -->
+  <!-- 
+  Summary: inserts the text vertical anchor 
+  Author: Clever Age
+  Modified: makz
+  Date: 13.11.2007
+  -->
   <xsl:template name="InsertTextAnchor">
     <xsl:param name="shapeStyle"/>
 
@@ -3164,10 +3169,18 @@
 
     <xsl:text>v-text-anchor:</xsl:text>
     <xsl:choose>
-      <xsl:when test="$verticalAlign = '' or $verticalAlign = 'top' ">top</xsl:when>
-      <xsl:when test="$verticalAlign = 'middle' or $verticalAlign = 'justify' ">middle</xsl:when>
-      <xsl:when test="$verticalAlign = 'bottom' ">bottom</xsl:when>
-      <xsl:otherwise>top</xsl:otherwise>
+      <xsl:when test="$verticalAlign = '' or $verticalAlign = 'top' ">
+        <xsl:text>top</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalAlign = 'middle' or $verticalAlign = 'justify' ">
+        <xsl:text>middle</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalAlign ='bottom' ">
+        <xsl:text>bottom</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>top</xsl:text>
+      </xsl:otherwise>
     </xsl:choose>
     <xsl:text>;</xsl:text>
   </xsl:template>
@@ -3322,9 +3335,14 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--
+  Summary: Inserts the wrap for shapes
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 13.11.2007
+  -->
   <xsl:template name="InsertShapeWrap">
     <xsl:param name="shapeStyle"/>
-
     <xsl:variable name="frameWrap">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -3332,23 +3350,22 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <!--frame wrap-->
     <xsl:choose>
       <xsl:when test="parent::node()[contains(name(), 'draw:')]/@text:anchor-type = 'as-char' ">
         <w10:wrap type="none"/>
         <w10:anchorlock/>
       </xsl:when>
-      <xsl:when test="$frameWrap = 'left' ">
+      <xsl:when test="$frameWrap='left'">
         <w10:wrap type="square" side="left"/>
       </xsl:when>
-      <xsl:when test="$frameWrap = 'right' ">
+      <xsl:when test="$frameWrap='right'">
         <w10:wrap type="square" side="right"/>
       </xsl:when>
-      <xsl:when test="$frameWrap = 'none'">
+      <xsl:when test="$frameWrap='none'">
         <xsl:message terminate="no">translation.odf2oox.shapeTopBottomWrapping</xsl:message>
         <w10:wrap type="topAndBottom"/>
       </xsl:when>
-      <xsl:when test="$frameWrap = 'parallel' ">
+      <xsl:when test="$frameWrap='parallel'">
         <xsl:variable name="wrappedPara">
           <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -3356,19 +3373,20 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
-          <xsl:when test="$wrappedPara = 1">
+          <xsl:when test="$wrappedPara=1">
             <w10:wrap type="none"/>
             <w10:anchorlock/>
           </xsl:when>
           <xsl:otherwise>
-            <w10:wrap type="square"/>
+            <w10:wrap type="tight"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="$frameWrap = 'dynamic' ">
+      <xsl:when test="$frameWrap='dynamic'">
         <w10:wrap type="square" side="largest"/>
       </xsl:when>
     </xsl:choose>
+    
   </xsl:template>
 
   <!--inserts text-box into shape element -->

@@ -89,7 +89,7 @@
   </xsl:template>
 
   <!-- 
-  Summary: Converts table cells and convered table cells
+  Summary: Converts table cells
   Author: Clever Age
   Modified: makz (DIaLOGIKa)
   Date: 26.10.2007
@@ -107,6 +107,20 @@
       <xsl:if test="child::node()[last()][self::table:table]">
         <xsl:call-template name="InsertEmptyParagraph"/>
       </xsl:if>
+    </w:tc>
+  </xsl:template>
+  
+  <!-- 
+  Summary: Converts covered table cells
+  Author: makz (DIaLOGIKa)
+  Date: 13.11.2007
+  -->
+  <xsl:template match="table:covered-table-cell">
+    <w:tc>
+      <w:tcPr>
+        <xsl:call-template name="InsertCellProperties"/>
+      </w:tcPr>
+      <w:p />
     </w:tc>
   </xsl:template>
 
@@ -590,7 +604,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <!-- pointers on the cell style properties -->
     <xsl:variable name="cellProp" select="key('automatic-styles', $cellStyleName)/style:table-cell-properties" />
     <xsl:variable name="rowProp" select="key('automatic-styles', parent::table:table-row/@table:style-name)/style:table-row-properties" />
     <xsl:variable name="tableProp" select="key('automatic-styles', ancestor::table:table[@table:style-name][1]/@table:style-name)/style:table-properties" />
@@ -673,16 +686,16 @@
   Date: 26.10.2007
   -->
   <xsl:template name="InsertCellSpan">
-    <xsl:if test="@table:number-rows-spanned">
-      <xsl:choose>
-        <xsl:when test="name()='table:covered-table-cell'">
-          <w:vMerge />
-        </xsl:when>
-        <xsl:otherwise>
-          <w:vMerge w:val="restart" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
+    <!-- vertical merge -->
+    <xsl:choose>
+      <xsl:when test="@table:number-rows-spanned">
+        <w:vMerge w:val="restart" />
+      </xsl:when>
+      <xsl:when test="name()='table:covered-table-cell'">
+        <w:vMerge w:val="continue" />
+      </xsl:when>
+    </xsl:choose>
+    <!-- horizontal merge -->
     <xsl:if test="@table:number-columns-spanned">
       <w:gridSpan w:val="{@table:number-columns-spanned}"/>
     </xsl:if>
