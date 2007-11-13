@@ -438,20 +438,12 @@
         <xsl:choose>
         <xsl:when test="$FirstLineIndent &gt; 0">
             <xsl:attribute name="w:firstLine">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="concat($FirstLineIndent,'cm')" />
-                </xsl:with-param>
-              </xsl:call-template>
+              <xsl:value-of select="$FirstLineIndent" />
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
             <xsl:attribute name="w:hanging">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="concat(-$FirstLineIndent,'cm')" />
-                </xsl:with-param>
-              </xsl:call-template>
+              <xsl:value-of select="-$FirstLineIndent" />
             </xsl:attribute>
           </xsl:otherwise>        
         </xsl:choose>
