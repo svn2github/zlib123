@@ -135,6 +135,50 @@ namespace CleverAge.OdfConverter.Spreadsheet
             else if (this.sst)
             {
             }
+               
+            /*
+              Bug No.         :1805599
+              Code Modified By:Vijayeta
+              Date            :6th Nov '07
+              Description     :If New Line(\n) is present in the text content, Insert empty <text:p> nodes
+           */
+
+            else if (text.Contains("SonataAnnotation"))
+            {
+
+                string[] content = text.Split('|');
+                string style = content[content.Length - 1];
+                string textContent = content[1];
+                if (textContent.Contains("\n"))
+                {
+                    char[] a = new char[] { '\n' };
+                    string[] p = textContent.Split(a);
+                    for (int i = 0; i < p.Length; i++)
+                    {
+                        if (p[i] == "")
+                        {
+                            WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            WriteStartElement("text", "span", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            WriteEndElement();
+                            WriteEndElement();
+                        }
+                        if (p[i] != "")
+                        {
+                            WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            WriteStartElement("text", "span", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            nextWriter.WriteStartAttribute("text", "style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            nextWriter.WriteValue(style);
+                            nextWriter.WriteEndAttribute();
+                            this.nextWriter.WriteString(p[i]);
+                            WriteEndElement();
+                            WriteEndElement();
+
+                        }
+                    }
+
+                }
+            }
+            //End of modification for the bug 1805599
             else
             {
 
