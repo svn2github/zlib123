@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shifted bug.
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -1452,8 +1459,9 @@
     </xsl:variable>
 
     <xsl:choose>
+      <!--RefNo-1-->
       <xsl:when
-        test="number(substring-after($CheckIfMerge, ':')) &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + number(substring-after($CheckIfMerge, ':')))">
+        test="number(substring-after($CheckIfMerge, ':')) &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 2 + number(substring-after($CheckIfMerge, ':')))">
 
         <xsl:call-template name="InsertPictureInMergeCell">
           <xsl:with-param name="BeforeMerge">
@@ -1702,8 +1710,16 @@
     </xsl:variable>
 
     <xsl:choose>
+      <!--RefNo-1
       <xsl:when
         test="$EndColl &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + $EndColl)">
+        -->
+      <xsl:when
+        test="$EndColl &gt; 1 and $GetMinColWithElement != ''">
+        <!--Start of RefNo-1-->
+        <xsl:choose>
+          <xsl:when test="$GetMinColWithElement &lt;= ($colNum - 2 + $EndColl)">
+            <!--End of RefNo-1-->
         <xsl:if test="$GetMinColWithElement - $colNum &gt; 0">
           <table:covered-table-cell>
             <xsl:attribute name="table:number-columns-repeated">
@@ -1810,14 +1826,40 @@
             <xsl:value-of select="$ConditionalCellStyle"/>
           </xsl:with-param>
           <xsl:with-param name="EndColl">
-            <xsl:value-of select="$EndColl"/>
+            <!--Start of RefNo-1-->
+            <xsl:choose>
+              <xsl:when test="$GetMinColWithElement - $colNum &gt; 0">
+                <xsl:value-of select="$EndColl - ($GetMinColWithElement - $colNum + 1)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$EndColl - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            <!--End of RefNo-1-->
           </xsl:with-param>
         </xsl:call-template>
+            <!--Start of RefNo-1-->
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="($EndColl - 1) &gt; 0">
+              <table:covered-table-cell>
+                <xsl:attribute name="table:number-columns-repeated">
+                  <xsl:value-of select="$EndColl - 1"/>
+                </xsl:attribute>
+              </table:covered-table-cell>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+        <!--End of RefNo-1-->
       </xsl:when>
-      <xsl:when test="$EndColl &gt; 1 and $GetMinColWithElement = ''">
+      <!--RefNo-1-->
+      <xsl:when test="$EndColl &gt; 1 and $GetMinColWithElement = '' and ($EndColl - 1) &gt; 0">
         <table:covered-table-cell>
           <xsl:attribute name="table:number-columns-repeated">
+            <!--RefNo-1
             <xsl:value-of select="$EndColl - $prevCellCol"/>
+            -->
+            <xsl:value-of select="$EndColl - 1"/>
           </xsl:attribute>
         </table:covered-table-cell>
       </xsl:when>

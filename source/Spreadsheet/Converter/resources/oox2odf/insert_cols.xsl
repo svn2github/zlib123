@@ -257,6 +257,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
 						  <!--End of RefNo-1-->
             </xsl:with-param>
             <xsl:with-param name="max">
+                <!--RefNo-1-->
 						  <xsl:value-of select="@min - 2"/>
             </xsl:with-param>
             <xsl:with-param name="value">
@@ -544,7 +545,8 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
               <xsl:attribute name="table:default-cell-style-name">
                 <xsl:value-of select="$DefaultCellStyleName"/>
               </xsl:attribute>
-            </table:table-column> -->
+            </table:table-column> 
+-->
 			  <xsl:choose>
 				  <xsl:when test="@min &gt; $GetMinManualColBreak">
 					  <xsl:if test="(@min - ($ManualCol + 1) - 1) &gt; 0">

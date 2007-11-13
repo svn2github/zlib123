@@ -26,6 +26,13 @@
     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden note is shown after conversion'.
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
@@ -205,8 +212,12 @@
         </xsl:call-template>
       </xsl:attribute>
 
+      <!--RefNo-1: xpath changed to get the required node.
       <xsl:for-each
         select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
+      -->
+      <xsl:for-each
+        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
 
         <xsl:attribute name="office:display">
           <xsl:call-template name="GetShapeProperty">
@@ -217,16 +228,35 @@
 
       </xsl:for-each>
 
+      <!--RefNo-1: xpath changed to get the required node.
       <xsl:apply-templates
         select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]"
+        mode="drawing">-->
+      <xsl:apply-templates
+        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]"
         mode="drawing">
         <xsl:with-param name="text" select="e:text"/>
       </xsl:apply-templates>
-
-      <text:p text:style-name="{generate-id(e:text)}">
-        <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
-      </text:p>
-
+      <!-- 
+	    Bug No.         :1805599
+		  Code Modified By:Vijayeta
+			Date            :6th Nov '07
+			Description     :New Line to be added, for which the comment is checked for new lines.			                
+	    -->
+      <xsl:variable name="textContent">
+        <xsl:value-of select="e:text/e:r/e:t/child::node()"/>
+      </xsl:variable>
+      <xsl:choose >
+        <xsl:when test ="contains($textContent, '&#xA;')">
+          <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <!--<text:p text:style-name="{generate-id(e:text)}">-->
+          <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
+          <!--</text:p>-->
+        </xsl:otherwise>
+      </xsl:choose>
+      <!-- End of modification for the bug 1805599-->
     </office:annotation>
 
   </xsl:template>

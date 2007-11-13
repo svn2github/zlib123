@@ -36,6 +36,9 @@ RefNo-2 22-Oct-2007 Sandeep S     1810604   Changes for default page settings.
 RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled column with column break. Column 
                                             breaks have 0 based indexing, where as styled columns indexing starts with 1.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default row style for each sheet correctly.
+                                            (Bug:Row break:-Round trip Conversion not proper for xlsx sheet)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -307,6 +310,7 @@ RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled 
 
     <!-- default & row Break style -->
 
+    <!--Start of RefNo-4: Commeted the code to get the correct default row style for the sheet with row breaks.
     <xsl:choose>
       <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
         <style:style
@@ -325,9 +329,9 @@ RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled 
                     </xsl:with-param>
                   </xsl:call-template>
                 </xsl:when>
-                <xsl:otherwise>
+                <xsl:otherwise>-->
                   <!-- Excel application default-->
-                  <xsl:call-template name="ConvertToCentimeters">
+                  <!--<xsl:call-template name="ConvertToCentimeters">
                     <xsl:with-param name="length" select="'20px'"/>
                   </xsl:call-template>
                 </xsl:otherwise>
@@ -337,6 +341,7 @@ RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled 
         </style:style>
       </xsl:when>
       <xsl:otherwise>
+      End of RefNo-4-->
         <style:style
           style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
           style:family="table-row">
@@ -363,8 +368,9 @@ RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled 
             </xsl:attribute>
           </style:table-row-properties>
         </style:style>
+    <!--RefNo-4
       </xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose>-->
 
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:sheetData"
       mode="automaticstyles"/>
@@ -729,7 +735,9 @@ RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled 
 	  <xsl:if
 		test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1 or e:alignment">  
       <style:table-cell-properties>
-        <xsl:if test="@applyAlignment = 1">
+        <!--RefNo-1
+        <xsl:if test="@applyAlignment = 1">-->
+        <xsl:if test="@applyAlignment = 1 or e:alignment">
           <!-- vertical-align -->
           <xsl:attribute name="style:vertical-align">
             <xsl:choose>
@@ -1039,6 +1047,24 @@ RefNo-3 26-Oct-2007 Sandeep S     1757322   Modification done to get the styled 
     </xsl:attribute>
   </xsl:template>
 
+	<!-- Fix for the bug 1802600
+	     Template added by Vijayeta:Add an additional attribute 'style:font-size-asian', if charset is of type Japaneese
+		 Date: 5th Nov '07-->
+	<xsl:template match="e:charset" mode="style">
+		<xsl:if test ="round(@val)=128">
+			<xsl:attribute name="style:font-size-asian">
+				<xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
+			</xsl:attribute>
+			<xsl:attribute name="style:font-size-complex">
+				<xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
+			</xsl:attribute>
+			<xsl:attribute name="style:font-name-asian">
+				<xsl:value-of select="./parent::node()/e:name/@val"/>
+			</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	<!-- End of fix for the bug 1802600-->
+	
   <xsl:template match="e:name" mode="style">
     <xsl:attribute name="style:font-name">
       <xsl:value-of select="@val"/>

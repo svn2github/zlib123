@@ -2304,14 +2304,45 @@
 
   <!-- convert run into span -->
   <xsl:template match="e:r">
-    <text:span>
+    <!-- 
+	        Bug No.          :1805599
+		    Code Modified By:Vijayeta
+			Date            :6th Nov '07
+			Description     :New Line to be added, for which the comment is checked for new lines.
+			                If present Post Processor in the CS file 'OdfSharedStringsPostProcessor.cs' is called
+	   -->
+    <xsl:variable name="textContent">
+      <xsl:value-of select="./e:t"/>
+    </xsl:variable>
+    <xsl:choose >
+      <xsl:when test ="contains($textContent, '&#xA;')">
+        <xsl:variable name ="Id" >
+          <xsl:value-of select ="generate-id(.)"/>
+        </xsl:variable>
+        <xsl:value-of select ="concat('SonataAnnotation|',$textContent,'|',$Id)"/>
+      </xsl:when>
+      <xsl:otherwise >
+        <text:p text:style-name="{generate-id(./parent::node())}">
+          <text:span>
+            <xsl:if test="e:rPr">
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="generate-id(.)"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates/>
+          </text:span>
+        </text:p >
+      </xsl:otherwise>
+    </xsl:choose>
+    <!-- End of modification for the bug 1805599-->
+    <!--<text:span>
       <xsl:if test="e:rPr">
         <xsl:attribute name="text:style-name">
           <xsl:value-of select="generate-id(.)"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:apply-templates/>
-    </text:span>
+    </text:span>-->
   </xsl:template>
   
   <!-- convert run into span in hyperlink-->
