@@ -124,15 +124,15 @@
             <xsl:choose>
               <!-- The border is defined in context.xml -->
               <xsl:when test="w:pPr/w:pBdr">
-                <xsl:call-template name="InsertParagraphBorder">
-                  <xsl:with-param name="pBdr" select="w:pPr/w:pBdr"/>
+                <xsl:call-template name="InsertBorders">
+                  <xsl:with-param name="border" select="w:pPr/w:pBdr"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertParagraphShadow"/>
               </xsl:when>
               <!-- The border is defined in styles.xml -->
               <xsl:when test="$externalBorderStyle">
-                <xsl:call-template name="InsertParagraphBorder">
-                  <xsl:with-param name="pBdr" select="$externalBorderStyle/w:pPr/w:pBdr"/>
+                <xsl:call-template name="InsertBorders">
+                  <xsl:with-param name="border" select="$externalBorderStyle/w:pPr/w:pBdr"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertParagraphShadow"/>
               </xsl:when>

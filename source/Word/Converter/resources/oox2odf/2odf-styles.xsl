@@ -787,8 +787,8 @@
   Date: 22.10.2007
   -->
   <xsl:template match="w:pBdr" mode="pPrChildren">
-     <xsl:call-template name="InsertParagraphBorder">
-      <xsl:with-param name="pBdr" select="w:pBdr"/>
+     <xsl:call-template name="InsertBorders">
+      <xsl:with-param name="border" select="w:pBdr"/>
     </xsl:call-template>
     <xsl:call-template name="InsertParagraphShadow"/>
   </xsl:template>
@@ -4417,41 +4417,41 @@
   </xsl:template>
 
   <!--
-  Summary: Writes the attributes of a paragraph border
+  Summary: Writes the attributes of a border
   Author: makz (DIaLOGIKa)
   Date: 22.10.2007
   -->
-  <xsl:template name="InsertParagraphBorder">
-    <xsl:param name="pBdr"/>
+  <xsl:template name="InsertBorders">
+    <xsl:param name="border"/>
     
-    <xsl:if test="$pBdr/w:between">
+    <xsl:if test="$border/w:between">
       <xsl:attribute name="style:join-border">false</xsl:attribute>
     </xsl:if>
     
     <!-- insert top border -->
     <xsl:call-template name="InsertBorderSide">
-      <xsl:with-param name="side" select="$pBdr/w:top"/>
+      <xsl:with-param name="side" select="$border/w:top"/>
       <xsl:with-param name="sideName">
         <xsl:text>top</xsl:text>
       </xsl:with-param>
     </xsl:call-template>
     <!-- insert bottom border -->
     <xsl:call-template name="InsertBorderSide">
-      <xsl:with-param name="side" select="$pBdr/w:bottom"/>
+      <xsl:with-param name="side" select="$border/w:bottom"/>
       <xsl:with-param name="sideName">
         <xsl:text>bottom</xsl:text>
       </xsl:with-param>
     </xsl:call-template>
     <!-- insert left border -->
     <xsl:call-template name="InsertBorderSide">
-      <xsl:with-param name="side" select="$pBdr/w:left"/>
+      <xsl:with-param name="side" select="$border/w:left"/>
       <xsl:with-param name="sideName">
         <xsl:text>left</xsl:text>
       </xsl:with-param>
     </xsl:call-template>
     <!-- insert right border -->
     <xsl:call-template name="InsertBorderSide">
-      <xsl:with-param name="side" select="$pBdr/w:right"/>
+      <xsl:with-param name="side" select="$border/w:right"/>
       <xsl:with-param name="sideName">
         <xsl:text>right</xsl:text>
       </xsl:with-param>
@@ -4472,7 +4472,7 @@
     <xsl:variable name="style">
       <xsl:choose>
         <xsl:when test="$side/@w:val">
-          <xsl:call-template name="GetParagraphBorderStyle">
+          <xsl:call-template name="GetBorderStyle">
             <xsl:with-param name="style" select="$side/@w:val"/>
           </xsl:call-template>
         </xsl:when>
@@ -4594,8 +4594,11 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- convert the style of a border -->
-  <xsl:template name="GetParagraphBorderStyle">
+  <!-- 
+  Summary: Mapping for border styles
+  Author: Clever Age
+  -->
+  <xsl:template name="GetBorderStyle">
     <xsl:param name="style"/>
     <xsl:choose>
       <xsl:when test="$style='basicBlackDashes'">dashed</xsl:when>

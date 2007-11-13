@@ -3383,7 +3383,12 @@
         </xsl:choose>
       </xsl:when>
       <xsl:when test="$frameWrap='dynamic'">
-        <w10:wrap type="square" side="largest"/>
+        <!--
+        makz: generally it's not possible to find a perfect value for a dynamic wrap.
+        But I think topAndBottom is in the most cases a better solution than square
+        -->
+        <w10:wrap type="topAndBottom"/>
+        <!--<w10:wrap type="square" side="largest"/>-->
       </xsl:when>
     </xsl:choose>
     

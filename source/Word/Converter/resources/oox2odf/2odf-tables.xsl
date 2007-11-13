@@ -273,6 +273,7 @@
   <!--  insert table properties: width, align, indent-->
   <xsl:template name="InsertTableProperties">
     <xsl:param name="Default"/>
+    
     <xsl:choose>
       <xsl:when test="w:tblW/@w:type='pct'">
         <xsl:attribute name="style:rel-width">
@@ -287,7 +288,7 @@
           <xsl:call-template name="InsertTableAlign"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test="w:tblW/@w:type = 'dxa'">
+      <xsl:when test="w:tblW/@w:type='dxa'">
         <xsl:attribute name="style:width">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
@@ -300,7 +301,7 @@
           <xsl:call-template name="InsertTableAlign"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test="w:tblW/@w:type = 'auto'">
+      <xsl:when test="w:tblW/@w:type='auto'">
         <xsl:attribute name="style:width">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
@@ -326,8 +327,7 @@
       </xsl:attribute>
     </xsl:if>
 
-    <xsl:if
-      test="parent::w:tbl/descendant::w:pageBreakBefore and 
+    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and 
       not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
       <xsl:choose>
         <xsl:when test="not(parent::w:tbl/preceding::w:p[1]/w:pPr/w:sectPr)">
@@ -373,7 +373,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-
   </xsl:template>
 
   <xsl:template name="InsertTableAlign">
@@ -487,6 +486,15 @@
     
     <!--    borders-->
     <xsl:call-template name="InsertCellBorders"/>
+    <!--
+    makz: there is already a template which converts borders.
+    That template is used for frames and pictures and could be used for tables to.
+    It doesn't work out of the box but i think it would be possible to modify it.
+    
+    <xsl:call-template name="InsertBorders">
+      <xsl:with-param name="border" select="w:tcBorders" />
+    </xsl:call-template>
+    -->
 
     <!-- Background color -->
     <xsl:if test="w:shd">
@@ -787,12 +795,17 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  insert cell borders from cell properties-->
+  <!--  
+  Summary: Insert cell borders from cell properties
+  Author: Clever Age
+  Moified: makz (DIaLOGIKa)
+  Date: 13.11.2007
+  -->
   <xsl:template name="InsertCellBorder">
     <xsl:param name="side"/>
     <xsl:param name="border"/>
     <xsl:param name="styleId"/>
-
+    
     <xsl:if test="$border">
       <xsl:choose>
         <xsl:when test="$border/@w:val = 'nil' or $border/@w:val = 'none' ">
