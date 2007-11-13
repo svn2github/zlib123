@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 06-Nov-2007 Sandeep S     1757284   Changes done to get the correct Used area-sheet after conversion. 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -564,7 +571,8 @@
 
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
-
+      <!--RefNo-1-->
+      <xsl:if test="not(count(following-sibling::table:table-row) &lt;= 1 and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -714,7 +722,7 @@
           </xsl:call-template>
         </xsl:if>
       </xsl:if>
-
+      </xsl:if>
     </xsl:if>
 
 
@@ -954,6 +962,9 @@
 
       <xsl:choose>
         <xsl:when test="$numberRowsRepeated &gt; 1">
+          <!--RefNo-1-->
+          <xsl:if test="not(count(following-sibling::table:table-row) &lt;= 1 and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
+
           <row>
             <xsl:attribute name="r">
               <xsl:value-of select="$rowNumber"/>
@@ -1092,6 +1103,7 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
+          </xsl:if>
         </xsl:when>
       </xsl:choose>
     </xsl:if>
@@ -1116,7 +1128,8 @@
     <xsl:param name="pivotCells"/>
 
     <xsl:message terminate="no">progress:table:table-cell</xsl:message>
-
+    <!--RefNo-1-->
+    <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name) or (256 = ($colNumber + @table:number-columns-repeated))))">
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -1165,7 +1178,7 @@
         <xsl:value-of select="$pivotCells"/>
       </xsl:with-param>
     </xsl:call-template>
-
+    </xsl:if>
     <xsl:apply-templates mode="cell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -1429,7 +1442,8 @@
 
       <xsl:when
         test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p or $columnCellStyle != '')">
-
+        <!--RefNo-1-->
+        <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name) or (256 = ($colNumber + @table:number-columns-repeated))))">
         <xsl:call-template name="InsertConvertCell">
           <xsl:with-param name="colNumber">
             <xsl:value-of select="$colNumber + 1"/>
@@ -1478,7 +1492,7 @@
             <xsl:value-of select="$pivotCells"/>
           </xsl:with-param>
         </xsl:call-template>
-
+        </xsl:if>
       </xsl:when>
       <xsl:otherwise>
 

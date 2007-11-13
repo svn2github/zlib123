@@ -317,7 +317,11 @@
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="fonts"/>
-
+		<!--Code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
+		<xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:automatic-styles"
+        mode="notesFonts"/>
+		<!--End of code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
         mode="fonts"/>
 
@@ -792,9 +796,13 @@
       defaultPivotStyle="PivotStyleLight16"/>
   </xsl:template>
 
+  <!-- Modified  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
   <xsl:template
+     match="style:text-properties[parent::node()[@style:family='table-cell']]"
+     mode="fonts">
+    <!--<xsl:template
     match="style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']]"
-    mode="fonts">
+    mode="fonts">-->
     <xsl:param name="hyperlink"/>
     <font>
       <xsl:call-template name="InsertTextProperties">
@@ -805,6 +813,22 @@
       </xsl:call-template>
     </font>
   </xsl:template>
+  <!--End of Modification  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
+  <!--Code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
+  <xsl:template
+  match="style:text-properties[parent::node()[@style:family='text']]"
+  mode="notesFonts">
+    <xsl:param name="hyperlink"/>
+    <font>
+      <xsl:call-template name="InsertTextProperties">
+        <xsl:with-param name="mode">fonts</xsl:with-param>
+        <xsl:with-param name="hyperlink">
+          <xsl:value-of select="$hyperlink"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </font>
+  </xsl:template>
+  <!--End of code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
 
   <xsl:template name="InsertUnderline">
     <xsl:param name="underlineStyle"/>

@@ -453,6 +453,7 @@
                     Id="{generate-id(parent::node())}"
                     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                     TargetMode="External">
+                    <xsl:message terminate="no">translation.odf2oox.draggedImagePath</xsl:message>
                     <xsl:attribute name="Target">
                           <!--Absolute path -->
 				<xsl:value-of select ="concat('Image-Path:',@xlink:href)"/>

@@ -26,6 +26,11 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+Log		Date 	Modified   By       BugNo.		MOdification description
+RefNo-1	
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
@@ -37,7 +42,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" exclude-result-prefixes="a">
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" exclude-result-prefixes="a r">
 
   <xsl:import href="cell.xsl"/>
   <xsl:import href="common.xsl"/>
@@ -158,6 +163,10 @@
                 <xdr:clientData/>
               </xdr:twoCellAnchor>
             </xsl:if>
+			  <xsl:if test ="contains($imageExt,'.svm')">
+				  <!-- warn Data or Images copied from other applications will be lost and not converted. -->
+				  <xsl:message terminate="no">translation.odf2oox.imageFromOtherApplication</xsl:message>
+			  </xsl:if>
             <!--End of Code added by vijayeta, for the bug 1806778 -->
           </xsl:when>
 
@@ -171,6 +180,8 @@
                     <!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
 		                     If the text box has Hyperlink-->
                     <xsl:if test ="draw:text-box/text:p/text:a">
+		      <!-- warn Hyperlink applied to whole text box when converted to XLSX.-->
+		      <xsl:message terminate="no">translation.odf2oox.hyperlinkTextbox</xsl:message>
                       <xsl:for-each select ="draw:text-box/text:p/text:a">
                         <xsl:variable name ="hlinkPos">
                           <xsl:value-of select ="generate-id(.)"/>

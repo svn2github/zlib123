@@ -347,7 +347,7 @@
           </xsl:when>
           <!-- secondary axis case (eliminate for now case when third chart is required - bar chart with lines and secondary axis) -->
           <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->
-          <xsl:when
+          <!--<xsl:when
             test="key('series','')[@chart:attached-axis = 'secondary-y'] and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])">
             <xsl:for-each select="parent::node()">
               <xsl:call-template name="InsertChartType">
@@ -357,7 +357,7 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:for-each>
-          </xsl:when>
+          </xsl:when>-->
         </xsl:choose>
 
         <xsl:if test="not(key('chart','')/@chart:class = 'chart:circle')">
@@ -412,9 +412,9 @@
           </xsl:for-each>
 
           <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->
-          <xsl:if test="chart:axis[contains(@chart:name,'secondary')]">
+          <!--<xsl:if test="chart:axis[contains(@chart:name,'secondary')]">
 
-            <!-- secondary Y axis -->
+            --><!-- secondary Y axis --><!--
             <xsl:choose>
               <xsl:when test="chart:axis[@chart:name='secondary-y']">
                 <xsl:for-each select="chart:axis[@chart:name='secondary-y']">
@@ -428,8 +428,8 @@
                   </xsl:call-template>
                 </xsl:for-each>
               </xsl:when>
-              <!-- hidden default axis -->
-              <xsl:otherwise>
+              --><!-- hidden default axis --><!--
+              --><!--<xsl:otherwise>
                 <c:valAx>
                   <c:axId val="104461824"/>
                   <c:scaling>
@@ -443,13 +443,13 @@
                   <c:crosses val="max"/>
                   <c:crossBetween val="between"/>
                 </c:valAx>
-              </xsl:otherwise>
+              </xsl:otherwise>--><!--
             </xsl:choose>
 
-            <!-- secondary X axis (there can't be one in Calc?) -->
-            <!-- default axes -->
+            --><!-- secondary X axis (there can't be one in Calc?) --><!--
+            --><!-- default axes --><!--
             <xsl:choose>
-              <!-- scater chart has value axis-X-->
+              --><!-- scater chart has value axis-X--><!--
               <xsl:when test="key('chart','')/@chart:class = 'chart:scatter' ">
                 <c:valAx>
                   <c:axId val="104425728"/>
@@ -464,7 +464,7 @@
                   <c:crossBetween val="midCat"/>
                 </c:valAx>
               </xsl:when>
-              <xsl:otherwise>
+              --><!--<xsl:otherwise>
                 <c:catAx>
                   <c:axId val="104425728"/>
                   <c:scaling>
@@ -478,9 +478,9 @@
                   <c:lblAlgn val="ctr"/>
                   <c:lblOffset val="100"/>
                 </c:catAx>
-              </xsl:otherwise>
+              </xsl:otherwise>--><!--
             </xsl:choose>
-          </xsl:if>
+          </xsl:if>-->
 
         </xsl:if>
 
@@ -2610,13 +2610,17 @@
     <xsl:choose>
       <!-- primary axes -->
       <xsl:when test="not(chart:plot-area/chart:axis/@chart:name = 'secondary-y')">
-        <c:axId val="104463360"/>
-        <c:axId val="104460288"/>
+        <!--<c:axId val="104463360"/>
+        <c:axId val="104460288"/>-->
+        <c:axId val="104425728"/>
+        <c:axId val="104461824"/>
       </xsl:when>
       <!-- secondary axes -->
       <xsl:otherwise>
-        <c:axId val="104425728"/>
-        <c:axId val="104461824"/>
+        <!--<c:axId val="104425728"/>
+        <c:axId val="104461824"/>-->
+        <c:axId val="104463360"/>
+        <c:axId val="104460288"/>
       </xsl:otherwise>
     </xsl:choose>
 
