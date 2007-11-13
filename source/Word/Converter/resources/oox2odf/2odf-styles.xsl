@@ -2568,6 +2568,65 @@
           <xsl:call-template name="setFoMarginBottom">
             <xsl:with-param name="setParagraphWAfter" select="$DefaultAfter"/>
           </xsl:call-template>
+
+          <!--math, dialogika: bugfix #1775344 BEGIN-->
+          <!--get indent from default properties-->
+          
+          <xsl:attribute name="fo:margin-left">
+            <xsl:choose>
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
+                <xsl:call-template name="ConvertTwips">
+                    <xsl:with-param name="length">
+                      <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="unit">cm</xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+              <xsl:otherwise>0cm</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+
+          <xsl:attribute name="fo:margin-right">
+            <xsl:choose>
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>0cm</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+
+          <xsl:attribute name="fo:text-indent">
+            <xsl:choose>
+              
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging != ''">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="-key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+
+              <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:firstLine != ''">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:firstLine"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>              
+              
+              <xsl:otherwise>0cm</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+
+          <!--math, dialogika: bugfix #1775344 END-->
+          
         </xsl:if>
         <!--//Insert margins in style from Normal
         Style or w:default -->
