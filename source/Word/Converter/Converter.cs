@@ -117,14 +117,20 @@ namespace CleverAge.OdfConverter.Word
                 DocxDocument doc = new DocxDocument(inputFile);
 
                 // uncomment for testing
-                //Stream package = doc.OpenXML;
-                //FileInfo fi = new FileInfo(@"C:\tmp\test_dump2.xml");
-                //Stream s = fi.OpenWrite();
-                //byte[] buffer = new byte[package.Length];
-                //package.Read(buffer, 0, (int)package.Length);
-                //s.Write(buffer, 0, (int)package.Length);
-                //s.Close();
-                
+                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                {
+                    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/DUMP")
+                    {
+                        Stream package = doc.OpenXML;
+                        FileInfo fi = new FileInfo(Environment.GetCommandLineArgs()[i + 1]);
+                        Stream s = fi.OpenWrite();
+                        byte[] buffer = new byte[package.Length];
+                        package.Read(buffer, 0, (int)package.Length);
+                        s.Write(buffer, 0, (int)package.Length);
+                        s.Close();
+                    }
+                }
+
                 return XmlReader.Create(doc.OpenXML, xrs);
             }
         }

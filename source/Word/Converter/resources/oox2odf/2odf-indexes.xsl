@@ -159,7 +159,7 @@
     <xsl:variable name="IsDefaultHeading">
       <xsl:call-template name="CheckDefaultHeading">
         <xsl:with-param name="Name">
-          <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:name/@w:val" />
+          <xsl:value-of select="key('StyleId',$thisStyle)/w:name/@w:val" />
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>    
@@ -199,7 +199,7 @@
                   <!--math, dialogika: Changed to avoid regression on solution for directly applied outline levels -->
                   <xsl:when test="$thisStyle and $thisStyle!=''
                             and ($FromInstrTextContent = 'true'
-                            or key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9)">
+                            or key('StyleId',$thisStyle)/w:pPr/w:outlineLvl/@w:val &lt; 9)">
                     <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
                   </xsl:when>                
                   <xsl:otherwise>
@@ -235,7 +235,7 @@
               <!--math, dialogika: Changed to avoid regression on solution for directly applied outline levels -->
               <xsl:when test="$thisStyle and $thisStyle!=''
                             and ($FromInstrTextContent = 'true'
-                            or key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $thisStyle]/w:pPr/w:outlineLvl/@w:val &lt; 9)">
+                            or key('StyleId',$thisStyle)/w:pPr/w:outlineLvl/@w:val &lt; 9)">
                 <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
               </xsl:when>
               <xsl:otherwise>
@@ -1053,7 +1053,7 @@
             </xsl:variable>
             
             <xsl:variable name="StyleLeaderChar">
-              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId]/w:pPr/w:tabs/w:tab/@w:leader" />
+              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:tabs/w:tab/@w:leader" />
             </xsl:variable>
             
             <!--default: 'dot'-->

@@ -1711,7 +1711,7 @@
     <xsl:variable name="fontSize" >
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length">
-          <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:styleId='$charStyle']/w:rPr/w:sz/@w:val" />
+          <xsl:value-of select="key('StyleId',$charStyle)/w:rPr/w:sz/@w:val" />
         </xsl:with-param>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
@@ -2813,10 +2813,10 @@
     </xsl:variable>
     
     <xsl:choose>
-      <xsl:when test="$numId != 'NaN' and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId = $numId]">true</xsl:when>
-      <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val">
+      <xsl:when test="$numId != 'NaN' and key('numId', $numId)">true</xsl:when>
+      <xsl:when test="key('StyleId', $StyleId)/w:basedOn/@w:val">
         <xsl:call-template name="CheckIfList">
-          <xsl:with-param name ="StyleId" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:basedOn/@w:val"/>
+          <xsl:with-param name ="StyleId" select="key('StyleId', $StyleId)/w:basedOn/@w:val"/>
         </xsl:call-template>
       </xsl:when>      
       <xsl:otherwise>false</xsl:otherwise>
@@ -2930,10 +2930,8 @@
     <xsl:variable name="AbstractNumId">
       <xsl:choose>
         <xsl:when
-          test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
-          <xsl:value-of
-            select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
-          />
+          test="key('numId', $NumId)/w:abstractNumId/@w:val">
+          <xsl:value-of select="key('numId', $NumId)/w:abstractNumId/@w:val" />
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
@@ -2943,9 +2941,9 @@
         <xsl:value-of select="w:ind/@w:firstLine"/>
       </xsl:when>
       <xsl:when
-        test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
+        test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
         <xsl:value-of
-          select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
+          select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
         />
       </xsl:when>
       <xsl:when
@@ -2963,7 +2961,7 @@
     <xsl:param name="CheckIfList"/>
     <xsl:param name="IndHanging"/>
     <xsl:param name="IndLeft"/>
-    <xsl:message>log:here</xsl:message>
+
     <xsl:choose>
       <xsl:when test="$CheckIfList='true'">
         <xsl:variable name="NumId">
@@ -3007,10 +3005,8 @@
         <xsl:variable name="AbstractNumId">
           <xsl:choose>
             <xsl:when
-              test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
-              <xsl:value-of
-                select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
-              />
+              test="key('numId', $NumId)/w:abstractNumId/@w:val">
+              <xsl:value-of select="key('numId', $NumId)/w:abstractNumId/@w:val" />
             </xsl:when>
           </xsl:choose>
         </xsl:variable>
@@ -3018,16 +3014,14 @@
         <xsl:variable name="LeftNumber">
           <xsl:choose>
             <xsl:when
-              test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left">
+              test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left">
               <xsl:value-of
-                select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
+                select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
               />
             </xsl:when>
             <xsl:when
-              test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
-              <xsl:value-of
-                select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left"
-              />
+              test="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
+              <xsl:value-of select="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left" />
             </xsl:when>
           </xsl:choose>
         </xsl:variable>
@@ -3035,16 +3029,14 @@
         <xsl:variable name="HangingNumber">
           <xsl:choose>
             <xsl:when
-              test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging">
+              test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging">
               <xsl:value-of
-                select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging"
+                select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging"
               />
             </xsl:when>
             <xsl:when
-              test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging">
-              <xsl:value-of
-                select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging"
-              />
+              test="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging">
+              <xsl:value-of select="key('numId', $NumId)/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging" />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -3056,9 +3048,9 @@
               <xsl:value-of select="w:ind/@w:firstLine"/>
             </xsl:when>
             <xsl:when
-              test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
+              test="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
               <xsl:value-of
-                select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
+                select="key('abstractNumId', $AbstractNumId)/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
               />
             </xsl:when>
             <xsl:otherwise>NaN</xsl:otherwise>
@@ -3756,17 +3748,17 @@
     <xsl:param name="Parameter"/>
     
     <xsl:variable name="NumberingDefinitions"
-      select="document('word/numbering.xml')/w:numbering"/>    
+      select="key('Part', 'word/numbering.xml')/w:numbering"/>    
 
     <xsl:variable name="ParagraphStyleDefinition"
-      select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId][1]"/>
+      select="key('StyleId',$StyleId)"/>
 
     <xsl:variable name="IndirectNumId">
       <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:numId/@w:val"/>
     </xsl:variable>
 
     <xsl:variable name="IndirectAbstractNumId">
-      <xsl:value-of select="$NumberingDefinitions/w:num[$IndirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
+      <xsl:value-of select="key('numId', $IndirectNumId)/w:abstractNumId/@w:val"/>
     </xsl:variable>
 
     <xsl:variable name="IndirectIlvl">
@@ -3774,8 +3766,8 @@
         <xsl:when test="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val">
           <xsl:value-of select="$ParagraphStyleDefinition/w:pPr/w:numPr/w:ilvl/@w:val"/>
         </xsl:when>
-        <xsl:when test="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]">
-          <xsl:value-of select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[w:pStyle/@w:val=$StyleId]/@w:ilvl"/>
+        <xsl:when test="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[w:pStyle/@w:val=$StyleId]">
+          <xsl:value-of select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[w:pStyle/@w:val=$StyleId]/@w:ilvl"/>
         </xsl:when>
         <!--assume default level 0-->
         <xsl:otherwise>0</xsl:otherwise>
@@ -3783,7 +3775,7 @@
     </xsl:variable>
 
     <xsl:variable name="IndirectListLevelDefinition"
-      select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
+      select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
 
     <xsl:choose>
       <xsl:when test = "$IndirectListLevelDefinition">
@@ -3855,14 +3847,14 @@
             </xsl:variable>
 
             <xsl:variable name="NumberingDefinitions"
-              select="/oox:package/oox:part[@oox:name='word/numbering.xml']/w:numbering"/>
+              select="key('Part', 'word/numbering.xml')/w:numbering"/>
 
             <xsl:variable name="DirectAbstractNumId">
-              <xsl:value-of select="$NumberingDefinitions/w:num[$DirectNumId = @w:numId]/w:abstractNumId/@w:val"/>
+              <xsl:value-of select="key('numId', $DirectNumId)/w:abstractNumId/@w:val"/>
             </xsl:variable>
 
             <xsl:variable name="DirectListLevelDefinition"
-               select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $DirectAbstractNumId]/w:lvl[@w:ilvl=$DirectIlvl][1]"/>
+               select="key('abstractNumId', $DirectAbstractNumId)/w:lvl[@w:ilvl=$DirectIlvl][1]"/>
 
             <xsl:variable name="StyleId">
               <xsl:value-of select="w:pStyle/@w:val"/>
@@ -3921,7 +3913,7 @@
 
             
             <xsl:variable name="IndirectListLevelDefinition"
-              select="$NumberingDefinitions/w:abstractNum[@w:abstractNumId = $IndirectAbstractNumId]/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
+              select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
 
             
             <xsl:variable name ="Suffix">
@@ -4116,7 +4108,7 @@
                     <!--no hanging-->
 
                     <xsl:variable name="DefaultTab">
-                      <xsl:value-of select="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:defaultTabStop/@w:val"/>
+                      <xsl:value-of select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
                     </xsl:variable>
                     <xsl:variable name="NextDefaultTabPos">
                       <xsl:value-of select="(floor(($Left + $FirstLine + $MinTabOffset) div $DefaultTab) + 1) * $DefaultTab"/>

@@ -18,69 +18,62 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-  xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w wp r uri a pic oox">
+  exclude-result-prefixes="w wp r uri a pic oox rels">
 
   <xsl:template name="CopyPictures">
     <xsl:param name="document"/>
     <xsl:param name="rId"/>
     <xsl:param name="targetName"/>
     <xsl:param name="destFolder" select="'Pictures'"/>
-    
+
     <!--  Copy Pictures Files to the picture catalog -->
     <xsl:variable name="id">
       <xsl:choose>
-        <xsl:when test="$rId != ''">  
-            <xsl:value-of select="$rId"/>
+        <xsl:when test="$rId != ''">
+          <xsl:value-of select="$rId"/>
         </xsl:when>
         <xsl:otherwise>
-         <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+          <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
         </xsl:otherwise>
       </xsl:choose>
-  </xsl:variable>
-    
-    <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
-      <xsl:for-each
-        select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
-        <xsl:if test="./@Id=$id">
-          <xsl:variable name="targetmode">
-            <xsl:value-of select="./@TargetMode"/>
-          </xsl:variable>
-          <xsl:variable name="pzipsource">
-            <xsl:value-of select="./@Target"/>
-          </xsl:variable>
-          <xsl:variable name="pziptarget">
-            <xsl:choose>
-              <xsl:when test="$targetName != ''">
-                  <xsl:value-of select="$targetName"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="substring-after($pzipsource,'/')"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="$targetmode='External'"/>
-            <xsl:when test="$destFolder = '.'">
-              <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{$pziptarget}"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat($destFolder,'/',$pziptarget)}"/>
-            </xsl:otherwise>
-          </xsl:choose>
-         </xsl:if>
-      </xsl:for-each>
-    </xsl:if>
+    </xsl:variable>
+
+    <xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))/rels:Relationships/rels:Relationship[@Id=$id]" >
+      <xsl:variable name="targetmode">
+        <xsl:value-of select="./@TargetMode"/>
+      </xsl:variable>
+      <xsl:variable name="pzipsource">
+        <xsl:value-of select="./@Target"/>
+      </xsl:variable>
+      <xsl:variable name="pziptarget">
+        <xsl:choose>
+          <xsl:when test="$targetName != ''">
+            <xsl:value-of select="$targetName"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-after($pzipsource,'/')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$targetmode='External'"/>
+        <xsl:when test="$destFolder = '.'">
+          <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{$pziptarget}"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat($destFolder,'/',$pziptarget)}"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
   <!--  gets document name where image is placed (header, footer, document)-->
   <xsl:template name="GetDocumentName">
-    <xsl:param name="rootId"/>
 
-    
     <xsl:variable name="path" select="ancestor::oox:part/@oox:name" />
     <xsl:choose>
       <xsl:when test="contains($path, '/')">
@@ -90,35 +83,21 @@
         <xsl:value-of select="$path" />
       </xsl:otherwise>
     </xsl:choose>
-    <!--xsl:choose>
-      <xsl:when test="ancestor::w:document ">
-        <xsl:text>document.xml</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each
-          select="key('Part', 'word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
-          <xsl:variable name="target">
-            <xsl:value-of select="./@Target"/>
-          </xsl:variable>
-          <xsl:if test="generate-id(/oox:package/oox:part[@oox:name=concat('word/',$target)]/node()) = $rootId">
-            <xsl:value-of select="$target"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose-->
+
   </xsl:template>
 
   <xsl:template name="GetTarget">
     <xsl:param name="document"/>
     <xsl:param name="id"/>
-    
-    <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
+
+    <xsl:value-of select="key('Part', concat('word/_rels/',$document,'.rels'))/rels:Relationships/rels:Relationship[@Id=$id]/@Target"/>
+    <!--xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
       <xsl:for-each
         select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:value-of select="./@Target"/>   
         </xsl:if>
       </xsl:for-each>
-    </xsl:if>
+    </xsl:if-->
   </xsl:template>
 </xsl:stylesheet>

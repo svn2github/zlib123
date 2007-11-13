@@ -1668,11 +1668,7 @@
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumber">
     <xsl:variable name="docName">
-      <xsl:call-template name="GetDocumentName">
-        <xsl:with-param name="rootId">
-          <xsl:value-of select="generate-id(/node())" />
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:call-template name="GetDocumentName" />
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$docName = 'document.xml'">

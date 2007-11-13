@@ -45,10 +45,8 @@
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w uri draw a pic r wp w xlink oox">
+  exclude-result-prefixes="w uri draw a pic r rels wp w xlink oox rels">
 
-  <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
-  
   <!-- 
   *************************************************************************
   MATCHING TEMPLATES
@@ -82,11 +80,7 @@
       <xsl:attribute name="xlink:href">
         <xsl:variable name="relationshipId" select="descendant::a:hlinkClick/@r:id"/>
         <xsl:variable name="document">
-          <xsl:call-template name="GetDocumentName">
-            <xsl:with-param name="rootId">
-              <xsl:value-of select="generate-id(/node())" />
-            </xsl:with-param>
-          </xsl:call-template>
+          <xsl:call-template name="GetDocumentName"/>
         </xsl:variable>
         <xsl:variable name="relDestination">
           <xsl:call-template name="GetTarget">
@@ -106,11 +100,7 @@
 
   <xsl:template match="wp:inline | wp:anchor">
     <xsl:variable name="document">
-      <xsl:call-template name="GetDocumentName">
-        <xsl:with-param name="rootId">
-          <xsl:value-of select="generate-id(/node())" />
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:call-template name="GetDocumentName"/>
     </xsl:variable>
 
     <xsl:call-template name="CopyPictures">

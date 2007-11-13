@@ -175,11 +175,7 @@
     <xsl:choose>
       <xsl:when test="v:imagedata">
         <xsl:variable name="document">
-          <xsl:call-template name="GetDocumentName">
-            <xsl:with-param name="rootId">
-              <xsl:value-of select="generate-id(/node())"/>
-            </xsl:with-param>
-          </xsl:call-template>
+          <xsl:call-template name="GetDocumentName"/>
         </xsl:variable>
         <xsl:call-template name="CopyPictures">
           <xsl:with-param name="document">
@@ -531,11 +527,7 @@
   -->
   <xsl:template match="o:OLEObject" mode="draw:frame">
     <xsl:variable name="document">
-      <xsl:call-template name="GetDocumentName">
-        <xsl:with-param name="rootId">
-          <xsl:value-of select="generate-id(/node())"/>
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:call-template name="GetDocumentName"/>
     </xsl:variable>
 
     <xsl:call-template name="CopyPictures">
@@ -584,11 +576,7 @@
   -->
   <xsl:template match="v:imagedata[not(ancestor::w:object)]">
     <xsl:variable name="document">
-      <xsl:call-template name="GetDocumentName">
-        <xsl:with-param name="rootId">
-          <xsl:value-of select="generate-id(/node())"/>
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:call-template name="GetDocumentName"/>
     </xsl:variable>
     <xsl:call-template name="CopyPictures">
       <xsl:with-param name="document">

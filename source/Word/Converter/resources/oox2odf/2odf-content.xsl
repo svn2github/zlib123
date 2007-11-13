@@ -103,7 +103,7 @@
     </xsl:if>
 
     <!-- when w:pict is child of a cell-->
-    <xsl:if test="key('Part', 'word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
+    <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
       <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict"
         mode="automaticpict"/>
     </xsl:if>
@@ -171,8 +171,7 @@
   <xsl:template name="InsertEndnoteStyles">
     <xsl:if
       test="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p/w:r/w:rPr | 
-      key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
-      <!-- divo: TODO check for copy and paste error in above test. shouldn't it be endnotes.xml twice??? -->
+      key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p/w:pPr">
       <xsl:apply-templates select="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p"
         mode="automaticstyles"/>
     </xsl:if>
@@ -492,7 +491,7 @@
     <xsl:variable name="IsDefaultHeading">
       <xsl:call-template name="CheckDefaultHeading">
         <xsl:with-param name="Name">
-          <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId]/w:name/@w:val" />
+          <xsl:value-of select="key('StyleId',$styleId)/w:name/@w:val" />
         </xsl:with-param>    
       </xsl:call-template>
     </xsl:variable>
@@ -514,7 +513,7 @@
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
 
       <xsl:when
-        test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
+        test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">
         <!--xsl:when
           test="$numId != '' and $level &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
           and not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
@@ -846,11 +845,7 @@
             <xsl:value-of select="@r:id"/>
           </xsl:variable>
           <xsl:variable name="document">
-            <xsl:call-template name="GetDocumentName">
-              <xsl:with-param name="rootId">
-                <xsl:value-of select="generate-id(/node())" />
-              </xsl:with-param>
-            </xsl:call-template>
+            <xsl:call-template name="GetDocumentName" />
           </xsl:variable>
           <xsl:for-each
             select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
@@ -1066,6 +1061,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
   <!--  cut start spaces -->
   <xsl:template name="CutStartSpaces">
     <xsl:param name="cuted"/>

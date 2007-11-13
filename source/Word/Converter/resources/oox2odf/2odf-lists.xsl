@@ -136,11 +136,7 @@
       <xsl:when test="w:numFmt[@w:val = 'bullet'] and w:lvlPicBulletId/@w:val != ''">
 
         <xsl:variable name="document">
-          <xsl:call-template name="GetDocumentName">
-            <xsl:with-param name="rootId">
-              <xsl:value-of select="generate-id(/node())" />
-            </xsl:with-param>
-          </xsl:call-template>
+          <xsl:call-template name="GetDocumentName"/>
         </xsl:variable>
 
         <xsl:variable name="lvlPicBulletId">
@@ -1038,33 +1034,26 @@
       <xsl:choose>
 
         <!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
-        <xsl:when
-          test="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:lvlOverride">
+        <xsl:when test="key('numId', $numId)/w:lvlOverride">
           <xsl:value-of select="concat('LO',$numId)"/>
         </xsl:when>
 
         <xsl:when
-          test="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink">
+          test="key('abstractNumId', key('numId', $numId)/w:abstractNumId/@w:val)/w:numStyleLink">
           <xsl:variable name="linkedStyle">
             <xsl:value-of
-              select="key('Part', 'word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink/@w:val"
+              select="key('abstractNumId', key('numId', $numId)/w:abstractNumId/@w:val)/w:numStyleLink/@w:val"
             />
           </xsl:variable>
           <xsl:variable name="linkedNumId">
-            <xsl:value-of
-              select="key('StyleId', $linkedStyle)/w:pPr/w:numPr/w:numId/@w:val"
-            />
+            <xsl:value-of select="key('StyleId', $linkedStyle)/w:pPr/w:numPr/w:numId/@w:val" />
           </xsl:variable>
-          <xsl:value-of
-            select="concat('L',key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$linkedNumId]/w:abstractNumId/@w:val)"
-          />
+          <xsl:value-of select="concat('L',key('numId', $linkedNumId)/w:abstractNumId/@w:val)" />
         </xsl:when>
 
         <!-- otherwise, list style is referred to abstractNumId -->
         <xsl:otherwise>
-          <xsl:value-of
-            select="concat('L',key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val)"
-          />
+          <xsl:value-of select="concat('L',key('numId', $numId)/w:abstractNumId/@w:val)" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
