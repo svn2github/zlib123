@@ -4180,7 +4180,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumOff/@val"/>
                   </xsl:with-param>
                   <xsl:with-param name ="shade">
-                    <xsl:for-each select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:shade/@val">
+                    <xsl:for-each select="p:style/a:lnRef/a:schemeClr/a:shade/@val">
                       <xsl:value-of select=". div 1000"/>
                     </xsl:for-each>
                   </xsl:with-param>

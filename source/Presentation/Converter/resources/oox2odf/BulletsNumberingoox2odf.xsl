@@ -3126,6 +3126,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     <xsl:param name="color"/>
     <xsl:param name ="lumMod"/>
     <xsl:param name ="lumOff"/>
+    <xsl:param  name ="shade"/>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
+    <xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:variable name ="ThemeColor">
       <xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
         <xsl:for-each select ="node()">
@@ -3186,6 +3189,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 			<xsl:with-param name="color" select="$NewColor" />
 			<xsl:with-param name ="lumMod" select ="$lumMod"/>
 			<xsl:with-param name ="lumOff" select ="$lumOff"/>
+      <xsl:with-param name ="shade" select ="$shade"/>
 		</xsl:call-template>
 	</xsl:template >
   <xsl:template name ="getBullet_Level1">
