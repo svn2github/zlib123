@@ -2813,6 +2813,9 @@
     </xsl:variable>
     
     <xsl:choose>
+      <!--math, dialogika: bugfix #1827476 BEGIN-->
+      <xsl:when test="$numId = '0'">false</xsl:when>
+      <!--math, dialogika: bugfix #1827476 END-->      
       <xsl:when test="$numId != 'NaN' and key('numId', $numId)">true</xsl:when>
       <xsl:when test="key('StyleId', $StyleId)/w:basedOn/@w:val">
         <xsl:call-template name="CheckIfList">
