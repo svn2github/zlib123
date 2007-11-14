@@ -411,6 +411,7 @@
             </xsl:call-template>
           </xsl:for-each>
 
+          <!--Commented by Sateesh Because temp.ods,estads.ods,mallocs.ods files are crashing -->
           <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->
           <!--<xsl:if test="chart:axis[contains(@chart:name,'secondary')]">
 
