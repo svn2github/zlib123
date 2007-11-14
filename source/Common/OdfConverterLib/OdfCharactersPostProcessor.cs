@@ -170,6 +170,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             }
             //End
+            else if (text.Contains("shade-tint"))
+            {
+
+                this.nextWriter.WriteString(EvalShadeExpression(text));
+
+            }
             //Shadow calculation
             else if (text.Contains("shadow-offset-x") || text.Contains("shadow-offset-y"))
             {
@@ -190,6 +196,137 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return str;
 
         }
+        private string EvalShadeExpression(string text)
+        {
+            string[] arrVal = new string[5];
+            arrVal = text.Split(':');
+
+            double dblRed = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+            double dblGreen = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+            double dblBlue = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+            double dblShade = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+
+            double sR;
+            if (dblRed < 10)
+            {
+                sR = 2.4865 * dblRed;
+            }
+            else
+            {
+                sR = (Math.Pow(((dblRed + 14.025) / 269.025), 2.4) ) *8192;
+            }
+            double sG;
+            if (dblGreen < 10)
+            {
+                sG = 2.4865 * dblGreen;
+
+            }
+            else {
+
+                sG = (Math.Pow(((dblGreen + 14.025) / 269.025), 2.4) ) * 8192;
+            
+            }
+
+            double sB;
+            if (dblBlue < 10)
+            {
+                sB = 2.4865 * dblBlue;
+            }
+            else
+            {
+                sB = (Math.Pow(((dblBlue + 14.025) / 269.025), 2.4)) * 8192;
+            }
+           
+            double NewRed;
+            double sRead;
+            sRead = (sR * dblShade / 100);
+
+            if (sRead < 10)
+            {
+                NewRed = 0;
+
+            }
+            else if (sRead < 24)
+            {
+                NewRed = (12.92 * 255 * sR  / 8192);
+
+            }
+            else if (sRead <= 8192)
+            {
+                NewRed = ((Math.Pow(sRead / 8192, 1 / 2.4) * 1.055 )- 0.055 )* 255 ;
+            }
+            else
+            {
+                NewRed = 255;
+            }
+            NewRed = Math.Round(NewRed);
+            
+            double NewGreen;
+            double sGreen;
+            sGreen = (sG  * dblShade / 100);
+
+            if (sGreen < 0)
+            {
+                NewGreen = 0;
+
+            }
+            else if (sGreen < 24)
+            {
+                NewGreen = (12.92 * 255 * dblGreen / 8192);
+
+            }
+            else if (sGreen < 8193)
+            {
+                NewGreen = ((Math.Pow(sGreen / 8192, 1 / 2.4) * 1.055) - 0.055) * 255;
+            }
+            else
+            {
+                NewGreen = 255;
+            }
+            NewGreen = Math.Round(NewGreen);
+
+            double NewBlue;
+            double sBlue;
+            sBlue = (sB  * dblShade / 100);
+
+            if (sBlue < 0)
+            {
+                NewBlue = 0;
+
+            }
+            else if (sBlue < 24)
+            {
+                NewBlue = (12.92 * 255 * dblBlue / 8192);
+
+            }
+            else if (sBlue < 8193)
+            {
+                NewBlue = ((Math.Pow(sBlue / 8192, 1 / 2.4) * 1.055) - 0.055) * 255; ;
+            }
+            else
+            {
+                NewBlue = 255;
+            }
+            NewBlue = Math.Round(NewBlue);
+            
+            int intRed;
+            int intGreen;
+            int intBlue;
+            intRed = (int)NewRed;
+            intGreen = (int)NewGreen;
+            intBlue = (int)NewBlue;
+
+            string hexRed;
+            string hexGreen;
+            string hexBlue;
+            
+            hexRed = String.Format("{0:x}", intRed);
+            hexGreen = String.Format("{0:x}", intGreen );
+            hexBlue = String.Format("{0:x}", intBlue );  
+            return ('#' + hexRed.ToUpper()   + hexGreen.ToUpper ()  + hexBlue.ToUpper()  );
+
+        }
+
         private string EvalExpression(string text)
         {
             string[] arrVal = new string[4];
