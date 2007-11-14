@@ -262,7 +262,17 @@
       </xsl:when>
       <xsl:otherwise>
     <text:p>
-      <xsl:attribute name="text:style-name">Normal</xsl:attribute>
+      <!--math, dialogika: bugfix #1771286 BEGIN-->      
+      <!--<xsl:attribute name="text:style-name">Normal</xsl:attribute>-->
+      <xsl:attribute name="text:style-name">
+        <xsl:choose>
+          <xsl:when test="w:pPr/w:pStyle/@w:val">
+            <xsl:value-of select="w:pPr/w:pStyle/@w:val" />  
+          </xsl:when>
+          <xsl:otherwise>Normal</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <!--math, dialogika: bugfix #1771286 END-->
       <xsl:apply-templates mode="indexa"/>
     </text:p>
     <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
@@ -714,7 +724,12 @@
     <xsl:if test="$level = 0"/>
     <xsl:attribute name="text:style-name">
       <xsl:choose>
-        <xsl:when test="$type='INDEXA'">Normal</xsl:when>
+        <!--math, dialogika: bugfix #1771286 BEGIN-->
+        <xsl:when test="$type='INDEXA' and key('Part', 'word/styles.xml')/w:styles/w:style/w:name[@w:val=(concat('index ',$level+1))]">
+          <xsl:value-of select="concat('index ',$level+1)" />
+        </xsl:when>
+        <!--math, dialogika: bugfix #1771286 END-->
+        <xsl:when test="$type='INDEXA'">Normal</xsl:when>        
         <xsl:when test="$level=0">
           <xsl:call-template name="TocToContent">
             <xsl:with-param name="styleValue">
