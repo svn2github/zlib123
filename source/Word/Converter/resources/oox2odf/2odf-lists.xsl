@@ -926,7 +926,7 @@
       <xsl:when test="$isNumPrefix and $isNumPrefix='true'">
         <xsl:value-of select="w:lvlText/@w:val"/>
       </xsl:when>
-      <xsl:otherwise>•</xsl:otherwise>
+      <xsl:otherwise><xsl:value-of select="w:lvlText/@w:val"/></xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
