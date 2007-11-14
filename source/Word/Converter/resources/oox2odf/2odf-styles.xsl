@@ -1711,8 +1711,8 @@
   <xsl:template name="InsertCustomFootnoteSeperator">
 
     <!-- Get the font size of the style referenced to the default paragraph -->
-    <xsl:variable name="paraStyle" select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:pStyle/@w:val" />
-    <xsl:variable name="charStyle" select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:styleId='$paraStyle']/w:basedOn/@w:val" />
+    <xsl:variable name="paraStyle" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:pStyle/@w:val" />
+    <xsl:variable name="charStyle" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='$paraStyle']/w:basedOn/@w:val" />
     <xsl:variable name="fontSize" >
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length">
@@ -1725,10 +1725,10 @@
     <!-- Get the space-before from ooxml -->
     <xsl:variable name="spaceBefore">
       <xsl:choose>
-        <xsl:when test="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before">
+        <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
+              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:before"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -1736,7 +1736,7 @@
         <xsl:otherwise>
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before"/>
+              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:before"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -1747,10 +1747,10 @@
     <!-- Get the space-after from ooxml -->
     <xsl:variable name="spaceAfter">
       <xsl:choose>
-        <xsl:when test="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after">
+        <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
+              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:default='1']/w:pPr/w:spacing/@w:after"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -1758,7 +1758,7 @@
         <xsl:otherwise>
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="key('Part', 'word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after"/>
+              <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:after"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -2153,7 +2153,7 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:choose>
-                  <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
+                  <xsl:when test="key('Part', 'word/settings.xml')/w:settings/w:gutterAtTop">
                     <xsl:choose>
                       <xsl:when test="w:pgMar/@w:top &lt; 0">
                         <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter"/>
@@ -2218,7 +2218,7 @@
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
             <xsl:choose>
-              <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
+              <xsl:when test="key('Part', 'word/settings.xml')/w:settings/w:gutterAtTop">
                 <xsl:value-of select="w:pgMar/@w:left"/>
               </xsl:when>
               <xsl:otherwise>
@@ -2431,7 +2431,7 @@
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:top &lt; 0">
                       <xsl:choose>
-                        <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
+                        <xsl:when test="key('Part', 'word/settings.xml')/w:settings/w:gutterAtTop">
                           <xsl:choose>
                             <xsl:when
                               test=" - w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header"
@@ -2454,7 +2454,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:choose>
-                        <xsl:when test="key('Part', 'word/settings.xml')//w:settings/w:gutterAtTop">
+                        <xsl:when test="key('Part', 'word/settings.xml')/w:settings/w:gutterAtTop">
                           <xsl:choose>
                             <xsl:when
                               test="w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
@@ -2541,17 +2541,29 @@
 
 
         <!-- Sets top and/or bottom  margin if contextual spacing applies-->
-        <xsl:call-template name="contextualSpacing">
-          <xsl:with-param name="prevP" select="preceding-sibling::w:p[1]"/>
-          <xsl:with-param name="nextP" select="following-sibling::w:p[1]"/>
-        </xsl:call-template>
-
-        <xsl:variable name="isContextualSpacingApplied">
-          <!-- Copy of the preceding template (we cant write attributes and get a retgurn value-->
-          <xsl:call-template name="contextualSpacingApplied">
+        <xsl:variable name="isContextualSpacing">
+          <xsl:call-template name="isContextualSpacing"/>
+        </xsl:variable>
+        <xsl:if test="$isContextualSpacing = 'true' ">
+          <xsl:call-template name="contextualSpacing">
             <xsl:with-param name="prevP" select="preceding-sibling::w:p[1]"/>
             <xsl:with-param name="nextP" select="following-sibling::w:p[1]"/>
           </xsl:call-template>
+        </xsl:if>
+
+        <xsl:variable name="isContextualSpacingApplied">
+          <!-- Copy of the preceding template (we cant write attributes and get a return value-->
+          <xsl:choose>
+            <xsl:when test="$isContextualSpacing = 'true' ">
+                <xsl:call-template name="contextualSpacingApplied">
+                  <xsl:with-param name="prevP" select="preceding-sibling::w:p[1]"/>
+                  <xsl:with-param name="nextP" select="following-sibling::w:p[1]"/>
+                </xsl:call-template>
+              </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'false'" />
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
 
         <!--Check if contextualSpacing was applied-->
@@ -3446,7 +3458,12 @@
     <xsl:call-template name="InsertDefaultBidiProperties"/>
 
     <!-- Sets top and/or bottom  margin if contextual spacing applies -->
-    <xsl:call-template name="contextualSpacing"/>
+    <xsl:variable name="isContextualSpacing">
+      <xsl:call-template name="isContextualSpacing"/>
+    </xsl:variable>
+    <xsl:if test="$isContextualSpacing = 'true' ">
+      <xsl:call-template name="contextualSpacing"/>
+    </xsl:if>
 
     <!-- Must not set it to 0 because it can overwrite the parent style -->
     <!--xsl:if test="ancestor::w:tc">
@@ -3500,7 +3517,10 @@
   </xsl:template>
 
   <xsl:template name="contextualSpacing">
-    <!-- @Description: Sets top and bottom margin to zero to emulate contextual spacing feature -->
+    <!-- @Description: Sets top and bottom margin to zero to emulate contextual spacing feature
+            Expects that template isContextualSpacing is called before calling this template for 
+            performance reasons 
+      -->
     <!-- @Context: A paragraph node (i.e. &lt;w:Ppr&gt;), or a node paragraph property node (i.e. &lt;w:Ppr&gt;) -->
     <!-- @Returns: Nothing -->
 
@@ -3509,12 +3529,12 @@
     <xsl:param name="nextP" select="parent::w:p/following-sibling::w:p[1]"/>
     <!-- The next paragraph -->
 
-    <xsl:variable name="isContextualSpacing">
+    <!--xsl:variable name="isContextualSpacing">
       <xsl:call-template name="isContextualSpacing"/>
-    </xsl:variable>
+    </xsl:variable-->
 
     <!-- if contextual spacing is applied to the current paragraph -->
-    <xsl:if test="$isContextualSpacing = 'true' ">
+    <!--xsl:if test="$isContextualSpacing = 'true' "-->
 
       <!-- Sets the top margin if there is a preceding paragraph... -->
       <xsl:if test="$prevP">
@@ -3543,7 +3563,7 @@
           <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
         </xsl:if>
       </xsl:if>
-    </xsl:if>
+    <!--/xsl:if-->
   </xsl:template>
 
   <xsl:template name="isContextualSpacing">
