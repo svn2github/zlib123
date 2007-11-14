@@ -190,4 +190,7 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>Ce document ne semble pas être un fichier OASIS  OpenDocument valide.</value>
   </data>
+  <data name="OdfConversionCanceled" xml:space="preserve">
+    <value>La conversion a été annulée par l’utilisateur</value>
+  </data>
 </root>

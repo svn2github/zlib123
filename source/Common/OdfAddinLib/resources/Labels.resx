@@ -184,7 +184,7 @@
     <value>Unable to create target file</value>
   </data>
   <data name="OdfConversionCanceled" xml:space="preserve">
-    <value>The conversion is canceled by the user</value>
+    <value>The conversion has been canceled by the user</value>
   </data>
   <data name="CorruptedInputFileDetail" xml:space="preserve">
     <value>If you think it is a valid ODF document, you should fill a bug report on the project web site  (http://odf-converter.sourceforge.net) with your file attached.</value>
