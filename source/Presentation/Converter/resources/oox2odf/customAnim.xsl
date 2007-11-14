@@ -88,7 +88,19 @@ exclude-result-prefixes="p a r xlink rels xmlns">
          
 					<!--anim:iterate-type="by-letter" anim:iterate-interval="0.05s"-->
 					<xsl:if test ="./p:cTn/p:iterate">
-						<anim:iterate smil:begin="0s" smil:fill="hold" anim:iterate-type="by-letter">
+						<anim:iterate smil:fill="hold" anim:iterate-type="by-letter">
+              <!-- code added to get the animation time correctly -->
+              <xsl:attribute name ="smil:begin">
+                <xsl:choose >
+                  <xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay">
+                    <xsl:value-of select ="concat(./p:cTn/p:stCondLst/p:cond/@delay div 1000,'s')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select ="'0s'"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <!-- end -->
 							<xsl:attribute name ="smil:targetElement">
 								<xsl:value-of select ="$animationId"/>
 							</xsl:attribute>

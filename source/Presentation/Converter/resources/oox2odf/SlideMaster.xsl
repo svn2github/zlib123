@@ -4068,6 +4068,11 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:variable  name ="GraphicId">
                        <xsl:value-of select ="concat($slideMasterName,concat('gr',$var_pos))"/>
                      </xsl:variable>
+                    <xsl:variable name="flagTextBox">
+                      <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                        <xsl:value-of select ="'True'"/>
+                      </xsl:if>
+                    </xsl:variable>
                     <style:style style:family="graphic" style:parent-style-name="standard">
                       <xsl:attribute name ="style:name">
                         <xsl:value-of select ="$GraphicId"/>
@@ -4102,6 +4107,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:call-template name="tmpShapeTextProcess">
                       <xsl:with-param name="ParaId" select="$ParaId"/>
                       <xsl:with-param name="TypeId" select="$slideMasterName"/>
+                      <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
                     </xsl:call-template>
                   </xsl:when>
                </xsl:choose>
@@ -4116,6 +4122,11 @@ Copyright (c) 2007, Sonata Software Limited
                      <xsl:variable name ="ParaId">
                   <xsl:value-of select ="concat($slideMasterName ,concat('PARA',$var_pos))"/>
                  </xsl:variable>
+                   <xsl:variable name="flagTextBox">
+                     <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                       <xsl:value-of select ="'True'"/>
+                     </xsl:if>
+                   </xsl:variable>
                     <style:style style:family="graphic" style:parent-style-name="standard">
                       <xsl:attribute name ="style:name">
                         <xsl:value-of select ="$GraphicId"/>
@@ -4186,6 +4197,11 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:variable name ="ParaId">
                       <xsl:value-of select ="concat('SMgrp',$slideMasterName,'PARA',$var_pos,'-', $pos)"/>
                     </xsl:variable>
+                      <xsl:variable name="flagTextBox">
+                        <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                          <xsl:value-of select ="'True'"/>
+                        </xsl:if>
+                      </xsl:variable>
                     <style:style style:family="graphic" style:parent-style-name="standard">
                       <xsl:attribute name ="style:name">
                         <xsl:value-of select ="$GraphicId"/>
@@ -4221,6 +4237,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:call-template name="tmpShapeTextProcess">
                       <xsl:with-param name="ParaId" select="$ParaId"/>
                       <xsl:with-param name="TypeId" select="$slideMasterName"/>
+                      <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
                     </xsl:call-template>
                   </xsl:if>
                 </xsl:when>
@@ -4482,6 +4499,17 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
+      <!-- Transparency percentage-->
+      <xsl:if test="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val">
+        <xsl:variable name ="alpha">
+          <xsl:value-of select ="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val"/>
+        </xsl:variable>
+        <xsl:if test="($alpha != '') or ($alpha != 0)">
+          <xsl:attribute name ="draw:opacity">
+            <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:if>
     <xsl:if test ="p:spPr/a:ln">
       <xsl:call-template name="tmpLineColor"/>
       <xsl:call-template name="LineStyle"/>
@@ -8305,112 +8333,7 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:otherwise>
                     </xsl:choose>
                   </xsl:attribute>
-                  <xsl:for-each select="a:gsLst/a:gs">
-                    <xsl:if test="position()=1">
-                      <xsl:choose>
-                        <xsl:when test="a:srgbClr/@val">
-                          <xsl:attribute name="draw:start-color">
-                            <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                          </xsl:attribute>
-                        </xsl:when>
-                        <xsl:when test="a:schemeClr/@val">
-                          <xsl:attribute name="draw:start-color">
-                            <xsl:call-template name="getColorCode">
-                              <xsl:with-param name="color">
-                                <xsl:value-of select="a:schemeClr/@val" />
-                              </xsl:with-param>
-                              <xsl:with-param name="lumMod">
-                                <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
-                              </xsl:with-param>
-                              <xsl:with-param name="lumOff">
-                                <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
-                              </xsl:with-param>
-                            </xsl:call-template>
-                          </xsl:attribute>
-                        </xsl:when>
-                      </xsl:choose>
-                    </xsl:if>
-                    <xsl:if test="position()=last()">
-                      <xsl:choose>
-                        <xsl:when test="a:srgbClr/@val">
-                          <xsl:attribute name="draw:end-color">
-                            <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                          </xsl:attribute>
-                        </xsl:when>
-                        <xsl:when test="a:schemeClr/@val">
-                          <xsl:attribute name="draw:end-color">
-                            <xsl:call-template name="getColorCode">
-                              <xsl:with-param name="color">
-                                <xsl:value-of select="a:schemeClr/@val" />
-                              </xsl:with-param>
-                              <xsl:with-param name="lumMod">
-                                <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
-                              </xsl:with-param>
-                              <xsl:with-param name="lumOff">
-                                <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
-                              </xsl:with-param>
-                            </xsl:call-template>
-                          </xsl:attribute>
-                         </xsl:when>
-                      </xsl:choose>
-                    </xsl:if>
-                  </xsl:for-each>
-                  <xsl:for-each select="a:lin">
-                    <xsl:attribute name="draw:style">
-                      <xsl:value-of select="'linear'"/>
-                    </xsl:attribute>
-                  </xsl:for-each>
-                  
-                  <xsl:for-each select="a:path">
-                    <xsl:choose>
-                      <xsl:when test="@path='circle'">
-                        <xsl:attribute name="draw:style">
-                          <xsl:value-of select="'radial'"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="@path='rect'">
-                        <xsl:attribute name="draw:style">
-                          <xsl:value-of select="'rectangular'"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                    </xsl:choose>
-                    <xsl:for-each select="a:fillToRect">
-                      <xsl:choose>
-                        <xsl:when test="@l and @r">
-                          <xsl:attribute name="draw:cx">
-                            <xsl:value-of select="concat(format-number( ( number(@l)+ number(@r) div 2) div 1000,'#'),'%') "/>
-                          </xsl:attribute>
-                        </xsl:when>
-                        <xsl:when test="@l and not(@r)">
-                          <xsl:attribute name="draw:cx">
-                            <xsl:value-of select="concat(format-number(@l div 1000,'#'),'%') "/>
-                          </xsl:attribute>
-                        </xsl:when>
-                        <xsl:when test="not(@l) and @r">
-                          <xsl:attribute name="draw:cx">
-                            <xsl:value-of select="concat(format-number(@r div 1000,'#'),'%') "/>
-                          </xsl:attribute>
-                        </xsl:when>
-                      </xsl:choose>
-                      <xsl:choose>
-                        <xsl:when test="@b and @t">
-                          <xsl:attribute name="draw:cy">
-                            <xsl:value-of select="concat(format-number( ( number(@b)+ number(@t) div 2) div 1000,'#'),'%') "/>
-                          </xsl:attribute>
-                        </xsl:when>
-                        <xsl:when test="@b and not(@t)">
-                          <xsl:attribute name="draw:cy">
-                            <xsl:value-of select="concat(format-number(@b div 1000,'#'),'%') "/>
-                          </xsl:attribute>
-                        </xsl:when>
-                        <xsl:when test="not(@b) and @t">
-                          <xsl:attribute name="draw:cx">
-                            <xsl:value-of select="concat(format-number(@t div 1000,'#'),'%') "/>
-                          </xsl:attribute>
-                        </xsl:when>
-                      </xsl:choose>
-                    </xsl:for-each>
-                  </xsl:for-each>
+                  <xsl:call-template name="tmpGradientFillTiletoRect"/>
                 </draw:gradient>
               </xsl:for-each>
            </xsl:template>
@@ -8428,6 +8351,12 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:attribute name="draw:display-name">
                   <xsl:value-of select="concat($FileType,'-Gradient')"/>
                 </xsl:attribute>
+                <xsl:call-template name="tmpGradientFillTiletoRect"/>
+              </draw:gradient>
+            </xsl:for-each>
+          </xsl:for-each>
+        </xsl:template>
+        <xsl:template name="tmpGradientFillTiletoRect">
                 <xsl:for-each select="a:gsLst/a:gs">
                   <xsl:if test="position()=1">
                     <xsl:choose>
@@ -8490,6 +8419,11 @@ Copyright (c) 2007, Sonata Software Limited
                         <xsl:value-of select="'radial'"/>
                       </xsl:attribute>
                     </xsl:when>
+              <xsl:when test="@path='shape'">
+                <xsl:attribute name="draw:style">
+                  <xsl:value-of select="'ellipsoid'"/>
+                </xsl:attribute>
+              </xsl:when>
                     <xsl:when test="@path='rect'">
                       <xsl:attribute name="draw:style">
                         <xsl:value-of select="'rectangular'"/>
@@ -8498,43 +8432,74 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:choose>
                   <xsl:for-each select="a:fillToRect">
                     <xsl:choose>
-                      <xsl:when test="@l and @r">
+                <xsl:when test="@l and @r and @t and @b">
                         <xsl:attribute name="draw:cx">
-                          <xsl:value-of select="concat(format-number( ( number(@l)+ number(@r) div 2) div 1000,'#'),'%') "/>
+                    <xsl:variable name="var_cx">
+                      <xsl:value-of select="number(format-number(( (@l+ @r) div 2 ) div 1000,'#')) "/>
+                    </xsl:variable>
+                    <xsl:value-of select="concat(100 - $var_cx,'%') "/>
+                  </xsl:attribute>
+                  <xsl:attribute name="draw:cy">
+                    <xsl:variable name="var_cy">
+                      <xsl:value-of select="number(format-number(( (@t+ @b) div 2 ) div 1000,'#')) "/>
+                    </xsl:variable>
+                    <xsl:value-of select="concat(100 - $var_cy,'%') "/>
                         </xsl:attribute>
                       </xsl:when>
-                      <xsl:when test="@l and not(@r)">
+                <xsl:when test="@l and @b">
                         <xsl:attribute name="draw:cx">
-                          <xsl:value-of select="concat(format-number(@l div 1000,'#'),'%') "/>
+                    <xsl:variable name="var_cx">
+                      <xsl:value-of select="number(format-number( @l  div 1000,'#')) "/>
+                    </xsl:variable>
+                    <xsl:value-of select="concat($var_cx,'%') "/>
+                  </xsl:attribute>
+                  <xsl:attribute name="draw:cy">
+                    <xsl:value-of select="'0%' "/>
                         </xsl:attribute>
                       </xsl:when>
-                      <xsl:when test="not(@l) and @r">
+          <xsl:when test="@l and @t">
                         <xsl:attribute name="draw:cx">
-                          <xsl:value-of select="concat(format-number(@r div 1000,'#'),'%') "/>
+              <xsl:variable name="var_cx">
+                <xsl:value-of select="number(format-number( @l  div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat($var_cx,'%') "/>
+                        </xsl:attribute>
+              <xsl:attribute name="draw:cy">
+              <xsl:variable name="var_cy">
+                <xsl:value-of select="number(format-number( @t  div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat($var_cy,'%') "/>
                         </xsl:attribute>
                       </xsl:when>
-                    </xsl:choose>
-                    <xsl:choose>
-                      <xsl:when test="@b and @t">
+          <xsl:when test="@r and @b">
+            <xsl:attribute name="draw:cx">
+              <xsl:value-of select="'0%' "/>
+            </xsl:attribute>
                         <xsl:attribute name="draw:cy">
-                          <xsl:value-of select="concat(format-number( ( number(@b)+ number(@t) div 2) div 1000,'#'),'%') "/>
+              <xsl:value-of select="'0%' "/>
                         </xsl:attribute>
                       </xsl:when>
-                      <xsl:when test="@b and not(@t)">
-                        <xsl:attribute name="draw:cy">
-                          <xsl:value-of select="concat(format-number(@b div 1000,'#'),'%') "/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="not(@b) and @t">
+          <xsl:when test="@r and @t">
                         <xsl:attribute name="draw:cx">
-                          <xsl:value-of select="concat(format-number(@t div 1000,'#'),'%') "/>
+              <xsl:value-of select="'0%' "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:variable name="var_cy">
+                <xsl:value-of select="number(format-number( @t  div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat($var_cy,'%') "/>
                         </xsl:attribute>
                       </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="draw:cx">
+              <xsl:value-of select="'100%' "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:value-of select="'100%' "/>
+            </xsl:attribute>
+          </xsl:otherwise>
                     </xsl:choose>
                   </xsl:for-each>
                 </xsl:for-each>
-              </draw:gradient>
-            </xsl:for-each>
-    </xsl:for-each>
-  </xsl:template>
+              </xsl:template>
 </xsl:stylesheet>

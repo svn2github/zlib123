@@ -2870,6 +2870,11 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:variable name ="ParaId">
                       <xsl:value-of select ="concat('SLgrp',$SlidePos,'PARA',$var_pos,'-', $pos)"/>
                     </xsl:variable>
+                      <xsl:variable name="flagTextBox">
+                        <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                          <xsl:value-of select ="'True'"/>
+                        </xsl:if>
+                      </xsl:variable>
                     <style:style style:family="graphic" style:parent-style-name="standard">
                       <xsl:attribute name ="style:name">
                         <xsl:value-of select ="$GraphicId"/>
@@ -2906,6 +2911,7 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:call-template name="tmpShapeTextProcess">
                       <xsl:with-param name="ParaId" select="$ParaId"/>
                       <xsl:with-param name="TypeId" select="substring-before($SlideId,'.xml')"/>
+                      <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
                     </xsl:call-template>
                   </xsl:if>
                 </xsl:when>
@@ -2917,6 +2923,11 @@ exclude-result-prefixes="p a r xlink rels">
                       </xsl:variable>
                       <xsl:variable name ="ParaId">
                         <xsl:value-of select ="concat('SLgrp',$SlidePos,'PARA',$var_pos,'-', $pos)"/>
+                      </xsl:variable>
+                      <xsl:variable name="flagTextBox">
+                        <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                          <xsl:value-of select ="'True'"/>
+                        </xsl:if>
                       </xsl:variable>
                       <style:style style:family="graphic" style:parent-style-name="standard">
                         <xsl:attribute name ="style:name">
@@ -3235,6 +3246,11 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:variable name ="ParaId">
                       <xsl:value-of select ="concat('SL',$SlidePos,'PARA',$var_pos)"/>
                     </xsl:variable>
+                    <xsl:variable name="flagTextBox">
+                      <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                        <xsl:value-of select ="'True'"/>
+                      </xsl:if>
+                    </xsl:variable>
                     <style:style style:family="graphic" style:parent-style-name="standard">
                       <xsl:attribute name ="style:name">
                         <xsl:value-of select ="$GraphicId"/>
@@ -3243,7 +3259,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <!--FILL-->
                         <xsl:call-template name ="Fill">
                           <xsl:with-param name="var_pos" select="$var_pos"/>
-                          <xsl:with-param name="FileType" select="concat('Slide',$SlidePos)"/>
+                          <xsl:with-param name="FileType" select="concat('slide',$SlidePos)"/>
                         </xsl:call-template>
                         <!--LINE COLOR-->
                         <xsl:call-template name ="LineColor" />
@@ -3273,7 +3289,7 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:with-param name="TypeId" select="$SlideID"/>
                       <xsl:with-param name="DefFont" select="$DefFont"/>
                       <xsl:with-param name="SMName" select="$SMName"/>
-                     
+                      <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
                     </xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
@@ -3342,6 +3358,11 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:variable>
                 <xsl:variable name ="ParaId">
                   <xsl:value-of select ="concat('SL',$SlidePos,'PARA',$var_pos)"/>
+                </xsl:variable>
+                <xsl:variable name="flagTextBox">
+                  <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                    <xsl:value-of select ="'True'"/>
+                  </xsl:if>
                 </xsl:variable>
                 <style:style style:family="graphic" style:parent-style-name="standard">
                   <xsl:attribute name ="style:name">
@@ -3438,6 +3459,11 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:variable name ="ParaId">
                     <xsl:value-of select ="concat('SL',$SlidePos,'LYT','PARA',$var_pos)"/>
                   </xsl:variable>
+                  <xsl:variable name="flagTextBox">
+                    <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                      <xsl:value-of select ="'True'"/>
+                    </xsl:if>
+                  </xsl:variable>
                   <style:style style:family="graphic" style:parent-style-name="standard">
                     <xsl:attribute name ="style:name">
                       <xsl:value-of select ="$GraphicId"/>
@@ -3472,6 +3498,7 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:call-template name="tmpShapeTextProcess">
                     <xsl:with-param name="ParaId" select="$ParaId"/>
                     <xsl:with-param name="TypeId" select="concat('SL',$SlidePos)"/>
+                    <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
                   </xsl:call-template>
                 </xsl:if>
               </xsl:for-each>
@@ -3484,6 +3511,11 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:variable>
                 <xsl:variable name ="ParaId">
                   <xsl:value-of select ="concat('SL',$SlidePos,'LYT','PARA',$var_pos)"/>
+                </xsl:variable>
+                <xsl:variable name="flagTextBox">
+                  <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+                    <xsl:value-of select ="'True'"/>
+                  </xsl:if>
                 </xsl:variable>
                 <style:style style:family="graphic" style:parent-style-name="standard">
                   <xsl:attribute name ="style:name">

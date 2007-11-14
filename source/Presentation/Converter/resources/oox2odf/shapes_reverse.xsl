@@ -1233,13 +1233,14 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
+
       <!-- Circular Arrow or CurvedLeftArrow or curvedRightArrow or  CurvedDownArrow or CurvedUpArrow -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='circularArrow' or p:spPr/a:prstGeom/@prst='curvedRightArrow' or p:spPr/a:prstGeom/@prst='curvedLeftArrow' or p:spPr/a:prstGeom/@prst='curvedDownArrow' or p:spPr/a:prstGeom/@prst='curvedUpArrow'">
         <!-- warn if CurvedLeftArrow or curvedRightArrow or  CurvedDownArrow or CurvedUpArrow   -->
         <xsl:message terminate="no">translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow</xsl:message>
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
-			<xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name="sldId" select="$slideId" />
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
@@ -1248,60 +1249,138 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600"  draw:text-areas="0 0 21600 21600" draw:type="circular-arrow" draw:modifiers="180 0 5500" draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
-            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
-              <xsl:attribute name ="draw:mirror-horizontal">
-                <xsl:value-of select="'true'"/>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
-              <xsl:attribute name ="draw:mirror-vertical">
-                <xsl:value-of select="'true'"/>
-              </xsl:attribute>
-            </xsl:if>
-            <draw:equation draw:name="f0" draw:formula="$0 "/>
-            <draw:equation draw:name="f1" draw:formula="$1 "/>
-            <draw:equation draw:name="f2" draw:formula="$2 "/>
-            <draw:equation draw:name="f3" draw:formula="10800+$2 "/>
-            <draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))"/>
-            <draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))"/>
-            <draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f8" draw:formula="?f4 +10800"/>
-            <draw:equation draw:name="f9" draw:formula="?f5 +10800"/>
-            <draw:equation draw:name="f10" draw:formula="?f6 +10800"/>
-            <draw:equation draw:name="f11" draw:formula="?f7 +10800"/>
-            <draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))"/>
-            <draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))"/>
-            <draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f16" draw:formula="?f12 +10800"/>
-            <draw:equation draw:name="f17" draw:formula="?f13 +10800"/>
-            <draw:equation draw:name="f18" draw:formula="?f14 +10800"/>
-            <draw:equation draw:name="f19" draw:formula="?f15 +10800"/>
-            <draw:equation draw:name="f20" draw:formula="21600-?f3 "/>
-            <draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
-            <draw:equation draw:name="f24" draw:formula="?f22 +10800"/>
-            <draw:equation draw:name="f25" draw:formula="$2 -2700"/>
-            <draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))"/>
-            <draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))"/>
-            <draw:equation draw:name="f28" draw:formula="?f26 +10800"/>
-            <draw:equation draw:name="f29" draw:formula="?f27 +10800"/>
-            <draw:equation draw:name="f30" draw:formula="($1+45)*pi/180"/>
-            <draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))"/>
-            <draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31"/>
-            <draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)"/>
-            <draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)"/>
-            <draw:equation draw:name="f35" draw:formula="?f28+?f33"/>
-            <draw:equation draw:name="f36" draw:formula="?f29+?f34"/>
-            <draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
-            <draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
-          </draw:enhanced-geometry>
+          <xsl:if test="p:spPr/a:prstGeom/@prst='circularArrow' or p:spPr/a:prstGeom/@prst='curvedDownArrow' or p:spPr/a:prstGeom/@prst='curvedUpArrow'">
+            <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="0 0 21600 21600" 
+                                  draw:modifiers="180 0 5500" draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
+              <xsl:if test="p:spPr/a:prstGeom/@prst='curvedUpArrow'">
+                <xsl:attribute name ="draw:type">
+                  <xsl:value-of select="'curvedUpArrow'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="p:spPr/a:prstGeom/@prst='curvedDownArrow'">
+                <xsl:attribute name ="draw:type">
+                  <xsl:value-of select="'curvedDownArrow'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="p:spPr/a:prstGeom/@prst='circularArrow'">
+                <xsl:attribute name ="draw:type">
+                  <xsl:value-of select="'circular-arrow'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="p:spPr/a:prstGeom/@prst='curvedUpArrow'">
+                <xsl:attribute name ="draw:mirror-vertical">
+                  <xsl:value-of select="'true'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <draw:equation draw:name="f0" draw:formula="$0 "/>
+              <draw:equation draw:name="f1" draw:formula="$1 "/>
+              <draw:equation draw:name="f2" draw:formula="$2 "/>
+              <draw:equation draw:name="f3" draw:formula="10800+$2 "/>
+              <draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))"/>
+              <draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))"/>
+              <draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f8" draw:formula="?f4 +10800"/>
+              <draw:equation draw:name="f9" draw:formula="?f5 +10800"/>
+              <draw:equation draw:name="f10" draw:formula="?f6 +10800"/>
+              <draw:equation draw:name="f11" draw:formula="?f7 +10800"/>
+              <draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))"/>
+              <draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))"/>
+              <draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f16" draw:formula="?f12 +10800"/>
+              <draw:equation draw:name="f17" draw:formula="?f13 +10800"/>
+              <draw:equation draw:name="f18" draw:formula="?f14 +10800"/>
+              <draw:equation draw:name="f19" draw:formula="?f15 +10800"/>
+              <draw:equation draw:name="f20" draw:formula="21600-?f3 "/>
+              <draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
+              <draw:equation draw:name="f24" draw:formula="?f22 +10800"/>
+              <draw:equation draw:name="f25" draw:formula="$2 -2700"/>
+              <draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f28" draw:formula="?f26 +10800"/>
+              <draw:equation draw:name="f29" draw:formula="?f27 +10800"/>
+              <draw:equation draw:name="f30" draw:formula="($1+45)*pi/180"/>
+              <draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))"/>
+              <draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31"/>
+              <draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)"/>
+              <draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)"/>
+              <draw:equation draw:name="f35" draw:formula="?f28+?f33"/>
+              <draw:equation draw:name="f36" draw:formula="?f29+?f34"/>
+              <draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
+              <draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
+            </draw:enhanced-geometry>
+          </xsl:if>
+          <xsl:if test="p:spPr/a:prstGeom/@prst='curvedRightArrow' or p:spPr/a:prstGeom/@prst='curvedLeftArrow'">
+            <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="0 0 21600 21600"                                                                                  
+                                      draw:mirror-vertical="true" draw:type="circular-arrow" draw:modifiers="84.1499444519454 -80.8262021942408 7331.32459905244" draw:enhanced-path="B ?f3 ?f3 ?f20 ?f20 ?f19 ?f18 ?f17 ?f16 W 0 0 21600 21600 ?f9 ?f8 ?f11 ?f10 L ?f24 ?f23 ?f36 ?f35 ?f29 ?f28 Z N">
+              <xsl:if test="p:spPr/a:prstGeom/@prst='curvedRightArrow'">
+                <xsl:attribute name ="draw:type">
+                  <xsl:value-of select="'curvedRightArrow'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="p:spPr/a:prstGeom/@prst='curvedLeftArrow'">
+                <xsl:attribute name ="draw:type">
+                  <xsl:value-of select="'curvedLeftArrow'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="p:spPr/a:prstGeom/@prst='curvedRightArrow'">
+                <xsl:attribute name ="draw:mirror-horizontal">
+                  <xsl:value-of select="'false'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="p:spPr/a:prstGeom/@prst='curvedLeftArrow'">
+                <xsl:attribute name ="draw:mirror-horizontal">
+                  <xsl:value-of select="'true'"/>
+                </xsl:attribute>
+              </xsl:if>
+              <draw:equation draw:name="f0" draw:formula="$0 "/>
+              <draw:equation draw:name="f1" draw:formula="$1 "/>
+              <draw:equation draw:name="f2" draw:formula="$2 "/>
+              <draw:equation draw:name="f3" draw:formula="10800+$2 "/>
+              <draw:equation draw:name="f4" draw:formula="10800*sin($0 *(pi/180))"/>
+              <draw:equation draw:name="f5" draw:formula="10800*cos($0 *(pi/180))"/>
+              <draw:equation draw:name="f6" draw:formula="10800*sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f7" draw:formula="10800*cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f8" draw:formula="?f4 +10800"/>
+              <draw:equation draw:name="f9" draw:formula="?f5 +10800"/>
+              <draw:equation draw:name="f10" draw:formula="?f6 +10800"/>
+              <draw:equation draw:name="f11" draw:formula="?f7 +10800"/>
+              <draw:equation draw:name="f12" draw:formula="?f3 *sin($0 *(pi/180))"/>
+              <draw:equation draw:name="f13" draw:formula="?f3 *cos($0 *(pi/180))"/>
+              <draw:equation draw:name="f14" draw:formula="?f3 *sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f15" draw:formula="?f3 *cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f16" draw:formula="?f12 +10800"/>
+              <draw:equation draw:name="f17" draw:formula="?f13 +10800"/>
+              <draw:equation draw:name="f18" draw:formula="?f14 +10800"/>
+              <draw:equation draw:name="f19" draw:formula="?f15 +10800"/>
+              <draw:equation draw:name="f20" draw:formula="21600-?f3 "/>
+              <draw:equation draw:name="f21" draw:formula="13500*sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f22" draw:formula="13500*cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
+              <draw:equation draw:name="f24" draw:formula="?f22 +10800"/>
+              <draw:equation draw:name="f25" draw:formula="$2 -2700"/>
+              <draw:equation draw:name="f26" draw:formula="?f25 *sin($1 *(pi/180))"/>
+              <draw:equation draw:name="f27" draw:formula="?f25 *cos($1 *(pi/180))"/>
+              <draw:equation draw:name="f28" draw:formula="?f26 +10800"/>
+              <draw:equation draw:name="f29" draw:formula="?f27 +10800"/>
+              <draw:equation draw:name="f30" draw:formula="($1+45)*pi/180"/>
+              <draw:equation draw:name="f31" draw:formula="sqrt(((?f29-?f24)*(?f29-?f24))+((?f28-?f23)*(?f28-?f23)))"/>
+              <draw:equation draw:name="f32" draw:formula="sqrt(2)/2*?f31"/>
+              <draw:equation draw:name="f33" draw:formula="?f32*sin(?f30)"/>
+              <draw:equation draw:name="f34" draw:formula="?f32*cos(?f30)"/>
+              <draw:equation draw:name="f35" draw:formula="?f28+?f33"/>
+              <draw:equation draw:name="f36" draw:formula="?f29+?f34"/>
+              <draw:handle draw:handle-position="10800 $0" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="10800" draw:handle-radius-range-maximum="10800"/>
+              <draw:handle draw:handle-position="$2 $1" draw:handle-polar="10800 10800" draw:handle-radius-range-minimum="0" draw:handle-radius-range-maximum="10800"/>
+            </draw:enhanced-geometry>
+          </xsl:if>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
+      
       <!-- Left-Up Arrow -->
       <xsl:when test ="p:spPr/a:prstGeom/@prst='leftUpArrow'">
         <draw:custom-shape draw:layer="layout">
@@ -1345,7 +1424,32 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
+      
       <!-- Bent-Up Arrow -->
+      <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
+      <xsl:when test="(p:nvSpPr/p:cNvPr/@name[contains(., 'bentUpArrow ')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'Bent-Up Arrow ')]) and (p:spPr/a:prstGeom/@prst='bentUpArrow')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name ="grID" select ="$GraphicId" />
+            <xsl:with-param name ="prID" select ="$ParaId" />
+            <xsl:with-param name="TypeId" select ="$TypeId" />
+            <xsl:with-param name="grpBln" select ="$grpBln" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+            <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 841 854" 
+            draw:mirror-horizontal="false" 
+            draw:mirror-vertical="false" 
+            draw:type="non-primitive" 
+            draw:enhanced-path="M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N">
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!--End of bug fix code-->
+      
       <xsl:when test ="p:spPr/a:prstGeom/@prst='bentUpArrow'">
         <draw:custom-shape draw:layer="layout">
           <xsl:call-template name ="CreateShape">
@@ -1377,6 +1481,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
+      
       <!-- Cube -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='cube')">
         <draw:custom-shape draw:layer="layout" >
@@ -3729,6 +3834,11 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:variable name ="ParaId">
             <xsl:value-of select ="concat('SL',$SlidePos,'LYT','PARA',position())"/>
           </xsl:variable>
+          <xsl:variable name="flagTextBox">
+            <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
+              <xsl:value-of select ="'True'"/>
+            </xsl:if>
+          </xsl:variable>
           <style:style style:family="graphic" style:parent-style-name="standard">
             <xsl:attribute name ="style:name">
               <xsl:value-of select ="$GraphicId"/>
@@ -3746,6 +3856,7 @@ Copyright (c) 2007, Sonata Software Limited
           </style:style>
           <xsl:call-template name="tmpShapeTextProcess">
             <xsl:with-param name="ParaId" select="$ParaId"/>
+            <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:for-each>
@@ -4025,6 +4136,11 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="lumOff">
                 <xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
               </xsl:with-param>
+              <xsl:with-param name ="shade">
+                <xsl:for-each select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:shade/@val">
+                  <xsl:value-of select=". div 1000"/>
+                </xsl:for-each>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
           <!-- Transparency percentage-->
@@ -4040,82 +4156,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </xsl:if>
       </xsl:when>
-
-      <xsl:otherwise>
-        <!--Line reference-->
-		  <xsl:if test ="not( (p:spPr/a:prstGeom/@prst='flowChartInternalStorage') or
-									(p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess') or
-									(p:spPr/a:prstGeom/@prst='flowChartSummingJunction') or
-									(p:spPr/a:prstGeom/@prst='flowChartOr') or
-									(p:spPr/a:prstGeom/@prst='flowChartSort') or
-									(p:spPr/a:prstGeom/@prst='flowChartMultidocument') or
-									(p:spPr/a:prstGeom/@prst='flowChartMagneticDisk') or
-									(p:spPr/a:prstGeom/@prst='flowChartMagneticDrum') or
-									(p:spPr/a:prstGeom/@prst='can') or
-									(p:spPr/a:prstGeom/@prst='cube') or
-									(p:spPr/a:prstGeom/@prst='foldedCorner') or
-									(p:spPr/a:prstGeom/@prst='noSmoking') or 
-									((p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')]) and (p:spPr/a:prstGeom/@prst='rect')) or
-									((p:nvSpPr/p:cNvPr/@name[contains(., 'Oval Custom')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or
-									((p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or 
-                  ((p:nvSpPr/p:cNvPr/@name[contains(., 'Ellipse ')]) and (p:spPr/a:prstGeom/@prst='ellipse')) or
-									(p:spPr/a:prstGeom/@prst='rightArrow') or
-									(p:spPr/a:prstGeom/@prst='upArrow') or 
-									(p:spPr/a:prstGeom/@prst='leftArrow') or 
-									(p:spPr/a:prstGeom/@prst='downArrow') or 
-									(p:spPr/a:prstGeom/@prst='leftRightArrow') or 
-									(p:spPr/a:prstGeom/@prst='upDownArrow') or 
-									(p:spPr/a:prstGeom/@prst='triangle') or 
-									(p:spPr/a:prstGeom/@prst='rtTriangle') or 
-									(p:spPr/a:prstGeom/@prst='parallelogram') or 
-									(p:spPr/a:prstGeom/@prst='trapezoid') or 
-									(p:spPr/a:prstGeom/@prst='diamond') or 
-									(p:spPr/a:prstGeom/@prst='pentagon') or 
-									(p:spPr/a:prstGeom/@prst='hexagon') or 
-									(p:spPr/a:prstGeom/@prst='octagon') or 
-									(p:spPr/a:prstGeom/@prst='circularArrow') or 
-									(p:spPr/a:prstGeom/@prst='curvedRightArrow') or 
-									(p:spPr/a:prstGeom/@prst='curvedLeftArrow') or 
-									(p:spPr/a:prstGeom/@prst='curvedDownArrow') or 
-									(p:spPr/a:prstGeom/@prst='curvedUpArrow') or 
-									(p:spPr/a:prstGeom/@prst='leftUpArrow') or 
-									(p:spPr/a:prstGeom/@prst='bentUpArrow') or 
-									(p:spPr/a:prstGeom/@prst='plus') or 
-									(p:spPr/a:prstGeom/@prst='lightningBolt') or 
-									(p:spPr/a:prstGeom/@prst='irregularSeal1') or 
-									(p:spPr/a:prstGeom/@prst='chord') or 
-									(p:spPr/a:prstGeom/@prst='wedgeRectCallout') or 
-									(p:spPr/a:prstGeom/@prst='wedgeRoundRectCallout') or 
-									(p:spPr/a:prstGeom/@prst='wedgeEllipseCallout') or 
-									(p:spPr/a:prstGeom/@prst='cloudCallout') or 
-									(p:spPr/a:prstGeom/@prst='bentArrow') or 
-									(p:spPr/a:prstGeom/@prst='uturnArrow') or 
-									(p:spPr/a:prstGeom/@prst='flowChartProcess') or 
-									(p:spPr/a:prstGeom/@prst='flowChartAlternateProcess') or 
-									(p:spPr/a:prstGeom/@prst='flowChartDecision') or 
-									(p:spPr/a:prstGeom/@prst='flowChartInputOutput') or  
-									(p:spPr/a:prstGeom/@prst='flowChartDocument') or  
-									(p:spPr/a:prstGeom/@prst='flowChartTerminator') or 
-									(p:spPr/a:prstGeom/@prst='flowChartPreparation') or 
-									(p:spPr/a:prstGeom/@prst='flowChartManualInput') or 
-									(p:spPr/a:prstGeom/@prst='flowChartManualOperation') or 
-									(p:spPr/a:prstGeom/@prst='flowChartConnector') or 
-									(p:spPr/a:prstGeom/@prst='flowChartOffpageConnector') or 
-									(p:spPr/a:prstGeom/@prst='flowChartPunchedCard') or 
-									(p:spPr/a:prstGeom/@prst='flowChartPunchedTape') or 
-									(p:spPr/a:prstGeom/@prst='flowChartCollate') or 
-									(p:spPr/a:prstGeom/@prst='flowChartExtract') or 
-									(p:spPr/a:prstGeom/@prst='flowChartMerge') or 
-									(p:spPr/a:prstGeom/@prst='flowChartOnlineStorage') or 
-									(p:spPr/a:prstGeom/@prst='flowChartDelay') or 
-									(p:spPr/a:prstGeom/@prst='flowChartMagneticTape') or 
-									(p:spPr/a:prstGeom/@prst='flowChartDisplay') or 
-									(p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle Custom')]) or 
-									(p:spPr/a:prstGeom/@prst='roundRect') or 
-									(p:spPr/a:prstGeom/@prst='snip1Rect') )">
-
-
-		    	  <xsl:if test ="p:style/a:lnRef">
+		    	  <xsl:when test ="p:style/a:lnRef">
             <xsl:attribute name ="draw:stroke">
               <xsl:value-of select="'solid'" />
             </xsl:attribute>
@@ -4124,21 +4165,6 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:attribute name ="svg:stroke-color">
                 <xsl:value-of select="concat('#',p:style/a:lnRef/a:srgbClr/@val)"/>
               </xsl:attribute>
-
-              <!--Shade percentage-->
-              <!--
-					<xsl:if test="p:style/a:lnRef/a:srgbClr/a:shade/@val">
-						<xsl:variable name ="shade">
-							<xsl:value-of select ="p:style/a:lnRef/a:srgbClr/a:shade/@val"/>
-						</xsl:variable>
-						-->
-              <!--<xsl:if test="($shade != '') or ($shade != 0)">
-							<xsl:attribute name ="svg:stroke-opacity">
-								<xsl:value-of select="concat(($shade div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>-->
-              <!--
-					</xsl:if>-->
             </xsl:if>
             <!--Theme color for border-->
             <xsl:if test ="p:style/a:lnRef/a:schemeClr/@val">
@@ -4153,25 +4179,15 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name ="lumOff">
                     <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumOff/@val"/>
                   </xsl:with-param>
+                  <xsl:with-param name ="shade">
+                    <xsl:for-each select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:shade/@val">
+                      <xsl:value-of select=". div 1000"/>
+                    </xsl:for-each>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:attribute>
-              <!--Shade percentage -->
-              <!--<xsl:if test="p:style/a:lnRef/a:schemeClr/a:shade/@val">
-						<xsl:variable name ="shade">
-							<xsl:value-of select ="p:style/a:lnRef/a:schemeClr/a:shade/@val"/>
-						</xsl:variable>
-						-->
-              <!--<xsl:if test="($shade != '') or ($shade != 0)">
-							<xsl:attribute name ="svg:stroke-opacity">
-								<xsl:value-of select="concat(($shade div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>-->
-              <!--
-					</xsl:if>-->
-            </xsl:if>
-          </xsl:if>
-        </xsl:if>
-      </xsl:otherwise>
+                 </xsl:if>
+          </xsl:when>
     </xsl:choose>
   </xsl:template>
   <!-- Get line styles for shape -->
