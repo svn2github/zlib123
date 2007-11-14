@@ -418,7 +418,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <!--</xsl:for-each>-->
               </xsl:when>
               <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape'
-              or name()='draw:line' or name()='draw:connector'">
+              or name()='draw:line' or name()='draw:connector' or name()='draw:circle'">
                 <!-- Code for shapes start-->
                 <xsl:variable name="var_pos" select="position()"/>
                 <!--<xsl:for-each select=".">-->
@@ -772,6 +772,8 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:with-param name ="level" select ="'0'"/>
                     <xsl:with-param name="framePresentaionStyleId" select="parent::node()/parent::node()/./@presentation:style-name" />
                     <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
+                    <xsl:with-param name ="prClsName" select ="$prClsName"/>
+                    <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                   </xsl:call-template >
                   <xsl:for-each select ="child::node()[position()]">
                     <xsl:choose >
@@ -791,6 +793,7 @@ Copyright (c) 2007, Sonata Software Limited
                                 <xsl:call-template name ="fontStyles">
                                   <xsl:with-param name ="Tid" select ="$textId" />
                                   <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                                  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                                 </xsl:call-template>
                               </xsl:if>
                               <xsl:choose>
@@ -820,8 +823,22 @@ Copyright (c) 2007, Sonata Software Limited
                             </xsl:call-template>
                           </xsl:if>
                         </xsl:if>
-                       
-
+                        <xsl:if test="not(node()) and 
+                                     not(parent::node()/parent::node()/parent::node()/office:event-listeners/presentation:event-listener)">
+                          <a:endParaRPr lang="en-US" dirty="0" smtClean="0">
+                            <!--Font Size -->
+                            <xsl:variable name ="textId">
+                                <xsl:value-of select ="@text:style-name"/>
+                              </xsl:variable>
+                              <xsl:if test ="not($textId ='')">
+                                <xsl:call-template name ="fontStyles">
+                                  <xsl:with-param name ="Tid" select ="$textId" />
+                                  <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                                  <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                                </xsl:call-template>
+                              </xsl:if>
+                          </a:endParaRPr>
+                        </xsl:if>
                       </xsl:when >
                       <xsl:when test ="name()='text:line-break'">
                         <xsl:call-template name ="processBR">
@@ -840,6 +857,7 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:call-template name ="fontStyles">
                                 <xsl:with-param name ="Tid" select ="$textId" />
                                 <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                                <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                               </xsl:call-template>
                             </xsl:if>
                             <xsl:choose>
@@ -913,6 +931,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:with-param name ="level" select ="$lvl"/>
                     <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
                     <!-- parameter added by vijayeta, dated 11-7-07-->
+                    <xsl:with-param name ="prClsName" select ="$prClsName"/>
                     <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                   </xsl:call-template >
                   <!--End of Code inserted by Vijayets for Bullets and numbering-->
@@ -1005,6 +1024,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
               <xsl:with-param name ="pos" select ="$forCount"/>
               <xsl:with-param name ="FrameCount" select ="substring-after($FrameCount,'Frame')"/>
+              <xsl:with-param name ="prClsName" select ="$prClsName"/>
             </xsl:call-template >
             <!--End of Code inserted by Vijayets for Bullets and numbering-->
             <xsl:for-each select ="child::node()[position()]">
@@ -1079,6 +1099,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
               <!-- parameter added by vijayeta, dated 11-7-07-->
               <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+              <xsl:with-param name ="prClsName" select ="$prClsName"/>
             </xsl:call-template >
             <!--End of Code inserted by Vijayets for Bullets and numbering-->
             <xsl:for-each select ="child::node()[position()]">
@@ -1126,6 +1147,8 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="level" select ="'0'"/>
               <xsl:with-param name="framePresentaionStyleId" select="parent::node()/parent::node()/./@presentation:style-name" />
               <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
+              <xsl:with-param name ="prClsName" select ="$prClsName"/>
+              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
             </xsl:call-template >
             <a:r>
               <a:rPr lang="en-US" smtClean="0">
@@ -1137,10 +1160,11 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:call-template name ="fontStyles">
                     <xsl:with-param name ="Tid" select ="$textId" />
                     <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                    <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                   </xsl:call-template>
                 </xsl:if>
                 <xsl:choose>
-                  <xsl:when test="parent::node()/parent::node()/parent::node()/office:event-listeners/presentation:event-listener">
+                  <xsl:when test="parent::node()/parent::node()/office:event-listeners/presentation:event-listener">
                     <xsl:copy-of select="$varRprHyperLinks"/>
                   </xsl:when>
                   <xsl:when test="./text:a">
@@ -1265,7 +1289,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$SMName]/draw:frame[@presentation:class='footer']">
 
                   <xsl:choose>
-                    <xsl:when test="document('content.xml') //presentation:footer-decl[@presentation:name=$footerId]">
+                    <xsl:when test="document('content.xml') //presentation:footer-decl[@presentation:name=$footerId] and contains($footerValue,'false')">
                       <a:r>
                         <a:rPr lang="en-US" dirty="0" smtClean="0"/>
                         <a:t>
@@ -1718,7 +1742,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:value-of select ="$anchorVal"/>
           </xsl:attribute>
         </xsl:if>
-        <xsl:attribute name ="anchorCtr">
+        <xsl:variable name="anchorCtr">
           <xsl:choose >
             <xsl:when test ="@draw:textarea-horizontal-align ='center'">
               <xsl:value-of select ="'1'"/>
@@ -1726,11 +1750,13 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test ="@draw:textarea-horizontal-align='justify'">
               <xsl:value-of select ="'0'"/>
             </xsl:when>
-            <xsl:otherwise >
-              <xsl:value-of select ="'0'"/>
-            </xsl:otherwise>
-          </xsl:choose>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:if test ="$anchorCtr != ''">
+          <xsl:attribute name ="anchorCtr">
+            <xsl:value-of select ="$anchorCtr"/>
         </xsl:attribute>
+        </xsl:if>
         <xsl:attribute name ="wrap">
           <xsl:choose >
             <!--<xsl:when test ="@fo:wrap-option ='no-wrap'">
@@ -2612,7 +2638,6 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:for-each select="./@presentation:class">
                       <xsl:for-each select ="parent::node()/office:event-listeners/presentation:event-listener">
                         <xsl:if test="@xlink:href">
-
                           <xsl:choose>
                             <xsl:when test="@xlink:href[ contains(.,'#')] and string-length(substring-before(@xlink:href,'#')) = 0 ">
                               <xsl:variable name="pageID">
@@ -2638,8 +2663,8 @@ Copyright (c) 2007, Sonata Software Limited
                             <xsl:when test="@xlink:href">
                               <Relationship>
                                 <xsl:attribute name="Id">
-                                  <xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>
-                                  <!--<xsl:value-of select="concat('AtchFileId',$PostionCount)"/>-->
+                                  <!--<xsl:value-of select="concat('TxtBoxAtchFileId',$PostionCount)"/>-->
+                                  <xsl:value-of select="concat('AtchFileId',position())"/>
                                 </xsl:attribute>
                                 <xsl:attribute name="Type">
                                   <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink'"/>
@@ -2667,7 +2692,6 @@ Copyright (c) 2007, Sonata Software Limited
                               </Relationship>
                             </xsl:when>
                           </xsl:choose>
-
                         </xsl:if>
                         <xsl:if test="presentation:sound">
                           <xsl:variable name="varblnDuplicateRelation">
@@ -3390,7 +3414,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:for-each>
           </xsl:when>
-          <xsl:when test="name()='draw:ellipse'">
+          <xsl:when test="name()='draw:ellipse' or name()='draw:circle'">
             <xsl:variable name="var_pos" select="position()"/>
             <xsl:for-each select=".">
               <xsl:variable name="shapeId">
@@ -4571,7 +4595,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:choose>
             <!--</xsl:for-each>-->
           </xsl:when>
-          <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape' 
+          <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape'  or name()='draw:circle'
                 or name()='draw:line' or name()='draw:connector'">
             <xsl:variable name="var_pos" select="position()"/>
             <xsl:call-template name ="shapes" >

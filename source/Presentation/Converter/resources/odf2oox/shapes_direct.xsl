@@ -148,7 +148,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </xsl:for-each>
          </xsl:when>
-        <xsl:when test ="name()='draw:ellipse'">
+        <xsl:when test ="name()='draw:ellipse' or name()='draw:circle'">
           <xsl:if test="not(@draw:kind)">
             <xsl:variable name="shapeCount" select="position()"/>
             <xsl:for-each select=".">
@@ -599,24 +599,40 @@ Copyright (c) 2007, Sonata Software Limited
 																   $angle)"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal">
-        <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal='true'">
-          <xsl:attribute name ="flipH">
-            <xsl:value-of select="'1'"/>
-          </xsl:attribute>
+      
+      <xsl:if test="not(draw:enhanced-geometry/@draw:type='curvedLeftArrow' or
+                    draw:enhanced-geometry/@draw:type='curvedRightArrow' or
+                    draw:enhanced-geometry/@draw:type='curvedDownArrow' or
+                    draw:enhanced-geometry/@draw:type='curvedUpArrow')">
+        <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal">
+          <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal='true'">
+            <xsl:attribute name ="flipH">
+              <xsl:value-of select="'1'"/>
+            </xsl:attribute>
+          </xsl:if>
         </xsl:if>
       </xsl:if>
-		
-		<xsl:if test="not(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
-			<xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical">
-				<xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical='true'">
-					<xsl:attribute name ="flipV">
-						<xsl:value-of select="'1'"/>
-					</xsl:attribute>
-				</xsl:if>
-			</xsl:if>
-		</xsl:if>
-		
+      <xsl:if test="not(draw:enhanced-geometry/@draw:type='curvedLeftArrow' or
+                          draw:enhanced-geometry/@draw:type='curvedRightArrow' or
+                          draw:enhanced-geometry/@draw:type='curvedDownArrow' or
+                          draw:enhanced-geometry/@draw:type='curvedUpArrow')">
+        <xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical">
+          <xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical='true'">
+            <xsl:attribute name ="flipV">
+              <xsl:value-of select="'1'"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+
+      <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
+      <xsl:if test="(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
+        <xsl:attribute name ="rot">
+          <xsl:value-of select ="'5400000'"/>
+        </xsl:attribute>
+      </xsl:if>
+      <!--End of bug fix code-->
+      
       <a:off>
         <xsl:if test="@draw:transform">
           <xsl:attribute name ="x">
@@ -1378,12 +1394,35 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
+      
       <!-- Circular Arrow -->
       <xsl:when test ="contains($prstGeom, 'circular-arrow')">
         <a:prstGeom prst="circularArrow">
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
+      <xsl:when test ="contains($prstGeom, 'curvedUpArrow')">
+        <a:prstGeom prst="curvedUpArrow">
+          <a:avLst/>
+        </a:prstGeom>
+      </xsl:when>
+      <xsl:when test ="contains($prstGeom, 'curvedDownArrow')">
+        <a:prstGeom prst="curvedDownArrow">
+          <a:avLst/>
+        </a:prstGeom>
+      </xsl:when>
+      <xsl:when test ="contains($prstGeom, 'curvedLeftArrow')">
+        <a:prstGeom prst="curvedLeftArrow">
+          <a:avLst/>
+        </a:prstGeom>
+      </xsl:when>
+      <xsl:when test ="contains($prstGeom, 'curvedRightArrow')">
+        <a:prstGeom prst="curvedRightArrow">
+          <a:avLst/>
+        </a:prstGeom>
+      </xsl:when>
+      <!-- End of Circular Arrow Code-->
+      
       <!-- leftUp Arrow -->
       <xsl:when test ="contains($prstGeom, 'leftUpArrow')">
         <a:prstGeom prst="leftUpArrow">
@@ -1645,19 +1684,29 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="gr" />
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:variable name="tranparencyinContent" select="substring-before(@draw:opacity,'%')"/>
     <xsl:choose>
       <xsl:when test="@draw:fill or @draw:fill-color ">
-        <xsl:call-template name ="tmpFill"/>
+        <xsl:call-template name ="tmpFill">
+          <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+          <xsl:with-param name="parentStyle" select="$parentStyle"/>
+        </xsl:call-template>
       </xsl:when>
       <xsl:when test="$parentStyle !='' and not(@draw:fill or @draw:fill-color)">
         <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
-          <xsl:call-template name ="tmpFill"/>
+          <xsl:call-template name ="tmpFill">
+            <xsl:with-param name="tranparencyinStyle" select="substring-before(@draw:opacity,'%')"/>
+            <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
     </xsl:choose>
       
   </xsl:template>
   <xsl:template name="tmpFill">
+    <xsl:param name="tranparencyinContent"/>
+    <xsl:param name="tranparencyinStyle"/>
+    <xsl:param name="parentStyle"/>
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
     <xsl:choose>
@@ -1667,18 +1716,11 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:attribute name ="val">
               <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
             </xsl:attribute>
-            <xsl:if test ="@draw:opacity">
-              <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-              <xsl:choose>
-                <xsl:when test="$tranparency !=''">
-                  <a:alpha>
-                    <xsl:attribute name="val">
-                      <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                    </xsl:attribute>
-                  </a:alpha>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:if>
+            <xsl:call-template name="tmpFillTransperancy">
+              <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
+              <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+              <xsl:with-param name="parentStyle" select="$parentStyle"/>
+            </xsl:call-template>
           </a:srgbClr >
         </a:solidFill>
       </xsl:when>
@@ -1697,25 +1739,134 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:attribute name ="val">
               <xsl:value-of select ="translate(substring-after(@draw:fill-color,'#'),$lcletters,$ucletters)"/>
             </xsl:attribute>
-            <xsl:if test ="@draw:opacity">
-              <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-              <xsl:choose>
-                <xsl:when test="$tranparency !=''">
-                  <a:alpha>
-                    <xsl:attribute name="val">
-                      <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                    </xsl:attribute>
-                  </a:alpha>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:if>
+            <xsl:call-template name="tmpFillTransperancy">
+              <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
+              <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+              <xsl:with-param name="parentStyle" select="$parentStyle"/>
+            </xsl:call-template>
           </a:srgbClr >
         </a:solidFill>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
- 
-  <xsl:template name ="getFillDetails">
+  <xsl:template name="tmpFillTransperancy">
+    <xsl:param name="tranparencyinContent"/>
+    <xsl:param name="tranparencyinStyle"/>
+    <xsl:param name="parentStyle"/>
+              <xsl:choose>
+      <xsl:when test ="$tranparencyinContent ='0' and $tranparencyinStyle =''">
+        <a:alpha val="0"/>
+      </xsl:when>
+      <xsl:when test ="$tranparencyinContent !='' and $tranparencyinStyle =''">
+                  <a:alpha>
+                    <xsl:attribute name="val">
+            <xsl:value-of select="format-number($tranparencyinContent * 1000,'#')" />
+                    </xsl:attribute>
+                  </a:alpha>
+                </xsl:when>
+      <xsl:when test ="$tranparencyinContent !='' and $tranparencyinStyle !=''">
+        <a:alpha>
+          <xsl:attribute name="val">
+            <xsl:value-of select="format-number($tranparencyinContent * 1000,'#')" />
+          </xsl:attribute>
+        </a:alpha>
+      </xsl:when>
+      <xsl:when test ="$tranparencyinContent ='' and $tranparencyinStyle ='' ">
+        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
+          <xsl:if test="@draw:opacity">
+          <a:alpha>
+            <xsl:attribute name="val">
+              <xsl:value-of select="format-number( substring-before(@draw:opacity,'%')* 1000,'#')" />
+            </xsl:attribute>
+          </a:alpha>
+            </xsl:if>
+        </xsl:for-each>
+        
+      </xsl:when>
+      <xsl:when test ="$tranparencyinContent ='' and $tranparencyinStyle ='0'">
+        <a:alpha val="0"/>
+      </xsl:when>
+      <xsl:when test ="$tranparencyinContent ='' and $tranparencyinStyle !=''">
+        <a:alpha>
+          <xsl:attribute name="val">
+            <xsl:value-of select="format-number($tranparencyinStyle * 1000,'#')" />
+          </xsl:attribute>
+        </a:alpha>
+      </xsl:when>
+
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name ="tmpLinefillColor">
+    <xsl:param name ="parentStyle" />
+    <xsl:param name ="gr" />
+    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:variable name="tranparencyinContent" select="substring-before(@svg:stroke-opacity,'%')"/>
+    <xsl:choose>
+      <xsl:when test="@draw:stroke or @svg:stroke-color ">
+        <xsl:call-template name ="tmpLineFill">
+          <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+          <xsl:with-param name="parentStyle" select="$parentStyle"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$parentStyle !='' and not(@draw:stroke or @svg:stroke-color)">
+        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
+          <xsl:call-template name ="tmpLineFill">
+            <xsl:with-param name="tranparencyinStyle" select="substring-before(@svg:stroke-opacity,'%')"/>
+            <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+  <xsl:template name="tmpLineFill">
+    <xsl:param name="tranparencyinContent"/>
+    <xsl:param name="tranparencyinStyle"/>
+    <xsl:param name="parentStyle"/>
+    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:choose>
+      <xsl:when test ="@draw:stroke='solid'">
+        <a:solidFill>
+          <a:srgbClr  >
+            <xsl:attribute name ="val">
+              <xsl:value-of select ="translate(substring-after(@svg:stroke-color,'#'),$lcletters,$ucletters)"/>
+            </xsl:attribute>
+            <xsl:call-template name="tmpFillTransperancy">
+              <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
+              <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+              <xsl:with-param name="parentStyle" select="$parentStyle"/>
+            </xsl:call-template>
+          </a:srgbClr >
+        </a:solidFill>
+      </xsl:when>
+      <xsl:when test ="@draw:stroke='none'">
+        <a:noFill/>
+      </xsl:when>
+      <xsl:when test ="@draw:stroke='gradient'">
+        <xsl:call-template name="tmpGradientFill">
+          <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+          <xsl:with-param  name="opacity" select="substring-before(@svg:stroke-opacity,'%')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="@svg:stroke-color">
+        <a:solidFill>
+          <a:srgbClr  >
+            <xsl:attribute name ="val">
+              <xsl:value-of select ="translate(substring-after(@svg:stroke-color,'#'),$lcletters,$ucletters)"/>
+            </xsl:attribute>
+            <xsl:call-template name="tmpFillTransperancy">
+              <xsl:with-param name="tranparencyinStyle" select="$tranparencyinStyle"/>
+              <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+              <xsl:with-param name="parentStyle" select="$parentStyle"/>
+            </xsl:call-template>
+          </a:srgbClr >
+        </a:solidFill>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+   <xsl:template name ="getFillDetails">
     <xsl:param name ="parentStyle" />
     <xsl:variable name ="opacity" >
       <xsl:value-of select ="@draw:opacity"/>
@@ -1796,68 +1947,10 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </xsl:if>
       </xsl:if>
-
-      <!-- Line color -->
-      <xsl:variable name ="lineOpacity"	>
-        <xsl:value-of select ="@svg:stroke-opacity"/>
-      </xsl:variable>
-      <xsl:choose>
-        <!-- Invisible line-->
-        <xsl:when test ="@draw:stroke='none'">
-          <a:noFill />
-        </xsl:when>
-        <xsl:when test ="@draw:stroke='solid' and not(@svg:stroke-color) and $parentStyle != ''">
-          <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
-            <xsl:choose>
-              <!-- Solid color -->
-              <xsl:when test ="@svg:stroke-color">
-                <xsl:call-template name ="getFillColor">
-                  <xsl:with-param name ="fill-color" select ="@svg:stroke-color" />
-                  <xsl:with-param name ="opacity" select ="$lineOpacity" />
+      <xsl:call-template name ="tmpLinefillColor">
+        <xsl:with-param name ="parentStyle" select="$parentStyle" />
                 </xsl:call-template>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:when test ="@draw:stroke='solid' and not(@svg:stroke-color)">
-          <a:solidFill>
-            <a:srgbClr val="000000">
-            </a:srgbClr>
-          </a:solidFill>
-        </xsl:when>
-        <xsl:when test ="@draw:stroke='dash' and not(@svg:stroke-color)">
-          <a:solidFill>
-            <a:srgbClr val="000000">
-            </a:srgbClr>
-          </a:solidFill>
-        </xsl:when>
-        <!-- Solid color -->
-        <xsl:when test ="@svg:stroke-color">
-          <xsl:call-template name ="getFillColor">
-            <xsl:with-param name ="fill-color" select ="@svg:stroke-color" />
-            <xsl:with-param name ="opacity" select ="@svg:stroke-opacity" />
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:when test ="($parentStyle != '')">
-          <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
-            <xsl:choose>
-              <!-- Invisible line-->
-              <xsl:when test ="@draw:stroke='none'">
-                <a:noFill />
-              </xsl:when>
-              <!-- Solid color -->
-              <xsl:when test ="@svg:stroke-color">
-                <xsl:call-template name ="getFillColor">
-                  <xsl:with-param name ="fill-color" select ="@svg:stroke-color" />
-                  <xsl:with-param name ="opacity" select ="$lineOpacity" />
-                </xsl:call-template>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:for-each>
-        </xsl:when>
-      </xsl:choose>
-
-      <!-- Dash type-->
+             <!-- Dash type-->
       <xsl:if test ="(@draw:stroke='dash')">
         <a:prstDash>
           <xsl:attribute name ="val">
@@ -1874,6 +1967,15 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name ="stroke-linejoin" select ="@draw:stroke-linejoin" />
         </xsl:call-template>
       </xsl:if>
+      <!-- added by yeswanth , Fix for join type , bug# 1811327 -->
+      <xsl:if test="not(./@draw:stroke-linejoin)">
+        <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='standard']/style:graphic-properties/@draw:stroke-linejoin">
+          <xsl:call-template name ="getJoinType">
+            <xsl:with-param name ="stroke-linejoin" select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='standard']/style:graphic-properties/@draw:stroke-linejoin"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:if>
+      <!-- End -->
 
       <!--Arrow type-->
       <xsl:if test="(@draw:marker-start) and (@draw:marker-start != '')">
@@ -1890,7 +1992,24 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </a:headEnd>
       </xsl:if>
-
+      <xsl:if test="not(@draw:marker-start) and not(@draw:marker-start != '') and $parentStyle !=''">
+        <xsl:for-each select ="document('styles.xml')//style:style[@style:name = $parentStyle]/style:graphic-properties">
+          <xsl:if test="@draw:marker-start">
+            <a:headEnd>
+              <xsl:attribute name ="type">
+                <xsl:call-template name ="getArrowType">
+                  <xsl:with-param name ="ArrowType" select ="@draw:marker-start" />
+                </xsl:call-template>
+              </xsl:attribute>
+              <xsl:if test ="@draw:marker-start-width">
+                <xsl:call-template name ="setArrowSize">
+                  <xsl:with-param name ="size" select ="substring-before(@draw:marker-start-width,'cm')" />
+                </xsl:call-template >
+              </xsl:if>
+            </a:headEnd>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:if>
       <xsl:if test="(@draw:marker-end) and (@draw:marker-end != '')">
         <a:tailEnd>
           <xsl:attribute name ="type">
@@ -1905,6 +2024,25 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template >
           </xsl:if>
         </a:tailEnd>
+      </xsl:if>
+      <xsl:if test="not(@draw:marker-end) and not(@draw:marker-end != '') and $parentStyle !=''">
+        <xsl:for-each select ="document('styles.xml')//style:style[@style:name = $parentStyle]/style:graphic-properties">
+          <xsl:if test="@draw:marker-end">
+            <a:tailEnd>
+              <xsl:attribute name ="type">
+                <xsl:call-template name ="getArrowType">
+                  <xsl:with-param name ="ArrowType" select ="@draw:marker-end" />
+                </xsl:call-template>
+              </xsl:attribute>
+
+              <xsl:if test ="@draw:marker-end-width">
+                <xsl:call-template name ="setArrowSize">
+                  <xsl:with-param name ="size" select ="substring-before(@draw:marker-end-width,'cm')" />
+                </xsl:call-template >
+              </xsl:if>
+            </a:tailEnd>
+          </xsl:if>
+        </xsl:for-each>
       </xsl:if>
     </a:ln>
   </xsl:template>
@@ -2716,6 +2854,8 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="isNumberingEnabled" select ="'false'"/>
               <xsl:with-param name ="slideMaster" select ="$fileName"/>
               <xsl:with-param name ="masterPageName" select ="$masterPageName"/>              
+              <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+              <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
             </xsl:call-template >
             <xsl:for-each select ="child::node()[position()]">
               <xsl:choose >
@@ -2949,10 +3089,12 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="level" select ="$lvl"/>
             <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
             <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
-            <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
             <xsl:with-param name ="slideMaster" select ="$fileName"/>
             <xsl:with-param name ="pos" select ="$forCount"/>
             <xsl:with-param name ="shapeCount" select ="$shapeCount"/>
+            <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+            <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+            <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
           </xsl:call-template >
           <!--End of Code inserted by Vijayets for Bullets and numbering-->
           <xsl:for-each select ="child::node()[position()]">

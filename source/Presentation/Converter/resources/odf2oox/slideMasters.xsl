@@ -259,56 +259,14 @@ Copyright (c) 2007, Sonata Software Limited
                                     <xsl:value-of select="@style:parent-style-name"/>
                                   </xsl:variable>
                                   <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]/style:graphic-properties">
-                                    <xsl:choose>
-                                      <xsl:when test="@draw:fill='solid'">
-                                        <xsl:if test="@draw:fill-color">
-                                          <a:solidFill>
-                                            <a:srgbClr>
-                                              <xsl:attribute name="val">
-                                                <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
-                                              </xsl:attribute>
-                                            </a:srgbClr>
-                                          </a:solidFill>
-                                        </xsl:if>
-                                      </xsl:when>
-                                      <xsl:when test="@draw:fill='none'">
-                                        <a:noFill/>
-                                      </xsl:when>
-                                      <xsl:when test="@draw:fill='gradient'">
-                                        <xsl:call-template name="tmpGradientFill">
-                                          <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-                                          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
-                                        </xsl:call-template>
-                                      </xsl:when>
-                                    </xsl:choose>
+                                    <xsl:call-template name="tmpSMShapeFillColor"/>
                                   </xsl:for-each>
 
                                 </xsl:for-each>
                               </xsl:when>
                               <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$prId]">
                                 <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$prId]/style:graphic-properties">
-                                  <xsl:choose>
-                                    <xsl:when test="@draw:fill='solid'">
-                                      <xsl:if test="@draw:fill-color">
-                                        <a:solidFill>
-                                          <a:srgbClr>
-                                            <xsl:attribute name="val">
-                                              <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
-                                            </xsl:attribute>
-                                          </a:srgbClr>
-                                        </a:solidFill>
-                                      </xsl:if>
-                                    </xsl:when>
-                                    <xsl:when test="@draw:fill='none'">
-                                      <a:noFill/>
-                                    </xsl:when>
-                                    <xsl:when test="@draw:fill='gradient'">
-                                      <xsl:call-template name="tmpGradientFill">
-                                        <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-                                        <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
-                                      </xsl:call-template>
-                                    </xsl:when>
-                                  </xsl:choose>
+                                  <xsl:call-template name="tmpSMShapeFillColor"/>
                                 </xsl:for-each>
 
                               </xsl:when>
@@ -3685,7 +3643,36 @@ Copyright (c) 2007, Sonata Software Limited
 		</p:sldMaster>
 
 	</xsl:template>
-
+  <xsl:template name="tmpSMShapeFillColor">
+    <xsl:choose>
+      <xsl:when test="@draw:fill='solid'">
+        <xsl:if test="@draw:fill-color">
+          <a:solidFill>
+            <a:srgbClr>
+              <xsl:attribute name="val">
+                <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
+              </xsl:attribute>
+              <xsl:if test ="@draw:opacity">
+                <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
+                <xsl:call-template name="tmpshapeTransperancy">
+                  <xsl:with-param name="tranparency" select="$tranparency"/>
+                </xsl:call-template>
+              </xsl:if>
+            </a:srgbClr>
+          </a:solidFill>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test="@draw:fill='none'">
+        <a:noFill/>
+      </xsl:when>
+      <xsl:when test="@draw:fill='gradient'">
+        <xsl:call-template name="tmpGradientFill">
+          <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 	<!--Recursive Functions-->
 	<xsl:template name ="BoldItalic">
 		<xsl:param name ="outlineNo" />
@@ -5623,28 +5610,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</a:prstGeom>
 				<!-- Solid fill color -->
 				<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]/style:graphic-properties ">
-          <xsl:choose>
-            <xsl:when test="@draw:fill='solid'">
-              <xsl:if test="@draw:fill-color">
-                <a:solidFill>
-                  <a:srgbClr>
-                    <xsl:attribute name="val">
-                      <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
-                    </xsl:attribute>
-                  </a:srgbClr>
-                </a:solidFill>
-              </xsl:if>
-            </xsl:when>
-            <xsl:when test="@draw:fill='none'">
-              <a:noFill/>
-            </xsl:when>
-            <xsl:when test="@draw:fill='gradient'">
-              <xsl:call-template name="tmpGradientFill">
-                <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-                <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
-              </xsl:call-template>
-            </xsl:when>
-          </xsl:choose>
+          <xsl:call-template name="tmpSMShapeFillColor"/>
 				</xsl:for-each>
         <!--Line Color-->
         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
@@ -5947,27 +5913,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</a:prstGeom>
 				<!-- Solid fill color -->
 				<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]/style:graphic-properties ">
-            <xsl:choose>
-              <xsl:when test="@draw:fill='solid'">
-                <xsl:if test="@draw:fill-color">
-                  <a:solidFill>
-                    <a:srgbClr>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
-                      </xsl:attribute>
-                    </a:srgbClr>
-                  </a:solidFill>
-                </xsl:if>
-              </xsl:when>
-              <xsl:when test="@draw:fill='none'">
-                <a:noFill/>
-              </xsl:when>
-              <xsl:when test="@draw:fill='gradient'">
-                <xsl:call-template name="tmpGradientFill">
-                  <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-                </xsl:call-template>
-              </xsl:when>
-            </xsl:choose>
+          <xsl:call-template name="tmpSMShapeFillColor"/>
 				</xsl:for-each>
         <!--Line Color-->
         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
@@ -6247,28 +6193,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</a:prstGeom>
 				<!-- Solid fill color -->
 				<xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]/style:graphic-properties ">
-          <xsl:choose>
-            <xsl:when test="@draw:fill='solid'">
-              <xsl:if test="@draw:fill-color">
-                <a:solidFill>
-                  <a:srgbClr>
-                    <xsl:attribute name="val">
-                      <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
-                    </xsl:attribute>
-                  </a:srgbClr>
-                </a:solidFill>
-              </xsl:if>
-            </xsl:when>
-            <xsl:when test="@draw:fill='none'">
-              <a:noFill/>
-            </xsl:when>
-            <xsl:when test="@draw:fill='gradient'">
-              <xsl:call-template name="tmpGradientFill">
-                <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-                <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
-              </xsl:call-template>
-            </xsl:when>
-          </xsl:choose>
+          <xsl:call-template name="tmpSMShapeFillColor"/>
 				</xsl:for-each>
         <!--Line Color-->
         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
@@ -6312,8 +6237,7 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:choose>
 								</xsl:attribute>
 							</xsl:for-each>
-					
-						<a:defRPr>
+											<a:defRPr>
 							
 							<xsl:variable name="textName">
 								<xsl:value-of select="./draw:text-box/text:p/text:span/@text:style-name"/>

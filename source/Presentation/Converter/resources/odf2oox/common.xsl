@@ -244,9 +244,18 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name="tmpSuperSubScriptForward"/>
 			</xsl:if>
 
-			<xsl:if test ="not(style:text-properties/@fo:font-size) and $flagPresentationClass='No'">
+			<xsl:if test ="not(style:text-properties/@fo:font-size) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param> 
           <xsl:with-param name="attrName" select="'Fontsize'"/>
 					</xsl:call-template >
 			      </xsl:if>
@@ -256,9 +265,18 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:value-of select ="'1'"/>
 				</xsl:attribute >
 			</xsl:if >
-      <xsl:if test ="not(style:text-properties/@fo:font-weight[contains(.,'bold')]) and $flagPresentationClass='No'">
+      <xsl:if test ="not(style:text-properties/@fo:font-weight[contains(.,'bold')]) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
           <xsl:with-param name="attrName" select="'Bold'"/>
         </xsl:call-template>
       </xsl:if>
@@ -275,9 +293,18 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:value-of select="0"/>
 				</xsl:attribute>
 			</xsl:if>
-      <xsl:if test ="not(style:text-properties/@style:letter-kerning) and  $flagPresentationClass='No'">
+      <xsl:if test ="not(style:text-properties/@style:letter-kerning) and   ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
           <xsl:with-param name="attrName" select="'kerning'"/>
         </xsl:call-template>
       </xsl:if>
@@ -289,17 +316,39 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:value-of select ="'1'"/>
 				</xsl:attribute >
 			</xsl:if >
-      <xsl:if test ="not(style:text-properties/@fo:font-style[contains(.,'italic')]) and $flagPresentationClass='No'">
+      <xsl:if test ="not(style:text-properties/@fo:font-style[contains(.,'italic')]) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
           <xsl:with-param name="attrName" select="'italic'"/>
         </xsl:call-template>
       </xsl:if>
 			
 			<!-- Font underline-->
-      <xsl:for-each select="style:text-properties">
-        <xsl:call-template name="tmpUnderLineStyle"/>
-      </xsl:for-each>
+    
+        <xsl:call-template name="tmpUnderLineStyle">
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="flagPresentationClass" select="$flagPresentationClass"/>
+          <xsl:with-param name="prClassName" select="$prClassName"/>
+        </xsl:call-template>
+      
 
       <!-- Font Strike through Start-->
 			<xsl:choose >
@@ -319,6 +368,23 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:value-of select ="'sngStrike'"/>
 					</xsl:attribute >
 				</xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="$flagPresentationClass='No' or $prClassName='subtitle'">
+            <xsl:call-template name="tmpgetDefualtTextProp">
+              <xsl:with-param name="parentStyleName">
+                <xsl:choose>
+                  <xsl:when test="$prClassName='subtitle'">
+                    <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$parentStyleName"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="attrName" select="'strike'"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:otherwise>
 			</xsl:choose>
 			<!-- Font Strike through end-->
 			<!--Charector spacing -->
@@ -355,29 +421,91 @@ Copyright (c) 2007, Sonata Software Limited
 					</a:srgbClr >
 				</a:solidFill>
 			</xsl:if>
-      <xsl:if test ="not(style:text-properties/@fo:color) and $flagPresentationClass='No'">
+      <xsl:if test ="not(style:text-properties/@fo:color) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
           <xsl:with-param name="attrName" select="'Fontcolor'"/>
         </xsl:call-template>
       </xsl:if>
-			<!-- Text Shadow fix -->
-			<xsl:if test ="style:text-properties/@fo:text-shadow != 'none'">
-				<a:effectLst>
-					<a:outerShdw blurRad="38100" dist="38100" dir="2700000" >
-						<a:srgbClr val="000000">
-							<a:alpha val="43137" />
-						</a:srgbClr>
-					</a:outerShdw>
-				</a:effectLst>
-			</xsl:if>
-      <xsl:if test ="not(style:text-properties/@fo:text-shadow) and $flagPresentationClass='No'">
+      <!-- Text Shadow fix -->
+      <xsl:if test ="style:text-properties/@fo:text-shadow != 'none'">
+        <a:effectLst>
+          <a:outerShdw blurRad="38100" dist="38100" dir="2700000" >
+            <a:srgbClr val="000000">
+              <a:alpha val="43137" />
+            </a:srgbClr>
+          </a:outerShdw>
+        </a:effectLst>
+      </xsl:if>
+      <xsl:if test ="not(style:text-properties/@fo:text-shadow) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
           <xsl:with-param name="attrName" select="'Textshadow'"/>
         </xsl:call-template>
       </xsl:if>
 
+      <!-- Underline color -->
+      <xsl:if test ="style:text-properties/@style:text-underline-color">
+        <a:uFill>
+          <a:solidFill>
+            <a:srgbClr>
+              <xsl:choose>
+                <xsl:when test="style:text-properties/@style:text-underline-color='font-color'">
+                  <xsl:attribute name ="val">
+                    <xsl:if test="style:text-properties/@fo:color">
+                    <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+                    </xsl:if>
+                    <xsl:if test="not(style:text-properties/@fo:color)">
+                      <xsl:for-each select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:text-properties">
+                        <xsl:value-of select ="translate(substring-after(@fo:color,'#'),$lcletters,$ucletters)"/>
+                      </xsl:for-each>
+                    </xsl:if>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="substring-after(style:text-properties/@style:text-underline-color,'#')"/>
+              </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
+            </a:srgbClr>
+          </a:solidFill>
+        </a:uFill>
+      </xsl:if>
+      <xsl:if test ="not(style:text-properties/@style:text-underline-color) and ($flagPresentationClass='No' or $prClassName='subtitle')">
+        <xsl:call-template name="tmpgetDefualtTextProp">
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="attrName" select="'Underlinecolor'"/>
+        </xsl:call-template>
+      </xsl:if>
+		
 			<xsl:if test ="style:text-properties/@fo:font-family">
 				<a:latin charset="0" >
 					<xsl:attribute name ="typeface" >
@@ -388,27 +516,23 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:if>
 			<!--Commented by Vipul As no need to assign defualt font as Arial-->
 			<!--Start-->
-      <xsl:if test ="not(style:text-properties/@fo:font-family) and $flagPresentationClass='No'">
+      <xsl:if test ="not(style:text-properties/@fo:font-family) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="parentStyleName">
+            <xsl:choose>
+              <xsl:when test="$prClassName='subtitle'">
+                <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$parentStyleName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
           <xsl:with-param name="attrName" select="'Fontname'"/>
 							</xsl:call-template >
 			</xsl:if>
 			<!--End-->
-			<!-- Underline color -->
-			<xsl:if test ="style:text-properties/style:text-underline-color">
-				<a:uFill>
-					<a:solidFill>
-						<a:srgbClr>
-							<xsl:attribute name ="val">
-								<xsl:value-of select ="substring-after(style:text-properties/style:text-underline-color,'#')"/>
-							</xsl:attribute>
-						</a:srgbClr>
-					</a:solidFill>
-				</a:uFill>
-			</xsl:if>
-
-		</xsl:for-each >
+			</xsl:for-each >
 	</xsl:template>
 	<xsl:template name ="paraProperties" >
 		<!--- Code inserted by Vijayeta for Bullets and numbering,For bullet properties-->
@@ -418,12 +542,15 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:param name ="level"/>
 		<xsl:param name ="isNumberingEnabled" />
 		<xsl:param name ="framePresentaionStyleId"/>
+    <xsl:param name ="prClsName"/>
 		<!-- parameter added by vijayeta, dated 13-7-07-->
 		<xsl:param name ="masterPageName"/>
 		<xsl:param name="slideMaster" />
     <xsl:param name="pos" />
     <xsl:param name ="shapeCount" />
     <xsl:param name ="FrameCount"/>
+    <xsl:param name ="flagPresentationClass"/>
+    <xsl:param name="parentStyleName"/>
 		<xsl:message terminate="no">progress:text:p</xsl:message>
 		<xsl:variable name ="fileName">
 			<xsl:if test ="$slideMaster !=''">
@@ -487,6 +614,21 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </xsl:if>
         </xsl:if >
+        <xsl:if test ="not(style:paragraph-properties/@fo:text-indent) and  ($flagPresentationClass='No' or $prClsName='subtitle')">
+          <xsl:call-template name="tmpgetDefualtParagraphProp">
+            <xsl:with-param name="parentStyleName">
+              <xsl:choose>
+                <xsl:when test="$prClsName='subtitle'">
+                  <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$parentStyleName"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="attrName" select="'Textindent'"/>
+          </xsl:call-template>
+        </xsl:if>
         <!-- End,bug number 1779336 vijayeta, date:23rd aug '07-->
 				<xsl:if test ="style:paragraph-properties/@fo:text-align">
 					<xsl:attribute name ="algn">
@@ -507,27 +649,22 @@ Copyright (c) 2007, Sonata Software Limited
 						</xsl:choose>
 					</xsl:attribute>
 				</xsl:if >
-				<!-- Added by Lohith - to set the text alignment using frame properties-->
-				<xsl:if test ="not(style:paragraph-properties/@fo:text-align)">
-					<xsl:for-each select ="document('content.xml')//style:style[@style:name=$framePresentaionStyleId]">
-						<xsl:if test="style:graphic-properties/@draw:textarea-horizontal-align = 'left'">
-							<xsl:attribute name ="algn">
-								<xsl:value-of select ="'l'"/>
-							</xsl:attribute>
-						</xsl:if>
-						<xsl:if test="style:graphic-properties/@draw:textarea-horizontal-align = 'right'">
-							<xsl:attribute name ="algn">
-								<xsl:value-of select ="'r'"/>
-							</xsl:attribute>
-						</xsl:if>
-						<xsl:if test="style:graphic-properties/@draw:textarea-horizontal-align = 'center'">
-							<xsl:attribute name ="algn">
-								<xsl:value-of select ="'ctr'"/>
-							</xsl:attribute>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:if >
-        <!-- Condition which checks if text indent is greater than 0 is removed, as the input has a marginn left of value 0
+        <xsl:if test ="not(style:paragraph-properties/@fo:text-align) and  ($flagPresentationClass='No' or $prClsName='subtitle')">
+          <xsl:call-template name="tmpgetDefualtParagraphProp">
+            <xsl:with-param name="parentStyleName">
+              <xsl:choose>
+                <xsl:when test="$prClsName='subtitle'">
+          <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+              </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$parentStyleName"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="attrName" select="'Textalign'"/>
+          </xsl:call-template>
+            </xsl:if>
+                <!-- Condition which checks if text indent is greater than 0 is removed, as the input has a marginn left of value 0
              bug number 1779336 by vijayeta, date:23rd aug '07-->
 				<xsl:if test ="style:paragraph-properties/@fo:margin-left">
 					<!--fo:margin-left-->
@@ -547,10 +684,26 @@ Copyright (c) 2007, Sonata Software Limited
           <!-- warn if indent after text-->
           <xsl:message terminate="no">translation.odf2oox.paragraphIndentTypeAfterText</xsl:message>
         </xsl:if>
+        <xsl:if test ="not(style:paragraph-properties/@fo:margin-left) and  ($flagPresentationClass='No' or $prClsName='subtitle')">
+          <xsl:call-template name="tmpgetDefualtParagraphProp">
+            <xsl:with-param name="parentStyleName">
+              <xsl:choose>
+                <xsl:when test="$prClsName='subtitle'">
+                  <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$parentStyleName"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="attrName" select="'MarginLeft'"/>
+          </xsl:call-template>
+        </xsl:if>
         <!-- End,bug number 1779336 vijayeta, date:23rd aug '07-->
 				<!--Code inserted by Vijayeta For Line Spacing,
             If the line spacing is in terms of Percentage, multiply the value with 1000-->
-				<xsl:if test ="style:paragraph-properties/@fo:line-height and 
+        <xsl:choose>
+          <xsl:when test ="style:paragraph-properties/@fo:line-height and 
 					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
 					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
 					<a:lnSpc>
@@ -560,9 +713,9 @@ Copyright (c) 2007, Sonata Software Limited
 							</xsl:attribute>
 						</a:spcPct>
 					</a:lnSpc>
-				</xsl:if>
+          </xsl:when>
 				<!--If the line spacing is in terms of Points,multiply the value with 2835-->
-        <xsl:if test ="substring-before(style:paragraph-properties/@style:line-spacing,'cm') > 0">
+          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-spacing,'cm') > 0">
 					<a:lnSpc>
 						<a:spcPts>
               <xsl:attribute name ="val">
@@ -574,8 +727,8 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:attribute>
 						</a:spcPts>
 					</a:lnSpc>
-				</xsl:if>
-        <xsl:if test ="substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') > 0 ">
+          </xsl:when>
+          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') > 0 ">
 					<a:lnSpc>
 						<a:spcPts>
               <xsl:attribute name ="val">
@@ -587,7 +740,26 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:attribute>
 						</a:spcPts>
 					</a:lnSpc>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="$flagPresentationClass='No' or $prClsName='subtitle'">
+              <xsl:call-template name="tmpgetDefualtParagraphProp">
+                <xsl:with-param name="parentStyleName">
+                  <xsl:choose>
+                    <xsl:when test="$prClsName='subtitle'">
+                      <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$parentStyleName"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
+                <xsl:with-param name="attrName" select="'Linespacing'"/>
+              </xsl:call-template>
 				</xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+
 				<!--End of Code inserted by Vijayeta For Line Spacing -->
 				<!-- Code Added by Vijayeta,for Paragraph Spacing, Before and After
              Multiply the value in cm with 2835
@@ -606,6 +778,21 @@ Copyright (c) 2007, Sonata Software Limited
 						</a:spcPts>
 					</a:spcBef >
 				</xsl:if>
+        <xsl:if test ="not(style:paragraph-properties/@fo:margin-top) and  ($flagPresentationClass='No' or $prClsName='subtitle')">
+          <xsl:call-template name="tmpgetDefualtParagraphProp">
+            <xsl:with-param name="parentStyleName">
+              <xsl:choose>
+                <xsl:when test="$prClsName='subtitle'">
+                  <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$parentStyleName"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="attrName" select="'MarginTop'"/>
+          </xsl:call-template>
+        </xsl:if>
 				<xsl:if test ="style:paragraph-properties/@fo:margin-bottom">
 					<a:spcAft>
 						<a:spcPts>
@@ -620,6 +807,21 @@ Copyright (c) 2007, Sonata Software Limited
 						</a:spcPts>
 					</a:spcAft>
 				</xsl:if >
+        <xsl:if test ="not(style:paragraph-properties/@fo:margin-bottom) and  ($flagPresentationClass='No' or $prClsName='subtitle')">
+          <xsl:call-template name="tmpgetDefualtParagraphProp">
+            <xsl:with-param name="parentStyleName">
+              <xsl:choose>
+                <xsl:when test="$prClsName='subtitle'">
+                  <xsl:value-of select="concat($masterPageName,'-subtitle')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$parentStyleName"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="attrName" select="'MarginBottom'"/>
+          </xsl:call-template>
+        </xsl:if>
 				<!-- Code Added by Vijayeta,for Paragraph Spacing, Before and After-->
 				<!--<xsl:if test ="isBulleted='false'">
 				<a:buNone/>
@@ -662,15 +864,9 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:attribute>
               <xsl:if test ="style:graphic-properties/@draw:opacity">
                 <xsl:variable name="tranparency" select="substring-before(style:graphic-properties/@draw:opacity,'%')"/>
-                <xsl:choose>
-                  <xsl:when test="$tranparency !=''">
-                    <a:alpha>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="format-number($tranparency * 1000,'#')" />
-                      </xsl:attribute>
-                    </a:alpha>
-                  </xsl:when>
-                </xsl:choose>               
+                <xsl:call-template name="tmpshapeTransperancy">
+                  <xsl:with-param name="tranparency" select="$tranparency"/>
+                </xsl:call-template>
               </xsl:if>
             </a:srgbClr >
           </a:solidFill>
@@ -686,6 +882,21 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when>
       </xsl:choose>
     </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpshapeTransperancy" >
+    <xsl:param name="tranparency"/>
+    <xsl:choose>
+      <xsl:when test ="$tranparency ='0'">
+        <a:alpha val="0"/>
+      </xsl:when>
+      <xsl:when test="$tranparency !=''">
+        <a:alpha>
+          <xsl:attribute name="val">
+            <xsl:value-of select="format-number($tranparency * 1000,'#')" />
+          </xsl:attribute>
+        </a:alpha>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   <xsl:template name="tmpGradientFill">
     <xsl:param name="gradStyleName"/>
@@ -704,13 +915,9 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:value-of select="'ffffff'" />
                     </xsl:if>
                   </xsl:attribute>
-              <xsl:if test ="$opacity !=''">
-                    <a:alpha>
-                      <xsl:attribute name="val">
-                    <xsl:value-of select="format-number($opacity * 1000,'#')" />
-                      </xsl:attribute>
-                    </a:alpha>
-              </xsl:if>
+               <xsl:call-template name="tmpshapeTransperancy">
+                <xsl:with-param name="tranparency" select="$opacity"/>
+              </xsl:call-template>
             </a:srgbClr >
           </a:gs>
           <a:gs pos="100000">
@@ -723,22 +930,24 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select="'ffffff'" />
                 </xsl:if>
               </xsl:attribute>
-              <xsl:if test ="$opacity !=''">
-                <a:alpha>
-                  <xsl:attribute name="val">
-                    <xsl:value-of select="format-number($opacity * 1000,'#')" />
-                  </xsl:attribute>
-                </a:alpha>
-              </xsl:if>
+              <xsl:call-template name="tmpshapeTransperancy">
+                <xsl:with-param name="tranparency" select="$opacity"/>
+              </xsl:call-template>
             </a:srgbClr>
           </a:gs>
         </a:gsLst>
-      </xsl:for-each>
-      <xsl:choose>
+           <xsl:choose>
         <xsl:when test="@draw:style='radial'">
           <a:path path="circle">
-            <a:fillToRect/>
+              <xsl:call-template name="tmpFillToRect"/>
+            </a:path>
+            <xsl:call-template name="tmpTileToRect"/>
+          </xsl:when>
+          <xsl:when test="@draw:style='ellipsoid'">
+            <a:path path="shape">
+               <xsl:call-template name="tmpFillToRect"/>
           </a:path>
+            <xsl:call-template name="tmpTileToRect"/>
         </xsl:when>
         <xsl:when test="@draw:style='linear'">
           <a:lin ang="0" scaled="1"/>
@@ -746,18 +955,69 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when>
         <xsl:when test="@draw:style='rectangular' or @draw:style='square'">
           <a:path path="rect">
-            <a:fillToRect/>
-            <a:tileRect/>
+              <xsl:call-template name="tmpFillToRect"/>
           </a:path>
+            <xsl:call-template name="tmpTileToRect"/>
         </xsl:when>
         <xsl:otherwise>
           <a:lin ang="0" scaled="1"/>
           <a:tileRect/>
         </xsl:otherwise>
         </xsl:choose>
-     
-
+      </xsl:for-each>
     </a:gradFill>
+  </xsl:template>
+  <xsl:template name="tmpFillToRect">
+    <xsl:choose>
+      <xsl:when test="@draw:cx and @draw:cy">
+        <xsl:choose>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 100">
+            <a:fillToRect l="50000" t="50000" r="50000" b="50000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 0">
+            <a:fillToRect r="100000" b="100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 0">
+            <a:fillToRect l="100000" b="100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 100">
+            <a:fillToRect r="100000" t="100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') > 0 and substring-before(@draw:cy,'%') > 0">
+            <a:fillToRect l="100000" t="100000" r="100000" b="100000"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <a:fillToRect/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="tmpTileToRect">
+    <xsl:choose>
+      <xsl:when test="@draw:cx and @draw:cy">
+        <xsl:choose>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 100">
+            <a:tileRect/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 0">
+            <a:tileRect l="-100000" t="-100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 0">
+            <a:tileRect r="-100000" t="-100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 100">
+            <a:tileRect l="-100000" b="-100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') > 0 and substring-before(@draw:cy,'%') > 0">
+            <a:tileRect/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <a:tileRect/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   <xsl:template name ="getClassName">
     <xsl:param name ="clsName"/>
@@ -1051,6 +1311,238 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:when>
           </xsl:choose>
         </xsl:when>
+        <xsl:when test="$attrName='strike'">
+          <xsl:choose >
+            <xsl:when  test="@style:text-line-through-type = 'solid'">
+              <xsl:attribute name ="strike">
+                <xsl:value-of select ="'sngStrike'"/>
+              </xsl:attribute >
+            </xsl:when >
+            <xsl:when test="@style:text-line-through-type[contains(.,'double')]">
+              <xsl:attribute name ="strike">
+                <xsl:value-of select ="'dblStrike'"/>
+              </xsl:attribute >
+            </xsl:when >
+            <!-- style:text-line-through-style-->
+            <xsl:when test="@style:text-line-through-style = 'solid'">
+              <xsl:attribute name ="strike">
+                <xsl:value-of select ="'sngStrike'"/>
+              </xsl:attribute >
+            </xsl:when>
+            <xsl:when test="not(@style:text-line-through-type or @style:text-line-through-style) and $prStyleName !=''">
+              <xsl:call-template name="tmpgetDefualtTextProp">
+                <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                <xsl:with-param name="attrName" select="'strike'"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+
+        </xsl:when>
+        <xsl:when test="$attrName='Underlinecolor'">
+          <xsl:choose>
+              <xsl:when test="@style:text-underline-color='font-color'">
+                <a:uFill>
+                  <xsl:call-template name="tmpgetDefualtTextProp">
+                    <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+                    <xsl:with-param name="attrName" select="'Fontcolor'"/>
+                  </xsl:call-template>
+                </a:uFill>
+              </xsl:when>
+            <xsl:when test ="@style:text-underline-color">
+              <a:uFill>
+                <a:solidFill>
+                  <a:srgbClr>
+                    <xsl:attribute name ="val">
+                      <xsl:value-of select ="substring-after(@style:text-underline-color,'#')"/>
+                    </xsl:attribute>
+                  </a:srgbClr>
+                </a:solidFill>
+              </a:uFill>
+            </xsl:when>
+            <xsl:when test="not(@style:text-underline-color) and $prStyleName !=''">
+              <xsl:call-template name="tmpgetDefualtTextProp">
+                <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                <xsl:with-param name="attrName" select="'Underlinecolor'"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+   <xsl:template name="tmpgetDefualtParagraphProp">
+    <xsl:param name="parentStyleName"/>
+    <xsl:param name="attrName"/>
+    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:for-each select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties">
+      <xsl:variable name="prStyleName" select="./parent::node()/@style:parent-style-name"/>
+      <xsl:choose>
+        <xsl:when test="$attrName='Textindent'">
+          <xsl:choose>
+            <xsl:when test="@fo:text-indent">
+              <xsl:variable name ="varIndent">
+                <xsl:call-template name ="convertToPoints">
+                  <xsl:with-param name="length"  select ="@fo:text-indent"/>
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:if test ="$varIndent!=''">
+                <xsl:attribute name ="indent">
+                  <xsl:value-of select ="$varIndent"/>
+                </xsl:attribute>
+              </xsl:if>
+            </xsl:when>
+            <xsl:when test="not(@fo:text-indent) and $prStyleName !=''">
+              <xsl:call-template name="tmpgetDefualtParagraphProp">
+                <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                <xsl:with-param name="attrName" select="'Textindent'"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$attrName='Textalign'">
+          <xsl:choose>
+            <xsl:when test="@fo:text-align">
+              <xsl:attribute name ="algn">
+                <xsl:choose >
+                  <xsl:when test ="@fo:text-align='center'">
+                    <xsl:value-of select ="'ctr'"/>
+                  </xsl:when>
+                  <xsl:when test ="@fo:text-align='end'">
+                    <xsl:value-of select ="'r'"/>
+                  </xsl:when>
+                  <xsl:when test ="@fo:text-align='justify'">
+                    <xsl:value-of select ="'just'"/>
+                  </xsl:when>
+                  <xsl:when test ="@fo:text-align='start'">
+                    <xsl:value-of select ="'l'"/>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="not(@fo:text-align) and $prStyleName !=''">
+              <xsl:call-template name="tmpgetDefualtParagraphProp">
+                <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                <xsl:with-param name="attrName" select="'Textalign'"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$attrName='MarginLeft'">
+          <xsl:choose>
+            <xsl:when test="@fo:margin-left">
+              <xsl:variable name ="varMarginLeft">
+                <xsl:call-template name ="convertToPoints">
+                  <xsl:with-param name="length"  select ="@fo:margin-left"/>
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:if test ="$varMarginLeft!=''">
+                <xsl:attribute name ="marL">
+                  <xsl:value-of select ="$varMarginLeft"/>
+                </xsl:attribute>
+              </xsl:if>
+            </xsl:when>
+            <xsl:when test="not(@fo:margin-left) and $prStyleName !=''">
+              <xsl:call-template name="tmpgetDefualtTextProp">
+                <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                <xsl:with-param name="attrName" select="'MarginLeft'"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$attrName='MarginTop'">
+          <xsl:choose>
+            <xsl:when test="@fo:margin-top">
+              <a:spcBef>
+                <a:spcPts>
+                  <xsl:attribute name ="val">
+                    <xsl:call-template name ="convertToPointsLineSpacing">
+                      <xsl:with-param name="length"  select ="@fo:margin-top"/>
+                      <xsl:with-param name ="unit" select ="'cm'"/>
+                    </xsl:call-template>
+                  </xsl:attribute>
+                </a:spcPts>
+              </a:spcBef >
+            </xsl:when>
+            <xsl:when test="not(@fo:margin-top) and $prStyleName !=''">
+              <xsl:call-template name="tmpgetDefualtTextProp">
+                <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                <xsl:with-param name="attrName" select="'MarginTop'"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$attrName='MarginBottom'">
+          <xsl:choose>
+            <xsl:when test="@fo:margin-bottom">
+              <a:spcAft>
+                <a:spcPts>
+                  <xsl:attribute name ="val">
+                    <xsl:call-template name ="convertToPointsLineSpacing">
+                      <xsl:with-param name="length"  select ="@fo:margin-bottom"/>
+                      <xsl:with-param name ="unit" select ="'cm'"/>
+                    </xsl:call-template>
+                  </xsl:attribute>
+                </a:spcPts>
+              </a:spcAft >
+            </xsl:when>
+            <xsl:when test="not(@fo:margin-bottom) and $prStyleName !=''">
+              <xsl:call-template name="tmpgetDefualtTextProp">
+                <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                <xsl:with-param name="attrName" select="'MarginBottom'"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$attrName='Linespacing'">
+            <xsl:choose>
+              <xsl:when test ="style:paragraph-properties/@fo:line-height and 
+					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
+					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
+                <a:lnSpc>
+                  <a:spcPct>
+                    <xsl:attribute name ="val">
+                      <xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:line-height,'%')* 1000,'#.##') "/>
+                    </xsl:attribute>
+                  </a:spcPct>
+                </a:lnSpc>
+              </xsl:when>
+              <xsl:when test ="substring-before(style:paragraph-properties/@style:line-spacing,'cm') > 0">
+                <a:lnSpc>
+                  <a:spcPts>
+                    <xsl:attribute name ="val">
+                      <xsl:call-template name ="convertToPointsLineSpacing">
+                        <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-spacing"/>
+                        <xsl:with-param name ="unit" select ="'cm'"/>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </a:spcPts>
+                </a:lnSpc>
+              </xsl:when>
+              <xsl:when test ="substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') > 0 ">
+                <a:lnSpc>
+                  <a:spcPts>
+                    <xsl:attribute name ="val">
+                      <xsl:call-template name ="convertToPointsLineSpacing">
+                        <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
+                        <xsl:with-param name ="unit" select ="'cm'"/>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </a:spcPts>
+                </a:lnSpc>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:if test="$prStyleName !=''">
+                  <xsl:call-template name="tmpgetDefualtParagraphProp">
+                    <xsl:with-param name="parentStyleName" select="$prStyleName"/>
+                    <xsl:with-param name="attrName" select="'Linespacing'"/>
+                  </xsl:call-template>
+                </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
@@ -1132,123 +1624,130 @@ Copyright (c) 2007, Sonata Software Limited
 
   </xsl:template>
   <xsl:template name="tmpUnderLineStyle">
+    <xsl:param name="parentStyleName"/>
+    <xsl:param name="flagPresentationClass"/>
+    <xsl:param name="prClassName"/>
+
     <xsl:choose >
       <!-- Added by lohith for fix - 1744082 - Start-->
-      <xsl:when test="@style:text-underline-type = 'single'">
+      <xsl:when test="style:text-properties/@style:text-underline-type = 'single'">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'sng'"/>
 					</xsl:attribute >
 				</xsl:when>
       <!-- Fix - 1744082 - End-->
-      <xsl:when test="@style:text-underline-style = 'solid' and
-								@style:text-underline-type[contains(.,'double')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'solid' and
+								style:text-properties/@style:text-underline-type[contains(.,'double')]">
         <xsl:attribute name ="u">
           <xsl:value-of select ="'dbl'"/>
         </xsl:attribute >
       </xsl:when>
-      <xsl:when test="@style:text-underline-style  = 'solid' and
-								@style:text-underline-width[contains(.,'bold')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style  = 'solid' and
+								style:text-properties/@style:text-underline-width[contains(.,'bold')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'heavy'"/>
 					</xsl:attribute >
 				</xsl:when>
-      <xsl:when test="@style:text-underline-style = 'solid' and
-							@style:text-underline-width[contains(.,'auto')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'solid' and
+							style:text-properties/@style:text-underline-width[contains(.,'auto')]">
         <xsl:attribute name ="u">
           <xsl:value-of select ="'sng'"/>
         </xsl:attribute >
       </xsl:when>
 				<!-- Dotted lean and dotted bold under line -->
-      <xsl:when test="@style:text-underline-style = 'dotted' and
-								@style:text-underline-width[contains(.,'auto')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'dotted' and
+								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dotted'"/>
 					</xsl:attribute >
 				</xsl:when>
-      <xsl:when test="@style:text-underline-style = 'dotted' and
-								@style:text-underline-width[contains(.,'bold')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'dotted' and
+								style:text-properties/@style:text-underline-width[contains(.,'bold')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dottedHeavy'"/>
 					</xsl:attribute >
 				</xsl:when>
 				<!-- Dash lean and dash bold underline -->
-      <xsl:when test="@style:text-underline-style = 'dash' and
-								@style:text-underline-width[contains(.,'auto')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dash'"/>
 					</xsl:attribute >
 				</xsl:when>
-      <xsl:when test="@style:text-underline-style = 'dash' and
-								@style:text-underline-width[contains(.,'bold')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'bold')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dashHeavy'"/>
 					</xsl:attribute >
 				</xsl:when>
 				<!-- Dash long and dash long bold -->
-      <xsl:when test="@style:text-underline-style = 'long-dash' and
-								@style:text-underline-width[contains(.,'auto')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'long-dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dashLong'"/>
 					</xsl:attribute >
 				</xsl:when>
-      <xsl:when test="@style:text-underline-style = 'long-dash' and
-								@style:text-underline-width[contains(.,'bold')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'long-dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'bold')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dashLongHeavy'"/>
 					</xsl:attribute >
 				</xsl:when>
 
 				<!-- dot Dash and dot dash bold -->
-      <xsl:when test="@style:text-underline-style = 'dot-dash' and
-								@style:text-underline-width[contains(.,'auto')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'dot-dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dotDash'"/>
 						<!-- Modified by lohith for fix 1739785 - dotDashLong to dotDash-->
 					</xsl:attribute >
 				</xsl:when>
-      <xsl:when test="@style:text-underline-style = 'dot-dash' and
-								@style:text-underline-width[contains(.,'bold')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style = 'dot-dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'bold')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dotDashHeavy'"/>
 					</xsl:attribute >
 				</xsl:when>
 				<!-- dot-dot-dash-->
-      <xsl:when test="@style:text-underline-style= 'dot-dot-dash' and
-								@style:text-underline-width[contains(.,'auto')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style= 'dot-dot-dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dotDotDash'"/>
 					</xsl:attribute >
 				</xsl:when>
-      <xsl:when test="@style:text-underline-style= 'dot-dot-dash' and
-								@style:text-underline-width[contains(.,'bold')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style= 'dot-dot-dash' and
+								style:text-properties/@style:text-underline-width[contains(.,'bold')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'dotDotDashHeavy'"/>
 					</xsl:attribute >
 				</xsl:when>
 				<!-- double Wavy -->
-      <xsl:when test="@style:text-underline-style[contains(.,'wave')] and
-								@style:text-underline-type[contains(.,'double')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style[contains(.,'wave')] and
+								style:text-properties/@style:text-underline-type[contains(.,'double')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'wavyDbl'"/>
 					</xsl:attribute >
 				</xsl:when>
 				<!-- Wavy and Wavy Heavy-->
-      <xsl:when test="@style:text-underline-style[contains(.,'wave')] and
-								@style:text-underline-width[contains(.,'auto')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style[contains(.,'wave')] and
+								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'wavy'"/>
 					</xsl:attribute >
 				</xsl:when>
-      <xsl:when test="@style:text-underline-style[contains(.,'wave')] and
-								@style:text-underline-width[contains(.,'bold')]">
+      <xsl:when test="style:text-properties/@style:text-underline-style[contains(.,'wave')] and
+								style:text-properties/@style:text-underline-width[contains(.,'bold')]">
 					<xsl:attribute name ="u">
 						<xsl:value-of select ="'wavyHeavy'"/>
 					</xsl:attribute >
 				</xsl:when>
       <xsl:otherwise >
-        <!--<xsl:call-template name ="getUnderlineFromStyles">
-          <xsl:with-param name ="className" select ="$prClassName"/>
-        </xsl:call-template>-->
+        <xsl:if test="$flagPresentationClass='No' or $prClassName='subtitle'">
+        <xsl:for-each select ="document('styles.xml')//style:style[@style:name = $parentStyleName]">
+          <xsl:call-template name="tmpUnderLineStyle">
+          </xsl:call-template>
+        </xsl:for-each>
+          </xsl:if>
       </xsl:otherwise>
 			</xsl:choose>
 		
@@ -1359,7 +1858,6 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:for-each>
 		</a:tabLst >
 	</xsl:template>
-	
 	<!-- Template added by lohith - to get the page id -->
 	<xsl:template name="getThePageId">
 		<xsl:param name="PageName"/>
@@ -1590,6 +2088,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                     <xsl:with-param name ="fileName" select ="$fileName"/>
                     <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
+                    <xsl:with-param name ="parentStyleName" select ="$prClassName"/>
                   </xsl:call-template>
                 </xsl:if>
               <xsl:if test="name()='text:a' or ./text:a">
@@ -1644,6 +2143,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
                 <xsl:with-param name ="fileName" select ="$fileName"/>
                 <xsl:with-param name ="flagPresentationClass" select ="$flagPresentationClass"/>
+                <xsl:with-param name ="parentStyleName" select ="$prClassName"/>
               </xsl:call-template>
             </xsl:if>
             <xsl:if test="name()='text:a' or ./text:a">
@@ -2562,6 +3062,18 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='circular-arrow')">
         <xsl:value-of select ="'circular-arrow'"/>
       </xsl:when>
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedUpArrow')">
+        <xsl:value-of select ="'curvedUpArrow'"/>
+      </xsl:when>
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedRightArrow')">
+        <xsl:value-of select ="'curvedRightArrow'"/>
+      </xsl:when>
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedDownArrow')">
+        <xsl:value-of select ="'curvedDownArrow'"/>
+      </xsl:when>
+      <xsl:when test ="(draw:enhanced-geometry/@draw:type='curvedLeftArrow')">
+        <xsl:value-of select ="'curvedLeftArrow'"/>
+      </xsl:when>
       <!-- Chord -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
                        (draw:enhanced-geometry/@draw:enhanced-path='M 780489 780489 W 0 0 914400 914400 780489 780489 457200 0 Z N')">
@@ -2591,6 +3103,13 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 868680 L 0 457772 W 0 101727 712090 813817 0 457772 356046 101727 L 610362 101727 L 610362 0 L 813816 203454 L 610362 406908 L 610362 305181 L 356045 305181 A 203454 305181 508636 610363 356045 305181 203454 457772 L 203454 868680 Z N')">
         <xsl:value-of select ="'bentArrow '"/>
       </xsl:when>
+      
+      <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
+      <xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
+        <xsl:value-of select ="'bentUpArrow '"/>
+      </xsl:when>
+      <!--End of bug fix code-->
+      
       <!--  Folded Corner (Added by A.Mathi as on 19/07/2007) -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='paper')">
         <xsl:value-of select ="'foldedCorner '"/>

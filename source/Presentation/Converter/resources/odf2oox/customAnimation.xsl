@@ -80,7 +80,25 @@ Copyright (c) 2007, Sonata Software Limited
 											</p:stCondLst>
 											<p:childTnLst>
 												<p:par>
-													<p:cTn id="5" fill="hold" nodeType="clickEffect">
+                          <p:cTn id="5" fill="hold">
+                            <!-- added by yeswanth , Fix for Animation Start type -->
+                            <xsl:attribute name="nodeType">
+                              <xsl:choose>
+                                <xsl:when test="./anim:par/anim:par/@presentation:node-type='after-previous'">
+                              <xsl:value-of select="'afterEffect'"/>
+                                </xsl:when>
+                                <xsl:when test="./anim:par/anim:par/@presentation:node-type='with-previous'">
+                                <xsl:value-of select="'withEffect'"/>
+                                </xsl:when>
+                                <xsl:when test="./anim:par/anim:par/@presentation:node-type='on-click'">
+                                <xsl:value-of select="'clickEffect'"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:value-of select="'clickEffect'"/>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:attribute>
+                            <!-- End -->
 														<xsl:attribute name ="presetClass">
 															<xsl:value-of select ="$animationType"/>
 														</xsl:attribute>
@@ -853,7 +871,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:for-each select ="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/parent::node()">
         <xsl:for-each select ="node()">
           <xsl:if test ="name()='draw:rect' or name()='draw:ellipse'
-                  or name()='draw:custom-shape' 
+                  or name()='draw:custom-shape' or  name()='draw:circle'
                   or name()='draw:g' or name()='draw:frame'">
             <xsl:choose>
               <xsl:when test="name()='draw:frame'">
@@ -907,7 +925,7 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:call-template>
                 </xsl:if>
               </xsl:when>
-              <xsl:when test="name()='draw:rect' or name()='draw:ellipse'
+              <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:circle'
                           or name()='draw:line' or name()='draw:connector'">
                 <xsl:call-template name="tmpgetNvPrID">
                   <xsl:with-param name="spId" select="$spId"/>
@@ -916,11 +934,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:choose>
           </xsl:if>
         </xsl:for-each>
-				<xsl:for-each select ="node()">
-          
-			
-				</xsl:for-each>
-			</xsl:for-each >
+	</xsl:for-each >
 		</xsl:variable>
 		<xsl:value-of select ="$varSpid"/>
 	</xsl:template>
