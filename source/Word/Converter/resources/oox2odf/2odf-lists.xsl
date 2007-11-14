@@ -196,11 +196,23 @@
           <xsl:attribute name="text:level">
             <xsl:value-of select="$lvl"/>
           </xsl:attribute>
-          <xsl:if test="w:rPr/w:rStyle">
+          <xsl:choose>
+            <xsl:when test="w:rPr/w:rStyle">
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="w:rPr/w:rStyle"/>
+              </xsl:attribute>
+            </xsl:when>
+            <!--clam: special style for bullets with symbol font (bug #1806059)-->
+            <xsl:when test="w:rPr/w:rFonts/@w:ascii='Symbol'">
+              <xsl:attribute name="text:style-name">BulletSymbol</xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise />              
+          </xsl:choose>
+          <!--<xsl:if test="w:rPr/w:rStyle">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="w:rPr/w:rStyle"/>
             </xsl:attribute>
-          </xsl:if>
+          </xsl:if>-->
           <xsl:attribute name="text:bullet-char">
             <xsl:call-template name="TextChar"/>
           </xsl:attribute>
@@ -911,7 +923,7 @@
       <xsl:when test="w:lvlText[@w:val = '' ]"></xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">☑</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '•' ]">•</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">●</xsl:when>
+      <!--<xsl:when test="w:lvlText[@w:val = '' ]">●</xsl:when>-->
       <xsl:when test="w:lvlText[@w:val = '' ]">➢</xsl:when>
       <!--<xsl:when test="w:lvlText[@w:val = '➢' ]">➢</xsl:when>-->
       <xsl:when test="w:lvlText[@w:val = '' ]">✔</xsl:when>

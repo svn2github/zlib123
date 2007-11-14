@@ -921,6 +921,11 @@
           </style:paragraph-properties>
         </style:style>
 
+        <!--clam: special style for bullets with symbol font (bug #1806059)-->
+        <style:style style:family="text" style:name="BulletSymbol">
+          <style:text-properties style:font-name="Symbol" />
+        </style:style>
+
         <xsl:call-template name="InsertNotesConfiguration"/>
         <xsl:if
           test="key('Part', 'word/document.xml')/w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
