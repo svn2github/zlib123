@@ -1952,9 +1952,7 @@
   </xsl:template>
 
   <xsl:template name="InsertField">
-    <xsl:variable name="Gudule">
-      <xsl:value-of select="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] "/>
-    </xsl:variable>
+    <!--xsl:variable name="Gudule" select="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] "/-->
 
     <xsl:choose>
       <!-- workaround for autonum fields - inserting numbera as plain text -->
@@ -1964,11 +1962,11 @@
         </text:span>
       </xsl:when>
       <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
-      <xsl:when test="$Gudule and not(contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
+      <xsl:when test="@oox:firstInstrText and not(contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
         <xsl:apply-templates select="w:instrText[1]"/>
       </xsl:when>
       <!-- autotext fields should be processed like normal text, because there is no autotext field in OO -->
-      <xsl:when test="$Gudule and (contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
+      <xsl:when test="@oox:firstInstrText and (contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
         <xsl:choose>
           <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
             <text:span text:style-name="{generate-id(self::node())}">
