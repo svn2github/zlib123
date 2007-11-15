@@ -579,11 +579,11 @@
       </xsl:choose>
     </xsl:variable>
 
-   <!-- <xsl:call-template name="ClearParentStyleTabs">
+    <xsl:call-template name="ClearParentStyleTabs">
       <xsl:with-param name="parentstyleName" select="$parentstyleName"/>
       <xsl:with-param name="styleContext" select="$styleContext"/>
       <xsl:with-param name="styleName" select="$styleName"/>
-    </xsl:call-template>-->
+    </xsl:call-template>
   </xsl:template>
 
   <!-- clear tabs of parent style -->
