@@ -29,6 +29,7 @@
 using System;
 using System.Xml;
 using System.Collections;
+using System.Globalization;
 using System.IO;
 using CleverAge.OdfConverter.OdfConverterLib;
 
@@ -130,13 +131,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private string condition;
         private bool isFilterValue;
         private string filterValue;
+        private IFormatProvider provider;
 
         public OoxPivotCachePostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
             this.pivotContext = new Stack();
             this.isPxsi = false;
-
+            this.provider = new NumberFormatInfo();
             //<pxsi:pivotTable> variables
             this.isInPivotTable = false;
             this.isSheetNum = false;
@@ -721,7 +723,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         {
                             //if name is of float type round it's represetation to 9 decimal places
                             //and output it wit a comma as separator
-                            double realName = Convert.ToDouble(nameVal.Replace('.', ','));
+                            double realName = Convert.ToDouble(nameVal,provider);
                             realName = Math.Round(realName,9);
                             this.nextWriter.WriteString(realName.ToString());
                         }
@@ -746,7 +748,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             try
                             {
                                 //if field value is a number
-                                Convert.ToDouble(this.fieldItems[col, 1][i].ToString().Replace('.', ','));
+                                Convert.ToDouble(this.fieldItems[col, 1][i].ToString(),provider);
                                 this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
                                 this.nextWriter.WriteStartAttribute("v");
                                 this.nextWriter.WriteString(this.fieldItems[col, 1][i].ToString());
@@ -804,7 +806,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             try
                             {
                                 //if this is number value
-                                Convert.ToDouble(pivotTable[row, col].Replace('.', ','));
+                                Convert.ToDouble(pivotTable[row, col],provider);
                                 this.nextWriter.WriteStartElement("n", EXCEL_NAMESPACE);
                                 this.nextWriter.WriteStartAttribute("v");
                                 this.nextWriter.WriteString(pivotTable[row, col]);
@@ -1016,7 +1018,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 //check weather an item is an integer
                 try
                 {
-                    Convert.ToDouble(this.fieldItems[field, 1][i].ToString().Replace('.', ','));
+                    Convert.ToDouble(this.fieldItems[field, 1][i].ToString(),provider);
                     if (this.fieldItems[field, 1][i].ToString().Contains("."))
                     {
                         containsNumber = true;
@@ -1111,9 +1113,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 try
                 {
                     //numbers with high precision can be rounded during conversion to double and back to string!!! (i.e 18.399999999999999 -> 18,4  )
-                    Convert.ToDouble(key.Replace('.', ','));
-                    numbers[0].Add(key.Replace('.', ','), key);
-                    numbers[1].Add(Convert.ToDouble(key.Replace('.', ',')).ToString(), key);
+                    Convert.ToDouble(key,provider);
+                    numbers[0].Add(key, key);
+                    numbers[1].Add(Convert.ToDouble(key,provider).ToString(), key);
                 }
                 catch
                 {
@@ -1132,7 +1134,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             int count = 0;
             foreach (string key in numbers[0].Keys)
             {
-                sortedNumbers[count] = Convert.ToDouble(key);
+                sortedNumbers[count] = Convert.ToDouble(key,provider);
                 count++;
             }
             Array.Sort(sortedNumbers);
