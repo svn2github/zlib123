@@ -3652,7 +3652,7 @@
           <xsl:call-template name="InsertFlagTextBeforeBreakPage2"/>
         </xsl:if>
         <xsl:choose>
-          <xsl:when test="parent::w:p//w:t">
+          <xsl:when test="parent::w:p//w:t or parent::w:p//w:br">
             <xsl:attribute name="fo:break-before">
               <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
             </xsl:attribute>
