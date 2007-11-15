@@ -127,22 +127,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteString(string text)
         {
-            //added by clam for bug 1785583
-            //Start
-            if (text.StartsWith(" "))
-            {
-                try
-                {
-                    this.nextWriter.WriteStartElement("text", "s", ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)this.currentNode.Peek()).Ns);
-                    this.nextWriter.WriteEndElement();
-                    text = text.Substring(1);
-                }
-                catch (Exception ex)
-                {                   
-                }
-            }
-            //End
-          
+                      
            //for getting system date  (text ==":::current:::")
            if (InSpan() && (!(text ==":::current:::")))
             {
@@ -184,6 +169,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             else
             {
+                //added by clam for bug 1785583
+                //Start
+                if (text.StartsWith(" ") && text.Trim().Length > 0)
+                {
+                    try
+                    {
+                        this.nextWriter.WriteStartElement("text", "s", ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)this.currentNode.Peek()).Ns);
+                        this.nextWriter.WriteEndElement();
+                        text = text.Substring(1);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+                //End
+
                 this.nextWriter.WriteString(text);
             }
         }
