@@ -70,11 +70,14 @@
           <xsl:when test="key('numId',$id)/w:lvlOverride">
             <xsl:value-of select="concat('LO',$id)"/>
           </xsl:when>
-
-          <!-- otherwise, list style is referred to abstractNumId -->
+          
+          <!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles BEGIN-->
           <xsl:otherwise>
-            <xsl:value-of select="concat('L',@w:abstractNumId)"/>
+            <!--<xsl:value-of select="concat('L',@w:abstractNumId)"/>-->
+            <xsl:value-of select="concat('L',$id)"/>
           </xsl:otherwise>
+          <!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles END-->
+          
         </xsl:choose>
       </xsl:attribute>
       <xsl:for-each select="w:lvl">
@@ -1060,13 +1063,19 @@
           <xsl:variable name="linkedNumId">
             <xsl:value-of select="key('StyleId', $linkedStyle)/w:pPr/w:numPr/w:numId/@w:val" />
           </xsl:variable>
-          <xsl:value-of select="concat('L',key('numId', $linkedNumId)/w:abstractNumId/@w:val)" />
+
+          <!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles BEGIN-->          
+          
+          <!--<xsl:value-of select="concat('L',key('numId', $linkedNumId)/w:abstractNumId/@w:val)" />-->
+          <xsl:value-of select="concat('L',$linkedNumId)" />-->
         </xsl:when>
 
-        <!-- otherwise, list style is referred to abstractNumId -->
         <xsl:otherwise>
-          <xsl:value-of select="concat('L',key('numId', $numId)/w:abstractNumId/@w:val)" />
+          <!--<xsl:value-of select="concat('L',key('numId', $numId)/w:abstractNumId/@w:val)" />-->
+          <xsl:value-of select="concat('L',$numId)" />
         </xsl:otherwise>
+        <!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles END-->
+        
       </xsl:choose>
     </xsl:variable>
 
