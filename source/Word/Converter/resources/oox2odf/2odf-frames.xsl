@@ -1036,16 +1036,18 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
-
+    
     <xsl:call-template name="InsertGraphicPosRelativeH">
       <xsl:with-param name="relativeFrom">
         <xsl:value-of select="$horizontalRel"/>
       </xsl:with-param>
     </xsl:call-template>
+    
   </xsl:template>
 
   <xsl:template name="InsertShapeVerticalPos">
     <xsl:param name="shape" select="."/>
+    
     <xsl:variable name="verticalPos">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -1072,6 +1074,13 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:call-template name="InsertVerticalPos">
+      <xsl:with-param name="vAlign" select="$verticalPos"/>
+    </xsl:call-template>
+    <xsl:call-template name="InsertVerticalRel">
+      <xsl:with-param name="vAnchor" select="$verticalRelative"/>
+    </xsl:call-template>
+    <!--
     <xsl:call-template name="InsertGraphicPosV">
       <xsl:with-param name="align" select="$verticalPos"/>
       <xsl:with-param name="relativeFrom" select="$verticalRelative"/>
@@ -1080,6 +1089,8 @@
       <xsl:with-param name="relativeFrom" select="$verticalRelative"/>
       <xsl:with-param name="align" select="$verticalPos"/>
     </xsl:call-template>
+    -->
+    
   </xsl:template>
 
   <xsl:template name="InsertShapeWrap">
@@ -1398,7 +1409,7 @@
       </xsl:call-template>
     </xsl:attribute>
   </xsl:template>
-
+  
   <xsl:template name="ExplodeValues">
     <xsl:param name="elementNum"/>
     <xsl:param name="text"/>
@@ -1670,6 +1681,160 @@
   </xsl:template>
 
   <!--
+  Summary: Inserts the attribute for vertical position
+  Author: makz (DIaLOGIKa)
+  Date: 15.11.2007
+  -->
+  <xsl:template name="InsertVerticalPos">
+    <xsl:param name="yAlign" />
+    <xsl:param name="y" />
+
+    <xsl:attribute name="style:vertical-pos">
+      <xsl:choose>
+        <xsl:when test="$yAlign='bottom'">
+          <xsl:text>bottom</xsl:text>
+        </xsl:when>
+        <xsl:when test="$yAlign='top'">
+          <xsl:choose>
+            <!--
+              makz: If there is a y coordinate then OOo needs "from-top" 
+              because "top" cannot have coordinates.
+              -->
+            <xsl:when test="$y">
+              <xsl:text>from-top</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>top</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$yAlign='center'">
+          <xsl:text>middle</xsl:text>
+        </xsl:when>
+        <!--
+          makz: If no yAlign is specified in OOX document use "from-top"
+          -->
+        <xsl:otherwise>
+          <xsl:text>from-top</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+
+  <!--
+  Summary: Inserts the attribute for horizontal position
+  Author: makz (DIaLOGIKa)
+  Date: 15.11.2007
+  -->
+  <xsl:template name="InsertHorizontalPos">
+    <xsl:param name="xAlign" />
+    
+    <xsl:attribute name="style:horizontal-pos">
+      <xsl:choose>
+        <xsl:when test="$xAlign='center'">
+          <xsl:text>middle</xsl:text>
+        </xsl:when>
+        <xsl:when test="$xAlign='inside'">
+          <xsl:text>left</xsl:text>
+        </xsl:when>
+        <xsl:when test="$xAlign='outside'">
+          <xsl:text>right</xsl:text>
+        </xsl:when>
+        <xsl:when test="$xAlign='left'">
+          <xsl:text>left</xsl:text>
+        </xsl:when>
+        <xsl:when test="$xAlign='right'">
+          <xsl:text>right</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>from-left</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute >
+  </xsl:template>
+
+  <!--
+  Summary: Inserts the attribute for horizontal relation
+  Author: makz (DIaLOGIKa)
+  Date: 15.11.2007
+  -->
+  <xsl:template name="InsertHorizontalRel">
+    <xsl:param name="hAnchor" />
+    
+    <xsl:attribute name="style:horizontal-rel">
+      <xsl:choose>
+        <xsl:when test="$hAnchor='margin'">
+          <xsl:text>paragraph-content</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hAnchor='page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$hAnchor='text'">
+          <xsl:text>page-content</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>page-content</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+
+  <!--
+  Summary: Inserts the attribute for vertical relation
+  Author: makz (DIaLOGIKa)
+  Date: 15.11.2007
+  -->
+  <xsl:template name="InsertVerticalRel">
+    <xsl:param name="vAnchor" />
+    
+    <xsl:attribute name="style:vertical-rel">
+      <xsl:choose>
+        <xsl:when test="$vAnchor='page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$vAnchor='text'">
+          <xsl:text>baseline</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>page</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+
+  <!--
+  Summary: Inserts the attribute for wrap
+  Author: makz (DIaLOGIKa)
+  Date: 15.11.2007
+  -->
+  <xsl:template name="InsertWrap">
+    <xsl:param name="wrap" />
+               
+    <xsl:attribute name="style:wrap">
+      <xsl:choose>
+        <xsl:when test="not($wrap) or $wrap ='none'">
+          <xsl:text>none</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap ='auto'">
+          <xsl:text>parallel</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap ='around'">
+          <xsl:text>parallel</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap ='notBeside'">
+          <xsl:text>parallel</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap ='through'">
+          <xsl:text>parallel</xsl:text>
+        </xsl:when>
+        <xsl:when test="$wrap ='tight'">
+          <xsl:text>parallel</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+    
+  <!--
   Summary: Converts the properties of the Anchor.
   Author: Clever Age
   Modified: makz (DIaLOGIKa)
@@ -1677,7 +1842,7 @@
   -->
   <xsl:template name="InsertFramePrAnchor">
     <xsl:param name="oFramePr"/>
-    
+
     <!-- Translation Rules                   -->
     <!-- w:wrap    =>  style:wrap            -->
     <!-- w:yAlign  =>  style:vertical-pos    -->
@@ -1689,128 +1854,27 @@
     <xsl:variable name="vAnchor"  select = "$oFramePr/@w:vAnchor"/>
     <xsl:variable name="xAlign"   select = "$oFramePr/@w:xAlign"/>
     <xsl:variable name="hAnchor"  select = "$oFramePr/@w:hAnchor"/>
-    
-    <!-- Wrap -->
-    <xsl:attribute name="style:wrap">
-      <xsl:choose>
-        <xsl:when test="not($Wrap) or $Wrap ='none'">
-          <xsl:text>none</xsl:text>
-        </xsl:when>
-        <xsl:when test="$Wrap ='auto'">
-          <xsl:text>parallel</xsl:text>
-        </xsl:when>
-        <xsl:when test="$Wrap ='around'">
-          <xsl:text>parallel</xsl:text>
-        </xsl:when>
-        <xsl:when test="$Wrap ='notBeside'">
-          <xsl:text>parallel</xsl:text>
-        </xsl:when>
 
-        <xsl:when test="$Wrap ='through'">
-          <xsl:text>parallel</xsl:text>
-        </xsl:when>
-
-        <xsl:when test="$Wrap ='tight'">
-          <xsl:text>parallel</xsl:text>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:attribute>
+    <xsl:call-template name="InsertWrap">
+      <xsl:with-param name="wrap" select="$Wrap" />
+    </xsl:call-template>
     
     <xsl:if test ="count($yAlign)>0 or count($vAnchor)>0">
-      
-      <!-- Vertical Position -->
-      <xsl:attribute name="style:vertical-pos">
-        <xsl:choose>
-          <xsl:when test="$yAlign='bottom'">
-            <xsl:text>bottom</xsl:text>
-          </xsl:when>
-          <xsl:when test="$yAlign='top'">
-            <xsl:choose>
-              <!--
-              makz: If there is a y coordinate then OOo needs "from-top" 
-              because "top" cannot have coordinates.
-              -->
-              <xsl:when test="$oFramePr/@w:y">
-                <xsl:text>from-top</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>top</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <xsl:when test="$yAlign='center'">
-            <xsl:text>middle</xsl:text>
-          </xsl:when>
-          <!--
-          makz: If no yAlign is specified in OOX document use "from-top"
-          -->
-          <xsl:otherwise>
-            <xsl:text>from-top</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      
-      <!-- Vertical Anchor -->
-      <xsl:attribute name="style:vertical-rel">
-        <xsl:choose>
-          <xsl:when test="$vAnchor='page'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$vAnchor='text'">
-            <xsl:text>baseline</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>page</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      
+      <xsl:call-template name="InsertVerticalPos">
+        <xsl:with-param name="yAlign" select="$yAlign" />
+        <xsl:with-param name="y" select="$oFramePr/@w:y" />
+      </xsl:call-template>
+      <xsl:call-template name="InsertVerticalRel">
+        <xsl:with-param name="vAnchor" select="$vAnchor" />
+      </xsl:call-template>
     </xsl:if>
-    
     <xsl:if test ="count($xAlign)>0 or count($hAnchor)>0">
-
-      <!-- Horizontal Position -->
-      <xsl:attribute name="style:horizontal-pos">
-        <xsl:choose>
-          <xsl:when test="$xAlign='center'">
-            <xsl:text>middle</xsl:text>
-          </xsl:when>
-          <xsl:when test="$xAlign='inside'">
-            <xsl:text>left</xsl:text>
-          </xsl:when>
-          <xsl:when test="$xAlign='outside'">
-            <xsl:text>right</xsl:text>
-          </xsl:when>
-          <xsl:when test="$xAlign='left'">
-            <xsl:text>left</xsl:text>
-          </xsl:when>
-          <xsl:when test="$xAlign='right'">
-            <xsl:text>right</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>from-left</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute >
-
-      <!-- Horizontal Anchor -->
-      <xsl:attribute name="style:horizontal-rel">
-        <xsl:choose>
-          <xsl:when test="$hAnchor='margin'">
-            <xsl:text>paragraph-content</xsl:text>
-          </xsl:when>
-          <xsl:when test="$hAnchor='page'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$hAnchor='text'">
-            <xsl:text>page-content</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>page-content</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      
+      <xsl:call-template name="InsertHorizontalPos">
+        <xsl:with-param name="xAlign" select="$xAlign" />
+      </xsl:call-template>
+      <xsl:call-template name="InsertHorizontalRel">
+        <xsl:with-param name="hAnchor" select="$hAnchor" />
+      </xsl:call-template>
     </xsl:if>
   </xsl:template>
 
@@ -1981,11 +2045,10 @@
         <xsl:when test="$HorizontalRelative = 'margin'">
           <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w) - number(ancestor::node()/w:sectPr/w:pgMar/@w:left) - number(ancestor::node()/w:sectPr/w:pgMar/@w:right)"/>
         </xsl:when>
-
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:if test="$position = 'absolute' or $shape[name()='w:framePr']">
+    <xsl:if test="$position='absolute' or $shape[name()='w:framePr']">
       <xsl:variable name="svgx">
         <xsl:choose>
           <xsl:when test="$shape[name()='w:framePr']">
@@ -2036,11 +2099,14 @@
         </xsl:choose>
       </xsl:variable>
 
-      <xsl:attribute name="svg:y">
+      <xsl:variable name="svgycm">
         <xsl:call-template name="ConvertMeasure">
           <xsl:with-param name="length" select="$svgy"/>
           <xsl:with-param name="destUnit" select="'cm'"/>
         </xsl:call-template>
+      </xsl:variable>
+      <xsl:attribute name="svg:y">
+        <xsl:value-of select="$svgycm"/>
       </xsl:attribute>
     </xsl:if>
   </xsl:template>

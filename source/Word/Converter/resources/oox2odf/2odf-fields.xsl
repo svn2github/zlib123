@@ -228,7 +228,6 @@
   </xsl:template>
 
   <!-- template with mode automaticpict should behave as with mode automaticstyles -->
-
   <xsl:template match="w:instrText" mode="automaticpict">
     <xsl:apply-templates select="." mode="automaticstyles"/>
   </xsl:template>

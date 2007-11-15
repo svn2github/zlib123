@@ -52,6 +52,22 @@
   MATCHING TEMPLATES
   *************************************************************************
   -->
+  <!--
+  Summary: Converts picture shapes
+  Author: Clever Age
+  -->
+  <xsl:template match="v:shape[v:imagedata]">
+    <draw:frame>
+      <xsl:call-template name="InsertCommonShapeProperties">
+        <xsl:with-param name="shape" select="." />
+      </xsl:call-template>
+      <xsl:call-template name="InsertShapeZindex"/>
+
+      <xsl:apply-templates/>
+      <!-- some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
+      <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
+    </draw:frame>
+  </xsl:template>
   
   <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
 
