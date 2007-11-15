@@ -234,15 +234,35 @@
   </xsl:template>
 
   <!--
-  Summary: Converts references to fields
+  Summary: Converts references to fields or bookmarks
   Author: Clever Age
   Modified: makz (DIaLOGIka)
   Date: 2.11.2007
   -->
   <xsl:template match="w:fldSimple[contains(@w:instr,'REF')]" mode="fields">
-    <xsl:call-template name="InsertUserVariable">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-    </xsl:call-template>
+
+    <xsl:variable name="fieldName">
+      <xsl:call-template name="ExtractFieldName">
+        <xsl:with-param name="fieldCode" select="@w:instr" />
+        <xsl:with-param name="fieldType" select="'REF'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="referencedItem" select="key('Part', 'word/document.xml')/w:document/w:body//w:bookmarkStart[@w:name=$fieldName]" />
+    
+    <xsl:choose>
+      <!-- Is the referenced field a bookmark? -->
+      <xsl:when test="$referencedItem">
+        <xsl:call-template name="InsertCrossReference">
+          <xsl:with-param name="fieldCode" select="@w:instr"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="InsertUserVariable">
+          <xsl:with-param name="fieldCode" select="@w:instr"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
   <!--document title TITLE, DOCPROPERTY Title-->
@@ -430,6 +450,11 @@
     <xsl:call-template name="InsertComments"/>
   </xsl:template>
 
+  <!--NUMWORDS, DOCPROPERTY Words-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMWORDS') or contains(@w:instr, 'Words')]" mode="fields">
+    <xsl:call-template name="InsertWordCount"/>
+  </xsl:template>
+
   <!-- 
   *************************************************************************
   CALLED TEMPLATES
@@ -575,7 +600,7 @@
   <!-- build a field code using current instrText and recursively forward (go to next instrText) -->
   <xsl:template name="BuildFieldCode">
     <xsl:param name="instrText" select="."/>
-    <xsl:param name="fieldCode"/>
+    <xsl:param name="fieldCode" />
     <!-- context must be w:instrText -->
     <xsl:choose>
       <!-- if next sibling instrText -->
@@ -934,13 +959,14 @@
   </xsl:template>
 
   <!--
-  Summary: inserts a reference to another field
+  Summary: inserts a reference to bookmark
   Author: Clever Age
   Modified: makz (DIaLOGIKa)
   Date: 2.11.2007
   -->
   <xsl:template name="InsertCrossReference">
     <xsl:param name="fieldCode"/>
+    <xsl:param name="displayValue" />
     
     <text:bookmark-ref text:reference-format="text">
       <xsl:choose>
@@ -955,7 +981,6 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
-          <xsl:apply-templates select="w:r/w:t"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:attribute name="text:ref-name">
@@ -968,10 +993,10 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
-          <xsl:apply-templates select="w:r/w:t"/>
-          <!--<xsl:apply-templates select="ancestor::w:p/descendant::w:t"/>-->
         </xsl:otherwise>
       </xsl:choose>
+
+      <xsl:apply-templates select="following-sibling::w:r/w:t"/>
     </text:bookmark-ref>
   </xsl:template>
 
@@ -2038,11 +2063,6 @@
     <text:template-name text:display="name">
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:template-name>
-  </xsl:template>
-
-  <!--NUMWORDS, DOCPROPERTY Words-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMWORDS') or contains(@w:instr, 'Words')]" mode="fields">
-    <xsl:call-template name="InsertWordCount"/>
   </xsl:template>
 
   <xsl:template name="InsertWordCount">

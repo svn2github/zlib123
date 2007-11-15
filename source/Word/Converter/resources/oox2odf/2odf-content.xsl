@@ -42,6 +42,7 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut"
   xmlns:v="urn:schemas-microsoft-com:vml" 
+  xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:oox="urn:oox"
   exclude-result-prefixes="w r xlink number wp oox">
 
@@ -52,6 +53,7 @@
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:import href="2odf-indexes.xsl"/>
   <xsl:import href="2odf-track.xsl"/>
+  <xsl:import href="2odf-ole.xsl"/>
   <xsl:import href="2odf-frames.xsl"/>
   <xsl:import href="2odf-sections.xsl"/>
   <!--xsl:import href="2odf-comments.xsl"/-->
@@ -82,7 +84,7 @@
         <xsl:call-template name="InsertSectionsStyles"/>
         <xsl:call-template name="InsertFootnoteStyles"/>
         <xsl:call-template name="InsertEndnoteStyles"/>
-        <xsl:call-template name="InsertFrameStyle"/>
+        <xsl:call-template name="InsertFrameStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
@@ -95,7 +97,7 @@
   </xsl:template>
 
   <!--  generates automatic styles for frames -->
-  <xsl:template name="InsertFrameStyle">
+  <xsl:template name="InsertFrameStyles">
     <!-- when w:pict is child of paragraph-->
     <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
       <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict"
@@ -129,10 +131,9 @@
     </xsl:if>
   </xsl:template>
 
-  <!--  generates automatic styles for paragraphs  ho w does it exactly work ?? -->
+  <!--  generates automatic styles for paragraphs  how does it exactly work ?? -->
   <xsl:template name="InsertBodyStyles">
-    <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body"
-      mode="automaticstyles"/>
+    <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body" mode="automaticstyles"/>
   </xsl:template>
 
   <xsl:template name="InsertListStyles">

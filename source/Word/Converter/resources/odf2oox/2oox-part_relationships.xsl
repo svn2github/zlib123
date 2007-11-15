@@ -27,7 +27,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -67,7 +68,9 @@
       <xsl:call-template name="InsertHeaderFooterRelationships"/>
 
       <!-- OLE objects relationships -->
-      <xsl:variable name="allOLEs" select="document('content.xml')/office:document-content/office:body//draw:object-ole | document('content.xml')/office:document-content/office:body//draw:object" />
+      <xsl:variable name="allOLEs" select="document('content.xml')/office:document-content/office:body//draw:object-ole | document('content.xml')/office:document-content/office:body//draw:object | 
+                    document('styles.xml')/office:document-styles/office:master-styles//draw:object-ole | document('styles.xml')/office:document-styles/office:master-styles//draw:object" />
+      
       <xsl:call-template name="InsertOleObjectsRelationships">
         <xsl:with-param name="oleObjects" select="$allOLEs"/>
       </xsl:call-template>

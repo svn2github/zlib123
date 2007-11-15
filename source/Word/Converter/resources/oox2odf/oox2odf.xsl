@@ -30,6 +30,9 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   exclude-result-prefixes="oox rels">
 
   <xsl:import href="measures.xsl"/>
@@ -39,6 +42,7 @@
   <xsl:import href="2odf-pictures.xsl"/>
   <xsl:import href="2odf-styles.xsl"/>
   <xsl:import href="2odf-frames.xsl"/>
+  <xsl:import href="2odf-ole.xsl"/>
   <xsl:import href="2odf-settings.xsl"/>
   <xsl:import href="2odf-relationships.xsl"/>
   <xsl:import href="2odf-footnotes.xsl"/>
@@ -103,17 +107,15 @@
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
           
-          <xsl:for-each
-            select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/') = 'media']">
+          <!-- copy relationships from document -->
+          <xsl:for-each select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
           <!-- divo TODO: does this work for more than one footer/header (i.e. if we have footer2.xml.rel etc) ??? -->
-          <xsl:for-each
-            select="key('Part', 'word/_rels/footer1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/') = 'media']">
+          <xsl:for-each select="key('Part', 'word/_rels/footer1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
-          <xsl:for-each
-            select="key('Part', 'word/_rels/header1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/') = 'media']">
+          <xsl:for-each select="key('Part', 'word/_rels/header1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
             <xsl:call-template name="InsertManifestFileEntry"/>
           </xsl:for-each>
         </manifest:manifest>
@@ -144,28 +146,90 @@
     </pzip:archive>
   </xsl:template>
 
+  <!--
+  Summary: Inserts the manifest entry for a single reference
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 14.11.2007
+  -->
   <xsl:template name="InsertManifestFileEntry">
     <manifest:file-entry>
-      <xsl:attribute name="manifest:media-type">
-        <xsl:if test="substring-after(@Target,'.') = 'gif'">
-          <xsl:text>image/gif</xsl:text>
-        </xsl:if>
-        <xsl:if
-          test="substring-after(@Target,'.') = 'jpg' or substring-after(@Target,'.') = 'jpeg'  or 
-          substring-after(@Target,'.') = 'jpe' or substring-after(@Target,'.') = 'jfif' ">
-          <xsl:text>image/jpeg</xsl:text>
-        </xsl:if>
-        <xsl:if test="substring-after(@Target,'.') = 'tif' or substring-after(@Target,'.') = 'tiff'">
-          <xsl:text>image/tiff</xsl:text>
-        </xsl:if>
-        <xsl:if test="substring-after(@Target,'.') = 'png'">
-          <xsl:text>image/png</xsl:text>
-        </xsl:if>
-      </xsl:attribute>
-      <xsl:attribute name="manifest:full-path">
-        <xsl:text>Pictures/</xsl:text>
-        <xsl:value-of select="substring-after(@Target,'/')"/>
-      </xsl:attribute>
+
+      <xsl:variable name="thisId" select="@Id" />
+      <xsl:variable name="suffix" select="translate(substring-after(@Target,'.'), 
+                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+      
+      <!-- write the media type -->
+      <xsl:choose>
+        <!-- GIF -->
+        <xsl:when test="$suffix='gif'">
+          <xsl:attribute name="manifest:media-type">
+            <xsl:text>image/gif</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- JPEG -->
+        <xsl:when test="$suffix='jpg' or $suffix='jpeg' or $suffix='jpe' or $suffix='jfif'">
+          <xsl:attribute name="manifest:media-type">
+            <xsl:text>image/jpeg</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- TIFF -->
+        <xsl:when test="$suffix='tif' or $suffix='tiff'">
+          <xsl:attribute name="manifest:media-type">
+            <xsl:text>image/tiff</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- PNG -->
+        <xsl:when test="$suffix='png'">
+          <xsl:attribute name="manifest:media-type">
+            <xsl:text>image/png</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- EMF -->
+        <xsl:when test="$suffix='emf'">
+          <xsl:attribute name="manifest:media-type">
+            <xsl:text>image/png</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- Binaries OLE -->
+        <xsl:when test="$suffix='bin'">
+          <xsl:attribute name="manifest:media-type">
+            <xsl:text>application/vnd.sun.star.oleobject</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+
+      <!-- write the path -->
+      <xsl:choose>
+        <!-- the ref is a ole -->
+        <xsl:when test="@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject'">
+          <xsl:attribute name="manifest:full-path">
+            <xsl:value-of select="substring-before(substring-after(@Target,'/'), '.bin')"/>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- the ref is ole picture -->
+        <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//w:object/v:shape/v:imagedata[@r:id=$thisId]">
+          <xsl:attribute name="manifest:full-path">
+            <xsl:text>ObjectReplacements/</xsl:text>
+            <xsl:choose>
+              <xsl:when test="$suffix='wmf' or $suffix='emf'">
+                <xsl:text>OLEplaceholder.png</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-after(@Target,'/')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- the ref is a normal picture -->
+        <xsl:otherwise>
+          <xsl:attribute name="manifest:full-path">
+            <xsl:text>Pictures/</xsl:text>
+            <xsl:value-of select="substring-after(@Target,'/')"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </manifest:file-entry>
   </xsl:template>
 

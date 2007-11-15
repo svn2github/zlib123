@@ -113,5 +113,8 @@
     <EmbeddedResource Include="resources\OLEplaceholder.png">
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\2odf-ole.xsl" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
