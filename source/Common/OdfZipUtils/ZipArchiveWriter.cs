@@ -426,9 +426,13 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     }
 
                 }
-                else if (IsOLERelationship(text))
+                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makeabspath#"))
                 {
-                    text = MakeRelPathToAbs(text);
+                    text = MakeAbsPath(text);
+                }
+                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makerelpath#"))
+                {
+                    text = MakeRelPath(text);
                 }
                 else if (text.Contains("COMPUTEODFCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "graphic-properties"))
                 {
@@ -589,12 +593,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
         }
 
-        private bool IsOLERelationship(string text)
-        {
-            return text.StartsWith("http://www.dialogika.de/odf-converter/makeabspath#");
-        }
-
-        private string MakeRelPathToAbs(string text)
+        private string MakeAbsPath(string text)
         {
             int pos = "http://www.dialogika.de/odf-converter/makeabspath#".Length;
             string relativePath = text.Remove(0, pos);
@@ -606,7 +605,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
                     path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
             }
-
             //for addins
             if (path == "")
             {
@@ -616,6 +614,67 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
             string absolutePath = Path.GetFullPath(path + relativePath).Replace(" ", "%20");
             return "file:///" + absolutePath;
+        }
+
+        private string MakeRelPath(string text)
+        {
+            int pos = "http://www.dialogika.de/odf-converter/makeabspath#".Length;
+            string absolutePath = text.Remove(0, pos);
+            string path = "";
+
+            // for Commandline tool
+            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            {
+                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                    path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+            }
+            //for addins
+            if (path == "")
+            {
+                path = Environment.CurrentDirectory;
+            }
+
+            string relativePath = MakeWinPathRelative(path, absolutePath);
+            return relativePath.Replace("\\", "/");
+        }
+
+        private string MakeWinPathRelative(string absolutePath, string relativeTo)
+        {
+            string[] absoluteDirectories = absolutePath.Split('\\');
+            string[] relativeDirectories = relativeTo.Split('\\');
+
+            //Get the shortest of the two paths
+            int length = absoluteDirectories.Length < relativeDirectories.Length ? absoluteDirectories.Length : relativeDirectories.Length;
+
+            //Use to determine where in the loop we exited
+            int lastCommonRoot = -1;
+            int index;
+
+            //Find common root
+            for (index = 0; index < length; index++)
+                if (absoluteDirectories[index] == relativeDirectories[index])
+                    lastCommonRoot = index;
+                else
+                    break;
+
+            //If we didn't find a common prefix then throw
+            if (lastCommonRoot == -1)
+                throw new ArgumentException("Paths do not have a common base");
+
+            //Build up the relative path
+            StringBuilder relativePath = new StringBuilder();
+
+            //Add on the ..
+            for (index = lastCommonRoot + 1; index < absoluteDirectories.Length; index++)
+                if (absoluteDirectories[index].Length > 0)
+                    relativePath.Append("..\\");
+
+            //Add on the folders
+            for (index = lastCommonRoot + 1; index < relativeDirectories.Length - 1; index++)
+                relativePath.Append(relativeDirectories[index] + "\\");
+            relativePath.Append(relativeDirectories[relativeDirectories.Length - 1]);
+
+            return "../" + relativePath.ToString();
         }
 
         public override void WriteFullEndElement()
