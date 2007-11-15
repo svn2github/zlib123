@@ -1987,11 +1987,11 @@
         </text:span>
       </xsl:when>
       <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
-      <xsl:when test="@oox:firstInstrText and not(contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
+      <xsl:when test="w:instrText/@oox:firstInstrText and not(contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
         <xsl:apply-templates select="w:instrText[1]"/>
       </xsl:when>
       <!-- autotext fields should be processed like normal text, because there is no autotext field in OO -->
-      <xsl:when test="@oox:firstInstrText and (contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
+      <xsl:when test="w:instrText/@oox:firstInstrText and (contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
         <xsl:choose>
           <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
             <text:span text:style-name="{generate-id(self::node())}">
