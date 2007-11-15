@@ -261,24 +261,35 @@
               <xsl:value-of select="w:lvlText/@w:val"/>
             </xsl:with-param>
           </xsl:call-template>
-          <xsl:if test="w:start and w:start/@w:val > 1">
-            <xsl:attribute name="text:start-value">
-              <xsl:value-of select="w:start/@w:val"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:variable name="display">
-            <xsl:call-template name="CountDisplayListLevels">
-              <xsl:with-param name="string">
-                <xsl:value-of select="./w:lvlText/@w:val"/>
-              </xsl:with-param>
-              <xsl:with-param name="count">0</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:if test="$display &gt; 1">
-            <xsl:attribute name="text:display-levels">
-              <xsl:value-of select="$display"/>
-            </xsl:attribute>
-          </xsl:if>
+          <xsl:choose>
+            <!--dialogika, clam: bugfix #1831298-->
+            <xsl:when test="starts-with(w:lvlText/@w:val,concat('%',$lvl,'%',$lvl))">
+              <xsl:attribute name="style:num-letter-sync">true</xsl:attribute>
+              <xsl:attribute name="text:start-value">27</xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="w:start and w:start/@w:val > 1">
+                <xsl:attribute name="text:start-value">
+                  <xsl:value-of select="w:start/@w:val"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:variable name="display">
+                <xsl:call-template name="CountDisplayListLevels">
+                  <xsl:with-param name="string">
+                    <xsl:value-of select="./w:lvlText/@w:val"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="count">0</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:if test="$display &gt; 1">
+                <xsl:attribute name="text:display-levels">
+                  <xsl:value-of select="$display"/>
+                </xsl:attribute>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+          
+          
           <style:list-level-properties>
 
             <!--math, dialogika: changed for correct indentation calculation BEGIN -->
