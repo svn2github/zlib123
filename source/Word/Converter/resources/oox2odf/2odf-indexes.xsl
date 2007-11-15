@@ -166,10 +166,29 @@
     <!--math, dialogika: added for bugfix #1802258 END -->
 
     <!--math, dialogika: added to avoid regression on solution for directly applied outline levels BEGIN -->
-    <xsl:variable name="FromInstrTextContent">
+    <xsl:variable name="IsDirectOutline">
       <xsl:choose>
-        <xsl:when test="w:hyperlink">false</xsl:when>
-        <xsl:otherwise>true</xsl:otherwise>
+        <xsl:when test="w:hyperlink">
+          <xsl:for-each select="key('tocBookmark',w:hyperlink/@w:anchor)">
+            <xsl:choose>
+              <xsl:when test="parent::w:p/w:pPr/w:outlineLvl/@w:val &lt; 9">true</xsl:when>
+              <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>  
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="instrTextContent">
+            <xsl:apply-templates select="w:r/w:instrText[1]" mode="textContent">
+              <xsl:with-param name="textContent"/>
+            </xsl:apply-templates>
+          </xsl:variable>
+          <xsl:for-each select="key('tocBookmark',substring-before(substring-after($instrTextContent,'PAGEREF '),' '))">
+            <xsl:choose>
+              <xsl:when test="parent::w:p/w:pPr/w:outlineLvl/@w:val &lt; 9">true</xsl:when>
+              <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <!--math, dialogika: added to avoid regression on solution for directly applied outline levels END -->
@@ -198,7 +217,7 @@
                 <xsl:choose>
                   <!--math, dialogika: Changed to avoid regression on solution for directly applied outline levels -->
                   <xsl:when test="$thisStyle and $thisStyle!=''
-                            and ($FromInstrTextContent = 'true'
+                            and ($IsDirectOutline = 'false'
                             or key('StyleId',$thisStyle)/w:pPr/w:outlineLvl/@w:val &lt; 9)">
                     <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
                   </xsl:when>                
@@ -234,7 +253,7 @@
             <xsl:choose>
               <!--math, dialogika: Changed to avoid regression on solution for directly applied outline levels -->
               <xsl:when test="$thisStyle and $thisStyle!=''
-                            and ($FromInstrTextContent = 'true'
+                            and ($IsDirectOutline = 'false'
                             or key('StyleId',$thisStyle)/w:pPr/w:outlineLvl/@w:val &lt; 9)">
                 <xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')"/>
               </xsl:when>
