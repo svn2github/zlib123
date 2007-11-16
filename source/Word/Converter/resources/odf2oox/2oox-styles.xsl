@@ -1461,7 +1461,7 @@
       <xsl:variable name="NextContext" select="preceding::*[self::text:p |self::text:h][1]" />
       
       <xsl:choose>
-        <xsl:when test="not($NextContext)">''</xsl:when>
+        <xsl:when test="not($NextContext)"></xsl:when>
         <xsl:when test="key('automatic-styles',$NextContext/@text:style-name)/@style:master-page-name">
           <xsl:value-of select="key('automatic-styles',$NextContext/@text:style-name)/@style:master-page-name" />
         </xsl:when>
@@ -1519,7 +1519,7 @@
 
         <xsl:variable name="MasterPageLayoutName">
           <xsl:choose>
-            <xsl:when test="$MasterPageName!=''">
+            <xsl:when test="$MasterPageName != ''">
               <xsl:value-of select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = $MasterPageName]/@style:page-layout-name" />
             </xsl:when>
             <xsl:otherwise>
