@@ -1452,6 +1452,30 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation BEGIN-->
+  <!--This template determines the master-page-name of the current paragraph searching for the
+      closest previous paragraph with master-page-name definition-->
+  <xsl:template name="DetermineMasterPageName">
+    <xsl:param name="Context"></xsl:param>
+    <xsl:for-each select="$Context">
+      <xsl:variable name="NextContext" select="preceding::*[self::text:p |self::text:h][1]" />
+      
+      <xsl:choose>
+        <xsl:when test="not($NextContext)">''</xsl:when>
+        <xsl:when test="key('automatic-styles',$NextContext/@text:style-name)/@style:master-page-name">
+          <xsl:value-of select="key('automatic-styles',$NextContext/@text:style-name)/@style:master-page-name" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="DetermineMasterPageName">
+            <xsl:with-param name="Context" select="$NextContext" />
+          </xsl:call-template>
+        </xsl:otherwise>            
+      </xsl:choose>
+    </xsl:for-each>  
+  </xsl:template>
+  <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation END-->
+  
+
   <!-- Single tab-stop processing -->
   <xsl:template name="tabStop">
     <xsl:param name="styleType"/>
@@ -1484,6 +1508,28 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+
+        <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation BEGIN-->        
+        
+        <xsl:variable name="MasterPageName">
+          <xsl:call-template name="DetermineMasterPageName">
+            <xsl:with-param name="Context" select="." />
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="MasterPageLayoutName">
+          <xsl:choose>
+            <xsl:when test="$MasterPageName!=''">
+              <xsl:value-of select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = $MasterPageName]/@style:page-layout-name" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$default-master-style/@style:page-layout-name" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation END-->
+        
         <xsl:variable name="position">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
@@ -1492,27 +1538,42 @@
                 <xsl:when
                   test="self::text:index-entry-tab-stop[@style:type = 'right' and not(@style:position)]">
                   <xsl:for-each select="document('styles.xml')">
+
+                    <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation BEGIN-->
+
                     <xsl:variable name="pageW">
                       <xsl:call-template name="twips-measure">
-                        <xsl:with-param name="length"
+                        <!--<xsl:with-param name="length"
                           select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width"
-                        />
+                        />-->
+                        <xsl:with-param name="length"
+                          select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:page-width"
+                        />                        
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:variable name="pageMarginL">
                       <xsl:call-template name="twips-measure">
-                        <xsl:with-param name="length"
+                        <!--<xsl:with-param name="length"
                           select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left"
-                        />
+                        />-->
+                        <xsl:with-param name="length"
+                          select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-left"
+                        />                        
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:variable name="pageMarginR">
                       <xsl:call-template name="twips-measure">
-                        <xsl:with-param name="length"
+                        <!--<xsl:with-param name="length"
                           select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right"
-                        />
+                        />-->
+                        <xsl:with-param name="length"
+                          select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-right"
+                        />                        
                       </xsl:call-template>
                     </xsl:variable>
+
+                    <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation END-->
+
                     <xsl:value-of select="$pageW - $pageMarginR - $pageMarginL"/>
                   </xsl:for-each>
                 </xsl:when>
