@@ -44,7 +44,6 @@
 
   <xsl:key name="images" match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''"/>
   <xsl:key name="frames" match="draw:frame" use="''"/>
-  <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
 
   <!-- 

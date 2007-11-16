@@ -304,9 +304,7 @@
 
         <!-- OLE -->
         <xsl:call-template name="InsertOleObjectsRelationships">
-          <xsl:with-param name="oleObjects"
-            select="key('ole-objects', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"
-          />
+          <xsl:with-param name="oleObjects" select="document('styles.xml')/office:document-styles/office:master-styles//draw:object-ole | document('styles.xml')/office:document-styles/office:master-styles//draw:object"/>
         </xsl:call-template>
 
         <!-- Images -->
