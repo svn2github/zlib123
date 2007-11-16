@@ -1460,9 +1460,9 @@
     <xsl:variable name="paintBorder">
       <!-- The stroked attribute of the shape is strnger than the attribute of the shapetype -->
       <xsl:choose>
-        <xsl:when test="$shape/@stroked">
+        <xsl:when test="$shape/@stroked or $shape/v:stroke">
           <xsl:choose>
-            <xsl:when test="$shape/@stroked='t' or $shape/@stroked='true'">
+            <xsl:when test="$shape/@stroked='t' or $shape/@stroked='true' or $shape/v:stroke">
               <xsl:text>shape</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -1470,9 +1470,9 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        <xsl:when test="$shapetype/@stroked">
+        <xsl:when test="$shapetype/@stroked or $shapetype/v:stroke">
           <xsl:choose>
-            <xsl:when test="$shapetype/@stroked='t' or $shapetype/@stroked='true'">
+            <xsl:when test="$shapetype/@stroked='t' or $shapetype/@stroked='true' or $shapetype/v:stroke">
               <xsl:text>shapetype</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -1607,12 +1607,20 @@
   </xsl:template>
 
   <xsl:template name="InsertTextBoxAutomaticHeight">
-    <xsl:param name="shape" select="."/>
-    <xsl:if test="contains(@style,'mso-fit-shape-to-text:t') or (not($shape/@w:h) and $shape/@hRule != 'exact')">
+    <xsl:param name="textbox" select="."/>
+
+    <xsl:variable name="fitToText">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$textbox"/>
+        <xsl:with-param name="propertyName" select="'mso-fit-shape-to-text'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$fitToText='t' or $fitToText='true' or (not($textbox/@w:h) and $textbox/@hRule!='exact')">
       <xsl:attribute name="fo:min-height">
         <xsl:choose>
-          <xsl:when test="$shape/@hRule='atLeast'">
-            <xsl:value-of select="$shape/@hRule"/>
+          <xsl:when test="$textbox/@hRule='atLeast'">
+            <xsl:value-of select="$textbox/@hRule"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>0cm</xsl:text>
@@ -1624,15 +1632,22 @@
 
   <xsl:template name="InsertShapeAutomaticWidth">
     <xsl:param name="shape" select="."/>
+    
     <xsl:variable name="wrapStyle">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="shape" select="$shape"/>
         <xsl:with-param name="propertyName" select="'mso-wrap-style'"/>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:variable name="fitToText">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape/v:textbox"/>
+        <xsl:with-param name="propertyName" select="'mso-fit-shape-to-text'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <xsl:choose>
-      <xsl:when
-        test="($wrapStyle != '' and $wrapStyle = 'none') or ( $shape/@w:wrap and $shape/@w:wrap != 'none' )">
+      <xsl:when test="$fitToText='t' or  $fitToText='true' or ($wrapStyle!='' and $wrapStyle='none') or ($shape/@w:wrap and $shape/@w:wrap != 'none')">
         <xsl:attribute name="fo:min-width">
           <xsl:text>0cm</xsl:text>
         </xsl:attribute>
@@ -2244,8 +2259,7 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if
-          test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t'))  or $shape/@w:h">
+        <xsl:if test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) or $shape/@w:h">
           <xsl:attribute name="svg:height">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="length" select="$height"/>
@@ -2299,7 +2313,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
     <xsl:variable name="relativeWidth">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="shape" select="$shape"/>
@@ -2327,24 +2340,27 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
-        <xsl:attribute name="svg:width">
-          <xsl:choose>
-            <xsl:when test="$width = 0 and $shape//@o:hr='t'">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length"
-                  select="following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1]"/>
-                <xsl:with-param name="unit" select="'cm'"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length" select="$width"/>
-                <xsl:with-param name="destUnit" select="'cm'"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
+
+        <!-- Don't insert the width if the textbox is set to auto-width -->
+        <xsl:if test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t'))">
+          <xsl:attribute name="svg:width">
+            <xsl:choose>
+              <xsl:when test="$width = 0 and $shape//@o:hr='t'">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length"
+                    select="following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1]"/>
+                  <xsl:with-param name="unit" select="'cm'"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="ConvertMeasure">
+                  <xsl:with-param name="length" select="$width"/>
+                  <xsl:with-param name="destUnit" select="'cm'"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
