@@ -2480,12 +2480,16 @@
     <xsl:variable name="anchor">
       <xsl:value-of select="$shapeProperties/@text:anchor-type"/>
     </xsl:variable>
-
-    <!-- text-box horizontal relative position -->
     <xsl:variable name="horizontalRel">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="verticalRel">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="wrappedPara">
@@ -2502,6 +2506,7 @@
         </xsl:call-template>
       </xsl:if>
     </xsl:variable>
+    
     <xsl:choose>
       <!-- inline image -->
       <xsl:when test="$wrappedPara = 1">mso-position-horizontal-relative:char;</xsl:when>
@@ -2543,14 +2548,7 @@
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-
-    <!-- text-box vertical relative position -->
-    <xsl:variable name="verticalRel">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
+    
     <xsl:choose>
       <!-- inline image -->
       <xsl:when test="$wrappedPara = 1">mso-position-vertical-relative:line;</xsl:when>
@@ -2567,28 +2565,57 @@
       <xsl:otherwise>
         <xsl:choose>
           <!-- page -->
-          <xsl:when test="$verticalRel='page'">mso-position-vertical-relative:page;</xsl:when>
+          <xsl:when test="$verticalRel='page'">
+            <xsl:text>mso-position-vertical-relative:page;</xsl:text>
+          </xsl:when>
           <!-- page-content -->
-          <xsl:when test="$verticalRel='page-content'">mso-position-vertical-relative:margin;</xsl:when>
+          <xsl:when test="$verticalRel='page-content'">
+            <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
+          </xsl:when>
           <!-- paragraph -->
-          <xsl:when test="$verticalRel='paragraph'">mso-position-vertical-relative:text;</xsl:when>
+          <xsl:when test="$verticalRel='paragraph'">
+            <xsl:text>mso-position-vertical-relative:text;</xsl:text>
+          </xsl:when>
           <!-- paragraph-content -->
-          <xsl:when test="$verticalRel='paragraph-content'">mso-position-vertical-relative:text;</xsl:when>
+          <xsl:when test="$verticalRel='paragraph-content'">
+            <xsl:text>mso-position-vertical-relative:text;</xsl:text>
+          </xsl:when>
           <!-- frame, frame-content -->
-          <xsl:when test="contains($verticalRel, 'frame')">mso-position-vertical-relative:text;</xsl:when>
-          <!-- char, line, baseline, text -->
-          <xsl:when
-            test="$verticalRel='char' or $verticalRel='line' or $verticalRel='baseline' or $verticalRel='text'"
-            >mso-position-vertical-relative:char;</xsl:when>
+          <xsl:when test="contains($verticalRel, 'frame')">
+            <xsl:text>mso-position-vertical-relative:text;</xsl:text>
+          </xsl:when>
+          <!-- baseline -->
+          <xsl:when test="$verticalRel='baseline'">
+            <xsl:choose>
+              <xsl:when test="$anchor='paragraph'">
+                <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>mso-position-vertical-relative:char;</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <!-- char, line, text -->
+          <xsl:when test="$verticalRel='char' or $verticalRel='line' or $verticalRel='text'">
+            <xsl:text>mso-position-vertical-relative:char;</xsl:text>
+          </xsl:when>
           <xsl:otherwise>
             <!-- no default value suggested. use anchor -->
             <xsl:choose>
-              <xsl:when test="$anchor = 'page' ">mso-position-horizontal-relative:page;</xsl:when>
-              <xsl:when test="$anchor = 'paragraph' or $anchor = 'frame' "
-                >mso-position-horizontal-relative:text;</xsl:when>
-              <xsl:when test="$anchor = 'char' ">mso-position-horizontal-relative:line;</xsl:when>
+              <xsl:when test="$anchor='page'">
+                <xsl:text>mso-position-horizontal-relative:page;</xsl:text>
+              </xsl:when>
+              <xsl:when test="$anchor='paragraph' or $anchor='frame'">
+                <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
+              </xsl:when>
+              <xsl:when test="$anchor='char'">
+                <xsl:text>mso-position-horizontal-relative:line;</xsl:text>
+              </xsl:when>
               <xsl:otherwise>
-                <!-- as-char anchor already handled (cf above). In case nothing is ever specified : use default = text -->
+                <!-- 
+                as-char anchor already handled (cf above). 
+                In case nothing is ever specified : use default = text 
+                -->
                 <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
               </xsl:otherwise>
             </xsl:choose>
@@ -2731,8 +2758,7 @@
       <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
       <xsl:text>margin-left:</xsl:text>
       <xsl:variable name="valX">
-        <xsl:if
-          test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' or ($marginLeft != '' and $marginLeft != 0 ) or ($marginRight != '' and $marginRight != 0 ) ">
+        <xsl:if test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' or ($marginLeft != '' and $marginLeft != 0 ) or ($marginRight != '' and $marginRight != 0 ) ">
           <xsl:choose>
             <!-- if rotation, revert X and Y -->
             <xsl:when test="$rotation != '' ">
@@ -2761,8 +2787,7 @@
       <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
       <xsl:text>margin-top:</xsl:text>
       <xsl:variable name="valY">
-        <xsl:if
-          test="$verticalPos = 'from-top' or ($marginTop != '' and $marginTop != 0 ) or ($marginBottom != '' and $marginBottom != 0 ) ">
+        <xsl:if test="$verticalPos='from-top' or ($marginTop != '' and $marginTop != 0 ) or ($marginBottom != '' and $marginBottom != 0 ) ">
           <xsl:choose>
             <!-- if rotation, revert X and Y -->
             <xsl:when test="$rotation != '' ">
@@ -2772,8 +2797,7 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="ComputeMarginY">
-                <xsl:with-param name="parent"
-                  select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                <xsl:with-param name="parent" select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -3409,19 +3433,10 @@
           <!-- comment : OpenOffice will rather use fo:min-width when parent style defined, and draw:auto-grow-width if not -->
           <xsl:choose>
             <xsl:when test="$shapeStyle/@style:parent-style-name">
-              <!--
-                makz: commented due to bug 1669046. Regression could be possible.
-                
                 <xsl:if
-                  test="@fo:min-height 
-                  or parent::draw:frame/@fo:min-width
+                  test="@fo:min-height or parent::draw:frame/@fo:min-width
                   or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                   or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
-                -->
-              <xsl:if
-                test="parent::draw:frame/@fo:min-width
-                or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
-                or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
               </xsl:if>
             </xsl:when>
