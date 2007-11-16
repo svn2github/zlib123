@@ -972,17 +972,36 @@
   </xsl:template>
 
   <!-- simple text  -->
+  <!--dialogika, clam: text:span added for hyperlinks (bug #1827518) -->
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
     <xsl:call-template name="InsertDropCapText"/>
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
       <xsl:when test="not(contains(., '  '))">
-        <xsl:value-of select="."/>
+        <xsl:choose>
+          <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink'">
+            <text:span text:style-name="{generate-id(..)}">
+              <xsl:value-of select="."/>
+            </text:span>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="."/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
-        <xsl:call-template name="InsertWhiteSpaces"/>
+        <xsl:choose>
+          <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink'">
+            <text:span text:style-name="{generate-id(..)}">
+              <xsl:call-template name="InsertWhiteSpaces"/>
+            </text:span>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertWhiteSpaces"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
