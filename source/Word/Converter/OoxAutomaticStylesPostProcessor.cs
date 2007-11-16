@@ -34,13 +34,15 @@ using System.IO;
 
 namespace CleverAge.OdfConverter.Word
 {
-
+        
     /// <summary>
     /// An <c>XmlWriter</c> implementation for automatic styles post processings
     public class OoxAutomaticStylesPostProcessor : AbstractPostProcessor
     {
 
         private const string NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        private const string PSECT_NAMESPACE = "urn:cleverage:xmlns:post-processings:sections";
+
 
         private string[] TOGGLE_PROPERTIES = 
             { "b", "bCs", "caps", "emboss", "i", "iCs", "imprint", "outline", "shadow", "smallCaps", "strike", "vanish" };
@@ -75,6 +77,12 @@ namespace CleverAge.OdfConverter.Word
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
+
+            if (ns == PSECT_NAMESPACE)
+            {
+                this.nextWriter.WriteStartElement(prefix, localName, ns);
+            }
+          
             this.currentNode.Push(new Element(prefix, localName, ns));
 
             if (IsStyle(localName, ns))

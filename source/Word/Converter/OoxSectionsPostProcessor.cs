@@ -670,9 +670,13 @@ namespace CleverAge.OdfConverter.Word
                     // page geometry properties
                     WritePageLayout(page);
 
-                   
+
 
                     nextWriter.WriteEndElement(); // end sectPr
+                }
+                else
+                {
+                    nextWriter.WriteElementString("SKIPPARAGRAPH", PSECT_NAMESPACE, "true");
                 }
             }
         }

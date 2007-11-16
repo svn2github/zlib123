@@ -42,6 +42,7 @@ namespace CleverAge.OdfConverter.Word
 
         private const string W_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         private const string V_NAMESPACE = "urn:schemas-microsoft-com:vml";
+        private const string PSECT_NAMESPACE = "urn:cleverage:xmlns:post-processings:sections";
         private const string DROPCAP_NAMESPACE = "urn:cleverage:xmlns:post-processings:dropcap";
  		private string[] PARAGRAPH_PROPERTIES = { "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "textboxTightWrap", "suppressOverlap", "jc", "textDirection", "textAlignment", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"};
     	private string[] RUN_PROPERTIES = { "ins", "del", "moveFrom", "moveTo", "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange" };
@@ -68,6 +69,13 @@ namespace CleverAge.OdfConverter.Word
         
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
+
+            if (PSECT_NAMESPACE.Equals(ns) && localName == "SKIPPARAGRAPH")
+            {
+                ((Paragraph)this.currentNode.Peek()).SkipParagraph = true;
+                return;
+            }
+
         	Element e = null;
         	if (W_NAMESPACE.Equals(ns) && "p".Equals(localName))
         	{
@@ -161,6 +169,11 @@ namespace CleverAge.OdfConverter.Word
         	if (e is Paragraph)
         	{
         		Paragraph p = (Paragraph) e;
+
+                if (p.SkipParagraph)
+                {
+                     return;
+                }
         		
         		if (p.IsDroppedCap && !HasAncestor("textbox", V_NAMESPACE))
         		{
@@ -577,6 +590,19 @@ namespace CleverAge.OdfConverter.Word
         protected class Paragraph : Element 
         {
         	private DropCapProperties dropCapProperties;
+            private bool skipParagraph = false;
+
+            public bool SkipParagraph
+            {
+                get
+                {
+                    return skipParagraph;
+                }
+                set
+                {
+                    skipParagraph = value;
+                }
+            }
         	
         	public bool IsDroppedCap 
         	{
