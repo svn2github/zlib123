@@ -3646,7 +3646,7 @@
   <!-- break before paragraph -->
   <xsl:template name="InsertParagraphBreakBefore">
     <xsl:choose>
-      <xsl:when test="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']">
+      <xsl:when test="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column'] and not(ancestor::w:tc)">
         <!-- if this is a break page-->
         <xsl:if test="parent::w:p/w:r/w:br[@w:type='page']">
           <xsl:call-template name="InsertFlagTextBeforeBreakPage2"/>
