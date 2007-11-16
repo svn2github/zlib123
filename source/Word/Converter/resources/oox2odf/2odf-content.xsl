@@ -53,7 +53,7 @@
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:import href="2odf-indexes.xsl"/>
   <xsl:import href="2odf-track.xsl"/>
-  <xsl:import href="2odf-ole.xsl"/>
+  <!--xsl:import href="2odf-ole.xsl"/-->
   <xsl:import href="2odf-frames.xsl"/>
   <xsl:import href="2odf-sections.xsl"/>
   <!--xsl:import href="2odf-comments.xsl"/-->

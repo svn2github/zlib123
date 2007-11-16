@@ -70,6 +70,10 @@
     </xsl:for-each>
   </xsl:variable>
   
+  <!-- remember id of first paragraph -->
+  <xsl:variable name="firstParaId" select="generate-id(($body/office:text/text:p | $body/office:text/text:h)[1])" />
+  
+  
   <!-- main document -->
   <xsl:template name="document">
     <w:document>
@@ -146,7 +150,9 @@
 
       <!--dialogika, clam: empty paragraphs cannot have a border in word,
       so we insert a blank in this case (bug #1569267)-->
-      <xsl:if test="not(node())">
+      <!-- commented out by divo, this workaround is not needed, the actual problem 
+           was fixed by a modification of section break translation -->
+      <!--xsl:if test="not(node())">
         <xsl:variable name="styleName">
           <xsl:value-of select="@text:style-name"/>
         </xsl:variable>
@@ -159,11 +165,13 @@
             </w:t>
           </w:r>
           </xsl:if>
-      </xsl:if>
+      </xsl:if-->
 
       <!-- if paragraph is the very first of page, declare user variables -->
-      <xsl:if test="parent::office:text and count(preceding::text:p) = 0">
-        <xsl:call-template name="InsertUserFieldDeclaration"/>
+      <xsl:if test="$body/office:text/text:user-field-decls">
+        <xsl:if test="generate-id(.) = $firstParaId">
+          <xsl:call-template name="InsertUserFieldDeclaration"/>
+        </xsl:if>
       </xsl:if>
 
       <!-- insert drawing objects that are preceding-sibling of current. -->
@@ -315,18 +323,19 @@
     <xsl:variable name="styleName">
       <xsl:value-of select="@text:style-name"/>
     </xsl:variable>
-    <xsl:if test="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-left">
+
+    <xsl:if test="key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left">
 
       <!--math, dialogika: changed for correct indentation calculation of headings 
       that are not in an <text:list> element but have an outline level BEGIN -->
-      
+
       <xsl:variable name = "ParagraphProperties"
-         select="ancestor::node()/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties" />
+         select="key('automatic-styles', $styleName)/style:paragraph-properties" />
 
       <xsl:variable name="MarginLeft">
         <xsl:value-of select="$ParagraphProperties/@fo:margin-left"/>
       </xsl:variable>
-     
+
       <xsl:variable name="OutlineLvl">
         <xsl:choose>
           <xsl:when test="@text:outline-level">

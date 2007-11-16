@@ -1156,16 +1156,17 @@
     <xsl:variable name="styleName">
       <xsl:value-of select="@text:style-name"/>
     </xsl:variable>
-    <xsl:if test="ancestor::office:document-content/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/style:tab-stops">
+
+    <xsl:if test="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops">
     <w:tabs>
       <xsl:variable name="tabInd">
         <xsl:call-template name="twips-measure">
           <xsl:with-param name="length">
-            <xsl:value-of select="ancestor::office:document-content/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/@fo:margin-left"/>
+            <xsl:value-of select="key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-        <xsl:for-each select="ancestor::office:document-content/office:automatic-styles/style:style[@style:name = $styleName]/style:paragraph-properties/style:tab-stops/style:tab-stop">
+        <xsl:for-each select="key('automatic-styles', $styleName)/style:paragraph-properties/style:tab-stops/style:tab-stop">
         <w:tab>
           <xsl:attribute name="w:val">
             <xsl:choose>
