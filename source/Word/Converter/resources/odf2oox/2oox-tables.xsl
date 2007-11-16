@@ -116,12 +116,23 @@
   Date: 13.11.2007
   -->
   <xsl:template match="table:covered-table-cell">
-    <w:tc>
-      <w:tcPr>
-        <xsl:call-template name="InsertCellProperties"/>
-      </w:tcPr>
-      <w:p />
-    </w:tc>
+    <!-- 
+    Insert convered cells only if the cell belongs to a vertical merge.
+    Covered cells of horizontal merges shell not be converted.
+    -->
+    <xsl:variable name="myPos" select="position()" />
+    <xsl:variable name="myRow" select="parent::node()" />
+    <xsl:variable name="precedingRow" select="$myRow/preceding-sibling::node()[1]" />
+    <xsl:variable name="possibleVMergeNode" select="$precedingRow/*[position()=$myPos]" />
+
+    <xsl:if test="$possibleVMergeNode/@table:number-rows-spanned">
+      <w:tc>
+        <w:tcPr>
+          <xsl:call-template name="InsertCellProperties"/>
+        </w:tcPr>
+        <w:p />
+      </w:tc>
+    </xsl:if>
   </xsl:template>
 
   <!-- match columns for gridCols -->
