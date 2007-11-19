@@ -1752,12 +1752,24 @@
       <xsl:value-of select="./@w:instr"/>
     </xsl:variable>
     <text:page-number>
-      <xsl:attribute name="text:select-page">
-        <xsl:text>current</xsl:text>
-      </xsl:attribute>
+
       <xsl:variable name="rId" select="concat('',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Target=$docName]/@Id)"/>
       <xsl:variable name="nodesectPr" select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]"/>
 
+      <!--dialogika, clam: bugfix (special workaround) for #1826728-->
+      <xsl:choose>
+        <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:start='0'">
+          <xsl:attribute name="text:select-page">
+            <xsl:text>previous</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="text:select-page">
+            <xsl:text>current</xsl:text>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      
       <xsl:variable name="standardNumType">
         <xsl:choose>
           <xsl:when test="$nodesectPr/w:pgNumType/@w:fmt">
