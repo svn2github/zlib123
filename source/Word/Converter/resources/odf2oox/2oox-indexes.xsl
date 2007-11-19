@@ -187,7 +187,7 @@
         <w:instrText xml:space="preserve">" </w:instrText>
       </xsl:when>
       <xsl:otherwise>
-        <w:instrText xml:space="preserve">\c "1" </w:instrText>
+        <!--<w:instrText xml:space="preserve">\c "1" </w:instrText>-->
       </xsl:otherwise>
     </xsl:choose>
 
