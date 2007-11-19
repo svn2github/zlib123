@@ -334,7 +334,7 @@
         Image embedded in draw:frame/draw:text-box or in text:note element has to be inline with text.
         Word cannot not have w:anchor elements in v:shape elements (ODF frames are converted to Word shapes).
         -->
-        <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote'] or $wrappedPara = 1">
+        <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@text:note-class='endnote'] or $wrappedPara = 1">
         <xsl:call-template name="InsertInlineImage">
             <xsl:with-param name="cx" select="$cx"/>
             <xsl:with-param name="cy" select="$cy"/>
