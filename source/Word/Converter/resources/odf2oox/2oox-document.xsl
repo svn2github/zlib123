@@ -214,7 +214,7 @@
         <xsl:call-template name="InsertIndexItem"/>
       </xsl:when>
 
-      <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
+      <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box because word doesn't support it -->
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
         <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
         <xsl:apply-templates select="child::node()[not(descendant-or-self::draw:text-box)]"
