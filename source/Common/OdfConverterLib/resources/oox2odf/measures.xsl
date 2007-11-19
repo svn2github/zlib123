@@ -573,7 +573,7 @@
     <xsl:variable name="low">
       <xsl:call-template name="HexMap">
         <xsl:with-param name="value">
-          <xsl:value-of select="$number mod 16"/>
+          <xsl:value-of select="floor($number mod 16)"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
