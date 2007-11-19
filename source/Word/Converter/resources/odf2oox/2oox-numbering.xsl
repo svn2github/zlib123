@@ -999,7 +999,7 @@
     <xsl:choose>
 
       <!-- first, if list is a restarting special overriding num-->
-      <xsl:when test="parent::text:list/text:list-item/@text:start-value">
+      <xsl:when test="parent::text:list/text:list-item/@text:start-value and count(ancestor::text:list) = 1">
         <xsl:value-of
           select="count(parent::text:list/preceding-sibling::text:list[text:list-item/@text:start-value])+2+$stylesListStyleCount + $automaticListStylesCount"
         />
