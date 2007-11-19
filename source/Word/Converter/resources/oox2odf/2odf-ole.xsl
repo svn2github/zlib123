@@ -68,16 +68,17 @@
     <xsl:variable name="oId" select="@r:id" />
     <xsl:variable name="filePath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$oId]/@Target" />
     <xsl:variable name="fileName" select="substring-after($filePath, 'embeddings/')" />
+    <xsl:variable name="newName" select="concat(substring-before($fileName, '.'), '.bin')" />
     
     <xsl:choose>
       <!-- it's an embedded object -->
       <xsl:when test="@Type='Embed'">
         <!-- copy the embedded object -->
-        <pzip:copy pzip:source="{concat('word/embeddings/', $fileName)}" pzip:target="{substring-before($fileName, '.bin')}"/>
+        <pzip:copy pzip:source="{concat('word/embeddings/', $fileName)}" pzip:target="{$newName}"/>
         
         <draw:object-ole>
           <xsl:call-template name="InsertObjectHref">
-            <xsl:with-param name="link" select="concat('./', substring-before($fileName, '.bin'))" />
+            <xsl:with-param name="link" select="$newName" />
           </xsl:call-template>
           <xsl:call-template name="InsertObjectShow" />
           <xsl:call-template name="InsertObjectType" />

@@ -895,7 +895,7 @@
     <xsl:param name="shape" select="."/>
     <xsl:variable name="fillcolor">
       <xsl:choose>
-        <xsl:when test="not($shape/@fillcolor='') and not($shape/@fillcolor='window') and not($shape/@fillcolor='gradient')">
+        <xsl:when test="$shape/@fillcolor and not($shape/@fillcolor='') and not($shape/@fillcolor='window') and not($shape/@fillcolor='gradient')">
           <xsl:value-of select="$shape/@fillcolor"/>
         </xsl:when>
         <xsl:otherwise>#ffffff</xsl:otherwise>
@@ -1507,40 +1507,50 @@
         <!-- calculate border color -->
         <xsl:variable name="borderColor">
           <xsl:choose>
-            <xsl:when test="$paintBorder='shape'">
+            <xsl:when test="$paintBorder='shape' and $shape/@strokecolor">
               <xsl:call-template name="InsertColor">
                 <xsl:with-param name="color" select="$shape/@strokecolor"/>
               </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$paintBorder='shapetype'">
+            <xsl:when test="$paintBorder='shapetype' and $shapetype/@strokecolor">
               <xsl:call-template name="InsertColor">
                 <xsl:with-param name="color" select="$shapetype/@strokecolor"/>
               </xsl:call-template>
             </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>#000000</xsl:text>
+            </xsl:otherwise>
+            <!--
             <xsl:when test="$paintBorder='default'">
               <xsl:text>#000000</xsl:text>
             </xsl:when>
+            -->
           </xsl:choose>
         </xsl:variable>
 
         <!-- calculate border weight -->
         <xsl:variable name="borderWeight">
           <xsl:choose>
-            <xsl:when test="$paintBorder='shape'">
+            <xsl:when test="$paintBorder='shape' and $shape/@strokeweight">
               <xsl:call-template name="ConvertMeasure">
                 <xsl:with-param name="length" select="$shape/@strokeweight"/>
                 <xsl:with-param name="destUnit" select="'cm'"/>
               </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$paintBorder='shapetype'">
+            <xsl:when test="$paintBorder='shapetype' and $shapetype/@strokeweight">
               <xsl:call-template name="ConvertMeasure">
                 <xsl:with-param name="length" select="$shapetype/@strokeweight"/>
                 <xsl:with-param name="destUnit" select="'cm'"/>
               </xsl:call-template>
             </xsl:when>
+            <!--
             <xsl:when test="$paintBorder='default'">
               <xsl:text>0.0176cm</xsl:text>
             </xsl:when>
+            -->
+            <xsl:otherwise>
+              <xsl:text>0.0176cm</xsl:text>
+            </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
 

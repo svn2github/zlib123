@@ -788,10 +788,11 @@
   -->
   <xsl:template match="w:pBdr" mode="pPrChildren">
      <xsl:call-template name="InsertBorders">
-      <xsl:with-param name="border" select="w:pBdr"/>
+      <xsl:with-param name="border" select="."/>
     </xsl:call-template>
     <xsl:call-template name="InsertParagraphShadow"/>
   </xsl:template>
+  
 
   <!-- bg color -->
   <xsl:template match="w:shd" mode="pPrChildren">
@@ -4487,87 +4488,91 @@
   <xsl:template name="InsertBorderSide">
     <xsl:param name="side"/>
     <xsl:param name="sideName"/>
+
+    <xsl:if test="$side/@w:val">
     
-    <!-- get border style -->
-    <xsl:variable name="style">
-      <xsl:choose>
-        <xsl:when test="$side/@w:val">
-          <xsl:call-template name="GetBorderStyle">
-            <xsl:with-param name="style" select="$side/@w:val"/>
+      <!-- get border style -->
+      <xsl:variable name="style">
+        <xsl:choose>
+          <xsl:when test="$side/@w:val">
+            <xsl:call-template name="GetBorderStyle">
+              <xsl:with-param name="style" select="$side/@w:val"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>solid</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- get border color -->
+      <xsl:variable name="color">
+        <xsl:choose>
+          <xsl:when test="$side/@w:color and not($side/@w:color='auto')">
+            <xsl:value-of select="$side/@w:color"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>000000</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- get border width -->
+      <xsl:variable name="width">
+        <xsl:choose>
+          <xsl:when test="$side/@w:sz">
+            <xsl:choose>
+              <xsl:when test="$style='double'">
+                <xsl:call-template name="ConvertEighthsPoints">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="$side/@w:sz * 2"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="ConvertEighthsPoints">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="$side/@w:sz"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0cm</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <!-- write border attribute -->
+      <xsl:attribute name="{concat('fo:border-', $sideName)}">
+        <xsl:value-of select="concat($width,' ',$style,' #',$color)"/>
+      </xsl:attribute>
+
+      <!-- write border padding attribute -->
+      <xsl:if test="$side/@w:space">
+        <xsl:attribute name="{concat('fo:padding-',$sideName)}">
+          <xsl:call-template name="ConvertPoints">
+            <xsl:with-param name="length">
+              <xsl:value-of select="$side/@w:space"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>solid</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+        </xsl:attribute>
+      </xsl:if>
 
-    <!-- get border color -->
-    <xsl:variable name="color">
-      <xsl:choose>
-        <xsl:when test="$side/@w:color and not($side/@w:color='auto')">
-          <xsl:value-of select="$side/@w:color"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>000000</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+      <!-- write double style attribute -->
+      <xsl:if test="$style='double'">
+        <xsl:attribute name="{concat('fo:border-line-width-',$sideName)}">
+          <xsl:call-template name="ComputeDoubleBorderWidth">
+            <xsl:with-param name="style" select="$side/@w:val"/>
+            <xsl:with-param name="borderWidth" select="$side/@w:sz"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
 
-    <!-- get border width -->
-    <xsl:variable name="width">
-      <xsl:choose>
-        <xsl:when test="$side/@w:sz">
-          <xsl:choose>
-            <xsl:when test="$style='double'">
-              <xsl:call-template name="ConvertEighthsPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="$side/@w:sz * 2"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="ConvertEighthsPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="$side/@w:sz"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0cm</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <!-- write border attribute -->
-    <xsl:attribute name="{concat('fo:border-', $sideName)}">
-      <xsl:value-of select="concat($width,' ',$style,' #',$color)"/>
-    </xsl:attribute>
-
-    <!-- write border padding attribute -->
-    <xsl:if test="$side/@w:space">
-      <xsl:attribute name="{concat('fo:padding-',$sideName)}">
-        <xsl:call-template name="ConvertPoints">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$side/@w:space"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- write double style attribute -->
-    <xsl:if test="$style='double'">
-      <xsl:attribute name="{concat('fo:border-line-width-',$sideName)}">
-        <xsl:call-template name="ComputeDoubleBorderWidth">
-          <xsl:with-param name="style" select="$side/@w:val"/>
-          <xsl:with-param name="borderWidth" select="$side/@w:sz"/>
-        </xsl:call-template>
-      </xsl:attribute>
     </xsl:if>
 
   </xsl:template>

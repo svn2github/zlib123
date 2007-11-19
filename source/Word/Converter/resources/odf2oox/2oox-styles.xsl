@@ -305,8 +305,7 @@
     <xsl:call-template name="InsertOutlineNumPr"/>
 
     <!-- line numbers -->
-    <xsl:if
-      test="not(document('styles.xml')/office:document-styles/office:styles/text:linenumbering-configuration/@text:number-lines='false' )">
+    <xsl:if test="not(document('styles.xml')/office:document-styles/office:styles/text:linenumbering-configuration/@text:number-lines='false' )">
       <xsl:choose>
         <xsl:when test="@text:number-lines='false' ">
           <w:suppressLineNumbers w:val="true"/>
@@ -321,7 +320,7 @@
 
     <!-- border color + padding + shadow -->
     <xsl:choose>
-      <xsl:when test="@fo:border and @fo:border != 'none' ">
+      <xsl:when test="@fo:border and @fo:border!='none'">
         <w:pBdr>
           <xsl:call-template name="InsertBorders">
             <xsl:with-param name="allSides">true</xsl:with-param>
