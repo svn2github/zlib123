@@ -1758,7 +1758,12 @@
 
       <!--dialogika, clam: bugfix (special workaround) for #1826728-->
       <xsl:choose>
-        <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:start='0'">
+        <xsl:when test="$nodesectPr[1]/w:pgNumType/@w:start='0'">
+          <xsl:attribute name="text:select-page">
+            <xsl:text>previous</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$nodesectPr[1]/preceding::w:sectPr[w:pgNumType/@w:start][1]/w:pgNumType/@w:start='0'">
           <xsl:attribute name="text:select-page">
             <xsl:text>previous</xsl:text>
           </xsl:attribute>
