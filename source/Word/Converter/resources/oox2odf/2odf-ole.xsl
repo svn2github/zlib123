@@ -28,9 +28,23 @@
         <xsl:with-param name="shape" select="../v:shape" />
       </xsl:call-template>
       <xsl:call-template name="InsertShapeZindex"/>
-      
-      <xsl:call-template name="InsertObject" />
-      <xsl:call-template name="InsertObjectPreview" />
+
+      <xsl:variable name="objectId" select="@r:id" />
+      <xsl:variable name="imageId" select="../v:shape/v:imagedata/@r:id" />
+      <xsl:variable name="objectPath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$objectId]/@Target" />
+      <xsl:variable name="imagePath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$imageId]/@Target" />
+      <xsl:variable name="objectName" select="substring-after($objectPath, 'embeddings/')" />
+      <xsl:variable name="newName" select="substring-before($objectName, '.')" />
+
+      <xsl:call-template name="InsertObject">
+        <xsl:with-param name="oldFilePath" select="$objectPath" />
+        <xsl:with-param name="oldFileName" select="$objectName" />
+        <xsl:with-param name="newFileName" select="$newName" />
+      </xsl:call-template>
+      <xsl:call-template name="InsertObjectPreview">
+        <xsl:with-param name="imageFilePath" select="$imagePath" />
+        <xsl:with-param name="newFileName" select="$newName" />
+      </xsl:call-template>
     </draw:frame>
   </xsl:template>
 
@@ -42,9 +56,9 @@
   <xsl:template match="o:OLEObject" mode="automaticstyles">
     <style:style style:family="graphic" style:parent-style-name="Frame">
       <xsl:attribute name="style:name">
-          <xsl:value-of select="generate-id(../v:shape)"/>
+        <xsl:value-of select="generate-id(../v:shape)"/>
       </xsl:attribute>
-      
+
       <style:graphic-properties>
         <xsl:call-template name="InsertShapeStyleProperties">
           <xsl:with-param name="shape" select="../v:shape" />
@@ -65,20 +79,19 @@
   Date: 14.11.2007
   -->
   <xsl:template name="InsertObject">
-    <xsl:variable name="oId" select="@r:id" />
-    <xsl:variable name="filePath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$oId]/@Target" />
-    <xsl:variable name="fileName" select="substring-after($filePath, 'embeddings/')" />
-    <xsl:variable name="newName" select="concat(substring-before($fileName, '.'), '.bin')" />
-    
+    <xsl:param name="oldFilePath" />
+    <xsl:param name="newFileName" />
+
     <xsl:choose>
       <!-- it's an embedded object -->
       <xsl:when test="@Type='Embed'">
         <!-- copy the embedded object -->
-        <pzip:copy pzip:source="{concat('word/embeddings/', $fileName)}" pzip:target="{$newName}"/>
+        <pzip:copy pzip:source="{concat('word/', $oldFilePath)}" 
+                   pzip:target="{$newFileName}"/>
         
         <draw:object-ole>
           <xsl:call-template name="InsertObjectHref">
-            <xsl:with-param name="link" select="$newName" />
+            <xsl:with-param name="link" select="concat('./', $newFileName)" />
           </xsl:call-template>
           <xsl:call-template name="InsertObjectShow" />
           <xsl:call-template name="InsertObjectType" />
@@ -89,7 +102,7 @@
       <xsl:otherwise>
         <draw:object>
           <xsl:call-template name="InsertObjectHref">
-            <xsl:with-param name="link" select="concat('http://www.dialogika.de/odf-converter/makerelpath#', substring-after($filePath, 'file:///'))" />
+            <xsl:with-param name="link" select="concat('http://www.dialogika.de/odf-converter/makerelpath#', substring-after($oldFilePath, 'file:///'))" />
           </xsl:call-template>
           <xsl:call-template name="InsertObjectShow" />
           <xsl:call-template name="InsertObjectType" />
@@ -105,39 +118,29 @@
   Date: 14.11.2007
   -->
   <xsl:template name="InsertObjectPreview">
-   
-    <xsl:variable name="imageId" select="../v:shape/v:imagedata/@r:id" />
-    <xsl:variable name="filePath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$imageId]/@Target" />
-    <xsl:variable name="fileName" select="substring-after($filePath, 'media/')" />
-    <xsl:variable name="suffix" select="substring-after($fileName, '.')" />
+    <xsl:param name="imageFilePath" />
+    <xsl:param name="newFileName" />
+
+    <xsl:variable name="suffix" select="substring-after($imageFilePath, '.')" />
     
     <draw:image>
       <xsl:call-template name="InsertObjectShow" />
       <xsl:call-template name="InsertObjectType" />
       <xsl:call-template name="InsertObjectActuate" />
       
-      <xsl:choose>
-        <xsl:when test="$suffix='wmf' or $suffix='emf'">
-          <xsl:call-template name="InsertObjectHref">
-            <xsl:with-param name="link" select="'./ObjectReplacements/OLEplaceholder.png'" />
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="InsertObjectHref">
-            <xsl:with-param name="link" select="concat('./ObjectReplacements/', $fileName)" />
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="InsertObjectHref">
+        <xsl:with-param name="link" select="concat('./ObjectReplacements/', $newFileName)" />
+      </xsl:call-template>
       
       <!-- copy placeholder for unsupported images -->
       <xsl:choose>
         <xsl:when test="$suffix='wmf' or $suffix='emf'">
           <pzip:copy pzip:source="#CER#WordConverter.dll#CleverAge.OdfConverter.Word.resources.OLEplaceholder.png#"
-                     pzip:target="ObjectReplacements/OLEplaceholder.png"/>
+                     pzip:target="{concat('ObjectReplacements/', $newFileName)}" />
         </xsl:when>
         <xsl:otherwise>
-          <pzip:copy pzip:source="{concat('word/media/', $fileName)}" 
-                     pzip:target="{concat('ObjectReplacements/', $fileName)}"/>
+          <pzip:copy pzip:source="{concat('word/', $imageFilePath)}"
+                     pzip:target="{concat('ObjectReplacements/', $newFileName)}" />
         </xsl:otherwise>
       </xsl:choose>
       

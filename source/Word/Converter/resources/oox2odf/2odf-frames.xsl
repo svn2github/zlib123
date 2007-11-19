@@ -1458,11 +1458,16 @@
     <xsl:variable name="shapetype" select="key('Part', 'word/document.xml')/w:document/w:body//v:shapetype[@id=$typeId]" />
 
     <xsl:variable name="paintBorder">
-      <!-- The stroked attribute of the shape is strnger than the attribute of the shapetype -->
+      <!-- The stroked attribute of the shape is stronger than the attribute of the shapetype -->
       <xsl:choose>
-        <xsl:when test="$shape/@stroked or $shape/v:stroke">
+        <xsl:when test="$shape/@stroked">
           <xsl:choose>
-            <xsl:when test="$shape/@stroked='t' or $shape/@stroked='true' or $shape/v:stroke">
+            <!-- there is no v:stroke element, then only paint the border if stroked is set to true -->
+            <xsl:when test="not($shape/v:stroke) and ($shape/@stroked='t' or $shape/@stroked='true')">
+              <xsl:text>shape</xsl:text>
+            </xsl:when>
+            <!-- there is a v:stroke element, then paint the border if stroked isn't disabled -->
+            <xsl:when test="$shape/v:stroke and ($shape/@stroked!='f' or $shape/@stroked!='false')">
               <xsl:text>shape</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -1470,9 +1475,14 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        <xsl:when test="$shapetype/@stroked or $shapetype/v:stroke">
+        <xsl:when test="$shapetype/@stroked">
           <xsl:choose>
-            <xsl:when test="$shapetype/@stroked='t' or $shapetype/@stroked='true' or $shapetype/v:stroke">
+            <!-- there is no v:stroke element, then only paint the border if stroked is enabled -->
+            <xsl:when test="not($shapetype/v:stroke) and ($shapetype/@stroked='t' or $shapetype/@stroked='true')">
+              <xsl:text>shapetype</xsl:text>
+            </xsl:when>
+            <!-- there is a v:stroke element, then paint the border if stroked isn't disabled -->
+            <xsl:when test="$shapetype/v:stroke and ($shapetype/@stroked!='f' and $shapetype/@stroked!='false')">
               <xsl:text>shapetype</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -1482,8 +1492,7 @@
         </xsl:when>
         <xsl:otherwise>
           <!-- 
-          if no stroked attribute is set
-          word paints a default border in some special cases
+          if no stroked attribute is set but a v:stroke element exists word paint a default border
           -->
           <xsl:choose>
             <xsl:when test="$shape/v:stroke or $shapetype/v:stroke">

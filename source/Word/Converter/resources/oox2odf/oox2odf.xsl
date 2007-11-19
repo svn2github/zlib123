@@ -192,7 +192,7 @@
           </xsl:attribute>
         </xsl:when>
         <!-- Binaries OLE -->
-        <xsl:when test="$suffix='bin'">
+        <xsl:when test="$suffix='bin' or $suffix='xls' or $suffix='doc' or $suffix='ppt'">
           <xsl:attribute name="manifest:media-type">
             <xsl:text>application/vnd.sun.star.oleobject</xsl:text>
           </xsl:attribute>
@@ -204,21 +204,14 @@
         <!-- the ref is a ole -->
         <xsl:when test="@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject'">
           <xsl:attribute name="manifest:full-path">
-            <xsl:value-of select="substring-before(substring-after(@Target,'/'), '.bin')"/>
+            <xsl:value-of select="substring-before(substring-after(@Target,'/'), '.')"/>
           </xsl:attribute>
         </xsl:when>
         <!-- the ref is ole picture -->
-        <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//w:object/v:shape/v:imagedata[@r:id=$thisId]">
+        <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//v:shape/v:imagedata[./@r:id=$thisId]">
           <xsl:attribute name="manifest:full-path">
             <xsl:text>ObjectReplacements/</xsl:text>
-            <xsl:choose>
-              <xsl:when test="$suffix='wmf' or $suffix='emf'">
-                <xsl:text>OLEplaceholder.png</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="substring-after(@Target,'/')"/>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="substring-before(substring-after(preceding-sibling::*[1]/@Target, '/'), '.')"/>
           </xsl:attribute>
         </xsl:when>
         <!-- the ref is a normal picture -->
