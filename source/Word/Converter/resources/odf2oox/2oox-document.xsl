@@ -509,6 +509,16 @@
           <xsl:with-param name="minLabelWidthTwip" select="$MinLabelWidthTwip"/>
           <xsl:with-param name="spaceBeforeTwip" select="$SpaceBeforeTwip"/>
         </xsl:call-template>
+
+        <!--math, dialogika bugfix #1834587 BEGIN-->
+        <!-- add tabs of current paragraph so as not to lose them in post-processing -->
+        <xsl:if test="key('styles', $styleName)//style:tab-stop">
+          <xsl:for-each select="key('styles', $styleName)/style:paragraph-properties">
+            <xsl:call-template name="ComputeParagraphTabs"/>
+          </xsl:for-each>
+        </xsl:if>
+        <!--math, dialogika bugfix #1834587 END-->
+        
       </w:tabs>      
 
       <!--<xsl:call-template name="InsertTabStops">
