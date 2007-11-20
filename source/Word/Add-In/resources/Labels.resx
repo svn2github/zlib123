@@ -438,4 +438,10 @@
   <data name="translation.odf2oox.odfolelost" xml:space="preserve">
     <value>Embedded ODF object</value>
   </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>Indentation resulting from direct formatting applied to list paragraphs</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>Continuous numbering inherited from parent styles</value>
+  </data>
 </root>
