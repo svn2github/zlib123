@@ -102,10 +102,14 @@
     <EmbeddedResource Include="resources\customUI.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="OdfPPT2007AddinSetup-chs\PostBuild.bat" />
+    <None Include="OdfPPT2007AddinSetup-chs\Release\OdfPPT2007AddinSetup-chs.msi" />
     <None Include="OdfPPT2007AddinSetup-de\PostBuild.bat" />
     <None Include="OdfPPT2007AddinSetup-de\Release\OdfPPT2007AddinSetup-de.msi" />
     <None Include="OdfPPT2007AddinSetup-fr\PostBuild.bat" />
     <None Include="OdfPPT2007AddinSetup-fr\Release\OdfPPT2007AddinSetup-fr.msi" />
+    <None Include="OdfPPT2007AddinSetup-ja\PostBuild.bat" />
+    <None Include="OdfPPT2007AddinSetup-ja\Release\OdfPPT2007AddinSetup-ja.msi" />
     <None Include="OdfPPT2007AddinSetup-nl\Debug\OdfPPT2007AddinSetup-nl.msi" />
     <None Include="OdfPPT2007AddinSetup-nl\PostBuild.bat" />
     <None Include="OdfPPT2007AddinSetup-nl\Release\OdfPPT2007AddinSetup-nl.msi" />
@@ -122,6 +126,10 @@
     <None Include="resources\vssver.scc" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OdfPPT2007AddinSetup-chs\AddExcelCustomActions.vbs" />
+    <Content Include="OdfPPT2007AddinSetup-chs\OdfPPT2007AddinSetup-chs.vdproj" />
+    <Content Include="OdfPPT2007AddinSetup-chs\README.htm" />
+    <Content Include="OdfPPT2007AddinSetup-chs\Release\setup.exe" />
     <Content Include="OdfPPT2007AddinSetup-de\AddExcelCustomActions.vbs" />
     <Content Include="OdfPPT2007AddinSetup-de\OdfPPT2007AddinSetup-de.vdproj" />
     <Content Include="OdfPPT2007AddinSetup-de\README.htm" />
@@ -130,6 +138,10 @@
     <Content Include="OdfPPT2007AddinSetup-fr\OdfPPT2007AddinSetup-fr.vdproj" />
     <Content Include="OdfPPT2007AddinSetup-fr\README.htm" />
     <Content Include="OdfPPT2007AddinSetup-fr\Release\setup.exe" />
+    <Content Include="OdfPPT2007AddinSetup-ja\AddExcelCustomActions.vbs" />
+    <Content Include="OdfPPT2007AddinSetup-ja\OdfPPT2007AddinSetup-ja.vdproj" />
+    <Content Include="OdfPPT2007AddinSetup-ja\README.htm" />
+    <Content Include="OdfPPT2007AddinSetup-ja\Release\setup.exe" />
     <Content Include="OdfPPT2007AddinSetup-nl\AddExcelCustomActions.vbs" />
     <Content Include="OdfPPT2007AddinSetup-nl\Debug\setup.exe" />
     <Content Include="OdfPPT2007AddinSetup-nl\OdfPPT2007AddinSetup-nl.vdproj" />
@@ -159,8 +171,10 @@
     <Content Include="OdfPPT2007AddinSetup\README.htm" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="OdfPPT2007AddinSetup-chs\Debug\" />
     <Folder Include="OdfPPT2007AddinSetup-de\Debug\" />
     <Folder Include="OdfPPT2007AddinSetup-fr\Debug\" />
+    <Folder Include="OdfPPT2007AddinSetup-ja\Debug\" />
     <Folder Include="OdfPPT2007AddinSetup\Release\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
