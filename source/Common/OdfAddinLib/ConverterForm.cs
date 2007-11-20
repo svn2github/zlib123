@@ -68,6 +68,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.manager = manager;
             this.isDirect = isDirect;
             lostElements = new ArrayList();
+
+            //this code is for displaying the label in progress bar               
+            //Code change 1 of 2
+            this.lblMessage.Text = manager.GetString("ProgressBarLoadLabel");
+            this.lblMessage.Visible  = true;                      
+            
         }
 
         public class CancelledException : Exception
@@ -131,6 +137,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else
             {
                 this.progressBar1.Increment(1);
+
+                //this code is for displaying the label in progress bar                         
+                //Code change 2 of 2                
+                if (this.progressBar1.Value == 1)
+                //when progress bar value is 1 then label is made in visible
+                {
+                    this.lblMessage.Visible = false; 
+                }
+                if (this.progressBar1.Value >= this.progressBar1.Maximum)
+                //when progress bar crosses maximum value, another message will be displayed 
+                {                    
+                    this.lblMessage.Visible = true;
+                    this.lblMessage.Text = manager.GetString("ProgressBarExitLabel");                    
+                }
             }
             Application.DoEvents();
             if (cancel) {

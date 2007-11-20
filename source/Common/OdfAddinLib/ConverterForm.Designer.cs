@@ -59,6 +59,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConverterForm));
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
+            this.lblMessage = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // progressBar1
@@ -75,11 +76,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.cancelButton.UseWaitCursor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
+            // lblMessage
+            // 
+            resources.ApplyResources(this.lblMessage, "lblMessage");
+            this.lblMessage.Name = "lblMessage";
+            // 
             // ConverterForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ControlBox = false;
+            this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.progressBar1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -91,6 +98,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.Activated += new System.EventHandler(this.ConverterForm_Activated);
             this.Load += new System.EventHandler(this.ConverterForm_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -98,6 +106,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Label lblMessage;
 
     }
 }
