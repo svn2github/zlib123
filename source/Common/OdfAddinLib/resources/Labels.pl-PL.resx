@@ -186,7 +186,10 @@
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>Ten dokument wydaje się nie być plikiem formatu OpenDocument.</value>
   </data>
-<data name="ProgressBarExitLabel" xml:space="preserve">
+  <data name="PossiblyEncryptedDocument" xml:space="preserve">
+    <value>Nie można otworzyć archiwum w formacie zip. Sprawdź, czy dokument nie został zaszyfrowany.</value>
+  </data>
+  <data name="ProgressBarExitLabel" xml:space="preserve">
     <value>Sprawiać przyjemność (proszę) czekają podczas gdy przemiana skończy</value>
   </data>
   <data name="ProgressBarLoadLabel" xml:space="preserve">
