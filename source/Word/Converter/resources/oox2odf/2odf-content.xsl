@@ -261,7 +261,7 @@
         <xsl:attribute name="style:parent-style-name">
           <!--clam bugfix #1806204-->
           <xsl:choose>
-            <xsl:when test="../../preceding::w:r[contains(w:instrText,'TOC')] and w:rStyle/@w:val='Hyperlink'">X3AS7TOCHyperlink</xsl:when>
+            <xsl:when test="ancestor::w:r[contains(w:instrText,'TOC')] and w:rStyle/@w:val='Hyperlink'">X3AS7TOCHyperlink</xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="w:rStyle/@w:val"/>
             </xsl:otherwise>
@@ -980,7 +980,7 @@
       <!--check whether string contains  whitespace sequence-->
       <xsl:when test="not(contains(., '  '))">
         <xsl:choose>
-          <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink'">
+          <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink' and ../w:rPr/w:color">
             <text:span text:style-name="{generate-id(..)}">
               <xsl:value-of select="."/>
             </text:span>
@@ -993,7 +993,7 @@
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
         <xsl:choose>
-          <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink'">
+          <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink' and ../w:rPr/w:color">
             <text:span text:style-name="{generate-id(..)}">
               <xsl:call-template name="InsertWhiteSpaces"/>
             </text:span>

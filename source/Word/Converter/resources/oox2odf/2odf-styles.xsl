@@ -5179,10 +5179,21 @@
     <xsl:apply-templates mode="rPrChildren"/>
 
     <!--clam bugfix #1806204 special case: hyperlink without style-->
-    <xsl:if test="ancestor::w:hyperlink and not(./w:rStyle) and not(./w:u) and not(w:color)">
-      <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
-      <xsl:attribute name="style:text-underline-type">none</xsl:attribute> 
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="ancestor::w:hyperlink and not(./w:rStyle) and not(./w:u) and not(w:color)">
+        <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
+        <xsl:attribute name="style:text-underline-type">none</xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="./w:rStyle/@w:val = 'Hyperlink' and not(w:color)">
+          <xsl:variable name="parentStyle" select="key('StyleId','Hyperlink')"></xsl:variable>
+          <xsl:if test="$parentStyle/w:rPr/w:color">
+            <xsl:attribute name="fo:color"><xsl:value-of select="concat('#',$parentStyle/w:rPr/w:color/@w:val)"></xsl:value-of>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
     
     <!-- other attributes forbidden in drop cap text style -->
     <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
