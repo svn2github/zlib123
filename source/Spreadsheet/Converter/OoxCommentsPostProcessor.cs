@@ -135,6 +135,54 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 string imagePathLocation = ImagePath(text);
                 this.nextWriter.WriteString(imagePathLocation);
             }
+            // Image cropping Added by Sonata
+            else if (text.Contains("image-properties"))
+            {
+                string[] arrVal = new string[6];
+                arrVal = text.Split(':');
+
+                string source = arrVal[1].ToString();
+                double top = double.Parse(arrVal[2].ToString());
+                double right = double.Parse(arrVal[3].ToString());
+                double bottom = double.Parse(arrVal[4].ToString());
+                double left = double.Parse(arrVal[5].ToString());
+
+                string tempFileName = AbstractConverter.inputTempFileName.ToString();
+                ZipResolver zipResolverObj = new ZipResolver(tempFileName);
+                OdfZipUtils.ZipArchiveWriter zipobj = new OdfZipUtils.ZipArchiveWriter(zipResolverObj);
+                string widht_height_res = zipobj.ImageCopyBinary(source);
+                zipResolverObj.Dispose();
+                zipobj.Close();
+
+
+                string[] arrValues = new string[3];
+                arrValues = widht_height_res.Split(':');
+                double width = double.Parse(arrValues[0].ToString());
+                double height = double.Parse(arrValues[1].ToString());
+                double res = double.Parse(arrValues[2].ToString());
+
+                double cx = width * 2.54 / res;
+                double cy = height * 2.54 / res;
+
+                int pptLeft = (int)(left * 100000 / cx * 2.54);
+                int pptRight = (int)(right * 100000 / cx * 2.54);
+                int pptTop = (int)(top * 100000 / cy * 2.54);
+                int pptBottom = (int)(bottom * 100000 / cy * 2.54);
+
+
+                WriteStartAttribute("l");
+                this.WriteString(pptLeft.ToString());
+                WriteEndAttribute();
+                WriteStartAttribute("r");
+                this.WriteString(pptRight.ToString());
+                WriteEndAttribute();
+                WriteStartAttribute("t");
+                this.WriteString(pptTop.ToString());
+                WriteEndAttribute();
+                WriteStartAttribute("b");
+                this.WriteString(pptBottom.ToString());
+                WriteEndAttribute();
+            }
             else
             {
                 this.nextWriter.WriteString(text);

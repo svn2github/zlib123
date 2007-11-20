@@ -30,6 +30,8 @@ using System;
 using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
+using CleverAge.OdfConverter.OdfZipUtils;
+
 
 namespace CleverAge.OdfConverter.Spreadsheet
 {
@@ -179,6 +181,47 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
             }
             //End of modification for the bug 1805599
+
+             // Image Cropping   Added by Sonata
+            else if (text.Contains("image-props"))
+            {
+                string[] arrVal = new string[6];
+                arrVal = text.Split(':');
+                string source = arrVal[1].ToString();
+                int left = int.Parse(arrVal[2].ToString());
+                int right = int.Parse(arrVal[3].ToString());
+                int top = int.Parse(arrVal[4].ToString());
+                int bottom = int.Parse(arrVal[5].ToString());
+
+                string tempFileName = AbstractConverter.inputTempFileName.ToString();
+                ZipResolver resolverObj = new ZipResolver(tempFileName);
+                ZipArchiveWriter zipObj = new ZipArchiveWriter(resolverObj);
+                string imgaeValues = zipObj.ImageCopyBinary(source);
+                zipObj.Close();
+                resolverObj.Dispose();
+
+                string[] arrValues = new string[3];
+                arrValues = imgaeValues.Split(':');
+                double width = double.Parse(arrValues[0].ToString());
+                double height = double.Parse(arrValues[1].ToString());
+                double res = double.Parse(arrValues[2].ToString());
+
+
+                double cx = width * 2.54 / res;
+                double cy = height * 2.54 / res;
+
+                double odpLeft = (left * cx / 100000)/2.54;
+                double odpRight = (right * cx / 100000)/2.54;
+                double odpTop = (top * cy / 100000)/2.54;
+                double odpBottom = (bottom * cy / 100000)/2.54;
+
+                string result = string.Concat("rect(", string.Format("{0:0.##}", odpTop) + "in" + " " + string.Format("{0:0.##}", odpRight) + "in" + " " + string.Format("{0:0.##}", odpBottom) + "in" + " " + string.Format("{0:0.##}", odpLeft) + "in", ")");
+                this.nextWriter.WriteString(result);
+
+
+              
+            }
+         
             else
             {
 

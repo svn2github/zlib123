@@ -12,6 +12,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
     {
 
         private const string ODF_TEXT_MIME = "application/vnd.oasis.opendocument.spreadsheet";
+        private const string OOX_TEXT_CONTENTTYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml";
 
 
         public Converter()
@@ -87,6 +88,39 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                                     + ". Invalid OASIS OpenDocument file");
             }
         }
+
+       // Code to fix the bug# 1698280 
+
+        protected override void CheckOoxFile(string fileName)
+        {
+            
+            XmlDocument doc;
+            try
+            {
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.XmlResolver = new ZipResolver(fileName);
+                settings.ProhibitDtd = false;
+                doc = new XmlDocument();
+                XmlReader reader = XmlReader.Create("[Content_Types].xml", settings);
+                doc.Load(reader);
+            }
+            catch (XmlException e)
+            {
+                throw new NotAnOoxDocumentException(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            XmlNodeList nodelist = doc.SelectNodes("//node()[@ContentType='" + OOX_TEXT_CONTENTTYPE + "']");
+            if (nodelist.Count== 0)
+            {
+                throw new NotAnOoxDocumentException("not an valid oox file");
+            }
+                  
+        }
+
+        // End
 
     }
 }
