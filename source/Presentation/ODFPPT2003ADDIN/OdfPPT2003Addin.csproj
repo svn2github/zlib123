@@ -98,6 +98,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OdfPPT2003AddinSetup-chs\AddExcelCustomActions.vbs" />
+    <Content Include="OdfPPT2003AddinSetup-chs\OdfPPT2003AddinSetup-chs.vdproj" />
+    <Content Include="OdfPPT2003AddinSetup-chs\README.htm" />
+    <Content Include="OdfPPT2003AddinSetup-chs\Release\setup.exe" />
     <Content Include="OdfPPT2003AddinSetup-de\AddExcelCustomActions.vbs" />
     <Content Include="OdfPPT2003AddinSetup-de\OdfPPT2003AddinSetup-de.vdproj" />
     <Content Include="OdfPPT2003AddinSetup-de\README.htm" />
@@ -108,6 +112,10 @@
     <Content Include="OdfPPT2003AddinSetup-fr\README.htm" />
     <Content Include="OdfPPT2003AddinSetup-fr\Release\KB908002\office2003-kb907417sfxcab-ENU.exe" />
     <Content Include="OdfPPT2003AddinSetup-fr\Release\setup.exe" />
+    <Content Include="OdfPPT2003AddinSetup-ja\AddExcelCustomActions.vbs" />
+    <Content Include="OdfPPT2003AddinSetup-ja\OdfPPT2003AddinSetup-ja.vdproj" />
+    <Content Include="OdfPPT2003AddinSetup-ja\README.htm" />
+    <Content Include="OdfPPT2003AddinSetup-ja\Release\setup.exe" />
     <Content Include="OdfPPT2003AddinSetup-nl\AddExcelCustomActions.vbs" />
     <Content Include="OdfPPT2003AddinSetup-nl\OdfPPT2003AddinSetup-nl.vdproj" />
     <Content Include="OdfPPT2003AddinSetup-nl\README.htm" />
@@ -127,6 +135,8 @@
     <Content Include="OdfPPT2003AddinSetup\README.htm" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="OdfPPT2003AddinSetup-chs\PostBuild.bat" />
+    <None Include="OdfPPT2003AddinSetup-chs\Release\OdfPPT2003AddinSetup-chs.msi" />
     <None Include="OdfPPT2003AddinSetup-de\PostBuild.bat" />
     <None Include="OdfPPT2003AddinSetup-de\Release\KB908002\extensibilityMSM.msi" />
     <None Include="OdfPPT2003AddinSetup-de\Release\KB908002\lockbackRegKey.msi" />
@@ -135,6 +145,8 @@
     <None Include="OdfPPT2003AddinSetup-fr\Release\KB908002\extensibilityMSM.msi" />
     <None Include="OdfPPT2003AddinSetup-fr\Release\KB908002\lockbackRegKey.msi" />
     <None Include="OdfPPT2003AddinSetup-fr\Release\OdfPPT2003AddinSetup-fr.msi" />
+    <None Include="OdfPPT2003AddinSetup-ja\PostBuild.bat" />
+    <None Include="OdfPPT2003AddinSetup-ja\Release\OdfPPT2003AddinSetup-ja.msi" />
     <None Include="OdfPPT2003AddinSetup-nl\PostBuild.bat" />
     <None Include="OdfPPT2003AddinSetup-nl\Release\KB908002\extensibilityMSM.msi" />
     <None Include="OdfPPT2003AddinSetup-nl\Release\KB908002\lockbackRegKey.msi" />
@@ -147,8 +159,10 @@
     <None Include="OdfPPT2003AddinSetup\PostBuild.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="OdfPPT2003AddinSetup-chs\Debug\" />
     <Folder Include="OdfPPT2003AddinSetup-de\Debug\" />
     <Folder Include="OdfPPT2003AddinSetup-fr\Debug\" />
+    <Folder Include="OdfPPT2003AddinSetup-ja\Debug\" />
     <Folder Include="OdfPPT2003AddinSetup-nl\Debug\" />
     <Folder Include="OdfPPT2003AddinSetup-pl\Debug\" />
     <Folder Include="OdfPPT2003AddinSetup\Release\" />
