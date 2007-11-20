@@ -1,69 +1,74 @@
 <html>
 <head>
-<META HTTP-EQUIV="content-type" CONTENT="text/html; charset=Shift_JIS">
-
-<title>ODF Add-in for Excel 2003 (Excel 2003 用 ODF アドイン プログラム)</title>
+    <meta http-equiv="content-type" content="text/html; charset=Shift_JIS">
+    <title>ODF Add-in for Excel 2003 (Excel 2003 用 ODF アドイン プログラム)</title>
 </head>
 <body>
-<h1>ODF Add-in for Excel 2003 (Excel 2003 用 ODF アドイン プログラム)</h1>
-ODF Add-in for Excel 2003 をダウンロードいただき、ありがとうございます。このソフトウェアをご使用になると、ODF 仕様のドキュメントを Excel 2003 で開くことができ、OpenXML と ODF 仕様との間の相互運用性を発揮することができまこ<br/> <br/> <br/>
-<h2>ソフトウェアの要件</h2>
-このアドイン プログラムをテストするには、以下の要件を満たしていただく必要があります。<br/>1. Excel 2003<br/> 2. .NET Framework 2.0*<br/> 3. Word、Excel、および PowerPoint 2007 ファイル形式と互換性のある互換機能パック* (ベータ 2 またはそれ以上のバージョン)。<br/><br/>重要事項:<br/> <br/> (*)ご注意:Microsoft Excel が既にインストールされている状態で .Net Framework をインストールした場合は、次の手順に従って Excel を更新してください。<br/><br/>1. [コントロール パネル] の [プログラムの追加と削除] をダブルクリックします。<br/>2. Microsoft Excel の [変更] をクリックします。<br/> 3. インストール プログラムの [機能の追加と削除] を選択し、[Microsoft Office Excel の .NET プログラミング サポート] を追加します。<br/><br/> (**) 必ず最新の Office 更新プログラムを実行してから、互換機能パックをインストールしてください。Office の更新プログラムをダウンロードするには、Office Online (http://office.microsoft.com/en-us/default.aspx) にアクセスしてください。<br/> <br/> <br/>
-<h2>アドインのインストール</h2>
-以下の手順に従い、ダウンロードした setup.exe プログラムをインストールしてください。<br/><br/>インストールが完了すると、Excel の [ファイル] メニューに [ODF を開く] が追加され、ODF スプレッドシート ファイルをインポートするか、または現在作業中のドキュメントを ODF スプレッドシート ファイルにエクスポートすることができます (注意: 開発段階で、これらの機能が一時的に使用できない場合がありますので、ご了承ください)。<br/><br/> 重要事項:アドインが開いた ODF ファイルは、Microsoft Excel の読み取り専用の XLSX ファイル形式です。ODF ファイル形式で保存し直す場合は、[ファイル] メニューの [名前を付けて保存] を選択して、そのドキュメントをいったん保存してから 、[ODF 形式で保存] を選択します。<br/> <br/> <br/>
-<h2>トラブルシューティング ガイド</h2>
-メニューに ODF が表示されない場合は、Excel の必須機能がインストールされていない可能性があります (上記の「ソフトウェアの要件」をご覧ください)。ODF アドインのインストールが完了したら、以下の手順でアドインを有効にしてください。<br/>* [ツール] メニューの [カスタマイズ] を選択して、[コマンド] タブをクリックします。<br/>* [カテゴリ] ボックスの [ツール] ボタンをクリックします。<br/>* [ツール] メニューの [コマンド] ボックスから [COM アドイン] をドラッグします。[ツール] メニューのコマンドが表示されたら、メニュー上で [COM アドイン] コマンドを表示したい場所までドラッグして、マウスのボタンを離します。<br/>* [閉じる] をクリックします。<br/>* [ツール] メニューの [COM アドイン] を選択して、利用可能な ODF アドインの隣にあるチェック ボックスをオンにします。使用したいアドインが表示されていない場合は、[追加] をクリックし、アドインを検索してから、[OK] をクリックします。<br/> <br/> <br/>
-<h2>現バージョンでサポートされている変換</h2>
-全機能についての詳細は、sourceForge.net のロードマップ (https://sourceforge.net/project/showfiles.php?group_id=169337) をご覧ください。<br/> <br/> <br/>
-<h2>ODF から OpenXML への変換で削除された機能またはオプション</h2>
-サポートされていない機能についての詳細は、sourceForge.net (https://sourceforge.net/tracker/?group_id=169337&amp;atid=932582) をご覧ください。<br/> <br/>
-<h2>リリース ノート</h2>
-(1) Office 2003 と Office 2007 の両方がインストールされている場合、アドインは動作しませんのでご注意ください。<br/> <br/>
-<h2>M5 で解消されていないバグ</h2>
-[ 1693462 ]	File converter failed to open the file<br/>
-[ 1701990 ]	Round Trip Conversion - Unexpected message while conversion<br/>
-[ 1702163 ]	Number format Color not retained.<br/>
-[ 1704269 ]	Cell border not properly retained<br/>
-[ 1726732 ]	Add-in crash - Dragged image in ods file.<br/>
-[ 1733369 ]	Conditional formatting not retained for empty cells.<br/>
-[ 1735657 ]	Number format not properly retained<br/>
-[ 1740412 ]	Negative test - part removal -Add-in crash.<br/>
-[ 1740752 ]	Negative test - Tag handling.<br/>
-[ 1746283 ]	Currency converted to date(English USA, Din (Latin)<br/>
-[ 1757284 ]	Used area-sheet contains Max no of Rows after conversion.<br/>
-[ 1757322 ]	Column breaks not properly retained after conversion.<br/>
-[ 1760182 ]	Hyperlink for text inside text box is not retained after con<br/>
-[ 1764339 ]	Conversion window closes with mouse over event<br/>
-[ 1764358 ]	Hyperlink text-Styles and formatting not retained<br/>
-[ 1768233 ]	Filters dropdown list conversion not proper-office XP/2003<br/>
-[ 1772957 ]	Round trip-sheet conversion not proper for manual breaks.<br/>
-[ 1780043 ]	Pie Charts data colors not properly retained after round trip<br/>
-[ 1780033 ]	Information Messages box -Details need to be localized<br/>
-[ 1782320 ]	Track changes & file Recovery message<br/>
-[ 1784784 ]	Add-in crash converting OLE objects<br/>
-[ 1784822 ]	Readme.htm need to be updated(KB908002).<br/>
-[ 1787480 ]	Symbol &quot; &apos; &quot; not retained after conversion<br/>
-[ 1788348 ]	Roundtrip conversion adds border to images<br/>
-[ 1788390 ]	Hide note is shown after conversion<br/>
-[ 1789938 ]	Installation:-localized Add-in disables back button option<br/>
-[ 1790019 ]	Row break:-Round trip Conversion not proper for xlsx sheet<br/>
-[ 1790018 ]	Scenario: Add-in crashes converting ods file<br/>
-[ 1791382 ]	Scenario within a scenario + Note: Add-in crashes<br/>
-[ 1796813 ]	Add-in crash - Copy & paste of xlsx charts in ods files.<br/>
-[ 1796840 ]	Reverse Conditional formatting not retained<br/>
-[ 1796862 ]	Line chart - line color not properly retained-Rev roundtrip<br/>
-[ 1797015 ]	Add-in crash - Modified chart data range<br/>
-[ 1798664 ]	Add-in crash converting corrupt ods file<br/>
-[ 1800984 ]	Add-in crashes converting data pivot table<br/>
-[ 1800991 ]	Round trip Add-in crash- Data pivot table<br/>
-[ 1802491 ]	Note for hidden column is shown after reverse roundtrip conv<br/>
-[ 1803262 ]	Data filter for merged cell is not properly retained<br/>
-[ 1803271 ]	Scenario not retained after conversion<br/>
-[ 1803329 ]	Filters - smallest % & greatest % not properly retained<br/>
-[ 1803380 ]	xlsx to xls- office excel terminates when conversion<br/>
-[ 1803372 ]	Conditional format for cell value having b/w condition<br/>
-[ 1805556 ]	Add-in crashes converting ods file having hyperlink with<br/>
-[ 1806752 ]	Textboxes- Arial font converted to Times New Roman<br/>
-[ 1806778 ]	Copy/Paste -Add-in crashes any ods file consisting GDIMetada<br/>
+    <h1>
+        ODF Add-in for Excel 2003 (Excel 2003 用 ODF アドイン プログラム)</h1>
+    ODF Add-in for Excel 2003 をダウンロードいただき、ありがとうございます。このソフトウェアをご使用になると、ODF 仕様のドキュメントを
+    Excel 2003 で開くことができ、OpenXML と ODF 仕様との間の相互運用性を発揮することができまこ<br />
+    <br />
+    <br />
+    <h2>
+        ソフトウェアの要件</h2>
+    このアドイン プログラムをテストするには、以下の要件を満たしていただく必要があります。<br />
+    1. Excel 2003<br />
+    2. .NET Framework 2.0* & Shared add-in extensibility(KB908002)***<br />
+    3. Word、Excel、および PowerPoint 2007 ファイル形式と互換性のある互換機能パック* (ベータ 2 またはそれ以上のバージョン)。<br />
+    <br />
+    重要事項:<br />
+    <br />
+    (*)ご注意:Microsoft Excel が既にインストールされている状態で .Net Framework をインストールした場合は、次の手順に従って Excel
+    を更新してください。<br />
+    <br />
+    1. [コントロール パネル] の [プログラムの追加と削除] をダブルクリックします。<br />
+    2. Microsoft Excel の [変更] をクリックします。<br />
+    3. インストール プログラムの [機能の追加と削除] を選択し、[Microsoft Office Excel の .NET プログラミング サポート] を追加します。<br />
+    <br />
+    (**) 必ず最新の Office 更新プログラムを実行してから、互換機能パックをインストールしてください。Office の更新プログラムをダウンロードするには、Office
+    Online (http://office.microsoft.com/en-us/default.aspx) にアクセスしてください。<br />
+    <br />
+    (***) Microsoft  共有アドイン サポート更新プログラム (KB908002) は、アドインのセットアップ中にインストールされます。
+    <br />
+    <h2>
+        アドインのインストール</h2>
+    以下の手順に従い、ダウンロードした setup.exe プログラムをインストールしてください。<br />
+    <br />
+    インストールが完了すると、Excel の [ファイル] メニューに [ODF を開く] が追加され、ODF スプレッドシート ファイルをインポートするか、または現在作業中のドキュメントを
+    ODF スプレッドシート ファイルにエクスポートすることができます (注意: 開発段階で、これらの機能が一時的に使用できない場合がありますので、ご了承ください)。<br />
+    <br />
+    重要事項:アドインが開いた ODF ファイルは、Microsoft Excel の読み取り専用の XLSX ファイル形式です。ODF ファイル形式で保存し直す場合は、[ファイル]
+    メニューの [名前を付けて保存] を選択して、そのドキュメントをいったん保存してから 、[ODF 形式で保存] を選択します。<br />
+    <br />
+    <br />
+    <h2>
+        トラブルシューティング ガイド</h2>
+    メニューに ODF が表示されない場合は、Excel の必須機能がインストールされていない可能性があります (上記の「ソフトウェアの要件」をご覧ください)。ODF
+    アドインのインストールが完了したら、以下の手順でアドインを有効にしてください。<br />
+    * [ツール] メニューの [カスタマイズ] を選択して、[コマンド] タブをクリックします。<br />
+    * [カテゴリ] ボックスの [ツール] ボタンをクリックします。<br />
+    * [ツール] メニューの [コマンド] ボックスから [COM アドイン] をドラッグします。[ツール] メニューのコマンドが表示されたら、メニュー上で [COM
+    アドイン] コマンドを表示したい場所までドラッグして、マウスのボタンを離します。<br />
+    * [閉じる] をクリックします。<br />
+    * [ツール] メニューの [COM アドイン] を選択して、利用可能な ODF アドインの隣にあるチェック ボックスをオンにします。使用したいアドインが表示されていない場合は、[追加]
+    をクリックし、アドインを検索してから、[OK] をクリックします。<br />
+    <br />
+    <br />
+    <h2>
+        現バージョンでサポートされている変換</h2>
+    全機能についての詳細は、sourceForge.net のロードマップ (https://sourceforge.net/project/showfiles.php?group_id=169337)
+    をご覧ください。<br />
+    <br />
+    <br />
+    <h2>
+        ODF から OpenXML への変換で削除された機能またはオプション</h2>
+    サポートされていない機能についての詳細は、sourceForge.net (https://sourceforge.net/tracker/?group_id=169337&amp;atid=932582)
+    をご覧ください。<br />
+    <br />
+    <h2>
+        リリース ノート</h2>
+    (1) Office 2003 と Office 2007 の両方がインストールされている場合、アドインは動作しませんのでご注意ください。<br />
+    <br />
 </body>
 </html>
