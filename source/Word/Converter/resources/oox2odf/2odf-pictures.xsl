@@ -622,6 +622,7 @@
 
   <xsl:template name="InsertGraphicPosRelativeH">
     <xsl:param name="relativeFrom"/>
+    <xsl:param name="hPos" />
 
     <xsl:attribute name="style:horizontal-rel">
       <xsl:choose>
@@ -631,7 +632,7 @@
         <xsl:when test="$relativeFrom ='page'">
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom ='text' or $relativeFrom = '' ">
+        <xsl:when test="$relativeFrom ='text'">
           <xsl:text>paragraph</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
@@ -655,6 +656,28 @@
         </xsl:when>
         <xsl:when test="$relativeFrom = 'outer-margin-area'">
           <xsl:text>paragraph-start-margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom=''">
+          <!-- 
+          if no relation is set, Word uses default values, 
+          depeding on the position
+          -->
+          <xsl:choose>
+            <!-- 
+            If no position is set, it is absolute positioning.
+            In this case the default relation is the paragraph-content 
+            -->
+            <xsl:when test="$hPos=''">
+              <xsl:text>paragraph-content</xsl:text>
+            </xsl:when>
+            <!-- 
+            If a position is set, it is relative positioning.
+            In this case the default relation is the page-content 
+            -->
+            <xsl:otherwise>
+              <xsl:text>page-content</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>paragraph</xsl:text>

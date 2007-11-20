@@ -131,7 +131,7 @@
                 <xsl:call-template name="InsertParagraphShadow"/>
               </xsl:when>
               <!-- The border is defined in styles.xml -->
-              <xsl:when test="$externalBorderStyle">
+              <xsl:when test="$externalBorderStyle/w:pPr/w:pBdr">
                 <xsl:call-template name="InsertBorders">
                   <xsl:with-param name="border" select="$externalBorderStyle/w:pPr/w:pBdr"/>
                 </xsl:call-template>
@@ -997,7 +997,6 @@
         <xsl:with-param name="shape" select="$shape"/>
       </xsl:call-template>
     </xsl:variable>
-    
     <xsl:variable name="horizontalPos">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -1024,6 +1023,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:choose>
       <xsl:when test="$shape/@o:hralign and $shape/@o:hr='t'">
         <xsl:call-template name="InsertGraphicPosH">
@@ -1050,9 +1050,8 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:call-template name="InsertGraphicPosRelativeH">
-      <xsl:with-param name="relativeFrom">
-        <xsl:value-of select="$horizontalRel"/>
-      </xsl:with-param>
+      <xsl:with-param name="relativeFrom" select="$horizontalRel" />
+      <xsl:with-param name="hPos" select="$horizontalPos" />
     </xsl:call-template>
   </xsl:template>
 
@@ -1089,7 +1088,8 @@
       <xsl:with-param name="vAlign" select="$verticalPos"/>
     </xsl:call-template>
     <xsl:call-template name="InsertVerticalRel">
-      <xsl:with-param name="vAnchor" select="$verticalRelative"/>
+      <xsl:with-param name="vRel" select="$verticalRelative"/>
+      <xsl:with-param name="vPos" select="$verticalPos" />
     </xsl:call-template>
     <!--
     <xsl:call-template name="InsertGraphicPosV">
@@ -1804,22 +1804,42 @@
   Date: 15.11.2007
   -->
   <xsl:template name="InsertHorizontalRel">
-    <xsl:param name="hAnchor" />
+    <xsl:param name="hRel" />
+    <xsl:param name="hPos" />
     
     <xsl:attribute name="style:horizontal-rel">
       <xsl:choose>
-        <xsl:when test="$hAnchor='margin'">
+        <xsl:when test="$hRel='margin'">
           <xsl:text>paragraph-content</xsl:text>
         </xsl:when>
-        <xsl:when test="$hAnchor='page'">
+        <xsl:when test="$hRel='page'">
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$hAnchor='text'">
+        <xsl:when test="$hRel='text'">
           <xsl:text>page-content</xsl:text>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>page-content</xsl:text>
-        </xsl:otherwise>
+        <xsl:when test="$hRel=''">
+          <!-- 
+          if no relation is set, Word uses default values, 
+          depeding on the position
+          -->
+          <xsl:choose>
+            <!-- 
+            If no position is set, it is absolute positioning.
+            In this case the default relation is the paragraph-content 
+            -->
+            <xsl:when test="$hPos=''">
+              <xsl:text>paragraph-content</xsl:text>
+            </xsl:when>
+            <!-- 
+            If a position is set, it is relative positioning.
+            In this case the default relation is the page-content 
+            -->
+            <xsl:otherwise>
+              <xsl:text>page-content</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
@@ -1830,19 +1850,39 @@
   Date: 15.11.2007
   -->
   <xsl:template name="InsertVerticalRel">
-    <xsl:param name="vAnchor" />
+    <xsl:param name="vRel" />
+    <xsl:param name="vPos" />
     
     <xsl:attribute name="style:vertical-rel">
       <xsl:choose>
-        <xsl:when test="$vAnchor='page'">
+        <xsl:when test="$vRel='page'">
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$vAnchor='text'">
+        <xsl:when test="$vRel='text'">
           <xsl:text>baseline</xsl:text>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>page-content</xsl:text>
-        </xsl:otherwise>
+        <xsl:when test="$vRel=''">
+          <!-- 
+          if no relation is set, Word uses default values, 
+          depeding on the position
+          -->
+          <xsl:choose>
+            <!-- 
+            If no position is set, it is absolute positioning.
+            In this case the default relation is the paragraph-content 
+            -->
+            <xsl:when test="$vPos=''">
+              <xsl:text>paragraph-content</xsl:text>
+            </xsl:when>
+            <!-- 
+            If a position is set, it is relative positioning.
+            In this case the default relation is the page-content 
+            -->
+            <xsl:otherwise>
+              <xsl:text>page-content</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
@@ -1910,7 +1950,8 @@
         <xsl:with-param name="y" select="$oFramePr/@w:y" />
       </xsl:call-template>
       <xsl:call-template name="InsertVerticalRel">
-        <xsl:with-param name="vAnchor" select="$vAnchor" />
+        <xsl:with-param name="vRel" select="$vAnchor" />
+        <xsl:with-param name="vPos" select="$yAlign" />
       </xsl:call-template>
     </xsl:if>
     <xsl:if test ="count($xAlign)>0 or count($hAnchor)>0">
@@ -1918,7 +1959,8 @@
         <xsl:with-param name="xAlign" select="$xAlign" />
       </xsl:call-template>
       <xsl:call-template name="InsertHorizontalRel">
-        <xsl:with-param name="hAnchor" select="$hAnchor" />
+        <xsl:with-param name="hRel" select="$hAnchor" />
+        <xsl:with-param name="hPos" select="$xAlign" />
       </xsl:call-template>
     </xsl:if>
   </xsl:template>

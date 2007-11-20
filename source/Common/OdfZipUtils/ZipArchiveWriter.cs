@@ -618,24 +618,32 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         private string MakeRelPath(string text)
         {
-            int pos = "http://www.dialogika.de/odf-converter/makeabspath#".Length;
+            int pos = "http://www.dialogika.de/odf-converter/makerelpath#".Length;
             string absolutePath = text.Remove(0, pos);
+            absolutePath = absolutePath.Replace("%20", " ");
             string path = "";
 
-            // for Commandline tool
-            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            //do not change network paths 
+            if (absolutePath.StartsWith("\\\\"))
             {
-                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
-                    path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                return absolutePath;
             }
-            //for addins
-            if (path == "")
+            else
             {
-                path = Environment.CurrentDirectory;
-            }
-
-            string relativePath = MakeWinPathRelative(path, absolutePath);
-            return relativePath.Replace("\\", "/");
+                // for Commandline tool
+                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                {
+                    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                        path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                }
+                //for addins
+                if (path == "")
+                {
+                    path = Environment.CurrentDirectory;
+                }
+                string relativePath = MakeWinPathRelative(path, absolutePath);
+                return relativePath.Replace("\\", "/");
+            }           
         }
 
         private string MakeWinPathRelative(string absolutePath, string relativeTo)
