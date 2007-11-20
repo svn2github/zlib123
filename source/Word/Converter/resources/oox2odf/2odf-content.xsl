@@ -498,6 +498,23 @@
     </xsl:variable>
     <!--math, dialogika: added for bugfix #1802258 END -->
 
+    
+    <!--Only show message if list style numbering inherited from default heading is destroyed-->
+    <xsl:if test="$dummyOutlineLevel != '' and $IsDefaultHeading != 'true'">
+
+      <xsl:variable name="IsParentDefaultHeading">
+        <xsl:call-template name="CheckDefaultHeading">
+          <xsl:with-param name="Name">
+            <xsl:value-of select="key('StyleId',key('StyleId',$styleId)/w:basedOn/@w:val)/w:name/@w:val" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:if test="$IsParentDefaultHeading = 'true'">
+        <xsl:message terminate="no">translation.oox2odf.lists.numbering</xsl:message>
+      </xsl:if>
+    </xsl:if>
+
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
       <xsl:when
@@ -508,7 +525,6 @@
       <!-- ignore paragraph if it's deleted in change tracking mode-->
       <!--xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/-->
       <xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
-
 
       <!--  check if the paragraf is list element (it can be a heading but only if it's style is NOT linked to a list level 
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
