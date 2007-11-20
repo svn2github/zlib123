@@ -925,11 +925,17 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:call-template>
                 </xsl:if>
               </xsl:when>
-              <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:circle'
-                          or name()='draw:line' or name()='draw:connector'">
+              <xsl:when test="name()='draw:rect'">
                 <xsl:call-template name="tmpgetNvPrID">
                   <xsl:with-param name="spId" select="$spId"/>
                 </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="name()='draw:ellipse' or name()='draw:circle'">
+                <xsl:if test="not(@draw:kind)">
+                <xsl:call-template name="tmpgetNvPrID">
+                  <xsl:with-param name="spId" select="$spId"/>
+                </xsl:call-template>
+                </xsl:if>
               </xsl:when>
             </xsl:choose>
           </xsl:if>

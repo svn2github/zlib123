@@ -311,12 +311,19 @@ Copyright (c) 2007, Sonata Software Limited
 			
 			<!-- End -->
 			<!-- Font Inclined-->
-			<xsl:if test="style:text-properties/@fo:font-style[contains(.,'italic')]">
+      <xsl:choose>
+        <xsl:when test="style:text-properties/@fo:font-style='italic'">
 				<xsl:attribute name ="i">
 					<xsl:value-of select ="'1'"/>
 				</xsl:attribute >
-			</xsl:if >
-      <xsl:if test ="not(style:text-properties/@fo:font-style[contains(.,'italic')]) and ($flagPresentationClass='No' or $prClassName='subtitle')">
+        </xsl:when >
+        <xsl:when test="style:text-properties/@fo:font-style='normal'">
+          <xsl:attribute name ="i">
+            <xsl:value-of select ="'0'"/>
+          </xsl:attribute >
+        </xsl:when >
+        <xsl:when test="not(style:text-properties/@fo:font-style='normal') and not(style:text-properties/@fo:font-style='italic')
+                           and not(style:text-properties/@fo:font-style) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
           <xsl:with-param name="parentStyleName">
             <xsl:choose>
@@ -330,8 +337,8 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:with-param>
           <xsl:with-param name="attrName" select="'italic'"/>
         </xsl:call-template>
-      </xsl:if>
-			
+        </xsl:when >
+      </xsl:choose>
 			<!-- Font underline-->
     
         <xsl:call-template name="tmpUnderLineStyle">
@@ -1184,8 +1191,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:when>
           </xsl:choose>
         </xsl:when>
-  
-        <xsl:when test="$attrName='Fontsize'">
+          <xsl:when test="$attrName='Fontsize'">
           <xsl:choose>
             <xsl:when test="substring-before(@fo:font-size,'pt') > 0">
               <xsl:attribute name ="sz">
@@ -1253,12 +1259,17 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when>
         <xsl:when test="$attrName='italic'">
           <xsl:choose>
-            <xsl:when test="@fo:font-style[contains(.,'italic')]">
+            <xsl:when test="@fo:font-style='italic'">
               <xsl:attribute name ="i">
                 <xsl:value-of select ="'1'"/>
               </xsl:attribute >
             </xsl:when>
-            <xsl:when test="not(@fo:font-style[contains(.,'italic')]) and $prStyleName !=''">
+            <xsl:when test="@fo:font-style='normal'">
+              <xsl:attribute name ="i">
+                <xsl:value-of select ="'0'"/>
+              </xsl:attribute >
+            </xsl:when >
+            <xsl:when test="not(@fo:font-style) and @fo:font-style!='italic' and @fo:font-style!='normal' and $prStyleName !=''">
               <xsl:call-template name="tmpgetDefualtTextProp">
                 <xsl:with-param name="parentStyleName" select="$prStyleName"/>
                 <xsl:with-param name="attrName" select="'italic'"/>
@@ -2233,14 +2244,20 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:attribute>
       </xsl:if>
       <!-- Font Inclined-->
-      <xsl:if test="style:text-properties/@fo:font-style[contains(.,'italic')]">
+      <xsl:choose>
+        <xsl:when test="style:text-properties/@fo:font-style='italic'">
         <xsl:attribute name ="i">
           <xsl:value-of select ="'1'"/>
         </xsl:attribute >
-      </xsl:if >
-
+        </xsl:when >
+        <xsl:when test="style:text-properties/@fo:font-style='normal'">
+          <xsl:attribute name ="i">
+            <xsl:value-of select ="'0'"/>
+          </xsl:attribute >
+        </xsl:when >
+      </xsl:choose>
       <!-- Font underline-->
-      <xsl:call-template name="Underline"/>
+      <xsl:call-template name="tmpUnderLineStyle"/>
 
       <!-- Font Strike through -->
       <xsl:choose >
@@ -2325,6 +2342,166 @@ Copyright (c) 2007, Sonata Software Limited
           </a:solidFill>
         </a:uFill>
       </xsl:if>
+    </xsl:for-each >
+  </xsl:template>
+  <xsl:template name ="tmpSMDefaultfontStyles">
+    <xsl:param name ="TextStyleID"/>
+
+    <xsl:for-each  select ="document('styles.xml')//style:style[@style:name =$TextStyleID ]">
+    
+      <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
+        <xsl:attribute name ="sz">
+          <xsl:call-template name ="convertToPoints">
+            <xsl:with-param name ="unit" select ="'pt'"/>
+            <xsl:with-param name ="length" select ="style:text-properties/@fo:font-size"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <!--Color Node set as standard colors -->
+      <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+      <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+      <xsl:if test ="style:text-properties/@fo:color">
+        <a:solidFill>
+          <a:srgbClr  >
+            <xsl:attribute name ="val">
+              <!--<xsl:value-of   select ="substring-after(style:text-properties/@fo:color,'#')"/>-->
+              <xsl:value-of select ="translate(substring-after(style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
+            </xsl:attribute>
+          </a:srgbClr >
+        </a:solidFill>
+      </xsl:if>
+      <!-- Text Shadow fix -->
+      <xsl:if test ="style:text-properties/@fo:font-family">
+        <a:latin charset="0" >
+          <xsl:attribute name ="typeface" >
+            <!-- fo:font-family-->
+            <xsl:value-of select ="translate(style:text-properties/@fo:font-family, &quot;'&quot;,'')" />
+          </xsl:attribute>
+        </a:latin >
+      </xsl:if>
+    </xsl:for-each >
+  </xsl:template>
+  <xsl:template name ="SMParagraphStyles" >
+    <!--- Code inserted by Vijayeta for Bullets and numbering,For bullet properties-->
+    <xsl:param name ="paraId" />
+    <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$paraId]">
+        <xsl:if test ="style:paragraph-properties/@fo:text-indent">
+          <!--fo:text-indent-->
+          <xsl:variable name ="varIndent">
+            <xsl:call-template name ="convertToPoints">
+              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:text-indent"/>
+              <xsl:with-param name ="unit" select ="'cm'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:if test ="$varIndent!=''">
+            <xsl:attribute name ="indent">
+              <xsl:value-of select ="$varIndent"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if >
+        <xsl:if test ="style:paragraph-properties/@fo:text-align">
+          <xsl:attribute name ="algn">
+            <!--fo:text-align-->
+            <xsl:choose >
+              <xsl:when test ="style:paragraph-properties/@fo:text-align='center'">
+                <xsl:value-of select ="'ctr'"/>
+              </xsl:when>
+              <xsl:when test ="style:paragraph-properties/@fo:text-align='end'">
+                <xsl:value-of select ="'r'"/>
+              </xsl:when>
+              <xsl:when test ="style:paragraph-properties/@fo:text-align='justify'">
+                <xsl:value-of select ="'just'"/>
+              </xsl:when>
+              <xsl:otherwise >
+                <xsl:value-of select ="'l'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if >
+        <xsl:if test ="style:paragraph-properties/@fo:margin-left">
+          <!--fo:margin-left-->
+          <xsl:variable name ="varMarginLeft">
+            <xsl:call-template name ="convertToPoints">
+              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-left"/>
+              <xsl:with-param name ="unit" select ="'cm'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:if test ="$varMarginLeft!=''">
+            <xsl:attribute name ="marL">
+              <xsl:value-of select ="$varMarginLeft"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if >
+        <xsl:if test ="style:paragraph-properties/@fo:margin-right">
+          <!-- warn if indent after text-->
+          <xsl:message terminate="no">translation.odf2oox.paragraphIndentTypeAfterText</xsl:message>
+        </xsl:if>
+        <xsl:choose>
+          <xsl:when test ="style:paragraph-properties/@fo:line-height and 
+					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
+					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
+            <a:lnSpc>
+              <a:spcPct>
+                <xsl:attribute name ="val">
+                  <xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:line-height,'%')* 1000,'#.##') "/>
+                </xsl:attribute>
+              </a:spcPct>
+            </a:lnSpc>
+          </xsl:when>
+          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-spacing,'cm') > 0">
+            <a:lnSpc>
+              <a:spcPts>
+                <xsl:attribute name ="val">
+                  <xsl:call-template name ="convertToPointsLineSpacing">
+                    <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-spacing"/>
+                    <xsl:with-param name ="unit" select ="'cm'"/>
+                  </xsl:call-template>
+                </xsl:attribute>
+              </a:spcPts>
+            </a:lnSpc>
+          </xsl:when>
+          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') > 0 ">
+            <a:lnSpc>
+              <a:spcPts>
+                <xsl:attribute name ="val">
+                  <xsl:call-template name ="convertToPointsLineSpacing">
+                    <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
+                    <xsl:with-param name ="unit" select ="'cm'"/>
+                  </xsl:call-template>
+                </xsl:attribute>
+              </a:spcPts>
+            </a:lnSpc>
+          </xsl:when>
+        </xsl:choose>
+        <xsl:if test ="style:paragraph-properties/@fo:margin-top">
+          <a:spcBef>
+            <a:spcPts>
+              <xsl:attribute name ="val">
+                <!--fo:margin-top-->
+                <xsl:call-template name ="convertToPointsLineSpacing">
+                  <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-top"/>
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                </xsl:call-template>
+                <!--<xsl:value-of select ="round(substring-before(style:paragraph-properties/@fo:margin-top,'cm')* 2835) "/>-->
+              </xsl:attribute>
+            </a:spcPts>
+          </a:spcBef >
+        </xsl:if>
+        <xsl:if test ="style:paragraph-properties/@fo:margin-bottom">
+          <a:spcAft>
+            <a:spcPts>
+              <xsl:attribute name ="val">
+                <!--fo:margin-bottom-->
+                <xsl:call-template name ="convertToPointsLineSpacing">
+                  <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-bottom"/>
+                  <xsl:with-param name ="unit" select ="'cm'"/>
+                </xsl:call-template>
+                <!--<xsl:value-of select ="round(substring-before(style:paragraph-properties/@fo:margin-bottom,'cm')* 2835) "/>-->
+              </xsl:attribute>
+            </a:spcPts>
+          </a:spcAft>
+        </xsl:if >
+        <xsl:call-template name ="paragraphTabstops"/>
     </xsl:for-each >
   </xsl:template>
   <xsl:template name="Underline">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <!-- 
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -231,6 +231,7 @@ Copyright (c) 2007, Sonata Software Limited
                           <xsl:call-template name="InsertPicture">
                             <xsl:with-param name="imageNo" select="$pageNo" />
                             <xsl:with-param name="picNo" select="$var_pos" />
+                            <xsl:with-param name="fileName" select="'content.xml'" />
                           </xsl:call-template>
                         </xsl:if>
                       </xsl:if>

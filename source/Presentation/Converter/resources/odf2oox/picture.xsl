@@ -49,6 +49,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="imageNo" />
     <xsl:param name ="picNo" />
     <xsl:param name ="master" />
+     <xsl:param name="fileName"/>
  <xsl:param name ="NvPrId" />
     <!-- warn if Audio or Video -->
     <xsl:message terminate="no">translation.odf2oox.audioVideoTypeImage</xsl:message>
@@ -87,6 +88,37 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:value-of select ="$imageSerialNo"/>
           </xsl:attribute>
         </a:blip >
+        <!--Image cropping-->
+        <xsl:variable name="imagePath">
+          <xsl:value-of select="@xlink:href"/>
+        </xsl:variable>
+        <xsl:variable name="graphicStyleName">
+          <xsl:value-of select="parent::node()/@draw:style-name"/>
+        </xsl:variable>
+        <xsl:for-each select="document($fileName)//office:automatic-styles/style:style[@style:name=$graphicStyleName]">
+          <xsl:if test="style:graphic-properties/@fo:clip">
+            <xsl:variable name="cropValue">
+              <xsl:value-of select="style:graphic-properties/@fo:clip"/>
+            </xsl:variable>
+            <xsl:variable name="var_Top">
+              <xsl:value-of select="substring-before(substring-after($cropValue,'rect('),' ')"/>
+            </xsl:variable>
+            <xsl:variable name="var_Right">
+              <xsl:value-of select="substring-before(substring-after(substring-after($cropValue,'rect('),' '),' ')"/>
+            </xsl:variable>
+            <xsl:variable name="var_Bottom">
+              <xsl:value-of select="substring-before(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' ')"/>
+            </xsl:variable>
+            <xsl:variable name="var_Left">
+              <xsl:value-of select="substring-before(substring-after(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' '),')')"/>
+            </xsl:variable>
+            <xsl:if test="not($var_Top='0cm' and $var_Right='0cm' and $var_Bottom='0cm' and $var_Left='0cm')">
+              <a:srcRect>
+                <xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'cm'),':',substring-before($var_Right,'cm'),':',substring-before($var_Bottom,'cm'),':',substring-before($var_Left,'cm'))"/>
+              </a:srcRect>
+            </xsl:if>
+          </xsl:if>
+        </xsl:for-each>
         <a:stretch>
           <a:fillRect />
         </a:stretch>
