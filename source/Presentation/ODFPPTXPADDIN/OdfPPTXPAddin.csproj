@@ -106,8 +106,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OdfPPTXPAddinSetup-chs\AddExcelCustomActions.vbs" />
+    <Content Include="OdfPPTXPAddinSetup-chs\OdfPPTXPAddinSetup-chs.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup-chs\README.htm" />
+    <Content Include="OdfPPTXPAddinSetup-chs\Release\setup.exe" />
     <Content Include="OdfPPTXPAddinSetup-de\OdfPPTXPAddinSetup-de.vdproj" />
     <Content Include="OdfPPTXPAddinSetup-fr\OdfPPTXPAddinSetup-fr.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup-ja\AddExcelCustomActions.vbs" />
+    <Content Include="OdfPPTXPAddinSetup-ja\OdfPPTXPAddinSetup-ja.vdproj" />
+    <Content Include="OdfPPTXPAddinSetup-ja\README.htm" />
+    <Content Include="OdfPPTXPAddinSetup-ja\Release\setup.exe" />
     <Content Include="OdfPPTXPAddinSetup-nl\OdfPPTXPAddinSetup-nl.vdproj" />
     <Content Include="OdfPPTXPAddinSetup-pl\OdfPPTXPAddinSetup-pl.vdproj" />
     <Content Include="OdfPPTXPAddinSetup\AddExcelCustomActions.vbs" />
@@ -119,10 +127,16 @@
     <Content Include="OdfPPTXPAddinSetup\README.htm" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="OdfPPTXPAddinSetup-chs\PostBuild.bat" />
+    <None Include="OdfPPTXPAddinSetup-chs\Release\OdfPPTXPAddinSetup-chs.msi" />
+    <None Include="OdfPPTXPAddinSetup-ja\PostBuild.bat" />
+    <None Include="OdfPPTXPAddinSetup-ja\Release\OdfPPTXPAddinSetup-ja.msi" />
     <None Include="OdfPPTXPAddinSetup\Debug\OdfPPTXPAddinSetup.tmp" />
     <None Include="OdfPPTXPAddinSetup\PostBuild.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="OdfPPTXPAddinSetup-chs\Debug\" />
+    <Folder Include="OdfPPTXPAddinSetup-ja\Debug\" />
     <Folder Include="OdfPPTXPAddinSetup\Release\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
