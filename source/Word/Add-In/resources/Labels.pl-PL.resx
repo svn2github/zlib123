@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="﻿translation.odf2oox.paddingShortened" xml:space="preserve">
+  <data name="translation.odf2oox.paddingShortened" xml:space="preserve">
     <value>Zmniejszony odstęp od zawartości</value>
   </data>
   <data name="translation.odf2oox.borderShortened" xml:space="preserve">
@@ -436,6 +436,6 @@
     <value>Wznowienie numerowania linii dla sekcji nie jest zachowywane</value>
   </data>
   <data name="translation.odf2oox.odfolelost" xml:space="preserve">
-    <value />
+    <value>Osadzony obiekt ODF</value>
   </data>
 </root>

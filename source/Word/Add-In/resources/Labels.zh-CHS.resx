@@ -436,6 +436,6 @@
     <value>正在重新启动每个部分的行编号</value>
   </data>
   <data name="translation.odf2oox.odfolelost" xml:space="preserve">
-    <value />
+    <value>嵌入 ODF 对象</value>
   </data>
 </root>
