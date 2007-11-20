@@ -133,7 +133,6 @@ RefNo-1
                       <a:picLocks noChangeAspect="0"/>
                     </xdr:cNvPicPr>
                   </xdr:nvPicPr>
-
                   <xdr:blipFill>
                     <a:blip
                       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
@@ -152,13 +151,43 @@ RefNo-1
                         </xsl:otherwise>
                       </xsl:choose>
                     </a:blip>
+                <!--Image Cropping-->
+                <xsl:variable name="graphicStyleName">
+                  <xsl:value-of select="@draw:style-name"/>
+                </xsl:variable>
+                <xsl:variable name="imagePath">
+                  <xsl:value-of select="draw:image/@xlink:href"/>
+                </xsl:variable>
+                <xsl:for-each select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$graphicStyleName]">
+                  <xsl:if test="style:graphic-properties/@fo:clip">
+                    <xsl:variable name="cropValue">
+                      <xsl:value-of select="style:graphic-properties/@fo:clip"/>
+                    </xsl:variable>
+                    <xsl:variable name="var_Top">
+                      <xsl:value-of select="substring-before(substring-after($cropValue,'rect('),' ')"/>
+                    </xsl:variable>
+                    <xsl:variable name="var_Right">
+                      <xsl:value-of select="substring-before(substring-after(substring-after($cropValue,'rect('),' '),' ')"/>
+                    </xsl:variable>
+                    <xsl:variable name="var_Bottom">
+                      <xsl:value-of select="substring-before(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' ')"/>
+                    </xsl:variable>
+                    <xsl:variable name="var_Left">
+                      <xsl:value-of select="substring-before(substring-after(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' '),')')"/>
+                    </xsl:variable>
+                    <xsl:if test="not($var_Top='0in' and $var_Right='0in' and $var_Bottom='0in' and $var_Left='0in')">
+                      <a:srcRect>
+                        <xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'in'),':',substring-before($var_Right,'in'),':',substring-before($var_Bottom,'in'),':',substring-before($var_Left,'in'))"/>
+                      </a:srcRect>
+                    </xsl:if>
+                  </xsl:if>
+                </xsl:for-each>
+                <!--End-->
                     <a:stretch>
                       <a:fillRect/>
                     </a:stretch>
                   </xdr:blipFill>
-
                   <xsl:call-template name="InsertFrameProperties"/>
-
                 </xdr:pic>
                 <xdr:clientData/>
               </xdr:twoCellAnchor>
