@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -191,6 +191,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else if (text.Contains("hyperlink-path"))
             {
                 this.nextWriter.WriteString(EvalHyperlinkPath(text));
+            }
+            //Image Cropping Calculation Added by Sonata-15/11/2007
+            else if (text.Contains("image-properties"))
+            {
+
+                EvalImageCropping(text);
+
             }
             else
             {
@@ -577,6 +584,58 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return address.ToString();
         }
         //end
+
+
+        //Image Cropping Added by Sonata-15/11/2007
+        private void EvalImageCropping(string text)
+        {
+            string[] arrVal = new string[6];
+            arrVal = text.Split(':');
+            string source = arrVal[1].ToString();
+            double top = double.Parse(arrVal[2].ToString());
+            double right = double.Parse(arrVal[3].ToString());
+            double bottom = double.Parse(arrVal[4].ToString());
+            double left = double.Parse(arrVal[5].ToString());
+
+
+            string tempFileName = AbstractConverter.inputTempFileName.ToString();
+            ZipResolver zipResolverObj = new ZipResolver(tempFileName);
+            OdfZipUtils.ZipArchiveWriter zipobj = new OdfZipUtils.ZipArchiveWriter(zipResolverObj);
+            string widht_height_res = zipobj.ImageCopyBinary(source);
+            zipResolverObj.Dispose();
+            zipobj.Close();
+
+
+            string[] arrValues = new string[3];
+            arrValues = widht_height_res.Split(':');
+            double width = double.Parse(arrValues[0].ToString());
+            double height = double.Parse(arrValues[1].ToString());
+            double res = double.Parse(arrValues[2].ToString());
+
+            double cx = width * 2.54 / res;
+            double cy = height * 2.54 / res;
+
+            int pptLeft = (int)(left * 100000 / cx);
+            int pptRight = (int)(right * 100000 / cx);
+            int pptTop = (int)(top * 100000 / cy);
+            int pptBottom = (int)(bottom * 100000 / cy);
+
+
+            WriteStartAttribute("l");
+            this.WriteString(pptLeft.ToString());
+            WriteEndAttribute();
+            WriteStartAttribute("r");
+            this.WriteString(pptRight.ToString());
+            WriteEndAttribute();
+            WriteStartAttribute("t");
+            this.WriteString(pptTop.ToString());
+            WriteEndAttribute();
+            WriteStartAttribute("b");
+            this.WriteString(pptBottom.ToString());
+            WriteEndAttribute();
+        }
+        //end
+
         public void WriteStoredRun()
         {
             Element e = (Element)this.store.Peek();

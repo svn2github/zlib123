@@ -30,7 +30,13 @@ using System.Xml;
 using System.Collections;
 using System;
 using System.IO;
-
+//added by sonata for mulltilevel grouping
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Text;
+using OdfConverter.Transforms;
+using OdfConverter.Transforms.Test;
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
 
@@ -154,6 +160,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.nextWriter.WriteString(EvalRotationExpression(text));
 
             }
+            else if (text.Contains("Group-Transform"))
+            {
+
+                this.nextWriter.WriteString(EvalGroupingExpression(text));
+
+            }
             //End
             else if (text.Contains("shade-tint"))
             {
@@ -166,6 +178,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
 
                 this.nextWriter.WriteString(EvalShadowExpression(text));
+            }
+            //Image Cropping Calculation Added by Sonata-15/11/2007
+            else if (text.Contains("image-props"))
+            {
+                EvalImageCrop(text);
             }
             else
             {
@@ -325,6 +342,184 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             hexGreen = String.Format("{0:x}", intGreen );
             hexBlue = String.Format("{0:x}", intBlue );  
             return ('#' + hexRed.ToUpper()   + hexGreen.ToUpper ()  + hexBlue.ToUpper()  );
+
+        }
+        //Added by sonata\Vipul for multilevel grouping
+        private string EvalGroupingExpression(string text)
+        {
+            List<OoxShape> _shapes = new List<OoxShape>();
+           
+            string strRet = "";
+            string strShapeCordinates = "";
+            string[] arrgroupShape = text.Split('$');
+            string[] arrgroup = arrgroupShape[0].Split('@');
+
+            //group cordinates
+            long dblgrpX ;
+            long dblgrpY ;
+            long dblgrpCX ;
+            long dblgrpCY;
+            long dblgrpChX;
+            long dblgrpChY;
+            long dblgrpChCX ;
+            long dblgrpChCY;
+            long dblgrpRot;
+
+            //shape cordinates
+            long dblShapeX;
+            long dblShapeY ;
+            long dblShapeCX;
+            long dblShapeCY;
+            long dblShapeRot;
+
+            OoxTransform  TopLevelgroup;
+            OoxTransform Targetgroup = new OoxTransform(5495925, 3286125, 1419225, 657225, 0, 1, 1);
+            OoxTransform shapeCord;
+            OoxTransform InnerLevelgroup;
+            OoxTransform Tempgroup;
+
+            string[] arrShapeCordinates;
+            string[] arrInnerGroup;
+            string[] arrFinalRet;
+
+            if (arrgroup.Length >= 4)
+            {
+                //Multilevel group
+
+                //top level Group cordinates
+                arrInnerGroup = arrgroup[1].Split(':');
+
+                 dblgrpX = long.Parse(arrInnerGroup[0], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpY = long.Parse(arrInnerGroup[1], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpCX = long.Parse(arrInnerGroup[2], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpCY = long.Parse(arrInnerGroup[3], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpChX = long.Parse(arrInnerGroup[4], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpChY = long.Parse(arrInnerGroup[5], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpChCX = long.Parse(arrInnerGroup[6], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpChCY = long.Parse(arrInnerGroup[7], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpRot = long.Parse(arrInnerGroup[8], System.Globalization.CultureInfo.InvariantCulture);
+
+                 TopLevelgroup = new OoxTransform(dblgrpChX, dblgrpChY, dblgrpChCX, dblgrpChCY, dblgrpX, dblgrpY, dblgrpCX, dblgrpCY, dblgrpRot, 1, 1);
+
+                for (int intCount = 2; intCount < arrgroup.Length - 1; intCount++)
+                {
+                    arrInnerGroup = arrgroup[intCount].Split(':');
+
+                    Tempgroup = TopLevelgroup;
+
+                    //Inner level Group cordinates
+                     dblgrpX = long.Parse(arrInnerGroup[0], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpY = long.Parse(arrInnerGroup[1], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpCX = long.Parse(arrInnerGroup[2], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpCY = long.Parse(arrInnerGroup[3], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpChX = long.Parse(arrInnerGroup[4], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpChY = long.Parse(arrInnerGroup[5], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpChCX = long.Parse(arrInnerGroup[6], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpChCY = long.Parse(arrInnerGroup[7], System.Globalization.CultureInfo.InvariantCulture);
+                     dblgrpRot = long.Parse(arrInnerGroup[8], System.Globalization.CultureInfo.InvariantCulture);
+
+                     InnerLevelgroup = new OoxTransform(dblgrpChX, dblgrpChY, dblgrpChCX, dblgrpChCY, dblgrpX, dblgrpY, dblgrpCX, dblgrpCY, dblgrpRot, 1, 1);
+
+                     Targetgroup =new  OoxTransform(Tempgroup, InnerLevelgroup);
+
+                     TopLevelgroup = Targetgroup;
+
+                }
+
+                arrShapeCordinates = arrgroupShape[1].Split(':'); 
+
+                //shape cordinates
+                 dblShapeX = long.Parse(arrShapeCordinates[1], System.Globalization.CultureInfo.InvariantCulture);
+                 dblShapeY = long.Parse(arrShapeCordinates[2], System.Globalization.CultureInfo.InvariantCulture);
+                 dblShapeCX = long.Parse(arrShapeCordinates[3], System.Globalization.CultureInfo.InvariantCulture);
+                 dblShapeCY = long.Parse(arrShapeCordinates[4], System.Globalization.CultureInfo.InvariantCulture);
+                 dblShapeRot = long.Parse(arrShapeCordinates[5], System.Globalization.CultureInfo.InvariantCulture);
+
+                 _shapes.Clear();
+
+                 shapeCord = new OoxTransform(dblShapeX, dblShapeY, dblShapeCX, dblShapeCY, dblShapeRot, 1, 1);
+
+                 _shapes.Add(new OoxShape(new OoxTransform(Targetgroup, shapeCord)));
+
+            }
+            else if (arrgroup.Length == 3)
+            {
+                //  single level group
+                arrInnerGroup = arrgroup[1].Split(':');
+
+                dblgrpX = long.Parse(arrInnerGroup[0], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpY = long.Parse(arrInnerGroup[1], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpCX = long.Parse(arrInnerGroup[2], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpCY = long.Parse(arrInnerGroup[3], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpChX = long.Parse(arrInnerGroup[4], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpChY = long.Parse(arrInnerGroup[5], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpChCX = long.Parse(arrInnerGroup[6], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpChCY = long.Parse(arrInnerGroup[7], System.Globalization.CultureInfo.InvariantCulture);
+                dblgrpRot = long.Parse(arrInnerGroup[8], System.Globalization.CultureInfo.InvariantCulture);
+
+                TopLevelgroup = new OoxTransform(dblgrpChX, dblgrpChY, dblgrpChCX, dblgrpChCY, dblgrpX, dblgrpY, dblgrpCX, dblgrpCY, dblgrpRot, 1, 1);
+                
+                arrShapeCordinates = arrgroupShape[1].Split(':');
+
+                //shape cordinates
+                dblShapeX = long.Parse(arrShapeCordinates[1], System.Globalization.CultureInfo.InvariantCulture);
+                dblShapeY = long.Parse(arrShapeCordinates[2], System.Globalization.CultureInfo.InvariantCulture);
+                dblShapeCX = long.Parse(arrShapeCordinates[3], System.Globalization.CultureInfo.InvariantCulture);
+                dblShapeCY = long.Parse(arrShapeCordinates[4], System.Globalization.CultureInfo.InvariantCulture);
+                dblShapeRot = long.Parse(arrShapeCordinates[5], System.Globalization.CultureInfo.InvariantCulture);
+
+                _shapes.Clear();
+
+                shapeCord = new OoxTransform(dblShapeX, dblShapeY, dblShapeCX, dblShapeCY, dblShapeRot, 1, 1);
+
+                _shapes.Add(new OoxShape(new OoxTransform(TopLevelgroup, shapeCord)));
+
+            }
+           
+            foreach (OoxShape shape in _shapes)
+            {
+                strRet = shape.OoxTransform.Odf;
+            }
+         
+            arrFinalRet = strRet.Split('@');
+
+            if (arrFinalRet[0] == "YESROT")
+            {
+                if (arrgroup[0].Contains("Width"))
+                {
+                    strShapeCordinates = arrFinalRet[1];
+                }
+                else if (arrgroup[0].Contains("Height"))
+                {
+                    strShapeCordinates = arrFinalRet[2];
+                }
+                else if (arrgroup[0].Contains("DrawTranform"))
+                {
+                    strShapeCordinates = arrFinalRet[3];
+                }
+            }
+            else if (arrFinalRet[0] == "NOROT")
+            {
+                if (arrgroup[0].Contains("Width"))
+                {
+                    strShapeCordinates = arrFinalRet[1];
+                }
+                else if (arrgroup[0].Contains("Height"))
+                {
+                    strShapeCordinates = arrFinalRet[2];
+                }
+                else if (arrgroup[0].Contains("SVGX"))
+                {
+                    strShapeCordinates = arrFinalRet[3];
+                }
+                else if (arrgroup[0].Contains("SVGY"))
+                {
+                    strShapeCordinates = arrFinalRet[4];
+                }
+            }
+
+
+            return strShapeCordinates;
 
         }
 
@@ -507,6 +702,48 @@ namespace CleverAge.OdfConverter.OdfConverterLib
            
         }
         //End
+
+        //Image Cropping Added by Sonata-15/11/2007
+        private void EvalImageCrop(string text)
+        {
+            string[] arrVal = new string[6];
+            arrVal = text.Split(':');
+            string source = arrVal[1].ToString();
+            int left = int.Parse(arrVal[2].ToString());
+            int right = int.Parse(arrVal[3].ToString());
+            int top = int.Parse(arrVal[4].ToString());
+            int bottom = int.Parse(arrVal[5].ToString());
+
+
+            string tempFileName = AbstractConverter.inputTempFileName.ToString();
+            ZipResolver zipResolverObj = new ZipResolver(tempFileName);
+            OdfZipUtils.ZipArchiveWriter zipobj = new OdfZipUtils.ZipArchiveWriter(zipResolverObj);
+            string widht_height_res = zipobj.ImageCopyBinary(source);
+            zipResolverObj.Dispose();
+            zipobj.Close();
+
+
+            string[] arrValues = new string[3];
+            arrValues = widht_height_res.Split(':');
+            double width = double.Parse(arrValues[0].ToString());
+            double height = double.Parse(arrValues[1].ToString());
+            double res = double.Parse(arrValues[2].ToString());
+
+
+            double cx = width * 2.54 / res;
+            double cy = height * 2.54 / res;
+
+            double odpLeft = left * cx / 100000;
+            double odpRight = right * cx / 100000;
+            double odpTop = top * cy / 100000;
+            double odpBottom = bottom * cy / 100000;
+
+            string result = string.Concat("rect(", string.Format("{0:0.##}", odpTop) + "cm" + " " + string.Format("{0:0.##}", odpRight) + "cm" + " " + string.Format("{0:0.##}", odpBottom) + "cm" + " " + string.Format("{0:0.##}", odpLeft) + "cm", ")");
+            this.nextWriter.WriteString(result);
+
+        }
+        //End
+
 
         // added for Shadow calculation
         private string EvalShadowExpression(string text)

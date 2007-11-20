@@ -55,6 +55,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected bool packaging = true;
         protected Assembly resourcesAssembly;
         protected Hashtable compiledProcessors;
+        //Added by Sonata-15/11/2007   
+        //static varibale is used for getting temporary input file name
+        public static string inputTempFileName;
         
         protected AbstractConverter(Assembly resourcesAssembly)
         {
@@ -232,6 +235,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 File.Copy(inputFile, tempInputFile, true);
                 File.SetAttributes(tempInputFile, FileAttributes.Normal);
+                //Added by sonata -15/11/2007              
+                inputTempFileName = tempInputFile;
+                //End
                 _Transform(tempInputFile, tempOutputFile);
 
                 if (outputFile != null)
