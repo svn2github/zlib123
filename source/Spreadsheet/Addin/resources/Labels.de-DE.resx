@@ -124,18 +124,16 @@
     <value>Bei der Datenüberprüfung werden die Makrowarnungen von Excel nicht unterstützt.</value>
   </data>
   <data name="translation.odf2oox.draggedImagePath" xml:space="preserve">
-    <value> Images which are dragged and dropped into ODS file takes relative path and hence will be lost during conversion to XLSX.-de
-</value>
+    <value>Da für die Bilder, die in ODS-Dateien gezogen werden, relative Pfade verwendet werden, gehen die Bilder während der Konvertierung in XLSX verloren.</value>
   </data>
   <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
     <value>Excel unterstützt in Kopf-/Fußzeilen nur 256 Zeichen (mit Formatierung). Alle Zeichen, die darüberhinausgehen, gehen verloren.</value>
   </data>
   <data name="translation.odf2oox.hyperlinkTextbox" xml:space="preserve">
-    <value>Hyperlink can be applied to individual words in a text box in ODS, but this will be applied to the whole text box when converted to XLSX.-de
-</value>
+    <value>In ODS können einzelne Wörter in einem Textfeld als Hyperlink formatiert werden. Bei der Konvertierung in XLSX wird der Hyperlink jedoch für das gesamte Textfeld übernommen.</value>
   </data>
   <data name="translation.odf2oox.imageFromOtherApplication" xml:space="preserve">
-    <value>Data or Images copied from other applications will be lost and not converted.-de</value>
+    <value>Daten und Bilder, die aus anderen Anwendungen eingefügt werden, gehen verloren und werden nicht konvertiert.</value>
   </data>
   <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
     <value>Rahmenfarben für Szenarios werden von Excel nicht unterstützt.</value>

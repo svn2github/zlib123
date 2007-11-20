@@ -124,19 +124,16 @@
     <value>Excel ondersteunt geen foutmelding voor macro's in gegevensvalidatie.sprawdzania poprawności danych.</value>
   </data>
   <data name="translation.odf2oox.draggedImagePath" xml:space="preserve">
-    <value> Images which are dragged and dropped into ODS file takes relative path and hence will be lost during conversion to XLSX.-nl
-</value>
+    <value>Afbeeldingen zie worden versleept in een .ODS-bestand worden opgeslagen met een relatief pad en gaan daardoor verloren bij de conversie naar XLSX.</value>
   </data>
   <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
     <value>Excel ondersteunt slechts 256 tekens in kop-/voettekst (met opmaak). Alleen de eerste 256 tekens worden bewaard.</value>
   </data>
   <data name="translation.odf2oox.hyperlinkTextbox" xml:space="preserve">
-    <value>Hyperlink can be applied to individual words in a text box in ODS, but this will be applied to the whole text box when converted to XLSX.-nl
-</value>
+    <value>Er kunnen hyperlinks worden aangemaakt voor afzonderlijke woorden in een tekstvak in ODS, maar na conversie naar XLSX beslaan ze het hele tekstvak.</value>
   </data>
   <data name="translation.odf2oox.imageFromOtherApplication" xml:space="preserve">
-    <value>Data or Images copied from other applications will be lost and not converted.-nl
-</value>
+    <value>Gegevens en afbeeldingen die uit andere documenten zijn gekopieerd en geplakt, gaan verloren en worden niet geconverteerd.</value>
   </data>
   <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
     <value>Excel ondersteunt geen randkleuren voor scenario's.</value>

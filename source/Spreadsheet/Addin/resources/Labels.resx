@@ -180,7 +180,6 @@
 </value>
   </data>
   <data name="translation.odf2oox.imageFromOtherApplication" xml:space="preserve">
-    <value>Data or Images copied from other applications will be lost and not converted.
-</value>
+    <value>Data or Images copied and pasted from other applications will be lost and not converted.</value>
   </data>
 </root>
