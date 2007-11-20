@@ -765,7 +765,10 @@
 
     <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
       <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
-        <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]" mode="PictureStyle"/>
+        <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]" mode="PictureStyle">
+          <xsl:with-param name="sheet" select="$sheet"/>
+          <xsl:with-param name="Target" select="$Target"/>
+        </xsl:apply-templates>
       </xsl:if>
     </xsl:for-each>
 
@@ -773,6 +776,8 @@
 
   <xsl:template match="xdr:twoCellAnchor" mode="PictureStyle">
     <xsl:param name="PictureCell"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="Target"/>
 
     <xsl:variable name="PictureColStart">
       <xsl:value-of select="xdr:from/xdr:col"/>
@@ -798,6 +803,68 @@
             </xsl:for-each>
           </xsl:when>
         </xsl:choose>
+
+        <!--Cropping-->
+        <xsl:variable name="relationId">
+          <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:embed"/>
+        </xsl:variable>
+        
+        <xsl:variable name="Drawing">
+          <xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+        </xsl:variable>
+        <xsl:variable name="document">
+          <xsl:value-of select="concat($Drawing, '.rels')"/>
+        </xsl:variable>
+         
+        <xsl:variable name="pzipsource">
+          <xsl:for-each select="document(concat('xl/drawings/_rels/',$document))//node()[name() = 'Relationship']">
+            <xsl:if test="./@Id=$relationId">
+              <xsl:value-of select="./@Target"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+      
+        <xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@l or xdr:pic/xdr:blipFill/a:srcRect/@r or xdr:pic/xdr:blipFill/a:srcRect/@t or xdr:pic/xdr:blipFill/a:srcRect/@b">
+          <xsl:variable name="left">
+            <xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@l">
+              <xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@l"/>
+            </xsl:if>
+            <xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@l)">
+              <xsl:value-of select="0"/>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:variable name="right">
+            <xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@r">
+              <xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@r"/>
+            </xsl:if>
+            <xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@r)">
+              <xsl:value-of select="0"/>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:variable name="top">
+            <xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@t">
+              <xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@t"/>
+            </xsl:if>
+            <xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@t)">
+              <xsl:value-of select="0"/>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:variable name="bottom">
+            <xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@b">
+              <xsl:value-of select="xdr:pic/xdr:blipFill/a:srcRect/@b"/>
+            </xsl:if>
+            <xsl:if test="not(xdr:pic/xdr:blipFill/a:srcRect/@b)">
+              <xsl:value-of select="0"/>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:attribute name ="fo:clip">
+            <xsl:variable name="temp">
+              <xsl:value-of select="concat('image-props:',concat('xl/',substring-after($pzipsource, '/')),':',$left,':',$right,':',$top,':',$bottom)"/>
+            </xsl:variable>
+            <xsl:value-of select="$temp"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!--End-->
       </style:graphic-properties>
     </style:style>
 
@@ -809,6 +876,8 @@
           select="concat(concat(concat(concat($PictureCell, $PictureRowStart), ':'), $PictureColStart), ';')"
         />
       </xsl:with-param>
+      <xsl:with-param name="sheet" select="$sheet"/>
+      <xsl:with-param name="Target" select="$Target"/>
     </xsl:apply-templates>
 
   </xsl:template>
