@@ -99,7 +99,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="TypeId" />
     <xsl:param name="var_pos" />
     <xsl:param name="grpBln" />
-    
+    <xsl:param name ="grpCordinates"/>
     <!-- Extra parameter "slideId" added by lohith,requierd for template AddTextHyperlinks -->
     <xsl:param name="slideId" />
     <xsl:variable name="varHyperLinksForShapes">
@@ -540,6 +540,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
               <xsl:with-param name="TypeId" select ="$TypeId" />
               <xsl:with-param name="grpBln" select ="$grpBln" />
+              <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
               <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             </xsl:call-template>
             <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
@@ -571,6 +572,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="prID" select="$ParaId" />
               <xsl:with-param name="TypeId" select ="$TypeId" />
               <xsl:with-param name="grpBln" select ="$grpBln" />
+              <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
               <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
               <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
               <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -593,6 +595,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
 		     	<xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+          <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
@@ -626,6 +629,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
@@ -659,6 +663,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
@@ -703,6 +708,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
           </xsl:call-template>
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
@@ -745,6 +751,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -790,6 +797,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -835,6 +843,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -882,6 +891,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -930,6 +940,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -974,6 +985,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1007,6 +1019,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1057,6 +1070,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
 			<xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1091,6 +1105,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1125,6 +1140,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1158,6 +1174,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1198,6 +1215,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1245,6 +1263,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1390,6 +1409,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1435,6 +1455,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
@@ -1458,6 +1479,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
 			<xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1492,6 +1514,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1542,6 +1565,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1582,6 +1606,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1625,6 +1650,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1678,6 +1704,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1726,6 +1753,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1757,6 +1785,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1791,6 +1820,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1823,6 +1853,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1858,6 +1889,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1893,6 +1925,7 @@ Copyright (c) 2007, Sonata Software Limited
 			  <xsl:with-param name ="prID" select ="$ParaId" />
 			  <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
 			  <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
 			  <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
 			  <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1935,6 +1968,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1981,6 +2015,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2057,6 +2092,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2132,6 +2168,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2190,6 +2227,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2246,6 +2284,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
@@ -2279,6 +2318,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select ="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!-- End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering -->
@@ -2311,6 +2351,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
           </xsl:call-template>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:line>
@@ -2322,6 +2363,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
           </xsl:call-template>
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:line >
@@ -2333,6 +2375,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
           </xsl:call-template>
           <xsl:copy-of select="$varHyperLinksForConnectors" />
         </draw:connector >
@@ -2344,6 +2387,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name="grpBln" select ="$grpBln" />
             <xsl:with-param name="sldId" select="$slideId" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
           </xsl:call-template>
           <xsl:copy-of select="$varHyperLinksForConnectors" />
         </draw:connector >
@@ -2359,6 +2403,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2408,6 +2453,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2442,6 +2488,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:with-param name ="prID" select="$ParaId" />
 			<xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2477,6 +2524,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2512,6 +2560,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="grID" select ="$GraphicId"/>
             <xsl:with-param name ="prID" select="$ParaId" />
@@ -2547,6 +2596,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2582,6 +2632,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2617,6 +2668,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2655,6 +2707,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -2683,6 +2736,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
           </xsl:call-template>
           <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
             <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
@@ -2721,6 +2775,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2750,6 +2805,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2778,6 +2834,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2806,6 +2863,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2834,6 +2892,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2862,6 +2921,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2890,6 +2950,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2918,6 +2979,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2946,6 +3008,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -2974,6 +3037,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3002,6 +3066,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3030,6 +3095,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3058,6 +3124,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3086,6 +3153,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3114,6 +3182,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3142,6 +3211,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3170,6 +3240,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3198,6 +3269,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3226,6 +3298,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3254,6 +3327,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3282,6 +3356,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3310,6 +3385,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3338,6 +3414,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3366,6 +3443,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3394,6 +3472,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3422,6 +3501,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name ="prID" select="$ParaId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
             <xsl:with-param name="grpBln" select ="$grpBln" />
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
             <!-- Extra parameter "SlideRelationId" added by lohith,requierd for template AddTextHyperlinks -->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           </xsl:call-template>
@@ -3452,7 +3532,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="TypeId" />
     <xsl:param name ="grpBln" />
     <xsl:param name ="flagTextBox" />
-    
+    <xsl:param name ="grpCordinates"/>
     <!-- Addition of a parameter,by Vijayets ,for bullets and numbering in shapes-->
     <xsl:param name="SlideRelationId"/>
 
@@ -3469,7 +3549,9 @@ Copyright (c) 2007, Sonata Software Limited
     <!-- For the Grouping of Shapes Bug Fixing -->
     <xsl:choose>
       <xsl:when test="$grpBln ='true'">
-        <xsl:call-template name="tmpGropingWriteCordinates"/>
+        <xsl:call-template name="tmpGropingWriteCordinates">
+          <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="tmpWriteCordinates"/>
@@ -3507,6 +3589,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="grID" />
     <xsl:param name ="grpBln" />
     <xsl:param name="sldId" />
+    <xsl:param name ="grpCordinates" />
     <xsl:attribute name ="draw:style-name">
       <xsl:value-of select ="$grID"/>
     </xsl:attribute>
@@ -3570,7 +3653,6 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:attribute>-->
 
     </xsl:for-each>
-
 	  <xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn)">
 
 		  <xsl:variable name="pNvprId">
@@ -3995,6 +4077,11 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="lumOff">
                 <xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
               </xsl:with-param>
+              <xsl:with-param name ="shade">
+                <xsl:for-each select="p:spPr/a:solidFill/a:schemeClr/a:shade/@val">
+                  <xsl:value-of select=". div 1000"/>
+                </xsl:for-each>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
           <!-- Transparency percentage-->
@@ -4054,7 +4141,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
 
           <!--Theme color-->
-          <xsl:if test ="p:style/a:fillRef//a:schemeClr/@val">
+          <xsl:if test ="p:style/a:fillRef/a:schemeClr/@val">
             <xsl:attribute name ="draw:fill-color">
               <xsl:call-template name ="getColorCode">
                 <xsl:with-param name ="color">
@@ -4065,6 +4152,11 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:with-param>
                 <xsl:with-param name ="lumOff">
                   <xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumOff/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name ="shade">
+                  <xsl:for-each select="p:style/a:fillRef/a:schemeClr/a:shade/@val">
+                    <xsl:value-of select=". div 1000"/>
+                  </xsl:for-each>
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:attribute>

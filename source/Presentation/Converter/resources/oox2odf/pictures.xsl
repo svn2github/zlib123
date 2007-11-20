@@ -59,6 +59,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="MasterId"/>
     <xsl:param name ="srcName"/>
  <xsl:param name ="grpBln"/>
+    <xsl:param name ="grpCordinates"/>
 
     <!-- warn if Audio or Video -->
     <xsl:message terminate="no">translation.oox2odf.pictureTypeProperties</xsl:message>
@@ -118,7 +119,9 @@ exclude-result-prefixes="p a r xlink rels">
         <xsl:when test ="p:spPr/a:xfrm/a:off">
           <xsl:choose>
             <xsl:when test="$grpBln='true'">
-              <xsl:call-template name="tmpGropingWriteCordinates"/>
+              <xsl:call-template name="tmpGropingWriteCordinates">
+                <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+              </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
           <xsl:call-template name="tmpWriteCordinates"/>
