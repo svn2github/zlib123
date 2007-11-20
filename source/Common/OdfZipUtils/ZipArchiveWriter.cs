@@ -31,6 +31,7 @@ using System.Collections;
 using System.IO;
 using System.Xml;
 using System.Text;
+using System.Drawing;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -1124,7 +1125,23 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
         }
 
+        //Added by Sonata for Getting Height,Width,Resolution of the image-15/11/2007   
+        /// <summary>
+        /// Transfer a binary file between two zip archives. 
+        /// The source archive is handled by the resolver.
+        /// This method returns image properties like height,width, and resolution
+        /// </summary>
+        /// <param name="source">Relative path inside the source archive</param>
+        public string ImageCopyBinary(String source)
+        {
+            Stream sourceStream = GetStream(source);
 
+            System.Drawing.Image img;
+            img = System.Drawing.Image.FromStream(sourceStream);
+
+            return img.Width.ToString() + ":" + img.Height.ToString() + ":" + img.VerticalResolution.ToString();
+
+        }
     }
 
 }
