@@ -1,69 +1,92 @@
 <html>
 <head>
-<META HTTP-EQUIV="content-type" CONTENT="text/html; charset=windows-1252">
-
-<title>ODF Add-In f&uuml;r Excel 2003</title>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <title>ODF Add-In f&uuml;r Excel 2003</title>
 </head>
 <body>
-<h1>ODF Add-In f&uuml;r Excel 2003</h1>
-Vielen Dank f&uuml;r das Herunterladen des ODF Add-Ins f&uuml;r Excel 2003. Die Software erm&ouml;glicht das &Ouml;ffnen eines auf der ODF-Spezifikation basierenden Dokuments in Excel 2003 und demonstriert die Interoperabilit&auml;t zwischen den OpenXML- und ODF- Spezifikationen.<br/> <br/> <br/>
-<h2>Softwareanforderungen</h2>
-Zum Testen des Add-Ins ist Folgendes erforderlich:<br/> 1. Excel 2003<br/> 2. .NET Framework 2.0*<br/> 3. Compatibility Pack* f&uuml;r Word-, Excel- und PowerPoint 2007-Dateiformate (mindestens Beta 2).<br/> <br/> Wichtige Hinweise:<br/> <br/> (*) Warnung: Wenn Sie Microsoft Excel bevor .NET Framework installieren, m&uuml;ssen Sie die Excel-Installation aktualisieren, indem Sie folgende Schritte ausf&uuml;hren.<br/> <br/> 1. Doppelklicken Sie in der Systemsteuerung auf die Option &quot;Software&quot;.<br/> 2. W&auml;hlen Sie Microsoft Excel aus und klicken Sie auf &quot;&Auml;ndern&quot;.<br/> 3. W&auml;hlen Sie &quot;Features hinzuf&uuml;gen/entfernen&quot; aus und f&uuml;gen Sie &quot;.Net-Programmierunterst&uuml;tzung&quot; im Abschnitt &quot;Microsoft Office Excel&quot; hinzu.<br/> <br/> (**) Stellen Sie sicher, dass das vollst&auml;ndige Office-Update ausgef&uuml;hrt wird, bevor Sie das Compatibility Pack installieren. Das Office-Update ist &uuml;ber Office Online (http://office.microsoft.com/en-us/default.aspx) verf&uuml;gbar.<br/> <br/> <br/>
-<h2>Installieren des Add-Ins</h2>
-F&uuml;hren Sie die heruntergeladene Datei setup.exe aus und folgen Sie den Anweisungen.<br/> <br/> Nachdem die Installation erfolgreich abgeschlossen wurde, wird im Excel-Men&uuml; &quot;Datei&quot; die Option &quot;ODF &ouml;ffnen&quot; angezeigt. Sie k&ouml;nnen die ODF-Arbeitsblattdatei importieren oder das aktuelle Dokument als ODF-Arbeitsblattdatei exportieren (w&auml;hrend der Entwicklung sind diese Funktionen m&ouml;glicherweise vor&uuml;bergehend nicht verf&uuml;gbar).<br/> <br/> Wichtiger Hinweis: Die mit dem Add-In ge&ouml;ffnete ODF-Datei wird als schreibgesch&uuml;tzte XLSX-Datei in Microsoft Excel importiert. Um die Datei wieder als ODF-Datei zu speichern, m&uuml;ssen Sie zuerst eine Kopie des Dokuments (&quot;Men&uuml; &gt; Speichern unter&quot;) erstellen und anschlie&szlig;end die Men&uuml;option &ldquo;Als ODF exportieren&quot; ausw&auml;hlen.<br/> <br/> <br/>
-<h2>Problembehandlung</h2>
-Wenn die ODF-Option nicht angezeigt wird, sind m&ouml;glicherweise Features in Excel nicht vorhanden (siehe Softwareanforderungen). Nachdem die Installation des ODF Add-ins abgeschlossen ist, gehen Sie wie folgt vor, um das Add-In zu aktivieren:<br/> * W&auml;hlen Sie &quot;Tools &gt; Anpassen&quot; aus und klicken Sie auf die Registerkarte &quot;Befehle&quot;.<br/> * Klicken Sie im Feld &quot;Kategorien&quot; auf &quot;Tools&quot;.<br/> * Ziehen Sie &quot;COM Add-Ins&quot; aus dem Feld &quot;Befehle&quot; in das Men&uuml; &quot;Tools&quot;. Wenn die Befehle im Men&uuml; &quot;Tools&quot; angezeigt werden, zeigen Sie auf die Stelle, an der die COM Add-Ins eingef&uuml;gt werden sollen, und lassen Sie die Maustaste los.<br/> * Klicken Sie auf &quot;Schlie&szlig;en&quot;.<br/> * Klicken Sie im Men&uuml; &quot;Tools&quot; auf &quot;COM Add-Ins&quot; und aktivieren Sie in der Liste das Kontrollk&auml;stchen &quot;ODF Add-In&quot;. Wenn das gew&uuml;nschte Add-In nicht in der Liste aufgef&uuml;hrt ist, klicken Sie auf &quot;Hinzuf&uuml;gen&quot;, w&auml;hlen Sie das Add-In aus und klicken Sie auf &quot;OK&quot;.<br/> <br/> <br/>
-<h2>Derzeit unterst&uuml;tzte Konvertierung</h2>
-Eine vollst&auml;ndige Liste der Features finden Sie auf sourceForge.net (https://sourceforge.net/project/showfiles.php?group_id=169337).<br/> <br/> <br/>
-<h2>In der ODF/OpenXML-Konvertierung nicht verf&uuml;gbare Features/Optionen</h2>
-Eine vollst&auml;ndige Liste der nicht unterst&uuml;tzten Features finden Sie unter sourceForge.net (https://sourceforge.net/tracker/?group_id=169337&amp;atid=932582).<br/> <br/>
-<h2>Neuigkeiten</h2>
-(1) Das Add-In funktioniert nicht, wenn Office 2007 und 2003 gleichzeitig installiert sind.<br/> <br/>
-<h2>Nicht behobene Probleme in M5</h2>
-[ 1693462 ]	File converter failed to open the file<br/>
-[ 1701990 ]	Round Trip Conversion - Unexpected message while conversion<br/>
-[ 1702163 ]	Number format Color not retained.<br/>
-[ 1704269 ]	Cell border not properly retained<br/>
-[ 1726732 ]	Add-in crash - Dragged image in ods file.<br/>
-[ 1733369 ]	Conditional formatting not retained for empty cells.<br/>
-[ 1735657 ]	Number format not properly retained<br/>
-[ 1740412 ]	Negative test - part removal -Add-in crash.<br/>
-[ 1740752 ]	Negative test - Tag handling.<br/>
-[ 1746283 ]	Currency converted to date(English USA, Din (Latin)<br/>
-[ 1757284 ]	Used area-sheet contains Max no of Rows after conversion.<br/>
-[ 1757322 ]	Column breaks not properly retained after conversion.<br/>
-[ 1760182 ]	Hyperlink for text inside text box is not retained after con<br/>
-[ 1764339 ]	Conversion window closes with mouse over event<br/>
-[ 1764358 ]	Hyperlink text-Styles and formatting not retained<br/>
-[ 1768233 ]	Filters dropdown list conversion not proper-office XP/2003<br/>
-[ 1772957 ]	Round trip-sheet conversion not proper for manual breaks.<br/>
-[ 1780043 ]	Pie Charts data colors not properly retained after round trip<br/>
-[ 1780033 ]	Information Messages box -Details need to be localized<br/>
-[ 1782320 ]	Track changes & file Recovery message<br/>
-[ 1784784 ]	Add-in crash converting OLE objects<br/>
-[ 1784822 ]	Readme.htm need to be updated(KB908002).<br/>
-[ 1787480 ]	Symbol &quot; &apos; &quot; not retained after conversion<br/>
-[ 1788348 ]	Roundtrip conversion adds border to images<br/>
-[ 1788390 ]	Hide note is shown after conversion<br/>
-[ 1789938 ]	Installation:-localized Add-in disables back button option<br/>
-[ 1790019 ]	Row break:-Round trip Conversion not proper for xlsx sheet<br/>
-[ 1790018 ]	Scenario: Add-in crashes converting ods file<br/>
-[ 1791382 ]	Scenario within a scenario + Note: Add-in crashes<br/>
-[ 1796813 ]	Add-in crash - Copy & paste of xlsx charts in ods files.<br/>
-[ 1796840 ]	Reverse Conditional formatting not retained<br/>
-[ 1796862 ]	Line chart - line color not properly retained-Rev roundtrip<br/>
-[ 1797015 ]	Add-in crash - Modified chart data range<br/>
-[ 1798664 ]	Add-in crash converting corrupt ods file<br/>
-[ 1800984 ]	Add-in crashes converting data pivot table<br/>
-[ 1800991 ]	Round trip Add-in crash- Data pivot table<br/>
-[ 1802491 ]	Note for hidden column is shown after reverse roundtrip conv<br/>
-[ 1803262 ]	Data filter for merged cell is not properly retained<br/>
-[ 1803271 ]	Scenario not retained after conversion<br/>
-[ 1803329 ]	Filters - smallest % & greatest % not properly retained<br/>
-[ 1803380 ]	xlsx to xls- office excel terminates when conversion<br/>
-[ 1803372 ]	Conditional format for cell value having b/w condition<br/>
-[ 1805556 ]	Add-in crashes converting ods file having hyperlink with<br/>
-[ 1806752 ]	Textboxes- Arial font converted to Times New Roman<br/>
-[ 1806778 ]	Copy/Paste -Add-in crashes any ods file consisting GDIMetada<br/>
+    <h1>
+        ODF Add-In f&uuml;r Excel 2003</h1>
+    Vielen Dank f&uuml;r das Herunterladen des ODF Add-Ins f&uuml;r Excel 2003. Die
+    Software erm&ouml;glicht das &Ouml;ffnen eines auf der ODF-Spezifikation basierenden
+    Dokuments in Excel 2003 und demonstriert die Interoperabilit&auml;t zwischen den
+    OpenXML- und ODF- Spezifikationen.<br />
+    <br />
+    <br />
+    <h2>
+        Softwareanforderungen</h2>
+    Zum Testen des Add-Ins ist Folgendes erforderlich:<br />
+    1. Excel 2003<br />
+    2. .NET Framework 2.0* & Shared add-in extensibility(KB908002)***<br />
+    3. Compatibility Pack* f&uuml;r Word-, Excel- und PowerPoint 2007-Dateiformate (mindestens
+    Beta 2).<br />
+    <br />
+    Wichtige Hinweise:<br />
+    <br />
+    (*) Warnung: Wenn Sie Microsoft Excel bevor .NET Framework installieren, m&uuml;ssen
+    Sie die Excel-Installation aktualisieren, indem Sie folgende Schritte ausf&uuml;hren.<br />
+    <br />
+    1. Doppelklicken Sie in der Systemsteuerung auf die Option &quot;Software&quot;.<br />
+    2. W&auml;hlen Sie Microsoft Excel aus und klicken Sie auf &quot;&Auml;ndern&quot;.<br />
+    3. W&auml;hlen Sie &quot;Features hinzuf&uuml;gen/entfernen&quot; aus und f&uuml;gen
+    Sie &quot;.Net-Programmierunterst&uuml;tzung&quot; im Abschnitt &quot;Microsoft
+    Office Excel&quot; hinzu.<br />
+    <br />
+    (**) Stellen Sie sicher, dass das vollst&auml;ndige Office-Update ausgef&uuml;hrt
+    wird, bevor Sie das Compatibility Pack installieren. Das Office-Update ist &uuml;ber
+    Office Online (http://office.microsoft.com/en-us/default.aspx) verf&uuml;gbar.<br />
+    <br />
+    (***) Microsoft Shared Add-in Support Update (KB908002) ist Teil der Add-In-Installation.
+    <br />
+    <h2>
+        Installieren des Add-Ins</h2>
+    F&uuml;hren Sie die heruntergeladene Datei setup.exe aus und folgen Sie den Anweisungen.<br />
+    <br />
+    Nachdem die Installation erfolgreich abgeschlossen wurde, wird im Excel-Men&uuml;
+    &quot;Datei&quot; die Option &quot;ODF &ouml;ffnen&quot; angezeigt. Sie k&ouml;nnen
+    die ODF-Arbeitsblattdatei importieren oder das aktuelle Dokument als ODF-Arbeitsblattdatei
+    exportieren (w&auml;hrend der Entwicklung sind diese Funktionen m&ouml;glicherweise
+    vor&uuml;bergehend nicht verf&uuml;gbar).<br />
+    <br />
+    Wichtiger Hinweis: Die mit dem Add-In ge&ouml;ffnete ODF-Datei wird als schreibgesch&uuml;tzte
+    XLSX-Datei in Microsoft Excel importiert. Um die Datei wieder als ODF-Datei zu speichern,
+    m&uuml;ssen Sie zuerst eine Kopie des Dokuments (&quot;Men&uuml; &gt; Speichern
+    unter&quot;) erstellen und anschlie&szlig;end die Men&uuml;option &ldquo;Als ODF
+    exportieren&quot; ausw&auml;hlen.<br />
+    <br />
+    <br />
+    <h2>
+        Problembehandlung</h2>
+    Wenn die ODF-Option nicht angezeigt wird, sind m&ouml;glicherweise Features in Excel
+    nicht vorhanden (siehe Softwareanforderungen). Nachdem die Installation des ODF
+    Add-ins abgeschlossen ist, gehen Sie wie folgt vor, um das Add-In zu aktivieren:<br />
+    * W&auml;hlen Sie &quot;Tools &gt; Anpassen&quot; aus und klicken Sie auf die Registerkarte
+    &quot;Befehle&quot;.<br />
+    * Klicken Sie im Feld &quot;Kategorien&quot; auf &quot;Tools&quot;.<br />
+    * Ziehen Sie &quot;COM Add-Ins&quot; aus dem Feld &quot;Befehle&quot; in das Men&uuml;
+    &quot;Tools&quot;. Wenn die Befehle im Men&uuml; &quot;Tools&quot; angezeigt werden,
+    zeigen Sie auf die Stelle, an der die COM Add-Ins eingef&uuml;gt werden sollen,
+    und lassen Sie die Maustaste los.<br />
+    * Klicken Sie auf &quot;Schlie&szlig;en&quot;.<br />
+    * Klicken Sie im Men&uuml; &quot;Tools&quot; auf &quot;COM Add-Ins&quot; und aktivieren
+    Sie in der Liste das Kontrollk&auml;stchen &quot;ODF Add-In&quot;. Wenn das gew&uuml;nschte
+    Add-In nicht in der Liste aufgef&uuml;hrt ist, klicken Sie auf &quot;Hinzuf&uuml;gen&quot;,
+    w&auml;hlen Sie das Add-In aus und klicken Sie auf &quot;OK&quot;.<br />
+    <br />
+    <br />
+    <h2>
+        Derzeit unterst&uuml;tzte Konvertierung</h2>
+    Eine vollst&auml;ndige Liste der Features finden Sie auf sourceForge.net (https://sourceforge.net/project/showfiles.php?group_id=169337).<br />
+    <br />
+    <br />
+    <h2>
+        In der ODF/OpenXML-Konvertierung nicht verf&uuml;gbare Features/Optionen</h2>
+    Eine vollst&auml;ndige Liste der nicht unterst&uuml;tzten Features finden Sie unter
+    sourceForge.net (https://sourceforge.net/tracker/?group_id=169337&amp;atid=932582).<br />
+    <br />
+    <h2>
+        Neuigkeiten</h2>
+    (1) Das Add-In funktioniert nicht, wenn Office 2007 und 2003 gleichzeitig installiert
+    sind.<br />
+    <br />
 </body>
 </html>
