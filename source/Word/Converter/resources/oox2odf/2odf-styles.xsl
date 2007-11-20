@@ -5180,7 +5180,7 @@
 
     <!--clam bugfix #1806204 special case: hyperlink without style-->
     <xsl:choose>
-      <xsl:when test="ancestor::w:hyperlink and not(./w:rStyle) and not(./w:u) and not(w:color)">
+      <xsl:when test="ancestor::w:hyperlink and not(./w:rStyle) and not(./w:u) and (not(w:color) or w:color/@w:val = 'auto')">
         <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
         <xsl:attribute name="style:text-underline-type">none</xsl:attribute>
       </xsl:when>
