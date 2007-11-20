@@ -33,7 +33,17 @@
       <xsl:variable name="imageId" select="../v:shape/v:imagedata/@r:id" />
       <xsl:variable name="objectPath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$objectId]/@Target" />
       <xsl:variable name="imagePath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$imageId]/@Target" />
-      <xsl:variable name="objectName" select="substring-after($objectPath, 'embeddings/')" />
+      <xsl:variable name="objectName">
+        <xsl:choose>
+          <!-- Internal object -->
+          <xsl:when test="@Type='Embed'">
+            <xsl:value-of select="substring-after($objectPath, 'embeddings/')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat('Object ', generate-id(.), '.bin')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:variable name="newName" select="substring-before($objectName, '.')" />
 
       <xsl:call-template name="InsertObject">

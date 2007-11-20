@@ -991,6 +991,13 @@
   <xsl:template name="InsertShapeHorizontalPos">
     <xsl:param name="shape" select="."/>
 
+    <xsl:variable name="pos">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'position'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <xsl:variable name="horizontalPos">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -1023,7 +1030,13 @@
           <xsl:with-param name="align" select="$shape/@o:hralign"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$horizontalPos = '' and ancestor::w:p/w:pPr/w:jc/@w:val and $horizontalRel != 'page'">
+      <!--
+      makz: changed due to problem with graph images in file ESTAT_SIF_FR.doc
+      in compatibility mode
+      <xsl:when test="$horizontalPos='' and ancestor::w:p/w:pPr/w:jc/@w:val and $horizontalRel!='page'">
+      -->
+      <xsl:when test="$horizontalPos='' and ancestor::w:p/w:pPr/w:jc/@w:val and $horizontalRel!='page' 
+                and $pos!='absolute'">
         <xsl:if test="ancestor::w:p/w:pPr/w:jc/@w:val">
           <xsl:call-template name="InsertGraphicPosH">
             <xsl:with-param name="align" select="ancestor::w:p/w:pPr/w:jc/@w:val"/>
@@ -1036,13 +1049,11 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
-    
     <xsl:call-template name="InsertGraphicPosRelativeH">
       <xsl:with-param name="relativeFrom">
         <xsl:value-of select="$horizontalRel"/>
       </xsl:with-param>
     </xsl:call-template>
-    
   </xsl:template>
 
   <xsl:template name="InsertShapeVerticalPos">
@@ -1090,11 +1101,11 @@
       <xsl:with-param name="align" select="$verticalPos"/>
     </xsl:call-template>
     -->
-    
   </xsl:template>
 
   <xsl:template name="InsertShapeWrap">
     <xsl:param name="shape" select="."/>
+    
     <xsl:choose>
       <xsl:when test="self::w:framePr">
         <xsl:if test="@w:wrap">
@@ -1107,7 +1118,7 @@
       <xsl:otherwise>
         <xsl:call-template name="InsertShapeWrapAttributes">
           <xsl:with-param name="shape" select="$shape"/>
-          <xsl:with-param name="wrap" select="w10:wrap"/>
+          <xsl:with-param name="wrap" select="$shape/w10:wrap"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -1830,7 +1841,7 @@
           <xsl:text>baseline</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:text>page</xsl:text>
+          <xsl:text>page-content</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>

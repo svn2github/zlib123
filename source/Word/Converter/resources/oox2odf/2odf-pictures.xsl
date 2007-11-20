@@ -656,6 +656,9 @@
         <xsl:when test="$relativeFrom = 'outer-margin-area'">
           <xsl:text>paragraph-start-margin</xsl:text>
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>paragraph</xsl:text>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
@@ -749,6 +752,9 @@
         <xsl:when test="$relativeFrom = 'text' or $relativeFrom = '' ">
           <xsl:text>paragraph-content</xsl:text>
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>page</xsl:text>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
 
