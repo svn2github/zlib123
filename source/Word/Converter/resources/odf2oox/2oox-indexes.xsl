@@ -361,16 +361,20 @@
           <xsl:choose>
             <xsl:when test="@style:display-name">
               <xsl:value-of select="@style:display-name"/>
-              <xsl:text>;</xsl:text>
+              <!--<xsl:text>;</xsl:text>-->
+              <xsl:text>[INSERTSEPARATOR]</xsl:text>
               <xsl:value-of select="@style:default-outline-level"/>
-              <xsl:text>;</xsl:text>
+              <!--<xsl:text>;</xsl:text>-->
+              <xsl:text>[INSERTSEPARATOR]</xsl:text>
             </xsl:when>
             <xsl:otherwise>
               <xsl:if test="@style:name">
                 <xsl:value-of select="@style:name"/>
-                <xsl:text>;</xsl:text>
+                <!--<xsl:text>;</xsl:text>-->
+                <xsl:text>[INSERTSEPARATOR]</xsl:text>
                 <xsl:value-of select="@style:default-outline-level"/>
-                <xsl:text>;</xsl:text>
+                <!--<xsl:text>;</xsl:text>-->
+                <xsl:text>[INSERTSEPARATOR]</xsl:text>
               </xsl:if>
             </xsl:otherwise>
           </xsl:choose>          
