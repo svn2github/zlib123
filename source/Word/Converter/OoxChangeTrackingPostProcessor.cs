@@ -78,6 +78,8 @@ namespace CleverAge.OdfConverter.Word
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
+
+
             this.currentNode.Push(new Element(prefix, localName, ns));
             if (IsRun())
             {
@@ -188,6 +190,12 @@ namespace CleverAge.OdfConverter.Word
 
         public override void WriteString(string text)
         {
+            //dialogika, clam: Word is not behaving like it should (according to the spec). It needs the currently set list separator
+            if (text == "[INSERTSEPARATOR]" && ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)currentNode.Peek()).Name == "instrText")
+            {
+                text = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator.ToString();
+            }  
+                
             if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
                 AddStringToNode(text);
