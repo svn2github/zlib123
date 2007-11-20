@@ -186,4 +186,13 @@
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>Ten dokument wydaje się nie być plikiem formatu OpenDocument.</value>
   </data>
+<data name="ProgressBarExitLabel" xml:space="preserve">
+    <value>Sprawiać przyjemność (proszę) czekają podczas gdy przemiana skończy</value>
+  </data>
+  <data name="ProgressBarLoadLabel" xml:space="preserve">
+    <value>Tłumaczenie Ładowania Tablic (stół)…</value>
+  </data>
+  <data name="OdfConversionCanceled" xml:space="preserve">
+    <value>Konwersja została anulowana przez użytkownika.</value>
+  </data>
 </root>

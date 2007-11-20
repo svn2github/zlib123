@@ -186,4 +186,13 @@
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>Das Dokument scheint keine valide OASIS OpenDocument Datei zu sein.</value>
   </data>
+ <data name="ProgressBarExitLabel" xml:space="preserve">
+    <value>Bitte warten Sie, während Umwandlung beendet</value>
+  </data>
+  <data name="ProgressBarLoadLabel" xml:space="preserve">
+    <value>Laden Übersetzung Tabellen…</value>
+  </data>
+  <data name="OdfConversionCanceled" xml:space="preserve">
+    <value>Die Konvertierung wurde vom Benutzer abgebrochen.</value>
+  </data>
 </root>

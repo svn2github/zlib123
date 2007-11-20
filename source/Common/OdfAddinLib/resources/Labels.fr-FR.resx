@@ -193,4 +193,13 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="OdfConversionCanceled" xml:space="preserve">
     <value>La conversion a été annulée par l’utilisateur</value>
   </data>
+<data name="ProgressBarExitLabel" xml:space="preserve">
+    <value>Veuillez patienter pendant que la conversion complète</value>
+  </data>
+  <data name="ProgressBarLoadLabel" xml:space="preserve">
+    <value>Chargement des tables de traduction…</value>
+  </data>
+  <data name="OdfConversionCanceled" xml:space="preserve">
+    <value>La conversion a été annulée par l’utilisateur.</value>
+  </data>
 </root>

@@ -184,12 +184,18 @@
     <value>ターゲット ファイルを作成できません</value>
   </data>
   <data name="OdfConversionCanceled" xml:space="preserve">
-    <value>変換がキャンセルされました。</value>
+    <value>変換は、ユーザーによってキャンセルされました。</value>
   </data>
   <data name="CorruptedInputFileDetail" xml:space="preserve">
     <value>有効な ODF ドキュメントであると思われる場合は、プロジェクト Web サイト (http://odf-converter.sourceforge.net) のバグ レポートに必要事項を入力し、ファイルを添付してください。</value>
   </data>
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>このドキュメントは、破損した OASIS OpenDocument ファイルです。</value>
+  </data>
+<data name="ProgressBarExitLabel" xml:space="preserve">
+    <value>変換が完了するまでお待ちください</value>
+  </data>
+  <data name="ProgressBarLoadLabel" xml:space="preserve">
+    <value>変換テーブルの読み込み…</value>
   </data>
 </root>

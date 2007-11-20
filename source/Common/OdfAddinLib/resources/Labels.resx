@@ -184,12 +184,18 @@
     <value>Unable to create target file</value>
   </data>
   <data name="OdfConversionCanceled" xml:space="preserve">
-    <value>The conversion has been canceled by the user</value>
+    <value>The conversion is canceled by the user</value>
   </data>
   <data name="CorruptedInputFileDetail" xml:space="preserve">
     <value>If you think it is a valid ODF document, you should fill a bug report on the project web site  (http://odf-converter.sourceforge.net) with your file attached.</value>
   </data>
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>This document seems to be corrupted OASIS OpenDocument file.</value>
+  </data>
+  <data name="ProgressBarExitLabel" xml:space="preserve">
+    <value>Please wait while conversion completes</value>
+  </data>
+  <data name="ProgressBarLoadLabel" xml:space="preserve">
+    <value>Loading Translation Tables…</value>
   </data>
 </root>

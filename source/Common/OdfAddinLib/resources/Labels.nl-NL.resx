@@ -192,4 +192,10 @@
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>Dit document is schijnbaar een corrupt OASIS OpenDocument-bestand.</value>
   </data>
+ <data name="ProgressBarExitLabel" xml:space="preserve">
+    <value>Even geduld terwijl de conversie voltooid</value>
+  </data>
+  <data name="ProgressBarLoadLabel" xml:space="preserve">
+    <value>Loading vertaling tabellen…</value>
+  </data>
 </root>
