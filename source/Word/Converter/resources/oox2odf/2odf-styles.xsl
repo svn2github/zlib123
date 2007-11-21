@@ -787,10 +787,17 @@
   Date: 22.10.2007
   -->
   <xsl:template match="w:pBdr" mode="pPrChildren">
-     <xsl:call-template name="InsertBorders">
-      <xsl:with-param name="border" select="."/>
-    </xsl:call-template>
-    <xsl:call-template name="InsertParagraphShadow"/>
+    <!-- 
+    Do not insert the border if the paragraph is a frame.
+    In this case the paragraph is inserted as draw:frame and 
+    the conversion of the border is handled by the frame conversion
+    -->
+    <xsl:if test="not(parent::node()/w:framePr)">
+       <xsl:call-template name="InsertBorders">
+        <xsl:with-param name="border" select="."/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertParagraphShadow"/>
+    </xsl:if>
   </xsl:template>
   
 
@@ -4788,7 +4795,8 @@
     <xsl:param name="side"/>
     <xsl:param name="sideName"/>
 
-    <xsl:if test="$side/@w:val">
+    <xsl:choose>
+    <xsl:when test="$side/@w:val">
     
       <!-- get border style -->
       <xsl:variable name="style">
@@ -4872,7 +4880,13 @@
         </xsl:attribute>
       </xsl:if>
 
-    </xsl:if>
+    </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="{concat('fo:border-', $sideName)}">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+  </xsl:choose>
 
   </xsl:template>
 

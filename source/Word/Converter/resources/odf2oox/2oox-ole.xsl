@@ -186,6 +186,8 @@
 
     <xsl:variable name="oleFile" select="substring-after(draw:object-ole/@xlink:href, './')" />
     <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
+    <xsl:variable name="suffix" select="translate(substring-after($oleFile, '.'), 
+                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
     
     <!-- 
     don't insert internal ODF OLEs 
@@ -217,7 +219,7 @@
         </o:OLEObject>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:message terminate="no">translation.odf2oox.odfolelost</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.oleOdfObject</xsl:message>
       </xsl:otherwise>
     </xsl:choose>
 

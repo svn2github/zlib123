@@ -266,16 +266,6 @@
     <xsl:message terminate="no">translation.odf2oox.floatingFrame</xsl:message>
   </xsl:template>
 
-  <!--
-  Summary: error message: object with xml representation are lost
-  Author: Clever Age
-  -->
-  <xsl:template match="draw:frame[./draw:object]" mode="paragraph">
-    <!-- insert link to TOC field when required (user indexes) -->
-    <!--sl:call-template name="InsertTCField"/-->
-    <xsl:message terminate="no">translation.odf2oox.embeddedObject</xsl:message>
-  </xsl:template>
-
   <!-- 
   *************************************************************************
   CALLED TEMPLATES
@@ -2324,7 +2314,6 @@
   <!-- shape properties attributes : size, position, z-index... -->
   <xsl:template name="InsertShapeSize">
     <xsl:param name="shapeProperties"/>
-
     <!-- width -->
     <xsl:variable name="frameW">
       <xsl:call-template name="ComputeDrawingObjectSize">
@@ -2350,7 +2339,6 @@
     <xsl:if test="$frameH != '' and $frameH != 0">
       <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
     </xsl:if>
-
   </xsl:template>
 
   <xsl:template name="InsertShapeRelativeSize">
@@ -3286,7 +3274,6 @@
     </xsl:if>
 
     <xsl:attribute name="style">
-
       <xsl:call-template name="InsertShapeSize">
         <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>

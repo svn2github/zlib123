@@ -45,6 +45,16 @@
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="newName" select="substring-before($objectName, '.')" />
+      <xsl:variable name="suffix" select="translate(substring-after($objectName, '.'), 
+                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+      
+      <!-- fidelity loss messages -->
+      <xsl:if test="contains($objectPath, '\\')">
+        <xsl:message terminate="no">translation.oox2odf.oleNetworkPath</xsl:message>
+      </xsl:if>
+      <xsl:if test="@Type='Embed' and ($suffix='docx' or $suffix='xlsx' or $suffix='pptx')">
+        <xsl:message terminate="no">translation.oox2odf.oleOoxObject</xsl:message>
+      </xsl:if>
 
       <xsl:call-template name="InsertObject">
         <xsl:with-param name="oldFilePath" select="$objectPath" />
