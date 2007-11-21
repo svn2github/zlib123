@@ -902,6 +902,11 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="isFilled" select="$shape/@filled"/>
+
+    <!--dialogika, clam: if filled is set to false, make it transparent (as Word does; bugfix #1800779)-->
+    <xsl:if test="$isFilled = 'f'">
+      <xsl:attribute name="style:background-transparency">100%</xsl:attribute>
+    </xsl:if>
     
     <!-- Insert background-color -->
     <xsl:if test="(not($isFilled) or $isFilled != 'f') and $fillcolor != ''">
