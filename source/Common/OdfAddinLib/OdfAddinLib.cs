@@ -176,9 +176,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     if (e.InnerException != null && e.InnerException is System.Xml.XmlException) 
                     {
                         // An xsl exception may embed an xml exception. In this case we have a non well formed xml document.
-                        InfoBox infoBox = new InfoBox("CorruptedInputFileLabel", 
-                            e.Message+"\r\nInnerException : " +
-                            e.InnerException.Message, this.resourceManager);
+                        ArrayList messages = new ArrayList();
+                        messages.Add("CorruptedInputFileDetail");
+                        messages.Add("");
+                        messages.Add(e.Message);
+                        messages.Add("InnerException: " + e.InnerException.Message);
+                        InfoBox infoBox = new InfoBox("CorruptedInputFileLabel", messages, this.resourceManager);
                         infoBox.ShowDialog();
                     }
                     else
@@ -253,7 +256,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     // this is meant to catch "file already accessed by another process", though there's no .NET fine-grain exception for this.
                     // bug #1676586  Concurrent file access crashes the addin
-                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", e.Message, this.resourceManager);
+                    // bug #1807447  avoid display of unlocalized .NET exception message text and display localized string
+                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "UnableToCreateOutputDetail", this.resourceManager);
+                    //InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", e.Message, this.resourceManager);
                     infoBox.ShowDialog();
                 }
                 catch (Exception e)
