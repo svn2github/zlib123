@@ -191,30 +191,45 @@
       <xsl:variable name="layoutInCell" select="@layoutInCell"/>
 
       <xsl:choose>
-        <xsl:when test="name(.) = 'wp:inline' ">
-          <xsl:text>as-char</xsl:text>
+        <!-- images in header must be anchored to paragraph or as-char -->
+        <xsl:when test="ancestor::*[w:hdr]">
+          <xsl:choose>
+            <xsl:when test="name(.) = 'wp:inline'">
+              <xsl:text>as-char</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>paragraph</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
-        <xsl:when test="$verticalRelativeFrom = 'line' or $horizontalRelativeFrom = 'line'">
-          <xsl:text>char</xsl:text>
-        </xsl:when>
-        <xsl:when
-          test="$verticalRelativeFrom = 'character' or $horizontalRelativeFrom = 'character'">
-          <xsl:text>char</xsl:text>
-        </xsl:when>
-        <xsl:when test="$verticalRelativeFrom = 'page'">
-          <xsl:text>page</xsl:text>
-        </xsl:when>
-        <xsl:when test="$verticalRelativeFrom = 'paragraph'">
-          <xsl:text>char</xsl:text>
-        </xsl:when>
-        <xsl:when test="$layoutInCell = 1">
-          <xsl:text>paragraph</xsl:text>
-        </xsl:when>
-        <xsl:when test="$layoutInCell = 0">
-          <xsl:text>page</xsl:text>
-        </xsl:when>
+        <!-- images in pages -->
         <xsl:otherwise>
-          <xsl:text>page</xsl:text>
+          <xsl:choose>
+            <xsl:when test="name(.) = 'wp:inline' ">
+              <xsl:text>as-char</xsl:text>
+            </xsl:when>
+            <xsl:when test="$verticalRelativeFrom = 'line' or $horizontalRelativeFrom = 'line'">
+              <xsl:text>char</xsl:text>
+            </xsl:when>
+            <xsl:when test="$verticalRelativeFrom = 'character' or $horizontalRelativeFrom = 'character'">
+              <xsl:text>char</xsl:text>
+            </xsl:when>
+            <xsl:when test="$verticalRelativeFrom = 'page'">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:when test="$verticalRelativeFrom = 'paragraph'">
+              <xsl:text>char</xsl:text>
+            </xsl:when>
+            <xsl:when test="$layoutInCell = 1">
+              <xsl:text>paragraph</xsl:text>
+            </xsl:when>
+            <xsl:when test="$layoutInCell = 0">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>page</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
@@ -695,8 +710,7 @@
         <xsl:when test="$align and $align != ''">
           <xsl:choose>
             <!--special rules-->
-            <xsl:when
-              test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
+            <xsl:when  test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
               <xsl:text>top</xsl:text>
             </xsl:when>
             <xsl:when test=" $relativeFrom = 'line'  and $align= 'bottom' ">
@@ -729,8 +743,7 @@
         <xsl:otherwise>
           <xsl:choose>
             <!-- if there is vertical position offset -->
-            <xsl:when
-              test="contains(@style,'margin-top') or wp:anchor/wp:positionV/wp:posOffset/text() != '' or (w:pPr/w:framePr/@w:y and not(w:pPr/w:framePr/@w:yAlign))">
+            <xsl:when test="contains(@style,'margin-top') or wp:anchor/wp:positionV/wp:posOffset/text() != '' or (w:pPr/w:framePr/@w:y and not(w:pPr/w:framePr/@w:yAlign))">
               <xsl:text>from-top</xsl:text>
             </xsl:when>
             <xsl:otherwise>
