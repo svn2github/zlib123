@@ -427,7 +427,7 @@
       </xsl:attribute>
       <xsl:attribute name="draw:end-color">
         <xsl:choose>
-          <xsl:when test="(@rotate='t' or @rotate='true') and $focusValue>0">
+          <xsl:when test="(@rotate='t' or @rotate='true' or @rotate='1') and $focusValue>0">
             <xsl:call-template name="InsertStartColor" />
           </xsl:when>
           <xsl:otherwise>
@@ -1492,11 +1492,11 @@
         <xsl:when test="$shape/@stroked">
           <xsl:choose>
             <!-- there is no v:stroke element, then only paint the border if stroked is set to true -->
-            <xsl:when test="not($shape/v:stroke) and ($shape/@stroked='t' or $shape/@stroked='true')">
+            <xsl:when test="not($shape/v:stroke) and ($shape/@stroked='t' or $shape/@stroked='true' or $shape/@stroked='1')">
               <xsl:text>shape</xsl:text>
             </xsl:when>
             <!-- there is a v:stroke element, then paint the border if stroked isn't disabled -->
-            <xsl:when test="$shape/v:stroke and ($shape/@stroked!='f' or $shape/@stroked!='false')">
+            <xsl:when test="$shape/v:stroke and ($shape/@stroked!='f' or $shape/@stroked!='false' or $shape/@stroked='0')">
               <xsl:text>shape</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -1507,11 +1507,11 @@
         <xsl:when test="$shapetype/@stroked">
           <xsl:choose>
             <!-- there is no v:stroke element, then only paint the border if stroked is enabled -->
-            <xsl:when test="not($shapetype/v:stroke) and ($shapetype/@stroked='t' or $shapetype/@stroked='true')">
+            <xsl:when test="not($shapetype/v:stroke) and ($shapetype/@stroked='t' or $shapetype/@stroked='true' or $shapetype/@stroked='1')">
               <xsl:text>shapetype</xsl:text>
             </xsl:when>
             <!-- there is a v:stroke element, then paint the border if stroked isn't disabled -->
-            <xsl:when test="$shapetype/v:stroke and ($shapetype/@stroked!='f' and $shapetype/@stroked!='false')">
+            <xsl:when test="$shapetype/v:stroke and ($shapetype/@stroked!='f' and $shapetype/@stroked!='false' or $shapetype/@stroked='0')">
               <xsl:text>shapetype</xsl:text>
             </xsl:when>
             <xsl:otherwise>
