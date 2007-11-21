@@ -2999,6 +2999,17 @@
             <xsl:text>pt</xsl:text>
           </xsl:attribute>
         </xsl:if>
+
+        <!--dialogika, clam: bugfix #1826917-->
+        <xsl:variable name="transparency">
+          <xsl:call-template name="GetGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>        
+        <xsl:if test="$transparency = '100%'">
+          <xsl:attribute name="obscured">true</xsl:attribute>
+        </xsl:if>
       </v:shadow>
     </xsl:if>
 
