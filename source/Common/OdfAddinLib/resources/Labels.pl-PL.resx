@@ -133,7 +133,7 @@
     <value>ODF...</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>Pojawił się niespodziewany błąd. Prosimy o wypełnienie raporu dotyczącego błędu na stronie projektu (http://odf-converter.sourceforge.net) załączając wadliwy plik.</value>
+    <value>Pojawił się niespodziewany błąd. Prosimy o wypełnienie raportu dotyczącego błędu na stronie projektu (http://odf-converter.sourceforge.net) załączając wadliwy plik.</value>
   </data>
   <data name="AllFileType" xml:space="preserve">
     <value>Wszystkie pliki</value>
@@ -151,7 +151,7 @@
     <value>Niektóre z elementów mogą zostać pominięte podczas transformacji. Aby zobaczyć listę potencjalnych pominiętych elementów naciśnij „Szczegóły”</value>
   </data>
   <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>a cecha nie jest przekształcana przez aktualną wtyczkę.</value>
+    <value>ta cecha nie jest przekształcana przez aktualną wersję wtyczki.</value>
   </data>
   <data name="EncryptedDocumentLabel" xml:space="preserve">
     <value>Dokument jest zabezpieczony hasłem.</value>
@@ -163,7 +163,7 @@
     <value>Ten dokument wydaje się nie być plikiem formatu OpenDocument.</value>
   </data>
   <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Konwerter dla Office 2007 nie jest zainstalowany, konwersja ODF bez nich jest niemożliwa.</value>
+    <value>Konwerter dla Office 2007 nie jest zainstalowany, konwersja ODF bez niego jest niemożliwa.</value>
   </data>
   <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
     <value>Błąd konwersji, spróbuj najpierw zapisać dokument w formacie Word 2007.</value>
@@ -190,10 +190,10 @@
     <value>Nie można otworzyć archiwum w formacie zip. Sprawdź, czy dokument nie został zaszyfrowany.</value>
   </data>
   <data name="ProgressBarExitLabel" xml:space="preserve">
-    <value>Sprawiać przyjemność (proszę) czekają podczas gdy przemiana skończy</value>
+    <value>Proszę poczekać aż konwersja się zakończy</value>
   </data>
   <data name="ProgressBarLoadLabel" xml:space="preserve">
-    <value>Tłumaczenie Ładowania Tablic (stół)…</value>
+    <value>Tłumaczenie Ładowania Tabel …</value>
   </data>
   <data name="OdfConversionCanceled" xml:space="preserve">
     <value>Konwersja została anulowana przez użytkownika.</value>
