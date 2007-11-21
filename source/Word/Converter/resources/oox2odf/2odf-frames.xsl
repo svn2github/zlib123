@@ -417,7 +417,7 @@
       </xsl:attribute>
       <xsl:attribute name="draw:start-color">
         <xsl:choose>
-          <xsl:when test="(@rotate='t' or @rotate='true') and $focusValue>0">
+          <xsl:when test="(@rotate='t' or @rotate='true' or @rotate='1') and $focusValue>0">
             <xsl:call-template name="InsertEndColor" />
           </xsl:when>
           <xsl:otherwise>
@@ -769,7 +769,7 @@
     <xsl:for-each select="v:shadow">
       <xsl:attribute name="style:shadow">
         <xsl:choose>
-          <xsl:when test="@on = 'false' or @on = 'f' ">none</xsl:when>
+          <xsl:when test="@on = 'false' or @on = 'f' or @on = '0'">none</xsl:when>
           <xsl:otherwise>
             <!-- report lost attributes -->
             <xsl:if test="@opacity">
@@ -779,6 +779,7 @@
               <xsl:message terminate="no">translation.oox2odf.shape.shadow.obscurity</xsl:message>
             </xsl:if>
             <xsl:if test="@type">
+              <!-- TODO is this a copy & paste error? -->
               <xsl:message terminate="no">translation.oox2odf.shape.shadow.obscurity</xsl:message>
             </xsl:if>
             <xsl:if test="@matrix">
