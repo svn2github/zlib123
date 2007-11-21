@@ -1145,10 +1145,13 @@
     <xsl:variable name="zindex">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="propertyName" select="'z-index'"/>
-        <xsl:with-param name="shape" select="."/>
+        <xsl:with-param name="shape" select="$shape"/>
       </xsl:call-template>
     </xsl:variable>
 
+    <!--
+    makz: style:run-through="background" must always be written for negative z-index
+    -->
     <xsl:if test="$zindex &lt; 0 and not($wrap/@type) and not(@w:wrap)">
       <xsl:attribute name="style:run-through">
         <xsl:text>background</xsl:text>
