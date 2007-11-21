@@ -493,8 +493,10 @@
       <xsl:when test="@text:bullet-char = '➔' "></xsl:when>
       <xsl:when test="@text:bullet-char = '✗' "></xsl:when>
       <xsl:when test="@text:bullet-char = '–' ">–</xsl:when>
-
-      <xsl:otherwise>•</xsl:otherwise>
+      <xsl:otherwise>
+        <xsl:value-of select="@text:bullet-char"></xsl:value-of>
+      </xsl:otherwise>
+      <!--<xsl:otherwise>•</xsl:otherwise>-->
     </xsl:choose>
   </xsl:template>
 
@@ -548,11 +550,18 @@
       <xsl:when test="$char  = ''  or $char ='' ">
         <w:rPr>
           <w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>
-          <xsl:call-template name="GetBulletSize">
-            <xsl:with-param name="fontName">
-              <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
-            </xsl:with-param>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="@text:style-name='BulletSymbol'">
+              <!--bugfix #1806059-->
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetBulletSize">
+                <xsl:with-param name="fontName">
+                  <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>          
         </w:rPr>
       </xsl:when>
       <xsl:otherwise/>
