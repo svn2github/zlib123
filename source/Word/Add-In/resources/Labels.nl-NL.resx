@@ -228,9 +228,6 @@
   <data name="translation.odf2oox.svmImage" xml:space="preserve">
     <value>SVM-afbeelding</value>
   </data>
-  <data name="translation.odf2oox.embeddedObject" xml:space="preserve">
-    <value>Ingesloten object</value>
-  </data>
   <data name="translation.odf2oox.embeddedPluginFile" xml:space="preserve">
     <value>Ingesloten bestand met invoegtoepassing</value>
   </data>
@@ -435,7 +432,13 @@
   <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
     <value>Herstarten van regelnummering per sectie</value>
   </data>
-  <data name="translation.odf2oox.odfolelost" xml:space="preserve">
+  <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
+    <value />
+  </data>
+  <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
+    <value />
+  </data>
+  <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
     <value />
   </data>
 </root>

@@ -435,7 +435,13 @@
   <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
     <value>Option de numérotation par section</value>
   </data>
-  <data name="translation.odf2oox.odfolelost" xml:space="preserve">
+  <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
     <value>Objet ODF incorporé</value>
+  </data>
+  <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
+    <value />
+  </data>
+  <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
+    <value />
   </data>
 </root>

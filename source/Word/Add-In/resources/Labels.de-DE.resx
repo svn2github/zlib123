@@ -250,7 +250,7 @@
     <value>skaliertes Bild</value>
   </data>
   <data name="translation.odf2oox.valignInsideTextbox" xml:space="preserve">
-    <value>senkrechte Textausrichtung innerhalb eines Textrahmens</value>
+    <value>vertikale Textausrichtung innerhalb eines Textrahmens</value>
   </data>
   <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
     <value>Shape top-and-bottom wrapping</value>
@@ -440,5 +440,14 @@
   </data>
   <data name="translation.odf2oox.odfolelost" xml:space="preserve">
     <value>Eingebettetes ODF-Objekt</value>
+  </data>
+  <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
+    <value />
+  </data>
+  <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
+    <value />
+  </data>
+  <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
+    <value />
   </data>
 </root>

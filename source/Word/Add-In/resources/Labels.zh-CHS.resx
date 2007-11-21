@@ -228,9 +228,6 @@
   <data name="translation.odf2oox.svmImage" xml:space="preserve">
     <value>SVM 图像</value>
   </data>
-  <data name="translation.odf2oox.embeddedObject" xml:space="preserve">
-    <value>嵌入对象</value>
-  </data>
   <data name="translation.odf2oox.embeddedPluginFile" xml:space="preserve">
     <value>含插件的嵌入文件</value>
   </data>
@@ -435,7 +432,13 @@
   <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
     <value>正在重新启动每个部分的行编号</value>
   </data>
-  <data name="translation.odf2oox.odfolelost" xml:space="preserve">
+  <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
     <value>嵌入 ODF 对象</value>
+  </data>
+  <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
+    <value />
+  </data>
+  <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
+    <value />
   </data>
 </root>

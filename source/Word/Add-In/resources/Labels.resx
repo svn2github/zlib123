@@ -444,4 +444,13 @@
   <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
     <value>Continuous numbering inherited from parent styles</value>
   </data>
+  <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
+    <value>Embedded ODF object</value>
+  </data>
+  <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
+    <value>Link to an OLE object in a network folder</value>
+  </data>
+  <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
+    <value>Embedded OpenXML object</value>
+  </data>
 </root>
