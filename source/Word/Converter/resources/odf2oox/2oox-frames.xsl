@@ -2849,7 +2849,11 @@
 
     <!-- wrapping of text (horizontal adjustment) -->
     <xsl:if test="$shapeProperties/@fo:min-width or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
-      <!--<xsl:text>mso-wrap-style:none;</xsl:text>-->
+      <!--
+      makz: was uncommented in r2655 by rebet
+      I commented it in for bugfix 1827515
+      -->
+      <xsl:text>mso-wrap-style:none;</xsl:text>
     </xsl:if>
 
     <!--text-box spacing/margins -->
