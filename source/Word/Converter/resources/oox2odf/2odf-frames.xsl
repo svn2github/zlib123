@@ -1643,14 +1643,15 @@
           </xsl:attribute>
         </xsl:if>
       </xsl:when>
-      <xsl:otherwise>
+      <!-- insert explicit NO border (only if the element is no line) -->
+      <xsl:when test="not(name($shape)='v:line')">
         <xsl:attribute name="draw:stroke">
           <xsl:text>none</xsl:text>
         </xsl:attribute>
         <xsl:attribute name="fo:border">
           <xsl:text>none</xsl:text>
         </xsl:attribute>
-    </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
