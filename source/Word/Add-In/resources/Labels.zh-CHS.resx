@@ -436,9 +436,15 @@
     <value>嵌入 ODF 对象</value>
   </data>
   <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
-    <value />
+    <value>嵌入 OpenXML 对象</value>
   </data>
   <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
-    <value />
+    <value>网络文件夹中 OLE 对象有链接</value>
+  </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>因应用于列表段落的直接格式而产生的缩进</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>自上级样式继承的编号</value>
   </data>
 </root>

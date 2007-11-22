@@ -433,12 +433,18 @@
     <value>Herstarten van regelnummering per sectie</value>
   </data>
   <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
-    <value />
+    <value>Ingebed ODF-object</value>
   </data>
   <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
-    <value />
+    <value>Ingebedde OpenXML-objecten</value>
   </data>
   <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
-    <value />
+    <value>Koppeling naar een OLE-object in een netwerkmap</value>
+  </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>Inspringen als gevolg van directe indeling toegepast op lijstalinea's</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>Nummering overgenomen van bovenliggende stijlen</value>
   </data>
 </root>

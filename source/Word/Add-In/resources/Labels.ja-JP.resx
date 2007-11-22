@@ -436,9 +436,15 @@
     <value>???? ODF ??????</value>
   </data>
   <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
-    <value />
+    <value>埋め込み OpenXML オブジェクト</value>
   </data>
   <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
-    <value />
+    <value>ネットワーク フォルダのOLE オブジェクトにリンクする</value>
+  </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>リストに書式を直接適用したために生じたインデント</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>親スタイルから継承した番号付け</value>
   </data>
 </root>

@@ -442,13 +442,13 @@
     <value>Eingebettetes ODF-Objekt</value>
   </data>
   <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
-    <value />
+    <value>Eingebettetes OpenXML-Objekt</value>
   </data>
   <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
-    <value />
+    <value>Eingebettetes ODF-Objekt</value>
   </data>
   <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
-    <value />
+    <value>Verknüpfung zu einem OLE-Objekt in einem Netzwerkordner</value>
   </data>
   <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
     <value>durch direkte Formatierung erzeugte Einrückung für Listenabsätze</value>

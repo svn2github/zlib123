@@ -436,9 +436,15 @@
     <value>Osadzony obiekt ODF</value>
   </data>
   <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
-    <value />
+    <value>Osadzony obiekt OpenXML</value>
   </data>
   <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
-    <value />
+    <value>Łącze do obiektu OLE w folderze sieciowym</value>
+  </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>Wcięcie wynikające z bezpośredniego formatowania listy akapitów</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>Numeracja dziedziczona od stylów nadrzędnych</value>
   </data>
 </root>

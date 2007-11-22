@@ -439,9 +439,15 @@
     <value>Objet ODF incorporé</value>
   </data>
   <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
-    <value />
+    <value>Objet OpenXML incorporé</value>
   </data>
   <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
-    <value />
+    <value>Lien vers un objet OLE dans un dossier réseau</value>
+  </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>Retrait de ligne résultant d'une mise en forme directe appliquée à des paragraphes de liste</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>Numérotation continue héritée des styles parents</value>
   </data>
 </root>
