@@ -744,8 +744,8 @@
     <xsl:attribute name="text:style-name">
       <xsl:choose>
         <!--math, dialogika: bugfix #1771286 BEGIN-->
-        <xsl:when test="$type='INDEXA' and key('Part', 'word/styles.xml')/w:styles/w:style/w:name[@w:val=(concat('index ',$level+1))]">
-          <xsl:value-of select="concat('index ',$level+1)" />
+        <xsl:when test="$type='INDEXA' and key('Part', 'word/styles.xml')/w:styles/w:style/w:name[@w:val=(concat('index ',$level))]">
+          <xsl:value-of select="concat('index ',$level)" />
         </xsl:when>
         <!--math, dialogika: bugfix #1771286 END-->
         <xsl:when test="$type='INDEXA'">Normal</xsl:when>        
