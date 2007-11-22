@@ -338,6 +338,8 @@
       </xsl:if>
       <xsl:variable name="NumSuffix">
         <xsl:call-template name="AfterTextNumber">
+          <!--math, dialogika: this is wrong:-->
+          <!--!!! Parameter name used here is different as parameter name in template -> NumSuffix = NULL always !!!-->          
           <xsl:with-param name="string">
             <xsl:value-of select="$BeforeAfterNum"/>
           </xsl:with-param>
@@ -1521,6 +1523,10 @@
                         <xsl:value-of select="concat($suffix,' ')"/>
                       </xsl:when>
                       <xsl:otherwise>
+                        <!--math, dialogika: test to improve appearance of TOC in ODT ???-->
+                        <!--TODO: add a check whether space is already at the end of the suffix-->
+                        <!--to avoid that roundtrip DOCX->ODT->DOCX->ODT adds another additional space-->
+                        <!--<xsl:value-of select="concat($suffix,' ')"/>-->
                         <xsl:value-of select="$suffix"/>
                       </xsl:otherwise>
                     </xsl:choose>
