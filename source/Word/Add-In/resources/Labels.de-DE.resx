@@ -450,4 +450,10 @@
   <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
     <value />
   </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>durch direkte Formatierung erzeugte Einrückung für Listenabsätze</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>Fortsetzung der von übergeordneten Formatvorlagen vererbten Nummerierung</value>
+  </data>
 </root>
