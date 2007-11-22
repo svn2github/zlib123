@@ -611,7 +611,7 @@
             test="string-length(@style:num-prefix) + string-length(@style:num-suffix) &gt; 2"
             >space</xsl:when>
           <!--dialogika, clam: bugfix #1834574-->         
-          <xsl:when test="contains(@style:num-prefix, '§') and style:list-level-properties/@text:space-before = '0cm' and style:list-level-properties/@text:min-label-width = '0cm'">
+          <xsl:when test="contains(@style:num-prefix, '§') and (not(style:list-level-properties/@text:space-before) or style:list-level-properties/@text:space-before = '0cm') and (not(style:list-level-properties/@text:min-label-width) or style:list-level-properties/@text:min-label-width = '0cm')">
             <xsl:text>nothing</xsl:text>
           </xsl:when>
           <!-- default value -->
