@@ -117,15 +117,23 @@
   -->
   <xsl:template match="table:covered-table-cell">
     <!-- 
-    Insert convered cells only if the cell belongs to a vertical merge.
+    Insert covered cells only if the cell belongs to a vertical merge.
     Covered cells of horizontal merges shell not be converted.
     -->
     <xsl:variable name="myPos" select="position()" />
-    <xsl:variable name="myRow" select="parent::node()" />
-    <xsl:variable name="precedingRow" select="$myRow/preceding-sibling::node()[1]" />
-    <xsl:variable name="possibleVMergeNode" select="$precedingRow/*[position()=$myPos]" />
-
-    <xsl:if test="$possibleVMergeNode/@table:number-rows-spanned">
+    <xsl:variable name="isPartOfHorizontalMerge">
+      <xsl:for-each select="preceding-sibling::table:table-cell">
+        <xsl:if test="@table:number-columns-spanned">
+          <xsl:variable name="cellPos" select="position()" />
+          <xsl:variable name="colspan" select="@table:number-columns-spanned" />
+          <xsl:if test="$myPos - $cellPos &lt; $colspan">
+            <xsl:text>true</xsl:text>
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:if test="not(contains($isPartOfHorizontalMerge, 'true'))">
       <w:tc>
         <w:tcPr>
           <xsl:call-template name="InsertCellProperties"/>
@@ -697,19 +705,94 @@
   Date: 26.10.2007
   -->
   <xsl:template name="InsertCellSpan">
+    
     <!-- vertical merge -->
     <xsl:choose>
       <xsl:when test="@table:number-rows-spanned">
         <w:vMerge w:val="restart" />
       </xsl:when>
-      <xsl:when test="name()='table:covered-table-cell'">
+      <xsl:when test="name(.)='table:covered-table-cell'">
         <w:vMerge w:val="continue" />
       </xsl:when>
     </xsl:choose>
+    
     <!-- horizontal merge -->
-    <xsl:if test="@table:number-columns-spanned">
-      <w:gridSpan w:val="{@table:number-columns-spanned}"/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@table:number-columns-spanned">
+        <w:gridSpan w:val="{@table:number-columns-spanned}" />
+      </xsl:when>
+      <!-- covered table cells can also have a colspan if the parent vMerge node has a colspan -->
+      <xsl:when test="name(.)='table:covered-table-cell'">
+
+        <xsl:variable name="myRow" select="parent::node()" />
+        <xsl:variable name="precedingRow" select="$myRow/preceding-sibling::node()[1]" />
+        <xsl:variable name="myPos" select="position()" />
+        <xsl:variable name="gridSpan">
+          <xsl:choose>
+            <!-- 
+            the precing row has as many cells as my row,
+            so it's the cell above me.
+            -->
+            <xsl:when test="count($precedingRow/*) = count($myRow/*)">
+              <xsl:value-of select="$precedingRow/*[position()=$myPos]"/>
+            </xsl:when>
+            <!-- 
+            the precing row has not the same column count, 
+            so try to find the matching node.
+            -->
+            <xsl:otherwise>
+              <xsl:variable name="precedingPos">
+                <xsl:call-template name="GetPrecedingPos">
+                  <xsl:with-param name="row" select="$precedingRow" />
+                  <xsl:with-param name="max" select="$myPos" />
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$precedingRow/*[position()=$precedingPos]/@table:number-columns-spanned"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <w:gridSpan w:val="{$gridSpan}" />
+      </xsl:when>
+    </xsl:choose>
+    
+  </xsl:template>
+
+  <!--
+  Summary: recursive template
+  Author: makz (DIaLOGIKa)
+  Date: 22.11.2007
+  -->
+  <xsl:template name="GetPrecedingPos">
+    <xsl:param name="iterator" select="1" />
+    <xsl:param name="pos" select="1" />
+    <xsl:param name="row" />
+    <xsl:param name="max" />
+
+    <xsl:choose>
+      <xsl:when test="$iterator &lt; $max">
+        <xsl:variable name="cell" select="$row/*[position()=$pos]" />
+        <xsl:variable name="addValue">
+          <xsl:choose>
+            <xsl:when test="$cell/@table:number-columns-spanned">
+              <xsl:value-of select="$cell/@table:number-columns-spanned" />
+            </xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:call-template name="GetPrecedingPos">
+          <xsl:with-param name="iterator" select="$iterator + $addValue" />
+          <xsl:with-param name="row" select="$row" />
+          <xsl:with-param name="max" select="$max" />
+          <xsl:with-param name="pos" select="$pos + 1" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$pos" />
+      </xsl:otherwise>
+    </xsl:choose>
+   
   </xsl:template>
 
   <!-- Inserts the cell borders -->
@@ -1083,8 +1166,7 @@
         <xsl:variable name="currentColumnWidth">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
-              <xsl:for-each
-                select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]">
+              <xsl:for-each  select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]">
                 <xsl:call-template name="ComputeColumnWidth"/>
               </xsl:for-each>
             </xsl:with-param>
@@ -1174,7 +1256,7 @@
     <xsl:variable name="tableSpace">
       <xsl:choose>
         <xsl:when
-          test="$tableSide='top' and key('automatic-styles',following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
+          test="$tableSide='top' and key('automatic-styles', following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length"
               select="key('automatic-styles',following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]"
