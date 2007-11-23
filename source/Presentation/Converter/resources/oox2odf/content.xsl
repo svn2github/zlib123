@@ -2083,16 +2083,7 @@ exclude-result-prefixes="p a r xlink rels">
    <xsl:param name ="drawAnimId" />
    <xsl:param name ="grpCordinates"/>
    <draw:g>
-     <xsl:variable name="grpoffX">
-       <xsl:value-of select="./p:grpSpPr/a:xfrm/a:off/@x"/>
-     </xsl:variable>
-     <xsl:variable name="grpchOffX">
-       <xsl:value-of select="./p:grpSpPr/a:xfrm/a:chOff/@x"/>
-     </xsl:variable>
-     <xsl:if test="$grpoffX != $grpchOffX">
-       <xsl:message terminate="no">translation.oox2odf.groupingTypeExtensionChange</xsl:message>
-     </xsl:if>
-       <xsl:attribute name ="draw:id" >
+          <xsl:attribute name ="draw:id" >
 				<xsl:value-of  select ="$drawAnimId"/>
 			  </xsl:attribute>
           <xsl:for-each select="node()">
@@ -2123,7 +2114,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:with-param name ="ParaId" select="$ParaId" />
                         <xsl:with-param name ="TypeId" select="$SlideID" />
                         <xsl:with-param name="SlideRelationId" select="$SlideRelationId"/>
-                        <xsl:with-param name="var_pos" select="$var_pos"/>
+                        <xsl:with-param name="var_pos" select ="concat($pos,'-',$var_pos)" />
                        <xsl:with-param name="grpBln" select="'true'"/>
                     <xsl:with-param name="groupPrefix" select="'Slidegroup'"/>
                    <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />

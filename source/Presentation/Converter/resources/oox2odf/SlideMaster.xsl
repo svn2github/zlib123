@@ -7406,10 +7406,19 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select ="concat('grHeaderDateTime',$pos)"/>
                 </xsl:attribute >
                 <style:graphic-properties draw:stroke="none" draw:fill="none"  draw:auto-grow-height="false">
-                  <!--FILL-->
-                  <xsl:call-template name ="getHandOutBg"/>
-                  <!--LINE COLOR-->
-                  <xsl:call-template name ="LineColor" />
+                  <xsl:call-template name="tmpSlideGrahicProp">
+                    <xsl:with-param name="FileType" select="$handoutMasterName"/>
+                    <xsl:with-param name="shapePhType">
+                      <xsl:choose>
+                        <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='hdr'">
+                          <xsl:value-of select="'Header'"/>
+                        </xsl:when>
+                        <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='dt'">
+                          <xsl:value-of select="'DateTime'"/>
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:with-param>
+                  </xsl:call-template>
                 </style:graphic-properties >
               </style:style>
               <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type='hdr'">
@@ -7487,10 +7496,19 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select ="concat('grFooterPageNum',$pos)"/>
                 </xsl:attribute >
                 <style:graphic-properties draw:stroke="none" draw:fill="none" draw:auto-grow-height="false" draw:textarea-vertical-align="bottom">
-                  <!--FILL-->
-                  <xsl:call-template name ="getHandOutBg"/>
-                  <!--LINE COLOR-->
-                  <xsl:call-template name ="LineColor" />
+                  <xsl:call-template name="tmpSlideGrahicProp">
+                    <xsl:with-param name="FileType" select="$handoutMasterName"/>
+                    <xsl:with-param name="shapePhType">
+                      <xsl:choose>
+                        <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='ftr'">
+                          <xsl:value-of select="'Footer'"/>
+                        </xsl:when>
+                        <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='sldNum'">
+                          <xsl:value-of select="'PageNumber'"/>
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:with-param>
+                  </xsl:call-template>
                 </style:graphic-properties >
               </style:style>
               <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type='sldNum'">
@@ -8453,6 +8471,9 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='dt'">
                     <xsl:value-of select="'DateTime'"/>
                   </xsl:when>
+                  <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='hdr'">
+                    <xsl:value-of select="'Header'"/>
+                  </xsl:when>
                   <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='body' and p:nvSpPr/p:nvPr/p:ph/@idx ">
                     <xsl:value-of select="'outline'"/>
                   </xsl:when>
@@ -8477,18 +8498,16 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name="var_index" select="$var_index"/>
                 <xsl:with-param name="var_pos" select="$var_pos"/>
                 <xsl:with-param name="groupPrefix" select="$groupPrefix"/>
-              
-              </xsl:call-template>
+                            </xsl:call-template>
             </xsl:when>
             <xsl:when test="name()='p:grpSp'">
-              <xsl:variable name="grpVarPos" select="position()"/>
-              <xsl:for-each select="node()">
-                <xsl:variable name="var_pos" select="position()"/>
-                <xsl:call-template name="tmpGrad">
+                           <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:call-template name="tmpGroupGradient">
                   <xsl:with-param name="FilePath" select="$FilePath" />
                   <xsl:with-param name="FileName" select="$FileName"/>
                   <xsl:with-param name="FileType" select="$FileType"/>
-                  <xsl:with-param name="var_pos" select="concat($grpVarPos,'-',$var_pos)"/>
+                  <xsl:with-param name="grppos" select="$var_pos"/>
                   <xsl:with-param name="groupPrefix">
                     <xsl:choose>
                       <xsl:when test="contains($FileType,'slideLayout')">
@@ -8509,6 +8528,40 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:for-each>
       </xsl:for-each>
     </xsl:template>
+  <xsl:template name="tmpGroupGradient">
+    <xsl:param name="FilePath" />
+    <xsl:param name="FileName"/>
+    <xsl:param name="FileType" />
+    <xsl:param name="grppos"/>
+    <xsl:param name="groupPrefix"/>
+    <xsl:for-each select="node()">
+      <xsl:choose>
+        <xsl:when test="name()='p:sp'">
+          <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph)">
+            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:call-template name="tmpGrad">
+              <xsl:with-param name="FilePath" select="$FilePath" />
+              <xsl:with-param name="FileName" select="$FileName"/>
+              <xsl:with-param name="FileType" select="$FileType"/>
+              <xsl:with-param name="var_pos" select="concat($grppos,'-',$var_pos)"/>
+              <xsl:with-param name="groupPrefix" select="$groupPrefix"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="name()='p:grpSp'">
+          <xsl:variable name="var_pos" select="position()"/>
+          <xsl:call-template name="tmpGroupGradient">
+            <xsl:with-param name="FilePath" select="$FilePath" />
+            <xsl:with-param name="FileName" select="$FileName"/>
+            <xsl:with-param name="FileType" select="$FileType"/>
+            <xsl:with-param name="grppos" select="concat($grppos,'-',$var_pos)"/>
+            <xsl:with-param name="groupPrefix" select="$groupPrefix"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+
+  </xsl:template>
    <xsl:template name="tmpGrad">
       <xsl:param name="FilePath"/>
       <xsl:param name="FileName"/>
@@ -8519,31 +8572,27 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:param name="var_index"/>
               <xsl:for-each select="p:spPr/a:gradFill">
                 <draw:gradient>
-                  <xsl:attribute name="draw:name">
+        <xsl:variable name="gradientName">
                     <xsl:choose>
                       <xsl:when test="contains($FileType,'slideLayout') and $var_TextBoxType !=''">
                 <xsl:value-of select="concat($groupPrefix,$FileType,'-',$var_TextBoxType,$var_index,'Gradient')"/>
                       </xsl:when>
-                      <xsl:when test="contains($FileType,'Master') and $var_TextBoxType !='' and not(contains($FileType,'slideLayout'))">
+            <xsl:when test="contains($FileType,'handoutMaster') and $var_TextBoxType !=''">
+              <xsl:value-of select="concat($groupPrefix,$FileType,$var_TextBoxType,'Gradient')"/>
+            </xsl:when>
+            <xsl:when test="contains($FileType,'slideMaster') and $var_TextBoxType !='' and not(contains($FileType,'slideLayout'))">
                         <xsl:value-of select="concat($FileType,$var_TextBoxType,'Gradient')"/>
                       </xsl:when>
                       <xsl:otherwise>
                 <xsl:value-of select="concat($groupPrefix,$FileType,'Gradient',$var_pos)"/>
                       </xsl:otherwise>
                     </xsl:choose>
+        </xsl:variable>
+        <xsl:attribute name="draw:name">
+          <xsl:value-of select="$gradientName"/>
                   </xsl:attribute>
                   <xsl:attribute name="draw:display-name">
-                    <xsl:choose>
-                      <xsl:when test="contains($FileType,'slideLayout') and $var_TextBoxType !=''">
-                <xsl:value-of select="concat($groupPrefix,$FileType,'-',$var_TextBoxType,$var_index,'Gradient')"/>
-                      </xsl:when>
-                      <xsl:when test="contains($FileType,'Master') and $var_TextBoxType !='' and not(contains($FileType,'slideLayout'))">
-                        <xsl:value-of select="concat($FileType,$var_TextBoxType,'Gradient')"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                <xsl:value-of select="concat($groupPrefix,$FileType,'Gradient',$var_pos)"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:value-of select="$gradientName"/>
                   </xsl:attribute>
                   <xsl:call-template name="tmpGradientFillTiletoRect"/>
                 </draw:gradient>

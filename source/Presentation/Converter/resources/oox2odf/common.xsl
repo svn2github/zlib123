@@ -1419,6 +1419,7 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:param name="var_pos"/>
     <xsl:param name="slideNo"/>
     <xsl:param name="FileType"/>
+    <xsl:param name="shapePhType"/>
 	  <xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:message terminate="no">progress:a:p</xsl:message>
     <!--Background Fill color-->
@@ -1486,6 +1487,7 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:call-template name="tmpGradFillColor">
           <xsl:with-param name="var_pos" select="$var_pos"/>
           <xsl:with-param name="FileType" select="concat($FileType,$slideNo)"/>
+          <xsl:with-param name="shapePhType" select="$shapePhType"/>
                   </xsl:call-template>
       </xsl:when>
       <!--Fill refernce-->

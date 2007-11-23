@@ -117,6 +117,25 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </xsl:for-each>
         </xsl:for-each>
+        <xsl:for-each select="document('ppt/presentation.xml')//p:handoutMasterIdLst/p:handoutMasterId">
+          <xsl:variable name ="handoutMasterIdRelation">
+            <xsl:value-of select ="./@r:id"/>
+          </xsl:variable>
+          <xsl:variable name ="curPos" select ="position()"/>
+          <xsl:for-each select="document('ppt/_rels/presentation.xml.rels')//node()[@Id=$handoutMasterIdRelation]">
+            <xsl:variable name="handoutMasterPath">
+              <xsl:value-of select="substring-after(@Target,'/')"/>
+            </xsl:variable>
+            <xsl:variable name="handoutMasterName">
+              <xsl:value-of select="substring-before($handoutMasterPath,'.xml')"/>
+            </xsl:variable>
+            <xsl:call-template name="tmpGradientFillStyle">
+              <xsl:with-param name="FilePath" select="concat('ppt/handoutMasters/',$handoutMasterPath)"/>
+              <xsl:with-param name="FileName" select="$handoutMasterPath"/>
+              <xsl:with-param name="FileType" select="$handoutMasterName"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:for-each>
 			</office:styles>
 		<office:automatic-styles>
         <!-- added by Vipul to insert background color for Slide master-->
