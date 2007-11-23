@@ -434,7 +434,14 @@ Copyright (c) 2007, Sonata Software Limited
       </p:nvSpPr>
       <p:spPr>
 
-        <xsl:call-template name ="drawShape" />
+        <xsl:choose>
+          <xsl:when test="$grpFlag='true'">
+            <xsl:call-template name ="tmpGroupdrawCordinates"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name ="tmpdrawCordinates"/>
+          </xsl:otherwise>
+        </xsl:choose>
 
         <xsl:call-template name ="getPresetGeom">
           <xsl:with-param name ="prstGeom" select ="$shapeName" />
@@ -452,6 +459,8 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:when>
             </xsl:choose>
           </xsl:with-param >
+          <xsl:with-param name ="shapeCount" select ="$shapeCount" />
+          <xsl:with-param name ="grpFlag" select ="$grpFlag" />
         </xsl:call-template>
       </p:spPr>
       <p:style>
@@ -1027,6 +1036,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select ="@presentation:style-name"/>
             </xsl:if >
           </xsl:with-param >
+          <xsl:with-param name ="grpFlag" select ="$grpFlag" />
         </xsl:call-template>
       </p:spPr>
       <p:style>
@@ -1050,7 +1060,8 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name ="getGraphicProperties">
     <xsl:param name ="fileName" />
     <xsl:param name ="gr" />
-
+    <xsl:param name ="shapeCount"  />
+    <xsl:param name ="grpFlag"/>
     <xsl:for-each select ="document($fileName)//office:automatic-styles/style:style[@style:name=$gr]/style:graphic-properties">
       <!-- Parent style name-->
       <!--FILL-->
@@ -1058,6 +1069,8 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:call-template name ="tmpshapefillColor">
         <xsl:with-param name ="parentStyle" select="$parentStyle" />
         <xsl:with-param name ="gr" select="$gr" />
+        <xsl:with-param name ="shapeCount" select ="$shapeCount" />
+        <xsl:with-param name ="grpFlag" select ="$grpFlag" />
       </xsl:call-template >
 
       <!--LINE COLOR AND STYLE-->
@@ -1682,6 +1695,8 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name ="tmpshapefillColor">
     <xsl:param name ="parentStyle" />
     <xsl:param name ="gr" />
+    <xsl:param name ="shapeCount" />
+    <xsl:param name ="grpFlag" />
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
     <xsl:variable name="tranparencyinContent" select="substring-before(@draw:opacity,'%')"/>
@@ -1690,6 +1705,8 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name ="tmpFill">
           <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
           <xsl:with-param name="parentStyle" select="$parentStyle"/>
+          <xsl:with-param name ="shapeCount" select ="$shapeCount" />
+          <xsl:with-param name ="grpFlag" select ="$grpFlag" />
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$parentStyle !='' and not(@draw:fill or @draw:fill-color)">
@@ -1697,6 +1714,8 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:call-template name ="tmpFill">
             <xsl:with-param name="tranparencyinStyle" select="substring-before(@draw:opacity,'%')"/>
             <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
+            <xsl:with-param name ="shapeCount" select ="$shapeCount" />
+            <xsl:with-param name ="grpFlag" select ="$grpFlag" />
           </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
@@ -1707,6 +1726,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="tranparencyinContent"/>
     <xsl:param name="tranparencyinStyle"/>
     <xsl:param name="parentStyle"/>
+    <xsl:param name ="shapeCount" />
+    <xsl:param name ="grpFlag"/>
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
     <xsl:choose>
@@ -2458,11 +2479,12 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:value-of select ="'sysDash'" />
         </xsl:otherwise>
       </xsl:choose>
+
+    </xsl:if >
       <xsl:if test ="not(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash])">
         <xsl:value-of select ="'sysDash'" />
       </xsl:if>
-    </xsl:if >
-  </xsl:template>
+   </xsl:template>
   <!-- Get text layout for shape-->
   <xsl:template name ="getParagraphProperties">
     <xsl:param name ="fileName" />

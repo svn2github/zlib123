@@ -363,6 +363,7 @@ Copyright (c) 2007, Sonata Software Limited
                         <!-- Solid fill color -->
                         <xsl:call-template name ="fillColor" >
                           <xsl:with-param name ="prId" select ="@presentation:style-name" />
+                          <xsl:with-param name ="var_pos" select ="$var_pos" />
                         </xsl:call-template>
                         <!-- added by Vipul to insert line style-->
                         <!--start-->
@@ -410,14 +411,12 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:when>
               <xsl:when test="name()='draw:g'">
                 <xsl:variable name="var_pos" select="position()"/>
-                <!--<xsl:variable name="var_pos" select="number"/>-->
-                <!--<xsl:for-each select=".">-->
-                <xsl:call-template name="tmpGroping">
+                          <xsl:call-template name="tmpGroping">
                   <xsl:with-param name="pageNo" select="$pageNo"/>
                   <xsl:with-param name="pos" select="$var_pos"/>
+                  <xsl:with-param name="fileName" select="'content.xml'"/>
                 </xsl:call-template>
-                <!--</xsl:for-each>-->
-              </xsl:when>
+                  </xsl:when>
               <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape'
               or name()='draw:line' or name()='draw:connector' or name()='draw:circle'">
                 <!-- Code for shapes start-->
@@ -3818,65 +3817,10 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <xsl:when test="name()='draw:g'">
             <xsl:variable name="var_pos" select="position()"/>
-            <xsl:for-each select ="node()">
-              <xsl:variable name="var_num_1">
-                <xsl:value-of select="position()"/>
-              </xsl:variable>
-              <xsl:variable name="var_num_2">
-                <xsl:number level="any"/>
-              </xsl:variable>
-              <xsl:variable name="NvPrId" select="number(concat($var_pos,$var_num_1,$var_num_2))"/>
-              <xsl:choose>
-                <xsl:when test="name()='draw:frame'">
-                  <!--<xsl:variable name="var_pos" select="position()"/>-->
-                  <xsl:for-each select=".">
-                    <xsl:choose>
-                      <xsl:when test="./draw:image">
-                        <xsl:for-each select="./draw:image">
-                          <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
-            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
-            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
-            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
-            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
-            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
-            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
-            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
-                            <xsl:if test="not(./@xlink:href[contains(.,'../')])">
-                              <Relationship>
-                                <xsl:attribute name="Id">
-                                  <xsl:value-of select="concat('sl',$slideNo,'Image',$NvPrId)" />
-                                </xsl:attribute>
-                                <xsl:attribute name="Type">
-                                  <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
-                                </xsl:attribute>
-                                <xsl:attribute name="Target">
-                                  <xsl:value-of select="concat('../media/',substring-after(@xlink:href,'/'))" />
-                                  <!-- <xsl:value-of select ="concat('../media/',substring-after(@xlink:href,'/'))"/>  -->
-                                </xsl:attribute>
-                              </Relationship>
-                            </xsl:if>
-                          </xsl:if>
-                        </xsl:for-each>
-                      </xsl:when>
-                      <xsl:when test="./draw:plugin">
-                      </xsl:when>
-                    </xsl:choose>
-                  </xsl:for-each>
-                </xsl:when>
-                <xsl:when test="name()='draw:custom-shape'">
-                </xsl:when>
-                <xsl:when test="name()='draw:rect'">
-                </xsl:when>
-                <xsl:when test="name()='draw:ellipse'">
-                </xsl:when>
-                <xsl:when test="name()='draw:line'">
-                </xsl:when>
-                <xsl:when test="name()='draw:connector'">
-                </xsl:when>
-                <xsl:when test="name()='draw:g'">
-                </xsl:when>
-              </xsl:choose>
-            </xsl:for-each>
+            <xsl:call-template name="tmpGroupingRelation">
+              <xsl:with-param name="slideNo" select="$slideNo"/>
+              <xsl:with-param name="pos" select="$var_pos"/>
+            </xsl:call-template>
           </xsl:when>
         </xsl:choose>
       </xsl:for-each>
@@ -4511,102 +4455,5 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  <xsl:template name="tmpGroping">
-    <xsl:param name="pos"/>
-    <xsl:param name="pageNo"/>
-    <p:grpSp>
-      <p:nvGrpSpPr>
-        <p:cNvPr name="Title 1">
-          <xsl:attribute name="name">
-            <xsl:value-of select="concat('Group ',$pos+1)"/>
-          </xsl:attribute>
-          <xsl:attribute name="id">
-            <xsl:value-of select="$pos+1"/>
-          </xsl:attribute>
-        </p:cNvPr>
-        <p:cNvGrpSpPr>
-          <a:grpSpLocks/>
-        </p:cNvGrpSpPr>
-        <p:nvPr/>
-      </p:nvGrpSpPr>
-      <xsl:call-template name="tmpgroupingCordinates"/>
-      <xsl:for-each select="node()">
-        <xsl:variable name="var_num_1">
-          <xsl:value-of select="position()"/>
-        </xsl:variable>
-        <xsl:variable name="var_num_2">
-          <xsl:number level="any"/>
-        </xsl:variable>
-        <xsl:variable name="NvPrId" select="number(concat($pos,$var_num_1,$var_num_2))"/>
-        <xsl:choose>
-          <!--<xsl:when test="name()='draw:g'">-->
-          <!--<xsl:for-each select=".">
-              <xsl:call-template name="tmpGroping">
-              <xsl:with-param name ="pos" select ="$pos"/>
-              <xsl:with-param name ="pageNo" select ="$pageNo"/>
-            </xsl:call-template>
-            </xsl:for-each>-->
-          <!--</xsl:when>-->
-          <xsl:when test="name()='draw:frame'">
-            <xsl:variable name="var_pos" select="position()"/>
-
-            <!--<xsl:for-each select=".">-->
-            <xsl:choose>
-              <xsl:when test="./draw:image">
-                <xsl:for-each select="./draw:image">
-                  <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
-            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
-            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
-            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
-            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
-            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
-            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
-            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
-                    <xsl:if test="not(./@xlink:href[contains(.,'../')])">
-                      <xsl:call-template name="InsertPicture">
-                        <xsl:with-param name="imageNo" select="$pageNo" />
-                        <xsl:with-param name="picNo" select="$NvPrId" />
-                        <xsl:with-param name ="grpFlag" select="'true'" />
-                      </xsl:call-template>
-                    </xsl:if>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:when test="@presentation:class[contains(.,'title')]
-                                  or @presentation:class[contains(.,'subtitle')]
-                                  or @presentation:class[contains(.,'outline')]">
-              </xsl:when>
-              <xsl:when test ="(draw:text-box) and not(@presentation:style-name) and not(@presentation:class)">
-                <xsl:call-template name ="CreateShape">
-                  <xsl:with-param name ="fileName" select ="'content.xml'"/>
-                  <xsl:with-param name ="shapeName" select="'TextBox '" />
-                  <xsl:with-param name ="shapeCount" select="$NvPrId" />
-                  <xsl:with-param name ="grpFlag" select="'true'" />
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:when test="./draw:plugin">
-                <!--<xsl:for-each select="./draw:plugin">
-                    <xsl:call-template name="InsertAudio">
-                      <xsl:with-param name="imageNo" select="$pageNo" />
-                      <xsl:with-param name="AudNo" select="$var_pos" />
-                    <xsl:with-param name ="NvPrId" select="$pos + $NvPrId" />
-                    </xsl:call-template>
-                  </xsl:for-each>-->
-              </xsl:when>
-            </xsl:choose>
-            <!--</xsl:for-each>-->
-          </xsl:when>
-          <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape'  or name()='draw:circle'
-                or name()='draw:line' or name()='draw:connector'">
-            <xsl:variable name="var_pos" select="position()"/>
-            <xsl:call-template name ="shapes" >
-              <xsl:with-param name ="fileName" select ="'content.xml'"/>
-              <xsl:with-param name ="var_pos" select="$NvPrId" />
-              <xsl:with-param name ="grpFlag" select="'true'" />
-            </xsl:call-template >
-          </xsl:when>
-        </xsl:choose>
-      </xsl:for-each>
-    </p:grpSp>
-  </xsl:template>
+ 
 </xsl:stylesheet>

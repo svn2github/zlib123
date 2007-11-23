@@ -50,11 +50,22 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="picNo" />
     <xsl:param name ="master" />
      <xsl:param name="fileName"/>
+     <xsl:param name="grpFlag"/>
+
  <xsl:param name ="NvPrId" />
     <!-- warn if Audio or Video -->
     <xsl:message terminate="no">translation.odf2oox.audioVideoTypeImage</xsl:message>
+
     <xsl:variable name ="imageSerialNo">
+       <xsl:choose>
+         <xsl:when test="$grpFlag='true'">
+           <xsl:value-of select ="concat('slgrpImage',$imageNo,'-',$picNo)"/>
+         </xsl:when>
+         <xsl:otherwise>
       <xsl:value-of select ="concat('sl',$imageNo,'Image' ,$picNo)"/>
+         </xsl:otherwise>
+       </xsl:choose>
+
     </xsl:variable>
     <pzip:copy pzip:source="{@xlink:href}"
 				   pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
@@ -71,7 +82,15 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
         </p:cNvPr >
         <p:cNvPicPr>
-          <a:picLocks noGrp="1" noChangeAspect="1" />
+          <a:picLocks noChangeAspect="1">
+            <xsl:choose>
+              <xsl:when test="$grpFlag!='true'">
+                <xsl:attribute name="noGrp">
+                  <xsl:value-of select="'1'"/>
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+          </a:picLocks>
         </p:cNvPicPr>
         <xsl:if test="$master='1'">
           <p:nvPr userDrawn="1"/>
@@ -124,70 +143,16 @@ Copyright (c) 2007, Sonata Software Limited
         </a:stretch>
       </p:blipFill>
       <p:spPr>
-        <a:xfrm>
-          <xsl:variable name ="angle">
-            <xsl:value-of select="substring-after(substring-before(substring-before(parent::node()/@draw:transform,'translate'),')'),'(')" />
-          </xsl:variable>
-          <xsl:variable name ="x2">
-            <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-          </xsl:variable>
-          <xsl:variable name ="y2">
-            <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-          </xsl:variable>
-          <xsl:if test="parent::node()/@draw:transform">
-            <xsl:attribute name ="rot">
-              <xsl:value-of select ="concat('draw-transform:ROT:',substring-before(parent::node()/@svg:width,'cm'), ':',
-																   substring-before(parent::node()/@svg:height,'cm'), ':', 
-																   $x2, ':',  $y2, ':', $angle)"/>
-            </xsl:attribute>
-          </xsl:if>
-          <a:off>
-            <xsl:if test="not(parent::node()/@draw:transform)">
-              <xsl:attribute name ="x">
-                <!--<xsl:value-of select ="@svg:x"/>-->
-                <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                  <xsl:with-param name ="length" select ="parent::node()/@svg:x"/>
-                </xsl:call-template>
-              </xsl:attribute>
-              <xsl:attribute name ="y">
-                <!--<xsl:value-of select ="@svg:y"/>-->
-                <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                  <xsl:with-param name ="length" select ="parent::node()/@svg:y"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if >
-            <xsl:if test="parent::node()/@draw:transform">
-              <xsl:attribute name ="x">
-                <xsl:value-of select ="concat('draw-transform:X:',substring-before(parent::node()/@svg:width,'cm'), ':',
-																   substring-before(parent::node()/@svg:height,'cm'), ':', 
-																   $x2, ':', $y2, ':', $angle)"/>
-              </xsl:attribute>
-              <xsl:attribute name ="y">
-                <xsl:value-of select ="concat('draw-transform:Y:',substring-before(parent::node()/@svg:width,'cm'), ':',
-																   substring-before(parent::node()/@svg:height,'cm'), ':', 
-																   $x2, ':',$y2, ':', $angle)"/>
-              </xsl:attribute>
-            </xsl:if>
-          </a:off >
-          <a:ext>
-            <xsl:attribute name ="cx">
-              <!--<xsl:value-of select ="@svg:width"/>-->
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="parent::node()/@svg:width"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name ="cy">
-              <!--<xsl:value-of select ="@svg:height"/>-->
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="parent::node()/@svg:height"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </a:ext >
-        </a:xfrm>        
+        <xsl:for-each select="./parent::node()">
+        <xsl:choose>
+          <xsl:when test="$grpFlag='true'">
+            <xsl:call-template name ="tmpGroupdrawCordinates"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name ="tmpdrawCordinates"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        </xsl:for-each>
         <!--Sateesh-->
         <a:prstGeom prst="rect">
           <a:avLst/>

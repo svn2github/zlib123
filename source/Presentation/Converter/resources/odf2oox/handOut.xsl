@@ -156,18 +156,11 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:variable name="styleName">
                         <xsl:value-of select="@draw:style-name"/>
                       </xsl:variable>
-                      <xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]/style:graphic-properties/@draw:fill-color">
-                        <a:solidFill>
-                          <a:srgbClr>
-                            <xsl:attribute name="val">
-                              <xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]">
-                                <!--<xsl:value-of select="./style:graphic-properties/@draw:fill-color"/>-->
-                                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                      <xsl:if test="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties">
+                        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties ">
+                          <xsl:call-template name="tmpSMShapeFillColor"/>
                               </xsl:for-each>
-                            </xsl:attribute>
-                          </a:srgbClr>
-                        </a:solidFill>
-                      </xsl:if>
+                                           </xsl:if>
                     </p:spPr>
                     <p:txBody>
                       <xsl:call-template name ="handOutTextAndAlignment" >
@@ -207,18 +200,11 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:variable name="styleName">
                         <xsl:value-of select="@draw:style-name"/>
                       </xsl:variable>
-                      <xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]/style:graphic-properties/@draw:fill-color">
-                        <a:solidFill>
-                          <a:srgbClr>
-                            <xsl:attribute name="val">
-                              <xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]">
-                                <!--<xsl:value-of select="./style:graphic-properties/@draw:fill-color"/>-->
-                                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                      <xsl:if test="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties">
+                        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties ">
+                          <xsl:call-template name="tmpSMShapeFillColor"/>
                               </xsl:for-each>
-                            </xsl:attribute>
-                          </a:srgbClr>
-                        </a:solidFill>
-                      </xsl:if>
+                                    </xsl:if>
                     </p:spPr>
                     <p:txBody>
                       <xsl:variable name ="dateId">
@@ -280,18 +266,11 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:variable name="styleName">
                         <xsl:value-of select="@draw:style-name"/>
                       </xsl:variable>
-                      <xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]/style:graphic-properties/@draw:fill-color">
-                        <a:solidFill>
-                          <a:srgbClr>
-                            <xsl:attribute name="val">
-                              <xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]">
-                                <!--<xsl:value-of select="./style:graphic-properties/@draw:fill-color"/>-->
-                                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                      <xsl:if test="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties">
+                        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties ">
+                          <xsl:call-template name="tmpSMShapeFillColor"/>
                               </xsl:for-each>
-                            </xsl:attribute>
-                          </a:srgbClr>
-                        </a:solidFill>
-                      </xsl:if>
+                                        </xsl:if>
                     </p:spPr>
                     <p:txBody>
                       <xsl:call-template name ="handOutTextAndAlignment" >
@@ -332,18 +311,11 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:variable name="styleName">
                         <xsl:value-of select="@draw:style-name"/>
                       </xsl:variable>
-                      <xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]/style:graphic-properties/@draw:fill-color">
-                        <a:solidFill>
-                          <a:srgbClr>
-                            <xsl:attribute name="val">
-                              <xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:name=$styleName]">
-                                <!--<xsl:value-of select="./style:graphic-properties/@draw:fill-color"/>-->
-                                <xsl:value-of select="substring-after(./style:graphic-properties/@draw:fill-color,'#')" />
+                      <xsl:if test="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties">
+                        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$styleName]/style:graphic-properties ">
+                          <xsl:call-template name="tmpSMShapeFillColor"/>
                               </xsl:for-each>
-                            </xsl:attribute>
-                          </a:srgbClr>
-                        </a:solidFill>
-                      </xsl:if>
+                                             </xsl:if>
                     </p:spPr>
                     <p:txBody>
                       <xsl:call-template name ="handoutPagenumber" >
