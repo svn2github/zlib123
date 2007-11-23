@@ -175,11 +175,22 @@ RefNo-1
                     <xsl:variable name="var_Left">
                       <xsl:value-of select="substring-before(substring-after(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' '),')')"/>
                     </xsl:variable>
+                    <xsl:choose>
+                      <xsl:when test="contains($var_Top,'in')">
                     <xsl:if test="not($var_Top='0in' and $var_Right='0in' and $var_Bottom='0in' and $var_Left='0in')">
                       <a:srcRect>
-                        <xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'in'),':',substring-before($var_Right,'in'),':',substring-before($var_Bottom,'in'),':',substring-before($var_Left,'in'))"/>
+                            <xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'in'),':',substring-before($var_Right,'in'),':',substring-before($var_Bottom,'in'),':',substring-before($var_Left,'in'),':','in')"/>
                       </a:srcRect>
                     </xsl:if>
+                      </xsl:when>
+                      <xsl:when test="contains($var_Top,'cm')">
+                        <xsl:if test="not($var_Top='0cm' and $var_Right='0cm' and $var_Bottom='0cm' and $var_Left='0cm')">
+                          <a:srcRect>
+                            <xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'cm'),':',substring-before($var_Right,'cm'),':',substring-before($var_Bottom,'cm'),':',substring-before($var_Left,'cm'),':','cm')"/>
+                          </a:srcRect>
+                        </xsl:if>
+                      </xsl:when>
+                    </xsl:choose>
                   </xsl:if>
                 </xsl:for-each>
                 <!--End-->
