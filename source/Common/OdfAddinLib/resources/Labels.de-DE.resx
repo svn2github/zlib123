@@ -197,10 +197,7 @@
   </data>
   <data name="ProgressBarLoadLabel" xml:space="preserve">
     <value>Laden der Übersetzungstabellen…</value>
-  </data>
-  <data name="OdfConversionCanceled" xml:space="preserve">
-    <value>Die Konvertierung wurde vom Benutzer abgebrochen.</value>
-  </data>
+  </data> 
   <data name="PossiblyEncryptedDocument" xml:space="preserve">
     <value>Das ZIP-Archiv konnte nicht geöffnet werden. Bitte überprüfen Sie, dass die Datei nicht passwortgeschützt ist.</value>
   </data>

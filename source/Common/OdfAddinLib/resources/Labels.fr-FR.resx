@@ -199,7 +199,4 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="ProgressBarLoadLabel" xml:space="preserve">
     <value>Chargement des tables de traduction…</value>
   </data>
-  <data name="OdfConversionCanceled" xml:space="preserve">
-    <value>La conversion a été annulée par l’utilisateur.</value>
-  </data>
-</root>
+  </root>
