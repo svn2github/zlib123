@@ -17,6 +17,7 @@
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:oox="urn:oox"
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   exclude-result-prefixes="w r draw number wp xlink v w10 o oox">
 
   <!-- 
@@ -2165,6 +2166,13 @@
       </xsl:choose>
     </xsl:variable>
 
+    <xsl:variable name="myId">
+      <xsl:variable name="myFileName" select="substring-after(ancestor::*[name()='oox:part']/@oox:name, 'word/')" />
+      <xsl:value-of select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Target=$myFileName]/@Id"/>
+    </xsl:variable>
+    <xsl:variable name="myFooterSectPr" select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr[w:footerReference/@r:id=$myId]" />
+    <xsl:variable name="myHeaderSectPr" select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr[w:headerReference/@r:id=$myId]" />
+    
     <!-- 
     Don't insert svg:x and svg:y if the shape is part of the group.
     This workaround must be removed if group positioning is implemented.
@@ -2197,6 +2205,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
+        
         <xsl:variable name="y">
           <xsl:choose>
             <xsl:when test="$shape[name()='w:framePr']">
@@ -2216,33 +2225,80 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
+
+        <!--
+        Modify the vertical position if the shape is 
+        in the footer/header and anchored to the page or margin.
+        -->
+        
         <xsl:variable name="posX">
           <xsl:call-template name="ConvertMeasure">
             <xsl:with-param name="length" select="$x"/>
             <xsl:with-param name="destUnit" select="'cm'"/>
           </xsl:call-template>
         </xsl:variable>
+        
         <xsl:variable name="posY">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length" select="$y"/>
-            <xsl:with-param name="destUnit" select="'cm'"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <!-- shape is in footer ... -->
+            <xsl:when test="ancestor::*[w:ftr]">
+              <xsl:variable name="pgH">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length" select="$myFooterSectPr/w:pgSz/@w:h"/>
+                  <xsl:with-param name="unit" select="'pt'"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="marT">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length" select="$myFooterSectPr/w:pgMar/@w:top"/>
+                  <xsl:with-param name="unit" select="'pt'"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="marB">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length" select="$myFooterSectPr/w:pgMar/@w:top"/>
+                  <xsl:with-param name="unit" select="'pt'"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:choose>
+                <!-- ... and relative to margin -->
+                <xsl:when test="$relV='margin'">
+                  <xsl:call-template name="ConvertMeasure">
+                    <xsl:with-param name="length" select="concat(substring-before($pgH, 'pt') - 
+                                substring-before($marT, 'pt') -
+                                substring-before($marB, 'pt') -
+                                substring-before($y, 'pt'), 'pt')"/>
+                    <xsl:with-param name="destUnit" select="'cm'"/>
+                  </xsl:call-template>
+                </xsl:when>
+                <!-- ... and relative to page -->
+                <xsl:when test="$relV='page'">
+                  <xsl:call-template name="ConvertMeasure">
+                    <xsl:with-param name="length" select="concat(substring-before($pgH, 'pt') - 
+                                substring-before($y, 'pt'), 'pt')"/>
+                    <xsl:with-param name="destUnit" select="'cm'"/>
+                  </xsl:call-template>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:when>
+            <!-- shape is in document -->
+            <xsl:otherwise>
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="$y"/>
+                <xsl:with-param name="destUnit" select="'cm'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
 
-        <!-- 
-        Write attributes .
-        Calculate the values relative to the group's values 
-        -->
-        <xsl:attribute name="svg:x">
-          <xsl:value-of select="$posX"/>
-        </xsl:attribute>
         <xsl:attribute name="svg:y">
           <xsl:value-of select="$posY"/>
         </xsl:attribute>
+        <xsl:attribute name="svg:x">
+          <xsl:value-of select="$posX"/>
+        </xsl:attribute>
       </xsl:if>
-
     </xsl:if>
-
   </xsl:template>
 
   <!--
