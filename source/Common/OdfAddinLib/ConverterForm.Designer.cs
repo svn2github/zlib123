@@ -80,6 +80,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             // 
             resources.ApplyResources(this.lblMessage, "lblMessage");
             this.lblMessage.Name = "lblMessage";
+            this.lblMessage.UseWaitCursor = true;
             // 
             // ConverterForm
             // 
