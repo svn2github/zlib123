@@ -2304,6 +2304,8 @@
 
   <!-- convert run into span -->
   <xsl:template match="e:r">
+    <!--RefNo-1: Changes for fixing 1833074 XLSX: Cell Content missing-->
+    <xsl:param name ="textp"/>
     <!-- 
 	        Bug No.          :1805599
 		    Code Modified By:Vijayeta
@@ -2321,6 +2323,18 @@
         </xsl:variable>
         <xsl:value-of select ="concat('SonataAnnotation|',$textContent,'|',$Id)"/>
       </xsl:when>
+      <!--Start of RefNo-1-->
+      <xsl:when test ="$textp='T'">
+        <text:span>
+          <xsl:if test="e:rPr">
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:apply-templates/>
+        </text:span>
+      </xsl:when>
+      <!--End of RefNo-1-->
       <xsl:otherwise >
         <text:p text:style-name="{generate-id(./parent::node())}">
           <text:span>
@@ -2335,6 +2349,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <!-- End of modification for the bug 1805599-->
+
     <!--<text:span>
       <xsl:if test="e:rPr">
         <xsl:attribute name="text:style-name">

@@ -121,7 +121,10 @@
                 <xsl:when test="contains($rSheredStrings, e:v) ">
                   <xsl:for-each
                     select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
-                    <xsl:apply-templates/>
+                    <xsl:apply-templates>
+                      <!--RefNo-1: Changes for fixing 1833074 XLSX: Cell Content missing-->
+                      <xsl:with-param name ="textp" select ="'T'"/>
+                    </xsl:apply-templates >
                   </xsl:for-each>
                 </xsl:when>
                 <xsl:otherwise>
