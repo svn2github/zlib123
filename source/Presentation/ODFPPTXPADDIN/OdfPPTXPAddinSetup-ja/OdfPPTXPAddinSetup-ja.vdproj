@@ -429,7 +429,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C0E0BCCAB91F41E8A2BFF3A3C73F8007"
             {
-            "SourcePath" = "8:C:\\Documents and Settings\\godha.gn\\Desktop\\README.htm"
+            "SourcePath" = "8:README.htm"
             "TargetName" = "8:README.htm"
             "Tag" = "8:"
             "Folder" = "8:_B1E4425745C04F45A257B7D6791625B9"
@@ -552,7 +552,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Add-in ODF for Microsoft PowerPoint"
+        "ProductName" = "8:Microsoft PowerPoint 用 ODF アドイン"
         "ProductCode" = "8:{C39D95F5-2626-4E91-A19F-19DD3098F3AA}"
         "PackageCode" = "8:{358F4A22-E37A-44A8-ACAF-0C55326B16D4}"
         "UpgradeCode" = "8:{DB03F1F2-4BC8-4E31-8D01-B1F94253DEAE}"
