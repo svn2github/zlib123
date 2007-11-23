@@ -378,8 +378,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         }
 
             }
+            if (strXY.Contains("XGroup"))
+                dblX2 = dblX2 / 1588;
+           
+            if (strXY.Contains("YGroup"))
+                dblY2 = dblY2 / 1588;
+
+
+
             if (strXY.Contains("X"))
             {
+
                 strReturn=( (int) Math.Round(dblX2)).ToString();
 
             }
@@ -397,104 +406,175 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         private string EvalGroupExpression(string text)
         {
-            string[] arrVal = new string[2];
+           
+            int intCount;
+            int intNextCnt;
+            double tempVal;
+            double dblX;
+            double dblY;
+            double dblWidth;
+            double dblHeight;
+            double dblRot;
+          
+            double dblValueNext;
+
+            ArrayList arrListX = new ArrayList();
+            ArrayList arrListY = new ArrayList();
 
             string strReturn = "";
-            arrVal = text.Split('@');
-            if (arrVal[1] == "" || arrVal[0] == "" || arrVal[0] == "$")
+            string[] arrVal = text.Split('@');
+
+            if (arrVal[1] == "")
                 return "0";
+          
+            for (intCount = 1; intCount < arrVal.Length - 1; intCount++)
+            {
+                 string[] arrCords = arrVal[intCount].Split(':');
+          
+                 dblX = Double.Parse(arrCords[0], System.Globalization.CultureInfo.InvariantCulture);
+                 dblY = Double.Parse(arrCords[1], System.Globalization.CultureInfo.InvariantCulture);
+                 dblWidth = Double.Parse(arrCords[2], System.Globalization.CultureInfo.InvariantCulture);
+                 dblHeight = Double.Parse(arrCords[3], System.Globalization.CultureInfo.InvariantCulture);
+                 dblRot = Double.Parse(arrCords[4], System.Globalization.CultureInfo.InvariantCulture);
+           
+                 tempVal = dblX;
+
+                 arrListX.Add(tempVal);
+
+                 tempVal = tempVal + Math.Cos(dblRot) * dblWidth;
+                arrListX.Add(tempVal);
+
+                tempVal = tempVal + Math.Sin(dblRot) * dblHeight;
+                arrListX.Add(tempVal);
+
+                tempVal = dblX + Math.Sin(dblRot) * dblHeight;
+                arrListX.Add(tempVal);
+
+        
+                tempVal = dblY;
+                arrListY.Add(tempVal);
+
+                tempVal = tempVal - Math.Sin(dblRot) * dblWidth;
+                arrListY.Add(tempVal);
+
+                tempVal = tempVal + Math.Cos(dblRot) * dblHeight;
+                arrListY.Add(tempVal);
+
+                tempVal = dblY + Math.Cos(dblRot) * dblHeight;
+                arrListY.Add(tempVal);
+
+            
+
+            }
+           
             string strXY = arrVal[0];
 
-            //string[] arrLst; //  = arrVal[1].Split(':');
-            //string[] arrLstCXCY;
-            //string[] arrLstXY;
-          
-            //ArrayList arrLst =new ArrayList();
-            //arrLst =(ArrayList) arrVal[1].Split(':');
-           
-            double maxVal = 0; // Location of largest item seen so far.
-            double minVal = 0; // Location of largest item seen so far.
+            double maxX = 0;
+            double maxY = 0; 
 
-             if (strXY.Contains("onlyX") || strXY.Contains("onlyY"))
-             {
-               string[] arrLst = arrVal[1].Split(':');
+            double minX = 0; 
+            double minY = 0;
 
-                minVal = Double.Parse(arrLst[0], System.Globalization.CultureInfo.InvariantCulture);
+            long ChOffX;
+            long ChOffY;
+            long ChExtX;
+            long ChExtY;
+            long OffX;
+            long OffY;
+            long ExtX;
+            long ExtY;
 
-               for (int intNextCnt = 1; intNextCnt <= arrLst.Length - 2; intNextCnt++)
-               {
-                   double arrValueNext = Double.Parse(arrLst[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
 
-                   if (arrValueNext <= minVal)
+                     minX =(double) arrListX[0];
+                 maxX = (double)arrListX[0];
+
+                 maxY = (double)arrListY[0];
+                 minY = (double)arrListY[0];
+                 for (intNextCnt = 1; intNextCnt < arrListX.Count - 1; intNextCnt++)
+                 {
+                     dblValueNext = (double)arrListX[intNextCnt];
+
+                    if (dblValueNext <= minX)
+                    {
+                       minX = dblValueNext;
+                      }
+                      if (dblValueNext >= maxX)
+                      {
+                          maxX = dblValueNext;
+                    }
+                }
+
+               
+                   for (intNextCnt = 1; intNextCnt < arrListY.Count - 1; intNextCnt++)
                    {
-                       minVal = arrValueNext;
+                       dblValueNext = (double)arrListY[intNextCnt];
+
+                       if (dblValueNext <= minY)
+                    {
+                           minY = dblValueNext;
+                       }
+                       if (dblValueNext >= maxY)
+                       {
+                           maxY = dblValueNext;
+                    }
+
+                }
+                 //Bounding Box
+                   OffX = (long) Math.Round(minX * 360000);
+                   OffY = (long)Math.Round(minY * 360000);
+                   ExtX = (long)Math.Round((Math.Abs(maxX - minX)) * 360000);
+                   ExtY = (long)Math.Round(Math.Abs((maxY - minY)) * 360000);
+
+                 //Child Bounding Box
+                   ChOffX = OffX / 1588;
+                   ChOffY = OffY / 1588;
+                   ChExtX = ExtX / 1588;
+                   ChExtY = ExtY / 1588;
+
+                   if (strXY.Contains("InnerGroup"))
+                   {
+                       if (strXY.Contains("onlyX"))
+                           strReturn = ChOffX.ToString();
+                       else if (strXY.Contains("onlyY"))
+                           strReturn = ChOffY.ToString();
+                       else if (strXY.Contains("onlyCX"))
+                           strReturn = ChExtX.ToString();
+                       else if (strXY.Contains("onlyCY"))
+                           strReturn = ChExtY.ToString();
+                       else if (strXY.Contains("onlyChX"))
+                           strReturn = ChOffX.ToString();
+                       else if (strXY.Contains("onlyChY"))
+                           strReturn = ChOffY.ToString();
+                       else if (strXY.Contains("onlyChCX"))
+                           strReturn = ChExtX.ToString();
+                       else if (strXY.Contains("onlyChCY"))
+                           strReturn = ChExtY.ToString();
+
                    }
+                   else
+                   {
 
-               }
-           
-                strReturn =((int)Math.Round(minVal * 360000)).ToString();
+                       if (strXY.Contains("onlyX"))
+                           strReturn = OffX.ToString();
+                       else if (strXY.Contains("onlyY"))
+                           strReturn = OffY.ToString();
+                       else if (strXY.Contains("onlyCX"))
+                           strReturn = ExtX.ToString();
+                       else if (strXY.Contains("onlyCY"))
+                           strReturn = ExtY.ToString();
+                       else if (strXY.Contains("onlyChX"))
+                           strReturn = ChOffX.ToString();
+                       else if (strXY.Contains("onlyChY"))
+                           strReturn = ChOffY.ToString();
+                       else if (strXY.Contains("onlyChCX"))
+                           strReturn = ChExtX.ToString();
+                       else if (strXY.Contains("onlyChCY"))
+                           strReturn = ChExtY.ToString();
 
             }
-            //if (strXY.Contains("onlyY"))
-            //{
-            //    for (int intNextCnt = 1; intNextCnt <= arrLst.Length - 2; intNextCnt++)
-            //    {
-
-            //        double arrValueNext = Double.Parse(arrLst[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
-
-            //        if (arrValueNext <= minVal)
-            //        {
-            //            minVal = arrValueNext;
-            //        }
-
-            //    }
-            //    strReturn = ((int)Math.Round(minVal * 360000)).ToString();
-
-            //}
-            if (strXY.Contains("CX") || strXY.Contains("CY"))
-            {
-                string[] arrLst = arrVal[1].Split('$');
-              
-                if (arrLst[0] == "")
-                    return "0";
-                string[] arrLstCXCY = arrLst[0].Split(':');
-                string[] arrLstXY = arrLst[1].Split(':');
-                double arrValueNext;
-                maxVal = Double.Parse(arrLstCXCY[0], System.Globalization.CultureInfo.InvariantCulture);
-                minVal = Double.Parse(arrLstXY[0], System.Globalization.CultureInfo.InvariantCulture);
-
-                for (int intNextCnt = 1; intNextCnt <= arrLstCXCY.Length - 2; intNextCnt++)
-                {
-
-                    arrValueNext = Double.Parse(arrLstCXCY[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
-
-                    if (arrValueNext >= maxVal)
-                    {
-                        maxVal = arrValueNext;
-                    }
-
-                }
-
-                for (int intNextCnt = 1; intNextCnt <= arrLstXY.Length - 2; intNextCnt++)
-                {
-
-                    arrValueNext = Double.Parse(arrLstXY[intNextCnt], System.Globalization.CultureInfo.InvariantCulture);
-
-                    if (arrValueNext <= minVal)
-                    {
-                        minVal = arrValueNext;
-                    }
-
-                }
-                strReturn = ((int)Math.Round(Math.Abs(maxVal - minVal) * 360000)).ToString();
-            }
            
-            //     if (strXY.Contains("CY"))
-            //{
-            //    strReturn = ((int)Math.Round(maxVal * 360000)).ToString();
 
-            //}
-            return strReturn;
+                     return strReturn;
         }
             
         //End 
@@ -592,10 +672,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string[] arrVal = new string[6];
             arrVal = text.Split(':');
             string source = arrVal[1].ToString();
-            double top = double.Parse(arrVal[2].ToString());
-            double right = double.Parse(arrVal[3].ToString());
-            double bottom = double.Parse(arrVal[4].ToString());
-            double left = double.Parse(arrVal[5].ToString());
+            double top = double.Parse(arrVal[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double right = double.Parse(arrVal[3].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double bottom = double.Parse(arrVal[4].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double left = double.Parse(arrVal[5].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
 
             string tempFileName = AbstractConverter.inputTempFileName.ToString();
@@ -608,9 +688,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             string[] arrValues = new string[3];
             arrValues = widht_height_res.Split(':');
-            double width = double.Parse(arrValues[0].ToString());
-            double height = double.Parse(arrValues[1].ToString());
-            double res = double.Parse(arrValues[2].ToString());
+            double width = double.Parse(arrValues[0].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double height = double.Parse(arrValues[1].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double res = double.Parse(arrValues[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
             double cx = width * 2.54 / res;
             double cy = height * 2.54 / res;

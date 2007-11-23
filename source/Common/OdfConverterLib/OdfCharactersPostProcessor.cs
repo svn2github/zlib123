@@ -487,35 +487,85 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 if (arrgroup[0].Contains("Width"))
                 {
+                    if (arrFinalRet[1].Contains("NaN"))
+                    {
+                        strShapeCordinates = "0cm";
+                    }
+                    else
+                    {
                     strShapeCordinates = arrFinalRet[1];
+                }
+                   
                 }
                 else if (arrgroup[0].Contains("Height"))
                 {
+                    if (arrFinalRet[2].Contains("NaN"))
+                    {
+                        strShapeCordinates = "0cm";
+                    }
+                    else
+                    {
                     strShapeCordinates = arrFinalRet[2];
+                }
                 }
                 else if (arrgroup[0].Contains("DrawTranform"))
                 {
+                    if (arrFinalRet[3].Contains("NaN"))
+                    {
+                        strShapeCordinates = "0cm";
+                    }
+                    else
+                    {
                     strShapeCordinates = arrFinalRet[3];
                 }
+            }
             }
             else if (arrFinalRet[0] == "NOROT")
             {
                 if (arrgroup[0].Contains("Width"))
                 {
+                    if (arrFinalRet[1].Contains("NaN"))
+                    {
+                        strShapeCordinates = "0cm";
+                    }
+                    else
+                    {
                     strShapeCordinates = arrFinalRet[1];
+                }
                 }
                 else if (arrgroup[0].Contains("Height"))
                 {
+                    if (arrFinalRet[2].Contains("NaN"))
+                    {
+                        strShapeCordinates = "0cm";
+                    }
+                    else
+                    {
                     strShapeCordinates = arrFinalRet[2];
+                }
                 }
                 else if (arrgroup[0].Contains("SVGX"))
                 {
+                    if (arrFinalRet[3].Contains("NaN"))
+                    {
+                        strShapeCordinates = "0cm";
+                    }
+                    else
+                    {
                     strShapeCordinates = arrFinalRet[3];
+                }
                 }
                 else if (arrgroup[0].Contains("SVGY"))
                 {
+                    if (arrFinalRet[4].Contains("NaN"))
+                    {
+                        strShapeCordinates = "0cm";
+                    }
+                    else
+                    {
                     strShapeCordinates = arrFinalRet[4];
                 }
+            }
             }
 
 
@@ -709,10 +759,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string[] arrVal = new string[6];
             arrVal = text.Split(':');
             string source = arrVal[1].ToString();
-            int left = int.Parse(arrVal[2].ToString());
-            int right = int.Parse(arrVal[3].ToString());
-            int top = int.Parse(arrVal[4].ToString());
-            int bottom = int.Parse(arrVal[5].ToString());
+            int left = int.Parse(arrVal[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            int right = int.Parse(arrVal[3].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            int top = int.Parse(arrVal[4].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            int bottom = int.Parse(arrVal[5].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
 
             string tempFileName = AbstractConverter.inputTempFileName.ToString();
@@ -725,9 +775,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             string[] arrValues = new string[3];
             arrValues = widht_height_res.Split(':');
-            double width = double.Parse(arrValues[0].ToString());
-            double height = double.Parse(arrValues[1].ToString());
-            double res = double.Parse(arrValues[2].ToString());
+            double width = double.Parse(arrValues[0].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double height = double.Parse(arrValues[1].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double res = double.Parse(arrValues[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
 
             double cx = width * 2.54 / res;
