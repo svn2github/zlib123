@@ -363,7 +363,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:ODF Add-in for Microsoft PowerPoint"
+        "ProductName" = "8:Odf Microsoft PowerPoint 加载项"
         "ProductCode" = "8:{2ABC82DB-8A31-49D0-84D7-5831CB4A50DF}"
         "PackageCode" = "8:{F5F7BB5C-C3EB-4050-A2AB-69E7327E5503}"
         "UpgradeCode" = "8:{346F3391-7672-4B61-918C-A4500EC5F4EB}"
