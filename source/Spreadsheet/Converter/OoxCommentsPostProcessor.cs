@@ -138,14 +138,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
             // Image cropping Added by Sonata
             else if (text.Contains("image-properties"))
             {
-                string[] arrVal = new string[6];
+                string[] arrVal = new string[7];
                 arrVal = text.Split(':');
 
                 string source = arrVal[1].ToString();
-                double top = double.Parse(arrVal[2].ToString());
-                double right = double.Parse(arrVal[3].ToString());
-                double bottom = double.Parse(arrVal[4].ToString());
-                double left = double.Parse(arrVal[5].ToString());
+                double top = double.Parse(arrVal[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                double right = double.Parse(arrVal[3].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                double bottom = double.Parse(arrVal[4].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                double left = double.Parse(arrVal[5].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                string measureType = arrVal[6].ToString();
 
                 string tempFileName = AbstractConverter.inputTempFileName.ToString();
                 ZipResolver zipResolverObj = new ZipResolver(tempFileName);
@@ -157,17 +158,32 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                 string[] arrValues = new string[3];
                 arrValues = widht_height_res.Split(':');
-                double width = double.Parse(arrValues[0].ToString());
-                double height = double.Parse(arrValues[1].ToString());
-                double res = double.Parse(arrValues[2].ToString());
+                double width = double.Parse(arrValues[0].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                double height = double.Parse(arrValues[1].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                double res = double.Parse(arrValues[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
                 double cx = width * 2.54 / res;
                 double cy = height * 2.54 / res;
 
-                int pptLeft = (int)(left * 100000 / cx * 2.54);
-                int pptRight = (int)(right * 100000 / cx * 2.54);
-                int pptTop = (int)(top * 100000 / cy * 2.54);
-                int pptBottom = (int)(bottom * 100000 / cy * 2.54);
+                int pptLeft=0; 
+                int pptRight=0;
+                int pptTop=0;
+                int pptBottom = 0;
+
+                if (measureType == "in") 
+                {
+                     pptLeft = (int)(left * 100000 / cx * 2.54);
+                     pptRight = (int)(right * 100000 / cx * 2.54);
+                     pptTop = (int)(top * 100000 / cy * 2.54);
+                     pptBottom = (int)(bottom * 100000 / cy * 2.54);
+                }
+                else if (measureType == "cm")
+                {
+                     pptLeft = (int)(left * 100000 / cx );
+                     pptRight = (int)(right * 100000 / cx );
+                     pptTop = (int)(top * 100000 / cy );
+                     pptBottom = (int)(bottom * 100000 / cy );
+                }
 
 
                 WriteStartAttribute("l");

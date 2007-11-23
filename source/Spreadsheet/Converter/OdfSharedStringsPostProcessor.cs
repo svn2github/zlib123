@@ -188,10 +188,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 string[] arrVal = new string[6];
                 arrVal = text.Split(':');
                 string source = arrVal[1].ToString();
-                int left = int.Parse(arrVal[2].ToString());
-                int right = int.Parse(arrVal[3].ToString());
-                int top = int.Parse(arrVal[4].ToString());
-                int bottom = int.Parse(arrVal[5].ToString());
+                int left = int.Parse(arrVal[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                int right = int.Parse(arrVal[3].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                int top = int.Parse(arrVal[4].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                int bottom = int.Parse(arrVal[5].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
                 string tempFileName = AbstractConverter.inputTempFileName.ToString();
                 ZipResolver resolverObj = new ZipResolver(tempFileName);
@@ -202,9 +202,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                 string[] arrValues = new string[3];
                 arrValues = imgaeValues.Split(':');
-                double width = double.Parse(arrValues[0].ToString());
-                double height = double.Parse(arrValues[1].ToString());
-                double res = double.Parse(arrValues[2].ToString());
+                double width = double.Parse(arrValues[0].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                double height = double.Parse(arrValues[1].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+                double res = double.Parse(arrValues[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
 
                 double cx = width * 2.54 / res;
