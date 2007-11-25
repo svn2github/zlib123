@@ -528,6 +528,10 @@
 
     <xsl:attribute name="relativeHeight">
       <xsl:choose>
+        <!-- divo: fix for roundtrip problem. This value may not be less than 0 -->
+        <xsl:when test="@draw:z-index and @draw:z-index &lt; 0">
+          <xsl:value-of select="'0'"/>
+        </xsl:when>
         <xsl:when test="@draw:z-index">
           <xsl:value-of select="2 + @draw:z-index"/>
         </xsl:when>
