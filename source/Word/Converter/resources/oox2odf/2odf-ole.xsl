@@ -47,7 +47,7 @@
       <xsl:variable name="newName" select="substring-before($objectName, '.')" />
       <xsl:variable name="suffix" select="translate(substring-after($objectName, '.'), 
                     'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
-      
+
       <!-- fidelity loss messages -->
       <xsl:if test="contains($objectPath, '\\')">
         <xsl:message terminate="no">translation.oox2odf.oleNetworkPath</xsl:message>
@@ -93,6 +93,16 @@
   *************************************************************************
   -->
 
+  <xsl:template name="InsertOlePreviewName">
+    <xsl:param name="thisId" />
+
+    <xsl:variable name="olePreview" select="key('Part', 'word/document.xml')/w:document/w:body//v:shape/v:imagedata[@r:id=$thisId]" />
+    <xsl:variable name="oleId" select="$olePreview/../../o:OLEObject/@r:id" />
+    <xsl:variable name="allRels" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship" />
+    <xsl:variable name="previewRelTarget" select="$allRels[@Id=$oleId]/@Target" />
+    <xsl:value-of select="substring-before(substring-after($previewRelTarget, '/'), '.')" />
+  </xsl:template>
+  
   <!--
   Summary: inserts the object itself
   Author: makz (DIaLOGIKa)

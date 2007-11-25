@@ -264,6 +264,14 @@
       <xsl:when test="$type='application/x-openoffice-wmf;windows_formatname=&quot;Image WMF&quot;'">
         <xsl:text>wmf</xsl:text>
       </xsl:when>
+      <!-- picture is a PNG -->
+      <xsl:when test="$type='image/png'">
+        <xsl:text>png</xsl:text>
+      </xsl:when>
+      <!-- picture is a JPG -->
+      <xsl:when test="$type='image/jpeg'">
+        <xsl:text>jpeg</xsl:text>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:text></xsl:text>
       </xsl:otherwise>

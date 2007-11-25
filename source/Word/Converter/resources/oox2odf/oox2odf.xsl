@@ -211,7 +211,9 @@
         <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//v:shape/v:imagedata[./@r:id=$thisId]">
           <xsl:attribute name="manifest:full-path">
             <xsl:text>ObjectReplacements/</xsl:text>
-            <xsl:value-of select="substring-before(substring-after(preceding-sibling::*[1]/@Target, '/'), '.')"/>
+            <xsl:call-template name="InsertOlePreviewName">
+              <xsl:with-param name="thisId" select="$thisId" />
+            </xsl:call-template>
           </xsl:attribute>
         </xsl:when>
         <!-- the ref is a normal picture -->
