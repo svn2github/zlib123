@@ -86,9 +86,32 @@
         </xsl:when>
         <!-- REF -->
         <xsl:when test="$fieldType='REF'">
-          <xsl:call-template name="InsertUserVariable">
+          <!--xsl:call-template name="InsertUserVariable">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
-          </xsl:call-template>
+          </xsl:call-template-->
+          <!-- divo: quick fix, code is duplicated from template match="w:fldSimple[contains(@w:instr,'REF')]" below -->
+          <xsl:variable name="fieldName">
+            <xsl:call-template name="ExtractFieldName">
+              <xsl:with-param name="fieldCode" select="." />
+              <xsl:with-param name="fieldType" select="'REF'" />
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="referencedItem" select="key('bookmarksByName', $fieldName)" />
+          
+          <xsl:choose>
+            <!-- Is the referenced field a bookmark? -->
+            <xsl:when test="$referencedItem">
+              <xsl:call-template name="InsertCrossReference">
+                <xsl:with-param name="fieldCode" select="."/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertUserVariable">
+                <xsl:with-param name="fieldCode" select="."/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+          
         </xsl:when>
         <!-- USERINITIALS -->
         <xsl:when test="$fieldType='USERINITIALS'">
@@ -239,14 +262,14 @@
   Date: 2.11.2007
   -->
   <xsl:template match="w:fldSimple[contains(@w:instr,'REF')]" mode="fields">
-
+    <!-- TODO code is duplicated in template match="w:instrText" above, create a new template and call it here -->
     <xsl:variable name="fieldName">
       <xsl:call-template name="ExtractFieldName">
         <xsl:with-param name="fieldCode" select="@w:instr" />
         <xsl:with-param name="fieldType" select="'REF'" />
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="referencedItem" select="key('Part', 'word/document.xml')/w:document/w:body//w:bookmarkStart[@w:name=$fieldName]" />
+    <xsl:variable name="referencedItem" select="key('bookmarksByName', $fieldName)" />
     
     <xsl:choose>
       <!-- Is the referenced field a bookmark? -->
@@ -995,7 +1018,14 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      <xsl:apply-templates select="following-sibling::w:r/w:t"/>
+      <xsl:choose>
+        <xsl:when test="name()='w:instrText'">
+          <xsl:apply-templates select="../following-sibling::w:r/w:t"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="following-sibling::w:r/w:t"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </text:bookmark-ref>
   </xsl:template>
 

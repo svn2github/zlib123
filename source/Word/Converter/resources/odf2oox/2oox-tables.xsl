@@ -734,7 +734,7 @@
             so it's the cell above me.
             -->
             <xsl:when test="count($precedingRow/*) = count($myRow/*)">
-              <xsl:value-of select="$precedingRow/*[position()=$myPos]"/>
+              <xsl:value-of select="$precedingRow/*[position()=$myPos]/@table:number-columns-spanned"/>
             </xsl:when>
             <!-- 
             the precing row has not the same column count, 

@@ -64,6 +64,7 @@
 
   <xsl:key name="InstrText" match="w:instrText" use="''"/>
   <xsl:key name="bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
+  <xsl:key name="bookmarksByName" match="w:bookmarkStart" use="@w:name"/>
   <xsl:key name="pPr" match="w:pPr" use="''"/>
   <xsl:key name="sectPr" match="w:sectPr" use="''"/>
   
