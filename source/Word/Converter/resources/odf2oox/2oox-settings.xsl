@@ -151,6 +151,13 @@
             </xsl:choose>
           </xsl:attribute>
         </w:doNotUseHTMLParagraphAutoSpacing>
+
+        <!--divo, dialogika: retain Use Printer Metrics compatibility setting BEGIN -->
+        <xsl:if test="$configuration-settings/config:config-item[@config:name='PrinterIndependentLayout']/text()='disabled'">
+          <w:usePrinterMetrics/>
+        </xsl:if>
+        <!--divo, dialogika: retain Use Printer Metrics compatibility setting END -->
+
       </w:compat>
     </w:settings>
   </xsl:template>

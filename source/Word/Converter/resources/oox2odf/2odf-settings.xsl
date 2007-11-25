@@ -58,7 +58,20 @@
           </config:config-item>
 
           <!--math, dialogika: Added for correct indentation calculation END -->
-          
+
+          <!--divo, dialogika: retain Use Printer Metrics compatibility setting BEGIN -->
+          <config:config-item config:name="PrinterIndependentLayout" config:type="string">
+            <xsl:choose>
+              <xsl:when test="key('Part', 'word/settings.xml')/w:settings/w:compat/w:usePrinterMetrics">
+                <xsl:value-of select="'disabled'"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'high-resolution'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </config:config-item>
+          <!--divo, dialogika: retain Use Printer Metrics compatibility setting END -->
+
         </config:config-item-set >
 
         </office:settings>
