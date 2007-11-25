@@ -164,10 +164,14 @@
       
       <!-- copy placeholder for unsupported images -->
       <xsl:choose>
+        <!--
         <xsl:when test="$suffix='wmf' or $suffix='emf'">
+        -->
+        <xsl:when test="$suffix='xxx'">
           <pzip:copy pzip:source="#CER#WordConverter.dll#CleverAge.OdfConverter.Word.resources.OLEplaceholder.png#"
                      pzip:target="{concat('ObjectReplacements/', $newFileName)}" />
         </xsl:when>
+
         <xsl:otherwise>
           <pzip:copy pzip:source="{concat('word/', $imageFilePath)}"
                      pzip:target="{concat('ObjectReplacements/', $newFileName)}" />
