@@ -184,11 +184,11 @@ namespace OdfConverter.Transforms {
                 Transform(_x, _y, out x, out y);
                 if (_rot == 0.0) {
                    //   return string.Format("svg:width={0:F3}cm@svg:height={1:F3}cm:svg:x={2:F3}cm svg:y={3:F3}cm",
-                    return string.Format("NOROT@{0:F3}cm@{1:F3}cm@{2:F3}cm@{3:F3}cm",
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "NOROT@{0:F3}cm@{1:F3}cm@{2:F3}cm@{3:F3}cm",
                         _cx * _scaleX, _cy * _scaleY, x, y);
                 } else {
                     // Compute the new position of (_x,_y) point
-                    return string.Format("YESROT@{0:F3}cm@{1:F3}cm@rotate ({2}) translate ({3:F3}cm {4:F3}cm)",
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "YESROT@{0:F3}cm@{1:F3}cm@rotate ({2}) translate ({3:F3}cm {4:F3}cm)",
                         _cx * _scaleX, _cy * _scaleY, -_rot, x, y);
                 }
             }
