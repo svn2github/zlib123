@@ -987,6 +987,10 @@
 
     <xsl:attribute name="style:flow-with-text">
       <xsl:choose>
+        <!-- a line flowing with text causes crash in OO (bug #1747143) -->
+        <xsl:when test="$shape[name()='v:line']">
+          <xsl:text>false</xsl:text>
+        </xsl:when>
         <xsl:when test="$layouitInCell = 'f' ">
           <xsl:text>false</xsl:text>
         </xsl:when>
