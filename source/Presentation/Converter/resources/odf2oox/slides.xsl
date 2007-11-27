@@ -358,6 +358,9 @@ Copyright (c) 2007, Sonata Software Limited
                             </xsl:attribute>
                           </a:ext>
                         </a:xfrm>
+                        <a:prstGeom prst="rect">
+                          <a:avLst />
+                        </a:prstGeom>
 
                         <!--End-->
                         <!-- Solid fill color -->
@@ -1593,13 +1596,14 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <xsl:template name ="TextAlignment">
     <xsl:param name ="prId"/>
-
     <a:bodyPr>
       <xsl:for-each select ="draw:text-box">
         <xsl:for-each select ="text:p">
           <xsl:variable name ="ParId">
             <xsl:value-of select ="@text:style-name"/>
           </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="document('content.xml')//style:style[@style:name=$ParId]/style:paragraph-properties/@style:writing-mode='tb-rl'">
           <xsl:for-each select ="document('content.xml')//style:style[@style:name=$ParId]/style:paragraph-properties">
             <xsl:if test ="@style:writing-mode='tb-rl'">
               <xsl:attribute name ="vert">
@@ -1607,6 +1611,18 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:attribute>
             </xsl:if>
           </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="document('content.xml')//style:style[@style:name=$prId]/style:paragraph-properties/@style:writing-mode='tb-rl'">
+              <xsl:for-each select ="document('content.xml')//style:style[@style:name=$prId]/style:paragraph-properties">
+                <xsl:if test ="@style:writing-mode='tb-rl'">
+                  <xsl:attribute name ="vert">
+                    <xsl:value-of select ="'vert'"/>
+                  </xsl:attribute>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+          </xsl:choose>
+
         </xsl:for-each>
       </xsl:for-each>
       <xsl:for-each select ="document('content.xml')//style:style[@style:name=$prId]/style:graphic-properties">

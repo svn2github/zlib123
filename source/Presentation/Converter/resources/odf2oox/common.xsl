@@ -2867,6 +2867,16 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:call-template name="InsertPicture">
                         <xsl:with-param name="imageNo" select="$pageNo" />
                         <xsl:with-param name="picNo" select ="concat($pos,$var_pos)"/>
+                        <xsl:with-param name="fileName">
+                          <xsl:choose>
+                            <xsl:when test="$master='1'">
+                              <xsl:value-of select="'styles.xml'"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="'content.xml'"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
                         <xsl:with-param name ="grpFlag" select="'true'" />
                         <xsl:with-param name ="master" select="$master" />
                       </xsl:call-template>
