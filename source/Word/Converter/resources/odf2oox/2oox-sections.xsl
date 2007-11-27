@@ -64,11 +64,15 @@
   <xsl:variable name="first-elt" select="$elts[1]"/>
 
     <xsl:template name="SoftPageBreaks">
-    <w:pPr>
+      
+    <!--math & clam, dialogika: bugfix #1838832 BEGIN--> 
+    <!--w:pPr tag is now written in the OoxSectionsPostProcessor if w:sectPr is not skipped-->
+    <!--<w:pPr>-->
       <w:sectPr>
         <xsl:attribute name="psect:next-soft-page-break">true</xsl:attribute>
       </w:sectPr>
-    </w:pPr>
+    <!--</w:pPr>-->
+    <!--math & clam, dialogika: bugfix #1838832 END-->
   </xsl:template>
 
   <!-- Document final section properties -->

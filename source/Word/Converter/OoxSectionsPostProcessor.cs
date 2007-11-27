@@ -645,6 +645,14 @@ namespace CleverAge.OdfConverter.Word
                 {
                     page.Use++;
 
+                    // math & clam, dialogika: bugfix #1838832 BEGIN
+                    // w:pPr are written here instead of 2oox-sections.xsl
+                    if (this.nextIsSoftPageBreak)
+                    {
+                        nextWriter.WriteStartElement("w", "pPr", W_NAMESPACE);
+                    }
+                    // math & clam, dialogika: bugfix #1838832 END
+
                     nextWriter.WriteStartElement("w", "sectPr", W_NAMESPACE);
 
                     // header / footer reference
@@ -673,10 +681,24 @@ namespace CleverAge.OdfConverter.Word
 
 
                     nextWriter.WriteEndElement(); // end sectPr
+
+                    // math & clam, dialogika: bugfix #1838832 BEGIN
+                    // w:pPr are written here instead of 2oox-sections.xsl
+                    if (this.nextIsSoftPageBreak)
+                    {
+                        nextWriter.WriteEndElement(); // end pPr
+                    }
+                    // math & clam, dialogika: bugfix #1838832 END
                 }
                 else
                 {
-                    nextWriter.WriteElementString("SKIPPARAGRAPH", PSECT_NAMESPACE, "true");
+                    // math & clam, dialogika: bugfix #1838832 BEGIN
+                    // only skip paragraph if this break is not a soft page break
+                    if (!this.nextIsSoftPageBreak)
+                    {
+                        nextWriter.WriteElementString("SKIPPARAGRAPH", PSECT_NAMESPACE, "true");
+                    }
+                    // math & clam, dialogika: bugfix #1838832 END
                 }
             }
         }
