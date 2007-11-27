@@ -338,9 +338,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string hexGreen;
             string hexBlue;
             
-            hexRed = String.Format("{0:x}", intRed);
-            hexGreen = String.Format("{0:x}", intGreen );
-            hexBlue = String.Format("{0:x}", intBlue );  
+            hexRed = String.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:x}", intRed);
+            hexGreen = String.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:x}", intGreen );
+            hexBlue = String.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:x}", intBlue );  
             return ('#' + hexRed.ToUpper()   + hexGreen.ToUpper ()  + hexBlue.ToUpper()  );
 
         }
@@ -788,7 +788,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             double odpTop = top * cy / 100000;
             double odpBottom = bottom * cy / 100000;
 
-            string result = string.Concat("rect(", string.Format("{0:0.##}", odpTop) + "cm" + " " + string.Format("{0:0.##}", odpRight) + "cm" + " " + string.Format("{0:0.##}", odpBottom) + "cm" + " " + string.Format("{0:0.##}", odpLeft) + "cm", ")");
+            string result = string.Concat("rect(", string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpTop) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpRight) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpBottom) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpLeft) + "cm", ")");
             this.nextWriter.WriteString(result);
 
         }
