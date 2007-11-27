@@ -215,7 +215,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 double odpTop = (top * cy / 100000)/2.54;
                 double odpBottom = (bottom * cy / 100000)/2.54;
 
-                string result = string.Concat("rect(", string.Format("{0:0.##}", odpTop) + "in" + " " + string.Format("{0:0.##}", odpRight) + "in" + " " + string.Format("{0:0.##}", odpBottom) + "in" + " " + string.Format("{0:0.##}", odpLeft) + "in", ")");
+                string result = string.Concat("rect(", string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpTop) + "in" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpRight) + "in" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpBottom) + "in" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpLeft) + "in", ")");
                 this.nextWriter.WriteString(result);
 
 
