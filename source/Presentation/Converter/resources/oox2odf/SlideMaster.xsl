@@ -4342,6 +4342,10 @@ Copyright (c) 2007, Sonata Software Limited
                   <!--LINE STYLE-->
                   <xsl:call-template name ="LineStyle"/>
                   <xsl:call-template name ="PictureBorderColor" />
+                  <!--Image Cropping-->
+                  <xsl:call-template name="tmpImageCropping">
+                    <xsl:with-param name="slideRel" select="concat('ppt/slideMasters/_rels',$slideMasterName,'.xml.rels')"/>
+                  </xsl:call-template>
                 </style:graphic-properties >
               </style:style>
             </xsl:if>

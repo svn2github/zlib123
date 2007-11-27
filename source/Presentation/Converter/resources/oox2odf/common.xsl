@@ -3426,5 +3426,60 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  <xsl:template name="tmpImageCropping">
+    <xsl:param name ="slideRel"/>
+    <!--Image Cropping-->
+    <xsl:variable name ="imageId">
+      <xsl:value-of select ="./p:blipFill/a:blip/@r:embed"/>
+    </xsl:variable>
+    <xsl:variable name ="sourceFile">
+      <xsl:for-each select ="document($slideRel)//node()[@Id = $imageId]">
+        <xsl:value-of select ="@Target"/>
+      </xsl:for-each>
+    </xsl:variable >
+    <xsl:variable name="var_picWidth">
+      <xsl:value-of select="concat('ppt',substring-after($sourceFile,'..'))"/>
+    </xsl:variable>
+    <xsl:if test="./p:blipFill/a:srcRect/@l or ./p:blipFill/a:srcRect/@r or ./p:blipFill/a:srcRect/@t or ./p:blipFill/a:srcRect/@b ">
+      <xsl:variable name="left">
+        <xsl:if test="p:blipFill/a:srcRect/@l">
+          <xsl:value-of select="p:blipFill/a:srcRect/@l"/>
+        </xsl:if>
+        <xsl:if test="not(p:blipFill/a:srcRect/@l)">
+          <xsl:value-of select="0"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="right">
+        <xsl:if test="p:blipFill/a:srcRect/@r">
+          <xsl:value-of select="p:blipFill/a:srcRect/@r"/>
+        </xsl:if>
+        <xsl:if test="not(p:blipFill/a:srcRect/@r)">
+          <xsl:value-of select="0"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="top">
+        <xsl:if test="p:blipFill/a:srcRect/@t">
+          <xsl:value-of select="p:blipFill/a:srcRect/@t"/>
+        </xsl:if>
+        <xsl:if test="not(p:blipFill/a:srcRect/@t)">
+          <xsl:value-of select="0"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="bottom">
+        <xsl:if test="p:blipFill/a:srcRect/@b">
+          <xsl:value-of select="p:blipFill/a:srcRect/@b"/>
+        </xsl:if>
+        <xsl:if test="not(p:blipFill/a:srcRect/@b)">
+          <xsl:value-of select="0"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:attribute name ="fo:clip">
+        <xsl:variable name="temp">
+          <xsl:value-of select="concat('image-props:',$var_picWidth,':',$left,':',$right,':',$top,':',$bottom)"/>
+        </xsl:variable>
+        <xsl:value-of select="$temp"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
   <!--End-->
 </xsl:stylesheet>

@@ -2090,12 +2090,19 @@ exclude-result-prefixes="p a r xlink rels">
             <xsl:message terminate="no">progress:a:p</xsl:message>
            <xsl:choose>
             <xsl:when test="name()='p:pic'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable  name ="GraphicId">
+                <xsl:value-of select ="concat('SLgrp','SLPicture',$SlidePos,'gr',$pos,'-', $var_pos,'-',./p:nvPicPr/p:cNvPr/@id)"/>
+              </xsl:variable>
               <xsl:for-each select=".">
+                <xsl:if test="not(p:nvPicPr/p:nvPr/a:audioFile or p:nvPicPr/p:nvPr/a:wavAudioFile or p:nvPicPr/p:nvPr/a:videoFile)">
                 <xsl:call-template name="InsertPicture">
                   <xsl:with-param name ="slideRel" select ="$SlideRelationId"/>
                 <xsl:with-param name="grpBln" select="'true'"/>
+                    <xsl:with-param name="grpGraphicID" select="$GraphicId"/>
                <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
                 </xsl:call-template>
+                </xsl:if>
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:sp'">
@@ -2872,6 +2879,8 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:with-param name="flagGroup" select="'True'"/>
                   <xsl:with-param name="SlideId" select="$SlideId"/>
                    <xsl:with-param name="SlideNumber" select="$SlideNumber"/>
+                  <xsl:with-param name="slideRel" select="$slideRel"/>
+
                 </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
@@ -2887,8 +2896,34 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name="SMName"/>
     <xsl:param name="DefFont"/>
     <xsl:param name="var_pos"/>
+    <xsl:param name="slideRel"/>
               <xsl:for-each select="node()">
                 <xsl:choose>
+                  <xsl:when test="name()='p:pic'">
+                    <xsl:variable name="pos" select="position()"/>
+                    <xsl:for-each select=".">
+                      <xsl:variable  name ="GraphicId">
+                        <xsl:value-of select ="concat('SLgrp','SLPicture',$SlidePos,'gr',$var_pos,'-', $pos,'-',./p:nvPicPr/p:cNvPr/@id)"/>
+                      </xsl:variable>
+                      <style:style style:family="graphic" style:parent-style-name="standard">
+                        <xsl:attribute name ="style:name">
+                          <xsl:value-of select ="$GraphicId"/>
+                        </xsl:attribute >
+                        <style:graphic-properties>
+                          <!--LINE STYLE-->
+                          <xsl:if test="p:spPr/a:ln">
+                            <xsl:call-template name ="LineStyle"/>
+                            <xsl:call-template name ="PictureBorderColor" />
+                          </xsl:if>
+                          <!--End-->
+                          <!--Image Cropping-->
+                          <xsl:call-template name="tmpImageCropping">
+                            <xsl:with-param name="slideRel" select="$slideRel"/>
+                          </xsl:call-template>
+                        </style:graphic-properties >
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
                   <xsl:when test="name()='p:sp'">
                      <xsl:variable name="pos" select="position()"/>
                     <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph)">
@@ -3005,11 +3040,14 @@ exclude-result-prefixes="p a r xlink rels">
             <xsl:with-param name="SlideId" select="$SlideId"/>
             <xsl:with-param name="SlideNumber" select="$SlideNumber"/>
             <xsl:with-param name="var_pos" select="concat($var_pos,'-',$pos)"/>
+            <xsl:with-param name="slideRel" select="$slideRel"/>
           </xsl:call-template>
           </xsl:when>
            </xsl:choose>
         </xsl:for-each>
+   
      </xsl:template>
+ 
   <!--@@ Pradeep Nemadi Paragraph Tab stops code is added -End -->
   <xsl:template name="GenerateId">
     <xsl:param name="node"/>
@@ -3455,57 +3493,9 @@ exclude-result-prefixes="p a r xlink rels">
                      </xsl:if>
                       <!--End-->
                       <!--Image Cropping-->
-                      <xsl:variable name ="imageId">
-                        <xsl:value-of select ="./p:blipFill/a:blip/@r:embed"/>
-                      </xsl:variable>
-                      <xsl:variable name ="sourceFile">
-                        <xsl:for-each select ="document($slideRel)//node()[@Id = $imageId]">
-                          <xsl:value-of select ="@Target"/>
-                        </xsl:for-each>
-                      </xsl:variable >
-                      <xsl:variable name="var_picWidth">
-                        <xsl:value-of select="concat('ppt',substring-after($sourceFile,'..'))"/>
-                      </xsl:variable>
-                      <xsl:if test="./p:blipFill/a:srcRect/@l or ./p:blipFill/a:srcRect/@r or ./p:blipFill/a:srcRect/@t or ./p:blipFill/a:srcRect/@b ">
-                        <xsl:variable name="left">
-                          <xsl:if test="p:blipFill/a:srcRect/@l">
-                            <xsl:value-of select="p:blipFill/a:srcRect/@l"/>
-                          </xsl:if>
-                          <xsl:if test="not(p:blipFill/a:srcRect/@l)">
-                            <xsl:value-of select="0"/>
-                          </xsl:if>
-                        </xsl:variable>
-                        <xsl:variable name="right">
-                          <xsl:if test="p:blipFill/a:srcRect/@r">
-                            <xsl:value-of select="p:blipFill/a:srcRect/@r"/>
-                          </xsl:if>
-                          <xsl:if test="not(p:blipFill/a:srcRect/@r)">
-                            <xsl:value-of select="0"/>
-                          </xsl:if>
-                        </xsl:variable>
-                        <xsl:variable name="top">
-                          <xsl:if test="p:blipFill/a:srcRect/@t">
-                            <xsl:value-of select="p:blipFill/a:srcRect/@t"/>
-                          </xsl:if>
-                          <xsl:if test="not(p:blipFill/a:srcRect/@t)">
-                            <xsl:value-of select="0"/>
-                          </xsl:if>
-                        </xsl:variable>
-                        <xsl:variable name="bottom">
-                          <xsl:if test="p:blipFill/a:srcRect/@b">
-                            <xsl:value-of select="p:blipFill/a:srcRect/@b"/>
-                          </xsl:if>
-                          <xsl:if test="not(p:blipFill/a:srcRect/@b)">
-                            <xsl:value-of select="0"/>
-                          </xsl:if>
-                        </xsl:variable>
-                      <xsl:attribute name ="fo:clip">
-                        <xsl:variable name="temp">
-                          <xsl:value-of select="concat('image-props:',$var_picWidth,':',$left,':',$right,':',$top,':',$bottom)"/>
-                        </xsl:variable>
-                        <xsl:value-of select="$temp"/>
-                      </xsl:attribute>
-                      </xsl:if>
+                      <xsl:call-template name="tmpImageCropping">
+                        <xsl:with-param name="slideRel" select="$slideRel"/>
+                      </xsl:call-template>
                     </style:graphic-properties >
                   </style:style>
                  

@@ -59,6 +59,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="MasterId"/>
     <xsl:param name ="srcName"/>
  <xsl:param name ="grpBln"/>
+    <xsl:param name ="grpGraphicID"/>
     <xsl:param name ="grpCordinates"/>
 
     <!-- warn if Audio or Video -->
@@ -105,16 +106,24 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:variable  name ="masterGraphicId">
         <xsl:value-of select ="concat($MasterId,'Picture',$PicPosition,'gr')"/>
       </xsl:variable>
-      <xsl:if test="$sourceName='content'">
+      <xsl:choose>
+        <xsl:when test="$sourceName='content'">
         <xsl:attribute name ="draw:style-name">
           <xsl:value-of select ="$GraphicId"/>
         </xsl:attribute >
-      </xsl:if>
-      <xsl:if test="$srcName='styles'">
+        </xsl:when>
+        <xsl:when test="$srcName='styles'">
         <xsl:attribute name ="draw:style-name">
           <xsl:value-of select ="$masterGraphicId"/>
         </xsl:attribute >
-      </xsl:if>
+        </xsl:when>
+        <xsl:when test="$grpGraphicID!=''">
+          <xsl:attribute name ="draw:style-name">
+            <xsl:value-of select ="$grpGraphicID"/>
+          </xsl:attribute >
+        </xsl:when>
+      </xsl:choose>
+     
       <xsl:choose>
         <xsl:when test ="p:spPr/a:xfrm/a:off">
           <xsl:choose>
