@@ -904,7 +904,9 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 string outputExtension = "";
                 if (this.output != null)
                 {
-                    outputExtension = this.output.Substring(this.output.IndexOf("."));
+                    FileInfo fi = new FileInfo(this.output);
+                    outputExtension = fi.Extension;
+                    //outputExtension = this.output.Substring(this.output.LastIndexOf("."));
                 }
                 switch (inputExtension)
                 {
