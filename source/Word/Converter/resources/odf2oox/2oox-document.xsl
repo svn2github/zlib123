@@ -1032,6 +1032,7 @@
               <xsl:value-of select="@office:target-frame-name"/>
             </xsl:attribute>
           </xsl:if>
+         
           <xsl:apply-templates mode="paragraph"/>
         </w:hyperlink>
       </xsl:otherwise>
@@ -1180,7 +1181,14 @@
         <xsl:with-param name="styleName" select="$styleName"/>
       </xsl:call-template>
     </xsl:variable>
+
+    <xsl:variable name="myStyle" select="key('automatic-styles', $styleName)"></xsl:variable>
+    
     <xsl:choose>
+
+      <xsl:when test="$myStyle[1]/style:text-properties/@style:use-window-font-color = 'true' and $myStyle[1]/style:text-properties/@style:text-underline-type = 'none'">
+        <!--dialogika, clam bugfix #1806204: don't set a style-->
+      </xsl:when>
       <xsl:when test="$prefixedStyleName!='' and not(parent::text:a/@text:style-name)">
         <w:rStyle w:val="{$prefixedStyleName}"/>
       </xsl:when>
