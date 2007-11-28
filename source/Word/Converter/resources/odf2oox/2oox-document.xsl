@@ -1240,6 +1240,13 @@
         test="ancestor::text:index-body and ((preceding-sibling::text:a or parent::text:a) and preceding-sibling::text:tab)">
         <!-- do nothing : only one tab-stop converted in indexes -->
       </xsl:when>
+      <xsl:when test="../../@text:style-name = 'X3AS7TABSTYLE'">
+        <w:rPr>
+          <w:noProof />
+          <w:webHidden />
+        </w:rPr>
+        <w:ptab w:relativeTo="margin" w:alignment="right" w:leader="none"/>
+      </xsl:when>
       <xsl:otherwise>
         <w:r>
           <w:rPr>
