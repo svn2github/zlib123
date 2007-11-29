@@ -550,6 +550,15 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
                 return false;
             }
+            //Pradeep Nemadi - Bug 1747083 Start
+            //IOException is added to fix this bug
+            catch (IOException e)
+            {
+                this.report.AddLog(input, "Conversion failed - " + e.Message, Report.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                return false;
+            }
+            //Pradeep Nemadi - Bug 1747083 end
             catch (Exception e)
             {
                 this.report.AddLog(input, "Conversion failed - Error during conversion", Report.ERROR_LEVEL);
