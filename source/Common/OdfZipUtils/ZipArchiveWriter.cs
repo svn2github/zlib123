@@ -1139,7 +1139,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             System.Drawing.Image img;
             img = System.Drawing.Image.FromStream(sourceStream);
 
-            return img.Width.ToString() + ":" + img.Height.ToString() + ":" + img.VerticalResolution.ToString();
+            return img.Width.ToString(System.Globalization.CultureInfo.InvariantCulture) + ":" + img.Height.ToString(System.Globalization.CultureInfo.InvariantCulture) + ":" + img.VerticalResolution.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
         }
     }
