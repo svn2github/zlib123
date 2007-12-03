@@ -198,7 +198,7 @@
                   </xsl:when>
                   <xsl:when
                     test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'column']">
-                    <xsl:text>,axisColumn</xsl:text>
+                    <xsl:text>,axisCol</xsl:text>
                   </xsl:when>
                   <xsl:when
                     test="following-sibling::table:data-pilot-field[@table:source-field-name = $name and @table:orientation = 'row']">
@@ -483,7 +483,8 @@
                 <field x="-2"/>
               </xsl:when>
               <xsl:when test="@table:source-field-name != '' ">
-                <field>
+                <!-- colfields need to be handled by post-processor in order to avoid crashes -->
+                <field pxsi:table-source-field-name="{concat(@table:source-field-name,'pxsi')}">
                   <pxsi:fieldPos pxsi:name="{@table:source-field-name}" pxsi:attribute="x"/>
                 </field>
               </xsl:when>
@@ -547,7 +548,7 @@
                 <xsl:value-of select="@table:source-field-name"/>
               </xsl:attribute>
 
-              <xsl:if test="@table:function != 'sum' ">
+              <xsl:if test="@table:function != 'sum'  and @table:function != 'auto'">
 
                 <xsl:attribute name="subtotal">
                   <xsl:choose>
@@ -560,9 +561,9 @@
                     <xsl:when test="@table:function = 'stdevp' ">
                       <xsl:text>stdDevp</xsl:text>
                     </xsl:when>
-                    <xsl:when test="@table:function != 'sum' ">
+                    <xsl:otherwise>
                       <xsl:value-of select="@table:function"/>
-                    </xsl:when>
+                    </xsl:otherwise>
                   </xsl:choose>
                 </xsl:attribute>
 

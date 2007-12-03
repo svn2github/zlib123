@@ -37,6 +37,7 @@
     <Compile Include="OoxCommentsPostProcessor.cs" />
     <Compile Include="OoxDrawingsPostProcessor.cs" />
     <Compile Include="OOXGroupsPostProcessor.cs" />
+    <Compile Include="OoxPivotCrashHandlingPostProcessor.cs" />
     <Compile Include="OOXStyleCellPostProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="resources\odf2oox\border.xsl" />
@@ -98,7 +99,7 @@
     <EmbeddedResource Include="resources\oox2odf\change_tracking.xsl" />
     <EmbeddedResource Include="resources\oox2odf\database-ranges.xsl" />
     <EmbeddedResource Include="resources\oox2odf\pivot_tables.xsl" />
-	<Compile Include="OdfSharedStringsPostProcessor.cs" />
+    <Compile Include="OdfSharedStringsPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />
     <Compile Include="OoxMaximumCellTextPostProcessor.cs" />
     <Compile Include="OoxPhysicalPathPostProcessor.cs" />

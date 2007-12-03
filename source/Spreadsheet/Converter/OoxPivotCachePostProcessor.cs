@@ -780,16 +780,20 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "fieldPos".Equals(element.Name))
                 {
-                    string fieldNum = fieldNamesText[0][this.fieldPosName].ToString();
+                    //process only if name of pivot table field is the same as its cell value
+                    if (fieldNamesText[0][this.fieldPosName] != null)
+                    {
+                        string fieldNum = fieldNamesText[0][this.fieldPosName].ToString();
 
-                    this.nextWriter.WriteStartAttribute(this.fieldPosAttribute);
-                    this.nextWriter.WriteString(fieldNum);
-                    this.nextWriter.WriteEndAttribute();
-
-                    this.fieldPosName = "";
-                    this.fieldPosAttribute = "";
-                    this.isInFieldPos = false;
-                    this.isPxsi = false;
+                        this.nextWriter.WriteStartAttribute(this.fieldPosAttribute);
+                        this.nextWriter.WriteString(fieldNum);
+                        this.nextWriter.WriteEndAttribute();
+                    }
+                        this.fieldPosName = "";
+                        this.fieldPosAttribute = "";
+                        this.isInFieldPos = false;
+                        this.isPxsi = false;
+                    
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "cacheRecords".Equals(element.Name))
                 {
