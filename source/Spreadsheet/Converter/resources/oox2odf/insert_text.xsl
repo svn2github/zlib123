@@ -587,11 +587,7 @@
 
       <xsl:when test="not(contains($string,'../')) and not(contains($string,'..\..\'))">
 
-        <xsl:value-of select="concat('../',$string)">
-          <!--xsl:call-template name="Change20PercentToSpace">
-              <xsl:with-param name="slash" select="concat('..\',substring-after($string,''))"/>
-              </xsl:call-template-->
-        </xsl:value-of>
+        <xsl:value-of select="concat('../',$string)"/>
 
       </xsl:when>
 
