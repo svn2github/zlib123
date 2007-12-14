@@ -27,11 +27,11 @@ DISTFILES=$(SOURCE) $(ODF2OOX_RES) $(OOX2ODF_RES)
 
 all-local: OdfConverterLib.dll OdfConverterLibStatic.dll 
 OdfConverterLib.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtils.dll \
+	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtils.dll -r:System.Data \
 		-out:OdfConverterLib.dll $(SOURCE)
 
 OdfConverterLibStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtilsStatic.dll \
+	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtilsStatic.dll -r:System.Data \
 		-out:OdfConverterLibStatic.dll $(SOURCE)
 
 clean-local:

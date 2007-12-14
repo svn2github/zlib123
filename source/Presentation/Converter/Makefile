@@ -27,13 +27,13 @@ DISTFILES=$(SOURCE) $(ODF2OOX_RES) $(OOX2ODF_RES)
 
 all-local: Presentation.dll PresentationStatic.dll 
 Presentation.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
 		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
 		-out:Presentation.dll $(SOURCE)
 
 PresentationStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
 		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
 		-out:PresentationStatic.dll $(SOURCE)

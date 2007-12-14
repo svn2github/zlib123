@@ -27,13 +27,13 @@ DISTFILES=$(SOURCE) $(ODF2OOX_RES) $(OOX2ODF_RES)
 
 all-local: Spreadsheet.dll SpreadsheetStatic.dll 
 Spreadsheet.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
 		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
 		-out:Spreadsheet.dll $(SOURCE)
 
 SpreadsheetStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
 		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
 		-out:SpreadsheetStatic.dll $(SOURCE)
