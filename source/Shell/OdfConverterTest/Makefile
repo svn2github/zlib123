@@ -71,7 +71,7 @@ else
 	    bundle.o \
 	    $(EXPORTDYNAMIC) \
 	    -Wl,--undefined=$(ZIPOPEN) -Wl,--undefined=$(UNZOPEN) \
-	    `pkg-config --libs-only-L mono` -L../AdditionalTools/zlib123/contrib/minizip \
+	    `pkg-config --libs-only-L mono` -L../../AdditionalTools/zlib123/contrib/minizip \
 	    -Wl,-Bstatic -lmono -lzlibwapi -Wl,-Bdynamic  \
 	    `pkg-config --libs-only-l mono | sed -e "s/\-lmono //"` \
 	    $(ZLIB) $(OTHERLIBS)
