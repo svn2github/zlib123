@@ -1050,7 +1050,14 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 int pos2 = source.IndexOf("#", 5, len - 5) + 1;
 
                 Assembly exeAssem = Assembly.GetExecutingAssembly();
-                string targetAssemPath = Path.GetDirectoryName(exeAssem.GetModules()[0].FullyQualifiedName) + "\\" + source.Substring(pos1, pos2 - pos1 -1);
+                string targetAssemPath = Path.GetDirectoryName(exeAssem.GetModules()[0].FullyQualifiedName);
+		if (targetAssemPath != "")
+		    targetAssemPath += Path.DirectorySeparatorChar;
+		targetAssemPath +=  source.Substring(pos1, pos2 - pos1 -1);
+#if STATIC
+		if (targetAssemPath.EndsWith(".dll"))
+		    targetAssemPath = targetAssemPath.Substring (0, targetAssemPath.Length - 4) + "Static.dll";
+#endif
                 Assembly targetAssem = System.Reflection.Assembly.LoadFile(targetAssemPath);
                 string res = source.Substring(pos2, len - pos2 - 1);
 

@@ -35,20 +35,20 @@ DISTFILES=$(SOURCE) zlib.def
 
 all-local: OdfConverterTest.exe OdfConverter$(EXEEXT)
 
-OdfConverterTest.exe : Makefile $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtils.dll ../../Common/OdfConverterLib/OdfConverterLib.dll ../../Word/Converter/Word.dll ../../Presentation/Converter/Presentation.dll ../../Spreadsheet/Converter/Spreadsheet.dll
+OdfConverterTest.exe : Makefile $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtils.dll ../../Common/OdfConverterLib/OdfConverterLib.dll ../../Word/Converter/WordConverter.dll ../../Presentation/Converter/Presentation.dll ../../Spreadsheet/Converter/Spreadsheet.dll
 	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTest.exe \
 		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
-		-reference:../../Word/Converter/Word.dll \
+		-reference:../../Word/Converter/WordConverter.dll \
 		-reference:../../Presentation/Converter/Presentation.dll \
 		-reference:../../Spreadsheet/Converter/Spreadsheet.dll \
 		$(SOURCE)
 
-OdfConverterTestStatic.exe : $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtilsStatic.dll ../../Common/OdfConverterLib/OdfConverterLibStatic.dll ../../Word/Converter/WordStatic.dll ../../Presentation/Converter/PresentationStatic.dll ../../Spreadsheet/Converter/SpreadsheetStatic.dll
+OdfConverterTestStatic.exe : $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtilsStatic.dll ../../Common/OdfConverterLib/OdfConverterLibStatic.dll ../../Word/Converter/WordConverterStatic.dll ../../Presentation/Converter/PresentationStatic.dll ../../Spreadsheet/Converter/SpreadsheetStatic.dll
 	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTestStatic.exe \
 		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
-		-reference:../../Word/Converter/WordStatic.dll \
+		-reference:../../Word/Converter/WordConverterStatic.dll \
 		-reference:../../Presentation/Converter/PresentationStatic.dll \
 		-reference:../../Spreadsheet/Converter/SpreadsheetStatic.dll \
 		$(SOURCE)
