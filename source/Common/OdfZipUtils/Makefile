@@ -10,12 +10,11 @@ dist-local: dist-common
 
 OdfZipUtils.dll : $(SOURCE)
 	$(CSC) $(CSC_DEBUG) -target:library -r:System.Drawing \
-	     -out:OdfZipUtils.dll $(SOURCE)
+	     -out:$@ $(SOURCE)
 
 OdfZipUtilsStatic.dll : $(SOURCE)
 	$(CSC) $(CSC_DEBUG) -d:STATIC -target:library -r:System.Drawing \
-	     -out:OdfZipUtilsStatic.dll $(SOURCE)
+	     -out:$@ $(SOURCE)
 
 clean-local:
-	rm -f *.dll *.mdb
-
+	rm -f *.dll *.mdb *.pdb

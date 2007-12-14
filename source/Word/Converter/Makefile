@@ -39,8 +39,6 @@ WordConverterStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
 		-out:$@ $(SOURCE)
 
 clean-local:
-
-clean-local:
-	rm -f *.dll
+	rm -f *.dll *.mdb *.pdb
 
 dist-local: dist-common

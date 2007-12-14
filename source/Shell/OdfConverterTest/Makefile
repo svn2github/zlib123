@@ -36,7 +36,7 @@ DISTFILES=$(SOURCE) zlib.def
 all-local: OdfConverterTest.exe OdfConverter$(EXEEXT)
 
 OdfConverterTest.exe : Makefile $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtils.dll ../../Common/OdfConverterLib/OdfConverterLib.dll ../../Word/Converter/WordConverter.dll ../../Presentation/Converter/Presentation.dll ../../Spreadsheet/Converter/Spreadsheet.dll
-	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTest.exe \
+	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:$@ \
 		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
 		-reference:../../Word/Converter/WordConverter.dll \
@@ -45,7 +45,7 @@ OdfConverterTest.exe : Makefile $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtils.d
 		$(SOURCE)
 
 OdfConverterTestStatic.exe : $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtilsStatic.dll ../../Common/OdfConverterLib/OdfConverterLibStatic.dll ../../Word/Converter/WordConverterStatic.dll ../../Presentation/Converter/PresentationStatic.dll ../../Spreadsheet/Converter/SpreadsheetStatic.dll
-	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTestStatic.exe \
+	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:$@ \
 		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
 		-reference:../../Word/Converter/WordConverterStatic.dll \
@@ -93,8 +93,9 @@ check-local: all
 	MONO_TRACE_LISTENER=Console.Error ./OdfConverter /LEVEL 1 /I /tmp/foo.odt /O /tmp/baa.docx 
 
 clean-local:
-	rm -f *.exe OdfConverterTest$(EXEEXT) *.mdb main.c bundle.o
+	rm -f *.exe OdfConverterTest$(EXEEXT) *.mdb *.pdb main.c bundle.o
 
 install-local: OdfConverter
 	install -D OdfConverter $(DESTDIR)/usr/lib/ooo-2.0/program/OdfConverter
+
 dist-local: dist-common

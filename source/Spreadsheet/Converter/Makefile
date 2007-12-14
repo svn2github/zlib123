@@ -30,17 +30,15 @@ Spreadsheet.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
 	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
 		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
-		-out:Spreadsheet.dll $(SOURCE)
+		-out:$@ $(SOURCE)
 
 SpreadsheetStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
 	$(CSC) $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
 		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
 		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
-		-out:SpreadsheetStatic.dll $(SOURCE)
+		-out:$@ $(SOURCE)
 
 clean-local:
-
-clean-local:
-	rm -f *.dll
+	rm -f *.dll *.mdb *.pdb
 
 dist-local: dist-common
