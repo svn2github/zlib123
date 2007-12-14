@@ -9,11 +9,11 @@ all-local: OdfZipUtils.dll OdfZipUtilsStatic.dll
 dist-local: dist-common
 
 OdfZipUtils.dll : $(SOURCE)
-	$(CSC) $(CSC_DEBUG) -target:library \
+	$(CSC) $(CSC_DEBUG) -target:library -r:System.Drawing \
 	     -out:OdfZipUtils.dll $(SOURCE)
 
 OdfZipUtilsStatic.dll : $(SOURCE)
-	$(CSC) $(CSC_DEBUG) -d:STATIC -target:library \
+	$(CSC) $(CSC_DEBUG) -d:STATIC -target:library -r:System.Drawing \
 	     -out:OdfZipUtilsStatic.dll $(SOURCE)
 
 clean-local:
