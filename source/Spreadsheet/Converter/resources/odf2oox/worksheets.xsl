@@ -528,7 +528,7 @@
           <xsl:for-each select="style:table-properties">
             <xsl:if test="attribute::style:writing-mode='rl-tb'">
               <xsl:attribute name="rightToLeft">
-                <xsl:value-of select="1"> </xsl:value-of>
+                <xsl:value-of select="1"/>
               </xsl:attribute>
             </xsl:if>
           </xsl:for-each>
