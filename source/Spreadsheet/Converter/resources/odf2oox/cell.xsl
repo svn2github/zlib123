@@ -572,7 +572,7 @@ RefNo-1 06-Nov-2007 Sandeep S     1757284   Changes done to get the correct Used
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
       <!--RefNo-1-->
-      <xsl:if test="not(count(following-sibling::table:table-row) &lt;= 1 and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
+      <xsl:if test="descendant::office:annotation or not(count(following-sibling::table:table-row) &lt;= 1 and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
