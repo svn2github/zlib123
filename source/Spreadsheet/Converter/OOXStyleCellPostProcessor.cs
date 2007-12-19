@@ -109,7 +109,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
             else if (this.changeCellName)
             {
-                this.nextWriter.WriteString(styleCellNumber[text].ToString());
+                if (!styleCellNumber.ContainsKey(text) && text.EndsWith("h"))
+                {
+                    this.nextWriter.WriteString(styleCellNumber[text.Substring(0, text.Length - 1)].ToString());
+                }
+                else
+                {
+                    this.nextWriter.WriteString(styleCellNumber[text].ToString());
+                }
             }
             else
             {
