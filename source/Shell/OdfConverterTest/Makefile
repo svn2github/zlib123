@@ -93,7 +93,7 @@ check-local: all
 	MONO_TRACE_LISTENER=Console.Error ./OdfConverter /LEVEL 1 /I /tmp/foo.odt /O /tmp/baa.docx 
 
 clean-local:
-	rm -f *.exe OdfConverterTest$(EXEEXT) *.mdb *.pdb main.c bundle.o
+	rm -f *.exe OdfConverterTest$(EXEEXT) *.mdb *.pdb main.c bundle.o libzlib.dll.a
 
 install-local: OdfConverter
 	install -D OdfConverter $(DESTDIR)/usr/lib/ooo-2.0/program/OdfConverter
