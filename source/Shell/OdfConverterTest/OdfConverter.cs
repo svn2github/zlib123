@@ -260,6 +260,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
         /// <param name="args">Command Line arguments</param>
         public static void Main(String[] args)
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             OdfConverter tester = new OdfConverter();
             ControlHandlerFonction myHandler = new ControlHandlerFonction(tester.MyHandler);
             SetConsoleCtrlHandler(myHandler, true);
