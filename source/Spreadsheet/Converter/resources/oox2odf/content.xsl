@@ -497,7 +497,7 @@
         <!-- for the current sheet -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
           <!-- if print range with apostrophes -->
-          <xsl:if test="contains(./self::node(), concat($apostrof, $checkedName))">
+          <xsl:if test="contains(./self::node(), concat($apostrof, $checkedName)) and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
             <!-- one print range with apostrophes -->
             <xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">
               <xsl:attribute name="table:print-ranges">
