@@ -886,7 +886,7 @@
     <!-- min integer digits -->
 
     <xsl:choose>
-      <xsl:when test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='0'">
+      <xsl:when test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='0' and $isFraction = 'false'">
         <xsl:attribute name="number:min-integer-digits">
           <xsl:call-template name="InsertMinIntegerDigits">
             <xsl:with-param name="code">
@@ -909,6 +909,18 @@
           <xsl:when
             test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='#'">
             <xsl:attribute name="number:min-integer-digits">0</xsl:attribute>
+          </xsl:when>
+          <xsl:when test="string-length(substring-before(substring-before($formatCodeWithoutComma,'/'),'\ ') > 0)">
+            <xsl:attribute name="number:min-integer-digits">
+              <xsl:call-template name="InsertMinIntegerDigits">
+                <xsl:with-param name="code">
+                  <xsl:value-of
+                    select="substring-before(substring-before($formatCodeWithoutComma,'/'),'\ ')"
+                  />
+                </xsl:with-param>
+                <xsl:with-param name="value">0</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
           </xsl:when>
         </xsl:choose>
       </xsl:otherwise>
