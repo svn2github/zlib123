@@ -154,7 +154,7 @@
     <xsl:choose>
       <!-- when text contains invalid tags, converter recognises that part of the text is inside such tag -->
       <!-- see https://sourceforge.net/tracker/index.php?func=detail&aid=1740752&group_id=169337&atid=929855 -->
-      <xsl:when test="name(./parent::node())!='text:p' and name(./parent::node())!='text:a' and name(./parent::node())!='text:span'"/>
+      <xsl:when test="name(./parent::node())!='text:p' and name(./parent::node())!='text:a' and name(./parent::node())!='text:span' and name(./parent::node())!='office:annotation'"/>
       <xsl:otherwise>
     <xsl:variable name="value">
       <xsl:value-of select="."/>
