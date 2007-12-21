@@ -941,12 +941,31 @@
               <xsl:attribute name="paperSize">
                 <xsl:call-template name="TranslatePaperSize">
                   <xsl:with-param name="width">
-                    <xsl:value-of
-                      select="format-number(substring-before(@fo:page-width,'cm'),'#.##')"/>
+                    <xsl:choose>
+                      <xsl:when test="contains(@fo:page-width,'cm')">
+                        <xsl:value-of select="format-number(substring-before(@fo:page-width,'cm'),'#.##')"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="format-number(substring-before(@fo:page-width,'in'),'#.##')"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name="height">
-                    <xsl:value-of
-                      select="format-number(substring-before(@fo:page-height,'cm'),'#.##')"/>
+                    <xsl:choose>
+                      <xsl:when test="contains(@fo:page-height,'cm')">
+                        <xsl:value-of select="format-number(substring-before(@fo:page-height,'cm'),'#.##')"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="format-number(substring-before(@fo:page-height,'in'),'#.##')"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                  <!-- check if paper size is defined in inches or centimeters-->
+                  <xsl:with-param name="unit">
+                    <xsl:choose>
+                      <xsl:when test="contains(@fo:page-width,'cm')">cm</xsl:when>
+                      <xsl:otherwise>in</xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:attribute>
@@ -1155,42 +1174,43 @@
   <xsl:template name="TranslatePaperSize">
     <xsl:param name="height"/>
     <xsl:param name="width"/>
+    <xsl:param name="unit"/>
 
     <xsl:choose>
       <!-- A3 -->
-      <xsl:when test="($width = 42 and $height = 29.7) or ($width = 29.7 and $height = 42)">
+      <xsl:when test="($unit='cm' and ($width = 42 and $height = 29.7) or ($width = 29.7 and $height = 42)) or ($unit='in' and ($width = 16.54 and $height = 11.69) or ($width = 11.69 and $height = 16.54))">
         <xsl:text>8</xsl:text>
       </xsl:when>
       <!-- A4 -->
-      <xsl:when test="($width = 29.7 and $height = 21) or ($width = 21 and $height = 29.7)">
+      <xsl:when test="($unit='cm' and ($width = 29.7 and $height = 21) or ($width = 21 and $height = 29.7)) or ($unit='in' and ($width = 11.69 and $height = 8.27) or ($width = 8.27 and $height = 11.69))">
         <xsl:text>9</xsl:text>
       </xsl:when>
       <!-- A5 -->
-      <xsl:when test="($width = 21 and $height = 14.8) or ($width = 14.8 and $height = 21)">
+      <xsl:when test="($unit='cm' and ($width = 21 and $height = 14.8) or ($width = 14.8 and $height = 21)) or ($unit='in' and ($width = 8.27 and $height = 5.83) or ($width = 5.83 and $height = 8.27))">
         <xsl:text>11</xsl:text>
       </xsl:when>
       <!-- B4 (JIS) -->
-      <xsl:when test="($width = 36.4 and $height = 25.7) or ($width = 25.7 and $height = 36.4)">
+      <xsl:when test="($unit='cm' and ($width = 36.4 and $height = 25.7) or ($width = 25.7 and $height = 36.4)) or ($unit='in' and ($width = 14.33 and $height = 10.12) or ($width = 10.12 and $height = 14.33))">
         <xsl:text>12</xsl:text>
       </xsl:when>
       <!-- B5 (JIS) -->
-      <xsl:when test="($width = 25.7 and $height = 18.2) or ($width = 18.2 and $height = 25.7)">
+      <xsl:when test="($unit='cm' and ($width = 25.7 and $height = 18.2) or ($width = 18.2 and $height = 25.7)) or ($unit='in' and ($width = 10.12 and $height = 7.17) or ($width = 7.17 and $height = 10.12))">
         <xsl:text>13</xsl:text>
       </xsl:when>
       <!-- Letter -->
-      <xsl:when test="($width = 27.94 and $height = 21.59) or ($width = 21.59 and $height = 27.94)">
+      <xsl:when test="($unit='cm' and ($width = 27.94 and $height = 21.59) or ($width = 21.59 and $height = 27.94)) or ($unit='in' and ($width = 11 and $height = 8.5) or ($width = 8.5 and $height = 11))">
         <xsl:text>1</xsl:text>
       </xsl:when>
       <!-- Tabloid -->
-      <xsl:when test="($width = 43.13 and $height = 27.96) or ($width = 27.96 and $height = 43.13)">
+      <xsl:when test="($unit='cm' and ($width = 43.13 and $height = 27.96) or ($width = 27.96 and $height = 43.13)) or ($unit='in' and ($width = 16.98 and $height = 11.01) or ($width = 11.01 and $height = 16.98))">
         <xsl:text>3</xsl:text>
       </xsl:when>
       <!-- Legal -->
-      <xsl:when test="($width = 35.57 and $height = 21.59) or ($width = 21.59 and $height = 35.57)">
+      <xsl:when test="($unit='cm' and ($width = 35.57 and $height = 21.59) or ($width = 21.59 and $height = 35.57)) or ($unit='in' and ($width = 14 and $height = 8.5) or ($width = 8.5 and $height = 14))">
         <xsl:text>5</xsl:text>
       </xsl:when>
       <!-- Japanese Postcard -->
-      <xsl:when test="($width = 14.8 and $height = 10) or ($width = 10 and $height = 14.8)">
+      <xsl:when test="($unit='cm' and ($width = 14.8 and $height = 10) or ($width = 10 and $height = 14.8)) or ($unit='in' and ($width = 5.83 and $height = 3.94) or ($width = 3.94 and $height = 5.83))">
         <xsl:text>43</xsl:text>
       </xsl:when>
       <!-- A4 as default -->
