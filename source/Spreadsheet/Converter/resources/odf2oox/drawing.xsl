@@ -1151,32 +1151,30 @@ RefNo-1
       </xsl:if>
       <xsl:choose>
         <xsl:when test="not(@draw:stroke = 'none' )">
-          <xsl:if test="@svg:stroke-color != ''">
           <a:solidFill>
-            <a:srgbClr>
-              <xsl:attribute name="val">
-                <xsl:choose>
-                  <xsl:when test="@svg:stroke-color != '' ">
-                    <xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:text>000000</xsl:text>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-              <xsl:if test="@svg:stroke-opacity != ''">
-                <xsl:variable name="transparency">
-                  <xsl:value-of select="substring-before(@svg:stroke-opacity, '%')"/>
-                </xsl:variable>
-                <a:alpha>
-                  <xsl:attribute name="val">
-                    <xsl:value-of select="$transparency * 1000"/>
-                  </xsl:attribute>
-                </a:alpha>
-              </xsl:if>
-            </a:srgbClr>
+              <a:srgbClr>
+                <xsl:attribute name="val">
+                  <xsl:choose>
+                    <xsl:when test="@svg:stroke-color != '' ">
+                      <xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>000000</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:if test="@svg:stroke-opacity != ''">
+                  <xsl:variable name="transparency">
+                    <xsl:value-of select="substring-before(@svg:stroke-opacity, '%')"/>
+                  </xsl:variable>
+                  <a:alpha>
+                    <xsl:attribute name="val">
+                      <xsl:value-of select="$transparency * 1000"/>
+                    </xsl:attribute>
+                  </a:alpha>
+                </xsl:if>
+              </a:srgbClr>
           </a:solidFill>
-          </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <a:noFill/>
