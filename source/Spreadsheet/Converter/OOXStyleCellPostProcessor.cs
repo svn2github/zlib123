@@ -40,13 +40,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
     {
         private Stack sharedStringContext;
         private const string PXSI_NAMESPACE = "urn:cleverage:xmlns:post-processings:shared-strings";
-        private bool isInSharedString;
-        private bool isString;
-        private string stringNumber;
-        private Element sharedStringElement;
-        private bool isPxsi;
-        private bool style;
-        private bool cellXfs;
         private bool tableCellNumber;
         private bool changeCellName;
         private int numberCell;
@@ -56,11 +49,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
             : base(nextWriter)
         {
             this.sharedStringContext = new Stack();
-            this.isInSharedString = false;
-            this.isString = false;
-            this.stringNumber = "0";
-            this.isPxsi = false;
-            this.style = false;
             this.tableCellNumber = false;
             this.changeCellName = false;
             this.numberCell = 0;
@@ -70,11 +58,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
-           
-            
-                this.nextWriter.WriteStartElement(prefix, localName, ns);
-           
-
+           this.nextWriter.WriteStartElement(prefix, localName, ns);
         }
 
         public override void WriteStartAttribute(string prefix, string localName, string ns)
@@ -94,8 +78,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.nextWriter.WriteStartAttribute(prefix, localName, ns);
             }
            
-
-
         }
 
         public override void WriteString(string text)
@@ -104,7 +86,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 if (!styleCellNumber.ContainsKey(text))
                 {
-                    styleCellNumber.Add(text, this.numberCell);
+                    if (!text.EndsWith("h") || !styleCellNumber.Contains(text.Substring(0, text.Length - 1)))
+                    {
+                        styleCellNumber.Add(text, this.numberCell);
+                    }
                 }
             }
             else if (this.changeCellName)
@@ -123,7 +108,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.nextWriter.WriteString(text);
             }
            
-
         }
 
         public override void WriteEndAttribute()
@@ -146,11 +130,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         public override void WriteEndElement()
         {
-
-          
-                this.nextWriter.WriteEndElement();
-           
-
+            this.nextWriter.WriteEndElement();
         }
     }
 }
