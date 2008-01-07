@@ -30,6 +30,7 @@ using System;
 using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.Text;
 
 namespace CleverAge.OdfConverter.Word
 {
@@ -41,7 +42,7 @@ namespace CleverAge.OdfConverter.Word
 		private Stack currentParagraphNode;
         private Stack currentStyleNode;
         private Stack context;
-        private string paragraphText;
+        private StringBuilder paragraphTextBuilder = new StringBuilder();
         private string styleText;
         private bool bIsDoneStyle = false;
         private ArrayList tabStyleName = new ArrayList();
@@ -114,7 +115,7 @@ namespace CleverAge.OdfConverter.Word
         		//if text element in paragraph or in style is not in attribute, it is added to paragraphText or styleText
         		if(IsNotInAttribute())
         		{
-        			if(IsInParagraph()) this.paragraphText = this.paragraphText + text;
+        			if(IsInParagraph()) this.paragraphTextBuilder.Append(text);
                     else if(IsInStyle()) this.styleText = this.styleText + text;
         			Element element = (Element)this.context.Peek();
         			this.context.Pop();
@@ -163,11 +164,11 @@ namespace CleverAge.OdfConverter.Word
         		{
         			// a new child element, which contains all the text in paragraph is created
         			Element paragraphTextElement = new Element("text","paragraph",element.Ns);
-        			paragraphTextElement.AddChild(this.paragraphText);
+        			paragraphTextElement.AddChild(this.paragraphTextBuilder.ToString());
         			element.AddChild(paragraphTextElement);
         			//and then WriteParagraph method is used
         			WriteParagraph(element, false);
-        			this.paragraphText = "";
+        			this.paragraphTextBuilder = new StringBuilder();
         			this.currentParagraphNode.Pop();
         			this.context.Pop();
         		}
