@@ -154,7 +154,7 @@
     <value>Internet-Eigenschaften</value>
   </data>
   <data name="translation.odf2oox.documentCreationDate" xml:space="preserve">
-    <value>Datum der Dokumenterstellungs</value>
+    <value>Datum der Dokumenterstellung</value>
   </data>
   <data name="translation.odf2oox.documentModificationDate" xml:space="preserve">
     <value>Datum der letzten Dokumentänderung</value>
@@ -223,7 +223,7 @@
     <value>Farbe der Fußnotentrennlinie</value>
   </data>
   <data name="translation.odf2oox.footnoteSeparatorStyle" xml:space="preserve">
-    <value>Formarvorlage der Fußnotentrennlinie</value>
+    <value>Formatvorlage der Fußnotentrennlinie</value>
   </data>
   <data name="translation.odf2oox.footnoteMaximumHeight" xml:space="preserve">
     <value>maximale Höhe einer Fußnote</value>
