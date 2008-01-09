@@ -25,6 +25,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/*
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 27-Dec-2007 Sateesh                 Changes done for localization and error regarding obj ref not set to an instance of obj.  
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+*/
 
 using System;
 using System.Xml;
@@ -712,8 +719,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     for (int col = 0; col < fieldNamesText[1].Count; col++)
                     {
                         //get field name
-                        nameVal = fieldNames[1][col].ToString();
-                        name = fieldNamesText[1][col].ToString();
+                        //Start of RefNo-1:for localization and error regarding obj ref not set to an instance of obj.
+                        //nameVal = fieldNames[1][col].ToString();
+                        //name = fieldNamesText[1][col].ToString();
+                        nameVal = Convert.ToString(fieldNames[1][col], CultureInfo.InvariantCulture);
+                        name = Convert.ToString(fieldNamesText[1][col], CultureInfo.InvariantCulture);
+                        //End of RefNo-1
 
                         this.nextWriter.WriteStartElement("cacheField", EXCEL_NAMESPACE);
 
@@ -783,7 +794,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     //process only if name of pivot table field is the same as its cell value
                     if (fieldNamesText[0][this.fieldPosName] != null)
                     {
-                        string fieldNum = fieldNamesText[0][this.fieldPosName].ToString();
+                        //Start of RefNo-1:for localization and error regarding obj ref not set to an instance of obj.
+                        //string fieldNum = fieldNamesText[0][this.fieldPosName].ToString();
+                        string fieldNum = Convert.ToString(fieldNamesText[0][this.fieldPosName], CultureInfo.InvariantCulture);
+                        //End of RefNo-1
 
                         this.nextWriter.WriteStartAttribute(this.fieldPosAttribute);
                         this.nextWriter.WriteString(fieldNum);

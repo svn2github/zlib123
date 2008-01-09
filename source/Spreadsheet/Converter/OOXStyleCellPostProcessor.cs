@@ -25,6 +25,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/*
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 27-Dec-2007 Sateesh                 Changes done for localization and error regarding obj ref not set to an instance of obj.  
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+*/
 
 using System;
 using System.Xml;
@@ -96,11 +103,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 if (!styleCellNumber.ContainsKey(text) && text.EndsWith("h"))
                 {
-                    this.nextWriter.WriteString(styleCellNumber[text.Substring(0, text.Length - 1)].ToString());
+                    //Start of RefNo-1 :for localization and error regarding obj ref not set to an instance of obj.
+                    this.nextWriter.WriteString(Convert.ToString(styleCellNumber[text.Substring(0, text.Length - 1)], System.Globalization.CultureInfo.InvariantCulture));
+                    //End of RefNo-1 
                 }
                 else
                 {
-                    this.nextWriter.WriteString(styleCellNumber[text].ToString());
+                    //Start of RefNo-1 :for localization and error regarding obj ref not set to an instance of obj.
+                    this.nextWriter.WriteString(Convert.ToString(styleCellNumber[text].ToString(), System.Globalization.CultureInfo.InvariantCulture));
+                    //End of RefNo-1
                 }
             }
             else
@@ -130,7 +141,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         public override void WriteEndElement()
         {
-            this.nextWriter.WriteEndElement();
+                this.nextWriter.WriteEndElement();
         }
     }
 }

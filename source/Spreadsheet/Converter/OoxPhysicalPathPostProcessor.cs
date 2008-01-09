@@ -106,24 +106,53 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
 
         }
-
         public override void WriteString(string text)
         {
             if (isPxsi) { ;}
             else if (isInPhysicalPath && isTarget)
             {
-
-                //Console.WriteLine(text + "#");
-                this.nextWriter.WriteString(String.Concat("file:///",Path.GetFullPath(text)));
-                
-            }
+                // this.nextWriter.WriteString(String.Concat("file:///",Path.GetFullPath(text))); --> code originally present
+                /*Defect Id        :1784784
+                 * Code Changed by :Vijayeta Tilak
+                 * Date            :26th Dec '07
+                 * Description     :This part of code was added because when a file contains OLE object, the absolute path,
+                 *              on converting through commandline would be realtive to the path of project and not relative to the path where the file resides. Hence causing an error.
+                 *              i.e. for an object in d:\excel\abc.xls, thro command line, the method GetFullPath for the passed parameter 'text' returns 'd:\xyz\Source\Shell\OdfConverterTest\bin', where the .exe file is present.
+                 *              To overcome this problem the following code is added
+                 */
+                string returnInputFilePath = "";
+                string linkPathLocation = "";
+                //If the OLE object is present in a network.
+                if (text.Substring(0, 2).Contains("\\"))
+                {
+                    this.nextWriter.WriteString(String.Concat("file:///", text));
+                }
+                //If the OLE object is present in a local machine.
+                else
+                {
+                    // for Commandline tool
+                    for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                    {
+                        if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                        {
+                            returnInputFilePath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
+                        }
+                    }
+                    linkPathLocation = Path.GetFullPath(Path.Combine(returnInputFilePath, text.ToString())).Replace("\\", "/").Replace(" ", "%20");
+                    //for addins
+                    if (returnInputFilePath == "")
+                    {
+                        linkPathLocation = "";
+                        linkPathLocation = Path.GetFullPath(text.ToString()).Replace("\\", "/").Replace(" ", "%20");
+                    }
+                    this.nextWriter.WriteString(String.Concat("file:///", linkPathLocation));
+                }
+            }               
             else
             {
                 this.nextWriter.WriteString(text);
             }
-
         }
-
         public override void WriteEndAttribute()
         {
             if (isPxsi)

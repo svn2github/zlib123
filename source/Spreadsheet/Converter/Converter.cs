@@ -51,7 +51,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
         protected override void CheckOdfFile(string fileName)
         {
             // Test for encryption
-            XmlDocument doc;
+            XmlDocument doc,docContent;
             try
             {
                 XmlReaderSettings settings = new XmlReaderSettings();
@@ -60,6 +60,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 doc = new XmlDocument();
                 XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
                 doc.Load(reader);
+                /*Code Changed By:Vijayeta 
+				    Defect ID      :1740412
+					Date           :20th Dec '07
+                    Description    :On an attempt to load content.xml, if content.xml is absent, an invalid file message is thrown */
+                docContent = new XmlDocument();
+                XmlReader readerContent = XmlReader.Create("content.xml", settings);
+                docContent.Load(readerContent);
+                //End Of code change, for the defect 1740412
             }
             catch (XmlException e)
             {

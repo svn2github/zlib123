@@ -153,8 +153,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 string textContent = content[1];
                 if (textContent.Contains("\n"))
                 {
-                    char[] a = new char[] { '\n' };
-                    string[] p = textContent.Split(a);
+                    char[] newLine = new char[] { '\n' };
+                    string[] p = textContent.Split(newLine);
                     for (int i = 0; i < p.Length; i++)
                     {
                         if (p[i] == "")
