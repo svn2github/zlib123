@@ -92,6 +92,11 @@
       <xsl:for-each select="document($ExternalLinkRels)//node()[name()='Relationship']">
         <xsl:if test="./@Id = $ExternalLinkId">
           <xsl:choose>
+            <!--added by chhavi for network path -->
+            <xsl:when test="contains(./@Target, 'file:///\\')">
+              <xsl:value-of select="translate(substring-after(./@Target, 'file:///'), '\', '/')"/>
+            </xsl:when>
+            <!-- ending here-->
             <xsl:when test="contains(./@Target, 'file://')">
               <xsl:value-of select="translate(substring-after(./@Target, 'file://'), '\', '/')"/>
             </xsl:when>
