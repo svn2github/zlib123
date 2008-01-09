@@ -81,10 +81,16 @@
     </Types>
   </xsl:template>
   <!-- OLE object types -->
-  <xsl:template name="InsertExternalLinkTypes">
+	<!--Defect Id     :1784784
+	* Code Changed by :Vijayeta Tilak
+	* Date            :26th Dec '07
+	* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+	*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+	-->
+	<xsl:template name="InsertExternalLinkTypes">
     <xsl:for-each select="document('content.xml')">
       <xsl:for-each
-        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
         <Override PartName="{concat(concat('/xl/externalLinks/externalLink', position()),'.xml')}"
           ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.externalLink+xml"
         />

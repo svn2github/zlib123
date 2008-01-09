@@ -82,8 +82,14 @@
       <xsl:for-each select="document('content.xml')">
 
         <!--Insert OLE relationships -->
+		  <!--Defect Id     :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+			-->
         <xsl:for-each
-          select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink">
             <xsl:attribute name="Id">
@@ -493,8 +499,14 @@
 
       </xsl:for-each>
 
+		<!--Defect Id     :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+			-->
       <xsl:for-each
-        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
 
         <Relationship
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
@@ -574,28 +586,28 @@
     </Relationships>
   </xsl:template>
 
-  <xsl:template name="InsertVmlDrawingRels">
+	      <!--Defect Id     :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+			-->
+	<xsl:template name="InsertVmlDrawingRels">	  
     <xsl:param name="sheetNum"/>
-
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-
       <xsl:for-each
-        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
-
+        select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/')  and not(name(parent::node()/parent::node()) = 'draw:g' )]">
         <Relationship
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
           <xsl:attribute name="Id">
             <xsl:value-of select="concat('rId',position())"/>
           </xsl:attribute>
-
           <xsl:variable name="ObjectNumber">
             <xsl:value-of select="substring-after(@xlink:href, './ObjectReplacements/Object ')"/>
           </xsl:variable>
-
           <xsl:attribute name="Target">
             <xsl:value-of select="concat('../media/image',$sheetNum,'_',position(),'.emf')"/>
           </xsl:attribute>
-
         </Relationship>
       </xsl:for-each>
     </Relationships>

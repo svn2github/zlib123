@@ -26,6 +26,13 @@
     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyperlink (hyperlink within rowgroup) in the sheet.
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -2772,8 +2779,10 @@
     <xsl:param name="contentFillCount"/>
     <xsl:param name="postStyleName" select="false"/>
 
+    <!--RefNo-1<xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]">-->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/descendant::table:table-row/table:table-cell[descendant::text:a]">
 
       <xsl:variable name="StyleName">
         <xsl:value-of select="@table:style-name"/>
@@ -3076,8 +3085,11 @@
 
   <xsl:template name="InsertHyperlinkTextStyle">
 
-    <xsl:apply-templates
+    <!--RefNo-1<xsl:apply-templates
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]"
+      mode="HyperlinkText"/>-->
+    <xsl:apply-templates
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table//table:table-row/table:table-cell[descendant::text:a]"
       mode="HyperlinkText"/>
 
   </xsl:template>

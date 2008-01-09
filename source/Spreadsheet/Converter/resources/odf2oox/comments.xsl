@@ -73,7 +73,11 @@
   </xsl:template>
 
   <xsl:template name="InsertTextBox">
-    <!--Added by Vijayeta, fix for bugs, 1802491,1788390 and 1797047 date:15th Oct '07-->
+     <!--  Defect Id   : 1802491,1788390 and 1797047 
+		   Code Changed by :Vijayeta Tilak
+		   Date            :15th Oct '07
+		   Description     :If attribute office:display is not present, then the visibility is set to true
+	 -->
     <xsl:variable name="VisibleOrHidden">
       <xsl:choose>
         <xsl:when test="@office:display">
@@ -148,7 +152,11 @@
         <x:LockText>False</x:LockText>
         <!--  <x:Row>2</x:Row>
           <x:Column>2</x:Column>-->
-        <!--Added by Vijayeta, fix for bugs, 1802491,1788390 and 1797047 date:15th Oct '07-->
+		  <!--  Defect Id   : 1802491,1788390 and 1797047 
+		   Code Changed by :Vijayeta Tilak
+		   Date            :15th Oct '07
+		   Description     :If attribute office:display is not present, then the visibility is set to true
+	      -->
         <xsl:if test="@office:display='true' or not(@office:display)">
           <x:Visible/>
         </xsl:if>

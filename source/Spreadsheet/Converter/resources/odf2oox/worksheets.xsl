@@ -471,16 +471,28 @@
       <xsl:if test="contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
         <drawing r:id="{concat('d_rId',$sheetId)}"/>
       </xsl:if>
-
+		
+		<!--Defect Id     :1784784
+		* Code Changed by :Vijayeta Tilak
+		* Date            :26th Dec '07
+		* Description     :This part of code( an OR condition to 'if' loop) was added because when a file contains OLE object directly in a drive
+		*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+		-->
       <xsl:if
-        test="descendant::office:annotation or descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        test="descendant::office:annotation or descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
         <legacyDrawing r:id="v_rId1"/>
       </xsl:if>
 
 
       <!-- Insert OLEObject -->
+		<!--Defect Id     :1784784
+		* Code Changed by :Vijayeta Tilak
+		* Date            :26th Dec '07
+		* Description     :This part of code( an OR condition to 'if' loop) was added because when a file contains OLE object directly in a drive
+		*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+		-->
       <xsl:if
-        test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
         <xsl:call-template name="InsertOLE_Object">
           <xsl:with-param name="sheetId" select="$sheetId"/>
         </xsl:call-template>

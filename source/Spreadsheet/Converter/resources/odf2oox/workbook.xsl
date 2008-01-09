@@ -179,9 +179,16 @@
       </xsl:for-each>
     </sheets>
 
-    <xsl:if test="table:table/table:shapes/draw:frame/draw:object">
-      <xsl:call-template name="ExternalReference"/>
-    </xsl:if>
+    <!--<xsl:if test="table:table/table:shapes/draw:frame/draw:object">-->
+	  <!--Defect Id       :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an additional '/') was added because when a notepad is inserted as an object, an addional elemnt
+			*                  'table:shapes' is present which is absent when anyother object such as a word doc is inseretd
+	  -->
+	  <xsl:if test="table:table//draw:frame/draw:object">
+		  <xsl:call-template name="ExternalReference"/>
+	  </xsl:if>
 
     <definedNames>
       <xsl:call-template name="InsertPrintRanges"/>
@@ -522,9 +529,33 @@
      </xsl:when>
      
      <xsl:otherwise>
+		 <!--Defect Id    :1838572
+			* Code Added by   :Sateesh Reddy
+            * Date            :03 Jan '08
+			* Description     :This part of code was added because when printarea value is not coming with '$' sign then file is crashing.
+                         To avoid crash I added this code.Here I am checking $sign.
+		 -->
        <xsl:choose>
          <xsl:when test="contains($result,',')">
+           <!--<xsl:value-of select="substring-before($result,',')"/>-->
+           <xsl:variable name="var_Res">
+             <xsl:value-of select="substring-after($result,',')"/>
+           </xsl:variable>
+           <xsl:variable name="var_Result">
+             <xsl:value-of select="substring-after($var_Res,':')"/>
+           </xsl:variable>
+           <xsl:variable name="var_Result1">
+             <xsl:value-of select="substring-after($var_Result,'$')"/>
+           </xsl:variable>
+           <xsl:variable name="var_Result2">
+             <xsl:value-of select="substring-after($var_Result1,'$')"/>
+           </xsl:variable>
+           <xsl:if test="$var_Result2 != ''">
+             <xsl:value-of select="$result"/>
+           </xsl:if>
+           <xsl:if test="$var_Result2 = ''">
            <xsl:value-of select="substring-before($result,',')"/>    
+           </xsl:if>
          </xsl:when>
          <xsl:when test="contains($result,':')">
            <xsl:variable name="var_Result">

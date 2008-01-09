@@ -43,57 +43,68 @@
 
   <xsl:template name="InsertOLE_Object">
     <xsl:param name="sheetId"/>
-    
-    <xsl:if test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+	  <!--Defect Id       :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'if') was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.
+			*                 This part of code( an additional '/') was added because when a notepad is inserted as an object, an addional elemnt
+			*                  'table:shapes' is present which is absent when anyother object such as a word doc is inseretd
+	   -->
+    <xsl:if test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/')  and not(name(parent::node()/parent::node()) = 'draw:g' )]">
       <oleObjects>
-        <xsl:apply-templates select="table:shapes/draw:frame[1]" mode="OLEobject">
+        <xsl:apply-templates select=".//draw:frame[1]" mode="OLEobject">
           <xsl:with-param name="sheetId" select="$sheetId"/>
         </xsl:apply-templates>
       </oleObjects>
     </xsl:if>
   </xsl:template>
-
-
-  <xsl:template match="draw:frame" mode="OLEobject">
-    <xsl:param name="sheetId"/>
-    <xsl:param name="LinkId" select="1"/>
-
-    <xsl:variable name="apos">
-      <xsl:text>&apos;&apos;&apos;&apos;</xsl:text>
-    </xsl:variable>
-    
-    <oleObject progId="opendocument.WriterDocument.1" oleUpdate="OLEUPDATE_ALWAYS">
-      
-      <xsl:attribute name="link">
-        <xsl:value-of select="concat('[', $LinkId, ']!', $apos)"/>
-      </xsl:attribute>
-
-      <xsl:attribute name="shapeId">
-        <xsl:value-of select="$sheetId * 1024 + count(preceding-sibling::draw:frame) + 1"/>
-      </xsl:attribute>
-
-      <xsl:attribute name="progId">
-        <xsl:value-of select="generate-id(draw:object)"/>
-      </xsl:attribute>
-      
-    </oleObject>
-    <!--xsl:value-of select="$LinkId"/-->
-
-    <xsl:if test="following-sibling::draw:frame">
-      <xsl:apply-templates select="following-sibling::draw:frame[1]" mode="OLEobject">
-        <xsl:with-param name="sheetId" select="$sheetId"/>
-        <xsl:with-param name="LinkId">
-          <xsl:value-of select="$LinkId + 1"/>
-        </xsl:with-param>
-      </xsl:apply-templates>
-    </xsl:if>
-
-  </xsl:template>
-  
-  <xsl:template name="InsertOLEexternalLinks">
-
+	<xsl:template match="draw:frame" mode="OLEobject">
+		<xsl:param name="sheetId"/>
+		<!--fix for the problem, where more than one ole objects linked do not work-->
+		<xsl:variable name ="LinkId">
+			<xsl:choose >
+				<xsl:when test ="parent::node()[name()='table:table-cell']">
+					<xsl:value-of select ="position()"/>
+				</xsl:when>
+				<xsl:otherwise >
+					<xsl:value-of select ="count(preceding-sibling::draw:frame)+1"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="apos">
+			<xsl:text>&apos;&apos;&apos;&apos;</xsl:text>
+		</xsl:variable>
+		<oleObject progId="opendocument.WriterDocument.1" oleUpdate="OLEUPDATE_ALWAYS">
+			<xsl:attribute name="link">
+				<xsl:value-of select="concat('[', $LinkId, ']!', $apos)"/>
+			</xsl:attribute>
+			<!--fix for the problem, where more than one ole objects linked do not work-->
+			<xsl:attribute name="shapeId">
+				<xsl:value-of select="$sheetId * 1024 + $LinkId"/>
+			</xsl:attribute>
+			<xsl:attribute name="progId">
+				<xsl:value-of select="generate-id(draw:object)"/>
+			</xsl:attribute>
+		</oleObject>
+		<xsl:if test="following-sibling::draw:frame">
+			<xsl:apply-templates select="following-sibling::draw:frame[1]" mode="OLEobject">
+				<xsl:with-param name="sheetId" select="$sheetId"/>
+				<xsl:with-param name="LinkId">
+					<xsl:value-of select="$LinkId + 1"/>
+				</xsl:with-param>
+			</xsl:apply-templates>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template name="InsertOLEexternalLinks">
+	  <!--Defect Id       :1784784
+		* Code Changed by :Vijayeta Tilak
+		* Date            :26th Dec '07
+		* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+		*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+	  -->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/')  and not(name(parent::node()/parent::node()) = 'draw:g' )]">
       <pzip:entry pzip:target="{concat('xl/externalLinks/externalLink',position(),'.xml')}">
         <externalLink xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
           <oleLink xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -114,8 +125,15 @@
 
 
   <xsl:template name="OLEexternalLinks_rels">
+	  <!--Defect Id     :1784784
+		* Code Changed by :Vijayeta Tilak
+		* Date            :26th Dec '07
+		* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+		*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+		*                  Also an additional 'when' is added that takes care of the above mentioned condition.
+		-->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
       <pzip:entry
         pzip:target="{concat('xl/externalLinks/_rels/externalLink',position(),'.xml.rels')}">
         <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -147,6 +165,21 @@
                         </Relationship>
                       </pxsi:physicalPath>
                     </xsl:when>
+					  <!-- fix for 1784784-->
+					  <xsl:when test="starts-with($translatedTarget,'/')">
+						  <pxsi:physicalPath xmlns:pxsi="urn:cleverage:xmlns:post-processings:path">
+							  <Relationship
+								xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+								Id="rId1"
+								Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
+								TargetMode="External">
+								  <xsl:attribute name="Target">
+									  <xsl:value-of
+										select="translate(substring-after($translatedTarget,'/'),'/','\')"/>
+								  </xsl:attribute>
+							  </Relationship>
+						  </pxsi:physicalPath>
+					  </xsl:when>
                     <xsl:otherwise>
                       <xsl:choose>
                         <!-- when file is on local disk -->
@@ -173,12 +206,17 @@
   </xsl:template>
 
   <xsl:template name="ExternalReference">
-
+	  <!--Defect Id     :1784784
+		* Code Changed by :Vijayeta Tilak
+		* Date            :26th Dec '07
+		* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+		*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+		-->
     <xsl:if
-      test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+      test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
       <externalReferences>
         <xsl:for-each
-          select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
           <externalReference>
             <xsl:attribute name="r:id">
               <xsl:value-of select="generate-id()"/>

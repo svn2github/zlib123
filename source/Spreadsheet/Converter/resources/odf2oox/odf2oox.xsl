@@ -316,10 +316,16 @@
           </xsl:for-each>
         </xsl:variable>
 
+		  <!--Defect Id       :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'when' loop) was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+			-->
         <xsl:variable name="sheetOleObject">
           <xsl:choose>
             <xsl:when
-              test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+              test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -344,7 +350,32 @@
           <xsl:choose>
             <xsl:when
               test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address]">
-              <xsl:text>true</xsl:text>
+				<!--Code Changed By:Vijayeta 
+				    Defect ID      :1800984 and 1803578
+					Date           :20th Dec '07-->
+				<xsl:variable name ="pivotRange">
+					<xsl:value-of select ="@table:target-range-address"/>
+				</xsl:variable>
+				<xsl:variable name ="tableName1">
+					<xsl:value-of select ="substring-before($pivotRange,'.')"/>
+				</xsl:variable>
+				<xsl:variable name ="cellVal">
+					<xsl:value-of select ="substring-after($pivotRange,'.')"/>
+				</xsl:variable>
+				<xsl:variable name ="rowNum">
+					<xsl:call-template name="GetRowNum">
+						<xsl:with-param name ="cell" select ="$cellVal"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:choose >
+					<xsl:when test ="./parent::node()/parent::node()/table:table/child::node()[name='table:table-row' and position()=$rowNum]">
+						<xsl:text>true</xsl:text>
+					</xsl:when>
+					<xsl:otherwise >
+						<xsl:text>false</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+				<!--End Of code change, for the defect 1800984 and 1803578-->
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>false</xsl:text>
@@ -371,8 +402,14 @@
             </xsl:call-template>
 
             <!--  create emf dummy images -->
+			  <!--Defect Id   :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'for-each' loop) was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+			-->
             <xsl:for-each
-              select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+              select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/')  and not(name(parent::node()/parent::node()) = 'draw:g' )]">
               <pzip:entry pzip:target="{concat('xl/media/image',$sheetNum,'_',position(),'.emf')}">
                 <empty/>
               </pzip:entry>
@@ -588,8 +625,14 @@
 
       <xsl:variable name="oleObject">
         <xsl:choose>
+			<!--Defect Id     :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'when' loop) was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+			-->
           <xsl:when
-            test="document('content.xml')/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+            test="document('content.xml')/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -653,8 +696,14 @@
 
     <xsl:variable name="OLEObject">
       <xsl:choose>
+		  <!--Defect Id       :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an OR condition to 'when') was added because when a file contains OLE object directly in a drive
+			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
+			-->
         <xsl:when
-          test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          test="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -729,9 +778,14 @@
 
 
         <!-- For each OLE object -->
-
-        <xsl:for-each
-          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:shapes/draw:frame">
+		  <!--Defect Id       :1784784
+			* Code Changed by :Vijayeta Tilak
+			* Date            :26th Dec '07
+			* Description     :This part of code( an additional '/') was added because when a notepad is inserted as an object, an addional elemnt
+			*                  'table:shapes' is present which is absent when anyother object such as a word doc is inseretd
+			-->
+        <!--<xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:shapes/draw:frame">-->
+		  <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]//draw:frame">
 
           <xsl:variable name="width">
             <xsl:call-template name="point-measure">
@@ -760,7 +814,35 @@
               <xsl:with-param name="length" select="@svg:y"/>
             </xsl:call-template>
           </xsl:variable>
-
+			  <xsl:variable name="anchorLeft">
+				  <xsl:call-template name="InsertStartColumn"/>
+			  </xsl:variable>
+			  <xsl:variable name="anchorLeftOffset">
+				  <!--<xsl:call-template name="InsertStartColumnOffset"/>-->
+				  <xsl:value-of select ="round(substring-before(@svg:x,'in')*96.21212)"/>
+			  </xsl:variable>
+			  <xsl:variable name="anchorTop">
+				  <xsl:call-template name="InsertStartRow"/>
+			  </xsl:variable>
+			  <xsl:variable name="anchorTopOffset">
+				  <!--<xsl:call-template name="InsertStartRowOffset"/>-->
+				  <xsl:value-of select ="round(substring-before(@svg:y,'in')*96.21212)"/>
+			  </xsl:variable>
+			  <xsl:variable name="anchorRight">
+				  <xsl:call-template name="InsertEndColumn"/>
+			  </xsl:variable>
+			  <xsl:variable name="anchorRightOffset">
+				  <!--<xsl:call-template name="InsertEndColumnOffset"/>-->
+				  <xsl:value-of select ="round(substring-before(@table:end-x,'in')*96.21212)"/>
+			  </xsl:variable>
+			  <xsl:variable name="anchorBottom">
+				  <xsl:call-template name="InsertEndRow"/>
+			  </xsl:variable>
+			  <xsl:variable name="anchorBottomOffset">
+				  <xsl:value-of select ="round(substring-before(@table:end-y,'in')*96.21212)"/>
+				  <!--<xsl:call-template name="InsertEndRowOffset"/>-->
+			  </xsl:variable>
+          <xsl:if test ="draw:object">
           <v:shape type="#_x0000_t75"
             style="position:absolute;margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
             filled="t" fillcolor="window [65]" stroked="t" strokecolor="windowText [64]"
@@ -773,11 +855,15 @@
             <v:imagedata o:relid="{concat('rId',position())}" o:title=""/>
             <x:ClientData ObjectType="Pict">
               <x:SizeWithCells/>
+				<x:Anchor>
+					<xsl:value-of select ="concat($anchorLeft,',',$anchorLeftOffset,',',$anchorTop,',',$anchorTopOffset,',',$anchorRight,',',$anchorRightOffset,',',$anchorBottom,',',$anchorBottomOffset)"/>
+				</x:Anchor>
               <x:CF>Pict</x:CF>
               <x:AutoPict/>
               <x:DDE/>
             </x:ClientData>
           </v:shape>
+          </xsl:if>
         </xsl:for-each>
 
 
