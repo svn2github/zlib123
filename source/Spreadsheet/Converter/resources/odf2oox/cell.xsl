@@ -31,6 +31,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 06-Nov-2007 Sandeep S     1757284   Changes done to get the correct Used area-sheet after conversion. 
+RefNo-2 26-Dec-2007 Sandeep S     1805556   Changes done to include a condition to retain row grouping in case of blank cell
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -572,7 +573,8 @@ RefNo-1 06-Nov-2007 Sandeep S     1757284   Changes done to get the correct Used
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
       <!--RefNo-1-->
-      <xsl:if test="descendant::office:annotation or not(count(following-sibling::table:table-row) &lt;= 1 and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
+      <!--RefNo-2: Changed count(following-sibling::table:table-row) &lt;= 1 to (count(following-sibling::table:table-row) &lt;= 1  and parent::table:table)-->
+      <xsl:if test="descendant::office:annotation or not((count(following-sibling::table:table-row) &lt;= 1  and parent::table:table) and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -963,9 +965,10 @@ RefNo-1 06-Nov-2007 Sandeep S     1757284   Changes done to get the correct Used
       <xsl:choose>
         <xsl:when test="$numberRowsRepeated &gt; 1">
           <!--RefNo-1-->
-          <xsl:if test="not(count(following-sibling::table:table-row) &lt;= 1 and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
+          <!--RefNo-2: Changed count(following-sibling::table:table-row) &lt;= 1 to (count(following-sibling::table:table-row) &lt;= 1  and parent::table:table)-->
+          <xsl:if test="not((count(following-sibling::table:table-row) &lt;= 1 and parent::table:table) and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
 
-          <row>
+            <row>
             <xsl:attribute name="r">
               <xsl:value-of select="$rowNumber"/>
             </xsl:attribute>
