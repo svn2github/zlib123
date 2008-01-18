@@ -1196,6 +1196,19 @@ exclude-result-prefixes="p a r xlink ">
           </xsl:for-each>
         </xsl:attribute>
       </xsl:when>
+      <xsl:when test ="a:rPr/a:ea/@typeface">
+        <xsl:attribute name ="fo:font-family">
+          <xsl:variable name ="typeFaceVal" select ="a:rPr/a:ea/@typeface"/>
+          <xsl:for-each select ="a:rPr/a:ea/@typeface">
+            <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+              <xsl:value-of  select ="$DefFont"/>
+            </xsl:if>
+            <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+              <xsl:value-of select ="."/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:attribute>
+      </xsl:when>
       <xsl:when test ="a:rPr/a:sym/@typeface">
         <xsl:attribute name ="fo:font-family">
           <xsl:variable name ="typeFaceVal" select ="a:rPr/a:sym/@typeface"/>
@@ -1420,6 +1433,10 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:param name="slideNo"/>
     <xsl:param name="FileType"/>
     <xsl:param name="shapePhType"/>
+    <xsl:param name="flagShape"/>
+    <xsl:param name="spType"/>
+
+
 	  <xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:message terminate="no">progress:a:p</xsl:message>
     <!--Background Fill color-->
@@ -1483,6 +1500,18 @@ exclude-result-prefixes="p a r xlink ">
           </xsl:if>
         </xsl:if>
       </xsl:when>
+      <xsl:when test="p:spPr/a:blipFill and p:spPr/a:blipFill/a:blip/@r:embed ">
+        <xsl:call-template name="tmpblipFill">
+          <xsl:with-param name="ThemeName" select="$ThemeName"/>
+          <xsl:with-param name="var_pos" select="$var_pos"/>
+          <xsl:with-param name="shapePhType" select="$shapePhType"/>
+          <xsl:with-param name="slideNo" select="$slideNo"/>
+          <xsl:with-param name="FileType" select="$FileType"/>
+          <xsl:with-param name="flagShape" select="$flagShape"/>
+          <xsl:with-param name="spType" select="$spType"/>
+        </xsl:call-template>
+      </xsl:when>
+
       <xsl:when test="p:spPr/a:gradFill">
         <xsl:call-template name="tmpGradFillColor">
           <xsl:with-param name="var_pos" select="$var_pos"/>
@@ -1490,6 +1519,7 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:with-param name="shapePhType" select="$shapePhType"/>
                   </xsl:call-template>
       </xsl:when>
+      
       <!--Fill refernce-->
       <xsl:when test ="p:style/a:fillRef">
         <!-- Standard color-->
@@ -1658,34 +1688,7 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:value-of select ="concat(format-number(number(p:txBody/a:bodyPr/@rIns div 360000), '#.##'), 'cm')"/>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test ="p:txBody/a:bodyPr/@anchor">
-      <xsl:attribute name ="draw:textarea-vertical-align">
-        <xsl:choose >
-          <!-- Top-->
-          <xsl:when test ="p:txBody/a:bodyPr/@anchor = 't' ">
-            <xsl:value-of  select ="'top'"/>
-          </xsl:when>
-          <!-- Middle-->
-          <xsl:when test ="p:txBody/a:bodyPr/@anchor = 'ctr' ">
-            <xsl:value-of  select ="'middle'"/>
-          </xsl:when>
-          <!-- bottom-->
-          <xsl:when test ="p:txBody/a:bodyPr/@anchor = 'b' ">
-            <xsl:value-of  select ="'bottom'"/>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if >
-    <xsl:if test ="p:txBody/a:bodyPr/@anchorCtr" >
-      <xsl:attribute name ="draw:textarea-horizontal-align">
-        <xsl:if test ="p:txBody/a:bodyPr/@anchorCtr= 1">
-          <xsl:value-of select ="'center'"/>
-        </xsl:if>
-        <xsl:if test ="p:txBody/a:bodyPr/@anchorCtr= 0">
-          <xsl:value-of select ="'justify'"/>
-        </xsl:if>
-      </xsl:attribute >
-    </xsl:if>
+ 
     <xsl:if test ="p:txBody/a:bodyPr/@wrap">
       <xsl:choose>
         <xsl:when test="p:txBody/a:bodyPr/@wrap='none'">
@@ -1706,6 +1709,38 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:attribute>
     </xsl:if>
     <xsl:for-each select="./p:txBody">
+      <xsl:choose>
+        <xsl:when test="$flagShape='No'">
+          <xsl:if test ="a:bodyPr/@anchor">
+      <xsl:attribute name ="draw:textarea-vertical-align">
+        <xsl:choose >
+          <!-- Top-->
+                <xsl:when test ="a:bodyPr/@anchor = 't' ">
+            <xsl:value-of  select ="'top'"/>
+          </xsl:when>
+          <!-- Middle-->
+                <xsl:when test ="a:bodyPr/@anchor = 'ctr' ">
+            <xsl:value-of  select ="'middle'"/>
+          </xsl:when>
+          <!-- bottom-->
+                <xsl:when test ="a:bodyPr/@anchor = 'b' ">
+            <xsl:value-of  select ="'bottom'"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if >
+          <xsl:if test ="a:bodyPr/@anchorCtr" >
+      <xsl:attribute name ="draw:textarea-horizontal-align">
+              <xsl:if test ="a:bodyPr/@anchorCtr= 1">
+          <xsl:value-of select ="'center'"/>
+        </xsl:if>
+              <xsl:if test ="a:bodyPr/@anchorCtr= 0">
+          <xsl:value-of select ="'justify'"/>
+        </xsl:if>
+      </xsl:attribute >
+    </xsl:if>
+     </xsl:when>
+        <xsl:otherwise>
       <xsl:if test="a:bodyPr/@vert='vert'">
         <xsl:choose>
           <xsl:when test="(a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='b' and not(a:bodyPr/@anchorCtr))">
@@ -1759,58 +1794,117 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:choose>
       </xsl:if>
       <xsl:if test="a:bodyPr/@vert='horz' or not(a:bodyPr/@vert) ">
-        <xsl:choose>
-          <xsl:when test="(a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='t' and not(a:bodyPr/@anchorCtr))">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'justify'"/>
-            </xsl:attribute>
+            <xsl:if test ="a:bodyPr/@anchor">
             <xsl:attribute name ="draw:textarea-vertical-align">
+                <xsl:choose >
+                  <!-- Top-->
+                  <xsl:when test ="a:bodyPr/@anchor = 't' ">
               <xsl:value-of select="'top'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="(a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='ctr' and not(a:bodyPr/@anchorCtr))  ">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'justify'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
+             </xsl:when>
+                  <!-- Middle-->
+                  <xsl:when test ="a:bodyPr/@anchor = 'ctr' ">
               <xsl:value-of select="'middle'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'center'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'top'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="(a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='b' and not(a:bodyPr/@anchorCtr))">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'justify'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
+             </xsl:when>
+                  <!-- bottom-->
+                  <xsl:when test ="a:bodyPr/@anchor = 'b' ">
               <xsl:value-of select="'bottom'"/>
+             </xsl:when>
+                </xsl:choose>
             </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='1'">
+            </xsl:if >
+            <xsl:if test ="a:bodyPr/@anchorCtr" >
             <xsl:attribute name ="draw:textarea-horizontal-align">
+                <xsl:if test ="a:bodyPr/@anchorCtr= 1">
               <xsl:value-of select="'center'"/>
+                </xsl:if>
+                <xsl:if test ="a:bodyPr/@anchorCtr= 0 or not(a:bodyPr/@anchorCtr)">
+                  <xsl:value-of select ="'justify'"/>
+                </xsl:if>
             </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'middle'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'center'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'bottom'"/>
-            </xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:if>
+           </xsl:if>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
 </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpblipFill">
+    <xsl:param name="ThemeName"/>
+    <xsl:param name="var_pos"/>
+    <xsl:param name="slideNo"/>
+    <xsl:param name="FileType"/>
+    <xsl:param name="shapePhType"/>
+    <xsl:param name="flagShape"/>
+    <xsl:param name="spType"/>
+      <xsl:attribute name="draw:fill-color">
+        <xsl:value-of select="'#FFFFFF'"/>
+      </xsl:attribute>
+      <xsl:attribute name="draw:fill">
+        <xsl:value-of select="'bitmap'"/>
+      </xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="p:spPr/a:blipFill/a:stretch/a:fillRect">
+          <xsl:attribute name="style:repeat">
+            <xsl:value-of select="'stretch'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="p:spPr/a:blipFill/a:tile">
+          <xsl:for-each select="./p:spPr/a:blipFill/a:tile">
+            <xsl:if test="@sx">
+              <xsl:attribute name="draw:fill-image-ref-point-x">
+                <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@sy">
+              <xsl:attribute name="draw:fill-image-ref-point-y">
+                <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@algn">
+              <xsl:attribute name="draw:fill-image-ref-point">
+                <xsl:choose>
+                  <xsl:when test="@algn='tl'">
+                    <xsl:value-of select ="'top-left'"/>
+                  </xsl:when>
+                  <xsl:when test="@algn='t'">
+                    <xsl:value-of select ="'top'"/>
+                  </xsl:when>
+                  <xsl:when test="@algn='tr'">
+                    <xsl:value-of select ="'top-right'"/>
+                  </xsl:when>
+                  <xsl:when test="@algn='r'">
+                    <xsl:value-of select ="'right'"/>
+                  </xsl:when>
+                  <xsl:when test="@algn='bl'">
+                    <xsl:value-of select ="'bottom-left'"/>
+                  </xsl:when>
+                  <xsl:when test="@algn='br'">
+                    <xsl:value-of select ="'bottom-right'"/>
+                  </xsl:when>
+                  <xsl:when test="@algn='b'">
+                    <xsl:value-of select ="'bottom'"/>
+                  </xsl:when>
+                  <xsl:when test="@algn='ctr'">
+                    <xsl:value-of select ="'center'"/>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:if>
+            <!--<xsl:attribute name="draw:tile-repeat-offset">
+                      <xsl:value-of select ="'100% horizontal'"/>
+                    </xsl:attribute>-->
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:attribute name="draw:fill-image-name">
+        <xsl:choose>
+          <xsl:when test="$spType!=''">
+            <xsl:value-of select="concat($FileType,$slideNo,'-',$spType,'Img',$var_pos)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($FileType,$slideNo,'-',$shapePhType,'Img',$var_pos)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
   </xsl:template>
   <xsl:template name="tmpGradFillColor">
     <xsl:param name="var_pos"/>
@@ -1833,7 +1927,17 @@ exclude-result-prefixes="p a r xlink ">
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="contains($FileType,'Layout') or contains($FileType,'Master') ">
       <xsl:value-of select="concat($FileType,$shapePhType,'Gradient',$var_pos)" />
+             
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat($FileType,'Gradient',$var_pos)" />
+            </xsl:otherwise>
+          </xsl:choose>
+
+
         </xsl:otherwise>
         </xsl:choose>
 
@@ -2375,7 +2479,7 @@ exclude-result-prefixes="p a r xlink ">
               <xsl:attribute name="style:name">
                 <xsl:value-of select="concat($TypeId,generate-id())"/>
               </xsl:attribute>
-              <style:text-properties>
+              <style:text-properties style:font-charset="x-symbol">
                 <xsl:call-template name="tmpSlideTextProperty">
                   <xsl:with-param name="DefFont" select="$DefFont"/>
                   <xsl:with-param name="fontscale" select="$var_fontScale"/>
@@ -2399,7 +2503,7 @@ exclude-result-prefixes="p a r xlink ">
               <xsl:attribute name="style:name">
                 <xsl:value-of select="concat($TypeId,generate-id())"/>
               </xsl:attribute>
-              <style:text-properties>
+              <style:text-properties style:font-charset="x-symbol">
                 <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
                 <xsl:choose>
                   <xsl:when test ="a:latin/@typeface">
@@ -2780,7 +2884,20 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:if>
       </xsl:if>
     <xsl:if test ="not(a:rPr/a:latin/@typeface) and not(a:rPr/a:cs/@typeface) and not(a:rPr/a:sym/@typeface)">
-      <xsl:choose>
+      <xsl:if test="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface">
+        <xsl:attribute name ="fo:font-family">
+          <xsl:variable name ="typeFaceVal" select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface"/>
+          <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface">
+            <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+              <xsl:value-of  select ="$DefFont"/>
+            </xsl:if>
+            <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+              <xsl:value-of select ="."/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:attribute>
+      </xsl:if>
+      <!--<xsl:choose>
         <xsl:when test="$flagTextBox='True'">
       <xsl:if test="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface">
         <xsl:attribute name ="fo:font-family">
@@ -2811,7 +2928,7 @@ exclude-result-prefixes="p a r xlink ">
             </xsl:attribute>
           </xsl:if>
         </xsl:otherwise>
-      </xsl:choose>
+      </xsl:choose>-->
      
     </xsl:if>
     <xsl:if test ="not(a:rPr/@strike)">

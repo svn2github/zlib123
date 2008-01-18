@@ -879,6 +879,23 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
+            <xsl:when test="name()='p:grpSp'">
+              <xsl:variable name ="drawAnimId">
+                <xsl:value-of select ="concat('SL',$SlidePos,'LYTan',p:nvSpPr/p:cNvPr/@id)"/>
+              </xsl:variable>
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="TopLevelgrpCordinates">
+                <xsl:call-template name="tmpGetgroupTransformValues"/>
+              </xsl:variable>
+              <xsl:call-template name ="tmpGroupedShapes">
+                <xsl:with-param name ="SlidePos" select="concat('SL',$SlidePos)" />
+                <xsl:with-param name ="SlideID"  select ="$SlideID" />
+                <xsl:with-param name ="pos"  select ="$var_pos" />
+                <xsl:with-param name ="drawAnimId"  select ="$drawAnimId" />
+                <xsl:with-param name ="SlideRelationId" select="$slideRel" />
+                <xsl:with-param name ="grpCordinates" select ="$TopLevelgrpCordinates" />
+              </xsl:call-template>
+            </xsl:when>
           </xsl:choose>
         </xsl:for-each>
 
@@ -2592,7 +2609,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:attribute name="style:name">
                           <xsl:value-of select="concat($SlideNumber,generate-id())"/>
                         </xsl:attribute>
-                        <style:text-properties>
+                        <style:text-properties style:font-charset="x-symbol">
                           <xsl:choose>
                             <xsl:when test="$var_TextBoxType='outline'">
                               <xsl:call-template name="tmpCommanOutlineTextProperty">
@@ -2626,7 +2643,7 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:attribute name="style:name">
                           <xsl:value-of select="concat($SlideNumber,generate-id())"/>
                         </xsl:attribute>
-                        <style:text-properties>
+                        <style:text-properties style:font-charset="x-symbol">
                           <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
                           <!-- Bug 1744106 fixed by vijayeta, date 16th Aug '07, font size and family from endPara-->
                           <xsl:choose>
@@ -2920,6 +2937,8 @@ exclude-result-prefixes="p a r xlink rels">
                           <xsl:call-template name="tmpImageCropping">
                             <xsl:with-param name="slideRel" select="$slideRel"/>
                           </xsl:call-template>
+                          <!--TEXT ALIGNMENT-->
+                          <xsl:call-template name ="TextLayout" />
                         </style:graphic-properties >
                       </style:style>
                     </xsl:for-each>
@@ -3045,10 +3064,8 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
            </xsl:choose>
         </xsl:for-each>
-   
-     </xsl:template>
- 
-  <!--@@ Pradeep Nemadi Paragraph Tab stops code is added -End -->
+        </xsl:template>
+   <!--@@ Pradeep Nemadi Paragraph Tab stops code is added -End -->
   <xsl:template name="GenerateId">
     <xsl:param name="node"/>
     <xsl:param name="nodetype"/>
@@ -3376,14 +3393,12 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='subTitle'">
                           <xsl:value-of select="'subtitle'"/>
                         </xsl:when>
-                        <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph/@type) and p:nvSpPr/p:nvPr/p:ph/@idx">
+
+                        <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='body' and p:nvSpPr/p:nvPr/p:ph/@idx ">
                           <xsl:value-of select="'outline'"/>
                         </xsl:when>
-                        <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='body'">
-                          <xsl:value-of select="'body'"/>
-                        </xsl:when>
-                        <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='ftr'">
-                          <xsl:value-of select="'ftr'"/>
+                        <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph/@type) and ./p:nvSpPr/p:nvPr/p:ph/@idx ">
+                          <xsl:value-of select="'outline'"/>
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:value-of select="p:nvSpPr/p:nvPr/p:ph/@type"/>
@@ -3552,7 +3567,7 @@ exclude-result-prefixes="p a r xlink rels">
                       <!--FILL-->
                       <xsl:call-template name ="Fill">
                         <xsl:with-param name="var_pos" select="$var_pos"/>
-                        <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'))"/>
+                        <xsl:with-param name="FileType" select="substring-before($LayoutFileName,'.xml')"/>
                       </xsl:call-template>
                       <!--LINE COLOR-->
                       <xsl:call-template name ="LineColor" />
@@ -3628,6 +3643,21 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:call-template name="tmpShapeTextProcess">
                   <xsl:with-param name="ParaId" select="$ParaId"/>
                   <xsl:with-param name="TypeId" select="concat('SL',$SlidePos)"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="name()='p:grpSp'">
+              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:for-each select=".">
+                <xsl:call-template name="tmpSlideGroupStyle">
+                  <xsl:with-param name="var_pos" select="$var_pos"/>
+                  <xsl:with-param name="SlidePos" select="concat('SL',$SlidePos)"/>
+                  <xsl:with-param name="DefFont" select="$DefFont"/>
+                  <xsl:with-param name="SMName" select="$SMName"/>
+                  <xsl:with-param name="flagGroup" select="'True'"/>
+                  <xsl:with-param name="SlideId" select="$SlideId"/>
+                  <xsl:with-param name="slideRel" select="$slideRel"/>
+                  <xsl:with-param name="SlideNumber" select="substring-before($newLayout,'.xml')"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -11802,15 +11832,18 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:with-param name="var_pos" select="$var_pos"/>
       <xsl:with-param name="FileType" select="$FileType"/>
       <xsl:with-param name="slideNo" select="$slideNo"/>
+      <xsl:with-param name="flagShape" select="'No'"/>
+<xsl:with-param name="shapePhType" select="$spType"/>
     </xsl:call-template>
-    <xsl:if test ="not(p:spPr/a:noFill) and not(p:spPr/a:solidFill) and not(p:style/a:fillRef) and not(p:spPr/a:gradFill)">
+    <xsl:if test ="not(p:spPr/a:noFill) and not(p:spPr/a:solidFill) and not(p:style/a:fillRef) and not(p:spPr/a:gradFill) and not(p:spPr/a:blipFill)">
       <xsl:message terminate="no">translation.oox2odf.slideTypeGraphicGradient</xsl:message>
       <xsl:choose>
         <xsl:when test="$spType='title'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
             <xsl:call-template name ="tmpLayoutGraphicProperty">
               <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
-              <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-',$spType)"/>
+              <xsl:with-param name="FileType" select="concat(substring-before($LayoutFileName,'.xml'),'-',$spType)"/>
+             
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -11818,7 +11851,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='subTitle']">
             <xsl:call-template name ="tmpLayoutGraphicProperty">
               <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
-              <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-',$spType)"/>
+              <xsl:with-param name="FileType" select="concat(substring-before($LayoutFileName,'.xml'),'-',$spType)"/>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -11826,7 +11859,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='body' and @idx=$index]">
             <xsl:call-template name ="tmpLayoutGraphicProperty">
               <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
-              <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-outline',$index)"/>
+              <xsl:with-param name="FileType" select="concat(substring-before($LayoutFileName,'.xml'),'-outline',$index)"/>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -11836,7 +11869,7 @@ exclude-result-prefixes="p a r xlink rels">
               <xsl:if test="not(./@type) or ./@type='body'">
               <xsl:call-template name ="tmpLayoutGraphicProperty">
                 <xsl:with-param name ="AttrType" select ="'Backcolor'"/>
-                  <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),'-',substring-before($LayoutFileName,'.xml'),'-outline',$index)"/>
+                  <xsl:with-param name="FileType" select="concat(substring-before($LayoutFileName,'.xml'),'-outline',$index)"/>
               </xsl:call-template>
             </xsl:if>
             </xsl:if>
@@ -12024,7 +12057,8 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-    <xsl:if test ="not(p:txBody/a:bodyPr/@anchor)">
+    <xsl:for-each select="node()/p:txBody/a:bodyPr">
+      <xsl:if test ="not(@anchor)">
       <xsl:choose>
         <xsl:when test="$spType='title'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
@@ -12060,7 +12094,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:when>
       </xsl:choose>
     </xsl:if >
-    <xsl:if test ="not(p:txBody/a:bodyPr/@anchorCtr)">
+      <xsl:if test ="not(@anchorCtr)">
       <xsl:choose>
         <xsl:when test="$spType='title'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
@@ -12096,6 +12130,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:when>
       </xsl:choose>
     </xsl:if>
+    </xsl:for-each>
     <xsl:if test ="not(p:txBody/a:bodyPr/@wrap)">
       <xsl:choose>
         <xsl:when test="$spType='title'">
@@ -12210,6 +12245,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name="var_pos"/>
     <xsl:param name="slideNo"/>
     <xsl:param name="FileType"/>
+    <xsl:param name="flagGroup"/>
     <xsl:choose>
       <xsl:when test="$AttrType='Backcolor'">
         <xsl:choose>
@@ -12338,6 +12374,83 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:call-template>
               </xsl:attribute>
             </xsl:if>
+          </xsl:when>
+          <xsl:when test="parent::node()/parent::node()/parent::node()/p:spPr/a:blipFill and 
+                          parent::node()/parent::node()/parent::node()/p:spPr/a:blipFill/a:blip/@r:embed ">
+            <xsl:for-each select="parent::node()/parent::node()/parent::node()">
+            <xsl:attribute name="draw:fill-color">
+              <xsl:value-of select="'#FFFFFF'"/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:fill">
+              <xsl:value-of select="'bitmap'"/>
+            </xsl:attribute>
+            <xsl:choose>
+              <xsl:when test="p:spPr/a:blipFill/a:stretch/a:fillRect">
+                <xsl:attribute name="style:repeat">
+                  <xsl:value-of select="'stretch'"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="p:spPr/a:blipFill/a:tile">
+                <xsl:for-each select="./p:spPr/a:blipFill/a:tile">
+                  <xsl:if test="@sx">
+                    <xsl:attribute name="draw:fill-image-ref-point-x">
+                      <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <xsl:if test="@sy">
+                    <xsl:attribute name="draw:fill-image-ref-point-y">
+                      <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <xsl:if test="@algn">
+                    <xsl:attribute name="draw:fill-image-ref-point">
+                      <xsl:choose>
+                        <xsl:when test="@algn='tl'">
+                          <xsl:value-of select ="'top-left'"/>
+                        </xsl:when>
+                        <xsl:when test="@algn='t'">
+                          <xsl:value-of select ="'top'"/>
+                        </xsl:when>
+                        <xsl:when test="@algn='tr'">
+                          <xsl:value-of select ="'top-right'"/>
+                        </xsl:when>
+                        <xsl:when test="@algn='r'">
+                          <xsl:value-of select ="'right'"/>
+                        </xsl:when>
+                        <xsl:when test="@algn='bl'">
+                          <xsl:value-of select ="'bottom-left'"/>
+                        </xsl:when>
+                        <xsl:when test="@algn='br'">
+                          <xsl:value-of select ="'bottom-right'"/>
+                        </xsl:when>
+                        <xsl:when test="@algn='b'">
+                          <xsl:value-of select ="'bottom'"/>
+                        </xsl:when>
+                        <xsl:when test="@algn='ctr'">
+                          <xsl:value-of select ="'center'"/>
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <!--<xsl:attribute name="draw:tile-repeat-offset">
+                      <xsl:value-of select ="'100% horizontal'"/>
+                    </xsl:attribute>-->
+                </xsl:for-each>
+              </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+              <xsl:when test="$flagGroup='True'">
+                <xsl:attribute name="draw:fill-image-name">
+                  <xsl:value-of select="concat($FileType,'grpImg',$var_pos)"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="draw:fill-image-name">
+                  <xsl:value-of select="concat($FileType,'Img',$var_pos)"/>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+            </xsl:for-each>
           </xsl:when>
         </xsl:choose>
       </xsl:when>

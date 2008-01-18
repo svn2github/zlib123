@@ -1776,39 +1776,39 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
-      <!--  Explosion 1 (Added by A.Mathi as on 20/07/2007) -->
-      <xsl:when test ="(p:spPr/a:prstGeom/@prst='irregularSeal1')">
-        <draw:custom-shape draw:layer="layout">
-          <xsl:call-template name ="CreateShape">
-			<xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name ="grID" select ="$GraphicId" />
-            <xsl:with-param name ="prID" select ="$ParaId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-            draw:glue-points="9722 1887 0 12875 11614 18844 21600 6646" 
-            draw:text-areas="5400 6570 14160 15290" 
-            draw:type="bang" 
-            draw:enhanced-path="M 11464 4340 L 9722 1887 8548 6383 4503 3626 5373 7816 1174 8270 3934 11592 0 12875 3329 15372 1283 17824 4804 18239 4918 21600 7525 18125 8698 19712 9871 17371 11614 18844 12178 15937 14943 17371 14640 14348 18878 15632 16382 12311 18270 11292 16986 9404 21600 6646 16382 6533 18005 3172 14524 5778 14789 0 11464 4340 Z N">
-            <xsl:if test="p:spPr/a:xfrm/@flipH='1'">
-              <xsl:attribute name ="draw:mirror-horizontal">
-                <xsl:value-of select="'true'"/>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="p:spPr/a:xfrm/@flipV='1'">
-              <xsl:attribute name ="draw:mirror-vertical">
-                <xsl:value-of select="'true'"/>
-              </xsl:attribute>
-            </xsl:if>
-          </draw:enhanced-geometry>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-      </xsl:when>
+		<!--  Explosion 1 (Modified by A.Mathi) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='irregularSeal1')">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600"
+										draw:glue-points="14623 106 106 8718 8590 21600 21600 13393"
+										draw:text-areas="4680 6570 16140 13280"
+										draw:type="mso-spt71"
+										draw:enhanced-path="M 10901 5905 L 8458 2399 7417 6425 476 2399 4732 7722 106 8718 3828 11880 243 14689 5772 14041 4868 17719 7819 15730 8590 21600 10637 15038 13349 19840 14125 14561 18248 18195 16938 13044 21600 13393 17710 10579 21198 8242 16806 7417 18482 4560 14257 5429 14623 106 10901 5905 Z N">
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
       <!-- Chord (Added by A.Mathi as on 20/07/2007)-->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='chord')">
         <!-- warn if chord -->
@@ -2341,6 +2341,226 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:copy-of select="$varHyperLinksForShapes" />
         </draw:custom-shape>
       </xsl:when>
+
+		<!--Equation Shapes-->
+		<!--Equal-->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathEqual'">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 1295400 990600" draw:extrusion-allowed="true"
+										draw:text-areas="171705 204064 1123695 786536"
+										draw:glue-points="1123695 320558 1123695 670042 647700 786536 171705 320558 171705 670042 647700 204064"
+										draw:enhanced-path="M 171705 204064 L 1123695 204064 L 1123695 437053 L 171705 437053 Z M 171705 553547 L 1123695 553547 L 1123695 786536 L 171705 786536 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='mathEqual'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'mathequal'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--Not Equal-->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathNotEqual'">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 1371600 1066800" draw:extrusion-allowed="true"
+										draw:text-areas="181806 219761 1189794 847039"
+										draw:glue-points="1189794 345216 1189794 721583 507275 1023891 181806 345216 181806 721583 864324 42908"
+										draw:enhanced-path="M 181806 219761 L 666448 219761 L 746435 0 L 982214 85817 L 933462 219761 L 1189794 219761 L 1189794 470672 L 842138 470672 L 796476 596128 L 1189794 596128 L 1189794 847039 L 705152 847039 L 625165 1066800 L 389386 980983 L 438138 847039 L 181806 847039 L 181806 596128 L 529462 596128 L 575124 470672 L 181806 470672 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='mathNotEqual'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'mathnotequal'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--Plus-->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathPlus'">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 1524000 1371600" draw:extrusion-allowed="true"
+										draw:text-areas="202006 524500 1321994 847100"
+										draw:glue-points="1321994 685800 762000 1189794 202006 685800 762000 181806"
+										draw:enhanced-path="M 202006 524500 L 600700 524500 L 600700 181806 L 923300 181806 L 923300 524500 L 1321994 524500 L 1321994 847100 L 923300 847100 L 923300 1189794 L 600700 1189794 L 600700 847100 L 202006 847100 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='mathPlus'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'mathplus'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--Minus-->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathMinus'">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 1371600 1219200" draw:extrusion-allowed="true"
+										draw:text-areas="181806 466222 1189794 752978"
+										draw:glue-points="1189794 609600 685800 752978 181806 609600 685800 466222"
+										draw:enhanced-path="M 181806 466222 L 1189794 466222 L 1189794 752978 L 181806 752978 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='mathMinus'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'mathminus'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--Multiply-->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathMultiply'">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 1676400 1600200"
+										draw:extrusion-allowed="true"
+										draw:text-areas="272693 248204 1403707 1351996"
+										draw:glue-points="402629 384328 1273771 384328 1273771 1215872 402629 1215872"
+										draw:enhanced-path="M 272693 520452 L 532566 248204 L 838200 539946 L 1143834 248204 L 1403707 520452 L 1110742 800100 L 1403707 1079748 L 1143834 1351996 L 838200 1060254 L 532566 1351996 L 272693 1079748 L 565658 800100 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='mathMultiply'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'mathmultiply'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!--Division-->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='mathDivide'">
+			<draw:custom-shape draw:layer="layout">
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 3200400 1524000"
+										draw:extrusion-allowed="true"
+										draw:text-areas="0 0 3200400 1524000"
+										draw:glue-points="1600200 179679 1779422 358901 1600200 538123 1420978 358901 1600200 179679 1600200 1344321 1420978 1165099 1600200 985877 1779422 1165099 1600200 1344321 424213 582778 2776186 582778 2776186 941222 424213 941222 424213 582778"
+										draw:enhanced-path="M 1600200 179679 C 1699182 179679 1779422 259920 1779422 358901 C 1779422 457883 1699181 538123 1600200 538123 C 1501218 538123 1420978 457882 1420978 358901 C 1420978 259919 1501219 179679 1600200 179679 Z M 1600200 1344321 C 1501218 1344321 1420978 1264080 1420978 1165099 C 1420978 1066117 1501219 985877 1600200 985877 C 1699182 985877 1779422 1066118 1779422 1165099 C 1779422 1264081 1699181 1344321 1600200 1344321 Z M 424213 582778 L 2776187 582778 L 2776187 941222 L 424213 941222 L 424213 582778 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='mathDivide'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'mathdivide'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
      
       <!--End-->
       <!-- Connectors -->
@@ -2475,225 +2695,265 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:if>
           </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-        
+        </draw:custom-shape> 
       </xsl:when>
-      <!-- Snip Same Side Corner Rectangle -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='snip2SameRect'">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-			<xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-			<xsl:with-param name ="prID" select="$ParaId" />
-			<xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-										 draw:type="rectangle" 
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-        <!--<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 914400 304800" 
-											draw:extrusion-allowed="true" 
-											draw:text-areas="25401 25401 888999 304800" 
-											draw:glue-points="914400 152400 457200 304800 0 152400 457200 0"
-											draw:type="mso-spt100" 
-											draw:enhanced-path="M 50801 0 L 863599 0 L 914400 50801 L 914400 304800 L 914400 304800 L 0 304800 L 0 304800 L 0 50801 Z N">
-						<draw:handle/>
-					</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>-->
-      </xsl:when>
-      <!-- Snip Diagonal Corner Rectangle -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='snip2DiagRect'">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-            <xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-            <xsl:with-param name ="prID" select="$ParaId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-										 draw:type="rectangle" 
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-        <!--<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 914400 228600" 
-											draw:extrusion-allowed="true" 
-											draw:text-areas="19050 19050 895350 209550" 
-											draw:glue-points="914400 114300 457200 228600 0 114300 457200 0" 
-											draw:type="mso-spt100" 
-											draw:enhanced-path="M 0 0 L 876299 0 L 914400 38101 L 914400 228600 L 914400 228600 L 38101 228600 L 0 190499 L 0 0 Z N">
-						<draw:handle/>
-					</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>-->
-      </xsl:when>
-      <!-- Snip and Round Single Corner Rectangle -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='snipRoundRect'">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-            <xsl:with-param name="sldId" select="$slideId" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-            <xsl:with-param name ="prID" select="$ParaId" />
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600"
-										 draw:type="rectangle"
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-        <!--<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 914400 228600" 
-											draw:extrusion-allowed="true" 
-											draw:text-areas="11159 11159 895349 228600" 
-											draw:glue-points="914400 114300 457200 228600 0 114300 457200 0" 
-											draw:type="mso-spt100" 
-											draw:enhanced-path="M 38101 0 L 876299 0 L 914400 38101 L 914400 228600 L 0 228600 L 0 38101 W 0 0 76202 76202 0 38101 38101 0 Z N">
-						<draw:handle/>
-					</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>-->
-      </xsl:when>
-      <!-- Round Single Corner Rectangle -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='round1Rect'">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-            <xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-            <xsl:with-param name ="prID" select="$ParaId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-										 draw:type="rectangle" 
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-        <!--<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 914400 228600" 
-											draw:extrusion-allowed="true" 
-											draw:text-areas="0 0 903241 228600" 
-											draw:glue-points="457200 0 0 114300 457200 228600 914400 114300" 
-											draw:type="mso-spt100" 
-											draw:enhanced-path="M 0 0 L 876299 0 W 838198 0 914400 76202 876299 0 914400 38101 L 914400 228600 L 0 228600 Z N">
-						<draw:handle/>
-					</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>-->
-      </xsl:when>
-      <!-- Round Same Side Corner Rectangle -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='round2SameRect'">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-            <xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-            <xsl:with-param name ="prID" select="$ParaId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
-										 draw:type="rectangle" 
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-        <!--<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 914400 914400" 
-											draw:extrusion-allowed="true" 
-											draw:text-areas="44637 44637 869763 914400" 
-											draw:glue-points="914400 457200 457200 914400 0 457200 457200 0" 
-											draw:type="mso-spt100" 
-											draw:enhanced-path="M 152403 0 L 761997 0 W 609594 0 914400 304806 761997 0 914400 152403 L 914400 914400 L 0 914400 L 0 152403 W 0 0 304806 304806 0 152403 152403 0 Z N">
-						<draw:handle/>
-					</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>-->
-      </xsl:when>
-      <!-- Round Diagonal Corner Rectangle -->
-      <xsl:when test ="p:spPr/a:prstGeom/@prst='round2DiagRect'">
-        <draw:custom-shape draw:layer="layout" >
-          <xsl:call-template name ="CreateShape">
-            <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
-            <xsl:with-param name="sldId" select="$slideId" />
-            <xsl:with-param name="grID" select ="$GraphicId"/>
-            <xsl:with-param name ="prID" select="$ParaId" />
-            <xsl:with-param name="TypeId" select ="$TypeId" />
-            <xsl:with-param name="grpBln" select ="$grpBln" />
-            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-          </xsl:call-template>
-          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600"
-										 draw:type="rectangle"
-										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-          <xsl:copy-of select="$varHyperLinksForShapes" />
-        </draw:custom-shape>
-        <!--<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 2286000 1524000" 
-						draw:extrusion-allowed="true" 
-						draw:text-areas="74396 74396 2211604 1449604" 
-						draw:glue-points="2286000 762000 1143000 1524000 0 762000 1143000 0" 
-						draw:type="mso-spt100" 
-						draw:enhanced-path="M 254005 0 L 2286000 0 L 2286000 1269995 W 1777990 1015990 2286000 1524000 2286000 1269995 2031995 1524000 L 0 1524000 L 0 254005 W 0 0 508010 508010 0 254005 254005 0 Z N">
-						<draw:handle/>
-					</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>-->
-      </xsl:when>
+
+		<!-- Snip Same Side Corner Rectangle -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2SameRect'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 2362200 1066800"
+										draw:extrusion-allowed="true"
+										draw:text-areas="88902 88902 2273298 1066799"
+										draw:glue-points="2362200 533400 1181100 1066800 0 533400 1181100 0"
+										draw:enhanced-path="M 177804 0 L 2184396 0 L 2362200 177804 L 2362200 1066800 L 2362200 1066800 L 0 1066800 L 0 1066800 L 0 177804 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='snip2SameRect'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'snip2samerect'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Snip Diagonal Corner Rectangle -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2DiagRect'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 2590800 1371600" draw:extrusion-allowed="true"
+										draw:text-areas="114302 114302 2476498 1257298"
+										draw:glue-points="2590800 685800 1295400 1371600 0 685800 1295400 0"
+										draw:enhanced-path="M 0 0 L 2362195 0 L 2590800 228605 L 2590800 1371600 L 2590800 1371600 L 228605 1371600 L 0 1142995 L 0 0 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='snip2DiagRect'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'snip2diagrect'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Snip and Round Single Corner Rectangle -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='snipRoundRect'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering -->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 2514600 1295400" draw:extrusion-allowed="true"
+										draw:text-areas="63236 63236 2406647 1295400"
+										draw:glue-points="2514600 647700 1257300 1295400 0 647700 1257300 0"
+										draw:enhanced-path="M 215904 0 L 2298696 0 L 2514600 215904 L 2514600 1295400 L 0 1295400 L 0 215904 W 0 0 431808 431808 0 215904 215904 0 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='snipRoundRect'">
+						<xsl:attribute name ="draw:type">
+							<xsl:value-of select="'sniproundrect'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Round Single Corner Rectangle -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='round1Rect'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 2438400 1066800" draw:extrusion-allowed="true"
+										draw:text-areas="0 0 2386323 1066800"
+										draw:glue-points="1219200 0 0 533400 1219200 1066800 2438400 533400" 
+										draw:enhanced-path="M 0 0 L 2260596 0 W 2082792 0 2438400 355608 2260596 0 2438400 177804 L 2438400 1066800 L 0 1066800 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='round1Rect'">
+						<xsl:attribute name="draw:type">
+							<xsl:value-of select="'round1rect'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Round Same Side Corner Rectangle -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='round2SameRect'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 2362200 1371600" draw:extrusion-allowed="true"
+										draw:text-areas="66956 66956 2295244 1371600"
+										draw:glue-points="2362200 685800 1181100 1371600 0 685800 1181100 0"
+										draw:enhanced-path="M 228605 0 L 2133595 0 W 1904990 0 2362200 457210 2133595 0 2362200 228605 L 2362200 1371600 L 0 1371600 L 0 228605 W 0 0 457210 457210 0 228605 228605 0 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='round2SameRect'">
+						<xsl:attribute name="draw:type">
+							<xsl:value-of select="'round2samerect'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Round Diagonal Corner Rectangle -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='round2DiagRect'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 2286000 1371600" draw:extrusion-allowed="true"
+										draw:text-areas="66956 66956 2219044 1304644"
+										draw:glue-points="2286000 685800 1143000 1371600 0 685800 1143000 0"
+										draw:enhanced-path="M 228605 0 L 2286000 0 L 2286000 1142995 W 1828790 914390 2286000 1371600 2286000 1142995 2057395 1371600 L 0 1371600 L 0 228605 W 0 0 457210 457210 0 228605 228605 0 Z N">
+					<xsl:if test="p:spPr/a:prstGeom/@prst='round2DiagRect'">
+						<xsl:attribute name="draw:type">
+							<xsl:value-of select="'round2diagrect'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Explosion 2 -->
+		<xsl:when test ="p:spPr/a:prstGeom/@prst='irregularSeal2'">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name="grID" select ="$GraphicId"/>
+					<xsl:with-param name ="prID" select="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600"
+										draw:glue-points="9722 1887 0 12875 11614 18844 21600 6646"
+                                        draw:text-areas="5400 6570 14160 15290"
+										draw:type="bang"
+                                        draw:enhanced-path="M 11464 4340 L 9722 1887 8548 6383 4503 3626 5373 7816 1174 8270 3934 11592 0 12875 3329 15372 1283 17824 4804 18239 4918 21600 7525 18125 8698 19712 9871 17371 11614 18844 12178 15937 14943 17371 14640 14348 18878 15632 16382 12311 18270 11292 16986 9404 21600 6646 16382 6533 18005 3172 14524 5778 14789 0 11464 4340 Z N">
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
 
       <!-- Flow chart shapes -->
 
@@ -4097,6 +4357,81 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </xsl:if>
       </xsl:when>
+      <xsl:when test="p:spPr/a:blipFill and p:spPr/a:blipFill/a:blip/@r:embed ">
+        <xsl:attribute name="draw:fill-color">
+          <xsl:value-of select="'#FFFFFF'"/>
+        </xsl:attribute>
+        <xsl:attribute name="draw:fill">
+          <xsl:value-of select="'bitmap'"/>
+        </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="p:spPr/a:blipFill/a:stretch/a:fillRect">
+            <xsl:attribute name="style:repeat">
+              <xsl:value-of select="'stretch'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="p:spPr/a:blipFill/a:tile">
+            <xsl:for-each select="./p:spPr/a:blipFill/a:tile">
+              <xsl:if test="@sx">
+                <xsl:attribute name="draw:fill-image-ref-point-x">
+                  <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="@sy">
+                <xsl:attribute name="draw:fill-image-ref-point-y">
+                  <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="@algn">
+                <xsl:attribute name="draw:fill-image-ref-point">
+                  <xsl:choose>
+                    <xsl:when test="@algn='tl'">
+                      <xsl:value-of select ="'top-left'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='t'">
+                      <xsl:value-of select ="'top'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='tr'">
+                      <xsl:value-of select ="'top-right'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='r'">
+                      <xsl:value-of select ="'right'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='bl'">
+                      <xsl:value-of select ="'bottom-left'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='br'">
+                      <xsl:value-of select ="'bottom-right'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='b'">
+                      <xsl:value-of select ="'bottom'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='ctr'">
+                      <xsl:value-of select ="'center'"/>
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:if>
+              <!--<xsl:attribute name="draw:tile-repeat-offset">
+                      <xsl:value-of select ="'100% horizontal'"/>
+                    </xsl:attribute>-->
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="$flagGroup='True'">
+            <xsl:attribute name="draw:fill-image-name">
+              <xsl:value-of select="concat($FileType,'-grpshapeImg',$var_pos)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="draw:fill-image-name">
+              <xsl:value-of select="concat($FileType,'-shapeImg',$var_pos)"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:when>
       <!--added by vipul for gradient fill-->
       <xsl:when test="p:spPr/a:gradFill">
         <xsl:call-template name="tmpGradFillColor">
@@ -4337,16 +4672,17 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:for-each select ="p:spPr/a:ln">
       <xsl:if test ="not(a:noFill)">
         <xsl:choose>
-          <xsl:when test ="(a:prstDash/@val='solid') or not(a:prstDash/@val)">
-            <xsl:attribute name ="draw:stroke">
-              <xsl:value-of select ="'solid'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name ="draw:stroke">
-              <xsl:value-of select ="'dash'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:stroke-dash">
+			<!--Bug fix for shape outline by Mathi-->
+			<xsl:when test ="(a:prstDash/@val='solid') or not(a:prstDash/@val)">
+				<xsl:attribute name ="draw:stroke">
+					<xsl:value-of select ="'solid'"/>
+				</xsl:attribute>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:attribute name ="draw:stroke">
+					<xsl:value-of select ="'dash'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="draw:stroke-dash">
               <xsl:choose>
                 <xsl:when test="(a:prstDash/@val='sysDot') and (@cap='rnd')">
                   <xsl:value-of select ="'sysDotRound'"/>
@@ -4728,6 +5064,15 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:value-of select ="'false'"/>
 				</xsl:attribute>
 			</xsl:when>
+
+			<!--Code Added for internal bug fix for explosion2 by Mathi-->
+			<xsl:when test="( ((a:bodyPr/a:spAutoFit) and not(a:bodyPr/@wrap)) and (parent::node()/p:spPr/a:prstGeom/@prst='irregularSeal2') )">
+				<xsl:attribute name="draw:auto-grow-height">
+					<xsl:value-of select ="'false'"/>
+				</xsl:attribute>
+			</xsl:when>
+			<!--End-->
+			
 			<!--Code Added for bug fix of text wrap inside the custom shapes by Mathi on 31st Aug2007-->
 			<xsl:when test ="( (a:bodyPr/a:spAutoFit) )">   <!--or (a:bodyPr/@wrap='square') )">-->
 				<xsl:attribute name="draw:auto-grow-height">

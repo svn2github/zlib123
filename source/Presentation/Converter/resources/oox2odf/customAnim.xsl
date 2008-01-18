@@ -1070,7 +1070,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:value-of select ="'ooo-entrance-split'"/>
 						</xsl:when>
 						<xsl:when test ="$animType =17 ">
-							<xsl:value-of select ="'ooo-entrance-stretchy '"/>
+							<xsl:value-of select ="'ooo-entrance-stretchy'"/>
 						</xsl:when>
 						<xsl:when test ="$animType =18 ">
 							<xsl:value-of select ="'ooo-entrance-diagonal-squares'"/>
@@ -1112,7 +1112,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:value-of select ="'ooo-entrance-float'"/>
 						</xsl:when>
 						<xsl:when test ="$animType =31 ">
-							<xsl:value-of select ="'ooo-entrance-turn-and-grow '"/>
+							<xsl:value-of select ="'ooo-entrance-turn-and-grow'"/>
 						</xsl:when>
 						<xsl:when test ="$animType =34 ">
 							<xsl:value-of select ="'ooo-entrance-breaks'"/>
@@ -1341,6 +1341,9 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				</xsl:when >
 				<xsl:when test ="./p:cTn/@presetClass ='emph'">
 					<xsl:choose >
+            <xsl:when test ="$animType =1  ">
+              <xsl:value-of select ="'ooo-emphasis-fill-color'"/>
+            </xsl:when>
 						<xsl:when test ="$animType =2  ">
 							<xsl:value-of select ="'ooo-emphasis-font'"/>
 						</xsl:when>
@@ -1356,6 +1359,9 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						<xsl:when test ="$animType =6 ">
 							<xsl:value-of select ="'ooo-emphasis-grow-and-shrink'"/>
 						</xsl:when>
+            <xsl:when test ="$animType =7 ">
+              <xsl:value-of select ="'ooo-emphasis-line-color'"/>
+            </xsl:when>
 						<xsl:when test ="$animType =8  ">
 							<xsl:value-of select ="'ooo-emphasis-spin'"/>
 						</xsl:when>

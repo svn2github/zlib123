@@ -241,7 +241,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:call-template name="tmpGradientFillStyle">
             <xsl:with-param name="FilePath" select="concat('ppt/slideLayouts/',$var_layoutName)"/>
             <xsl:with-param name="FileName" select="$var_layoutName"/>
-            <xsl:with-param name="FileType" select="concat($slideMasterName,'-',substring-before($var_layoutName,'.xml'))"/>
+            <xsl:with-param name="FileType" select="substring-before($var_layoutName,'.xml')"/>
           </xsl:call-template>
           <xsl:call-template name="tmpBGgradientFillStyle">
             <xsl:with-param name="FilePath" select="concat('ppt/slideLayouts/',$var_layoutName)"/>
@@ -3014,6 +3014,7 @@ Copyright (c) 2007, Sonata Software Limited
            </xsl:for-each>
             <!--NotesMaster-->
             <xsl:if test="document('ppt/presentation.xml')//p:notesMasterIdLst/p:notesMasterId">
+            
               <xsl:call-template name="NotesMaster">
                 <xsl:with-param name="smName" select="$slideMasterName"/>
               </xsl:call-template>
@@ -3658,6 +3659,12 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:if test="$FileType='SL'">
         <xsl:value-of select="'slideLayouts'"/>
       </xsl:if>
+      <xsl:if test="contains($FileType,'handoutMaster')">
+        <xsl:value-of select="'handoutMasters'"/>
+      </xsl:if>
+      <xsl:if test="contains($FileType,'notesMaster')">
+        <xsl:value-of select="'notesMasters'"/>
+      </xsl:if>
     </xsl:variable>
     <xsl:for-each select="document($FilePath)//p:cSld/p:bg">
       <xsl:choose>
@@ -3667,7 +3674,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:call-template name="tmpInsertBackImage">
               <xsl:with-param name ="slideRel" select ="concat('ppt/',$var_FileType,'/_rels/',$FileName,'.rels')"/>
               <xsl:with-param name ="backImage" select ="'1'"/>
-              <xsl:with-param name ="SMName" select ="substring-before($FileName,'.xml')"/>
+              <xsl:with-param name ="SMName" select ="concat(substring-before($FileName,'.xml'),'BackImg')"/>
             </xsl:call-template>
           </xsl:for-each>
           <!-- Pictures-->
@@ -3770,7 +3777,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="slideRel" select ="concat('ppt/',$var_FileType,'/_rels/',$FileName,'.rels')"/>
               <xsl:with-param name ="backImage" select ="'1'"/>
               <xsl:with-param name ="idx" select ="p:bgRef/@idx - 1000"/> 
-              <xsl:with-param name ="SMName" select ="substring-before($FileName,'.xml')"/>
+              <xsl:with-param name ="SMName" select ="concat(substring-before($FileName,'.xml'),'BackImg')"/>
              <xsl:with-param name ="ThemeFile" select ="$var_Themefile"/>
             </xsl:call-template>
             <!-- Pictures-->
@@ -3778,6 +3785,132 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
       </xsl:choose>
     </xsl:for-each>
+    <xsl:for-each select="document($FilePath)//p:cSld/p:spTree">
+      <xsl:for-each select="node()">
+        <xsl:choose>
+          <xsl:when test="name()='p:sp'">
+            <xsl:choose>
+              <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph)">
+                <xsl:variable name="var_pos" select="position()"/>
+                <xsl:choose>
+                  <xsl:when test="p:spPr/a:blipFill/a:blip/@r:embed">
+                    <!-- Pictures-->
+                    <xsl:for-each select="p:spPr">
+                      <xsl:call-template name="tmpInsertBackImage">
+                        <xsl:with-param name ="slideRel" select ="concat('ppt/',$var_FileType,'/_rels/',$FileName,'.rels')"/>
+                        <xsl:with-param name ="backImage" select ="'1'"/>
+                        <xsl:with-param name ="var_pos" select ="$var_pos"/>
+                        <xsl:with-param name ="SMName" select ="concat(substring-before($FileName,'.xml'),'-shapeImg')"/>
+                      </xsl:call-template>
+                    </xsl:for-each>
+                    <!-- Pictures-->
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:when test="p:nvSpPr/p:nvPr/p:ph">
+                <xsl:variable name="var_pos" select="position()"/>
+                <xsl:variable name="var_shapeType">
+                  <xsl:choose>
+                    <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='ctrTitle' or p:nvSpPr/p:nvPr/p:ph/@type='title'">
+                      <xsl:value-of select="'title'"/>
+                    </xsl:when>
+                    <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='subTitle'">
+                      <xsl:value-of select="'subtitle'"/>
+                    </xsl:when>
+
+                    <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='body' and p:nvSpPr/p:nvPr/p:ph/@idx ">
+                      <xsl:value-of select="'outline'"/>
+                    </xsl:when>
+                    <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph/@type) and ./p:nvSpPr/p:nvPr/p:ph/@idx ">
+                      <xsl:value-of select="'outline'"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="p:nvSpPr/p:nvPr/p:ph/@type"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="p:spPr/a:blipFill/a:blip/@r:embed">
+                    <!-- Pictures-->
+                    <xsl:for-each select="p:spPr">
+                      <xsl:call-template name="tmpInsertBackImage">
+                        <xsl:with-param name ="slideRel" select ="concat('ppt/',$var_FileType,'/_rels/',$FileName,'.rels')"/>
+                        <xsl:with-param name ="backImage" select ="'1'"/>
+                        <xsl:with-param name ="var_pos">
+                          <xsl:choose>
+                            <xsl:when test="$FileType='SM' and (not (contains($var_shapeType,'title')) and not(contains($var_shapeType,'subtitle')))">
+                              <xsl:value-of select="$var_pos"/>
+                            </xsl:when>
+                            <xsl:when test="$FileType='SL' and (not (contains($var_shapeType,'title')) and not(contains($var_shapeType,'subtitle')))">
+                              <xsl:value-of select="$var_pos"/>
+                            </xsl:when>
+                            <xsl:when test="$FileType='S'">
+                              <xsl:value-of select="$var_pos"/>
+                            </xsl:when>
+                          </xsl:choose>
+                        </xsl:with-param>
+                        <xsl:with-param name ="SMName" select ="concat(substring-before($FileName,'.xml'),'-',$var_shapeType,'Img')"/>
+                      </xsl:call-template>
+                    </xsl:for-each>
+                    <!-- Pictures-->
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="name()='p:grpSp'">
+            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:for-each select=".">
+              <xsl:call-template name="tmpGroupedShapeImage">
+                <xsl:with-param name ="FileName" select ="$FileName"/>
+                <xsl:with-param name ="var_FileType" select ="$var_FileType"/>
+                <xsl:with-param name ="var_pos" select ="$var_pos"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpGroupedShapeImage">
+    <xsl:param name="FileName"/>
+    <xsl:param name="var_FileType"/>
+    <xsl:param name="var_shapeType"/>
+    <xsl:param name="var_pos"/>
+    
+    <xsl:for-each select="node()">
+      <xsl:choose>
+        <xsl:when test="name()='p:sp'">
+          <xsl:choose>
+            <xsl:when test="not(p:nvSpPr/p:nvPr/p:ph)">
+              <xsl:variable name="pos" select="position()"/>
+              <xsl:choose>
+                <xsl:when test="p:spPr/a:blipFill/a:blip/@r:embed">
+                  <!-- Pictures-->
+                  <xsl:for-each select="p:spPr">
+                    <xsl:call-template name="tmpInsertBackImage">
+                      <xsl:with-param name ="slideRel" select ="concat('ppt/',$var_FileType,'/_rels/',$FileName,'.rels')"/>
+                      <xsl:with-param name ="backImage" select ="'1'"/>
+                      <xsl:with-param name ="var_pos" select ="concat($var_pos,'-',$pos)"/>
+                      <xsl:with-param name ="SMName" select ="concat(substring-before($FileName,'.xml'),'-grpshapeImg')"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                  <!-- Pictures-->
+                </xsl:when>
+              </xsl:choose>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="name()='p:grpSp'">
+          <xsl:variable name="pos" select="position()"/>
+          <xsl:call-template name="tmpGroupedShapeImage">
+            <xsl:with-param name ="FileName" select ="$FileName"/>
+            <xsl:with-param name ="var_FileType" select ="$var_FileType"/>
+            <xsl:with-param name ="var_pos" select ="concat($var_pos,'-',$pos)"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+        </xsl:for-each>
   </xsl:template>
   <xsl:template name ="Outlines">
     <xsl:param name="level"/>
@@ -4346,6 +4479,8 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:call-template name="tmpImageCropping">
                     <xsl:with-param name="slideRel" select="concat('ppt/slideMasters/_rels',$slideMasterName,'.xml.rels')"/>
                   </xsl:call-template>
+                  <!--TEXT ALIGNMENT-->
+                  <xsl:call-template name ="TextLayout" />
                 </style:graphic-properties >
               </style:style>
             </xsl:if>
@@ -4531,7 +4666,22 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="blnSubTitle"/>
     <xsl:param name="SMName"/>
     <xsl:param name="shapePhType"/>
-   
+    <xsl:variable name="var_spType">
+      <xsl:choose>
+        <xsl:when test="contains($shapePhType,'Footer')">
+          <xsl:value-of select="'ftr'"/>
+        </xsl:when>
+        <xsl:when test="contains($shapePhType,'PageNumber')">
+          <xsl:value-of select="'sldNum'"/>
+        </xsl:when>
+        <xsl:when test="contains($shapePhType,'DateTime')">
+          <xsl:value-of select="'dt'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$shapePhType"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:for-each select=".">
     <xsl:choose>
       <xsl:when test ="p:spPr/a:noFill">
@@ -4579,6 +4729,71 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="FileType" select="substring-before($SMName,'.xml')"/>
           <xsl:with-param name="shapePhType" select="$shapePhType"/>
                   </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="p:spPr/a:blipFill and p:spPr/a:blipFill/a:blip/@r:embed ">
+        <xsl:attribute name="draw:fill-color">
+          <xsl:value-of select="'#FFFFFF'"/>
+        </xsl:attribute>
+        <xsl:attribute name="draw:fill">
+          <xsl:value-of select="'bitmap'"/>
+        </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="p:spPr/a:blipFill/a:stretch/a:fillRect">
+            <xsl:attribute name="style:repeat">
+              <xsl:value-of select="'stretch'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="p:spPr/a:blipFill/a:tile">
+            <xsl:for-each select="./p:spPr/a:blipFill/a:tile">
+              <xsl:if test="@sx">
+                <xsl:attribute name="draw:fill-image-ref-point-x">
+                  <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="@sy">
+                <xsl:attribute name="draw:fill-image-ref-point-y">
+                  <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="@algn">
+                <xsl:attribute name="draw:fill-image-ref-point">
+                  <xsl:choose>
+                    <xsl:when test="@algn='tl'">
+                      <xsl:value-of select ="'top-left'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='t'">
+                      <xsl:value-of select ="'top'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='tr'">
+                      <xsl:value-of select ="'top-right'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='r'">
+                      <xsl:value-of select ="'right'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='bl'">
+                      <xsl:value-of select ="'bottom-left'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='br'">
+                      <xsl:value-of select ="'bottom-right'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='b'">
+                      <xsl:value-of select ="'bottom'"/>
+                    </xsl:when>
+                    <xsl:when test="@algn='ctr'">
+                      <xsl:value-of select ="'center'"/>
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:if>
+              <!--<xsl:attribute name="draw:tile-repeat-offset">
+                      <xsl:value-of select ="'100% horizontal'"/>
+                    </xsl:attribute>-->
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+        <xsl:attribute name="draw:fill-image-name">
+          <xsl:value-of select="concat(substring-before($SMName,'.xml'),$var_spType,'Img')"/>
+        </xsl:attribute>
       </xsl:when>
       <!--Fill refernce-->
       <xsl:when test ="p:style/a:fillRef">
@@ -5200,7 +5415,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="SMName"/>
     <style:graphic-properties draw:stroke="none" draw:fill="none">
       <xsl:call-template name="tmpSMGraphicProperty">
-        <xsl:with-param name="SMName" select="$SMName"/>
+        <xsl:with-param name="SMName" select="$prm_SMName"/>
         <xsl:with-param name="shapePhType" select="'outline'"/>
       </xsl:call-template>
       <text:list-style>
@@ -7422,6 +7637,9 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:when>
                       </xsl:choose>
                     </xsl:with-param>
+                    <xsl:with-param name="spType">
+                      <xsl:value-of select="p:nvSpPr/p:nvPr/p:ph/@type"/>
+                    </xsl:with-param>
                   </xsl:call-template>
                 </style:graphic-properties >
               </style:style>
@@ -7433,7 +7651,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <style:paragraph-properties>
                     <xsl:call-template name="tmpHMParagraphStyle"/>
                   </style:paragraph-properties>
-                  <style:text-properties>
+                  <style:text-properties style:font-charset="x-symbol">
                     <xsl:attribute name ="fo:font-size">
                       <xsl:value-of select ="concat(format-number(./p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100, '#.##'), 'pt')"/>
                     </xsl:attribute>
@@ -7448,7 +7666,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <!-- Text properties-->
                 <xsl:if test ="./p:txBody/a:p/a:r">
                   <style:style style:name="{generate-id()}" style:family="text">
-                    <style:text-properties>
+                    <style:text-properties style:font-charset="x-symbol">
                       <xsl:for-each select ="./p:txBody/a:p/a:r">
                         <xsl:call-template name="tmpHandOutTextProperty">
                           <xsl:with-param name="DefFont" select="$DefFont"/>
@@ -7467,7 +7685,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <style:paragraph-properties fo:text-align="end" >
                     <xsl:call-template name="tmpHMParagraphStyle"/>
                   </style:paragraph-properties>
-                  <style:text-properties>
+                  <style:text-properties style:font-charset="x-symbol">
                     <xsl:attribute name ="fo:font-size">
                       <xsl:value-of select ="concat(format-number(./p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100, '#.##'), 'pt')"/>
                     </xsl:attribute>
@@ -7482,7 +7700,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <!-- Text properties-->
                 <xsl:if test ="./p:txBody/a:p/a:r">
                   <style:style style:name="{generate-id()}" style:family="text">
-                    <style:text-properties>
+                    <style:text-properties style:font-charset="x-symbol">
                       <xsl:for-each select ="./p:txBody/a:p/a:r">
                         <xsl:call-template name="tmpHandOutTextProperty">
                           <xsl:with-param name="DefFont" select="$DefFont"/>
@@ -7512,6 +7730,9 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:when>
                       </xsl:choose>
                     </xsl:with-param>
+                    <xsl:with-param name="spType">
+                      <xsl:value-of select="p:nvSpPr/p:nvPr/p:ph/@type"/>
+                    </xsl:with-param>
                   </xsl:call-template>
                 </style:graphic-properties >
               </style:style>
@@ -7523,7 +7744,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <style:paragraph-properties fo:text-align="end" >
                     <xsl:call-template name="tmpHMParagraphStyle"/>
                   </style:paragraph-properties>
-                  <style:text-properties>
+                  <style:text-properties style:font-charset="x-symbol">
                     <xsl:attribute name ="fo:font-size">
                       <xsl:value-of select ="concat(format-number(./p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100, '#.##'), 'pt')"/>
                     </xsl:attribute>
@@ -7538,7 +7759,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <!-- Text properties-->
                 <xsl:if test ="./p:txBody/a:p/a:r">
                   <style:style style:name="{generate-id()}" style:family="text">
-                    <style:text-properties>
+                    <style:text-properties style:font-charset="x-symbol">
                       <xsl:for-each select ="./p:txBody/a:p/a:r">
                         <xsl:call-template name="tmpHandOutTextProperty">
                           <xsl:with-param name="DefFont" select="$DefFont"/>
@@ -7557,7 +7778,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <style:paragraph-properties>
                     <xsl:call-template name="tmpHMParagraphStyle"/>
                   </style:paragraph-properties>
-                  <style:text-properties>
+                  <style:text-properties style:font-charset="x-symbol">
                     <xsl:attribute name ="fo:font-size">
                       <xsl:value-of select ="concat(format-number(./p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100, '#.##'), 'pt')"/>
                     </xsl:attribute>
@@ -7572,7 +7793,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <!-- Text properties-->
                 <xsl:if test ="./p:txBody/a:p/a:r">
                   <style:style style:name="{generate-id()}" style:family="text">
-                    <style:text-properties>
+                    <style:text-properties style:font-charset="x-symbol">
                       <xsl:for-each select ="./p:txBody/a:p/a:r">
                         <xsl:call-template name="tmpHandOutTextProperty">
                           <xsl:with-param name="DefFont" select="$DefFont"/>
@@ -8146,7 +8367,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:attribute name="style:name">
                 <xsl:value-of select="concat($TypeId,generate-id())"/>
               </xsl:attribute>
-              <style:text-properties>
+              <style:text-properties style:font-charset="x-symbol">
                 <!-- added by vipul to get text propreties from Presentation.xml-->
                  <xsl:for-each select="./parent::node()/parent::node()/a:lstStyle/a:lvl1pPr">
                   <xsl:call-template name="tmpShapeTextProperty">
@@ -8278,7 +8499,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:attribute name="style:name">
                 <xsl:value-of select="concat($TypeId,generate-id())"/>
               </xsl:attribute>
-              <style:text-properties>
+              <style:text-properties style:font-charset="x-symbol">
                 <!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
               
                   <xsl:choose >
@@ -8379,12 +8600,25 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:for-each select="node()">
            <xsl:choose>
             <xsl:when test="name()='p:pic'">
+              <xsl:variable name="var_pos" select="position()"/>
               <xsl:for-each select=".">
+                <xsl:variable  name ="GraphicId">
+                  <xsl:value-of select ="concat('SMgrp',$SlidePos,'Picture',$pos,'-', $var_pos,'gr')"/>
+                </xsl:variable>
+                  <xsl:if test="not(p:nvPicPr/p:nvPr/a:audioFile or p:nvPicPr/p:nvPr/a:wavAudioFile or p:nvPicPr/p:nvPr/a:videoFile)">
                 <xsl:call-template name="InsertPicture">
                   <xsl:with-param name ="slideRel" select ="$SlideRelationId"/>
                 <xsl:with-param name="grpBln" select="'true'"/>
+                      <xsl:with-param name="grpGraphicID" select="$GraphicId"/>
                   <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
                 </xsl:call-template>
+                  </xsl:if>
+               
+                <!--<xsl:call-template name="InsertPicture">
+                  <xsl:with-param name ="slideRel" select ="$SlideRelationId"/>
+                <xsl:with-param name="grpBln" select="'true'"/>
+                  <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                </xsl:call-template>-->
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:sp'">
@@ -8505,6 +8739,7 @@ Copyright (c) 2007, Sonata Software Limited
                             </xsl:call-template>
             </xsl:when>
             <xsl:when test="name()='p:grpSp'">
+              <xsl:variable name="grpVarPos" select="position()"/>
                            <xsl:variable name="var_pos" select="position()"/>
               <xsl:for-each select=".">
                 <xsl:call-template name="tmpGroupGradient">

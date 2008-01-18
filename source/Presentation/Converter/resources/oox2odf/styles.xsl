@@ -134,8 +134,18 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name="FileName" select="$handoutMasterPath"/>
               <xsl:with-param name="FileType" select="$handoutMasterName"/>
             </xsl:call-template>
+            <xsl:call-template name="tmpgetBackImage">
+              <xsl:with-param name="FilePath" select="concat('ppt/handoutMasters/',$handoutMasterPath)"/>
+              <xsl:with-param name="FileName" select="$handoutMasterPath"/>
+              <xsl:with-param name="FileType" select="$handoutMasterName"/>
+            </xsl:call-template>
           </xsl:for-each>
         </xsl:for-each>
+        <xsl:call-template name="tmpgetBackImage">
+          <xsl:with-param name="FilePath" select="'ppt/notesMasters/notesMaster1.xml'"/>
+          <xsl:with-param name="FileName" select="'notesMaster1.xml'"/>
+          <xsl:with-param name="FileType" select="'notesMaster1'"/>
+        </xsl:call-template>
 			</office:styles>
 		<office:automatic-styles>
         <!-- added by Vipul to insert background color for Slide master-->

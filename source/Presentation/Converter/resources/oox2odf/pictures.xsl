@@ -251,6 +251,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="idx"/>
     <xsl:param name="SMName"/>
     <xsl:param name="ThemeFile"/>
+    <xsl:param name="var_pos"/>
        <!--<xsl:variable name="var_idx">
           <xsl:value-of select="number(./p:bgRef/@idx - 1000)"/>
       </xsl:variable>-->
@@ -292,7 +293,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:value-of select ="concat('Pictures/',$targetFile)"/>
         </xsl:attribute>
         <xsl:attribute name ="draw:name">
-          <xsl:value-of select ="concat($SMName,'BackImg')"/>
+          <xsl:value-of select ="concat($SMName,$var_pos)"/>
         </xsl:attribute>
       </draw:fill-image>
   </xsl:template>
