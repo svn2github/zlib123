@@ -29,7 +29,7 @@
 Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-RefNo-1 27-Dec-2007 Sateesh                 Changes done for localization and error regarding obj ref not set to an instance of obj.  
+RefNo-1 27-Dec-2007 Sateesh Reddy                 Changes done for localization and error regarding obj ref not set to an instance of obj.  
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 */
 
