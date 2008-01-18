@@ -55,7 +55,20 @@ Copyright (c) 2007, Sonata Software Limited
  <xsl:param name ="NvPrId" />
     <!-- warn if Audio or Video -->
     <xsl:message terminate="no">translation.odf2oox.audioVideoTypeImage</xsl:message>
+     <xsl:variable name="UniqueID">
+       <xsl:value-of select="generate-id()"/>
+     </xsl:variable>
+     <xsl:variable name ="blipNo">
+       <xsl:choose>
+         <xsl:when test="$grpFlag='true'">
+           <xsl:value-of select ="concat('slgrpImage',$imageNo,'-',$picNo,$UniqueID)"/>
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:value-of select ="concat('sl',$imageNo,'Image' ,$picNo,$UniqueID)"/>
+         </xsl:otherwise>
+       </xsl:choose>
 
+     </xsl:variable>
     <xsl:variable name ="imageSerialNo">
        <xsl:choose>
          <xsl:when test="$grpFlag='true'">
@@ -104,7 +117,14 @@ Copyright (c) 2007, Sonata Software Limited
       <p:blipFill>
         <a:blip>
           <xsl:attribute name ="r:embed">
+            <xsl:choose>
+              <xsl:when test="$grpFlag='true'">
+                <xsl:value-of select ="$blipNo"/>
+              </xsl:when>
+              <xsl:otherwise>
             <xsl:value-of select ="$imageSerialNo"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
         </a:blip >
         <!--Image cropping-->
@@ -120,20 +140,31 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select="style:graphic-properties/@fo:clip"/>
             </xsl:variable>
             <xsl:variable name="var_Top">
-              <xsl:value-of select="substring-before(substring-after($cropValue,'rect('),' ')"/>
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length" select="substring-before(substring-after($cropValue,'rect('),' ')"/>
+              </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="var_Right">
-              <xsl:value-of select="substring-before(substring-after(substring-after($cropValue,'rect('),' '),' ')"/>
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length" select="substring-before(substring-after(substring-after($cropValue,'rect('),' '),' ')"/>
+              </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="var_Bottom">
-              <xsl:value-of select="substring-before(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' ')"/>
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length" select="substring-before(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' ')"/>
+              </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="var_Left">
-              <xsl:value-of select="substring-before(substring-after(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' '),')')"/>
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length" select="substring-before(substring-after(substring-after(substring-after(substring-after($cropValue,'rect('),' '),' '),' '),')')"/>
+              </xsl:call-template>
             </xsl:variable>
-            <xsl:if test="not($var_Top='0cm' and $var_Right='0cm' and $var_Bottom='0cm' and $var_Left='0cm')">
+            <xsl:call-template name="convertUnitsToCm">
+              <xsl:with-param name="length" select="@svg:width"/>
+            </xsl:call-template>
+            <xsl:if test="not($var_Top='0' and $var_Right='0' and $var_Bottom='0' and $var_Left='0')">
               <a:srcRect>
-                <xsl:value-of select ="concat('image-properties:',$imagePath,':',substring-before($var_Top,'cm'),':',substring-before($var_Right,'cm'),':',substring-before($var_Bottom,'cm'),':',substring-before($var_Left,'cm'))"/>
+                <xsl:value-of select ="concat('image-properties:',$imagePath,':',$var_Top,':',$var_Right,':',$var_Bottom,':',$var_Left)"/>
               </a:srcRect>
             </xsl:if>
           </xsl:if>
@@ -262,72 +293,7 @@ Copyright (c) 2007, Sonata Software Limited
         </a:stretch>
       </p:blipFill>
       <p:spPr>
-        <a:xfrm>
-          <xsl:variable name ="angle">
-            <xsl:value-of select="substring-after(substring-before(substring-before(parent::node()/@draw:transform,'translate'),')'),'(')" />
-          </xsl:variable>
-          <xsl:variable name ="x2">
-            <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-          </xsl:variable>
-          <xsl:variable name ="y2">
-            <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(parent::node()/@draw:transform,'translate'),'('),')'),' '),'cm')" />
-          </xsl:variable>
-          <xsl:if test="@draw:transform">
-            <xsl:attribute name ="rot">
-              <xsl:value-of select ="concat('draw-transform:ROT:',substring-before(parent::node()/@svg:width,'cm'), ':',
-																   substring-before(parent::node()/@svg:height,'cm'), ':', 
-																   $x2, ':', 
-                                   $y2, ':', 
-																   $angle)"/>
-            </xsl:attribute>
-          </xsl:if>
-          <a:off >
-            <xsl:if test="not(@draw:transform)">
-              <xsl:attribute name ="x">
-                <!--<xsl:value-of select ="@svg:x"/>-->
-                <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                  <xsl:with-param name ="length" select ="parent::node()/@svg:x"/>
-                </xsl:call-template>
-              </xsl:attribute>
-              <xsl:attribute name ="y">
-                <!--<xsl:value-of select ="@svg:y"/>-->
-                <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                  <xsl:with-param name ="length" select ="parent::node()/@svg:y"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if >
-            <xsl:if test="@draw:transform">
-              <xsl:attribute name ="x">
-                <xsl:value-of select ="concat('draw-transform:X:',substring-before(parent::node()/@svg:width,'cm'), ':',
-																   substring-before(parent::node()/@svg:height,'cm'), ':', 
-																   $x2, ':', $y2, ':', $angle)"/>
-              </xsl:attribute>
-              <xsl:attribute name ="y">
-                <xsl:value-of select ="concat('draw-transform:Y:',substring-before(parent::node()/@svg:width,'cm'), ':',
-																   substring-before(parent::node()/@svg:height,'cm'), ':', 
-																   $x2, ':',$y2, ':', $angle)"/>
-              </xsl:attribute>
-            </xsl:if>
-          </a:off>
-          <a:ext>
-            <xsl:attribute name ="cx">
-              <!--<xsl:value-of select ="@svg:width"/>-->
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="parent::node()/@svg:width"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name ="cy">
-              <!--<xsl:value-of select ="@svg:height"/>-->
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="parent::node()/@svg:height"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </a:ext >
-        </a:xfrm>
+        <xsl:call-template name="tmpdrawCordinates"/>
         <a:prstGeom prst="rect">
           <a:avLst />
         </a:prstGeom>
@@ -347,8 +313,18 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name ="tmpInsertBackImage">
     <xsl:param name ="FileName" />
     <xsl:param name ="imageName" />
+    <xsl:param name ="fillType" />
+    
     <xsl:variable name ="imageSerialNo">
+      <xsl:choose>
+        <xsl:when test="$fillType='shape'">
+          <xsl:value-of select ="$FileName"/>
+        </xsl:when>
+        <xsl:otherwise>
       <xsl:value-of select ="concat($FileName,'BackImg')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    
     </xsl:variable>
     <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$imageName]">
       <xsl:variable name="Source">

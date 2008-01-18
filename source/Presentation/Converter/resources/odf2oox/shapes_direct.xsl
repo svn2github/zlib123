@@ -127,7 +127,6 @@ Copyright (c) 2007, Sonata Software Limited
        <xsl:value-of select ="position()"/>
      </xsl:if>
 	</xsl:template>
-	
   <!-- Template for Shapes in direct conversion -->
   <xsl:template name ="shapes">
     <xsl:param name ="fileName" />
@@ -135,6 +134,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="var_pos" />
     <xsl:param name ="NvPrId" />
     <xsl:param name ="grpFlag" />
+    <xsl:param name ="UniqueId" />
          <xsl:choose>
         <xsl:when test ="name()='draw:rect'">
           <xsl:variable name="shapeCount" select="position()"/>
@@ -144,7 +144,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="shapeName" select="'Rectangle '" />
               <xsl:with-param name ="shapeCount" select="$var_pos" />
               <xsl:with-param name ="grpFlag" select="$grpFlag" />
-              <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
+              <xsl:with-param name ="UniqueId" select="generate-id()" />
             </xsl:call-template>
           </xsl:for-each>
          </xsl:when>
@@ -157,6 +157,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name="shapeName" select="'Oval '" />
                 <xsl:with-param name ="shapeCount" select="$var_pos" />
                 <xsl:with-param name ="grpFlag" select="$grpFlag" />
+                <xsl:with-param name ="UniqueId" select="generate-id()" />
                 <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
               </xsl:call-template>
             </xsl:for-each>
@@ -177,6 +178,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="customShape" select ="'true'" />
                 <xsl:with-param name ="shapeCount" select="$var_pos" />
               <xsl:with-param name ="grpFlag" select="$grpFlag" />
+                <xsl:with-param name ="UniqueId" select="generate-id()" />
                 <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
               </xsl:call-template>
             </xsl:if>
@@ -239,6 +241,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="shapeCount" />
     <xsl:param name ="NvPrId" />
     <xsl:param name ="grpFlag" />
+    <xsl:param name ="UniqueId" />
+    
     <p:sp>
       <p:nvSpPr>
         <p:cNvPr>
@@ -461,10 +465,12 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:with-param >
           <xsl:with-param name ="shapeCount" select ="$shapeCount" />
           <xsl:with-param name ="grpFlag" select ="$grpFlag" />
+          <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+          
         </xsl:call-template>
       </p:spPr>
       <p:style>
-        <a:lnRef idx="2">
+        <a:lnRef idx="1">
           <a:schemeClr val="dk1" />
         </a:lnRef>
         <a:fillRef idx="0">
@@ -504,7 +510,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:call-template>
 
         <xsl:choose>
-          <xsl:when test ="draw:text-box">
+          <xsl:when test ="draw:text-box/text:p or draw:text-box/text:list">
             <xsl:for-each select ="draw:text-box">
               <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
               <xsl:variable name ="masterPageName" select ="./parent::node()/parent::node()/@draw:master-page-name"/>
@@ -526,7 +532,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
+          <xsl:when test ="not(draw:text-box/text:p) and not(draw:text-box/text:list) and not(text:p or text:list)">
+              <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>
+            </xsl:when>
           <xsl:otherwise>
+
             <xsl:call-template name ="processShapeText">
               <xsl:with-param name ="fileName" select ="$fileName" />
               <xsl:with-param name="shapeType" select="name()" />
@@ -586,132 +596,7 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:choose>
   </xsl:template>
   
- 
-  <!-- Draw shape -->
-  <xsl:template name ="drawShape">
-    <a:xfrm>
-      <xsl:variable name ="angle">
-        <xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
-      </xsl:variable>
-      <xsl:variable name ="x2">
-        <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
-      </xsl:variable>
-      <xsl:variable name ="y2">
-        <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
-      </xsl:variable>
-      <xsl:if test="@draw:transform">
-        <xsl:attribute name ="rot">
-          <xsl:value-of select ="concat('draw-transform:ROT:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
-																   $x2, ':', 
-                                   $y2, ':', 
-																   $angle)"/>
-        </xsl:attribute>
-      </xsl:if>
-      
-      <xsl:if test="not(draw:enhanced-geometry/@draw:type='curvedLeftArrow' or
-                    draw:enhanced-geometry/@draw:type='curvedRightArrow' or
-                    draw:enhanced-geometry/@draw:type='curvedDownArrow' or
-                    draw:enhanced-geometry/@draw:type='curvedUpArrow')">
-        <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal">
-          <xsl:if test="draw:enhanced-geometry/@draw:mirror-horizontal='true'">
-            <xsl:attribute name ="flipH">
-              <xsl:value-of select="'1'"/>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
-      </xsl:if>
-      <xsl:if test="not(draw:enhanced-geometry/@draw:type='curvedLeftArrow' or
-                          draw:enhanced-geometry/@draw:type='curvedRightArrow' or
-                          draw:enhanced-geometry/@draw:type='curvedDownArrow' or
-                          draw:enhanced-geometry/@draw:type='curvedUpArrow')">
-        <xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical">
-          <xsl:if test="draw:enhanced-geometry/@draw:mirror-vertical='true'">
-            <xsl:attribute name ="flipV">
-              <xsl:value-of select="'1'"/>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
-      </xsl:if>
-
-      <!--Bug Fix for Shape Corner-Right Arrow from ODP to PPtx-->
-      <xsl:if test="(draw:enhanced-geometry/@draw:enhanced-path='M 517 247 L 517 415 264 415 264 0 0 0 0 680 517 680 517 854 841 547 517 247 Z N')">
-        <xsl:attribute name ="rot">
-          <xsl:value-of select ="'5400000'"/>
-        </xsl:attribute>
-      </xsl:if>
-      <!--End of bug fix code-->
-      
-      <a:off>
-        <xsl:if test="@draw:transform">
-          <xsl:attribute name ="x">
-            <xsl:value-of select ="concat('draw-transform:X:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
-																   $x2, ':', 
-                                   $y2, ':', 
-																   $angle)"/>
-          </xsl:attribute>
-
-          <xsl:attribute name ="y">
-            <xsl:value-of select ="concat('draw-transform:Y:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
-																   $x2, ':', 
-                                   $y2, ':', 
-																   $angle)"/>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="not(@draw:transform)">
-          <xsl:attribute name ="x">
-            <xsl:call-template name ="convertToPoints">
-              <xsl:with-param name ="unit" select ="'cm'"/>
-              <xsl:with-param name ="length" select ="@svg:x"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:attribute name ="y">
-            <xsl:call-template name ="convertToPoints">
-              <xsl:with-param name ="unit" select ="'cm'"/>
-              <xsl:with-param name ="length" select ="@svg:y"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-      </a:off>
-      <a:ext>
-        <xsl:attribute name ="cx">
-          <xsl:choose>
-            <xsl:when test="number(substring-before(@svg:width,'cm')) &lt; 0">
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="concat(number(substring-before(@svg:width,'cm')) * -1,'cm')"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-          <xsl:call-template name ="convertToPoints">
-            <xsl:with-param name ="unit" select ="'cm'"/>
-            <xsl:with-param name ="length" select ="@svg:width"/>
-          </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:attribute name ="cy">
-          <xsl:choose>
-            <xsl:when test="number(substring-before(@svg:height,'cm')) &lt; 0">
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="concat(number(substring-before(@svg:height,'cm')) * -1,'cm')"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-          <xsl:call-template name ="convertToPoints">
-            <xsl:with-param name ="unit" select ="'cm'"/>
-            <xsl:with-param name ="length" select ="@svg:height"/>
-          </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </a:ext>
-    </a:xfrm>
-  </xsl:template>
-  <!-- Draw line-->
+   <!-- Draw line-->
   <xsl:template name ="drawLine">
     <xsl:param name ="fileName" />
     <xsl:param name ="shapeCount" />
@@ -719,7 +604,26 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="NvPrId" />
     <xsl:param name ="grpFlag" />
     
-
+    <xsl:variable name="x1" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:x1"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="x2" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:x2"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="y1" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:y1"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="y2" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:y2"/>
+      </xsl:call-template>
+    </xsl:variable>
     <p:cxnSp>
       <p:nvCxnSpPr>
         <p:cNvPr>
@@ -970,53 +874,51 @@ Copyright (c) 2007, Sonata Software Limited
         <p:nvPr/>
       </p:nvCxnSpPr>
       <p:spPr>
-
         <a:xfrm>
           <xsl:attribute name ="rot">
-            <xsl:value-of select ="concat('cxnSp:rot:',substring-before(@svg:x1,'cm'), ':',
-																   substring-before(@svg:x2,'cm'), ':', 
-																   substring-before(@svg:y1,'cm'), ':', 
-																   substring-before(@svg:y2,'cm'))"/>
+            <xsl:value-of select ="concat('cxnSp:rot:',$x1, ':',
+																   $x2, ':', 
+																   $y1, ':', 
+																   $y2)"/>
           </xsl:attribute>
           <xsl:attribute name ="flipH">
-            <xsl:value-of select ="concat('cxnSp:flipH:',substring-before(@svg:x1,'cm'), ':',
-																   substring-before(@svg:x2,'cm'), ':', 
-																   substring-before(@svg:y1,'cm'), ':', 
-																   substring-before(@svg:y2,'cm'))"/>
+            <xsl:value-of select ="concat('cxnSp:flipH:',$x1, ':',
+																   $x2, ':', 
+																   $y1, ':', 
+																   $y2)"/>
           </xsl:attribute>
           <xsl:attribute name ="flipV">
-            <xsl:value-of select ="concat('cxnSp:flipV:',substring-before(@svg:x1,'cm'), ':',
-																   substring-before(@svg:x2,'cm'), ':', 
-																   substring-before(@svg:y1,'cm'), ':', 
-																   substring-before(@svg:y2,'cm'))"/>
+            <xsl:value-of select ="concat('cxnSp:flipV:',$x1, ':',
+																   $x2, ':', 
+																   $y1, ':', 
+																   $y2)"/>
           </xsl:attribute>
           <a:off >
             <xsl:attribute name ="x">
-
-              <xsl:value-of select ="concat('cxnSp:x:',substring-before(@svg:x1,'cm'), ':',
-																   substring-before(@svg:x2,'cm'), ':', 
-																   substring-before(@svg:y1,'cm'), ':', 
-																   substring-before(@svg:y2,'cm'))"/>
+              <xsl:value-of select ="concat('cxnSp:x:',$x1, ':',
+																   $x2, ':', 
+																   $y1, ':', 
+																   $y2)"/>
             </xsl:attribute>
             <xsl:attribute name ="y">
-              <xsl:value-of select ="concat('cxnSp:y:',substring-before(@svg:x1,'cm'), ':',
-																   substring-before(@svg:x2,'cm'), ':', 
-																   substring-before(@svg:y1,'cm'), ':', 
-																   substring-before(@svg:y2,'cm'))"/>
+              <xsl:value-of select ="concat('cxnSp:y:',$x1, ':',
+																   $x2, ':', 
+																   $y1, ':', 
+																   $y2)"/>
             </xsl:attribute>
           </a:off>
           <a:ext>
             <xsl:attribute name ="cx">
-              <xsl:value-of select ="concat('cxnSp:cx:',substring-before(@svg:x1,'cm'), ':',
-																   substring-before(@svg:x2,'cm'), ':', 
-																   substring-before(@svg:y1,'cm'), ':', 
-																   substring-before(@svg:y2,'cm'))"/>
+              <xsl:value-of select ="concat('cxnSp:cx:',$x1, ':',
+																   $x2, ':', 
+																   $y1, ':', 
+																   $y2)"/>
             </xsl:attribute>
             <xsl:attribute name ="cy">
-              <xsl:value-of select ="concat('cxnSp:cy:',substring-before(@svg:x1,'cm'), ':',
-																   substring-before(@svg:x2,'cm'), ':', 
-																   substring-before(@svg:y1,'cm'), ':', 
-																   substring-before(@svg:y2,'cm'))"/>
+              <xsl:value-of select ="concat('cxnSp:cy:',$x1, ':',
+																   $x2, ':', 
+																   $y1, ':', 
+																   $y2)"/>
             </xsl:attribute>
 
           </a:ext>
@@ -1062,6 +964,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="gr" />
     <xsl:param name ="shapeCount"  />
     <xsl:param name ="grpFlag"/>
+    <xsl:param name ="UniqueId"  />
     <xsl:for-each select ="document($fileName)//office:automatic-styles/style:style[@style:name=$gr]/style:graphic-properties">
       <!-- Parent style name-->
       <!--FILL-->
@@ -1071,6 +974,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:with-param name ="gr" select="$gr" />
         <xsl:with-param name ="shapeCount" select ="$shapeCount" />
         <xsl:with-param name ="grpFlag" select ="$grpFlag" />
+        <xsl:with-param name ="UniqueId" select ="$UniqueId" />
       </xsl:call-template >
 
       <!--LINE COLOR AND STYLE-->
@@ -1100,15 +1004,28 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name="tmpShapeShadow">
     <xsl:param name="parentStyle"/>
     <xsl:param name="filename"/>
+
 			<xsl:variable name="shadowOffsetX">
+      
+    
 				<xsl:if test="@draw:shadow-offset-x">
-					<xsl:value-of select="substring-before(@draw:shadow-offset-x,'cm')"/>
+          <xsl:variable name="convertUnit">
+            <xsl:call-template name="getConvertUnit">
+              <xsl:with-param name="length" select="@draw:shadow-offset-x"/>
+            </xsl:call-template>
+          </xsl:variable>
+					<xsl:value-of select="substring-before(@draw:shadow-offset-x,$convertUnit)"/>
 				</xsl:if>
 				<xsl:if test="not(@draw:shadow-offset-x)">
 					<xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties">
 						<xsl:choose>
 							<xsl:when test="(@draw:shadow-offset-x != 0)">
-						<xsl:value-of select="substring-before(@draw:shadow-offset-x,'cm')"/>
+                <xsl:variable name="convertUnit">
+                  <xsl:call-template name="getConvertUnit">
+                    <xsl:with-param name="length" select="@draw:shadow-offset-x"/>
+                  </xsl:call-template>
+                </xsl:variable>
+						<xsl:value-of select="substring-before(@draw:shadow-offset-x,$convertUnit)"/>
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="'0'"/>
@@ -1120,13 +1037,23 @@ Copyright (c) 2007, Sonata Software Limited
 
 			<xsl:variable name="shadowOffsetY">
 				<xsl:if test="@draw:shadow-offset-y">
-					<xsl:value-of select="substring-before(@draw:shadow-offset-y,'cm')"/>
+          <xsl:variable name="convertUnit">
+            <xsl:call-template name="getConvertUnit">
+              <xsl:with-param name="length" select="@draw:shadow-offset-y"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="substring-before(@draw:shadow-offset-y,$convertUnit)"/>
 				</xsl:if>
 				<xsl:if test="not(@draw:shadow-offset-y)">
 					<xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$parentStyle]/style:graphic-properties">
 						<xsl:choose>
 							<xsl:when test="(@draw:shadow-offset-y != 0)">
-						<xsl:value-of select="substring-before(@draw:shadow-offset-y,'cm')"/>
+                <xsl:variable name="convertUnit">
+                  <xsl:call-template name="getConvertUnit">
+                    <xsl:with-param name="length" select="@draw:shadow-offset-y"/>
+                  </xsl:call-template>
+                </xsl:variable>
+						<xsl:value-of select="substring-before(@draw:shadow-offset-y,$convertUnit)"/>
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="'0'"/>
@@ -1389,6 +1316,45 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
+
+		<!--Equation Shapes-->
+		<!--Not Equal-->
+		<xsl:when test ="contains($prstGeom, 'Not Equal ')">
+			<a:prstGeom prst="mathNotEqual">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!--Equal-->
+		<xsl:when test ="contains($prstGeom, 'Equal ')">
+			<a:prstGeom prst="mathEqual">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!--Plus-->
+		<xsl:when test ="contains($prstGeom, 'Plus ')">
+			<a:prstGeom prst="mathPlus">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!--Minus-->
+		<xsl:when test ="contains($prstGeom, 'Minus ')">
+			<a:prstGeom prst="mathMinus">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!--Multiply-->
+		<xsl:when test ="contains($prstGeom, 'Multiply ')">
+			<a:prstGeom prst="mathMultiply">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!--Division-->
+		<xsl:when test ="contains($prstGeom, 'Division ')">
+			<a:prstGeom prst="mathDivide">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		
       <!-- Rounded Rectangle -->
       <xsl:when test ="contains($prstGeom, 'Rounded Rectangle')">
         <a:prstGeom prst="roundRect">
@@ -1401,12 +1367,24 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
-      <!-- Snip Same Side Corner -->
-      <xsl:when test ="contains($prstGeom, 'Snip Same Side Corner Rectangle')">
-        <a:prstGeom prst="snip2SameRect">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
+		<!-- Snip Same Side Corner Rectangle -->
+		<xsl:when test ="contains($prstGeom, 'Snip Same Side Corner Rectangle')">
+			<a:prstGeom prst="snip2SameRect">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Snip Diagonal Corner Rectangle -->
+		<xsl:when test ="contains($prstGeom, 'Snip Diagonal Corner Rectangle')">
+			<a:prstGeom prst="snip2DiagRect">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Snip and Round Single Corner Rectangle -->
+		<xsl:when test ="contains($prstGeom, 'Snip and Round Single Corner Rectangle')">
+			<a:prstGeom prst="snipRoundRect">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
       
       <!-- Circular Arrow -->
       <xsl:when test ="contains($prstGeom, 'circular-arrow')">
@@ -1448,36 +1426,31 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
-      <!-- Snip Diagonal Corner -->
-      <xsl:when test ="contains($prstGeom, 'Snip Diagonal Corner Rectangle')">
-        <a:prstGeom prst="snip2DiagRect">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
-      <!-- and Round Single Corner -->
-      <xsl:when test ="contains($prstGeom, 'Snip and Round Single Corner Rectangle')">
-        <a:prstGeom prst="snipRoundRect">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
-      <!-- Round Single Corner -->
-      <xsl:when test ="contains($prstGeom, 'Round Single Corner Rectangle')">
-        <a:prstGeom prst="round1Rect">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
-      <!-- Round Same Side Corner -->
-      <xsl:when test ="contains($prstGeom, 'Round Same Side Corner Rectangle')">
-        <a:prstGeom prst="round2SameRect">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
-      <!-- Round Diagonal Corner -->
-      <xsl:when test ="contains($prstGeom, 'Round Diagonal Corner Rectangle')">
-        <a:prstGeom prst="round2DiagRect">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
+      
+		<!-- Round Single Corner Rectangle -->
+		<xsl:when test ="contains($prstGeom, 'Round Single Corner Rectangle')">
+			<a:prstGeom prst="round1Rect">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Round Same Side Corner Rectangle -->
+		<xsl:when test ="contains($prstGeom, 'Round Same Side Corner Rectangle')">
+			<a:prstGeom prst="round2SameRect">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Round Diagonal Corner Rectangle -->
+		<xsl:when test ="contains($prstGeom, 'Round Diagonal Corner Rectangle')">
+			<a:prstGeom prst="round2DiagRect">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Explosion 2 -->
+		<xsl:when test ="contains($prstGeom, 'Explosion 2')">
+			<a:prstGeom prst="irregularSeal2">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
       <!-- Rectangles -->
       <xsl:when test ="(contains($prstGeom, 'Rectangle')) or (contains($prstGeom, 'TextBox'))">
         <a:prstGeom prst="rect">
@@ -1697,6 +1670,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="gr" />
     <xsl:param name ="shapeCount" />
     <xsl:param name ="grpFlag" />
+    <xsl:param name ="UniqueId"  />
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
     <xsl:variable name="tranparencyinContent" select="substring-before(@draw:opacity,'%')"/>
@@ -1707,6 +1681,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="parentStyle" select="$parentStyle"/>
           <xsl:with-param name ="shapeCount" select ="$shapeCount" />
           <xsl:with-param name ="grpFlag" select ="$grpFlag" />
+          <xsl:with-param name ="UniqueId" select ="$UniqueId" />
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$parentStyle !='' and not(@draw:fill or @draw:fill-color)">
@@ -1716,6 +1691,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="tranparencyinContent" select="$tranparencyinContent"/>
             <xsl:with-param name ="shapeCount" select ="$shapeCount" />
             <xsl:with-param name ="grpFlag" select ="$grpFlag" />
+            <xsl:with-param name ="UniqueId" select ="$UniqueId" />
           </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
@@ -1728,6 +1704,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="parentStyle"/>
     <xsl:param name ="shapeCount" />
     <xsl:param name ="grpFlag"/>
+    <xsl:param name ="UniqueId" />
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
     <xsl:choose>
@@ -1754,6 +1731,21 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
         </xsl:call-template>
       </xsl:when>
+      <xsl:when test ="@draw:fill='bitmap' and $grpFlag!='true'">
+        <xsl:call-template name="tmpBitmapFill">
+          <xsl:with-param name="FileName" select="concat('bitmap',$shapeCount)" />
+          <xsl:with-param name="var_imageName" select="@draw:fill-image-name" />
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test ="@draw:fill='bitmap' and $grpFlag='true'">
+        <xsl:call-template name="tmpBitmapFill">
+          <xsl:with-param name="FileName" select="concat('grpbitmap',$UniqueId)" />
+          <xsl:with-param name="var_imageName" select="@draw:fill-image-name" />
+          <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+        </xsl:call-template>
+      </xsl:when>
+      
       <xsl:when test ="@draw:fill-color">
         <a:solidFill>
           <a:srgbClr  >
@@ -1997,8 +1989,12 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:when test ="@svg:stroke-width">
           <xsl:attribute name ="w">
             <xsl:call-template name ="convertToPoints">
-              <xsl:with-param name="length"  select ="@svg:stroke-width"/>
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
+                  <xsl:with-param name="length" select="@svg:stroke-width"/>
+                </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:when>
@@ -2008,8 +2004,12 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:if test ="@svg:stroke-width">
               <xsl:attribute name ="w">
                 <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name="length"  select ="@svg:stroke-width"/>
-                  <xsl:with-param name ="unit" select ="'cm'"/>
+                   <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="@svg:stroke-width"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:attribute>
             </xsl:if >
@@ -2087,8 +2087,13 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </xsl:attribute>
           <xsl:if test ="@draw:marker-start-width">
+            <xsl:variable name="Unit">
+              <xsl:call-template name="getConvertUnit">
+                <xsl:with-param name="length" select="@draw:marker-start-width"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:call-template name ="setArrowSize">
-              <xsl:with-param name ="size" select ="substring-before(@draw:marker-start-width,'cm')" />
+              <xsl:with-param name ="size" select ="substring-before(@draw:marker-start-width,$Unit)" />
             </xsl:call-template >
           </xsl:if>
         </a:headEnd>
@@ -2103,8 +2108,13 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:call-template>
               </xsl:attribute>
               <xsl:if test ="@draw:marker-start-width">
+                <xsl:variable name="Unit">
+                  <xsl:call-template name="getConvertUnit">
+                    <xsl:with-param name="length" select="@draw:marker-start-width"/>
+                  </xsl:call-template>
+                </xsl:variable>
                 <xsl:call-template name ="setArrowSize">
-                  <xsl:with-param name ="size" select ="substring-before(@draw:marker-start-width,'cm')" />
+                  <xsl:with-param name ="size" select ="substring-before(@draw:marker-start-width,$Unit)" />
                 </xsl:call-template >
               </xsl:if>
             </a:headEnd>
@@ -2120,8 +2130,13 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
 
           <xsl:if test ="@draw:marker-end-width">
+            <xsl:variable name="Unit">
+              <xsl:call-template name="getConvertUnit">
+                <xsl:with-param name="length" select="@draw:marker-end-width"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:call-template name ="setArrowSize">
-              <xsl:with-param name ="size" select ="substring-before(@draw:marker-end-width,'cm')" />
+              <xsl:with-param name ="size" select ="substring-before(@draw:marker-end-width,$Unit)" />
             </xsl:call-template >
           </xsl:if>
         </a:tailEnd>
@@ -2135,10 +2150,14 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name ="ArrowType" select ="@draw:marker-end" />
                 </xsl:call-template>
               </xsl:attribute>
-
+              <xsl:variable name="Unit">
+                <xsl:call-template name="getConvertUnit">
+                  <xsl:with-param name="length" select="@draw:marker-end-width"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:if test ="@draw:marker-end-width">
                 <xsl:call-template name ="setArrowSize">
-                  <xsl:with-param name ="size" select ="substring-before(@draw:marker-end-width,'cm')" />
+                  <xsl:with-param name ="size" select ="substring-before(@draw:marker-end-width,$Unit)" />
                 </xsl:call-template >
               </xsl:if>
             </a:tailEnd>
@@ -2397,11 +2416,29 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name ="getDashType">
     <xsl:param name ="stroke-dash" />
     <xsl:if test ="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
-      <xsl:variable name ="dots1" select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots1"/>
-      <xsl:variable name ="dots1-length" select ="substring-before(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots1-length, 'cm')" />
-      <xsl:variable name ="dots2" select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots2"/>
-      <xsl:variable name ="dots2-length" select ="substring-before(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots2-length, 'cm')"/>
-      <xsl:variable name ="distance" select ="substring-before(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:distance, 'cm')" />
+      <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
+        <xsl:variable name="Unit1">
+          <xsl:call-template name="getConvertUnit">
+            <xsl:with-param name="length" select="@draw:dots1-length"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="Unit2">
+          <xsl:call-template name="getConvertUnit">
+            <xsl:with-param name="length" select="@draw:dots2-length"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="Unit3">
+          <xsl:call-template name="getConvertUnit">
+            <xsl:with-param name="length" select="@draw:distance"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name ="dots1" select="@draw:dots1"/>
+        <xsl:variable name ="dots1-length" select ="substring-before(@draw:dots1-length, $Unit1)" />
+        <xsl:variable name ="dots2" select="@draw:dots2"/>
+        <xsl:variable name ="dots2-length" select ="substring-before(@draw:dots2-length, $Unit2)"/>
+        <xsl:variable name ="distance" select ="substring-before(@draw:distance, $Unit3)" />
+
+
 
       <xsl:choose>
         <xsl:when test ="($dots1=1) and ($dots2=1)">
@@ -2479,7 +2516,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:value-of select ="'sysDash'" />
         </xsl:otherwise>
       </xsl:choose>
-
+      </xsl:for-each>
     </xsl:if >
       <xsl:if test ="not(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash])">
         <xsl:value-of select ="'sysDash'" />
@@ -2627,30 +2664,10 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:value-of select ="parent::node()/@style:parent-style-name"/>
         </xsl:variable>
 
-        <xsl:variable name ="default-padding-left">
-          <xsl:call-template name ="getDefaultStyle">
-            <xsl:with-param name ="parentStyle" select ="$parentStyle" />
-            <xsl:with-param name ="attributeName" select ="'padding-left'" />
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name ="default-padding-top">
-          <xsl:call-template name ="getDefaultStyle">
-            <xsl:with-param name ="parentStyle" select ="$parentStyle" />
-            <xsl:with-param name ="attributeName" select ="'padding-top'" />
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name ="default-padding-right">
-          <xsl:call-template name ="getDefaultStyle">
-            <xsl:with-param name ="parentStyle" select ="$parentStyle" />
-            <xsl:with-param name ="attributeName" select ="'padding-right'" />
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name ="default-padding-bottom">
-          <xsl:call-template name ="getDefaultStyle">
-            <xsl:with-param name ="parentStyle" select ="$parentStyle" />
-            <xsl:with-param name ="attributeName" select ="'padding-bottom'" />
-          </xsl:call-template>
-        </xsl:variable>
+      
+
+      
+       
         <xsl:variable name ="default-wrap-option">
           <xsl:call-template name ="getDefaultStyle">
             <xsl:with-param name ="parentStyle" select ="$parentStyle" />
@@ -2672,19 +2689,34 @@ Copyright (c) 2007, Sonata Software Limited
 
         <!--Text margins in shape-->
         <xsl:if test ="@fo:padding-left">
-          <xsl:attribute name ="lIns">
-            <xsl:call-template name ="convertToPoints">
-              <xsl:with-param name ="unit" select ="'cm'"/>
-              <xsl:with-param name ="length" select ="@fo:padding-left"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test ="not(@fo:padding-left)">
+
 
           <xsl:attribute name ="lIns">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
+              <xsl:with-param name ="length" select ="@fo:padding-left"/>
+            </xsl:call-template>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test ="not(@fo:padding-left)">
+          <xsl:variable name ="default-padding-left">
+            <xsl:call-template name ="getDefaultStyle">
+              <xsl:with-param name ="parentStyle" select ="$parentStyle" />
+              <xsl:with-param name ="attributeName" select ="'padding-left'" />
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:attribute name ="lIns">
+            <xsl:call-template name ="convertToPoints">
+              <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="$default-padding-left"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
@@ -2694,16 +2726,29 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:attribute name ="tIns">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="@fo:padding-top"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
         <xsl:if test ="not(@fo:padding-top)">
-
+          <xsl:variable name ="default-padding-top">
+            <xsl:call-template name ="getDefaultStyle">
+              <xsl:with-param name ="parentStyle" select ="$parentStyle" />
+              <xsl:with-param name ="attributeName" select ="'padding-top'" />
+            </xsl:call-template>
+          </xsl:variable>
           <xsl:attribute name ="tIns">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="$default-padding-top"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
@@ -2713,16 +2758,29 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:attribute name ="rIns">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="@fo:padding-right"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
         <xsl:if test ="not(@fo:padding-right)">
-
+          <xsl:variable name ="default-padding-right">
+            <xsl:call-template name ="getDefaultStyle">
+              <xsl:with-param name ="parentStyle" select ="$parentStyle" />
+              <xsl:with-param name ="attributeName" select ="'padding-right'" />
+            </xsl:call-template>
+          </xsl:variable>
           <xsl:attribute name ="rIns">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="$default-padding-right"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
@@ -2732,16 +2790,29 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:attribute name ="bIns">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="@fo:padding-bottom"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
         <xsl:if test ="not(@fo:padding-bottom)">
-
+          <xsl:variable name ="default-padding-bottom">
+            <xsl:call-template name ="getDefaultStyle">
+              <xsl:with-param name ="parentStyle" select ="$parentStyle" />
+              <xsl:with-param name ="attributeName" select ="'padding-bottom'" />
+            </xsl:call-template>
+          </xsl:variable>
           <xsl:attribute name ="bIns">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="$default-padding-bottom"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
@@ -2896,7 +2967,8 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:value-of  select ="office:document-styles/office:styles/style:style/style:text-properties/@fo:font-size"/>
     </xsl:variable>
     <xsl:for-each select ="node()">
-      <xsl:if test ="name()='text:p'" >
+      <xsl:choose>
+        <xsl:when test ="name()='text:p'" >
         <xsl:variable name="aColonhlinkClick">
           <xsl:if test="$grpFlag !='true'">
           <xsl:if test="text:a">
@@ -3131,8 +3203,8 @@ Copyright (c) 2007, Sonata Software Limited
           </a:p>
         </xsl:if>
         <!-- Change made by vijayeta, Bug fix	1731885-->
-      </xsl:if>
-      <xsl:if test ="name()='text:list'">
+        </xsl:when>
+        <xsl:when test ="name()='text:list'">
         <xsl:variable name="forCount" select="position()" />
         <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
           <!--Code inserted by Vijayets for Bullets and numbering-->
@@ -3227,7 +3299,12 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:for-each>
           <!--<xsl:copy-of select="$varFrameHyperLinks"/>-->
         </a:p >
-      </xsl:if>
+        </xsl:when>
+        <!--<xsl:when test ="name()!='text:list' and name()!='text:p'">
+          <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>
+        </xsl:when>-->
+      </xsl:choose>
+
     </xsl:for-each>
   </xsl:template>
   <!-- Blank lines in text-->

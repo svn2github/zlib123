@@ -447,7 +447,7 @@
           <xsl:value-of select ="text:list/text:list-item/text:p/text:span/text:a/@xlink:href"/>
         </xsl:if>
         <xsl:if test="text:list/text:list-item/text:p/text:a">
-          <xsl:value-of select ="text:list/text:list-item/text:list/text:list-item/text:p/text:a/@xlink:href"/>
+          <xsl:value-of select ="text:list/text:list-item/text:p/text:a/@xlink:href"/>
         </xsl:if>
       </xsl:when>
       <xsl:when test ="$blvl='2'">

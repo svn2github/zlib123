@@ -209,6 +209,202 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template >
+  <xsl:template name ="convertUnitsToCm">
+    <xsl:param name ="unit"/>
+    <xsl:param name ="length"/>
+    <xsl:choose>
+      <xsl:when test="contains($length,'cm')">
+        <xsl:value-of select="substring-before($length,'cm')"/>
+      </xsl:when>
+      <xsl:when test="contains($length,'pt')">
+        <xsl:value-of select="substring-before($length,'pt') * 0.035277778"/>
+      </xsl:when>
+      <xsl:when test="contains($length,'in')">
+        <xsl:value-of select="substring-before($length,'in') * 2.54 "/>
+      </xsl:when>
+      <!--mm to cm -->
+      <xsl:when test="contains($length,'mm')">
+        <xsl:value-of select="substring-before($length,'mm') div 10 "/>
+      </xsl:when>
+      <!-- m to cm -->
+      <xsl:when test="contains($length,'m')">
+        <xsl:value-of select="substring-before($length,'m') * 100 "/>
+      </xsl:when>
+      <!-- km to cm -->
+      <xsl:when test="contains($length,'km')">
+        <xsl:value-of select="substring-before($length,'km') * 100000  "/>
+      </xsl:when>
+      <!-- mi to cm -->
+      <xsl:when test="contains($length,'mi')">
+        <xsl:value-of select="substring-before($length,'mi') * 160934.4"/>
+      </xsl:when>
+      <!-- ft to cm -->
+      <xsl:when test="contains($length,'ft')">
+        <xsl:value-of select="substring-before($length,'ft') * 30.48 "/>
+      </xsl:when>
+      <!-- em to cm -->
+      <xsl:when test="contains($length,'em')">
+        <xsl:value-of select="round(substring-before($length,'em') * .4233) "/>
+      </xsl:when>
+      <!-- px to cm -->
+      <xsl:when test="contains($length,'px')">
+        <xsl:value-of select="round(substring-before($length,'px') div 35.43307) "/>
+      </xsl:when>
+      <!-- pc to cm -->
+      <xsl:when test="contains($length,'pc')">
+        <xsl:value-of select="round(substring-before($length,'pc') div 2.362) "/>
+      </xsl:when>
+      <!-- ex to cm 1 ex to 6 px-->
+      <xsl:when test="contains($length,'ex')">
+        <xsl:value-of select="round((substring-before($length,'ex') div 35.43307)* 6) "/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$length"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template >
+  <xsl:template name ="tmpconvertToPoints">
+    <xsl:param name ="unit"/>
+    <xsl:param name ="length"/>
+    <xsl:message terminate="no">progress:text:p</xsl:message>
+    <xsl:variable name="lengthVal">
+      <xsl:choose>
+        <xsl:when test="contains($length,'cm')">
+          <xsl:value-of select="substring-before($length,'cm')"/>
+        </xsl:when>
+        <xsl:when test="contains($length,'pt')">
+          <xsl:value-of select="substring-before($length,'pt')"/>
+        </xsl:when>
+        <xsl:when test="contains($length,'in')">
+          <xsl:value-of select="substring-before($length,'in') * 2.54 "/>
+        </xsl:when>
+        <!--mm to cm -->
+        <xsl:when test="contains($length,'mm')">
+          <xsl:value-of select="substring-before($length,'mm') div 10 "/>
+        </xsl:when>
+        <!-- m to cm -->
+        <xsl:when test="contains($length,'m')">
+          <xsl:value-of select="substring-before($length,'m') * 100 "/>
+        </xsl:when>
+        <!-- km to cm -->
+        <xsl:when test="contains($length,'km')">
+          <xsl:choose>
+            <xsl:when test ="$unit='cm'" >
+              <xsl:value-of select="substring-before($length,'km') * 100000  "/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select="substring-before($length,'km')" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!-- mi to cm -->
+        <xsl:when test="contains($length,'mi')">
+          <xsl:choose>
+            <xsl:when test ="$unit='cm'" >
+              <xsl:value-of select="substring-before($length,'mi') * 160934.4"/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select="substring-before($length,'mi')" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!-- ft to cm -->
+        <xsl:when test="contains($length,'ft')">
+          <xsl:choose>
+            <xsl:when test ="$unit='cm'" >
+              <xsl:value-of select="substring-before($length,'ft') * 30.48 "/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select="substring-before($length,'ft')" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!-- em to cm -->
+        <xsl:when test="contains($length,'em')">
+          <xsl:choose>
+            <xsl:when test ="$unit='cm'" >
+              <xsl:value-of select="round(substring-before($length,'em') * .4233) "/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select="substring-before($length,'em')" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!-- px to cm -->
+        <xsl:when test="contains($length,'px')">
+          <xsl:choose>
+            <xsl:when test ="$unit='cm'" >
+              <xsl:value-of select="round(substring-before($length,'px') div 35.43307) "/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select="substring-before($length,'px')" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!-- pc to cm -->
+        <xsl:when test="contains($length,'pc')">
+          <xsl:choose>
+            <xsl:when test ="$unit='cm'" >
+              <xsl:value-of select="round(substring-before($length,'pc') div 2.362) "/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select="substring-before($length,'pc')" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!-- ex to cm 1 ex to 6 px-->
+        <xsl:when test="contains($length,'ex')">
+          <xsl:choose>
+            <xsl:when test ="$unit='cm'" >
+              <xsl:value-of select="round((substring-before($length,'ex') div 35.43307)* 6) "/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select="substring-before($length,'ex')" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$length"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test ="contains($lengthVal,'NaN')">
+        <xsl:value-of select ="0"/>
+      </xsl:when>
+      <xsl:when test="$lengthVal='0' or $lengthVal='' or ( ($lengthVal &lt; 0) and ($unit != 'cm')) ">
+        <xsl:value-of select="0"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'cm'">
+        <xsl:value-of select="concat(format-number($lengthVal * 360000,'#'),'')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'mm'">
+        <xsl:value-of select="concat(format-number($lengthVal * 25.4 div 72,'#.###'),'mm')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'in'">
+        <xsl:value-of select="concat(format-number($lengthVal div 72,'#.###'),'in')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'pt'">
+        <xsl:value-of select="concat(format-number($lengthVal,'#') * 100 ,'')"/>
+        <!--Added by lohith - format-number($lengthVal,'#') to make sure that pt will be a int not a real value-->
+      </xsl:when>
+      <xsl:when test="$unit = 'pica'">
+        <xsl:value-of select="concat(format-number($lengthVal div 12,'#.###'),'pica')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'dpt'">
+        <xsl:value-of select="concat($lengthVal,'dpt')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'px'">
+        <xsl:value-of select="concat(format-number($lengthVal * 96.19 div 72,'#.###'),'px')"/>
+      </xsl:when>
+      <xsl:when test="not($lengthVal)">
+        <xsl:value-of select="concat(0,'cm')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$lengthVal"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template >
 	<xsl:template name ="fontStyles">
 		<xsl:param name ="Tid"/>
 		<xsl:param name ="prClassName"/>
@@ -396,25 +592,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<!-- Font Strike through end-->
 			<!--Charector spacing -->
 			<!-- Modfied by lohith - @fo:letter-spacing will have a text value 'normal' when no change is required -->
-			<xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">
-				<!-- Modfied by lohith - "spc" should be a int value, '#.##'has been replaced by '#'   -->
-        <xsl:variable name ="spc">
-					<xsl:if test ="substring-before(style:text-properties/@fo:letter-spacing,'cm')&lt; 0 ">
-						<!--<xsl:value-of select ="format-number(substring-before(style:text-properties/@fo:letter-spacing,'cm') * 3.5 *1000 ,'#')"/>-->
-						<xsl:value-of select ="format-number(substring-before(style:text-properties/@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"/>
-					</xsl:if >
-					<xsl:if test ="substring-before(style:text-properties/@fo:letter-spacing,'cm')
-								&gt; 0 or substring-before(style:text-properties/@fo:letter-spacing,'cm') = 0 ">
-						<!--<xsl:value-of select ="format-number((substring-before(style:text-properties/@fo:letter-spacing,'cm') div .035) *100 ,'#')"/>-->
-						<xsl:value-of select ="format-number((substring-before(style:text-properties/@fo:letter-spacing,'cm') * 72 div 2.54) *100 ,'#')"/>
-					</xsl:if>
-				</xsl:variable>
-        <xsl:if test ="$spc!=''">
-          <xsl:attribute name ="spc">
-            <xsl:value-of select ="$spc"/>
-          </xsl:attribute>
-        </xsl:if>
-			</xsl:if >
+      <xsl:call-template name="tmpCharacterSpacing"/>
 			<!--Color Node set as standard colors -->
 			<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
 			<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -541,6 +719,28 @@ Copyright (c) 2007, Sonata Software Limited
 			<!--End-->
 			</xsl:for-each >
 	</xsl:template>
+  <xsl:template name="tmpCharacterSpacing">
+    <xsl:if test ="style:text-properties/@fo:letter-spacing">
+      <xsl:variable name ="spc">
+        <xsl:variable name="spcTemp">
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length"  select ="style:text-properties/@fo:letter-spacing"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test ="$spcTemp &lt; 0 ">
+          <xsl:value-of select ="format-number($spcTemp * 7200 div 2.54 ,'#')"/>
+        </xsl:if >
+        <xsl:if test ="$spcTemp &gt; 0 or $spcTemp = 0 ">
+          <xsl:value-of select ="format-number(($spcTemp * 72 div 2.54) *100 ,'#')"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:if test ="$spc!=''">
+        <xsl:attribute name ="spc">
+          <xsl:value-of select ="$spc"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:if >
+  </xsl:template>
 	<xsl:template name ="paraProperties" >
 		<!--- Code inserted by Vijayeta for Bullets and numbering,For bullet properties-->
 		<xsl:param name ="paraId" />
@@ -611,8 +811,12 @@ Copyright (c) 2007, Sonata Software Limited
           <!--fo:text-indent-->
           <xsl:variable name ="varIndent">
             <xsl:call-template name ="convertToPoints">
-              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:text-indent"/>
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
+                  <xsl:with-param name="length" select="style:paragraph-properties/@fo:text-indent"/>
+                </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
           <xsl:if test ="$varIndent!=''">
@@ -673,20 +877,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:if>
                 <!-- Condition which checks if text indent is greater than 0 is removed, as the input has a marginn left of value 0
              bug number 1779336 by vijayeta, date:23rd aug '07-->
-				<xsl:if test ="style:paragraph-properties/@fo:margin-left">
-					<!--fo:margin-left-->
-					<xsl:variable name ="varMarginLeft">
-						<xsl:call-template name ="convertToPoints">
-							<xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-left"/>
-							<xsl:with-param name ="unit" select ="'cm'"/>
-						</xsl:call-template>
-					</xsl:variable>
-					<xsl:if test ="$varMarginLeft!=''">
-						<xsl:attribute name ="marL">
-							<xsl:value-of select ="$varMarginLeft"/>
-						</xsl:attribute>
-					</xsl:if>
-				</xsl:if >
+        <xsl:call-template name ="tmpMarLeft"/>
         <xsl:if test ="style:paragraph-properties/@fo:margin-right">
           <!-- warn if indent after text-->
           <xsl:message terminate="no">translation.odf2oox.paragraphIndentTypeAfterText</xsl:message>
@@ -709,7 +900,18 @@ Copyright (c) 2007, Sonata Software Limited
         <!-- End,bug number 1779336 vijayeta, date:23rd aug '07-->
 				<!--Code inserted by Vijayeta For Line Spacing,
             If the line spacing is in terms of Percentage, multiply the value with 1000-->
+        <xsl:variable name="lineSpc">
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:letter-spacing"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="lineSpcAtleast">
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:choose>
+         
           <xsl:when test ="style:paragraph-properties/@fo:line-height and 
 					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
 					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
@@ -722,29 +924,36 @@ Copyright (c) 2007, Sonata Software Limited
 					</a:lnSpc>
           </xsl:when>
 				<!--If the line spacing is in terms of Points,multiply the value with 2835-->
-          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-spacing,'cm') > 0">
+        
+          <xsl:when test ="$lineSpc > 0">
 					<a:lnSpc>
 						<a:spcPts>
               <xsl:attribute name ="val">
                 <xsl:call-template name ="convertToPointsLineSpacing">
-                  <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-spacing"/>
                   <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="$lineSpc"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
                 </xsl:call-template>
-                <!--<xsl:value-of select ="round(substring-before(style:paragraph-properties/@style:line-spacing,'cm')* 2835) "/>-->
-              </xsl:attribute>
+                  </xsl:attribute>
 						</a:spcPts>
 					</a:lnSpc>
           </xsl:when>
-          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') > 0 ">
+          <xsl:when test ="$lineSpcAtleast > 0 ">
 					<a:lnSpc>
 						<a:spcPts>
               <xsl:attribute name ="val">
                 <xsl:call-template name ="convertToPointsLineSpacing">
-                  <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
                   <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="$lineSpcAtleast"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
                 </xsl:call-template>
-                <!--<xsl:value-of select ="round(substring-before(style:paragraph-properties/@style:line-height-at-least,'cm')* 2835) "/>-->
-              </xsl:attribute>
+                 </xsl:attribute>
 						</a:spcPts>
 					</a:lnSpc>
           </xsl:when>
@@ -771,20 +980,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<!-- Code Added by Vijayeta,for Paragraph Spacing, Before and After
              Multiply the value in cm with 2835
 			 date: on 01-06-07-->
-				<xsl:if test ="style:paragraph-properties/@fo:margin-top">
-					<a:spcBef>
-						<a:spcPts>
-              <xsl:attribute name ="val">
-                <!--fo:margin-top-->
-                <xsl:call-template name ="convertToPointsLineSpacing">
-                  <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-top"/>
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                </xsl:call-template>
-                <!--<xsl:value-of select ="round(substring-before(style:paragraph-properties/@fo:margin-top,'cm')* 2835) "/>-->
-              </xsl:attribute>
-						</a:spcPts>
-					</a:spcBef >
-				</xsl:if>
+        <xsl:call-template name ="tmpMarTop"/>
         <xsl:if test ="not(style:paragraph-properties/@fo:margin-top) and  ($flagPresentationClass='No' or $prClsName='subtitle')">
           <xsl:call-template name="tmpgetDefualtParagraphProp">
             <xsl:with-param name="parentStyleName">
@@ -800,20 +996,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="attrName" select="'MarginTop'"/>
           </xsl:call-template>
         </xsl:if>
-				<xsl:if test ="style:paragraph-properties/@fo:margin-bottom">
-					<a:spcAft>
-						<a:spcPts>
-              <xsl:attribute name ="val">
-                <!--fo:margin-bottom-->
-                <xsl:call-template name ="convertToPointsLineSpacing">
-                  <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-bottom"/>
-                  <xsl:with-param name ="unit" select ="'cm'"/>
-                </xsl:call-template>
-                <!--<xsl:value-of select ="round(substring-before(style:paragraph-properties/@fo:margin-bottom,'cm')* 2835) "/>-->
-              </xsl:attribute>
-						</a:spcPts>
-					</a:spcAft>
-				</xsl:if >
+        <xsl:call-template name ="tmpMarBottom"/>
         <xsl:if test ="not(style:paragraph-properties/@fo:margin-bottom) and  ($flagPresentationClass='No' or $prClsName='subtitle')">
           <xsl:call-template name="tmpgetDefualtParagraphProp">
             <xsl:with-param name="parentStyleName">
@@ -856,12 +1039,134 @@ Copyright (c) 2007, Sonata Software Limited
 			</a:pPr>
 		</xsl:for-each >
 	</xsl:template>
+  <xsl:template name="tmpMarLeft">
+    <xsl:if test ="style:paragraph-properties/@fo:margin-left">
+      <!--fo:margin-left-->
+      <xsl:variable name ="varMarginLeft">
+        <xsl:call-template name ="convertToPoints">
+          <xsl:with-param name ="unit" select ="'cm'"/>
+          <xsl:with-param name ="length">
+            <xsl:call-template name="convertUnitsToCm">
+              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-left"/>
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test ="$varMarginLeft!=''">
+        <xsl:attribute name ="marL">
+          <xsl:value-of select ="$varMarginLeft"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:if >
+  </xsl:template>
+  <xsl:template name="tmpMarTop">
+    <xsl:if test ="style:paragraph-properties/@fo:margin-top">
+      <xsl:if test ="style:paragraph-properties/@fo:margin-top">
+        <a:spcBef>
+          <a:spcPts>
+            <xsl:attribute name ="val">
+              <!--fo:margin-top-->
+              <xsl:call-template name ="convertToPointsLineSpacing">
+                <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-top"/>
+                <xsl:with-param name ="unit" select ="'cm'"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </a:spcPts>
+        </a:spcBef >
+      </xsl:if>
+    </xsl:if>
+     </xsl:template>
+  <xsl:template name="tmpMarBottom">
+    <xsl:if test ="style:paragraph-properties/@fo:margin-bottom">
+      <a:spcAft>
+        <a:spcPts>
+          <xsl:attribute name ="val">
+            <!--fo:margin-bottom-->
+            <xsl:call-template name ="convertToPointsLineSpacing">
+              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-bottom"/>
+              <xsl:with-param name ="unit" select ="'cm'"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </a:spcPts>
+      </a:spcAft>
+    </xsl:if >
+  </xsl:template>
+ 
+  <xsl:template name="tmpLineSpacing">
+    <xsl:variable name="Unit">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="style:paragraph-properties/@style:line-spacing"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="Unit1">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="style:paragraph-properties/@style:line-height-at-least"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test ="style:paragraph-properties/@fo:line-height and 
+					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
+					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
+    
+      <a:lnSpc>
+        <a:spcPct>
+          <xsl:attribute name ="val">
+            <xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:line-height,'%')* 1000,'#.##') "/>
+          </xsl:attribute>
+        </a:spcPct>
+      </a:lnSpc>
+    </xsl:if>
+    <!--If the line spacing is in terms of Points,multiply the value with 2835-->
+    <xsl:if test ="style:paragraph-properties/@style:line-spacing and 
+					substring-before(style:paragraph-properties/@style:line-spacing,$Unit) &gt; 0">
+      <xsl:variable name="lineSpacing">
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name ="length" select ="style:paragraph-properties/@style:line-spacing"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <a:lnSpc>
+        <a:spcPts>
+          <xsl:attribute name ="val">
+            <xsl:value-of select ="round($lineSpacing* 2835) "/>
+          </xsl:attribute>
+        </a:spcPts>
+      </a:lnSpc>
+    </xsl:if>
+    <xsl:if test ="style:paragraph-properties/@style:line-height-at-least and 
+					substring-before(style:paragraph-properties/@style:line-height-at-least,$Unit1) &gt; 0 ">
+      <xsl:variable name="lineSpacing">
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name ="length" select ="style:paragraph-properties/@style:line-height-at-least"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <a:lnSpc>
+        <a:spcPts>
+          <xsl:attribute name ="val">
+            <xsl:value-of select ="round($lineSpacing* 2835) "/>
+          </xsl:attribute>
+        </a:spcPts>
+      </a:lnSpc>
+    </xsl:if>
+  </xsl:template>
 	<xsl:template name ="fillColor">
 		<xsl:param name ="prId"/>
+    <xsl:param name ="var_pos"/>
+    <xsl:param name="flagFile"/>
+    <xsl:variable name="filename">
+      <xsl:choose>
+        <xsl:when test="$flagFile=''">
+          <xsl:value-of select="'content.xml'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'styles.xml'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 		<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
 		<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-		<xsl:for-each select ="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$prId] ">
+		<xsl:for-each select ="document($filename)//style:style[@style:name=$prId] ">
+      <xsl:if test="position()=1">
 			<!--test="not(style:graphic-properties/@draw:fill = 'none' - Added by lohith.ar for invalid fill color for textboxes - Fill type should be given priority on fill color-->
+        <xsl:variable name="parentStyle" select="@style:parent-style-name"/>
       <xsl:choose>
         <xsl:when test ="style:graphic-properties/@draw:fill='solid'">
           <a:solidFill>
@@ -887,9 +1192,91 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param  name="opacity" select="substring-before(style:graphic-properties/@draw:opacity,'%')"/>
           </xsl:call-template>
         </xsl:when>
+        <xsl:when test ="style:graphic-properties/@draw:fill='bitmap'">
+          <xsl:call-template name="tmpBitmapFill">
+            <xsl:with-param name="FileName" select="concat('bitmap',$var_pos)" />
+            <xsl:with-param name="var_imageName" select="style:graphic-properties/@draw:fill-image-name" />
+        </xsl:call-template>
+        </xsl:when>
+          <xsl:when test ="not(style:graphic-properties/@draw:fill) and $parentStyle!=''">
+            <xsl:call-template name="fillColor">
+              <xsl:with-param name ="prId" select ="$parentStyle" />
+              <xsl:with-param name ="var_pos" select ="$var_pos" />
+              <xsl:with-param name ="flagFile" select ="'styles.xml'" />
+            </xsl:call-template>
+          </xsl:when>
       </xsl:choose>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
+  
+  <xsl:template name="tmpBitmapFill">
+    <xsl:param name="var_imageName"/>
+    <xsl:param name="FileName"/>
+   
+    <xsl:if test="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$var_imageName]">
+      <a:blipFill dpi="0" rotWithShape="1">
+        <xsl:call-template name="tmpInsertBackImage">
+          <xsl:with-param name="FileName" select="$FileName" />
+          <xsl:with-param name="imageName" select="$var_imageName" />
+          <xsl:with-param name="fillType" select="'shape'" />
+        </xsl:call-template>
+        <xsl:if test="@style:repeat='stretch'">
+          <a:stretch>
+            <a:fillRect />
+          </a:stretch>
+        </xsl:if>
+        <xsl:if test="@draw:fill-image-ref-point-x or @draw:fill-image-ref-point-y">
+          <a:tile tx="0" ty="0" flip="none">
+            <xsl:if test="@draw:fill-image-ref-point-x">
+              <xsl:attribute name="sx">
+                <xsl:value-of select="number(substring-before(@draw:fill-image-ref-point-x,'%')) * 1000"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@draw:fill-image-ref-point-y">
+              <xsl:attribute name="sy">
+                <xsl:value-of select="number(substring-before(@draw:fill-image-ref-point-y,'%')) * 1000"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@draw:fill-image-ref-point">
+              <xsl:attribute name="algn">
+                <xsl:choose>
+                  <xsl:when test="@draw:fill-image-ref-point='top-left'">
+                    <xsl:value-of select ="'tl'"/>
+                  </xsl:when>
+                  <xsl:when test="@draw:fill-image-ref-point='top'">
+                    <xsl:value-of select ="'t'"/>
+                  </xsl:when>
+                  <xsl:when test="@draw:fill-image-ref-point='top-right'">
+                    <xsl:value-of select ="'tr'"/>
+                  </xsl:when>
+                  <xsl:when test="@draw:fill-image-ref-point='right'">
+                    <xsl:value-of select ="'r'"/>
+                  </xsl:when>
+                  <xsl:when test="@draw:fill-image-ref-point='bottom-left'">
+                    <xsl:value-of select ="'bl'"/>
+                  </xsl:when>
+                  <xsl:when test="@draw:fill-image-ref-point='bottom-right'">
+                    <xsl:value-of select ="'br'"/>
+                  </xsl:when>
+                  <xsl:when test="@draw:fill-image-ref-point='bottom'">
+                    <xsl:value-of select ="'b'"/>
+                  </xsl:when>
+                  <xsl:when test="@draw:fill-image-ref-point='center'">
+                    <xsl:value-of select ="'ctr'"/>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:if>
+          </a:tile>
+        </xsl:if>
+      </a:blipFill>
+    </xsl:if>
+    <xsl:if test="not(document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$var_imageName])">
+      <a:noFill/>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template name="tmpshapeTransperancy" >
     <xsl:param name="tranparency"/>
     <xsl:choose>
@@ -1394,8 +1781,12 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="@fo:text-indent">
               <xsl:variable name ="varIndent">
                 <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name="length"  select ="@fo:text-indent"/>
                   <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="@fo:text-indent"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
               <xsl:if test ="$varIndent!=''">
@@ -1445,8 +1836,12 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="@fo:margin-left">
               <xsl:variable name ="varMarginLeft">
                 <xsl:call-template name ="convertToPoints">
-                  <xsl:with-param name="length"  select ="@fo:margin-left"/>
-                  <xsl:with-param name ="unit" select ="'cm'"/>
+                   <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="@fo:margin-left"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
               <xsl:if test ="$varMarginLeft!=''">
@@ -1508,6 +1903,16 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:choose>
         </xsl:when>
         <xsl:when test="$attrName='Linespacing'">
+          <xsl:variable name="lineSpc">
+            <xsl:call-template name="convertUnitsToCm">
+              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:letter-spacing"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="lineSpcAtleast">
+            <xsl:call-template name="convertUnitsToCm">
+              <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
+            </xsl:call-template>
+          </xsl:variable>
             <xsl:choose>
               <xsl:when test ="style:paragraph-properties/@fo:line-height and 
 					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
@@ -1520,25 +1925,34 @@ Copyright (c) 2007, Sonata Software Limited
                   </a:spcPct>
                 </a:lnSpc>
               </xsl:when>
-              <xsl:when test ="substring-before(style:paragraph-properties/@style:line-spacing,'cm') > 0">
+            <!--If the line spacing is in terms of Points,multiply the value with 2835-->
+            <xsl:when test ="$lineSpc > 0">
                 <a:lnSpc>
                   <a:spcPts>
                     <xsl:attribute name ="val">
                       <xsl:call-template name ="convertToPointsLineSpacing">
-                        <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-spacing"/>
-                        <xsl:with-param name ="unit" select ="'cm'"/>
+                       <xsl:with-param name ="unit" select ="'cm'"/>
+                      <xsl:with-param name ="length">
+                        <xsl:call-template name="convertUnitsToCm">
+                          <xsl:with-param name="length"  select ="$lineSpc"/>
+                        </xsl:call-template>
+                      </xsl:with-param>
                       </xsl:call-template>
                     </xsl:attribute>
                   </a:spcPts>
                 </a:lnSpc>
               </xsl:when>
-              <xsl:when test ="substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') > 0 ">
+            <xsl:when test ="$lineSpcAtleast > 0 ">
                 <a:lnSpc>
                   <a:spcPts>
                     <xsl:attribute name ="val">
                       <xsl:call-template name ="convertToPointsLineSpacing">
-                        <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
-                        <xsl:with-param name ="unit" select ="'cm'"/>
+                       <xsl:with-param name ="unit" select ="'cm'"/>
+                      <xsl:with-param name ="length">
+                        <xsl:call-template name="convertUnitsToCm">
+                          <xsl:with-param name="length"  select ="$lineSpcAtleast"/>
+                        </xsl:call-template>
+                      </xsl:with-param>
                       </xsl:call-template>
                     </xsl:attribute>
                   </a:spcPts>
@@ -1835,14 +2249,21 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:for-each select ="style:paragraph-properties/style:tab-stops/style:tab-stop">
 				<a:tab >
           <xsl:choose>
-            <xsl:when test="@style:position='cm' or @style:position='NaNcm'">
+            <xsl:when test="@style:position='cm' or contains(@style:position,'NaN')">
               <xsl:attribute name ="pos">
               <xsl:value-of select="'0'"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
 					<xsl:attribute name ="pos">
-						<xsl:value-of select ="round(substring-before(@style:position,'cm') * 360000)"/>
+              <xsl:call-template name ="convertToPoints">
+                <xsl:with-param name ="unit" select ="'cm'"/>
+                <xsl:with-param name ="length">
+                  <xsl:call-template name="convertUnitsToCm">
+                    <xsl:with-param name="length"  select ="@style:position"/>
+                  </xsl:call-template>
+                </xsl:with-param>
+              </xsl:call-template>
 					</xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
@@ -1898,8 +2319,12 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:when test ="./child::node()[$level]/style:list-level-properties/@text:space-before">
 					<xsl:call-template name ="convertToPoints">
 						<xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
 						<xsl:with-param name ="length" select ="./child::node()[$level]/style:list-level-properties/@text:space-before"/>
 					</xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise >
           <!--edited by vipul Margin Left cant be 0cm-->
@@ -1917,8 +2342,12 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:when test ="./child::node()[$level]/style:list-level-properties/@text:space-before">
 					<xsl:call-template name ="convertToPoints">
 						<xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
 						<xsl:with-param name ="length" select ="./child::node()[$level]/style:list-level-properties/@text:min-label-width"/>
 					</xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise >
           <!--edited by vipul indent cant be 0cm-->
@@ -2279,25 +2708,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when>
       </xsl:choose>
       <!--Charector spacing -->
-      <xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">
-        <!-- Modfied by lohith - "spc" should be a int value, '#.##'has been replaced by '#'   -->
-        <xsl:variable name ="spc">
-          <xsl:if test ="substring-before(style:text-properties/@fo:letter-spacing,'cm')&lt; 0 ">
-            <!--<xsl:value-of select ="format-number(substring-before(style:text-properties/@fo:letter-spacing,'cm') * 3.5 *1000 ,'#')"/>-->
-            <xsl:value-of select ="format-number(substring-before(style:text-properties/@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"/>
-          </xsl:if >
-          <xsl:if test ="substring-before(style:text-properties/@fo:letter-spacing,'cm')
-								&gt; 0 or substring-before(style:text-properties/@fo:letter-spacing,'cm') = 0 ">
-            <!--<xsl:value-of select ="format-number((substring-before(style:text-properties/@fo:letter-spacing,'cm') div .035) *100 ,'#')"/>-->
-            <xsl:value-of select ="format-number((substring-before(style:text-properties/@fo:letter-spacing,'cm') * 72 div 2.54) *100 ,'#')"/>
-          </xsl:if>
-        </xsl:variable>
-        <xsl:if test ="$spc!=''">
-          <xsl:attribute name ="spc">
-            <xsl:value-of select ="$spc"/>
-          </xsl:attribute>
-        </xsl:if>
-      </xsl:if >
+      <xsl:call-template name="tmpCharacterSpacing"/>
       <!--Color Node set as standard colors -->
       <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
       <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -2389,8 +2800,12 @@ Copyright (c) 2007, Sonata Software Limited
           <!--fo:text-indent-->
           <xsl:variable name ="varIndent">
             <xsl:call-template name ="convertToPoints">
-              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:text-indent"/>
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
+                  <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:text-indent"/>
+                </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
           <xsl:if test ="$varIndent!=''">
@@ -2422,8 +2837,12 @@ Copyright (c) 2007, Sonata Software Limited
           <!--fo:margin-left-->
           <xsl:variable name ="varMarginLeft">
             <xsl:call-template name ="convertToPoints">
-              <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-left"/>
-              <xsl:with-param name ="unit" select ="'cm'"/>
+               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
+                  <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:margin-left"/>
+                </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
           <xsl:if test ="$varMarginLeft!=''">
@@ -2436,6 +2855,16 @@ Copyright (c) 2007, Sonata Software Limited
           <!-- warn if indent after text-->
           <xsl:message terminate="no">translation.odf2oox.paragraphIndentTypeAfterText</xsl:message>
         </xsl:if>
+      <xsl:variable name="lineSpc">
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name="length"  select ="style:paragraph-properties/@fo:letter-spacing"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="lineSpcAtleast">
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
+        </xsl:call-template>
+      </xsl:variable>
         <xsl:choose>
           <xsl:when test ="style:paragraph-properties/@fo:line-height and 
 					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
@@ -2448,25 +2877,33 @@ Copyright (c) 2007, Sonata Software Limited
               </a:spcPct>
             </a:lnSpc>
           </xsl:when>
-          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-spacing,'cm') > 0">
+        <xsl:when test ="$lineSpc > 0">
             <a:lnSpc>
               <a:spcPts>
                 <xsl:attribute name ="val">
                   <xsl:call-template name ="convertToPointsLineSpacing">
-                    <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-spacing"/>
-                    <xsl:with-param name ="unit" select ="'cm'"/>
+                   <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="$lineSpc"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
                   </xsl:call-template>
                 </xsl:attribute>
               </a:spcPts>
             </a:lnSpc>
           </xsl:when>
-          <xsl:when test ="substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') > 0 ">
+        <xsl:when test ="$lineSpcAtleast > 0 ">
             <a:lnSpc>
               <a:spcPts>
                 <xsl:attribute name ="val">
                   <xsl:call-template name ="convertToPointsLineSpacing">
-                    <xsl:with-param name="length"  select ="style:paragraph-properties/@style:line-height-at-least"/>
-                    <xsl:with-param name ="unit" select ="'cm'"/>
+                   <xsl:with-param name ="unit" select ="'cm'"/>
+                  <xsl:with-param name ="length">
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="$lineSpcAtleast"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
                   </xsl:call-template>
                 </xsl:attribute>
               </a:spcPts>
@@ -2722,7 +3159,56 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:choose>
   </xsl:template >
   <!--End of snippet for Bug 1744106, fixed by vijayeta, date 16th Aug '07, add a new template to set font size and family in endPara-->
- 
+  <xsl:template name ="getConvertUnit">
+    <xsl:param name ="length"/>
+    <xsl:choose>
+      <xsl:when test="contains($length,'cm')">
+        <xsl:value-of select="'cm'"/>
+      </xsl:when>
+      <xsl:when test="contains($length,'pt')">
+        <xsl:value-of select="'pt'"/>
+      </xsl:when>
+      <xsl:when test="contains($length,'in')">
+        <xsl:value-of select="'in'"/>
+      </xsl:when>
+      <!--mm to cm -->
+      <xsl:when test="contains($length,'mm')">
+        <xsl:value-of select="'mm'"/>
+      </xsl:when>
+      <!-- m to cm -->
+      <xsl:when test="contains($length,'m')">
+        <xsl:value-of select="'m'"/>
+      </xsl:when>
+      <!-- km to cm -->
+      <xsl:when test="contains($length,'km')">
+        <xsl:value-of select="'km'"/>
+      </xsl:when>
+      <!-- mi to cm -->
+      <xsl:when test="contains($length,'mi')">
+        <xsl:value-of select="'mi'"/>
+      </xsl:when>
+      <!-- ft to cm -->
+      <xsl:when test="contains($length,'ft')">
+        <xsl:value-of select="'ft'"/>
+      </xsl:when>
+      <!-- em to cm -->
+      <xsl:when test="contains($length,'em')">
+        <xsl:value-of select="'em'"/>
+      </xsl:when>
+      <!-- px to cm -->
+      <xsl:when test="contains($length,'px')">
+        <xsl:value-of select="'px'"/>
+      </xsl:when>
+      <!-- pc to cm -->
+      <xsl:when test="contains($length,'pc')">
+        <xsl:value-of select="'pc'"/>
+      </xsl:when>
+      <!-- ex to cm 1 ex to 6 px-->
+      <xsl:when test="contains($length,'ex')">
+        <xsl:value-of select="'ex'"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template >
   <xsl:template name="tmpgroupingCordinates">
     <xsl:param name="InnerGrp"/>
 
@@ -2818,10 +3304,13 @@ Copyright (c) 2007, Sonata Software Limited
   </xsl:template>
   <xsl:template name="tmpGroping">
     <xsl:param name="pos"/>
+    <xsl:param name="startPos"/>
     <xsl:param name="pageNo"/>
     <xsl:param name="InnerGrp"/>
     <xsl:param name="fileName"/>
     <xsl:param name="master"/>
+    <xsl:param name="UniqueId"/>
+    
     <p:grpSp>
       <p:nvGrpSpPr>
         <p:cNvPr name="Title 1">
@@ -2847,11 +3336,12 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="var_num_2">
           <xsl:number level="any"/>
         </xsl:variable>
-        <xsl:variable name="NvPrId" select="number(concat($pos,$var_num_1,$var_num_2))"/>
+    
         <xsl:choose>
 
           <xsl:when test="name()='draw:frame'">
             <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
                 <xsl:choose>
               <xsl:when test="./draw:image">
                 <xsl:for-each select="./draw:image">
@@ -2866,7 +3356,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:if test="not(./@xlink:href[contains(.,'../')])">
                       <xsl:call-template name="InsertPicture">
                         <xsl:with-param name="imageNo" select="$pageNo" />
-                        <xsl:with-param name="picNo" select ="concat($pos,$var_pos)"/>
+                        <xsl:with-param name="picNo" select ="$NvPrId"/>
                         <xsl:with-param name="fileName">
                           <xsl:choose>
                             <xsl:when test="$master='1'">
@@ -2890,6 +3380,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name ="shapeName" select="'TextBox '" />
                   <xsl:with-param name ="shapeCount" select="$NvPrId" />
                   <xsl:with-param name ="grpFlag" select="'true'" />
+                  <xsl:with-param name="UniqueId" select="generate-id()"/>
                 </xsl:call-template>
                   </xsl:when>
                </xsl:choose>
@@ -2897,6 +3388,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:when test="name()='draw:rect' or name()='draw:ellipse' 
           or name()='draw:custom-shape'  or name()='draw:circle'">
             <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
             <xsl:call-template name ="shapes" >
               <xsl:with-param name ="fileName" select ="$fileName"/>
               <xsl:with-param name ="var_pos" select="$NvPrId" />
@@ -2905,9 +3397,11 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
           <xsl:when test="name()='draw:g'">
             <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
             <xsl:for-each select=".">
               <xsl:call-template name="tmpGroping">
-                <xsl:with-param name ="pos" select ="concat($pos,$var_pos)"/>
+                <xsl:with-param name ="pos" select ="$NvPrId"/>
+                <xsl:with-param name ="startPos" select ="$startPos+1"/>
                 <xsl:with-param name ="pageNo" select ="$pageNo"/>
                 <xsl:with-param name ="InnerGrp" select ="'InnerGroup'"/>
                 <xsl:with-param name="fileName" select="$fileName"/>
@@ -2922,15 +3416,27 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name="tmpGroupingRelation">
     <xsl:param name="pos"/>
     <xsl:param name="slideNo"/>
-
+    <xsl:param name="FileName"/>
+ <xsl:param name="startPos"/>
           <xsl:for-each select="node()">
+      <xsl:variable name="var_num_1">
+        <xsl:value-of select="position()"/>
+      </xsl:variable>
+      <xsl:variable name="var_num_2">
+        <xsl:number level="any"/>
+      </xsl:variable>
             <xsl:choose>
             <xsl:when test="name()='draw:frame'">
           <xsl:variable name="var_pos" select="position()"/>
+          <xsl:variable name="Uid" select="generate-id()"/>
+              <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
           <xsl:for-each select=".">
                 <xsl:choose>
                   <xsl:when test="./draw:image">
                 <xsl:for-each select="./draw:image">
+                  <xsl:variable name="UniqueID">
+                    <xsl:value-of select="generate-id()"/>
+                  </xsl:variable>
                   <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
             or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
             or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
@@ -2942,7 +3448,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:if test="not(./@xlink:href[contains(.,'../')])">
                       <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
                         <xsl:attribute name="Id">
-                          <xsl:value-of select="concat('slgrpImage',$slideNo,'-',$pos,$var_pos)" />
+                          <xsl:value-of select="concat('slgrpImage',$slideNo,'-',$NvPrId,$UniqueID)" />
                         </xsl:attribute>
                         <xsl:attribute name="Type">
                           <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
@@ -2956,31 +3462,163 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:for-each>
                           </xsl:when>
             </xsl:choose>
+              <xsl:call-template name="tmpBitmapFillRel">
+                <xsl:with-param name ="UniqueId" select="$Uid" />
+                <xsl:with-param name ="FileName" select="$FileName" />
+                <xsl:with-param name ="prefix" select="'grpbitmap'" />
+              </xsl:call-template>
+            
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name()='draw:custom-shape'">
+          <xsl:variable name="var_pos" select="position()"/>
+          <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
+          <xsl:variable name="Uid" select="generate-id()"/>
+          <xsl:for-each select=".">
+            <xsl:call-template name="tmpBitmapFillRel">
+              <xsl:with-param name ="UniqueId" select="$Uid" />
+              <xsl:with-param name ="FileName" select="$FileName" />
+              <xsl:with-param name ="prefix" select="'grpbitmap'" />
+            </xsl:call-template>
+
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name()='draw:rect'">
+          <xsl:variable name="var_pos" select="position()"/>
+          <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
+          <xsl:variable name="Uid" select="generate-id()"/>
+          <xsl:for-each select=".">
+            <xsl:call-template name="tmpBitmapFillRel">
+              <xsl:with-param name ="UniqueId" select="$Uid" />
+              <xsl:with-param name ="FileName" select="$FileName" />
+              <xsl:with-param name ="prefix" select="'grpbitmap'" />
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name()='draw:ellipse' or name()='draw:circle'">
+          <xsl:variable name="var_pos" select="position()"/>
+          <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
+          <xsl:variable name="Uid" select="generate-id()"/>
+          <xsl:for-each select=".">
+            <xsl:call-template name="tmpBitmapFillRel">
+              <xsl:with-param name ="UniqueId" select="$Uid" />
+              <xsl:with-param name ="FileName" select="$FileName" />
+              <xsl:with-param name ="prefix" select="'grpbitmap'" />
+            </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="name()='draw:g'">
           <xsl:variable name="var_pos" select="position()"/>
+          <xsl:variable name="NvPrId" select="$pos+$var_pos+$startPos"/>
           <xsl:call-template name="tmpGroupingRelation">
             <xsl:with-param name="slideNo" select="$slideNo"/>
-            <xsl:with-param name ="pos" select ="concat($pos,$var_pos)"/>
+            <xsl:with-param name ="pos" select ="$NvPrId"/>
+            <xsl:with-param name="startPos" select="$startPos+1"/>
+            <xsl:with-param name ="FileName" select="$FileName" />
           </xsl:call-template>
                           </xsl:when>
                            </xsl:choose>
     </xsl:for-each>
   </xsl:template>
+  
+  <xsl:template name="tmpBitmapFillRel">
+    <xsl:param name="UniqueId"/>
+    <xsl:param name="FileName"/>
+    <xsl:param name="prefix"/>
+   
+    <xsl:variable name ="grStyle" >
+      <xsl:choose>
+        <xsl:when test="@draw:style-name">
+          <xsl:value-of select ="@draw:style-name"/>
+        </xsl:when>
+        <xsl:when test="@presentation:style-name">
+          <xsl:value-of select ="@presentation:style-name"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:for-each select="document($FileName)//style:style[@style:name=$grStyle]/style:graphic-properties">
+      <xsl:if test="@draw:fill='bitmap'">
+      <xsl:call-template name="tmpBitmapRelationship">
+        <xsl:with-param name="UniqueId" select="$UniqueId"/>
+        <xsl:with-param name="FileName" select="$FileName"/>
+        <xsl:with-param name="prefix" select="$prefix"/>
+      </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="not(@draw:fill) and ./parent::node()/@style:parent-style-name!=''">
+        <xsl:variable name="graphicStyle" select="./parent::node()/@style:parent-style-name"/>
+        <xsl:for-each select="document('styles.xml')//style:style[@style:name=$graphicStyle]/style:graphic-properties">
+          <xsl:if test="@draw:fill='bitmap'">
+            <xsl:call-template name="tmpBitmapRelationship">
+              <xsl:with-param name="UniqueId" select="$UniqueId"/>
+              <xsl:with-param name="FileName" select="$FileName"/>
+              <xsl:with-param name="prefix" select="$prefix"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpBitmapRelationship">
+    <xsl:param name="UniqueId"/>
+    <xsl:param name="FileName"/>
+    <xsl:param name="prefix"/>
+        <xsl:variable name="var_imageName" select="@draw:fill-image-name"/>
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$var_imageName]">
+          <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
+            or contains(@xlink:href,'.bmp') or contains(@xlink:href,'.dib') or contains(@xlink:href,'.rle')
+            or contains(@xlink:href,'.bmz') or contains(@xlink:href,'.gfa') 
+            or contains(@xlink:href,'.emz') or contains(@xlink:href,'.wmz') or contains(@xlink:href,'.pcz')
+            or contains(@xlink:href,'.tif') or contains(@xlink:href,'.tiff') 
+            or contains(@xlink:href,'.cdr') or contains(@xlink:href,'.cgm') or contains(@xlink:href,'.eps') 
+            or contains(@xlink:href,'.pct') or contains(@xlink:href,'.pict') or contains(@xlink:href,'.wpg') 
+            or contains(@xlink:href,'.jpeg') or contains(@xlink:href,'.gif') or contains(@xlink:href,'.png') or contains(@xlink:href,'.jpg')">
+            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+              <xsl:attribute name="Id">
+                <xsl:value-of select="concat($prefix,$UniqueId)" />
+              </xsl:attribute>
+              <xsl:attribute name="Type">
+                <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'" />
+              </xsl:attribute>
+              <xsl:attribute name="Target">
+                <xsl:value-of select="concat('../media/',substring-after(@xlink:href,'/'))" />
+              </xsl:attribute>
+            </Relationship>
+          </xsl:if>
+        </xsl:for-each>
+     </xsl:template>
   <xsl:template name="tmpgrpValues">
     <xsl:param name="shape_count"/>
     <xsl:param name="Shapetype"/>
     <xsl:choose>
       <xsl:when test="$Shapetype='Line'">
+        <xsl:variable name="x1">
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length"  select ="@svg:x1"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="x2">
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length"  select ="@svg:x2"/>
+          </xsl:call-template>
+        </xsl:variable>
+         <xsl:variable name="y1">
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length"  select ="@svg:y1"/>
+          </xsl:call-template>
+        </xsl:variable>
+         <xsl:variable name="y2">
+          <xsl:call-template name="convertUnitsToCm">
+            <xsl:with-param name="length"  select ="@svg:y2"/>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:variable name="Width">
           <xsl:choose>
             <xsl:when test="@svg:x1 and @svg:x2">
               <xsl:if test="svg:x2 >= svg:x1">
-                <xsl:value-of select="number(substring-before(@svg:x1,'cm')) + ( number(substring-before(@svg:x2,'cm')) - number(substring-before(@svg:x1,'cm')))"/>
+                <xsl:value-of select="number($x1) + ( number($x2) - number($x1))"/>
                       </xsl:if>
               <xsl:if test="svg:x1 >= svg:x2">
-                <xsl:value-of select="number(substring-before(@svg:x1,'cm')) + ( number(substring-before(@svg:x1,'cm')) - number(substring-before(@svg:x2,'cm')))"/>
+                <xsl:value-of select="number($x1) + ( number($x1) - number($x2))"/>
                     </xsl:if>
                   </xsl:when>
                   <xsl:otherwise>
@@ -2992,10 +3630,10 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:choose>
                   <xsl:when test="@svg:y1 and @svg:y2">
                     <xsl:if test="svg:y2 >= svg:y1">
-                <xsl:value-of select="number(substring-before(@svg:y1,'cm')) + ( number(substring-before(@svg:y2,'cm')) - number(substring-before(@svg:y1,'cm')))"/>
+                      <xsl:value-of select="number($y1) + ( number($y2) - number($y1))"/>
                     </xsl:if>
                     <xsl:if test="svg:y1 >= svg:y2">
-                <xsl:value-of select="number(substring-before(@svg:y1,'cm')) + ( number(substring-before(@svg:y1,'cm')) - number(substring-before(@svg:y2,'cm')))"/>
+                      <xsl:value-of select="number($y1) + ( number($y1) - number($y2))"/>
                     </xsl:if>
                   </xsl:when>
                   <xsl:otherwise>
@@ -3006,7 +3644,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="X">
           <xsl:choose>
             <xsl:when test="@svg:x1">
-              <xsl:value-of select="substring-before(@svg:x1,'cm')"/>
+              <xsl:value-of select="$x1"/>
                   </xsl:when>
                   <xsl:otherwise>
               <xsl:value-of select="'0'"/>
@@ -3016,7 +3654,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="Y">
           <xsl:choose>
             <xsl:when test="@svg:y1">
-              <xsl:value-of select="substring-before(@svg:y1,'cm')"/>
+              <xsl:value-of select="$y1"/>
               </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="'0'"/>
@@ -3040,10 +3678,17 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:value-of select="concat($X,':',$Y,':',$Width,':',$Height,':',$Rot,'@')"/>
                   </xsl:when>
       <xsl:otherwise>
+        <xsl:variable name="convertUnit">
+          <xsl:call-template name="getConvertUnit">
+            <xsl:with-param name="length" select="@draw:transform"/>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:variable name="Width">
                     <xsl:choose>
             <xsl:when test="@svg:width">
-              <xsl:value-of select="substring-before(@svg:width,'cm')"/>
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length"  select ="@svg:width"/>
+              </xsl:call-template>
                       </xsl:when>
                       <xsl:otherwise>
               <xsl:value-of select="'0'"/>
@@ -3053,7 +3698,9 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="Height">
                 <xsl:choose>
             <xsl:when test="@svg:height">
-              <xsl:value-of select="substring-before(@svg:height,'cm')"/>
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length"  select ="@svg:height"/>
+              </xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
               <xsl:value-of select="'0'"/>
@@ -3063,11 +3710,13 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="X">
                 <xsl:choose>
                   <xsl:when test="@svg:x">
-              <xsl:value-of select="substring-before(@svg:x,'cm')"/>
+                    <xsl:call-template name="convertUnitsToCm">
+                      <xsl:with-param name="length"  select ="@svg:x"/>
+                    </xsl:call-template>
                   </xsl:when>
                   <xsl:when test="@draw:transform">
                     <xsl:variable name ="x">
-                      <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
+                      <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
                     </xsl:variable>
               <xsl:value-of select="$x"/>
                   </xsl:when>
@@ -3079,11 +3728,13 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="Y">
                         <xsl:choose>
                           <xsl:when test="@svg:y">
-              <xsl:value-of select="substring-before(@svg:y,'cm')"/>
+                            <xsl:call-template name="convertUnitsToCm">
+                              <xsl:with-param name="length"  select ="@svg:y"/>
+                            </xsl:call-template>
                           </xsl:when>
                           <xsl:when test="@draw:transform">
                             <xsl:variable name ="y">
-                              <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
+                              <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
                             </xsl:variable>
               <xsl:value-of select="$y"/>
                           </xsl:when>
@@ -3111,20 +3762,51 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:choose>
   </xsl:template>
   <xsl:template name ="tmpdrawCordinates">
+    <xsl:variable name="convertUnit">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="@draw:transform"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="width" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="height" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:height"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="x" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:x"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="y" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:y"/>
+      </xsl:call-template>
+    </xsl:variable>
     <a:xfrm>
       <xsl:variable name ="angle">
         <xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
       </xsl:variable>
       <xsl:variable name ="x2">
-        <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name="length" select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+        </xsl:call-template>
       </xsl:variable>
       <xsl:variable name ="y2">
-        <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
+        <xsl:call-template name="convertUnitsToCm">
+          <xsl:with-param name="length" select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+        </xsl:call-template>
       </xsl:variable>
       <xsl:if test="@draw:transform">
+      
+       
         <xsl:attribute name ="rot">
-          <xsl:value-of select ="concat('draw-transform:ROT:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
+          <xsl:value-of select ="concat('draw-transform:ROT:',$width, ':',
+																   $height, ':', 
 																   $x2, ':', 
                                    $y2, ':', 
 																   $angle)"/>
@@ -3163,20 +3845,19 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:attribute>
       </xsl:if>
       <!--End of bug fix code-->
-
       <a:off>
         <xsl:if test="@draw:transform">
           <xsl:attribute name ="x">
-            <xsl:value-of select ="concat('draw-transform:X:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
+            <xsl:value-of select ="concat('draw-transform:X:',$width, ':',
+																   $height, ':', 
 																   $x2, ':', 
                                    $y2, ':', 
 																   $angle)"/>
           </xsl:attribute>
 
           <xsl:attribute name ="y">
-            <xsl:value-of select ="concat('draw-transform:Y:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
+            <xsl:value-of select ="concat('draw-transform:Y:',$width, ':',
+																   $height, ':', 
 																   $x2, ':', 
                                    $y2, ':', 
 																   $angle)"/>
@@ -3186,68 +3867,89 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:attribute name ="x">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="@svg:x"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
           <xsl:attribute name ="y">
             <xsl:call-template name ="convertToPoints">
               <xsl:with-param name ="unit" select ="'cm'"/>
+              <xsl:with-param name ="length">
+                <xsl:call-template name="convertUnitsToCm">
               <xsl:with-param name ="length" select ="@svg:y"/>
+            </xsl:call-template>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
       </a:off>
       <a:ext>
         <xsl:attribute name ="cx">
-                <xsl:choose>
-            <xsl:when test="number(substring-before(@svg:width,'cm')) &lt; 0">
-              <xsl:call-template name ="convertToPoints">
+               <xsl:call-template name ="convertToPoints">
                 <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="concat(number(substring-before(@svg:width,'cm')) * -1,'cm')"/>
-              </xsl:call-template>
-                  </xsl:when>
-                  <xsl:otherwise>
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
                 <xsl:with-param name ="length" select ="@svg:width"/>
               </xsl:call-template>
-                  </xsl:otherwise>
-                </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name ="cy">
-                <xsl:choose>
-            <xsl:when test="number(substring-before(@svg:height,'cm')) &lt; 0">
-              <xsl:call-template name ="convertToPoints">
+            <xsl:call-template name ="convertToPoints">
                 <xsl:with-param name ="unit" select ="'cm'"/>
-                <xsl:with-param name ="length" select ="concat(number(substring-before(@svg:height,'cm')) * -1,'cm')"/>
-              </xsl:call-template>
-                  </xsl:when>
-                  <xsl:otherwise>
-              <xsl:call-template name ="convertToPoints">
-                <xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
                 <xsl:with-param name ="length" select ="@svg:height"/>
               </xsl:call-template>
-                  </xsl:otherwise>
-                </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:attribute>
       </a:ext>
     </a:xfrm>
   </xsl:template>
   <xsl:template name ="tmpGroupdrawCordinates">
+    <xsl:variable name="convertUnit">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="@draw:transform"/>
+    </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="width" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="height" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:height"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="x" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:x"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="y" >
+      <xsl:call-template name="convertUnitsToCm">
+        <xsl:with-param name="length" select="@svg:y"/>
+      </xsl:call-template>
+    </xsl:variable>
     <a:xfrm>
       <xsl:variable name ="angle">
         <xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
         </xsl:variable>
       <xsl:variable name ="x2">
-        <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
+        <xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
         </xsl:variable>
       <xsl:variable name ="y2">
-        <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),'cm')" />
+        <xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
         </xsl:variable>
       <xsl:if test="@draw:transform">
         <xsl:attribute name ="rot">
-          <xsl:value-of select ="concat('draw-transform:ROT:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
+          <xsl:value-of select ="concat('draw-transform:ROT:',$width, ':',
+																   $height, ':', 
 																   $x2, ':', 
                                    $y2, ':', 
 																   $angle)"/>
@@ -3290,16 +3992,16 @@ Copyright (c) 2007, Sonata Software Limited
         <a:off>
         <xsl:if test="@draw:transform">
           <xsl:attribute name ="x">
-            <xsl:value-of select ="concat('draw-transform:XGroup:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
+            <xsl:value-of select ="concat('draw-transform:XGroup:',$width, ':',
+																   $height, ':', 
 																   $x2, ':', 
                                    $y2, ':', 
 																   $angle)"/>
           </xsl:attribute>
 
           <xsl:attribute name ="y">
-            <xsl:value-of select ="concat('draw-transform:YGroup:',substring-before(@svg:width,'cm'), ':',
-																   substring-before(@svg:height,'cm'), ':', 
+            <xsl:value-of select ="concat('draw-transform:YGroup:',$width, ':',
+																   $height, ':', 
 																   $x2, ':', 
                                    $y2, ':', 
 																   $angle)"/>
@@ -3308,16 +4010,16 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:if test="not(@draw:transform)">
           <xsl:attribute name ="x">
             <xsl:choose>
-              <xsl:when test="@svg:x='0cm' or @svg:x='NaNcm' or @svg:x='cm' or @svg:x=''">
+              <xsl:when test="$x=0 or contains($x,'NaN') or @svg:x='cm' or $x=''">
                 <xsl:value-of select="'0'"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:choose>
-                  <xsl:when test="((number(substring-before(@svg:x,'cm')) * 360000) div 1588) &lt;= 1">
+                  <xsl:when test="((number($x) * 360000) div 1588) &lt;= 1">
                     <xsl:value-of select="'0'"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select ="format-number(( number(substring-before(@svg:x,'cm')) * 360000) div 1588,'#')"/>
+                    <xsl:value-of select ="format-number(( number($x) * 360000) div 1588,'#')"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:otherwise>
@@ -3325,16 +4027,16 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
           <xsl:attribute name ="y">
             <xsl:choose>
-              <xsl:when test="@svg:y='0cm' or @svg:y='NaNcm' or @svg:y='cm' or @svg:y=''">
+              <xsl:when test="$y=0 or contains($y,'NaN') or @svg:y='cm' or $y=''">
                 <xsl:value-of select="'0'"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:choose>
-                  <xsl:when test="((number(substring-before(@svg:y,'cm')) * 360000) div 1588) &lt;= 1">
+                  <xsl:when test="((number($y) * 360000) div 1588) &lt;= 1">
                     <xsl:value-of select="'0'"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select ="format-number(( number(substring-before(@svg:y,'cm')) * 360000) div 1588,'#')"/>
+                    <xsl:value-of select ="format-number(( number($y) * 360000) div 1588,'#')"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:otherwise>
@@ -3345,16 +4047,16 @@ Copyright (c) 2007, Sonata Software Limited
       <a:ext>
           <xsl:attribute name ="cx">
           <xsl:choose>
-            <xsl:when test="@svg:width='0cm' or @svg:width='NaNcm' or @svg:width='cm' or @svg:width=''">
+            <xsl:when test="$width='0' or contains($width,'NaN') or @svg:width='cm' or $width=''">
               <xsl:value-of select="'0'"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="((number(substring-before(@svg:width,'cm')) * 360000) div 1588) &lt;= 1">
+                <xsl:when test="((number($width) * 360000) div 1588) &lt;= 1">
                   <xsl:value-of select="'0'"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select ="format-number(( number(substring-before(@svg:width,'cm')) * 360000) div 1588,'#')"/>
+                  <xsl:value-of select ="format-number(( number($width) * 360000) div 1588,'#')"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
@@ -3362,16 +4064,16 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
           <xsl:attribute name ="cy">
           <xsl:choose>
-            <xsl:when test="@svg:height='0cm' or @svg:height='NaNcm' or @svg:height='cm' or @svg:height=''">
+            <xsl:when test="$height='0' or contains($height,'NaN') or @svg:height='cm' or $height=''">
               <xsl:value-of select="'0'"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="((number(substring-before(@svg:height,'cm')) * 360000) div 1588) &lt;= 1">
+                <xsl:when test="((number($height) * 360000) div 1588) &lt;= 1">
                   <xsl:value-of select="'0'"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select ="format-number(( number(substring-before(@svg:height,'cm')) * 360000) div 1588,'#')"/>
+                  <xsl:value-of select ="format-number(( number($height) * 360000) div 1588,'#')"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
@@ -3524,10 +4226,11 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N')">
         <xsl:value-of select ="'lightningBolt '"/>
       </xsl:when>
-      <!--  Explosion 1 (Added by A.Mathi as on 20/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='bang')">
-        <xsl:value-of select ="'irregularSeal1 '"/>
-      </xsl:when>
+		<!--  Explosion 1 (Modified by A.Mathi) -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt71') and 
+					   (draw:enhanced-geometry/@draw:enhanced-path='M 10901 5905 L 8458 2399 7417 6425 476 2399 4732 7722 106 8718 3828 11880 243 14689 5772 14041 4868 17719 7819 15730 8590 21600 10637 15038 13349 19840 14125 14561 18248 18195 16938 13044 21600 13393 17710 10579 21198 8242 16806 7417 18482 4560 14257 5429 14623 106 10901 5905 Z N')">
+			<xsl:value-of select ="'irregularSeal1 '"/>
+		</xsl:when>
       <!-- Left Bracket (Added by A.Mathi as on 20/07/2007) -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='left-bracket')">
         <xsl:value-of select ="'Left Bracket '"/>
@@ -3574,36 +4277,62 @@ Copyright (c) 2007, Sonata Software Limited
 									 (draw:enhanced-geometry/@draw:enhanced-path='M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N')">
         <xsl:value-of select ="'Snip Single Corner Rectangle '"/>
       </xsl:when>
-      <!-- Snip Same Side Corner Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 50801 0 L 863599 0 L 914400 50801 L 914400 304800 L 914400 304800 L 0 304800 L 0 304800 L 0 50801 Z N')">
-        <xsl:value-of select ="'Snip Same Side Corner Rectangle '"/>
-      </xsl:when>
-      <!-- Snip Diagonal Corner Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 876299 0 L 914400 38101 L 914400 228600 L 914400 228600 L 38101 228600 L 0 190499 L 0 0 Z N')">
-        <xsl:value-of select ="'Snip Diagonal Corner Rectangle '"/>
-      </xsl:when>
-      <!-- Snip and Round Single Corner Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 38101 0 L 876299 0 L 914400 38101 L 914400 228600 L 0 228600 L 0 38101 W 0 0 76202 76202 0 38101 38101 0 Z N')">
-        <xsl:value-of select ="'Snip and Round Single Corner Rectangle '"/>
-      </xsl:when>
-      <!-- Round Single Corner Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 876299 0 W 838198 0 914400 76202 876299 0 914400 38101 L 914400 228600 L 0 228600 Z N')">
-        <xsl:value-of select ="'Round Single Corner Rectangle '"/>
-      </xsl:when>
-      <!-- Round Same Side Corner Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 152403 0 L 761997 0 W 609594 0 914400 304806 761997 0 914400 152403 L 914400 914400 L 0 914400 L 0 152403 W 0 0 304806 304806 0 152403 152403 0 Z N')">
-        <xsl:value-of select ="'Round Same Side Corner Rectangle '"/>
-      </xsl:when>
-      <!-- Round Diagonal Corner Rectangle -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
-									 (draw:enhanced-geometry/@draw:enhanced-path='M 254005 0 L 2286000 0 L 2286000 1269995 W 1777990 1015990 2286000 1524000 2286000 1269995 2031995 1524000 L 0 1524000 L 0 254005 W 0 0 508010 508010 0 254005 254005 0 Z N')">
-        <xsl:value-of select ="'Round Diagonal Corner Rectangle '"/>
-      </xsl:when>
+		
+		<!--Equation Shapes-->
+		<!--Not Equal-->
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathnotequal')">
+			<xsl:value-of select="'Not Equal '"/>
+		</xsl:when>
+		<!--Equal-->
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathequal')">
+			<xsl:value-of select="'Equal '"/>
+		</xsl:when>
+		<!--Plus-->
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathplus')">
+			<xsl:value-of select="'Plus '"/>
+		</xsl:when>
+		<!--Minus-->
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathminus')">
+			<xsl:value-of select="'Minus '"/>
+		</xsl:when>
+		<!--Multiply-->
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathmultiply')">
+			<xsl:value-of select="'Multiply '"/>
+		</xsl:when>
+		<!--Division-->
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='mathdivide')">
+			<xsl:value-of select="'Division '"/>
+		</xsl:when>
+
+		<!-- Snip Same Side Corner Rectangle -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='snip2samerect')">
+			<xsl:value-of select ="'Snip Same Side Corner Rectangle '"/>
+		</xsl:when>
+		<!-- Snip Diagonal Corner Rectangle -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='snip2diagrect')">
+			<xsl:value-of select ="'Snip Diagonal Corner Rectangle '"/>
+		</xsl:when>
+		<!-- Snip and Round Single Corner Rectangle -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='sniproundrect')">
+			<xsl:value-of select ="'Snip and Round Single Corner Rectangle '"/>
+		</xsl:when>
+
+		<!-- Round Single Corner Rectangle -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='round1rect')">
+			<xsl:value-of select ="'Round Single Corner Rectangle '"/>
+		</xsl:when>
+		<!-- Round Same Side Corner Rectangle -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='round2samerect')">
+			<xsl:value-of select ="'Round Same Side Corner Rectangle '"/>
+		</xsl:when>
+		<!-- Round Diagonal Corner Rectangle -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='round2diagrect')">
+			<xsl:value-of select ="'Round Diagonal Corner Rectangle '"/>
+		</xsl:when>
+		<!-- Explosion 2 -->
+		<xsl:when test="(draw:enhanced-geometry/@draw:type='bang')">
+			<xsl:value-of select="'Explosion 2 '"/>
+		</xsl:when>
 
       <!-- Flow Chart: Process -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-process')">
@@ -3748,6 +4477,9 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:choose>
   </xsl:template>
   <xsl:template name="tmpSMShapeFillColor">
+    <xsl:param name ="shapeCount" />
+    <xsl:param name="grpFlag" />
+    <xsl:param name ="UniqueId" />
     <xsl:choose>
       <xsl:when test="@draw:fill='solid'">
         <xsl:if test="@draw:fill-color">
@@ -3775,21 +4507,125 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="@draw:fill-color">
-        <a:solidFill>
-          <a:srgbClr>
-            <xsl:attribute name="val">
-              <xsl:value-of select="substring-after(@draw:fill-color,'#')" />
-            </xsl:attribute>
-            <xsl:if test ="@draw:opacity">
-              <xsl:variable name="tranparency" select="substring-before(@draw:opacity,'%')"/>
-              <xsl:call-template name="tmpshapeTransperancy">
-                <xsl:with-param name="tranparency" select="$tranparency"/>
+
+      <!--Added by Mathi-->
+      <xsl:when test="(@draw:fill='bitmap') and $grpFlag!='true'">
+        <xsl:call-template name="tmpBitmapFill">
+          <xsl:with-param name="FileName" select="concat('bitmap',$shapeCount)" />
+          <xsl:with-param name="var_imageName" select="@draw:fill-image-name"/>
               </xsl:call-template>
-            </xsl:if>
-          </a:srgbClr>
-        </a:solidFill>
-    </xsl:when>
+            </xsl:when>
+      <xsl:when test="(@draw:fill='bitmap') and $grpFlag='true'">
+        <xsl:call-template name="tmpBitmapFill">
+          <xsl:with-param name="FileName" select="concat('grpbitmap',$UniqueId)" />
+          <xsl:with-param name="var_imageName" select="@draw:fill-image-name" />
+          <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+        </xsl:call-template>
+      </xsl:when>
+
     </xsl:choose>
+  </xsl:template>
+  <xsl:template name="tmpInternalPadding">
+    <xsl:variable name="UnitTop">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="@fo:padding-top"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UnitBottom">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="@fo:padding-bottom"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UnitLeft">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="@fo:padding-left"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UnitRight">
+      <xsl:call-template name="getConvertUnit">
+        <xsl:with-param name="length" select="@fo:padding-right"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+       <xsl:choose>
+      <xsl:when test ="@fo:padding-top and
+					substring-before(@fo:padding-top,$UnitTop) &gt; 0">
+        <xsl:attribute name ="tIns">
+          <xsl:call-template name ="convertToPoints">
+            <xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length"  select ="@fo:padding-top"/>
+              </xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        </xsl:when>
+      <xsl:when test ="substring-before(@fo:padding,$UnitTop) = '0' or substring-before(@fo:padding,$UnitTop) = ''">
+        <xsl:attribute name ="tIns">
+          <xsl:value-of select ="0"/>
+        </xsl:attribute>
+      </xsl:when >
+    </xsl:choose>
+       <xsl:choose>
+      <xsl:when test="@fo:padding-bottom and
+					substring-before(@fo:padding-bottom,$UnitBottom) &gt; 0">
+        <xsl:attribute name ="bIns">
+          <xsl:call-template name ="convertToPoints">
+            <xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length"  select ="@fo:padding-bottom"/>
+              </xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        </xsl:when>
+      <xsl:when test ="substring-before(@fo:padding,$UnitBottom) = '0' or substring-before(@fo:padding,$UnitBottom) = ''">
+          <xsl:attribute name ="bIns">
+            <xsl:value-of select ="0"/>
+          </xsl:attribute>
+        </xsl:when >
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="@fo:padding-left and
+					substring-before(@fo:padding-left,$UnitLeft) &gt; 0">
+          <xsl:attribute name ="lIns">
+          <xsl:call-template name ="convertToPoints">
+            <xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length"  select ="@fo:padding-left"/>
+              </xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test ="substring-before(@fo:padding,$UnitLeft) = '0' or substring-before(@fo:padding,$UnitLeft) = ''">
+          <xsl:attribute name ="lIns">
+          <xsl:value-of select ="0"/>
+          </xsl:attribute>
+        </xsl:when >
+      </xsl:choose>
+      <xsl:choose>
+      <xsl:when test="@fo:padding-right and
+					substring-before(@fo:padding-right,$UnitRight) &gt; 0">
+        <xsl:attribute name ="rIns">
+          <xsl:call-template name ="convertToPoints">
+            <xsl:with-param name ="unit" select ="'cm'"/>
+            <xsl:with-param name ="length">
+              <xsl:call-template name="convertUnitsToCm">
+                <xsl:with-param name="length"  select ="@fo:padding-right"/>
+              </xsl:call-template>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+        <xsl:when test ="substring-before(@fo:padding,$UnitRight) = '0' or substring-before(@fo:padding,$UnitRight) = ''">
+        <xsl:attribute name ="rIns">
+          <xsl:value-of select ="0"/>
+        </xsl:attribute>
+        </xsl:when >
+         </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>

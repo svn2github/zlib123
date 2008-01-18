@@ -30,6 +30,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"   
   xmlns:odf="urn:odf"
+    xmlns:msxsl="urn:schemas-microsoft-com:xslt"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"  
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -172,7 +173,10 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:for-each>
 		</xsl:variable>
 
-		<xsl:if test ="$animationVal!=''">
+		
+		<xsl:if test ="msxsl:node-set($animationVal)/p:par">
+			
+			<!--<xsl:if test =" $animationVal !='' or ($animationVal)">-->
 			<p:timing>
 				<p:tnLst>
 					<p:par>
@@ -1058,108 +1062,140 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:choose >
 			<xsl:when test ="$animationType ='entr'">
 				<xsl:choose >
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-appear'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-appear'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-appear'">
 						<xsl:value-of select ="1"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fly-in'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fly-in'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-fly-in'">
 						<xsl:value-of select ="'2'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-venetian-blinds'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-venetian-blinds'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-venetian-blinds'">
 						<xsl:value-of select ="'3'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-box'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-box'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-box'">
 						<xsl:value-of select ="'4'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-checkerboard'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-checkerboard'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-checkerboard'">
 						<xsl:value-of select ="'5'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-circle'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-circle'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-circle'">
 						<xsl:value-of select ="'6'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fly-in-slow'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fly-in-slow'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-fly-in-slow'">
 						<xsl:value-of select ="'7'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-diamond'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-diamond'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-diamond'">
 						<xsl:value-of select ="'8'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-dissolve-in'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-dissolve-in'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-dissolve-in'">
 						<xsl:value-of select ="'9'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fade-in'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fade-in'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-fade-in'">
 						<xsl:value-of select ="'10'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-flash-once'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-flash-once'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-flash-once'">
 						<xsl:value-of select ="'11'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-peek-in'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-peek-in'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-peek-in'">
 						<xsl:value-of select ="'12'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-plus'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-plus'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-plus'">
 						<xsl:value-of select ="'13'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-random-bars'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-random-bars'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-random-bars'">
 						<xsl:value-of select ="'14'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-random'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-random'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-random'">
 						<xsl:value-of select ="'24'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-split'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-split'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-split'">
 						<xsl:value-of select ="'16'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-diagonal-squares'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-diagonal-squares'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-diagonal-squares'">
 						<xsl:value-of select ="'18'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-wedge'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-wedge'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-wedge'">
 						<xsl:value-of select ="'20'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-wheel'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-wheel'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-wheel'">
 						<xsl:value-of select ="'21'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-wipe'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-wipe'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-wipe'">
 						<xsl:value-of select ="'22'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-expand'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-expand'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-expand'">
 						<xsl:value-of select ="'55'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-fade-in-and-swivel'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fade-in-and-swivel'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-fade-in-and-swivel'">
 						<xsl:value-of select ="'45'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fade-in-and-zoom'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-fade-in-and-zoom'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-fade-in-and-zoom'">
 						<xsl:value-of select ="'53'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-ascend'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-ascend'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-ascend'">
 						<xsl:value-of select ="'42'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-center-revolve'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-center-revolve'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-center-revolve'">
 						<xsl:value-of select ="'43'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-colored-lettering'
 						 or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-colored-lettering'">
 						<xsl:value-of select ="'27'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-compress'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-compress'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-compress'">
 						<xsl:value-of select ="'50'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-descend'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-descend'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-descend'">
 						<xsl:value-of select ="'47'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-ease-in'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-ease-in'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-ease-in'">
 						<xsl:value-of select ="'29'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-turn-and-grow'
 							or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-turn-and-grow'">
 						<xsl:value-of select ="'31'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-rise-up'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-rise-up'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-rise-up'">
 						<xsl:value-of select ="'37'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-spin-in'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-spin-in'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-spin-in'">
 						<xsl:value-of select ="'49'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-stretchy'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-stretchy'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-stretchy'">
 						<xsl:value-of select ="'17'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-swivel'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-swivel'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-entrance-swivel'">
 						<xsl:value-of select ="'19'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-entrance-unfold'
@@ -1397,38 +1433,48 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:when>
 			<xsl:when test ="$animationType ='emph'">
 				<xsl:choose >
-          <xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-fill-color'">
+          <xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-fill-color'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-fill-color'">
             <xsl:value-of select ="'1'"/>
           </xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-font'">
 						<xsl:value-of select ="'2'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font-color'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font-color'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-font-color'">
 						<xsl:value-of select ="'3'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font-size'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font-size'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-font-size'">
 						<xsl:value-of select ="'4'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font-style'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-font-style'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-font-style'">
 						<xsl:value-of select ="'5'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-grow-and-shrink'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-grow-and-shrink'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-grow-and-shrink'">
 						<xsl:value-of select ="'6'"/>
 					</xsl:when>
-          <xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-line-color'">
+          <xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-line-color'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-line-color'">
             <xsl:value-of select ="'7'"/>
           </xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-spin'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-spin'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-spin'">
 						<xsl:value-of select ="'8'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-transparency'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-transparency'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-transparency'">
 						<xsl:value-of select ="'9'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-bold-flash' or 
                           ./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-bold-flash'">
 						<xsl:value-of select ="'10'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-color-over-by-word'">
+					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-color-over-by-word'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-color-over-by-word'">
 						<xsl:value-of select ="'16'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-reveal-underline'">
@@ -1455,49 +1501,64 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-color-over-by-letter'">
 						<xsl:value-of select ="'20'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-complementary-color'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-complementary-color'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-complementary-color'">
 						<xsl:value-of select ="'21'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-complementary-color-2'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-complementary-color-2'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-complementary-color-2'">
 						<xsl:value-of select ="'22'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-contrasting-color'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-contrasting-color'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-contrasting-color'">
 						<xsl:value-of select ="'23'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-darken'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-darken'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-darken'">
 						<xsl:value-of select ="'24'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-desaturate'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-desaturate'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-desaturate'">
 						<xsl:value-of select ="'25'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-flash-bulb'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-flash-bulb'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-flash-bulb'">
 						<xsl:value-of select ="'26'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-lighten'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-lighten'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-lighten'">
 						<xsl:value-of select ="'30'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-vertical-highlight'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-vertical-highlight'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-vertical-highlight'">
 						<xsl:value-of select ="'33'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-flicker'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-flicker'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-flicker'">
 						<xsl:value-of select ="'27'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-grow-with-color'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-grow-with-color'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-grow-with-color'">
 						<xsl:value-of select ="'28'"/>
 					</xsl:when>
-          <xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-shimmer'">
+          <xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-shimmer'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-shimmer'">
 						<xsl:value-of select ="'36'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-teeter'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-teeter'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-teeter'">
 						<xsl:value-of select ="'32'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-blast'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-blast'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-blast'">
 						<xsl:value-of select ="'14'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-blink'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-blink'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-blink'">
 						<xsl:value-of select ="'35'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-bold-reveal'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-bold-reveal'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-bold-reveal'">
 						<xsl:value-of select ="'15'"/>
 					</xsl:when>
 					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-style-emphasis'
@@ -1505,7 +1566,8 @@ Copyright (c) 2007, Sonata Software Limited
             or ./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-style-emphasis' ">
 						<xsl:value-of select ="'31'"/>
 					</xsl:when>
-					<xsl:when test ="./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-wave'">
+					<xsl:when test ="./anim:par/anim:par/@presentation:preset-id ='ooo-emphasis-wave'
+            or ./anim:par/anim:iterate/@presentation:preset-id ='ooo-emphasis-wave'">
 						<xsl:value-of select ="'34'"/>
 					</xsl:when>
 				</xsl:choose>

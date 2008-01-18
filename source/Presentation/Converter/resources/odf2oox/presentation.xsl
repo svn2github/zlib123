@@ -101,7 +101,11 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:if test="style:page-layout-properties/@fo:page-width">
               <xsl:call-template name ="convertToPoints">
                 <xsl:with-param name ="unit" select ="'cm'"/>
+                <xsl:with-param name ="length">
+                  <xsl:call-template name="convertUnitsToCm">
                 <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-width"/>
+              </xsl:call-template>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:if>
             <!-- Modified by lohith - Always cx should be greater than 0-->
@@ -113,8 +117,13 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:if test="style:page-layout-properties/@fo:page-height">
               <xsl:call-template name ="convertToPoints">
                 <xsl:with-param name ="unit" select ="'cm'"/>
+                <xsl:with-param name ="length">
+                  <xsl:call-template name="convertUnitsToCm">
                 <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-height"/>
               </xsl:call-template>
+                </xsl:with-param>
+              </xsl:call-template>
+              
             </xsl:if>
             <!-- Modified by lohith - Always cy should be greater than 0-->
             <xsl:if test="not(style:page-layout-properties/@fo:page-height)">
@@ -136,7 +145,11 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:if test="style:page-layout-properties/@fo:page-width">
                     <xsl:call-template name ="convertToPoints">
                       <xsl:with-param name ="unit" select ="'cm'"/>
+                      <xsl:with-param name ="length">
+                        <xsl:call-template name="convertUnitsToCm">
                       <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-width"/>
+                    </xsl:call-template>
+                      </xsl:with-param>
                     </xsl:call-template>
                   </xsl:if>
                   <!-- Modified by lohith - Always cx should be greater than 0-->
@@ -148,7 +161,11 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:if test="style:page-layout-properties/@fo:page-height">
                     <xsl:call-template name ="convertToPoints">
                       <xsl:with-param name ="unit" select ="'cm'"/>
+                      <xsl:with-param name ="length">
+                        <xsl:call-template name="convertUnitsToCm">
                       <xsl:with-param name ="length" select ="style:page-layout-properties/@fo:page-height"/>
+                    </xsl:call-template>
+                      </xsl:with-param>
                     </xsl:call-template>
                   </xsl:if>
                   <!-- Modified by lohith - Always cy should be greater than 0-->
