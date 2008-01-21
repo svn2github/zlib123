@@ -53,7 +53,7 @@
 
     <!-- Search Revision Log Files -->
     <xsl:variable name="revisionLogFiles">
-      <xsl:for-each select="document('xl/_rels/workbook.xml.rels')//node()[name()='Relationship']">
+      <xsl:for-each select="key('Part', 'xl/_rels/workbook.xml.rels')//node()[name()='Relationship']">
         <xsl:if
           test="./@Type = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionHeaders'">
           <xsl:value-of select="./@Target"/>
@@ -63,7 +63,7 @@
 
     <!-- Open Files with Change Tracking -->
 
-    <xsl:for-each select="document(concat('xl/', $revisionLogFiles))">
+    <xsl:for-each select="key('Part', concat('xl/', $revisionLogFiles))">
       <table:tracked-changes>
         <xsl:call-template name="SearchChangeTracking">
           <xsl:with-param name="revisionLogFiles">
@@ -131,7 +131,7 @@
 
     <xsl:variable name="Target">
       <xsl:for-each
-        select="document(concat('xl/', substring-before($revisionLogFiles, '/'), '/_rels/', substring-after($revisionLogFiles, '/'), '.rels'))//node()[name()='Relationship']">
+        select="key('Part', concat('xl/', substring-before($revisionLogFiles, '/'), '/_rels/', substring-after($revisionLogFiles, '/'), '.rels'))//node()[name()='Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:value-of
             select="concat('xl/', substring-before($revisionLogFiles, '/'), '/', ./@Target)"/>
@@ -139,7 +139,7 @@
       </xsl:for-each>
     </xsl:variable>
 
-    <xsl:for-each select="document($Target)/e:revisions">
+    <xsl:for-each select="key('Part', $Target)/e:revisions">
       <xsl:if test="e:rcc|e:rm|e:rrc">
         <xsl:apply-templates select="node()[name()='rcc' or name()='rm' or name() = 'rrc'][1]">
           <xsl:with-param name="dateTime">
@@ -166,7 +166,7 @@
 
     <!-- Search Previous Style or Value in Change Tracking -->
     <xsl:variable name="prevStyle">
-      <xsl:for-each select="document($Target)/e:revisions">
+      <xsl:for-each select="key('Part', $Target)/e:revisions">
         <xsl:if test="e:rcc|e:rm">
           <xsl:apply-templates select="node()[name()='rcc' or name()='rm'][1]"
             mode="SearchPreviousStyle">
@@ -191,7 +191,7 @@
 
     <xsl:variable name="prevDelColStyle">
 
-      <xsl:for-each select="document($Target)/e:revisions">
+      <xsl:for-each select="key('Part', $Target)/e:revisions">
 
         <xsl:if test="e:rrc">
 
@@ -208,7 +208,7 @@
     </xsl:variable>
 
     <xsl:variable name="DeleteMovedRange">
-      <xsl:for-each select="document($Target)/e:revisions">
+      <xsl:for-each select="key('Part', $Target)/e:revisions">
         <xsl:choose>
           <xsl:when test="e:rcc|e:rm">
             <xsl:apply-templates select="node()[name()='rcc' or name()='rm'][1]"
@@ -852,7 +852,7 @@
 
     <xsl:variable name="Target">
       <xsl:for-each
-        select="document(concat('xl/', substring-before($revisionLogFiles, '/'), '/_rels/', substring-after($revisionLogFiles, '/'), '.rels'))//node()[name()='Relationship']">
+        select="key('Part', concat('xl/', substring-before($revisionLogFiles, '/'), '/_rels/', substring-after($revisionLogFiles, '/'), '.rels'))//node()[name()='Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:value-of
             select="concat('xl/', substring-before($revisionLogFiles, '/'), '/', ./@Target)"/>
@@ -861,7 +861,7 @@
     </xsl:variable>
 
     <xsl:variable name="prevRangeMoved">
-      <xsl:for-each select="document($Target)/e:revisions">
+      <xsl:for-each select="key('Part', $Target)/e:revisions">
         <xsl:if test="e:rcc|e:rm">
           <xsl:apply-templates select="node()[name()='rcc' or name()='rm'][1]"
             mode="SearchRangeMoved">

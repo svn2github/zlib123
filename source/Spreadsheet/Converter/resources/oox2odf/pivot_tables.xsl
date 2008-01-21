@@ -65,7 +65,7 @@
     <!-- @Context: None -->
 
     <!-- get all sheet Id's -->
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
 
       <xsl:variable name="sheet">
         <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
@@ -82,7 +82,7 @@
       </xsl:variable>
 
       <xsl:if
-        test="document(concat('xl/worksheets/_rels/',$fileName,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'pivotTable' )]/@Target">
+        test="key('Part', concat('xl/worksheets/_rels/',$fileName,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'pivotTable' )]/@Target">
         <xsl:value-of select="position()"/>
         <xsl:text>,</xsl:text>
       </xsl:if>
@@ -109,7 +109,7 @@
     <xsl:param name="sheetNum"/>
 
     <xsl:for-each
-      select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[position() = $sheetNum]">
+      select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[position() = $sheetNum]">
 
       <xsl:variable name="sheetName">
         <xsl:call-template name="CheckSheetName">
@@ -137,14 +137,14 @@
       </xsl:variable>
 
       <xsl:for-each
-        select="document(concat('xl/worksheets/_rels/',$fileName,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'pivotTable' )]">
+        select="key('Part', concat('xl/worksheets/_rels/',$fileName,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'pivotTable' )]">
 
         <xsl:variable name="TargetPilotFile">
           <xsl:value-of select="substring-after(@Target,'../')"/>
         </xsl:variable>
 
-        <xsl:if test="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
-          <xsl:for-each select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
+        <xsl:if test="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
+          <xsl:for-each select="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
 
             <xsl:variable name="name">
               <xsl:value-of select="@name"/>
@@ -256,7 +256,7 @@
               <!-- locate cache for this pivot table -->
               <xsl:variable name="cacheFile">
                 <xsl:for-each
-                  select="document(concat('xl/pivotTables/_rels/',substring-after($TargetPilotFile,'/'),'.rels'))//node()[name()='Relationship' and contains(@Type,'pivotCacheDefinition' )]">
+                  select="key('Part', concat('xl/pivotTables/_rels/',substring-after($TargetPilotFile,'/'),'.rels'))//node()[name()='Relationship' and contains(@Type,'pivotCacheDefinition' )]">
 
                   <xsl:value-of select="substring-after(@Target,'../')"/>
 
@@ -265,9 +265,8 @@
 
 
               <!-- insert pilot table source range -->
-              <xsl:for-each select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition">
+              <xsl:for-each select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition">
                 <xsl:for-each select="e:cacheSource/e:worksheetSource">
-
                   <xsl:variable name="apos">
                     <xsl:text>&apos;</xsl:text>
                   </xsl:variable>
@@ -294,13 +293,13 @@
 
                     <!-- Insert Filters-->
                     <xsl:for-each
-                      select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters">
+                      select="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters">
 
                       <table:filter table:condition-source-range-address="">
                         <table:filter-or>
 
                           <xsl:for-each
-                            select="document(concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters/e:filter">
+                            select="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters/e:filter">
                             <xsl:variable name="labelFilterNum">
                               <xsl:value-of select="@fld"/>
                             </xsl:variable>
@@ -498,12 +497,12 @@
 
     <!-- do not converted group fields and formula fields -->
     <xsl:if
-      test="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum + 1 and not(e:fieldGroup) and not(@formula)]">
+      test="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum + 1 and not(e:fieldGroup) and not(@formula)]">
 
       <table:data-pilot-field>
 
         <xsl:for-each
-          select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum + 1]">
+          select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum + 1]">
 
           <xsl:attribute name="table:source-field-name">
 
@@ -632,7 +631,7 @@
 
           <xsl:variable name="baseCacheValue">
             <xsl:for-each
-              select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $base + 1]/e:sharedItems">
+              select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $base + 1]/e:sharedItems">
               <xsl:value-of select="child::node()[$baseCacheNum + 1]/@v"/>
             </xsl:for-each>
           </xsl:variable>
@@ -680,7 +679,7 @@
               </xsl:attribute>
 
               <xsl:for-each
-                select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[$base + 1]">
+                select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[$base + 1]">
 
                 <xsl:attribute name="table:field-name">
                   <xsl:value-of select="@name"/>
@@ -722,7 +721,7 @@
 
                 <xsl:variable name="hiddenCacheValue">
                   <xsl:for-each
-                    select="document(concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum]/e:sharedItems">
+                    select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum]/e:sharedItems">
                     <xsl:value-of select="child::node()[position() = $hiddenFieldNum + 1]/@v"/>
                   </xsl:for-each>
                 </xsl:variable>

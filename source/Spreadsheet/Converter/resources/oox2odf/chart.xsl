@@ -64,7 +64,7 @@
     <!-- @Context: None -->
 
     <!-- get all sheet Id's -->
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
 
       <xsl:variable name="sheet">
         <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
@@ -77,7 +77,7 @@
       </xsl:variable>
 
       <!-- go to sheet file and search for drawing -->
-      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:drawing">
 
         <xsl:variable name="drawing">
           <!-- path to drawing file from xl/ catalog (i.e. $drawing = ../drawings/drawing2.xml) -->
@@ -93,7 +93,7 @@
 
         <!-- go to sheet drawing file and search for charts -->
         <xsl:for-each
-          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
 
           <xsl:variable name="chart">
             <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->
@@ -113,7 +113,7 @@
           </xsl:variable>
 
           <!-- finally go to a chart file -->
-          <xsl:for-each select="document(concat('xl/',substring-after($chart,'/')))">
+          <xsl:for-each select="key('Part', concat('xl/',substring-after($chart,'/')))">
 
             <xsl:call-template name="InsertChart">
               <xsl:with-param name="chartId" select="$chartId"/>
@@ -132,14 +132,14 @@
   <xsl:template name="CreateSheetCharts">
 
     <xsl:for-each
-      select="document('xl/_rels/workbook.xml.rels')//node()[name() = 'Relationship' and starts-with(@Target,'chartsheets/')]">
+      select="key('Part', 'xl/_rels/workbook.xml.rels')//node()[name() = 'Relationship' and starts-with(@Target,'chartsheets/')]">
 
       <xsl:variable name="sheet">
         <xsl:value-of select="@Target"/>
       </xsl:variable>
 
       <!-- go to sheet file and search for drawing -->
-      <xsl:for-each select="document(concat('xl/',$sheet))/e:chartsheet/e:drawing">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:chartsheet/e:drawing">
 
         <xsl:variable name="drawing">
           <!-- path to drawing file from xl/ catalog (i.e. $drawing = ../drawings/drawing2.xml) -->
@@ -155,7 +155,7 @@
 
         <!-- go to sheet drawing file and search for charts -->
         <xsl:for-each
-          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
 
           <xsl:variable name="chart">
             <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->
@@ -175,7 +175,7 @@
           </xsl:variable>
 
           <!-- finally go to a chart file -->
-          <xsl:for-each select="document(concat('xl/',substring-after($chart,'/')))">
+          <xsl:for-each select="key('Part', concat('xl/',substring-after($chart,'/')))">
 
             <xsl:call-template name="InsertChart">
               <xsl:with-param name="chartId" select="$chartId"/>

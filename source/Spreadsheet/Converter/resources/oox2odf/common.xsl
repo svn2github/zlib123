@@ -42,15 +42,16 @@
     <xsl:param name="cell"/>
     <xsl:param name="columnId"/>
 
+    <!--xsl:value-of select="substring-before($cell, '|')"/-->
     <xsl:choose>
-      <!-- when whole literal column id has been extracted than convert alphabetic index to number -->
-      <xsl:when test="number(substring($cell,1,1))">
+    <!-- when whole literal column id has been extracted than convert alphabetic index to number -->
+    <xsl:when test="number(substring($cell,1,1))">
         <xsl:call-template name="GetAlphabeticPosition">
           <xsl:with-param name="literal" select="$columnId"/>
         </xsl:call-template>
       </xsl:when>
-      <!--  recursively extract literal column id (i.e if $cell='GH15' it will return 'GH') -->
-      <xsl:otherwise>
+    <!--  recursively extract literal column id (i.e if $cell='GH15' it will return 'GH') -->
+    <xsl:otherwise>
         <xsl:call-template name="GetColNum">
           <xsl:with-param name="cell" select="substring-after($cell,substring($cell,1,1))"/>
           <xsl:with-param name="columnId" select="concat($columnId,substring($cell,1,1))"/>
@@ -59,10 +60,25 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="GetColNum2">
+    <xsl:param name="cell"/>
+
+    <xsl:value-of select="substring-before($cell, '|')"/>
+    
+  </xsl:template>
+
+  <xsl:template name="GetRowNum2">
+    <xsl:param name="cell"/>
+
+    <xsl:value-of select="substring-after($cell, '|')"/>
+    
+  </xsl:template>
+
   <!-- gets a row number from cell coordinates -->
   <xsl:template name="GetRowNum">
     <xsl:param name="cell"/>
 
+    <!--xsl:value-of select="substring-after($cell, '|')"/-->
     <xsl:choose>
       <xsl:when test="number($cell)">
         <xsl:value-of select="$cell"/>
@@ -806,7 +822,7 @@
 
     <!-- strange but true: the best result is when you WON'T convert average digit width from pt to px-->
     <xsl:variable name="defaultFontSize">
-      <xsl:for-each select="document('xl/styles.xml')">
+      <xsl:for-each select="key('Part', 'xl/styles.xml')">
         <xsl:choose>
           <xsl:when test="e:styleSheet/e:fonts/e:font">
             <xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
@@ -858,10 +874,10 @@
       <xsl:when test="@indexed">
         <xsl:choose>
           <xsl:when
-            test="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]">
+            test="key('Part', 'xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]">
             <xsl:variable name="color">
               <xsl:value-of
-                select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"
+                select="key('Part', 'xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"
               />
             </xsl:variable>
             <xsl:value-of select="concat('#',substring($color,3,9))"/>
@@ -904,14 +920,14 @@
           <xsl:choose>
             <!-- if color is in 'sysClr' node -->
             <xsl:when
-              test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr">
+              test="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr">
               <xsl:value-of
-                select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr"
+                select="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr"
               />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of
-                select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@val"
+                select="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@val"
               />
             </xsl:otherwise>
           </xsl:choose>
@@ -1615,7 +1631,7 @@
           <xsl:value-of select="$color"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:for-each select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
+          <xsl:for-each select="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
             <xsl:for-each select="node()[name() = concat('a:',$color)]">
 
               <xsl:choose>
@@ -1635,33 +1651,33 @@
 
     <xsl:variable name="BgTxColors">
       <xsl:if test="$color = 'bg2' ">
-        <xsl:value-of select="document('xl/theme/theme1.xml')//a:lt2/a:srgbClr/@val"/>
+        <xsl:value-of select="key('Part', 'xl/theme/theme1.xml')//a:lt2/a:srgbClr/@val"/>
       </xsl:if>
 
       <xsl:if test="$color = 'bg1' ">
         <xsl:choose>
-          <xsl:when test="document('xl/theme/theme1.xml')//a:lt1/a:srgbClr/@val">
-            <xsl:value-of select="document('xl/theme/theme1.xml')//a:lt1/a:srgbClr/@val"/>
+          <xsl:when test="key('Part', 'xl/theme/theme1.xml')//a:lt1/a:srgbClr/@val">
+            <xsl:value-of select="key('Part', 'xl/theme/theme1.xml')//a:lt1/a:srgbClr/@val"/>
           </xsl:when>
-          <xsl:when test="document('xl/theme/theme1.xml')//a:lt1/node()/@lastClr">
-            <xsl:value-of select="document('xl/theme/theme1.xml')//a:lt1/node()/@lastClr"/>
+          <xsl:when test="key('Part', 'xl/theme/theme1.xml')//a:lt1/node()/@lastClr">
+            <xsl:value-of select="key('Part', 'xl/theme/theme1.xml')//a:lt1/node()/@lastClr"/>
           </xsl:when>
         </xsl:choose>
       </xsl:if>
 
       <xsl:if test="$color = 'tx1' ">
         <xsl:choose>
-          <xsl:when test="document('xl/theme/theme1.xml')//a:dk1/node()/@lastClr">
-            <xsl:value-of select="document('xl/theme/theme1.xml')//a:dk1/node()/@lastClr"/>
+          <xsl:when test="key('Part', 'xl/theme/theme1.xml')//a:dk1/node()/@lastClr">
+            <xsl:value-of select="key('Part', 'xl/theme/theme1.xml')//a:dk1/node()/@lastClr"/>
           </xsl:when>
-          <xsl:when test="document('xl/theme/theme1.xml')//a:dk1/node()/@val">
-            <xsl:value-of select="document('xl/theme/theme1.xml')//a:dk1/node()/@val"/>
+          <xsl:when test="key('Part', 'xl/theme/theme1.xml')//a:dk1/node()/@val">
+            <xsl:value-of select="key('Part', 'xl/theme/theme1.xml')//a:dk1/node()/@val"/>
           </xsl:when>
         </xsl:choose>
       </xsl:if>
 
       <xsl:if test="$color = 'tx2' ">
-        <xsl:value-of select="document('xl/theme/theme1.xml')//a:dk2/a:srgbClr/@val"/>
+        <xsl:value-of select="key('Part', 'xl/theme/theme1.xml')//a:dk2/a:srgbClr/@val"/>
       </xsl:if>
     </xsl:variable>
 

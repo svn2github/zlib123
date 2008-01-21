@@ -50,10 +50,12 @@
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
 
+  <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
+
   <!-- App version number -->
   <xsl:variable name="app-version">1.0.0</xsl:variable>
 
-  <xsl:template match="/oox:source">
+  <xsl:template match="/oox:package">
     <pzip:archive pzip:target="{$outputFile}">
 
       <!-- Manifest -->
@@ -99,7 +101,7 @@
 
   <xsl:template name="InsertChartEntries">
     <!-- get all sheet Id's -->
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
 
       <xsl:variable name="sheet">
         <xsl:call-template name="GetTarget">
@@ -116,7 +118,7 @@
       </xsl:variable>
 
       <!-- go to worksheet file and search for drawing -->
-      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:drawing">
 
         <xsl:variable name="drawing">
           <xsl:call-template name="GetTarget">
@@ -132,14 +134,14 @@
 
         <!-- finally insert entry for each chart -->
         <xsl:for-each
-          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
           <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.chart"
             manifest:full-path="{concat('Object ',generate-id(.),'/')}"/>
         </xsl:for-each>
       </xsl:for-each>
 
       <!-- go to chartsheet file and search for drawing -->
-      <xsl:for-each select="document(concat('xl/',$sheet))/e:chartsheet/e:drawing">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:chartsheet/e:drawing">
 
         <xsl:variable name="drawing">
           <xsl:call-template name="GetTarget">
@@ -155,7 +157,7 @@
 
         <!-- finally insert entry for each chart -->
         <xsl:for-each
-          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
           <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.chart"
             manifest:full-path="{concat('Object ',generate-id(.),'/')}"/>
         </xsl:for-each>

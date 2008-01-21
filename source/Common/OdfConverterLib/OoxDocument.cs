@@ -44,6 +44,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected string _fileName;
         protected Stream _stream;
         private bool _disposed = false;
+        protected Dictionary<string, bool> _copiedParts;
 
         // use a similar schema than defined by "http://schemas.microsoft.com/office/2006/xmlPackage"
         protected const string PACKAGE_NS = "urn:oox";
@@ -51,7 +52,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected const string RELATIONSHIP_NS = "http://schemas.openxmlformats.org/package/2006/relationships";
 
         protected const string CONTENT_TYPES = "[Content_Types].xml";
-        protected const string CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"; 
+        protected const string CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types";
 
         public OoxDocument(string fileName)
         {
@@ -68,7 +69,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
+
         public void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -100,6 +101,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         ZipReader archive = ZipFactory.OpenArchive(_fileName);
 
                         _stream = new MemoryStream();
+                        _copiedParts = new Dictionary<string, bool>();
                         XmlTextWriter xtw = new XmlTextWriter(new StreamWriter(_stream, Encoding.UTF8));
 
                         xtw.WriteStartDocument(true);
@@ -111,7 +113,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
                         xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, CONTENT_TYPES);
                         xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, CONTENT_TYPES_NS);
-                        Copy(reader, xtw, true);
+                        CopyPart(reader, xtw, CONTENT_TYPES_NS, CONTENT_TYPES);
+                        _copiedParts.Add(CONTENT_TYPES, true);
                         reader.Close();
                         xtw.WriteEndElement();
                         xtw.Flush();
@@ -147,45 +150,58 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 // copy relationship part and extract relationships
                 reader = XmlReader.Create(archive.GetEntry(relFile));
 
-                xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
-                xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, relFile);
-                xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, RELATIONSHIP_NS);
-                rels = Copy(reader, xtw, true);
-                reader.Close();
-                xtw.WriteEndElement();
-                xtw.Flush();
-
-                // copy referenced parts
-                foreach (RelationShip rel in rels)
+                if (!_copiedParts.ContainsKey(relFile))
                 {
-                    if (namespaces.Contains(rel.Type))
+                    xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
+                    xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, relFile);
+                    xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, RELATIONSHIP_NS);
+                    rels = CopyPart(reader, xtw, RELATIONSHIP_NS, relFile);
+                    _copiedParts.Add(relFile, true);
+                    reader.Close();
+                    xtw.WriteEndElement();
+                    xtw.Flush();
+
+                    // copy referenced parts
+                    foreach (RelationShip rel in rels)
                     {
-                        try
+                        if (namespaces.Contains(rel.Type))
                         {
-                            string basePath = relFile.Substring(0, relFile.LastIndexOf("_rels/"));
-                            string path = rel.Target.Substring(0, rel.Target.LastIndexOf('/') + 1);
-                            string file = rel.Target.Substring(rel.Target.LastIndexOf('/') + 1);
+                            try
+                            {
+                                string basePath = relFile.Substring(0, relFile.LastIndexOf("_rels/"));
+                                string path = rel.Target.Substring(0, rel.Target.LastIndexOf('/') + 1);
+                                string file = rel.Target.Substring(rel.Target.LastIndexOf('/') + 1);
 
-                            // if there is a relationship part for the current part 
-                            // copy relationships and referenced files recursively
-                            CopyLevel(archive, basePath + path + "_rels/" + file + ".rels", xtw, namespaces);
+                                path = CombinePath(basePath, path);
+                                // if there is a relationship part for the current part 
+                                // copy relationships and referenced files recursively
+                                CopyLevel(archive, path + "_rels/" + file + ".rels", xtw, namespaces);
 
-                            reader = XmlReader.Create(archive.GetEntry(basePath + rel.Target));
+                                string partName = CombinePath(basePath, rel.Target);
+                                reader = XmlReader.Create(archive.GetEntry(basePath + rel.Target));
 
-                            xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
-                            xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, basePath + rel.Target);
-                            xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, rel.Type);
-                            xtw.WriteAttributeString(NS_PREFIX, "rId", PACKAGE_NS, rel.Id);
+                                if (!_copiedParts.ContainsKey(partName))
+                                {
+                                    xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
+                                    xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, partName);
+                                    xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, rel.Type);
+                                    xtw.WriteAttributeString(NS_PREFIX, "rId", PACKAGE_NS, rel.Id);
 
-                            Copy(reader, xtw, false);
-                            
-                            reader.Close();
+                                    CopyPart(reader, xtw, rel.Type, partName);
+                                    _copiedParts.Add(partName, true);
+                                    reader.Close();
 
-                            xtw.WriteEndElement();
-                            xtw.Flush();
+                                    xtw.WriteEndElement();
+                                    xtw.Flush();
+                                }
+                            }
+                            catch (ZipEntryNotFoundException)
+                            {
+                            }
                         }
-                        catch (ZipEntryNotFoundException)
+                        else
                         {
+                            System.Diagnostics.Trace.WriteLine("ERROR: Namespace {0} not included.", rel.Type);
                         }
                     }
                 }
@@ -195,9 +211,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        protected virtual List<RelationShip> Copy(XmlReader xtr, XmlTextWriter xtw, bool extractRels)
+        protected virtual List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName)
         {
             bool isInRel = false;
+            bool extractRels = ns.Equals(RELATIONSHIP_NS);
             List<RelationShip> rels = new List<RelationShip>();
 
             RelationShip rel = new RelationShip();
@@ -295,6 +312,27 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected abstract List<string> Namespaces
         {
             get;
+        }
+
+        private string CombinePath(string basePath, string subfolder)
+        {
+            if (basePath.EndsWith("/"))
+            {
+                basePath = basePath.Substring(0, basePath.Length - 1);
+            }
+
+            while (subfolder.StartsWith("../"))
+            {
+                basePath = basePath.Substring(0, basePath.LastIndexOf('/'));
+                subfolder = subfolder.Substring(subfolder.IndexOf('/') + 1);
+            }
+
+            if (!basePath.Equals(""))
+            {
+                basePath = basePath + "/";
+            }
+
+            return basePath + subfolder;
         }
     }
 }

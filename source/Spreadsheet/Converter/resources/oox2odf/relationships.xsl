@@ -34,13 +34,17 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  exclude-result-prefixes="e a pic r w">
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+  exclude-result-prefixes="e a pic r w rels">
 
   <xsl:template name="GetTarget">
     <xsl:param name="document"/>
     <xsl:param name="file" select="$document"/>
     <xsl:param name="id"/>
 
+    <!--xsl:variable name="file" select="substring-after($document, '/')" /-->
+    
+    
     <xsl:choose>
       <xsl:when test="contains($file,'/')">
         <xsl:call-template name="GetTarget">
@@ -52,14 +56,16 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="document(concat(substring-before($document,$file),'_rels/',$file,'.rels'))">
+        <xsl:value-of select="key('Part', concat(substring-before($document,$file),'_rels/',$file,'.rels'))/rels:Relationships/rels:Relationship[@Id=$id]/@Target"/>
+
+        <!--xsl:if test="key('Part', concat(substring-before($document,$file),'_rels/',$file,'.rels'))">
           <xsl:for-each
-            select="document(concat(substring-before($document,$file),'_rels/',$file,'.rels'))//node()[name()='Relationship']">
+            select="key('Part', concat(substring-before($document,$file),'_rels/',$file,'.rels'))//node()[name()='Relationship']">
             <xsl:if test="./@Id=$id">
               <xsl:value-of select="./@Target"/>
               </xsl:if>
           </xsl:for-each>
-        </xsl:if>
+        </xsl:if-->
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -81,9 +87,9 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:if test="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship' and contains(@Type,'image')]">
+    <xsl:if test="key('Part', concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship' and contains(@Type,'image')]">
       <xsl:for-each
-        select="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship' and contains(@Type,'image')]">
+        select="key('Part', concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship' and contains(@Type,'image')]">
           <xsl:variable name="targetmode">
             <xsl:value-of select="./@TargetMode"/>
           </xsl:variable>
@@ -115,7 +121,7 @@
   </xsl:template>
   
   <!--  gets document name where image is placed (header, footer, document)-->
-  <xsl:template name="GetDocumentName">
+  <!--xsl:template name="GetDocumentName">
     <xsl:param name="rootId"/>
     
     <xsl:choose>
@@ -124,17 +130,17 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each
-          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
+          select="key('Part', 'word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
           <xsl:variable name="target">
             <xsl:value-of select="./@Target"/>
           </xsl:variable>
-          <xsl:if test="generate-id(document(concat('word/',$target))//node()) = $rootId">
+          <xsl:if test="generate-id(key('Part', concat('word/',$target))//node()) = $rootId">
             <xsl:value-of select="$target"/>
           </xsl:if>
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
+  </xsl:template-->
   
   
   

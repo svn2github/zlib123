@@ -39,15 +39,15 @@
     <xsl:param name="activeTab"/>
 
     <xsl:variable name="defaultFontFace">
-      <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+      <xsl:value-of select="key('Font', '0')/e:name/@val"/>
     </xsl:variable>
 
     <xsl:variable name="defaultFontSize">
-      <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+      <xsl:value-of select="key('Font', '0')/e:sz/@val"/>
     </xsl:variable>
 
     <xsl:for-each
-      select="document(concat('xl/worksheets/sheet', $activeTab + 1,'.xml'))/e:worksheet/e:headerFooter">
+      select="key('Part', concat('xl/worksheets/sheet', $activeTab + 1,'.xml'))/e:worksheet/e:headerFooter">
       <!-- odd header styles -->
       <xsl:for-each select="e:oddHeader">
         <xsl:call-template name="GetHeaderFooterStyles">
@@ -113,12 +113,10 @@
               <xsl:with-param name="changedStyle" select="1"/>
               <!-- restore default properties -->
               <xsl:with-param name="fontFace">
-                <xsl:value-of
-                  select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+                <xsl:value-of select="key('Font', '0')/e:name/@val"/>
               </xsl:with-param>
               <xsl:with-param name="fontSize">
-                <xsl:value-of
-                  select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+                <xsl:value-of select="key('Font', '0')/e:sz/@val"/>
               </xsl:with-param>
 
               <xsl:with-param name="underline" select=" 'none' "/>
@@ -293,14 +291,14 @@
                     <xsl:choose>
                       <!-- if color is in 'sysClr' node -->
                       <xsl:when
-                        test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr">
+                        test="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr">
                         <xsl:value-of
-                          select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr"
+                          select="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr"
                         />
                       </xsl:when>
                       <xsl:otherwise>
                         <xsl:value-of
-                          select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@val"
+                          select="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@val"
                         />
                       </xsl:otherwise>
                     </xsl:choose>
@@ -868,7 +866,7 @@
     <xsl:param name="activeTab"/>
 
     <xsl:for-each
-      select="document(concat('xl/worksheets/sheet', $activeTab + 1,'.xml'))/e:worksheet/e:headerFooter">
+      select="key('Part', concat('xl/worksheets/sheet', $activeTab + 1,'.xml'))/e:worksheet/e:headerFooter">
 
       <style:header>
         <xsl:for-each select="e:oddHeader">
@@ -1163,7 +1161,7 @@
     <xsl:param name="activeTab"/>
 
     <xsl:for-each
-      select="document(concat('xl/worksheets/sheet', $activeTab + 1,'.xml'))/e:worksheet/e:headerFooter">
+      select="key('Part', concat('xl/worksheets/sheet', $activeTab + 1,'.xml'))/e:worksheet/e:headerFooter">
       <!-- odd header styles -->
       <xsl:for-each select="e:oddHeader">
         <xsl:call-template name="GetHeaderFooterFonts">

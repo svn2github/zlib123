@@ -42,14 +42,16 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  exclude-result-prefixes="e r c xdr draw xlink">
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="e oox r c xdr draw rels xlink">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="chart.xsl"/>
   <!-- Added by vijayeta, fix fo the bug 1760182-->
   <xsl:import href="insert_text.xsl"/>
 
-  <xsl:key name="drawing" match="e:drawing" use="''"/>
+  <xsl:key name="drawing" match="e:drawing" use="@oox:part"/>
 
   <!-- Get cell with picture -->
   <xsl:template name="PictureCell">
@@ -111,7 +113,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+    <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
       <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
         <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]"/>
       </xsl:if>
@@ -128,9 +130,9 @@
 
     <xsl:variable name="Target">
       <xsl:if
-        test="document(concat(concat('xl/chartsheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
+        test="key('Part', concat(concat('xl/chartsheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
         <xsl:for-each
-          select="document(concat(concat('xl/chartsheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
+          select="key('Part', concat(concat('xl/chartsheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
           <xsl:if test="./@Id=$id">
             <xsl:value-of select="@Target"/>
           </xsl:if>
@@ -138,7 +140,7 @@
       </xsl:if>
     </xsl:variable>
 
-    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+    <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
       <xsl:if test="xdr:wsDr/xdr:absoluteAnchor">
         <xsl:text>1:1;</xsl:text>
       </xsl:if>
@@ -150,9 +152,9 @@
     <xsl:param name="id"/>
     <xsl:param name="sheet"/>
     <xsl:if
-      test="document(concat(concat('xl/worksheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
+      test="key('Part', concat(concat('xl/worksheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
       <xsl:for-each
-        select="document(concat(concat('xl/worksheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
+        select="key('Part', concat(concat('xl/worksheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
         <xsl:if test="./@Id=$id">
           <xsl:value-of select="@Target"/>
         </xsl:if>
@@ -242,7 +244,6 @@
           </xsl:for-each>
 
           <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-
             <xsl:call-template name="InsertImageHref">
               <xsl:with-param name="document">
                 <xsl:value-of select="concat($Drawing, '.rels')"/>
@@ -282,38 +283,38 @@
       <!-- insert text-box -->
       <xsl:when test="xdr:sp/xdr:nvSpPr/xdr:cNvSpPr/@txBox = 1">
         <draw:frame draw:z-index="0">
-			<!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+          <!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
 		         If the text box has Hyperlink, variables defined-->
-			<xsl:variable name ="hlinkId">
-				<xsl:if test ="xdr:sp/xdr:nvSpPr/xdr:cNvPr/a:hlinkClick">
-					<xsl:value-of select ="xdr:sp/xdr:nvSpPr/xdr:cNvPr/a:hlinkClick/@r:id"/>
-				</xsl:if>
-			</xsl:variable>
-			<xsl:variable name ="drawingRels">
-				<xsl:value-of select ="concat('xl/drawings/_rels/',$Drawing,'.rels')"/>
-			</xsl:variable>
-			<xsl:variable name ="target">
-				<xsl:value-of select ="document($drawingRels)//node()/node()[@Id=$hlinkId]/@Target"/>
-			</xsl:variable>
-			<xsl:variable name ="newTarget">
-				<xsl:choose>
-					<!-- when hyperlink leads to a file in network -->
-					<xsl:when test="starts-with($target,'file:///\\')">
-						<xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"/>
-					</xsl:when>
-					<!--when hyperlink leads to www or mailto -->
-					<xsl:when test="contains($target,':')">
-						<xsl:value-of select="$target"/>
-					</xsl:when>
-					<!--when hyperlink leads to a document -->
-					<xsl:otherwise>
-						<xsl:call-template name="Change20PercentToSpace">
-							<xsl:with-param name="string" select="$target"/>
-						</xsl:call-template>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:variable>
-			<!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07, variable definition -->
+          <xsl:variable name ="hlinkId">
+            <xsl:if test ="xdr:sp/xdr:nvSpPr/xdr:cNvPr/a:hlinkClick">
+              <xsl:value-of select ="xdr:sp/xdr:nvSpPr/xdr:cNvPr/a:hlinkClick/@r:id"/>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:variable name ="drawingRels">
+            <xsl:value-of select ="concat('xl/drawings/_rels/',$Drawing,'.rels')"/>
+          </xsl:variable>
+          <xsl:variable name ="target">
+            <xsl:value-of select ="key('Part', $drawingRels)//node()/node()[@Id=$hlinkId]/@Target"/>
+          </xsl:variable>
+          <xsl:variable name ="newTarget">
+            <xsl:choose>
+              <!-- when hyperlink leads to a file in network -->
+              <xsl:when test="starts-with($target,'file:///\\')">
+                <xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"/>
+              </xsl:when>
+              <!--when hyperlink leads to www or mailto -->
+              <xsl:when test="contains($target,':')">
+                <xsl:value-of select="$target"/>
+              </xsl:when>
+              <!--when hyperlink leads to a document -->
+              <xsl:otherwise>
+                <xsl:call-template name="Change20PercentToSpace">
+                  <xsl:with-param name="string" select="$target"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07, variable definition -->
           <xsl:attribute name="draw:style-name">
             <xsl:value-of select="generate-id(.)"/>
           </xsl:attribute>
@@ -327,34 +328,34 @@
               <xsl:value-of select="$NameSheet"/>
             </xsl:with-param>
           </xsl:call-template>
-			<!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
+          <!-- Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07
 		         If the text box has Hyperlink-->
-			<xsl:choose >
-				<xsl:when test ="$hlinkId!='' and $newTarget!=''">
-					<draw:text-box>
-						<text:p>
-							<xsl:if test="a:pPr">
-								<xsl:attribute name="text:style-name">
-									<xsl:value-of select="generate-id(.)"/>
-								</xsl:attribute>
-							</xsl:if>
-							<text:a>
-								<xsl:attribute name ="xlink:href">
-									<xsl:value-of select =" $newTarget"/>
-								</xsl:attribute>
-								<xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>
-							</text:a>
-						</text:p>
-					</draw:text-box>
-				</xsl:when>
-				<xsl:otherwise >
-          <draw:text-box>
-            <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
-          </draw:text-box>
-				</xsl:otherwise>
-			</xsl:choose>
-			<!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07-->
-			<!--<draw:text-box>
+          <xsl:choose >
+            <xsl:when test ="$hlinkId!='' and $newTarget!=''">
+              <draw:text-box>
+                <text:p>
+                  <xsl:if test="a:pPr">
+                    <xsl:attribute name="text:style-name">
+                      <xsl:value-of select="generate-id(.)"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <text:a>
+                    <xsl:attribute name ="xlink:href">
+                      <xsl:value-of select =" $newTarget"/>
+                    </xsl:attribute>
+                    <xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>
+                  </text:a>
+                </text:p>
+              </draw:text-box>
+            </xsl:when>
+            <xsl:otherwise >
+              <draw:text-box>
+                <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
+              </draw:text-box>
+            </xsl:otherwise>
+          </xsl:choose>
+          <!--End of Code added by vijayeta, Fix for the bug 1760182, date:23rd Oct '07-->
+          <!--<draw:text-box>
             <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
           </draw:text-box>-->
 
@@ -514,7 +515,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="xdr:pic/xdr:blipFill/a:blip/@r:embed">
-          <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:embed"/>
+            <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:embed"/>
           </xsl:if>
           <xsl:if test="xdr:pic/xdr:blipFill/a:blip/@r:link">
             <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:link"/>
@@ -522,36 +523,35 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:for-each
-      select="document(concat('xl/drawings/_rels/',$document))//node()[name() = 'Relationship']">
-      <xsl:if test="./@Id=$id">
-        <xsl:variable name="targetmode">
-          <xsl:value-of select="./@TargetMode"/>
-        </xsl:variable>
-        <xsl:variable name="pzipsource">
-          <xsl:value-of select="./@Target"/>
-        </xsl:variable>
-        <xsl:variable name="pziptarget">
-          <xsl:choose>
-            <xsl:when test="$targetName != ''">
-              <xsl:value-of select="$targetName"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="substring-after(translate(substring-after($pzipsource,'/'),'\' ,'/'),'/')"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:attribute name="xlink:href">
-          <xsl:choose>
-            <xsl:when test="$targetmode='External'">
-              <xsl:value-of select="$pziptarget"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </xsl:if>
+
+    <xsl:for-each select="key('Part', concat('xl/drawings/_rels/',$document))/rels:Relationships/rels:Relationship[@Id=$id]">
+
+      <xsl:variable name="targetmode">
+        <xsl:value-of select="@TargetMode"/>
+      </xsl:variable>
+      <xsl:variable name="pzipsource">
+        <xsl:value-of select="@Target"/>
+      </xsl:variable>
+      <xsl:variable name="pziptarget">
+        <xsl:choose>
+          <xsl:when test="$targetName != ''">
+            <xsl:value-of select="$targetName"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-after(translate(substring-after($pzipsource,'/'),'\' ,'/'),'/')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:attribute name="xlink:href">
+        <xsl:choose>
+          <xsl:when test="$targetmode='External'">
+            <xsl:value-of select="$pziptarget"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:for-each>
   </xsl:template>
 
@@ -597,11 +597,11 @@
 
       <xsl:variable name="checkedName">
         <xsl:for-each
-          select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($NameSheet,$apos,'')]">
+          select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($NameSheet,$apos,'')]">
           <xsl:call-template name="CheckSheetName">
             <xsl:with-param name="sheetNumber">
               <xsl:for-each
-                select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($NameSheet,$apos,'')]">
+                select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($NameSheet,$apos,'')]">
                 <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
               </xsl:for-each>
             </xsl:with-param>
@@ -732,7 +732,7 @@
       <xsl:value-of select="@name"/>
     </xsl:variable>
 
-    <xsl:for-each select="document(concat('xl/',$Id))">
+    <xsl:for-each select="key('Part', concat('xl/',$Id))">
       <xsl:apply-templates select="e:worksheet/e:drawing" mode="PictureStyle">
         <xsl:with-param name="sheet">
           <xsl:value-of select="$Id"/>
@@ -763,7 +763,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+    <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
       <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
         <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]" mode="PictureStyle">
           <xsl:with-param name="sheet" select="$sheet"/>
@@ -808,22 +808,22 @@
         <xsl:variable name="relationId">
           <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:embed"/>
         </xsl:variable>
-        
+
         <xsl:variable name="Drawing">
           <xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
         </xsl:variable>
         <xsl:variable name="document">
           <xsl:value-of select="concat($Drawing, '.rels')"/>
         </xsl:variable>
-         
+
         <xsl:variable name="pzipsource">
-          <xsl:for-each select="document(concat('xl/drawings/_rels/',$document))//node()[name() = 'Relationship']">
+          <xsl:for-each select="key('Part', concat('xl/drawings/_rels/',$document))//node()[name() = 'Relationship']">
             <xsl:if test="./@Id=$relationId">
               <xsl:value-of select="./@Target"/>
             </xsl:if>
           </xsl:for-each>
         </xsl:variable>
-      
+
         <xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@l or xdr:pic/xdr:blipFill/a:srcRect/@r or xdr:pic/xdr:blipFill/a:srcRect/@t or xdr:pic/xdr:blipFill/a:srcRect/@b">
           <xsl:variable name="left">
             <xsl:if test="xdr:pic/xdr:blipFill/a:srcRect/@l">
@@ -967,11 +967,11 @@
     <xsl:param name="NameSheet"/>
     <xsl:param name="Target"/>
 
-    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+    <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
       <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
 
         <xsl:for-each
-          select="document(concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">
+          select="key('Part', concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">
           <xsl:call-template name="CopyPictures">
             <xsl:with-param name="document">
               <xsl:value-of
@@ -1058,14 +1058,14 @@
 
       <!-- drawing.xml file path -->
       <xsl:variable name="Target">
-        <xsl:for-each select="document(concat('xl/',$sheet))/e:chartsheet/e:drawing">
+        <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:chartsheet/e:drawing">
           <xsl:variable name="id">
             <xsl:value-of select="@r:id"/>
           </xsl:variable>
           <xsl:if
-            test="document(concat(concat('xl/chartsheets/_rels/', substring-after($sheet,'/')), '.rels'))//node()[name()='Relationship']">
+            test="key('Part', concat(concat('xl/chartsheets/_rels/', substring-after($sheet,'/')), '.rels'))//node()[name()='Relationship']">
             <xsl:for-each
-              select="document(concat(concat('xl/chartsheets/_rels/', substring-after($sheet,'/')), '.rels'))//node()[name()='Relationship']">
+              select="key('Part', concat(concat('xl/chartsheets/_rels/', substring-after($sheet,'/')), '.rels'))//node()[name()='Relationship']">
               <xsl:if test="./@Id=$id">
                 <xsl:value-of select="@Target"/>
               </xsl:if>
@@ -1077,7 +1077,7 @@
       <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
       <table:shapes>
 
-        <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+        <xsl:for-each select="key('Part', concat('xl/', substring-after($Target, '/')))">
           <xsl:for-each select="xdr:wsDr/xdr:absoluteAnchor">
 
             <draw:frame draw:z-index="0" svg:width="7.999cm" svg:height="6.999cm" svg:x="0cm"
@@ -1100,9 +1100,9 @@
 
       </table:shapes>
       <table:table-column
-        table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}"/>
+        table:style-name="{generate-id(key('Part', 'xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}"/>
       <table:table-row
-        table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}">
+        table:style-name="{generate-id(key('Part', 'xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}">
         <table:table-cell/>
       </table:table-row>
     </table:table>
@@ -1527,7 +1527,7 @@
         <xsl:attribute name="svg:stroke-width">
           <xsl:call-template name="ConvertEmu">
             <xsl:with-param name="length"
-              select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:fmtScheme/a:lnStyleLst/a:ln[position() = $index]/@w"/>
+              select="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:fmtScheme/a:lnStyleLst/a:ln[position() = $index]/@w"/>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
@@ -1557,7 +1557,7 @@
         </xsl:variable>
 
         <xsl:for-each
-          select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:fmtScheme/a:lnStyleLst/a:ln[position() = $index]">
+          select="key('Part', 'xl/theme/theme1.xml')/a:theme/a:themeElements/a:fmtScheme/a:lnStyleLst/a:ln[position() = $index]">
           <xsl:call-template name="InsertLineDash"/>
         </xsl:for-each>
       </xsl:when>
@@ -1833,7 +1833,7 @@
 
   <xsl:template name="InsertTextBoxTextStyles">
     <!-- get all sheet Id's -->
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
 
       <xsl:variable name="sheet">
         <xsl:call-template name="GetTarget">
@@ -1846,7 +1846,7 @@
       <!--i.e. $sheet = worksheets/sheet1.xml -->
 
       <!-- go to worksheet file and search for drawing -->
-      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:drawing">
 
         <xsl:variable name="drawing">
           <xsl:call-template name="GetTarget">
@@ -1862,7 +1862,7 @@
 
         <!-- finally insert entry for each chart -->
         <xsl:for-each
-          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:sp/xdr:txBody">
+          select="key('Part', concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:sp/xdr:txBody">
 
           <xsl:for-each select="a:p/a:pPr">
             <xsl:call-template name="InsertTextBoxParagraphStyle"/>
@@ -1874,7 +1874,7 @@
                 fo:color="#000000">
                 <xsl:call-template name="TextBoxRunProperties"/>
               </style:text-properties>
-            </style:style>            
+            </style:style>
           </xsl:for-each>
 
         </xsl:for-each>
@@ -2046,7 +2046,7 @@
   </xsl:template>
 
   <xsl:template name="TextBoxRunProperties">
-    
+
     <xsl:choose>
       <xsl:when test="a:latin/@typeface != '+mn-lt' and a:latin/@typeface != '+mj-lt' ">
         <xsl:attribute name="fo:font-family">
@@ -2393,5 +2393,5 @@
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
-  
+
 </xsl:stylesheet>

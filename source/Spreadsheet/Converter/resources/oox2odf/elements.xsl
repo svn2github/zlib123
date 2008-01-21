@@ -41,7 +41,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  exclude-result-prefixes="e r c xdr draw xlink">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="e oox r c xdr draw xlink">
 
   <!-- Insert Empty Sheet with picture -->
 
@@ -63,7 +64,7 @@
     <xsl:param name="AllRowBreakes"/>
 
     <xsl:variable name="id">
-      <xsl:value-of select="key('drawing', '')/@r:id"/>
+      <xsl:value-of select="key('drawing', ancestor::e:worksheet/@oox:part)/@r:id"/>
     </xsl:variable>
 
     <xsl:variable name="AllElementsCell">
@@ -110,7 +111,7 @@
 
     <xsl:if test="$GetMinRowWithElement != ''">
 
-      <xsl:for-each select="document(concat('xl/',$sheet))">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
         <table:table-row>
 
 
@@ -119,12 +120,12 @@
               test="contains(concat(';', $AllRowBreakes), concat(';', $GetMinRowWithElement))">
               <xsl:attribute name="table:style-name">
                 <xsl:value-of
-                  select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
+                  select="generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
               <xsl:attribute name="table:style-name">
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
@@ -264,7 +265,7 @@
 
 
     <xsl:variable name="Target">
-      <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
+      <xsl:for-each select="key('Part', concat('xl/', $sheet))/e:worksheet/e:drawing">
         <xsl:call-template name="GetTargetPicture">
           <xsl:with-param name="sheet">
             <xsl:value-of select="substring-after($sheet, '/')"/>
@@ -300,7 +301,7 @@
           test="contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
           <xsl:variable name="ConditionalStyleId">
             <xsl:value-of
-              select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';') + 1])"
+              select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';')])"
             />
           </xsl:variable>
           <xsl:attribute name="table:style-name">
@@ -404,8 +405,8 @@
     <xsl:param name="repeat"/>
     <xsl:param name="sheet"/>
     <xsl:if test="$repeat &gt; 0">
-      <xsl:for-each select="document(concat('xl/',$sheet))">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
           table:number-rows-repeated="{$repeat}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -473,7 +474,7 @@
 
 
     <xsl:variable name="id">
-      <xsl:value-of select="key('drawing', '')/@r:id"/>
+      <xsl:value-of select="key('drawing', ancestor::e:worksheet/@oox:part)/@r:id"/>
     </xsl:variable>
 
     <xsl:variable name="AllElementsCell">
@@ -510,7 +511,7 @@
       </xsl:when>
       <xsl:when
         test=" ($GetMinRowWithElement &gt; $EndRow or $GetMinRowWithElement = '') and $EndRow - $prevRow &gt; 0">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
           table:number-rows-repeated="{$EndRow - $prevRow}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -533,19 +534,19 @@
 
     <xsl:if test="$GetMinRowWithElement != '' and $GetMinRowWithElement &lt;= $EndRow">
 
-      <xsl:for-each select="document(concat('xl/',$sheet))">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
         <table:table-row>
           <xsl:choose>
             <xsl:when
               test="contains(concat(';', $AllRowBreakes), concat(';', $GetMinRowWithElement))">
               <xsl:attribute name="table:style-name">
                 <xsl:value-of
-                  select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
+                  select="generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
               <xsl:attribute name="table:style-name">
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
@@ -686,7 +687,7 @@
         </xsl:call-template>
 
         <xsl:variable name="Target">
-          <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
+          <xsl:for-each select="key('Part', concat('xl/', $sheet))/e:worksheet/e:drawing">
             <xsl:call-template name="GetTargetPicture">
               <xsl:with-param name="sheet">
                 <xsl:value-of select="substring-after($sheet, '/')"/>
@@ -707,7 +708,7 @@
               test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
                   <xsl:attribute name="table:style-name">
                     <xsl:value-of
-                      select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';') + 1])"
+                      select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';')])"
                     />
                   </xsl:attribute>
             </xsl:if>

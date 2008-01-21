@@ -51,8 +51,10 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="a e r number">
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="a e oox r number">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
@@ -60,14 +62,19 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   <xsl:import href="insert_cols.xsl"/>
   <xsl:import href="note.xsl"/>
 
-  <xsl:key name="Border" match="e:borders" use="''"/>
+  <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
+  <xsl:key name="Font" match="e:styleSheet/e:fonts/e:font" use="@oox:id"/>
+  <xsl:key name="Fill" match="e:styleSheet/e:fills/e:fill" use="@oox:id"/>
+  <xsl:key name="Border" match="e:styleSheet/e:borders/e:border" use="@oox:id"/>
+  <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="@oox:id"/>
+  <xsl:key name="Dxf" match="e:styleSheet/e:dxfs/e:dxf" use="@oox:id"/>
   <xsl:key name="CellStylesId" match="e:cellStyle" use="@xfId"/>
   <xsl:key name="Cell" match="e:c" use="@r"/>
 
   <xsl:template name="styles">
 
     <xsl:variable name="activeTab">
-      <xsl:for-each select="document('xl/workbook.xml')">
+      <xsl:for-each select="key('Part', 'xl/workbook.xml')">
         <xsl:choose>
           <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
             <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
@@ -88,7 +95,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         <xsl:call-template name="InsertDefaultTableCellStyle"/>
         <xsl:call-template name="InsertCellStyle"/>
         <!-- if there is at least one comment with border style defined -->
-        <xsl:if test="document('xl/drawings/vmlDrawing1.vml')/xml[1]/v:shape/v:stroke">
+        <xsl:if test="key('Part', 'xl/drawings/vmlDrawing1.vml')/xml[1]/v:shape/v:stroke">
           <xsl:call-template name="InsertCommentsBorderStyles"/>
         </xsl:if>
         <!-- Insert Conditional Styles-->
@@ -113,7 +120,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   </xsl:template>
 
   <xsl:template name="InsertFonts">
-    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[e:name]">
+    <xsl:for-each select="key('Part', 'xl/styles.xml')/e:styleSheet/e:fonts/e:font[e:name]">
       <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>
     </xsl:for-each>
   </xsl:template>
@@ -121,7 +128,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   <xsl:template name="InsertDefaultTableCellStyle">
     <style:style style:name="Default" style:family="table-cell">
       <style:text-properties>
-        <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]"
+        <xsl:apply-templates select="key('Part', 'xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]"
           mode="style"/>
       </style:text-properties>
     </style:style>
@@ -129,7 +136,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
   <!-- insert column styles from all sheets -->
   <xsl:template name="InsertColumnStyles">
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
       <xsl:call-template name="InsertSheetColumnStyles">
         <xsl:with-param name="sheet">
           <xsl:call-template name="GetTarget">
@@ -148,24 +155,24 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     <xsl:param name="sheet"/>
 
     <xsl:variable name="ManualColBreaks">
-      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
         <xsl:value-of select="concat(@id,';')"/>
       </xsl:for-each>
     </xsl:variable>
 
-    <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks">
+    <xsl:if test="key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks">
       <style:style
-        style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
+        style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
         style:family="table-column">
         <style:table-column-properties fo:break-before="page">
           <xsl:attribute name="style:column-width">
             <xsl:choose>
               <xsl:when
-                test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+                test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
                 <xsl:call-template name="ConvertFromCharacters">
                   <xsl:with-param name="value">
                     <xsl:value-of
-                      select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                      select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
                     />
                   </xsl:with-param>
                 </xsl:call-template>
@@ -183,17 +190,17 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </xsl:if>
 
     <style:style
-      style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+      style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
       style:family="table-column">
       <style:table-column-properties fo:break-before="auto">
         <xsl:attribute name="style:column-width">
           <xsl:choose>
             <xsl:when
-              test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+              test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
               <xsl:call-template name="ConvertFromCharacters">
                 <xsl:with-param name="value">
                   <xsl:value-of
-                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                    select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
                   />
                 </xsl:with-param>
               </xsl:call-template>
@@ -209,7 +216,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
       </style:table-column-properties>
     </style:style>
 
-    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[1]"
+    <xsl:apply-templates select="key('Part', concat('xl/',$sheet))/e:worksheet/e:cols/e:col[1]"
       mode="automaticstyles">
       <xsl:with-param name="manualBreakes" select="$ManualColBreaks"/>
     </xsl:apply-templates>
@@ -225,7 +232,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
       </xsl:call-template>
     </xsl:variable>
     <xsl:attribute name="table:style-name">
-      <xsl:value-of select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:colBreaks)"/>
+      <xsl:value-of select="generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks)"/>
     </xsl:attribute>
   </xsl:template>
 
@@ -267,17 +274,17 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
     <!-- TO DO: do not create column style without break when this is e:col for single column and it has break -->
     <!--xsl:if test="not(@min != @max and substring-before($manualBreakes,';') &lt;= @max)"-->
-      <style:style style:name="{generate-id(.)}" style:family="table-column">
-        <style:table-column-properties>
-          <xsl:if test="@width">
-            <xsl:attribute name="style:column-width">
-              <xsl:call-template name="ConvertFromCharacters">
-                <xsl:with-param name="value" select="@width"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-        </style:table-column-properties>
-      </style:style>
+    <style:style style:name="{generate-id(.)}" style:family="table-column">
+      <style:table-column-properties>
+        <xsl:if test="@width">
+          <xsl:attribute name="style:column-width">
+            <xsl:call-template name="ConvertFromCharacters">
+              <xsl:with-param name="value" select="@width"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+      </style:table-column-properties>
+    </style:style>
     <!--/xsl:if-->
 
     <xsl:if test="following-sibling::e:col">
@@ -290,7 +297,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
   <!-- insert row styles from all sheets -->
   <xsl:template name="InsertRowStyles">
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
       <xsl:call-template name="InsertSheetRowStyles">
         <xsl:with-param name="sheet">
           <xsl:call-template name="GetTarget">
@@ -312,26 +319,26 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
     <!--Start of RefNo-4: Commeted the code to get the correct default row style for the sheet with row breaks.
     <xsl:choose>
-      <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
+      <xsl:when test="key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
         <style:style
-          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)}"
+          style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks)}"
           style:family="table-row">
           <style:table-row-properties fo:break-before="page">
             <xsl:attribute name="style:row-height">
               <xsl:choose>
                 <xsl:when
-                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
+                  test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
                   <xsl:call-template name="ConvertToCentimeters">
                     <xsl:with-param name="length">
                       <xsl:value-of
-                        select="concat(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
+                        select="concat(key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
                       />
                     </xsl:with-param>
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>-->
-                  <!-- Excel application default-->
-                  <!--<xsl:call-template name="ConvertToCentimeters">
+    <!-- Excel application default-->
+    <!--<xsl:call-template name="ConvertToCentimeters">
                     <xsl:with-param name="length" select="'20px'"/>
                   </xsl:call-template>
                 </xsl:otherwise>
@@ -342,71 +349,71 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
       </xsl:when>
       <xsl:otherwise>
       End of RefNo-4-->
-        <style:style
-          style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-          style:family="table-row">
-          <style:table-row-properties fo:break-before="auto">
-            <xsl:attribute name="style:row-height">
-              <xsl:choose>
-                <xsl:when
-                  test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
-                  <xsl:call-template name="ConvertToCentimeters">
-                    <xsl:with-param name="length">
-                      <xsl:value-of
-                        select="concat(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
+    <style:style
+      style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+      style:family="table-row">
+      <style:table-row-properties fo:break-before="auto">
+        <xsl:attribute name="style:row-height">
+          <xsl:choose>
+            <xsl:when
+              test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
+              <xsl:call-template name="ConvertToCentimeters">
+                <xsl:with-param name="length">
+                  <xsl:value-of
+                    select="concat(key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
                       />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <!-- Excel application default-->
-                  <xsl:call-template name="ConvertToCentimeters">
-                    <xsl:with-param name="length" select="'20px'"/>
-                  </xsl:call-template>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </style:table-row-properties>
-        </style:style>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- Excel application default-->
+              <xsl:call-template name="ConvertToCentimeters">
+                <xsl:with-param name="length" select="'20px'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </style:table-row-properties>
+    </style:style>
     <!--RefNo-4
       </xsl:otherwise>
     </xsl:choose>-->
 
-    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:sheetData"
+    <xsl:apply-templates select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetData"
       mode="automaticstyles"/>
   </xsl:template>
 
   <xsl:template match="e:row" mode="automaticstyles">
     <xsl:if test="@ht">
-		<xsl:variable name ="currentRow">			
-			<xsl:value-of  select ="@r"/>
-		</xsl:variable>
-		<xsl:variable name ="rowBrk">
-			<xsl:choose >
-				<xsl:when test ="parent::node()/parent::node()/e:rowBreaks">
-					<xsl:for-each select ="parent::node()/parent::node()/e:rowBreaks/e:brk">
-						<xsl:if test ="@id=$currentRow - 1">
-							<xsl:value-of select ="'page'"/>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:when>
-			</xsl:choose>
-		</xsl:variable>
+      <xsl:variable name ="currentRow">
+        <xsl:value-of  select ="@r"/>
+      </xsl:variable>
+      <xsl:variable name ="rowBrk">
+        <xsl:choose >
+          <xsl:when test ="parent::node()/parent::node()/e:rowBreaks">
+            <xsl:for-each select ="parent::node()/parent::node()/e:rowBreaks/e:brk">
+              <xsl:if test ="@id=$currentRow - 1">
+                <xsl:value-of select ="'page'"/>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
       <style:style style:name="{generate-id(.)}" style:family="table-row">
-		  <style:table-row-properties>
-			  <xsl:variable name ="pageBreak">
-				  <xsl:choose >
-					  <xsl:when test ="contains($rowBrk,'page')">
-						  <xsl:value-of select ="'page'"/>
-					  </xsl:when>
-					  <xsl:otherwise >
-						  <xsl:value-of select ="'auto'"/>
-					  </xsl:otherwise>
-				  </xsl:choose>
-			  </xsl:variable>
-			  <xsl:attribute name ="fo:break-before">
-				  <xsl:value-of select ="$pageBreak"/>
-			  </xsl:attribute>
+        <style:table-row-properties>
+          <xsl:variable name ="pageBreak">
+            <xsl:choose >
+              <xsl:when test ="contains($rowBrk,'page')">
+                <xsl:value-of select ="'page'"/>
+              </xsl:when>
+              <xsl:otherwise >
+                <xsl:value-of select ="'auto'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <xsl:attribute name ="fo:break-before">
+            <xsl:value-of select ="$pageBreak"/>
+          </xsl:attribute>
           <xsl:attribute name="style:row-height">
             <xsl:call-template name="ConvertToCentimeters">
               <xsl:with-param name="length" select="concat(@ht,'pt')"/>
@@ -435,7 +442,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
   <!--  Insert Table Properties -->
   <xsl:template name="InsertStyleTableProperties">
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
       <style:style>
         <xsl:attribute name="style:name">
           <xsl:value-of select="generate-id()"/>
@@ -462,7 +469,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
             </xsl:call-template>
           </xsl:variable>
 
-          <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView">
+          <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView">
             <xsl:if test="@rightToLeft = 1">
               <xsl:attribute name="style:writing-mode">
                 <xsl:value-of select="'rl-tb'"/>
@@ -482,33 +489,32 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
   <xsl:template name="InsertNumberStyles">
 
-    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
+    <xsl:apply-templates select="key('Part', 'xl/styles.xml')/e:styleSheet/e:cellXfs"
       mode="fixedNumFormat"/>
-    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:numFmts"
+    <xsl:apply-templates select="key('Part', 'xl/styles.xml')/e:styleSheet/e:numFmts"
       mode="automaticstyles"/>
   </xsl:template>
 
-<xsl:template name="InsertCellStyles">
+  <xsl:template name="InsertCellStyles">
 
-    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf">
+    <xsl:for-each select="key('Part', 'xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf">
       <style:style style:name="{generate-id(.)}" style:family="table-cell">
         <xsl:call-template name="InsertCellFormat"/>
-      </style:style> 
+      </style:style>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertMergeCellStyles">
-   
-    <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
-      mode="MergeStyle">
+
+    <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="MergeStyle">
       <xsl:with-param name="number">1</xsl:with-param>
     </xsl:apply-templates>
-    
+
   </xsl:template>
-  
+
   <xsl:template match="e:sheet" mode="MergeStyle">
     <xsl:param name="number"/>
-    
+
     <xsl:variable name="Id">
       <xsl:call-template name="GetTarget">
         <xsl:with-param name="id">
@@ -517,49 +523,57 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="sheetName">
       <xsl:value-of select="@name"/>
     </xsl:variable>
-    
-      <xsl:variable name="MergeCell">
-        <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:mergeCells">
-          <xsl:apply-templates select="e:mergeCell[1]" mode="merge"/>
-        </xsl:for-each>
-      </xsl:variable>
-    
-    <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:sheetData">
-    <xsl:call-template name="InsertMergeCellStyleProperties">
-      <xsl:with-param name="Id">
-        <xsl:value-of select="$Id"/>
-      </xsl:with-param>
-      <xsl:with-param name="MergeCell">
-        <xsl:value-of select="$MergeCell"/>
-      </xsl:with-param>
-    </xsl:call-template>
+
+    <!-- get a ';'-separated list of all merged cells for sheet $Id -->
+    <xsl:variable name="MergeCell">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
+        <xsl:apply-templates select="e:mergeCell[1]" mode="merge"/>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:sheetData">
+      <xsl:call-template name="InsertMergeCellStyleProperties">
+        <xsl:with-param name="Id">
+          <xsl:value-of select="$Id"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
     </xsl:for-each>
-    
+
     <!-- Insert next Table -->
-    
+
     <xsl:apply-templates select="following-sibling::e:sheet[1]" mode="MergeStyle">
       <xsl:with-param name="number">
         <xsl:value-of select="$number + 1"/>
       </xsl:with-param>
     </xsl:apply-templates>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertMergeCellStyleProperties">
     <xsl:param name="MergeCell"/>
     <xsl:param name="Id"/>
-    
+
     <xsl:if test="$MergeCell != ''">
-      
+
       <xsl:variable name="NrStyleMergeStart">
-        <xsl:value-of select="key('Cell', substring-before($MergeCell, ':'))/@s"/>
+        <xsl:value-of select="key('Cell', substring-before($MergeCell, ':'))[ancestor::e:worksheet/@oox:part = key('Part', concat('xl/', $Id))/e:worksheet/@oox:part]/@s"/>
       </xsl:variable>
-      
-      <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $NrStyleMergeStart +1]">        
+
+      <!--xsl:comment>Merged Cell Styles
+        Node = <xsl:value-of select="name()"/>
+        @MergeCell = <xsl:value-of select="$MergeCell"/>
+        @Id = <xsl:value-of select="$Id"/>
+        $NrStyleMergeStart = <xsl:value-of select="$NrStyleMergeStart"/>
+      </xsl:comment-->
+
+      <xsl:for-each select="key('Xf', $NrStyleMergeStart)">
         <style:style style:name="{concat(generate-id(.), generate-id(.))}" style:family="table-cell">
           <xsl:call-template name="InsertCellFormat">
             <xsl:with-param name="Id">
@@ -569,9 +583,9 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
               <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
           </xsl:call-template>
-          </style:style>
-        </xsl:for-each>
-      
+        </style:style>
+      </xsl:for-each>
+
       <xsl:call-template name="InsertMergeCellStyleProperties">
         <xsl:with-param name="Id">
           <xsl:value-of select="$Id"/>
@@ -581,22 +595,22 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    
-    
+
+
   </xsl:template>
-  
+
   <xsl:template name="InsertHorizontalCellStyles">
-    
-    <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
+
+    <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
       mode="HorizontalStyle">
       <xsl:with-param name="number">1</xsl:with-param>
     </xsl:apply-templates>
-    
+
   </xsl:template>
-  
+
   <xsl:template match="e:sheet" mode="HorizontalStyle">
     <xsl:param name="number"/>
-    
+
     <xsl:variable name="Id">
       <xsl:call-template name="GetTarget">
         <xsl:with-param name="id">
@@ -605,89 +619,80 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="sheetName">
       <xsl:value-of select="@name"/>
     </xsl:variable>
-    
-    <xsl:apply-templates select="document(concat('xl/',$Id))/e:worksheet/e:sheetData/e:row[1]" mode="HorizontalStyle"/>
-    
+
+    <xsl:apply-templates select="key('Part', concat('xl/',$Id))/e:worksheet/e:sheetData/e:row[1]" mode="HorizontalStyle"/>
+
     <!-- Insert next Table -->
-    
+
     <xsl:apply-templates select="following-sibling::e:sheet[1]" mode="HorizontalStyle">
       <xsl:with-param name="number">
         <xsl:value-of select="$number + 1"/>
       </xsl:with-param>
     </xsl:apply-templates>
-    
+
   </xsl:template>
-  
+
   <xsl:template match="e:row" mode="HorizontalStyle">
-    
-    <xsl:apply-templates select="e:c[1]" mode="HorizontalStyle"/> 
-    
+
+    <xsl:apply-templates select="e:c[1]" mode="HorizontalStyle"/>
+
     <xsl:if test="following-sibling::e:row">
-      NEXT
       <xsl:apply-templates select="following-sibling::e:row[1]" mode="HorizontalStyle"/>
     </xsl:if>
+
   </xsl:template>
-  
+
   <xsl:template match="e:c" mode="HorizontalStyle">
-    
+
     <xsl:if test="e:v">
-      
-    <xsl:variable name="position">
-      <xsl:value-of select="@s + 1"/>
-    </xsl:variable>
-    
-    <xsl:variable name="horizontal">
-      <xsl:for-each select="document('xl/styles.xml')">
-        <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
-        />
-      </xsl:for-each>
-    </xsl:variable>
-      
+
+      <xsl:variable name="horizontal">
+        <xsl:value-of select="key('Xf', @s)/e:alignment/@horizontal" />
+      </xsl:variable>
+
       <xsl:variable name="continuous">
         <xsl:call-template name="CountContinuous"/>
       </xsl:variable>
-      
-    <xsl:if test="$horizontal = 'centerContinuous'">
-      
-     
-      <xsl:call-template name="InsertHorizontalCellStylesProperties">
-        <xsl:with-param name="FirstHorizontalCellStyle">
-          <xsl:value-of select="@s"/>
-        </xsl:with-param>
-        <xsl:with-param name="LastHorizontalCellStyle">
-          <xsl:value-of select="following-sibling::e:c[position() = $continuous - 1]/@s"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-      
-      <xsl:if test="following-sibling::e:c">
-            <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
+
+      <xsl:if test="$horizontal = 'centerContinuous'">
+
+
+        <xsl:call-template name="InsertHorizontalCellStylesProperties">
+          <xsl:with-param name="FirstHorizontalCellStyle">
+            <xsl:value-of select="@s"/>
+          </xsl:with-param>
+          <xsl:with-param name="LastHorizontalCellStyle">
+            <xsl:value-of select="following-sibling::e:c[position() = $continuous - 1]/@s"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:if>
-      
+
+      <xsl:if test="following-sibling::e:c">
+        <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
+      </xsl:if>
+
     </xsl:if>
-    
+
     <xsl:if test="not(e:v)">
-      
-    <xsl:if test="following-sibling::e:c">      
-          <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
+
+      <xsl:if test="following-sibling::e:c">
+        <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
+      </xsl:if>
+
     </xsl:if>
-      
-    </xsl:if>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertHorizontalCellStylesProperties">
     <xsl:param name="FirstHorizontalCellStyle"/>
     <xsl:param name="LastHorizontalCellStyle"/>
-    
-  
-  
-    
-    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $FirstHorizontalCellStyle + 1]">        
+
+
+    <xsl:for-each select="key('Xf', $FirstHorizontalCellStyle)">
       <style:style style:name="{concat(generate-id(.), generate-id(.))}" style:family="table-cell">
         <xsl:call-template name="InsertCellFormat">
           <xsl:with-param name="LastHorizontalCellStyle">
@@ -696,7 +701,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </xsl:call-template>
       </style:style>
     </xsl:for-each>
-    
+
   </xsl:template>
 
   <!-- cell formats -->
@@ -731,9 +736,10 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     <!--RefNo-1
     <xsl:if
       test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1">-->
-	  <!--Code added by Sandeep : BugNo.1812102: 22-oct-2007 :Added condition to check for "alignment" child element-->
-	  <xsl:if
-		test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1 or e:alignment">  
+    <!--Code added by Sandeep : BugNo.1812102: 22-oct-2007 :Added condition to check for "alignment" child element-->
+    <xsl:if
+		test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1 or e:alignment">
+
       <style:table-cell-properties>
         <!--RefNo-1
         <xsl:if test="@applyAlignment = 1">-->
@@ -827,10 +833,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </xsl:if>
 
         <xsl:if test="@applyFill=1 or @fillId!='0'">
-          <xsl:variable name="this" select="."/>
-          <xsl:apply-templates
-            select="ancestor::e:styleSheet/e:fills/e:fill[position() = $this/@fillId + 1]"
-            mode="style"/>
+          <xsl:apply-templates select="key('Fill', @fillId)" mode="style"/>
         </xsl:if>
 
       </style:table-cell-properties>
@@ -903,17 +906,14 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
     <xsl:if test="@applyFont = 1 or  @fontId != ''">
       <style:text-properties>
-        <xsl:variable name="this" select="."/>
-        <xsl:apply-templates
-          select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
-          mode="style"/>
+        <xsl:apply-templates select="key('Font', @fontId)" mode="style"/>
       </style:text-properties>
     </xsl:if>
   </xsl:template>
 
   <!-- ignore text -->
   <xsl:template match="text()" mode="style"/>
-  
+
   <!-- convert font name-->
   <xsl:template match="e:rFont" mode="style">
     <xsl:attribute name="style:font-name">
@@ -959,15 +959,14 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     <!-- @Description: inserts text styles -->
     <!-- @Context: none -->
 
-    <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]"
-      mode="automaticstyles"/>
-    
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-      <xsl:apply-templates select="document(concat('xl/comments', position(), '.xml'))/e:comments">
+    <xsl:apply-templates select="key('Part', 'xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]" mode="automaticstyles"/>
+
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+      <xsl:apply-templates select="key('Part', concat('xl/comments', position(), '.xml'))/e:comments">
         <xsl:with-param name="number">
           <xsl:value-of select="position()"/>
         </xsl:with-param>
-      </xsl:apply-templates>  
+      </xsl:apply-templates>
     </xsl:for-each>
 
   </xsl:template>
@@ -980,7 +979,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     <xsl:param name="number"/>
     <!--(int) number of sheet/comments file -->
     <xsl:apply-templates select="e:commentList/e:comment/e:text/e:r[e:rPr]" mode="automaticstyles"/>
-    <xsl:apply-templates select="document(concat('xl/comments',$number + 1,'.xml'))">
+    <xsl:apply-templates select="key('Part', concat('xl/comments',$number + 1,'.xml'))">
       <xsl:with-param name="number">
         <xsl:value-of select="$number+1"/>
       </xsl:with-param>
@@ -1047,24 +1046,24 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </xsl:attribute>
   </xsl:template>
 
-	<!-- Fix for the bug 1802600
+  <!-- Fix for the bug 1802600
 	     Template added by Vijayeta:Add an additional attribute 'style:font-size-asian', if charset is of type Japaneese
 		 Date: 5th Nov '07-->
-	<xsl:template match="e:charset" mode="style">
-		<xsl:if test ="round(@val)=128">
-			<xsl:attribute name="style:font-size-asian">
-				<xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
-			</xsl:attribute>
-			<xsl:attribute name="style:font-size-complex">
-				<xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
-			</xsl:attribute>
-			<xsl:attribute name="style:font-name-asian">
-				<xsl:value-of select="./parent::node()/e:name/@val"/>
-			</xsl:attribute>
-		</xsl:if>
-	</xsl:template>
-	<!-- End of fix for the bug 1802600-->
-	
+  <xsl:template match="e:charset" mode="style">
+    <xsl:if test ="round(@val)=128">
+      <xsl:attribute name="style:font-size-asian">
+        <xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
+      </xsl:attribute>
+      <xsl:attribute name="style:font-size-complex">
+        <xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
+      </xsl:attribute>
+      <xsl:attribute name="style:font-name-asian">
+        <xsl:value-of select="./parent::node()/e:name/@val"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  <!-- End of fix for the bug 1802600-->
+
   <xsl:template match="e:name" mode="style">
     <xsl:attribute name="style:font-name">
       <xsl:value-of select="@val"/>
@@ -1103,7 +1102,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
   <xsl:template name="InsertPageLayout">
     <xsl:variable name="ActiveTabNumber">
-      <xsl:for-each select="document('xl/workbook.xml')">
+      <xsl:for-each select="key('Part', 'xl/workbook.xml')">
         <xsl:choose>
           <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
             <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
@@ -1114,7 +1113,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </xsl:variable>
 
     <xsl:for-each
-      select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet">
+      select="key('Part', concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet">
       <style:page-layout style:name="pm1">
         <style:page-layout-properties>
 
@@ -1138,27 +1137,27 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
               </xsl:when>
               <!-- Letter -->
               <xsl:otherwise>
-					<!-- Start of RefNo-2-Code inseretd by Sandeep, Fix for the bug 1810604 Date:22nd Oct '07-->
-					<xsl:choose>
-						<xsl:when test="@orientation = 'landscape' ">
-                <xsl:attribute name="fo:page-width">
-                  <xsl:text>27.94cm</xsl:text>
-                </xsl:attribute>
-                <xsl:attribute name="fo:page-height">
-                  <xsl:text>21.59cm</xsl:text>
-                </xsl:attribute>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:attribute name="fo:page-width">
-								<xsl:text>21.59cm</xsl:text>
-							</xsl:attribute>
-							<xsl:attribute name="fo:page-height">
-								<xsl:text>27.94cm</xsl:text>
-							</xsl:attribute>
-						</xsl:otherwise>
-					</xsl:choose>
+                <!-- Start of RefNo-2-Code inseretd by Sandeep, Fix for the bug 1810604 Date:22nd Oct '07-->
+                <xsl:choose>
+                  <xsl:when test="@orientation = 'landscape' ">
+                    <xsl:attribute name="fo:page-width">
+                      <xsl:text>27.94cm</xsl:text>
+                    </xsl:attribute>
+                    <xsl:attribute name="fo:page-height">
+                      <xsl:text>21.59cm</xsl:text>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="fo:page-width">
+                      <xsl:text>21.59cm</xsl:text>
+                    </xsl:attribute>
+                    <xsl:attribute name="fo:page-height">
+                      <xsl:text>27.94cm</xsl:text>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:otherwise>
-				<!--End of RefNo-2-End of Code inseretd by Sandeep, Fix for the bug 1810604 Date:22nd Oct '07-->
+              <!--End of RefNo-2-End of Code inseretd by Sandeep, Fix for the bug 1810604 Date:22nd Oct '07-->
             </xsl:choose>
 
             <!-- paper orientation -->
@@ -1343,7 +1342,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
 
   <xsl:template name="InsertCellStyle">
-    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs">
+    <xsl:for-each select="key('Part', 'xl/styles.xml')/e:styleSheet/e:cellXfs">
       <xsl:apply-templates select="e:xf" mode="stylesandformating"/>
     </xsl:for-each>
   </xsl:template>
@@ -1365,25 +1364,25 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
       </style:style>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertCommentsBorderStyles">
     <draw:stroke-dash draw:name="round_20_dotted" draw:display-name="round dotted" draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
-    
+
     <draw:stroke-dash draw:name="square_20_dotted" draw:display-name="square dotted"
       draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
-    
+
     <draw:stroke-dash draw:name="dashed" draw:style="rect" draw:dots1="1" draw:dots1-length="0.15cm" draw:dots2="1" draw:dots2-length="0.15cm" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
-    
+
     <draw:stroke-dash draw:name="dash_20_dot" draw:display-name="dash dot" draw:style="rect"
       draw:dots1="1" draw:dots1-length="0.1cm" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
-    
+
     <draw:stroke-dash draw:name="long_20_dash" draw:display-name="long dash" draw:style="rect"
       draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="1" draw:dots2-length="0.2cm"
       draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
-    
+
     <draw:stroke-dash draw:name="long_20_dash_20_dot" draw:display-name="long dash dot"
       draw:style="rect" draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
-    
+
     <draw:stroke-dash draw:name="long_20_dash_20_dot_20_dot" draw:display-name="long dash dot dot" draw:style="rect" draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="2"
       draw:distance="0.1cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
   </xsl:template>

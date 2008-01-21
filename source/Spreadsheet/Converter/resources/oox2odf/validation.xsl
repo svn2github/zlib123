@@ -448,12 +448,12 @@
         <!-- Check If Validations are in this sheet -->
 
         <xsl:variable name="ValidationCell">
-            <xsl:for-each select="document(concat('xl/',$Id))">
+            <xsl:for-each select="key('Part', concat('xl/',$Id))">
                 <xsl:call-template name="ValidationCell"/>
             </xsl:for-each>
         </xsl:variable>
 
-        <xsl:for-each select="document(concat('xl/',$Id))">
+        <xsl:for-each select="key('Part', concat('xl/',$Id))">
             <xsl:apply-templates select="e:worksheet/e:dataValidations " mode="Validation">
                 <xsl:with-param name="sheet">
                     <xsl:value-of select="$number"/>

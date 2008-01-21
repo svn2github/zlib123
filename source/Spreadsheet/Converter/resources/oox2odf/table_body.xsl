@@ -36,7 +36,9 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="e oox r">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="insert_cols.xsl"/>
@@ -44,7 +46,7 @@
   <xsl:import href="insert_text.xsl"/>
   <xsl:import href="elements.xsl"/>
 
-  <xsl:key name="hyperlinkPosition" match="e:c" use="'@r'"/>
+  <!--xsl:key name="hyperlinkPosition" match="e:c" use="'@r'"/-->
   <xsl:key name="ref" match="e:hyperlink" use="@ref"/>
   <!--xsl:key name="outlineLevelRow" match="e:sheetFormatPr" use="@outlineLevelRow"/-->
   <!--xsl:key name="outlineLevel" match="e:row" use="@outlineLevel"/-->
@@ -69,13 +71,13 @@
     <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="AllRowBreakes"/>
-    
-    
+
+
     <xsl:choose>
       <!-- when sheet is empty  -->
       <xsl:when
         test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = '' and $NoteCell = '' and $ConditionalCell = '' and $ValidationCell = '' and $AllRowBreakes = '' ">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
           table:number-rows-repeated="65536">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -169,7 +171,7 @@
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-              <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+              <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
                 table:number-rows-repeated="{65536 - e:worksheet/e:sheetData/e:row[last()]/@r}">
                 <table:table-cell table:number-columns-repeated="256"/>
               </table:table-row>
@@ -216,11 +218,11 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="currentRowNumber">
       <xsl:value-of select="preceding-sibling::e:row[1]/@r"/>
     </xsl:variable>
-      
+
     <xsl:variable name="PictureColl">
       <xsl:call-template name="GetCollsWithElement">
         <xsl:with-param name="rowNumber">
@@ -265,11 +267,11 @@
 
               <xsl:when test="contains(concat(';', $AllRowBreakes), concat(';', @r, ';'))">
                 <xsl:value-of
-                  select="generate-id(document(concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
+                  select="generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks)"/>
               </xsl:when>
 
               <xsl:otherwise>
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
@@ -361,9 +363,7 @@
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
-                    <xsl:for-each select="document('xl/styles.xml')">
-                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
-                    </xsl:for-each>
+                    <xsl:value-of select="generate-id(key('Xf', @s))"/>
                   </xsl:attribute>
                 </xsl:if>
               </table:table-cell>
@@ -374,9 +374,7 @@
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
-                    <xsl:for-each select="document('xl/styles.xml')">
-                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
-                    </xsl:for-each>
+                    <xsl:value-of select="generate-id(key('Xf', @s))"/>
                   </xsl:attribute>
                 </xsl:if>
                 <xsl:if test="$CheckIfBigMerge != ''">
@@ -472,9 +470,7 @@
               <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
-                    <xsl:for-each select="document('xl/styles.xml')">
-                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
-                    </xsl:for-each>
+                    <xsl:value-of select="generate-id(key('Xf', @s))"/>
                   </xsl:attribute>
                 </xsl:if>
               </table:table-cell>
@@ -563,13 +559,8 @@
           </xsl:attribute>
           <!-- if there is a default cell style for the row -->
           <xsl:if test="parent::node()/@s">
-            <xsl:variable name="position">
-              <xsl:value-of select="$this/parent::node()/@s + 1"/>
-            </xsl:variable>
             <xsl:attribute name="table:style-name">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-              </xsl:for-each>
+              <xsl:value-of select="generate-id(key('Xf', parent::node()/@s))"/>
             </xsl:attribute>
           </xsl:if>
         </table:table-cell>
@@ -715,13 +706,8 @@
                 </xsl:attribute>
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="parent::node()/@s">
-                  <xsl:variable name="position">
-                    <xsl:value-of select="$this/parent::node()/@s + 1"/>
-                  </xsl:variable>
                   <xsl:attribute name="table:style-name">
-                    <xsl:for-each select="document('xl/styles.xml')">
-                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-                    </xsl:for-each>
+                    <xsl:value-of select="generate-id(key('Xf', parent::node()/@s))"/>
                   </xsl:attribute>
                 </xsl:if>
                 <xsl:variable name="thisCellCol">
@@ -735,7 +721,7 @@
                   <xsl:value-of select="concat($thisCellCol,$rowNum -1)"/>
                 </xsl:variable>
                 <xsl:apply-templates
-                  select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
+                  select="key('Part', concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
                   <xsl:with-param name="number" select="$sheetNr"/>
                 </xsl:apply-templates>
               </table:table-cell>
@@ -766,13 +752,8 @@
                 </xsl:attribute>
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="parent::node()/@s">
-                  <xsl:variable name="position">
-                    <xsl:value-of select="$this/parent::node()/@s + 1"/>
-                  </xsl:variable>
                   <xsl:attribute name="table:style-name">
-                    <xsl:for-each select="document('xl/styles.xml')">
-                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-                    </xsl:for-each>
+                    <xsl:value-of select="generate-id(key('Xf', parent::node()/@s))"/>
                   </xsl:attribute>
                 </xsl:if>
                 <xsl:variable name="thisCellCol">
@@ -786,7 +767,7 @@
                   <xsl:value-of select="concat($thisCellCol,$rowNum - 1)"/>
                 </xsl:variable>
                 <xsl:apply-templates
-                  select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
+                  select="key('Part', concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
                   <xsl:with-param name="number" select="$sheetNr"/>
                 </xsl:apply-templates>
               </table:table-cell>
@@ -925,9 +906,6 @@
         <!-- insert this one cell-->
 
         <table:table-cell>
-          <xsl:variable name="position">
-            <xsl:value-of select="$this/@s + 1"/>
-          </xsl:variable>
           <xsl:variable name="CheckIfPicture">
             <xsl:choose>
               <xsl:when
@@ -951,12 +929,9 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:variable name="horizontal">
-            <xsl:for-each select="document('xl/styles.xml')">
-              <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
-              />
-            </xsl:for-each>
+            <xsl:value-of select="key('Xf', $this/@s)/e:alignment/@horizontal" />
           </xsl:variable>
 
 
@@ -991,17 +966,15 @@
               <xsl:when
                 test="@s and contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
                 <xsl:variable name="CellStyleId">
-                  <xsl:for-each select="document('xl/styles.xml')">
-                    <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-                  </xsl:for-each>
+                  <xsl:value-of select="generate-id(key('Xf', $this/@s))"/>
                 </xsl:variable>
                 <xsl:variable name="ConditionalStyleId">
                   <xsl:value-of
-                    select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1])"
+                    select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')])"
                   />
                 </xsl:variable>
-                <xsl:attribute name="table:style-name">                  
-                  <xsl:for-each select="document('xl/styles.xml')">
+                <xsl:attribute name="table:style-name">
+                  <xsl:for-each select="key('Part', 'xl/styles.xml')">
                     <xsl:value-of select="concat($CellStyleId, $ConditionalStyleId)"/>
                   </xsl:for-each>
                 </xsl:attribute>
@@ -1011,24 +984,20 @@
                 <xsl:choose>
                   <xsl:when test="$CheckIfMerge != 'false'">
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="document('xl/styles.xml')">
-                        <xsl:value-of select="concat(generate-id(key('Xf', '')[position() = $position]), generate-id(key('Xf', '')[position() = $position]))"/>
-                      </xsl:for-each>
-                    </xsl:attribute>    
+                      <xsl:value-of select="concat(generate-id(key('Xf', @s)), generate-id(key('Xf', @s)))"/>
+                    </xsl:attribute>
                   </xsl:when>
                   <xsl:otherwise>
-                <xsl:attribute name="table:style-name">                  
-                  <xsl:for-each select="document('xl/styles.xml')">
-                    <xsl:choose>
-                      <xsl:when test="$horizontal = 'centerContinuous'">
-                        <xsl:value-of select="concat(generate-id(key('Xf', '')[position() = $position]), generate-id(key('Xf', '')[position() = $position]))"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>    
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:for-each>
-                </xsl:attribute>
+                    <xsl:attribute name="table:style-name">
+                      <xsl:choose>
+                        <xsl:when test="$horizontal = 'centerContinuous'">
+                          <xsl:value-of select="concat(generate-id(key('Xf', @s)), generate-id(key('Xf', @s)))"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="generate-id(key('Xf', @s))"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:attribute>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
@@ -1036,14 +1005,14 @@
               <xsl:otherwise>
                 <xsl:attribute name="table:style-name">
                   <xsl:value-of
-                    select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1])"
+                    select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')])"
                   />
                 </xsl:attribute>
               </xsl:otherwise>
             </xsl:choose>
 
 
-            
+
             <xsl:if test="$horizontal = 'centerContinuous' and e:v">
               <xsl:variable name="continous">
                 <xsl:call-template name="CountContinuous"/>
@@ -1055,7 +1024,7 @@
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
             </xsl:if>
-            
+
           </xsl:if>
 
           <!-- chceck if DataValidation -->
@@ -1075,7 +1044,8 @@
           <xsl:if test="e:v">
             <xsl:call-template name="InsertText">
               <xsl:with-param name="position">
-                <xsl:value-of select="$position"/>
+                <!-- the style id -->
+                <xsl:value-of select="$this/@s"/>
               </xsl:with-param>
               <xsl:with-param name="colNum" select="$colNum"/>
               <xsl:with-param name="rowNum" select="$rowNum"/>
@@ -1233,14 +1203,8 @@
           </xsl:when>
           <!-- when cell had 'centerContinuous' horizontal alignment -->
           <xsl:when test="@s and e:v">
-            <xsl:variable name="position">
-              <xsl:value-of select="$this/@s + 1"/>
-            </xsl:variable>
             <xsl:variable name="horizontal">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
-                />
-              </xsl:for-each>
+              <xsl:value-of select="key('Xf', $this/@s)/e:alignment/@horizontal" />
             </xsl:variable>
             <xsl:variable name="continuous">
               <xsl:call-template name="CountContinuous"/>
@@ -1251,9 +1215,7 @@
                   <xsl:value-of select="$continuous - 1"/>
                 </xsl:attribute>
                 <xsl:attribute name="table:style-name">
-                  <xsl:for-each select="document('xl/styles.xml')">
-                    <xsl:value-of select="generate-id(key('Xf', '')[position() = 1])"/>
-                  </xsl:for-each>
+                  <xsl:value-of select="generate-id(key('Xf', '0'))"/>
                 </xsl:attribute>
               </table:covered-table-cell>
             </xsl:if>
@@ -1336,13 +1298,8 @@
     <xsl:variable name="countContinuous">
       <xsl:choose>
         <xsl:when test="@s and e:v">
-          <xsl:variable name="position">
-            <xsl:value-of select="$this/@s + 1"/>
-          </xsl:variable>
           <xsl:variable name="horizontal">
-            <xsl:for-each select="document('xl/styles.xml')">
-              <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
-            </xsl:for-each>
+            <xsl:value-of select="key('Xf', $this/@s)/e:alignment/@horizontal"/>
           </xsl:variable>
 
           <xsl:choose>
@@ -1704,9 +1661,9 @@
         <xsl:if test="following-sibling::e:c">
           <xsl:apply-templates select="following-sibling::e:c[1]">
             <xsl:with-param name="prevCellCol">
-              <xsl:call-template name="GetColNum">
+              <xsl:call-template name="GetColNum2">
                 <xsl:with-param name="cell">
-                  <xsl:value-of select="@r"/>
+                  <xsl:value-of select="@oox:p"/>
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:with-param>

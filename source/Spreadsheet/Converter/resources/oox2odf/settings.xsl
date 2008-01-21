@@ -47,7 +47,7 @@
             <config:config-item-map-entry>
 
               <!-- settings based on default active table -->
-              <xsl:for-each select="document('xl/workbook.xml')">
+              <xsl:for-each select="key('Part', 'xl/workbook.xml')">
                 <xsl:variable name="ActiveTabNumber">
                   <xsl:choose>
                     <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
@@ -67,7 +67,7 @@
 
                 <config:config-item config:name="ZoomValue" config:type="int">
                   <xsl:for-each
-                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
+                    select="key('Part', concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
                     <xsl:choose>
                       <xsl:when test="not(@view = 'pageBreakPreview') and @zoomScale">
                         <xsl:value-of select="@zoomScale"/>
@@ -81,7 +81,7 @@
 
                 <config:config-item config:name="PageViewZoomValue" config:type="int">
                   <xsl:for-each
-                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
+                    select="key('Part', concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
                     <xsl:choose>
                       <xsl:when test="@view = 'pageBreakPreview' and @zoomScale">
                         <xsl:value-of select="@zoomScale"/>
@@ -95,7 +95,7 @@
 
                 <config:config-item config:name="ShowPageBreakPreview" config:type="boolean">
                   <xsl:for-each
-                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
+                    select="key('Part', concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
                     <xsl:choose>
                       <xsl:when test="@view = 'pageBreakPreview' ">
                         <xsl:text>true</xsl:text>
@@ -107,7 +107,7 @@
                 
                 <config:config-item config:name="HasColumnRowHeaders" config:type="boolean">
                   <xsl:for-each
-                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
+                    select="key('Part', concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
                     <xsl:choose>
                       <xsl:when test="@showRowColHeaders = 0">
                         <xsl:text>false</xsl:text>
@@ -119,7 +119,7 @@
               </xsl:for-each>
               
               <config:config-item-map-named config:name="Tables">
-                <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+                <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
                   <xsl:call-template name="InsertCursorPosition">
                     <xsl:with-param name="sheet">
                       <xsl:call-template name="GetTarget">
@@ -145,12 +145,12 @@
       <config:config-item config:name="CursorPositionX" config:type="int">
         <xsl:choose>
           <xsl:when
-            test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+            test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
             <xsl:variable name="col">
               <xsl:call-template name="GetColNum">
                 <xsl:with-param name="cell">
                   <xsl:value-of
-                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+                    select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
                   />
                 </xsl:with-param>
               </xsl:call-template>
@@ -165,12 +165,12 @@
       <config:config-item config:name="CursorPositionY" config:type="int">
         <xsl:choose>
           <xsl:when
-            test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+            test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
             <xsl:variable name="row">
               <xsl:call-template name="GetRowNum">
                 <xsl:with-param name="cell">
                   <xsl:value-of
-                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+                    select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
                   />
                 </xsl:with-param>
               </xsl:call-template>

@@ -38,7 +38,10 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  exclude-result-prefixes="e r pxsi">
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="e oox r pxsi">
+
+  <xsl:key name="SharedStrings" match="e:sst/e:si" use="@oox:id"/>
 
   <xsl:template name="InsertText">
     <xsl:param name="position"/>
@@ -47,8 +50,10 @@
     <xsl:param name="sheetNr"/>
     <xsl:param name="rSheredStrings"/>
 
+    <xsl:variable name="partId" select="ancestor::e:worksheet/@oox:part" />
+    
     <xsl:choose>
-      <xsl:when test="@t='s' or key('ref',@r)">
+      <xsl:when test="@t='s' or key('ref',@r)[./@oox:part = $partId]">
         <xsl:attribute name="office:value-type">
           <xsl:text>string</xsl:text>
         </xsl:attribute>
@@ -57,7 +62,7 @@
         </xsl:variable>
         <text:p>
           <xsl:choose>
-            <xsl:when test="key('ref',@r)">
+            <xsl:when test="key('ref',@r)[./@oox:part = $partId]">
 
               <xsl:variable name="XlinkHref">
                 <xsl:call-template name="XlinkHref">
@@ -70,14 +75,9 @@
 
 
               <!-- a postprocessor puts here strings from sharedstrings -->
-              <xsl:variable name="eV">
-                <xsl:value-of select="e:v + 1"/>
-              </xsl:variable>
-              <!-- a postprocessor puts here strings from sharedstrings -->
               <xsl:choose>
                 <xsl:when test="contains($rSheredStrings, e:v) ">
-                  <xsl:for-each
-                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
+                  <xsl:for-each select="key('SharedStrings', e:v)">
 
                     <xsl:apply-templates select="e:r[1]" mode="hyperlink">
                       <xsl:with-param name="XlinkHref">
@@ -108,19 +108,13 @@
                 </xsl:otherwise>
 
               </xsl:choose>
-
-
             </xsl:when>
 
             <xsl:otherwise>
-              <xsl:variable name="eV">
-                <xsl:value-of select="e:v + 1"/>
-              </xsl:variable>
               <!-- a postprocessor puts here strings from sharedstrings -->
               <xsl:choose>
                 <xsl:when test="contains($rSheredStrings, e:v) ">
-                  <xsl:for-each
-                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position() = $eV]">
+                  <xsl:for-each select="key('SharedStrings', e:v)">
                     <xsl:apply-templates>
                       <!--RefNo-1: Changes for fixing 1833074 XLSX: Cell Content missing-->
                       <xsl:with-param name ="textp" select ="'T'"/>
@@ -133,8 +127,6 @@
                   </pxsi:v>
                 </xsl:otherwise>
               </xsl:choose>
-
-
 
             </xsl:otherwise>
           </xsl:choose>
@@ -167,11 +159,7 @@
                   <xsl:value-of select="e:v"/>
                 </xsl:with-param>
                 <xsl:with-param name="numStyle">
-                  <xsl:for-each select="document('xl/styles.xml')">
-                    <xsl:value-of
-                      select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
-                    />
-                  </xsl:for-each>
+                  <xsl:value-of select="key('numFmtId',key('Xf', $position)/@numFmtId)/@formatCode" />
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
@@ -194,26 +182,17 @@
               <xsl:value-of select="e:v"/>
             </xsl:with-param>
             <xsl:with-param name="numStyle">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of
-                  select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
-                />
-              </xsl:for-each>
+              <xsl:value-of select="key('numFmtId',key('Xf', $position)/@numFmtId)/@formatCode" />
             </xsl:with-param>
           </xsl:call-template>
         </text:p>
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="numStyle">
-          <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of
-              select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"/>
-          </xsl:for-each>
+          <xsl:value-of select="key('numFmtId',key('Xf', $position)/@numFmtId)/@formatCode" />
         </xsl:variable>
         <xsl:variable name="numId">
-          <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of select="key('Xf','')[position()=$position]/@numFmtId"/>
-          </xsl:for-each>
+          <xsl:value-of select="key('Xf', $position)/@numFmtId"/>
         </xsl:variable>
 
         <xsl:variable name="strippedFormat">
@@ -272,7 +251,7 @@
                 <xsl:with-param name="value">
                   <xsl:choose>
                     <xsl:when
-                      test="document('xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
+                      test="key('Part', 'xl/workbook.xml')/e:workbook/e:workbookPr/@date1904 =1 ">
                       <xsl:value-of select="(e:v) + (1462)"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -435,7 +414,7 @@
 
     <xsl:variable name="target">
       <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
-      <xsl:for-each select="key('ref',@r)">
+      <xsl:for-each select="key('ref',@r)[./@oox:part = ancestor::e:worksheet/@oox:part]">
         <xsl:call-template name="GetTarget">
           <xsl:with-param name="id">
             <xsl:value-of select="@r:id"/>
@@ -457,8 +436,8 @@
         <xsl:value-of select="$target"/>
       </xsl:when>
       <!-- when hyperlink leads to another place in workbook -->
-      <xsl:when test="key('ref',@r)/@location != '' ">
-        <xsl:for-each select="key('ref',@r)">
+      <xsl:when test="key('ref',@r)[./@oox:part = ancestor::e:worksheet/@oox:part]/@location != '' ">
+        <xsl:for-each select="key('ref',@r)[./@oox:part = ancestor::e:worksheet/@oox:part]">
 
           <xsl:variable name="apos">
             <xsl:text>&apos;</xsl:text>
@@ -483,11 +462,11 @@
 
           <xsl:variable name="checkedName">
             <xsl:for-each
-              select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+              select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
               <xsl:call-template name="CheckSheetName">
                 <xsl:with-param name="sheetNumber">
                   <xsl:for-each
-                    select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+                    select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
                     <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
                   </xsl:for-each>
                 </xsl:with-param>
@@ -684,12 +663,10 @@
       <xsl:choose>
         <xsl:when test="following-sibling::e:c[1]/@s and not(following-sibling::e:c[1]/e:v)">
           <xsl:variable name="position">
-            <xsl:value-of select="following-sibling::e:c[1]/@s + 1"/>
+            <xsl:value-of select="following-sibling::e:c[1]/@s"/>
           </xsl:variable>
           <xsl:variable name="horizontal">
-            <xsl:for-each select="document('xl/styles.xml')">
-              <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
-            </xsl:for-each>
+            <xsl:value-of select="key('Xf', $position)/e:alignment/@horizontal"/>
           </xsl:variable>
 
           <xsl:choose>

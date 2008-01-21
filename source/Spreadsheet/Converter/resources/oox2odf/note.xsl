@@ -58,12 +58,12 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
 
     <xsl:variable name="targetFile">
       <xsl:value-of
-        select="document(concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'comments' )]/@Target"
+        select="key('Part', concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'comments' )]/@Target"
       />
     </xsl:variable>
 
     <xsl:apply-templates
-      select="document(concat('xl/',substring-after($targetFile,'../')))/e:comments"
+      select="key('Part', concat('xl/',substring-after($targetFile,'../')))/e:comments"
       mode="note-cell"/>
 
   </xsl:template>
@@ -133,7 +133,7 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
 
     <xsl:variable name="targetFile">
       <xsl:value-of
-        select="document(concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'comments' )]/@Target"
+        select="key('Part', concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'comments' )]/@Target"
       />
     </xsl:variable>
 
@@ -142,7 +142,7 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
     </xsl:variable>
 
     <xsl:apply-templates
-      select="document(concat('xl/comments',$fileNumber,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
+      select="key('Part', concat('xl/comments',$fileNumber,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
       <xsl:with-param name="number" select="$fileNumber"/>
       <xsl:with-param name="rowNum">
         <xsl:value-of select="$rowNum"/>
@@ -174,13 +174,13 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
 
       <xsl:variable name="widthInPt">
         <xsl:value-of
-          select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('width', ':')), ';')"
+          select="substring-before(substring-after(key('Part', concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('width', ':')), ';')"
         />
       </xsl:variable>
 
       <xsl:variable name="heightInPt">
         <xsl:value-of
-          select="substring-before(substring-after(document(concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('height', ':')), ';')"
+          select="substring-before(substring-after(key('Part', concat('xl/drawings/vmlDrawing', $number, '.vml'))//v:shape[number($numberOfComment)]/@style, concat('height', ':')), ';')"
         />
       </xsl:variable>
 
@@ -214,10 +214,10 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
 
       <!--RefNo-1: xpath changed to get the required node.
       <xsl:for-each
-        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
+        select="key('Part', concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
       -->
       <xsl:for-each
-        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
+        select="key('Part', concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]">
 
         <xsl:attribute name="office:display">
           <xsl:call-template name="GetShapeProperty">
@@ -230,10 +230,10 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
 
       <!--RefNo-1: xpath changed to get the required node.
       <xsl:apply-templates
-        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]"
+        select="key('Part', concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]"
         mode="drawing">-->
       <xsl:apply-templates
-        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]"
+        select="key('Part', concat('xl/drawings/vmlDrawing',$number,'.vml'))//v:shape[x:ClientData/x:Row = $rowNum - 1 and x:ClientData/x:Column = $colNum - 1]"
         mode="drawing">
         <xsl:with-param name="text" select="e:text"/>
       </xsl:apply-templates>
@@ -298,11 +298,11 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
 
     <xsl:variable name="targetFile">
       <xsl:value-of
-        select="document(concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing' )]/@Target"
+        select="key('Part', concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing' )]/@Target"
       />
     </xsl:variable>
 
-    <xsl:for-each select="document(concat('xl/', substring-after($targetFile, '/')))/xml/v:shape">
+    <xsl:for-each select="key('Part', concat('xl/', substring-after($targetFile, '/')))/xml/v:shape">
       <style:style style:name="{generate-id(.)}" style:family="graphic">
         <style:graphic-properties>
 

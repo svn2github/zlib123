@@ -41,7 +41,9 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" 
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="e oox r">
 
 
   <xsl:template name="CheckIfMerge">
@@ -615,7 +617,7 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
     <xsl:param name="Repeat"/>
     <xsl:param name="BigMergeCell"/>
 
-    <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+    <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}">
       <xsl:call-template name="InsertColumnsBigMergeColl">
         <xsl:with-param name="BigMergeCell">
           <xsl:value-of select="$BigMergeCell"/>
@@ -1534,7 +1536,7 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
       <table:covered-table-cell>
       
         <xsl:variable name="Target">
-          <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
+          <xsl:for-each select="key('Part', concat('xl/', $sheet))/e:worksheet/e:drawing">
             <xsl:call-template name="GetTargetPicture">
               <xsl:with-param name="sheet">
                 <xsl:value-of select="substring-after($sheet, '/')"/>
@@ -1731,7 +1733,7 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
         <table:covered-table-cell>
 
           <xsl:variable name="Target">
-            <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
+            <xsl:for-each select="key('Part', concat('xl/', $sheet))/e:worksheet/e:drawing">
               <xsl:call-template name="GetTargetPicture">
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="substring-after($sheet, '/')"/>

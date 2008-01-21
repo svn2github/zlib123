@@ -46,7 +46,7 @@
   <xsl:template name="InsertOLEObjects">
     <xsl:choose>
       <xsl:when
-        test="e:oleObject[not(@r:id)] and not (document('xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:group' ])">
+        test="e:oleObject[not(@r:id)] and not (key('Part', 'xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:group' ])">
         <table:shapes>
           <xsl:for-each select="e:oleObject ">
             <xsl:call-template name="InsertOLEObjectsLinks"/>
@@ -82,14 +82,14 @@
     </xsl:variable>
 
     <xsl:variable name="ExternalLinkId">
-      <xsl:for-each select="document($ExternalLink)">
+      <xsl:for-each select="key('Part', $ExternalLink)">
         <xsl:value-of select="e:externalLink/e:oleLink[@progId = $ProgId]/@r:id"/>
       </xsl:for-each>
     </xsl:variable>
 
     <xsl:variable name="XlinkOLEObject">
 
-      <xsl:for-each select="document($ExternalLinkRels)//node()[name()='Relationship']">
+      <xsl:for-each select="key('Part', $ExternalLinkRels)//node()[name()='Relationship']">
         <xsl:if test="./@Id = $ExternalLinkId">
           <xsl:choose>
             <!--added by chhavi for network path -->
@@ -115,7 +115,7 @@
     <xsl:if test="$XlinkOLEObject != ''">
       <draw:frame>
         <xsl:apply-templates
-          select="document('xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:shape' and contains(@id,$ShapeId)] "/>
+          select="key('Part', 'xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:shape' and contains(@id,$ShapeId)] "/>
         <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="$XlinkOLEObject"/>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -48,7 +48,9 @@
   xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events"
   xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" office:version="1.0"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r pxsi">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="e r pxsi oox">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="database-ranges.xsl"/>
@@ -69,14 +71,12 @@
   <xsl:import href="pivot_tables.xsl"/>
 
 
-  <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
-  <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
-  <xsl:key name="Dxf" match="e:styleSheet/e:dxfs/e:dxf" use="''"/>
-  <xsl:key name="Sst" match="e:si" use="''"/>
-  <xsl:key name="SheetFormatPr" match="e:sheetFormatPr" use="''"/>
-  <xsl:key name="Col" match="e:col" use="''"/>
-  <xsl:key name="ConditionalFormatting" match="e:conditionalFormatting" use="''"/>
+  <!--xsl:key name="Sst" match="e:si" use="''"/-->
+  <xsl:key name="SheetFormatPr" match="e:sheetFormatPr" use="@oox:part"/>
+  <xsl:key name="Col" match="e:col" use="@oox:part"/>
+  <xsl:key name="ConditionalFormatting" match="e:worksheet/e:conditionalFormatting" use="@oox:part"/>
 
+  <!-- recursive search and replace -->
   <xsl:template name="recursive">
     <xsl:param name="oldString"/>
     <xsl:param name="newString"/>
@@ -104,35 +104,56 @@
       </office:font-face-decls>
       <office:automatic-styles>
         <xsl:call-template name="InsertColumnStyles"/>
+        
+        <!--xsl:comment>Row Styles</xsl:comment-->
         <xsl:call-template name="InsertRowStyles"/>
+        
+        <!--xsl:comment>Number Styles</xsl:comment-->
         <xsl:call-template name="InsertNumberStyles"/>
+        
+        <!--xsl:comment>Cell Styles</xsl:comment-->
         <xsl:call-template name="InsertCellStyles"/>
+
+        <!--xsl:comment>Merged Cell Styles</xsl:comment-->
         <xsl:call-template name="InsertMergeCellStyles"/>
-        <xsl:if test="document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf/e:alignment/@horizontal = 'centerContinuous'">
-            <xsl:call-template name="InsertHorizontalCellStyles"/>
+
+        <!--xsl:comment>Horizontal Cell Styles</xsl:comment-->
+        <xsl:if test="key('Part', 'xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf/e:alignment/@horizontal = 'centerContinuous'">
+          <xsl:call-template name="InsertHorizontalCellStyles"/>
         </xsl:if>
+        
+        <!--xsl:comment>Table Styles</xsl:comment-->
         <xsl:call-template name="InsertStyleTableProperties"/>
+        
+        <!--xsl:comment>Text Styles</xsl:comment-->
         <xsl:call-template name="InsertTextStyles"/>
+        
+        <!--xsl:comment>Text Box Styles</xsl:comment-->
         <xsl:call-template name="InsertTextBoxTextStyles"/>
         <!-- Insert Picture properties -->
-        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
-          mode="PictureStyle">
+        
+        <!--xsl:comment>Picture Styles</xsl:comment-->
+        <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="PictureStyle">
           <xsl:with-param name="number">1</xsl:with-param>
         </xsl:apply-templates>
+
         <!-- Insert Conditional Properties -->
-        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
-          mode="ConditionalStyle">
+        <!--xsl:comment>Conditional Styles</xsl:comment-->
+        <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="ConditionalStyle">
           <xsl:with-param name="number">1</xsl:with-param>
         </xsl:apply-templates>
+
         <!-- Insert Scenario properties -->
+        <!--xsl:comment>Scenario Styles</xsl:comment-->
         <xsl:call-template name="InsertScenarioStyles"/>
         <!-- Insert Note Shape properties -->
-        <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-        <xsl:call-template name="InsertNoteStyles">
-          <xsl:with-param name="sheetNr">
-            <xsl:value-of select="position()"/>
-          </xsl:with-param>
-        </xsl:call-template>
+        <!--xsl:comment>Note Styles</xsl:comment-->
+        <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+          <xsl:call-template name="InsertNoteStyles">
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="position()"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:for-each>
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
@@ -143,15 +164,15 @@
 
     <office:body>
       <office:spreadsheet>
-        
+
         <!--Insert Change Tracking -->
         <xsl:call-template name="InsertChangeTracking"/>
-        
+
         <xsl:variable name="rSheredStrings">
           <xsl:call-template name="rSheredStrings"/>
         </xsl:variable>
-        
-        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
+
+        <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
           mode="Validation">
           <xsl:with-param name="number">1</xsl:with-param>
           <xsl:with-param name="rSheredStrings">
@@ -160,15 +181,22 @@
         </xsl:apply-templates>
 
         <!-- insert strings from sharedStrings to be moved later by post-processor-->
-        <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst">
+        <xsl:for-each select="key('Part', 'xl/sharedStrings.xml')/e:sst">
           <pxsi:sst xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
             <xsl:for-each select="e:si">
               <xsl:call-template name="e:si"/>
-           </xsl:for-each>
+            </xsl:for-each>
           </pxsi:sst>
         </xsl:for-each>
 
-        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
+        <!--xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+          <xsl:call-template name="gaga" >
+            <xsl:with-param name="number">1</xsl:with-param>
+            <xsl:with-param name="rSheredStrings" select="$rSheredStrings"/>
+          </xsl:call-template>
+        </xsl:for-each-->
+
+        <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
           <xsl:with-param name="number">1</xsl:with-param>
           <xsl:with-param name="rSheredStrings">
             <xsl:value-of select="$rSheredStrings"/>
@@ -176,7 +204,7 @@
         </xsl:apply-templates>
 
         <table:database-ranges>
-          <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
+          <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
             <xsl:with-param name="number">1</xsl:with-param>
             <xsl:with-param name="mode" select="'database'"/>
             <xsl:with-param name="rSheredStrings">
@@ -184,9 +212,9 @@
             </xsl:with-param>
           </xsl:apply-templates>
         </table:database-ranges>
-        
+
         <!--xsl:variable name="pivotTables"-->
-          <xsl:call-template name="InsertPilotTables"/>
+        <xsl:call-template name="InsertPilotTables"/>
         <!--/xsl:variable-->
 
       </office:spreadsheet>
@@ -236,7 +264,7 @@
 
         <!-- if there is filter or sort -->
         <xsl:if
-          test="document(concat('xl/',$target))/e:worksheet/e:autoFilter or document(concat('xl/',$target))/e:worksheet/e:sortState/e:sortCondition[not(@customList)]">
+          test="key('Part', concat('xl/',$target))/e:worksheet/e:autoFilter or key('Part', concat('xl/',$target))/e:worksheet/e:sortState/e:sortCondition[not(@customList)]">
 
           <xsl:variable name="checkedName">
             <xsl:call-template name="CheckSheetName">
@@ -249,7 +277,7 @@
             </xsl:call-template>
           </xsl:variable>
 
-          <xsl:for-each select="document(concat('xl/',$target))/e:worksheet">
+          <xsl:for-each select="key('Part', concat('xl/',$target))/e:worksheet">
             <xsl:call-template name="InsertDatabaseRange">
               <xsl:with-param name="number" select="$number"/>
               <xsl:with-param name="checkedName" select="$checkedName"/>
@@ -305,28 +333,28 @@
     </xsl:variable>
 
     <xsl:variable name="BigMergeCell">
-      <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:mergeCells">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
         <xsl:apply-templates select="e:mergeCell[1]" mode="BigMergeColl"/>
       </xsl:for-each>
     </xsl:variable>
 
     <xsl:variable name="BigMergeRow">
-      <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:mergeCells">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
         <xsl:apply-templates select="e:mergeCell[1]" mode="BigMergeRow"/>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <!-- variable with merge cell -->
     <xsl:variable name="MergeCell">
-     <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:mergeCells">
-       <xsl:apply-templates select="e:mergeCell[1]" mode="merge"/>
-     </xsl:for-each>
+      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
+        <xsl:apply-templates select="e:mergeCell[1]" mode="merge"/>
+      </xsl:for-each>
     </xsl:variable>
-    
+
 
     <!-- Check If Picture are in this sheet  -->
     <xsl:variable name="PictureCell">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="PictureCell">
           <xsl:with-param name="sheet">
             <xsl:value-of select="substring-after($Id, '/')"/>
@@ -340,7 +368,7 @@
 
     <!-- Check if notes are in this sheet -->
     <xsl:variable name="NoteCell">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="NoteCell">
           <xsl:with-param name="sheetNr" select="$number"/>
         </xsl:call-template>
@@ -350,7 +378,7 @@
     <!-- Check If Conditionals are in this sheet -->
 
     <xsl:variable name="ConditionalCell">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell"/>
       </xsl:for-each>
     </xsl:variable>
@@ -364,7 +392,7 @@
     </xsl:variable>
 
     <xsl:variable name="ConditionalCellStyle">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell">
           <xsl:with-param name="document">
             <xsl:text>style</xsl:text>
@@ -375,7 +403,7 @@
 
     <!-- Check If Data Validation are in this sheet -->
     <xsl:variable name="ValidationCell">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ValidationCell"/>
       </xsl:for-each>
     </xsl:variable>
@@ -389,7 +417,7 @@
     </xsl:variable>
 
     <xsl:variable name="ValidationCellStyle">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ValidationCell">
           <xsl:with-param name="document">
             <xsl:text>style</xsl:text>
@@ -400,13 +428,13 @@
 
     <!-- Check if Scenario are in this sheet -->
     <xsl:variable name="ScenarioCell">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ScenarioCell"/>
       </xsl:for-each>
     </xsl:variable>
 
     <xsl:variable name="PictureRow">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="PictureRow">
           <xsl:with-param name="PictureCell">
             <xsl:value-of select="$PictureCell"/>
@@ -416,7 +444,7 @@
     </xsl:variable>
 
     <xsl:variable name="NoteRow">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="NoteRow">
           <xsl:with-param name="NoteCell">
             <xsl:value-of select="$NoteCell"/>
@@ -426,9 +454,9 @@
     </xsl:variable>
 
     <xsl:variable name="removeFilter">
-      <xsl:if test="document(concat('xl/',$Id))/e:worksheet/e:autoFilter">
+      <xsl:if test="key('Part', concat('xl/',$Id))/e:worksheet/e:autoFilter">
 
-        <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:autoFilter">
+        <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:autoFilter">
           <xsl:variable name="filtersNum">
             <xsl:value-of select="count(e:filterColumn/e:filters)"/>
           </xsl:variable>
@@ -462,9 +490,9 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <!-- variable with values of all manual row breakes-->
+    <!-- variable with values of all manual row breaks-->
     <xsl:variable name="AllRowBreakes">
-      <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:rowBreaks/e:brk">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:rowBreaks/e:brk">
         <xsl:value-of select="concat(@id + 1,';')"/>
       </xsl:for-each>
     </xsl:variable>
@@ -472,7 +500,7 @@
     <table:table>
 
       <xsl:variable name="GroupCell">
-        <xsl:apply-templates select="document(concat('xl/',$Id))/e:worksheet/e:cols/e:col[1]"
+        <xsl:apply-templates select="key('Part', concat('xl/',$Id))/e:worksheet/e:cols/e:col[1]"
           mode="groupTag"/>
       </xsl:variable>
 
@@ -493,7 +521,7 @@
       <xsl:variable name="apostrof">
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
-      <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
+      <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
         <!-- for the current sheet -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
           <!-- if print range with apostrophes -->
@@ -503,8 +531,7 @@
               <xsl:attribute name="table:print-ranges">
                 <xsl:call-template name="recursive">
                   <xsl:with-param name="oldString" select="':'"/>
-                  <xsl:with-param name="newString"
-                    select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
+                  <xsl:with-param name="newString" select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
                   <xsl:with-param name="wholeText" select="translate(./self::node(), '!', '.')"/>
                 </xsl:call-template>
               </xsl:attribute>
@@ -524,44 +551,44 @@
           </xsl:if>
         </xsl:if>
       </xsl:for-each>
-      <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
+      <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
         <!-- for the current sheet -->
         <!-- if the print range is without apostrophes -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
-        <xsl:if
-          test="string($checkedName) = translate(substring-before(self::node(), '!'), '!-$#:(),.+','') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
-          <!-- one print range without apostrophes -->
-          <xsl:if test="not(contains(./self::node(), concat(',', $checkedName)))">
-            <xsl:variable name="temporary">
-              <xsl:call-template name="recursive">
-                <xsl:with-param name="wholeText" select="translate(self::node(), '!', '.')"/>
-                <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"/>
-                <xsl:with-param name="oldString" select="':'"/>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:attribute name="table:print-ranges">
-              <!-- <xsl:value-of
+          <xsl:if
+            test="string($checkedName) = translate(substring-before(self::node(), '!'), '!-$#:(),.+','') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
+            <!-- one print range without apostrophes -->
+            <xsl:if test="not(contains(./self::node(), concat(',', $checkedName)))">
+              <xsl:variable name="temporary">
+                <xsl:call-template name="recursive">
+                  <xsl:with-param name="wholeText" select="translate(self::node(), '!', '.')"/>
+                  <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"/>
+                  <xsl:with-param name="oldString" select="':'"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:attribute name="table:print-ranges">
+                <!-- <xsl:value-of
               select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
                 />-->
-               <xsl:call-template name="recursive">
-                 <xsl:with-param name="wholeText" select="$temporary"/>
-                 <xsl:with-param name="oldString" select="substring-before($temporary, '$')"/>
-                 <xsl:with-param name="newString" select="concat($checkedName, '.')"/>
-               </xsl:call-template>         
-            </xsl:attribute>
+                <xsl:call-template name="recursive">
+                  <xsl:with-param name="wholeText" select="$temporary"/>
+                  <xsl:with-param name="oldString" select="substring-before($temporary, '$')"/>
+                  <xsl:with-param name="newString" select="concat($checkedName, '.')"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+            <!-- multiple print ranges without apostrophes -->
+            <xsl:if test="contains(./self::node(), concat(',', $checkedName))">
+              <xsl:attribute name="table:print-ranges">
+                <xsl:call-template name="recursive">
+                  <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"/>
+                  <xsl:with-param name="wholeText"
+                    select="translate(translate(./self::node(), '!', '.'), ',', ' ')"/>
+                  <xsl:with-param name="oldString" select="':'"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
           </xsl:if>
-          <!-- multiple print ranges without apostrophes -->
-          <xsl:if test="contains(./self::node(), concat(',', $checkedName))">
-            <xsl:attribute name="table:print-ranges">
-              <xsl:call-template name="recursive">
-                <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"/>
-                <xsl:with-param name="wholeText"
-                  select="translate(translate(./self::node(), '!', '.'), ',', ' ')"/>
-                <xsl:with-param name="oldString" select="':'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
         </xsl:if>
       </xsl:for-each>
 
@@ -584,7 +611,7 @@
       </xsl:variable>
 
       <xsl:apply-templates
-        select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1]"
+        select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1]"
         mode="PrintArea">
         <xsl:with-param name="name">
           <xsl:value-of select="@name"/>
@@ -666,14 +693,14 @@
 
     </table:table>
 
-    <xsl:for-each select="document(concat('xl/',$Id))/e:worksheet/e:scenarios">
+    <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:scenarios">
       <xsl:call-template name="Scenarios"/>
-    </xsl:for-each> 
-    
-    <xsl:if test="document(concat('xl/',$Id))/e:worksheet/e:dataConsolidate">
+    </xsl:for-each>
+
+    <xsl:if test="key('Part', concat('xl/',$Id))/e:worksheet/e:dataConsolidate">
       <xsl:message terminate="no">translation.oox2odf.DataConsolidation</xsl:message>
     </xsl:if>
-    
+
   </xsl:template>
 
   <xsl:template match="e:definedName" mode="PrintArea">
@@ -740,7 +767,7 @@
     <xsl:param name="mode"/>
     <xsl:param name="checkedName"/>
     <!-- if print ranges attribute does not contain '#REF' -->
-    <xsl:for-each select="document('xl/workbook.xml')">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')">
       <xsl:if
         test="not(contains(//workbook/definedNames/definedName[attribute::name = '_xlnm.Print_Area' ],'#REF'))">
         <xsl:variable name="apos">
@@ -909,7 +936,7 @@
       </xsl:if>
     </xsl:for-each>
     <!-- if print ranges attribute contains '#REF' then there should be 'table:print' attribute put instead with 'false' value -->
-    <xsl:for-each select="document('xl/workbook.xml')">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')">
       <xsl:if
         test="contains(//workbook/definedNames/definedName[attribute::name = '_xlnm.Print_Area' ],'#REF')">
         <xsl:attribute name="table:print">
@@ -923,9 +950,9 @@
   <!-- insert string -->
   <xsl:template name="e:si">
     <xsl:if test="not(e:r)">
-    <pxsi:si pxsi:number="{position() - 1}">     
+      <pxsi:si pxsi:number="{position() - 1}">
         <xsl:apply-templates/>
-    </pxsi:si>
+      </pxsi:si>
     </xsl:if>
 
   </xsl:template>
@@ -955,13 +982,13 @@
     <xsl:param name="AllRowBreakes"/>
     <xsl:param name="rSheredStrings"/>
 
-    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:oleObjects">
+    <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:oleObjects">
       <xsl:call-template name="InsertOLEObjects"/>
     </xsl:for-each>
 
 
     <xsl:variable name="ManualColBreaks">
-      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
+      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
         <xsl:value-of select="concat(@id,';')"/>
       </xsl:for-each>
     </xsl:variable>
@@ -981,7 +1008,7 @@
       <xsl:value-of select="@name"/>
     </xsl:variable>
 
-    <xsl:for-each select="document(concat('xl/',$sheet))">
+    <xsl:for-each select="key('Part', concat('xl/',$sheet))">
 
       <xsl:variable name="apos">
         <xsl:text>&apos;</xsl:text>
@@ -991,9 +1018,9 @@
         <xsl:choose>
           <!-- if sheet name in range definition is in apostrophes -->
           <xsl:when
-            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+            test="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
             <xsl:for-each
-              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+              select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
               <xsl:choose>
                 <!-- when header columns are present -->
                 <xsl:when test="contains(text(),',')">
@@ -1011,9 +1038,9 @@
           </xsl:when>
 
           <xsl:when
-            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+            test="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
             <xsl:for-each
-              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+              select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
               <xsl:choose>
                 <!-- when header columns are present -->
                 <xsl:when test="contains(text(),',')">
@@ -1035,9 +1062,9 @@
         <xsl:choose>
           <!-- if sheet name in range definition is in apostrophes -->
           <xsl:when
-            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+            test="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
             <xsl:for-each
-              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+              select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
               <xsl:choose>
                 <!-- when header columns are present -->
                 <xsl:when test="contains(text(),',')">
@@ -1052,9 +1079,9 @@
           </xsl:when>
 
           <xsl:when
-            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+            test="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
             <xsl:for-each
-              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+              select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
               <xsl:choose>
                 <!-- when header columns are present -->
                 <xsl:when test="contains(text(),',')">
@@ -1105,7 +1132,7 @@
               <!-- when there aren't any rows before at all -->
               <xsl:when
                 test="not(e:worksheet/e:sheetData/e:row[@r &lt; $headerRowsStart and @r &lt; 65537])">
-                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
                   table:number-rows-repeated="{$headerRowsStart - 1}">
                   <table:table-cell table:number-columns-repeated="256"/>
                 </table:table-row>
@@ -1114,7 +1141,7 @@
               <xsl:otherwise>
                 <xsl:for-each
                   select="e:worksheet/e:sheetData/e:row[@r &lt; $headerRowsStart and @r &lt; 65537][last()]">
-                  <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+                  <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
                     table:number-rows-repeated="{$headerRowsStart - @r - 1}">
                     <table:table-cell table:number-columns-repeated="256"/>
                   </table:table-row>
@@ -1207,7 +1234,7 @@
 
               <xsl:when
                 test="not(e:worksheet/e:sheetData/e:row[@r &gt;= $headerRowsStart and @r &lt;= $headerRowsEnd and @r &lt; 65537])">
-                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
                   table:number-rows-repeated="{$headerRowsEnd - $headerRowsStart + 1}">
                   <table:table-cell table:number-columns-repeated="256"/>
                 </table:table-row>
@@ -1218,7 +1245,7 @@
             <xsl:for-each
               select="e:worksheet/e:sheetData/e:row[@r &gt;= $headerRowsStart and @r &lt;= $headerRowsEnd and @r &lt; 65537][last()]">
               <xsl:if test="@r &lt; $headerRowsEnd">
-                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
                   table:number-rows-repeated="{$headerRowsEnd - @r}">
                   <table:table-cell table:number-columns-repeated="256"/>
                 </table:table-row>
@@ -1475,7 +1502,7 @@
       <xsl:when
         test="position()=1 and @r>1 and $BigMergeCell = '' and ($GetMinRowWithElement = '' or ($GetMinRowWithElement) &gt;= @r)">
 
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -1630,7 +1657,7 @@
 
         <!-- when this row is not first one and there were empty rows after previous non-empty row -->
         <xsl:if test="preceding-sibling::e:row[1]/@r &lt;  @r - 1">
-          <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+          <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
             table:number-rows-repeated="{@r -1 - preceding-sibling::e:row[1]/@r}">
             <table:table-cell table:number-columns-repeated="256"/>
           </table:table-row>
@@ -1825,7 +1852,7 @@
       <!-- when this row is the first non-empty one before header but not row 1 and there aren't Big Merge Coll -->
       <xsl:when
         test="position()=1 and @r > 1 and @r &lt; $headerRowsStart and $BigMergeCell = '' ">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -1858,7 +1885,7 @@
               </xsl:with-param>
               <xsl:with-param name="MergeCell">
                 <xsl:value-of select="$MergeCell"/>
-               </xsl:with-param>
+              </xsl:with-param>
               <xsl:with-param name="Repeat">
                 <xsl:value-of select="@r - 2"/>
               </xsl:with-param>
@@ -1867,7 +1894,7 @@
 
           <!-- if the first non-empty header row isn't the first header row -->
           <xsl:when test="position() = 1 and @r &gt; $headerRowsStart">
-            <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+            <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
               table:number-rows-repeated="{@r - $headerRowsStart}">
               <table:table-cell table:number-columns-repeated="256"/>
             </table:table-row>
@@ -1875,7 +1902,7 @@
 
           <!-- if there are empty header rows before this one header row-->
           <xsl:when test="position() &gt; 1 and @r - 1 != preceding-sibling::e:row[1]/@r">
-            <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+            <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
               table:number-rows-repeated="{@r - preceding-sibling::e:row[1]/@r - 1}">
               <table:table-cell table:number-columns-repeated="256"/>
             </table:table-row>
@@ -1885,7 +1912,7 @@
 
       <!-- when this row is the first non-empty one after header rows and there aren't Big Merge Coll -->
       <xsl:when test="position()=1 and @r &gt; $headerRowsEnd + 1 and $BigMergeCell = '' ">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
           table:number-rows-repeated="{@r - $headerRowsEnd - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -1923,7 +1950,7 @@
 
       <!-- when this row is not first one and there were empty rows after previous non-empty row -->
       <xsl:when test="position() != 1 and @r != preceding-sibling::e:row[1]/@r + 1">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
           table:number-rows-repeated="{@r -1 - preceding-sibling::e:row[1]/@r}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -1960,7 +1987,7 @@
 
   </xsl:template>
 
-  <xsl:template match="e:c">
+  <xsl:template name="testConvertCell" match="e:c">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>
@@ -1982,18 +2009,18 @@
 
     <xsl:variable name="this" select="."/>
 
-    <xsl:variable name="colNum">
-      <xsl:call-template name="GetColNum">
+    <xsl:variable name="colNum" >
+      <xsl:call-template name="GetColNum2">
         <xsl:with-param name="cell">
-          <xsl:value-of select="@r"/>
+          <xsl:value-of select="@oox:p"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="rowNum">
-      <xsl:call-template name="GetRowNum">
+    <xsl:variable name="rowNum" >
+      <xsl:call-template name="GetRowNum2">
         <xsl:with-param name="cell">
-          <xsl:value-of select="@r"/>
+          <xsl:value-of select="@oox:p"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -2359,12 +2386,12 @@
       <xsl:apply-templates/>
     </text:span>-->
   </xsl:template>
-  
+
   <!-- convert run into span in hyperlink-->
   <xsl:template match="e:r" mode="hyperlink">
     <xsl:param name="XlinkHref"/>
     <xsl:param name="position"/>
-    
+
     <xsl:choose>
       <xsl:when test="$position = '1'">
         <text:span>
@@ -2375,10 +2402,25 @@
           </xsl:if>
           <text:a>
             <xsl:attribute name="xlink:href">
-              <xsl:value-of select="$XlinkHref"/>  
+              <xsl:value-of select="$XlinkHref"/>
             </xsl:attribute>
-          <xsl:apply-templates/>
-          <xsl:if test="following-sibling::e:r">
+            <xsl:apply-templates/>
+            <xsl:if test="following-sibling::e:r">
+              <xsl:apply-templates select="following-sibling::e:r[1]" mode="hyperlink">
+                <xsl:with-param name="XlinkHref">
+                  <xsl:value-of select="$XlinkHref"/>
+                </xsl:with-param>
+                <xsl:with-param name="position">
+                  <xsl:value-of select="$position+1"/>
+                </xsl:with-param>
+              </xsl:apply-templates>
+            </xsl:if>
+          </text:a>
+        </text:span>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+        <xsl:if test="following-sibling::e:r">
           <xsl:apply-templates select="following-sibling::e:r[1]" mode="hyperlink">
             <xsl:with-param name="XlinkHref">
               <xsl:value-of select="$XlinkHref"/>
@@ -2387,26 +2429,11 @@
               <xsl:value-of select="$position+1"/>
             </xsl:with-param>
           </xsl:apply-templates>
-          </xsl:if>
-          </text:a>
-        </text:span>    
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates/>
-        <xsl:if test="following-sibling::e:r">
-        <xsl:apply-templates select="following-sibling::e:r[1]" mode="hyperlink">
-          <xsl:with-param name="XlinkHref">
-            <xsl:value-of select="$XlinkHref"/>
-          </xsl:with-param>
-          <xsl:with-param name="position">
-            <xsl:value-of select="$position+1"/>
-          </xsl:with-param>
-        </xsl:apply-templates>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    
-    
+
+
   </xsl:template>
 
   <xsl:template name="CheckSheetName">
@@ -2430,44 +2457,44 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="rSheredStrings">
     <xsl:param name="result"/>
-    
-    <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst">
-     
-          <xsl:apply-templates select="e:si[1]" mode="r">
-            <xsl:with-param name="result">
-              <xsl:choose>
-                <xsl:when test="e:r">
-                  <xsl:value-of select="concat($result, '0', ';')"/>    
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$result"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="position">
-              <xsl:text>0</xsl:text>
-            </xsl:with-param>
-          </xsl:apply-templates>
+
+    <xsl:for-each select="key('Part', 'xl/sharedStrings.xml')/e:sst">
+
+      <xsl:apply-templates select="e:si[1]" mode="r">
+        <xsl:with-param name="result">
+          <xsl:choose>
+            <xsl:when test="e:r">
+              <xsl:value-of select="concat($result, '0', ';')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$result"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="position">
+          <xsl:text>0</xsl:text>
+        </xsl:with-param>
+      </xsl:apply-templates>
 
     </xsl:for-each>
-    
+
   </xsl:template>
-  
-  
+
+
   <xsl:template match="e:si" mode="r">
     <xsl:param name="result"/>
     <xsl:param name="position"/>
-    
+
     <xsl:choose>
       <xsl:when test="following-sibling::e:si/e:r">
         <xsl:apply-templates select="following-sibling::e:si[1]" mode="r">
           <xsl:with-param name="result">
             <xsl:choose>
               <xsl:when test="e:r">
-                <xsl:value-of select="concat($result, $position, ';')"/>    
+                <xsl:value-of select="concat($result, $position, ';')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$result"/>
@@ -2482,7 +2509,7 @@
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="e:r">
-            <xsl:value-of select="concat($result, $position, ';')"/>    
+            <xsl:value-of select="concat($result, $position, ';')"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$result"/>
@@ -2490,7 +2517,7 @@
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
 </xsl:stylesheet>

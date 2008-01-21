@@ -34,7 +34,9 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" 
+  xmlns:oox="urn:oox"
+  exclude-result-prefixes="e oox r">
 
   <xsl:import href="common.xsl"/>
   <xsl:import href="relationships.xsl"/>
@@ -142,7 +144,7 @@
                   </xsl:with-param>
                   <xsl:with-param name="dxfIdStyle">
                     <xsl:value-of select="$dxfIdStyle"/>
-                  </xsl:with-param>                  
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:with-param>
               <xsl:with-param name="document">
@@ -184,7 +186,7 @@
                     />
                   </xsl:when>
                   <xsl:otherwise>
-                   <xsl:value-of select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"/>
+                    <xsl:value-of select="concat($rowNum, ':', $colNum, ';', $ConditionalCell)"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
@@ -274,7 +276,7 @@
     </xsl:variable>
 
     <xsl:value-of select="concat($ConditionalCell, $RepeatRowConditional)"/>
-    
+
   </xsl:template>
 
   <xsl:template name="RepeatRowConditional">
@@ -290,25 +292,25 @@
       <xsl:when test="$StartRowNum &lt;= $EndRowNum">
 
         <xsl:call-template name="RepeatColConditional">
-            <xsl:with-param name="StartColNum">
-              <xsl:value-of select="$StartColNum"/>
-            </xsl:with-param>
-            <xsl:with-param name="EndColNum">
-              <xsl:value-of select="$EndColNum"/>
-            </xsl:with-param>
-            <xsl:with-param name="StartRowNum">
-              <xsl:value-of select="$StartRowNum"/>
-            </xsl:with-param>
-            <xsl:with-param name="EndRowNum">
-              <xsl:value-of select="$EndRowNum"/>
-            </xsl:with-param>
-            <xsl:with-param name="document">
-              <xsl:value-of select="$document"/>
-            </xsl:with-param>
-            <xsl:with-param name="dxfIdStyle">
-              <xsl:value-of select="$dxfIdStyle"/>
-            </xsl:with-param>
-          </xsl:call-template>
+          <xsl:with-param name="StartColNum">
+            <xsl:value-of select="$StartColNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="EndColNum">
+            <xsl:value-of select="$EndColNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="StartRowNum">
+            <xsl:value-of select="$StartRowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="EndRowNum">
+            <xsl:value-of select="$EndRowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:value-of select="$document"/>
+          </xsl:with-param>
+          <xsl:with-param name="dxfIdStyle">
+            <xsl:value-of select="$dxfIdStyle"/>
+          </xsl:with-param>
+        </xsl:call-template>
 
         <xsl:call-template name="RepeatRowConditional">
           <xsl:with-param name="ConditionalCell">
@@ -426,13 +428,13 @@
     <!-- Check If Conditionals are in this sheet -->
 
     <xsl:variable name="ConditionalCell">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell"/>
       </xsl:for-each>
     </xsl:variable>
 
     <xsl:variable name="ConditionalCellStyle">
-      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell">
           <xsl:with-param name="document">
             <xsl:text>style</xsl:text>
@@ -441,9 +443,9 @@
       </xsl:for-each>
     </xsl:variable>
 
-    <xsl:for-each select="document(concat('xl/',$Id))">
+    <xsl:for-each select="key('Part', concat('xl/',$Id))">
 
-      <xsl:apply-templates select="e:worksheet/e:conditionalFormatting " mode="ConditionalStyle">
+      <xsl:apply-templates select="e:worksheet/e:conditionalFormatting" mode="ConditionalStyle">
         <xsl:with-param name="sheet">
           <xsl:value-of select="$Id"/>
         </xsl:with-param>
@@ -458,7 +460,6 @@
         </xsl:with-param>
       </xsl:apply-templates>
 
-
     </xsl:for-each>
 
     <!-- Insert next Table -->
@@ -471,11 +472,12 @@
 
   </xsl:template>
 
-  <xsl:template match="e:conditionalFormatting " mode="ConditionalStyle">
+  <xsl:template match="e:conditionalFormatting" mode="ConditionalStyle">
     <xsl:call-template name="InsertConditionalProperties"/>
   </xsl:template>
 
   <xsl:template name="InsertConditionalProperties">
+    
     <style:style style:name="{generate-id(.)}" style:family="table-cell"
       style:parent-style-name="Default">
       <xsl:call-template name="InsertConditional"/>
@@ -493,10 +495,8 @@
           </xsl:variable>
           <xsl:choose>
             <!-- if there is a specified style for cells fullfilling certain condition -->
-            <xsl:when test="$PositionStyle != ''">
-          <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of select="generate-id(key('Dxf', '')[position() = $PositionStyle + 1])"/>
-          </xsl:for-each>
+            <xsl:when test="@dxfId != ''">
+              <xsl:value-of select="generate-id(key('Dxf', @dxfId))"/>
             </xsl:when>
             <!-- default style -->
             <xsl:otherwise>
@@ -568,7 +568,7 @@
   <!-- Insert Coditional Styles -->
 
   <xsl:template name="InsertConditionalStyles">
-    <xsl:for-each select="document('xl/styles.xml')">
+    <xsl:for-each select="key('Part', 'xl/styles.xml')">
       <xsl:apply-templates select="e:styleSheet/e:dxfs/e:dxf"/>
     </xsl:for-each>
   </xsl:template>
@@ -618,28 +618,27 @@
 
         <xsl:attribute name="style:name">
           <xsl:variable name="CellStyleId">
-            <xsl:for-each select="document('xl/styles.xml')/e:styleSheet">
-              <xsl:for-each select="key('Xf', '')[position() = $CellStyleNumber + 1]">
+            <xsl:for-each select="key('Part', 'xl/styles.xml')/e:styleSheet">
+              <xsl:for-each select="key('Xf', $CellStyleNumber)">
                 <xsl:value-of select="generate-id(.)"/>
               </xsl:for-each>
             </xsl:for-each>
           </xsl:variable>
           <xsl:variable name="ConditionalStyleId">
             <xsl:for-each
-              select="key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1]">
+              select="key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')]">
               <xsl:value-of select="generate-id(.)"/>
             </xsl:for-each>
           </xsl:variable>
           <xsl:value-of select="concat($CellStyleId, $ConditionalStyleId)"/>
         </xsl:attribute>
 
-        <xsl:for-each select="document('xl/styles.xml')/e:styleSheet">
-          <xsl:for-each select="key('Xf', '')[position() = $CellStyleNumber + 1]">
-            <xsl:call-template name="InsertCellFormat"/>
-          </xsl:for-each>
+        <xsl:for-each select="key('Xf', $CellStyleNumber)">
+          <xsl:call-template name="InsertCellFormat"/>
         </xsl:for-each>
+
         <xsl:for-each
-          select="key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1]">
+          select="key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';')]">
           <xsl:call-template name="InsertConditional"/>
         </xsl:for-each>
       </style:style>

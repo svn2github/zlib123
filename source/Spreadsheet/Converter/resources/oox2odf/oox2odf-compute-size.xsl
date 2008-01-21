@@ -33,7 +33,7 @@
   <xsl:import href="relationships.xsl"/> 
   
   <xsl:template match="/oox:source">
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
       <xsl:call-template name="CountCells">
         <xsl:with-param name="sheet">
           <xsl:call-template name="GetTarget">
@@ -47,7 +47,7 @@
   
   <xsl:template name="CountCells">
     <xsl:param name="sheet"/>
-    <xsl:for-each select="document(concat('xl/',$sheet))//e:c">
+    <xsl:for-each select="key('Part', concat('xl/',$sheet))//e:c">
       <xsl:message terminate="no">progress:c</xsl:message>        
     </xsl:for-each>
   </xsl:template>

@@ -172,7 +172,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 // Activation of XSL Debugging only in "DEBUG" compilation mode
 
 #if DEBUG
-                XslCompiledTransform xslt = new XslCompiledTransform(true);
+                XslCompiledTransform xslt = new XslCompiledTransform(false);
 #else
                 XslCompiledTransform xslt = new XslCompiledTransform();
 #endif
@@ -246,6 +246,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     {
                         File.Delete(outputFile);
                     }
+                    // make sure that the output folder exists
+                    FileInfo fi = new FileInfo(outputFile);
+                    Directory.CreateDirectory(fi.DirectoryName);
+
                     File.Move(tempOutputFile, outputFile);
                 }
             }

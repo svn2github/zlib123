@@ -189,15 +189,15 @@
             <xsl:value-of select="concat('xl/worksheets/_rels/', $RelsName)"/>
         </xsl:variable>
       
-        <xsl:for-each select="document($PathRels)//node()[name() = 'Relationship' and contains(@Type,'queryTable')]"> 
-            <xsl:for-each select="document(concat('xl/', substring-after(@Target, '/')))//node()[name() = 'queryTable']">
+        <xsl:for-each select="key('Part', $PathRels)//node()[name() = 'Relationship' and contains(@Type,'queryTable')]"> 
+            <xsl:for-each select="key('Part', concat('xl/', substring-after(@Target, '/')))//node()[name() = 'queryTable']">
                 <xsl:if test="@name = $ConnectionName">
                     
                     <xsl:variable name="ConnectionId">
                         <xsl:value-of select="@connectionId"/>        
                     </xsl:variable>
                    
-                    <xsl:for-each select="document('xl/connections.xml')//node()[name() = 'connection']">
+                    <xsl:for-each select="key('Part', 'xl/connections.xml')//node()[name() = 'connection']">
                         <xsl:if test="@id = $ConnectionId">
                             <xsl:attribute name="xlink:href">
                                 <xsl:value-of select="e:webPr/@url"/>

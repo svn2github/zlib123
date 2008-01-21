@@ -38,7 +38,8 @@
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
     xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-    exclude-result-prefixes="e r">
+    xmlns:oox="urn:oox"
+    exclude-result-prefixes="e oox r">
 
     <!-- Insert Scenario Styles -->
 
@@ -167,17 +168,17 @@
 
             <xsl:for-each select="e:inputCells">
                 <xsl:variable name="numCol">
-                    <xsl:call-template name="GetColNum">
+                    <xsl:call-template name="GetColNum2">
                         <xsl:with-param name="cell">
-                            <xsl:value-of select="@r"/>
+                            <xsl:value-of select="@oox:p"/>
                         </xsl:with-param>
                     </xsl:call-template>
                 </xsl:variable>
 
                 <xsl:variable name="numRow">
-                    <xsl:call-template name="GetRowNum">
+                    <xsl:call-template name="GetRowNum2">
                         <xsl:with-param name="cell">
-                            <xsl:value-of select="@r"/>
+                            <xsl:value-of select="@oox:p"/>
                         </xsl:with-param>
                     </xsl:call-template>
                 </xsl:variable>

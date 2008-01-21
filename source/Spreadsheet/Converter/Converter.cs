@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.IO;
 
 
 namespace CleverAge.OdfConverter.Spreadsheet
@@ -18,13 +19,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
         public Converter()
             : base(Assembly.GetExecutingAssembly())
         { }
-      
-        protected override string [] DirectPostProcessorsChain
+
+        protected override string[] DirectPostProcessorsChain
         {
             get
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
-                return new string []  {
+                return new string[]  {
                    "CleverAge.OdfConverter.Spreadsheet.OoxCommentsPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.Spreadsheet.OoxDrawingsPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.Spreadsheet.OoxHeaderFooterPostProcessor,"+fullname,
@@ -36,18 +37,18 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 };
             }
         }
-        protected override string [] ReversePostProcessorsChain
+        protected override string[] ReversePostProcessorsChain
         {
             get
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
-                return new string []  {
+                return new string[]  {
                     "CleverAge.OdfConverter.Spreadsheet.OdfSharedStringsPostProcessor,"+fullname,
                     "CleverAge.OdfConverter.Spreadsheet.OOXGroupsPostProcessor,"+fullname
                 };
             }
         }
-    
+
         protected override void CheckOdfFile(string fileName)
         {
             // Test for encryption
@@ -98,11 +99,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
         }
 
-       // Code to fix the bug# 1698280 
+        // Code to fix the bug# 1698280 
 
         protected override void CheckOoxFile(string fileName)
         {
-            
+
             XmlDocument doc;
             try
             {
@@ -122,14 +123,65 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 throw e;
             }
             XmlNodeList nodelist = doc.SelectNodes("//node()[@ContentType='" + OOX_TEXT_CONTENTTYPE + "']");
-            if (nodelist.Count== 0)
+            if (nodelist.Count == 0)
             {
-                throw new NotAnOoxDocumentException("not an valid oox file");
+                throw new NotAnOoxDocumentException("not a valid oox file");
             }
-                  
+
         }
 
-        // End
+        /// <summary>
+        /// Pull the input xml document to the xsl transformation
+        /// </summary>
+        protected override XmlReader Source(string inputFile)
+        {
+            if (this.DirectTransform)
+            {
+                // ODS -> XLSX
+                return base.Source(inputFile);
+            }
+            else
+            {
+                // use performance improved method for
+                // DOCX -> ODT conversion
+                XmlReaderSettings xrs = new XmlReaderSettings();
+                // do not look for DTD
+                xrs.ProhibitDtd = false;
+
+                XlsxDocument doc = new XlsxDocument(inputFile);
+
+                // uncomment for testing
+                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                {
+                    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/DUMP")
+                    {
+                        StreamReader package = new StreamReader(doc.OpenXML);
+                        FileInfo fi = new FileInfo(Environment.GetCommandLineArgs()[i + 1]);
+                        
+                        XmlWriterSettings settings = new XmlWriterSettings();
+                        settings.Indent = true;
+                        settings.IndentChars = ("    ");
+                        settings.OmitXmlDeclaration = true;
+                        using (XmlWriter writer = XmlWriter.Create(fi.FullName, settings)) {
+                            writer.WriteRaw(package.ReadToEnd());
+                            writer.Flush();
+                        }
+
+
+                        
+                        //using (StreamWriter sw = new XmlTextWriter File.Create(fi.FullName, (int)package.Length))
+                        //{
+                        //    char[] buffer = new char[package.Length];
+                        //    package.Read(buffer, 0, (int)package.Length);
+                        //    sw.Write(buffer, 0, (int)package.Length);
+                        //    sw.Close();
+                        //}
+                    }
+                }
+
+                return XmlReader.Create(doc.OpenXML, xrs);
+            }
+        }
 
     }
 }
