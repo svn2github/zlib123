@@ -1238,4 +1238,167 @@
 <!-- do not process theese elements -->
   <xsl:template match="draw:frame|office:annotation" mode="pivot"/>
 
+  <!-- template to process rows in order to find empty pivot cells -->
+  
+  <xsl:template match="table:table-row" mode="checkPivotCells">
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="cellStart"/>
+    <xsl:param name="cellEnd"/>
+    <xsl:variable name="CreatePivotTable">
+    <xsl:apply-templates select="table:table-cell[1]" mode="checkPivotCells">
+      <xsl:with-param name="rowNumber" select="$rowNumber"/>
+      <xsl:with-param name="colNumber">0</xsl:with-param>
+      <xsl:with-param name="cellStart" select="$cellStart"/>
+      <xsl:with-param name="cellEnd" select="$cellEnd"/>
+      <xsl:with-param name="isinPivotTable">false</xsl:with-param>
+    </xsl:apply-templates>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$CreatePivotTable='false'">false</xsl:when>
+      <xsl:when test="$CreatePivotTable='true'">true</xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="checkPivotCells">
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated+1"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="cellStart" select="$cellStart"/>
+          <xsl:with-param name="cellEnd" select="$cellEnd"/>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template to process cells in order to find empty pivot cells -->
+  
+  <xsl:template match="table:table-cell" mode="checkPivotCells">
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="colNumber"/>
+    <xsl:param name="cellStart"/>
+    <xsl:param name="cellEnd"/>
+    <xsl:param name="isinPivotTable"/>
+    <xsl:variable name="colChar">
+      <xsl:call-template name="NumbersToChars">
+        <xsl:with-param name="num" select="$colNumber"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="cellNum">
+      <xsl:value-of select="concat($colChar, $rowNumber)"/>
+    </xsl:variable>
+    <xsl:variable name="numberOfEndCell">
+      <xsl:call-template name="GetNumberOfEndCell">
+        <xsl:with-param name="endCell">
+          <xsl:value-of select="$cellEnd"/>
+        </xsl:with-param>
+        <xsl:with-param name="number">2</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="lastCellInRow">
+      <xsl:value-of select="concat($numberOfEndCell,$rowNumber)"/>
+    </xsl:variable>
+     <xsl:choose>
+      
+      <!-- check if cells processed are in a pivot table -->
+      <xsl:when test="$isinPivotTable='true'">
+        <xsl:choose>
+          
+          <!-- if there is an attribute @table:number-columns-repeated, then  the next cell must be empty -->
+          <xsl:when test="@table:number-columns-repeated">false</xsl:when>
+          
+          <!-- if the last column of pivot table is reached, then there are no empty cells in first row -->
+          <xsl:when test="$cellNum = $lastCellInRow">true</xsl:when>
+          
+          <!-- otherwise process following cells--> 
+          <xsl:otherwise>
+            <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="checkPivotCells">
+              <xsl:with-param name="rowNumber" select="$rowNumber"/>
+              <xsl:with-param name="colNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-columns-repeated">
+                    <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$colNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="isinPivotTable">
+                <xsl:choose>
+                  <xsl:when test="$isinPivotTable='true'">true</xsl:when>
+                  <xsl:otherwise>
+                    <xsl:choose>
+                      <xsl:when test="$cellNum = $cellStart">true</xsl:when>
+                      <xsl:otherwise>false</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="cellStart" select="$cellStart"/>
+              <xsl:with-param name="cellEnd" select="$cellEnd"/>
+            </xsl:apply-templates>
+          </xsl:otherwise>
+          
+        </xsl:choose>
+      </xsl:when>
+      
+      <!-- otherwise process following cells -->
+      <xsl:otherwise>
+        <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="checkPivotCells">
+          <xsl:with-param name="rowNumber" select="$rowNumber"/>
+          <xsl:with-param name="colNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-columns-repeated">
+                <xsl:value-of select="$colNumber+@table:number-columns-repeated+1"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$colNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="isinPivotTable">
+            <xsl:choose>
+              <xsl:when test="$isinPivotTable='true'">true</xsl:when>
+              <xsl:otherwise>
+                <xsl:choose>
+                  <xsl:when test="$cellNum = $cellStart">true</xsl:when>
+                  <xsl:otherwise>false</xsl:otherwise>
+                </xsl:choose>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="cellStart" select="$cellStart"/>
+          <xsl:with-param name="cellEnd" select="$cellEnd"/>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="text()" mode="checkPivotCells"/>
+  
+  <!-- template to get column number from cell with given cell address -->
+  
+  <xsl:template name="GetNumberOfEndCell">
+    <xsl:param name="endCell"/>
+    <xsl:param name="number"/>
+    <xsl:choose>
+      <xsl:when test="starts-with(substring($endCell,$number),'0') or starts-with(substring($endCell,$number),'1') or starts-with(substring($endCell,$number),'2') or starts-with(substring($endCell,$number),'3') or starts-with(substring($endCell,$number),'4') or starts-with(substring($endCell,$number),'5') or starts-with(substring($endCell,$number),'6') or starts-with(substring($endCell,$number),'7') or starts-with(substring($endCell,$number),'8') or starts-with(substring($endCell,$number),'9')">
+        <xsl:value-of select="substring($endCell,0,$number)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="GetNumberOfEndCell">
+          <xsl:with-param name="endCell" select="$endCell"/>
+          <xsl:with-param name="number">
+            <xsl:value-of select="$number+1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>

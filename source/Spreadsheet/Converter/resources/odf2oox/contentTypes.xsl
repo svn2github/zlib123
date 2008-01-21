@@ -265,24 +265,46 @@
       
       <xsl:for-each
         select="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address]">
-
-        <!-- pivotTable -->
-        <Override PartName="{concat('/xl/pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}"
-          ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotTable+xml"/>
-
-        <xsl:variable name="pivotSource">
+        
+        <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them -->
+        <xsl:variable name="sheetName">
+          <xsl:value-of select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+        </xsl:variable>
+        <xsl:variable name="cellAddress">
           <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
         </xsl:variable>
-
-        <xsl:if
-          test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
-          <Override PartName="{concat('/xl/pivotCache/pivotCacheDefinition_',generate-id(),'.xml')}"
-            ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheDefinition+xml"/>
-          <Override PartName="{concat('/xl/pivotCache/pivotCacheRecords_',generate-id(),'.xml')}"
-            ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheRecords+xml"
-          />
+        <xsl:variable name="CreatePivotTable">
+          <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+            <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
+              <xsl:with-param name="rowNumber">1</xsl:with-param>
+              <xsl:with-param name="cellStart">
+                <xsl:value-of select="substring-before(substring-after($cellAddress,'.'),':')"/>
+              </xsl:with-param>
+              <xsl:with-param name="cellEnd">
+                <xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>
+              </xsl:with-param>
+            </xsl:apply-templates>
+          </xsl:for-each>
+        </xsl:variable>
+        
+        <xsl:if test="$CreatePivotTable != 'false'">
+          <!-- pivotTable -->
+          <Override PartName="{concat('/xl/pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}"
+            ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotTable+xml"/>
+          
+          <xsl:variable name="pivotSource">
+            <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+          </xsl:variable>
+          
+          <xsl:if
+            test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+            <Override PartName="{concat('/xl/pivotCache/pivotCacheDefinition_',generate-id(),'.xml')}"
+              ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheDefinition+xml"/>
+            <Override PartName="{concat('/xl/pivotCache/pivotCacheRecords_',generate-id(),'.xml')}"
+              ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheRecords+xml"
+            />
+          </xsl:if>
         </xsl:if>
-
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>

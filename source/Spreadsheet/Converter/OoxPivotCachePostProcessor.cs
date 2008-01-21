@@ -550,9 +550,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
                 else if (PXSI_NAMESPACE.Equals(element.Ns) && "pivotCell".Equals(element.Name))
                 {
-                    pivotCells.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellVal);
-                    pivotCellsText.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellText);
-
+                    if (!pivotCells.Contains(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow))
+                    {
+                        pivotCells.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellVal);
+                        pivotCellsText.Add(pivotCellSheet + "#" + pivotCellCol + ":" + pivotCellRow, pivotCellText);
+                    }
                     this.isInPivotCell = false;
                     this.pivotCellSheet = "";
                     this.pivotCellCol = "";

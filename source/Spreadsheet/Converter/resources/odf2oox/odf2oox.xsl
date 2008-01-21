@@ -350,32 +350,7 @@
           <xsl:choose>
             <xsl:when
               test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address]">
-				<!--Code Changed By:Vijayeta 
-				    Defect ID      :1800984 and 1803578
-					Date           :20th Dec '07-->
-				<xsl:variable name ="pivotRange">
-					<xsl:value-of select ="@table:target-range-address"/>
-				</xsl:variable>
-				<xsl:variable name ="tableName1">
-					<xsl:value-of select ="substring-before($pivotRange,'.')"/>
-				</xsl:variable>
-				<xsl:variable name ="cellVal">
-					<xsl:value-of select ="substring-after($pivotRange,'.')"/>
-				</xsl:variable>
-				<xsl:variable name ="rowNum">
-					<xsl:call-template name="GetRowNum">
-						<xsl:with-param name ="cell" select ="$cellVal"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:choose >
-					<xsl:when test ="./parent::node()/parent::node()/table:table/child::node()[name='table:table-row' and position()=$rowNum]">
-						<xsl:text>true</xsl:text>
-					</xsl:when>
-					<xsl:otherwise >
-						<xsl:text>false</xsl:text>
-					</xsl:otherwise>
-				</xsl:choose>
-				<!--End Of code change, for the defect 1800984 and 1803578-->
+              <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>false</xsl:text>
@@ -436,103 +411,125 @@
 
           <xsl:for-each
             select="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName]">
-
-            <!-- create pivot table array in postprocessor -->
-            <pxsi:pivotTable>
-
-              <xsl:for-each select="table:source-cell-range">
-
-                <xsl:variable name="rowStart">
-                  <xsl:call-template name="GetRowNum">
-                    <xsl:with-param name="cell">
-                      <xsl:value-of
-                        select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
-                      />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
-
-                <xsl:variable name="colStart">
-                  <xsl:call-template name="GetColNum">
-                    <xsl:with-param name="cell">
-                      <xsl:value-of
-                        select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
-                      />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
-
-                <xsl:variable name="rowEnd">
-                  <xsl:call-template name="GetRowNum">
-                    <xsl:with-param name="cell">
-                      <xsl:value-of
-                        select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
-                      />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
-
-                <xsl:variable name="colEnd">
-                  <xsl:call-template name="GetColNum">
-                    <xsl:with-param name="cell">
-                      <xsl:value-of
-                        select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
-                      />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
-
-                <xsl:attribute name="pxsi:sheetNum">
-                  <xsl:variable name="sourceSheet">
-                    <xsl:value-of select="translate(substring-before(@table:cell-range-address,'.'),$apos,'')"/>
-                  </xsl:variable>
-                  
-                  <xsl:for-each select="parent::node()/parent::node()/parent::node()/table:table[@table:name = $sourceSheet]">
-                    <xsl:value-of select="count(preceding-sibling::table:table) + 1"/>
-                  </xsl:for-each>
-                </xsl:attribute>
-
-                <xsl:attribute name="pxsi:colStart">
-                  <xsl:value-of select="$colStart"/>
-                </xsl:attribute>
-
-                <xsl:attribute name="pxsi:colEnd">
-                  <xsl:value-of select="$colEnd"/>
-                </xsl:attribute>
-
-                <xsl:attribute name="pxsi:rowStart">
-                  <!-- first row is always a header row -->
-                  <xsl:value-of select="$rowStart + 1"/>
-                </xsl:attribute>
-
-                <xsl:attribute name="pxsi:rowEnd">
-                  <xsl:value-of select="$rowEnd"/>
-                </xsl:attribute>
-
-              </xsl:for-each>
-            </pxsi:pivotTable>
-
-            <xsl:call-template name="CreatePivotTable">
-              <xsl:with-param name="sheetNum" select="$sheetNum"/>
-            </xsl:call-template>
-
-            <xsl:call-template name="CreatePivotTableRels">
-              <xsl:with-param name="sheetNum" select="$sheetNum"/>
-            </xsl:call-template>
-
-            <xsl:variable name="pivotSource">
+            
+            <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them -->
+            <xsl:variable name="sheetName">
+              <xsl:value-of select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+            </xsl:variable>
+            <xsl:variable name="cellAddress">
               <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
             </xsl:variable>
-
-            <!-- do not duplicate the same source range cache -->
-            <!-- due to postprocessor requirements cache definition must be created after pivot table -->
-            <xsl:if
-              test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
-              <xsl:call-template name="CreateCacheDefinition"/>
-              <xsl:call-template name="CreateCacheDefinitionRels"/>
-              <xsl:call-template name="CreateCacheRecords"/>
+            <xsl:variable name="CreatePivotTable">
+              <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+                <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
+                  <xsl:with-param name="rowNumber">1</xsl:with-param>
+                  <xsl:with-param name="cellStart">
+                    <xsl:value-of select="substring-before(substring-after($cellAddress,'.'),':')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="cellEnd">
+                    <xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>
+                  </xsl:with-param>
+                </xsl:apply-templates>
+              </xsl:for-each>
+            </xsl:variable>
+            <xsl:if test="$CreatePivotTable != 'false'">
+              <!-- create pivot table array in postprocessor -->
+              <pxsi:pivotTable>
+                
+                <xsl:for-each select="table:source-cell-range">
+                  
+                  <xsl:variable name="rowStart">
+                    <xsl:call-template name="GetRowNum">
+                      <xsl:with-param name="cell">
+                        <xsl:value-of
+                          select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                        />
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:variable name="colStart">
+                    <xsl:call-template name="GetColNum">
+                      <xsl:with-param name="cell">
+                        <xsl:value-of
+                          select="substring-after(substring-before(@table:cell-range-address,':'),'.')"
+                        />
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:variable name="rowEnd">
+                    <xsl:call-template name="GetRowNum">
+                      <xsl:with-param name="cell">
+                        <xsl:value-of
+                          select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
+                        />
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:variable name="colEnd">
+                    <xsl:call-template name="GetColNum">
+                      <xsl:with-param name="cell">
+                        <xsl:value-of
+                          select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
+                        />
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:attribute name="pxsi:sheetNum">
+                    <xsl:variable name="sourceSheet">
+                      <xsl:value-of select="translate(substring-before(@table:cell-range-address,'.'),$apos,'')"/>
+                    </xsl:variable>
+                    
+                    <xsl:for-each select="parent::node()/parent::node()/parent::node()/table:table[@table:name = $sourceSheet]">
+                      <xsl:value-of select="count(preceding-sibling::table:table) + 1"/>
+                    </xsl:for-each>
+                  </xsl:attribute>
+                  
+                  <xsl:attribute name="pxsi:colStart">
+                    <xsl:value-of select="$colStart"/>
+                  </xsl:attribute>
+                  
+                  <xsl:attribute name="pxsi:colEnd">
+                    <xsl:value-of select="$colEnd"/>
+                  </xsl:attribute>
+                  
+                  <xsl:attribute name="pxsi:rowStart">
+                    <!-- first row is always a header row -->
+                    <xsl:value-of select="$rowStart + 1"/>
+                  </xsl:attribute>
+                  
+                  <xsl:attribute name="pxsi:rowEnd">
+                    <xsl:value-of select="$rowEnd"/>
+                  </xsl:attribute>
+                  
+                </xsl:for-each>
+              </pxsi:pivotTable>
+              
+              
+              <xsl:call-template name="CreatePivotTable">
+                <xsl:with-param name="sheetNum" select="$sheetNum"/>
+              </xsl:call-template>
+              
+              <xsl:call-template name="CreatePivotTableRels">
+                <xsl:with-param name="sheetNum" select="$sheetNum"/>
+              </xsl:call-template>
+              
+              <xsl:variable name="pivotSource">
+                <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+              </xsl:variable>
+              
+              <!-- do not duplicate the same source range cache -->
+              <!-- due to postprocessor requirements cache definition must be created after pivot table -->
+              <xsl:if
+                test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+                <xsl:call-template name="CreateCacheDefinition"/>
+                <xsl:call-template name="CreateCacheDefinitionRels"/>
+                <xsl:call-template name="CreateCacheRecords"/>
+              </xsl:if>
             </xsl:if>
-
           </xsl:for-each>
         </xsl:if>
 

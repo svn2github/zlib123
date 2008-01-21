@@ -39,13 +39,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
     public class OoxPivotCrashHandlingPostProcessor : AbstractPostProcessor
     {
         private ArrayList fieldNamesText;
-        private bool isInPivotTable;
+        private int PivotTableElementDepth;
+        private bool isPivotTableAttribute;
         private bool fieldState;
         private bool fieldElementState;
         private bool fieldAttributeState;
         private String fieldAttributeText;
         private string pivotCellText;
         private Stack fields;
+        private Stack pivotCacheStack;
         public OoxPivotCrashHandlingPostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
@@ -54,18 +56,30 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.fieldAttributeState = false;
             this.fieldNamesText = new ArrayList();
             this.fields = new Stack();
+            this.pivotCacheStack = new Stack();
+            this.PivotTableElementDepth = 0;
+            this.isPivotTableAttribute = false;
         }
         
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
-            if ("pivotCell".Equals(localName))
+            //pivotCache elements need to be processed in a postprocessor in order to avoid putting empty pivotCaches elements 
+            if ("pivotCaches".Equals(localName))
             {
-                this.isInPivotTable = true;
-                this.nextWriter.WriteStartElement(prefix,localName,ns);
+                this.pivotCacheStack.Push(new Element(prefix,localName,ns));
+            }
+            else if (this.pivotCacheStack.Count > 0)
+            {
+                this.pivotCacheStack.Push(new Element(prefix, localName, ns));
+            }
+            else if ("pivotCell".Equals(localName) || this.PivotTableElementDepth > 0)
+            {
+                this.PivotTableElementDepth++;
+                this.nextWriter.WriteStartElement(prefix, localName, ns);
 
             }
             //put colfields on stack instead of processing them
-            else if("colFields".Equals(localName))
+            else if ("colFields".Equals(localName))
             {
                 this.fieldState = true;
                 fields.Push(new Element(prefix, localName, ns));
@@ -83,8 +97,16 @@ namespace CleverAge.OdfConverter.Spreadsheet
         }
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
+            if (this.PivotTableElementDepth > 0)
+            {
+                this.isPivotTableAttribute = true;
+            }
+            if (this.pivotCacheStack.Count > 0)
+            {
+                this.pivotCacheStack.Push(new Attribute(prefix, localName, ns));
+            }
             //put field attributes on stack instead of processing them
-            if (fieldState)
+            else if (fieldState)
             {
                 if ("table-source-field-name".Equals(localName))
                 {
@@ -99,13 +121,29 @@ namespace CleverAge.OdfConverter.Spreadsheet
         }
         public override void WriteString(string text)
         {
+            if (this.pivotCacheStack.Count > 0)
+            {
+                if (this.pivotCacheStack.Peek() is Element)
+                {
+                    Element element = ((Element)this.pivotCacheStack.Pop());
+                    element.AddChild(text);
+                    this.pivotCacheStack.Push(element);
+                }
+                else
+                {
+                    Attribute attribute = ((Attribute)this.pivotCacheStack.Pop());
+                    attribute.Value = text;
+                    this.pivotCacheStack.Push(attribute);
+                }
+            }
             //collect all pivot table fields' names
-            if (isInPivotTable)
+            else if (this.PivotTableElementDepth > 0 && !isPivotTableAttribute)
             {
                 this.pivotCellText += text;
+                this.nextWriter.WriteString(text);
             }
             //collect field attribute value
-            else if (fieldElementState)
+            else if (fieldState)
             {
                 this.fieldAttributeText += text;
             }
@@ -116,8 +154,19 @@ namespace CleverAge.OdfConverter.Spreadsheet
         }
         public override void WriteEndAttribute()
         {
+            if (this.isPivotTableAttribute)
+            {
+                this.isPivotTableAttribute = false;
+            }
+            if (this.pivotCacheStack.Count > 0)
+            {
+                Attribute attribute = ((Attribute)this.pivotCacheStack.Pop());
+                Element element = ((Element)this.pivotCacheStack.Pop());
+                element.AddAttribute(attribute);
+                this.pivotCacheStack.Push(element);
+            }
             //Add field attribute value
-            if (fieldState)
+            else if (fieldState)
             {
                 Attribute attribute = ((Attribute)fields.Pop());
                 if (fieldAttributeState)
@@ -151,12 +200,29 @@ namespace CleverAge.OdfConverter.Spreadsheet
         }
         public override void WriteEndElement()
         {
+            if(this.pivotCacheStack.Count > 0)
+            {
+                Element element = ((Element)this.pivotCacheStack.Pop());
+                if (this.pivotCacheStack.Count > 0)
+                {
+                    Element mainElement = ((Element)this.pivotCacheStack.Pop());
+                    mainElement.AddChild(element);
+                    this.pivotCacheStack.Push(mainElement);
+                }
+                else
+                {
+                    if (element.HasChild())
+                    {
+                        element.Write(this.nextWriter);
+                    }
+                }
+            }
             //collect pivot table field names
-            if (isInPivotTable)
+            else if (this.PivotTableElementDepth > 0)
             {
                 this.fieldNamesText.Add(this.pivotCellText);
                 this.pivotCellText = "";
-                this.isInPivotTable = false;
+                this.PivotTableElementDepth--;
                 this.nextWriter.WriteEndElement();
             }
             //process colfields and field elements only if table-source-field-name value is a proper pivot table field name

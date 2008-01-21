@@ -113,9 +113,32 @@
           <!-- do not duplicate the same source range cache -->
           <xsl:if
             test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
+            
+            <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them -->
+            <xsl:variable name="sheetName">
+              <xsl:value-of select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+            </xsl:variable>
+            <xsl:variable name="cellAddress">
+              <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+            </xsl:variable>
+            <xsl:variable name="CreatePivotTable">
+              <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+                <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
+                  <xsl:with-param name="rowNumber">1</xsl:with-param>
+                  <xsl:with-param name="cellStart">
+                    <xsl:value-of select="substring-before(substring-after($cellAddress,'.'),':')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="cellEnd">
+                    <xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>
+                  </xsl:with-param>
+                </xsl:apply-templates>
+              </xsl:for-each>
+            </xsl:variable>
+            <xsl:if test="$CreatePivotTable != 'false'">
             <Relationship Id="{generate-id()}"
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition"
               Target="{concat('pivotCache/pivotCacheDefinition_',generate-id(),'.xml')}"/>
+            </xsl:if>
           </xsl:if>
         </xsl:for-each>
       </xsl:for-each>
@@ -332,9 +355,32 @@
       <xsl:if test="$pivot = 'true' ">
         <xsl:for-each
           select="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName]">
+          
+          <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them -->
+          <xsl:variable name="sheetName">
+            <xsl:value-of select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+          </xsl:variable>
+          <xsl:variable name="cellAddress">
+            <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+          </xsl:variable>
+          <xsl:variable name="CreatePivotTable">
+            <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+              <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
+                <xsl:with-param name="rowNumber">1</xsl:with-param>
+                <xsl:with-param name="cellStart">
+                  <xsl:value-of select="substring-before(substring-after($cellAddress,'.'),':')"/>
+                </xsl:with-param>
+                <xsl:with-param name="cellEnd">
+                  <xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>
+                </xsl:with-param>
+              </xsl:apply-templates>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:if test="$CreatePivotTable != 'false'">
           <Relationship Id="{generate-id(.)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotTable"
             Target="{concat('../pivotTables/pivotTable',$sheetNum,'_',position(),'.xml')}"/>
+            </xsl:if>
         </xsl:for-each>
       </xsl:if>
     </Relationships>
