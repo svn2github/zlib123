@@ -53,7 +53,7 @@
     <xsl:variable name="partId" select="ancestor::e:worksheet/@oox:part" />
     
     <xsl:choose>
-      <xsl:when test="@t='s' or key('ref',@r)[./@oox:part = $partId]">
+      <xsl:when test="@t='s' or key('ref',@r)[@oox:part = $partId]">
         <xsl:attribute name="office:value-type">
           <xsl:text>string</xsl:text>
         </xsl:attribute>
@@ -62,7 +62,7 @@
         </xsl:variable>
         <text:p>
           <xsl:choose>
-            <xsl:when test="key('ref',@r)[./@oox:part = $partId]">
+            <xsl:when test="key('ref',@r)[@oox:part = $partId]">
 
               <xsl:variable name="XlinkHref">
                 <xsl:call-template name="XlinkHref">
@@ -412,9 +412,11 @@
   <xsl:template name="XlinkHref">
     <xsl:param name="sheetNr"/>
 
+    <xsl:variable name="partId" select="ancestor::e:worksheet/@oox:part" />
+
     <xsl:variable name="target">
       <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
-      <xsl:for-each select="key('ref',@r)[./@oox:part = ancestor::e:worksheet/@oox:part]">
+      <xsl:for-each select="key('ref',@r)[@oox:part = $partId]">
         <xsl:call-template name="GetTarget">
           <xsl:with-param name="id">
             <xsl:value-of select="@r:id"/>
@@ -436,8 +438,8 @@
         <xsl:value-of select="$target"/>
       </xsl:when>
       <!-- when hyperlink leads to another place in workbook -->
-      <xsl:when test="key('ref',@r)[./@oox:part = ancestor::e:worksheet/@oox:part]/@location != '' ">
-        <xsl:for-each select="key('ref',@r)[./@oox:part = ancestor::e:worksheet/@oox:part]">
+      <xsl:when test="key('ref',@r)[@oox:part = $partId]/@location != '' ">
+        <xsl:for-each select="key('ref',@r)[@oox:part = $partId]">
 
           <xsl:variable name="apos">
             <xsl:text>&apos;</xsl:text>

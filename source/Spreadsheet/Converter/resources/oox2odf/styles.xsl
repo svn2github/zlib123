@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -636,12 +637,15 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
   </xsl:template>
 
-  <xsl:template match="e:row" mode="HorizontalStyle">
+  <xsl:template name="ConvertHorizontalStyleForRow" match="e:row" mode="HorizontalStyle">
 
     <xsl:apply-templates select="e:c[1]" mode="HorizontalStyle"/>
 
     <xsl:if test="following-sibling::e:row">
-      <xsl:apply-templates select="following-sibling::e:row[1]" mode="HorizontalStyle"/>
+      <xsl:for-each select="following-sibling::e:row[1]">
+        <xsl:call-template name="ConvertHorizontalStyleForRow"/>
+      </xsl:for-each>
+      <!--xsl:apply-templates select="following-sibling::e:row[1]" mode="HorizontalStyle"/-->
     </xsl:if>
 
   </xsl:template>

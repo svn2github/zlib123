@@ -1659,63 +1659,65 @@
       <xsl:otherwise>
 
         <xsl:if test="following-sibling::e:c">
-          <xsl:apply-templates select="following-sibling::e:c[1]">
-            <xsl:with-param name="prevCellCol">
-              <xsl:call-template name="GetColNum2">
-                <xsl:with-param name="cell">
-                  <xsl:value-of select="@oox:p"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:with-param>
-            <xsl:with-param name="BigMergeCell">
-              <xsl:value-of select="$BigMergeCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="MergeCell">
-              <xsl:value-of select="$MergeCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="PictureRow">
-              <xsl:value-of select="$PictureRow"/>
-            </xsl:with-param>
-            <xsl:with-param name="PictureCell">
-              <xsl:value-of select="$PictureCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="NoteRow">
-              <xsl:value-of select="$NoteRow"/>
-            </xsl:with-param>
-            <xsl:with-param name="NoteCell">
-              <xsl:value-of select="$NoteCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="sheet">
-              <xsl:value-of select="$sheet"/>
-            </xsl:with-param>
-            <xsl:with-param name="NameSheet">
-              <xsl:value-of select="$NameSheet"/>
-            </xsl:with-param>
-            <xsl:with-param name="sheetNr">
-              <xsl:value-of select="$sheetNr"/>
-            </xsl:with-param>
-            <xsl:with-param name="ConditionalCell">
-              <xsl:value-of select="$ConditionalCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="ConditionalCellStyle">
-              <xsl:value-of select="$ConditionalCellStyle"/>
-            </xsl:with-param>
-            <xsl:with-param name="ConnectionsCell">
-              <xsl:value-of select="$ConnectionsCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="ValidationCell">
-              <xsl:value-of select="$ValidationCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="ValidationRow">
-              <xsl:value-of select="$ValidationRow"/>
-            </xsl:with-param>
-            <xsl:with-param name="ValidationCellStyle">
-              <xsl:value-of select="$ValidationCellStyle"/>
-            </xsl:with-param>
-            <xsl:with-param name="rSheredStrings">
-              <xsl:value-of select="$rSheredStrings"/>
-            </xsl:with-param>
-          </xsl:apply-templates>
+          <xsl:for-each select="following-sibling::e:c[1]">
+            <xsl:call-template name="ConvertCell">
+              <xsl:with-param name="prevCellCol">
+                <xsl:call-template name="GetColNum2">
+                  <xsl:with-param name="cell">
+                    <xsl:value-of select="@oox:p"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:with-param>
+              <xsl:with-param name="BigMergeCell">
+                <xsl:value-of select="$BigMergeCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="$MergeCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureRow">
+                <xsl:value-of select="$PictureRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureCell">
+                <xsl:value-of select="$PictureCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="NoteRow">
+                <xsl:value-of select="$NoteRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="NoteCell">
+                <xsl:value-of select="$NoteCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>
+              <xsl:with-param name="sheetNr">
+                <xsl:value-of select="$sheetNr"/>
+              </xsl:with-param>
+              <xsl:with-param name="ConditionalCell">
+                <xsl:value-of select="$ConditionalCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="ConditionalCellStyle">
+                <xsl:value-of select="$ConditionalCellStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="ConnectionsCell">
+                <xsl:value-of select="$ConnectionsCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="ValidationCell">
+                <xsl:value-of select="$ValidationCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="ValidationRow">
+                <xsl:value-of select="$ValidationRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="ValidationCellStyle">
+                <xsl:value-of select="$ValidationCellStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="rSheredStrings">
+                <xsl:value-of select="$rSheredStrings"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>

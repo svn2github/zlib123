@@ -30,9 +30,11 @@
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   
-  <xsl:import href="relationships.xsl"/> 
+  <xsl:import href="relationships.xsl"/>
+
+  <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
   
-  <xsl:template match="/oox:source">
+  <xsl:template match="/oox:package">
     <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
       <xsl:call-template name="CountCells">
         <xsl:with-param name="sheet">

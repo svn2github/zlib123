@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -1987,7 +1987,7 @@
 
   </xsl:template>
 
-  <xsl:template name="testConvertCell" match="e:c">
+  <xsl:template name="ConvertCell" match="e:c">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>

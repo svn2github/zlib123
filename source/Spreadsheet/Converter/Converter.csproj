@@ -71,7 +71,6 @@
     <EmbeddedResource Include="resources\odf2oox\data_consolidation.xsl" />
     <EmbeddedResource Include="resources\odf2oox\scenario.xsl" />
     <EmbeddedResource Include="resources\odf2oox\pivotTable.xsl" />
-    <EmbeddedResource Include="resources\oox2odf\2ods-content.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
     <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
@@ -116,6 +115,7 @@
       <Name>OdfZipUtils</Name>
     </ProjectReference>
     <Content Include="Converter.csproj" />
+    <EmbeddedResource Include="resources\oox2odf\content.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

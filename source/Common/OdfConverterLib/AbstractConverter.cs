@@ -172,7 +172,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 // Activation of XSL Debugging only in "DEBUG" compilation mode
 
 #if DEBUG
-                XslCompiledTransform xslt = new XslCompiledTransform(false);
+                XslCompiledTransform xslt = new XslCompiledTransform(true);
 #else
                 XslCompiledTransform xslt = new XslCompiledTransform();
 #endif
