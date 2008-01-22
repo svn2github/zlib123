@@ -759,7 +759,7 @@
     <xsl:variable name="startText">
       <xsl:choose>
         <xsl:when
-          test="number:text[not(preceding-sibling::node())] != ' ' and number:text[not(preceding-sibling::node())] != '-' and number:text[not(preceding-sibling::node())] != '.'">
+          test="number:text[not(preceding-sibling::node())] != ' ' and number:text[not(preceding-sibling::node())] != '.'">
           <xsl:value-of select="number:text[not(preceding-sibling::node())]"/>
         </xsl:when>
         <xsl:otherwise>
