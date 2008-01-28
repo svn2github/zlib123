@@ -37,10 +37,7 @@ namespace OdfPPTXPAddin
     using Extensibility;
     using System.Runtime.InteropServices;
     using System.Collections;
-#if WordXP
     using PowerPoint = Microsoft.Office.Interop.PowerPoint;
-#else
-#endif
     using CleverAge.OdfConverter.OdfConverterLib;
     using Sonata.OdfConverter.OdfPowerpointAddinLib;
     using Microsoft.Win32;
@@ -95,6 +92,13 @@ namespace OdfPPTXPAddin
             string languageVal = Microsoft.Win32.Registry
                 .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
 
+            if (languageVal == null)
+            {
+                languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_LOCAL_MACHINE\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
+            }
+            
+            
             if (languageVal != null)
             {
                 int.TryParse(languageVal, out culture);
