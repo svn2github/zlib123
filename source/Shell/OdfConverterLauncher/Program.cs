@@ -112,6 +112,158 @@ namespace OdfConverterLauncher
                 new System.Globalization.CultureInfo(culture);
         }
     }
+    class Presentation
+    {
+        Type _type;
+        object _instance;
+        Type _docsType;
+        object _documents;
+
+        public Presentation()
+        {
+            _type = Type.GetTypeFromProgID("PowerPoint.Application");
+            //  _type = Type.GetTypeFromProgID("POWERPOINT.Application"); 
+            _instance = Activator.CreateInstance(_type);
+            _docsType = null;
+            _documents = null;
+        }
+
+        public bool Visible
+        {
+            set
+            {
+                object[] args = new object[] { value };
+                _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
+            }
+        }
+
+        public void Quit()
+        {
+            object[] args = new object[] { Missing.Value,
+                                            Missing.Value,
+                                            Missing.Value };
+            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
+        }
+
+        public void Open(string document)
+        {
+            if (_documents == null)
+            {
+                if (_documents == null)
+                {
+                    _documents = _type.InvokeMember("Presentations", BindingFlags.GetProperty, null, _instance, null);
+                    _docsType = _documents.GetType();
+                }
+                object[] args = new object[] { document };
+                _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
+            }
+        }
+
+        public void getLanguage()
+        {
+
+            // set culture to match current application culture or user's choice
+            int culture = 0;
+            string languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
+
+
+            if (languageVal != null)
+            {
+                int.TryParse(languageVal, out culture);
+            }
+
+            if (culture == 0)
+            {
+                object _languageSettings;
+                Type _languageSettingsType;
+
+                _languageSettings = _type.InvokeMember("LanguageSettings", BindingFlags.GetProperty, null, _instance, null);
+                _languageSettingsType = _languageSettings.GetType();
+
+                object[] args = new object[] { 2 };
+                culture = (int)_languageSettingsType.InvokeMember("LanguageID", BindingFlags.GetProperty, null, _languageSettings, args);
+
+            }
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture =
+                new System.Globalization.CultureInfo(culture);
+        }
+    }
+    class Excel
+    {
+        Type _type;
+        object _instance;
+        Type _docsType;
+        object _documents;
+
+        public Excel()
+        {
+            _type = Type.GetTypeFromProgID("Excel.Application");
+            _instance = Activator.CreateInstance(_type);
+            _docsType = null;
+            _documents = null;
+        }
+
+        public bool Visible
+        {
+            set
+            {
+                object[] args = new object[] { value };
+                _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
+            }
+        }
+
+        public void Quit()
+        {
+            object[] args = new object[] { Missing.Value,
+                                            Missing.Value,
+                                            Missing.Value };
+            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
+        }
+
+        public void Open(string document)
+        {
+            if (_documents == null)
+            {
+                _documents = _type.InvokeMember("Workbooks", BindingFlags.GetProperty, null, _instance, null);
+                _docsType = _documents.GetType();
+            }
+            object[] args = new object[] { document };
+            _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
+            
+           
+        }
+
+        public void getLanguage()
+        {
+            // set culture to match current application culture or user's choice
+            int culture = 0;
+            string languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "Language", null) as string;
+
+            if (languageVal != null)
+            {
+                int.TryParse(languageVal, out culture);
+            }
+
+            if (culture == 0)
+            {
+                object _languageSettings;
+                Type _languageSettingsType;
+
+                _languageSettings = _type.InvokeMember("LanguageSettings", BindingFlags.GetProperty, null, _instance, null);
+                _languageSettingsType = _languageSettings.GetType();
+
+                object[] args = new object[] { 2 };
+                culture = (int)_languageSettingsType.InvokeMember("LanguageID", BindingFlags.GetProperty, null, _languageSettings, args);
+
+            }
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture =
+                new System.Globalization.CultureInfo(culture);
+        }
+    }
 
     static class Program
     {
@@ -124,9 +276,71 @@ namespace OdfConverterLauncher
             if (args.Length == 1) 
             {
                 string input = args[0];
+                if (input.ToUpper().EndsWith(".ODP"))
+                {
+                    OdfAddinLib lib = new Sonata.OdfConverter.Presentation.Addin();
+                    Presentation ppt = null;
+                    try
+                    {
+                        bool showUserInterface = true;
+                        string output = lib.GetTempFileName(input, ".pptx");
+                        ppt = new Presentation();
+                        ppt.getLanguage();
+                        lib.OdfToOox(input, output, showUserInterface);
+                        if (File.Exists((string)output))
+                        {
+                            ppt.Visible = true;
+                            ppt.Open(output);
+
+                        }
+                        else
+                        {
+                            ppt.Quit();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
+                        Assembly.GetAssembly(lib.GetType()));
+                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", rm);
+                        infoBox.ShowDialog();
+                    }
+                }
+                if (input.ToUpper().EndsWith(".ODS"))
+                {
+                    OdfAddinLib lib = new CleverAge.OdfConverter.Spreadsheet.Addin();
+                    Excel objExcel = null;
+                   
+                   
+                    try
+                    {
+                        bool showUserInterface = true;
+                        string output = lib.GetTempFileName(input, ".xlsx");
+                        objExcel = new Excel();
+                        objExcel.getLanguage();
+                        lib.OdfToOox(input, output, showUserInterface);
+                        if (File.Exists((string)output))
+                        {
+                                objExcel.Visible = true;
+                                objExcel.Open(output);
+                        }
+                        else
+                        {
+                            objExcel.Quit();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
+                        Assembly.GetAssembly(lib.GetType()));
+                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", rm);
+                        infoBox.ShowDialog();
+                    }
+                }
+                if (input.ToUpper().EndsWith(".ODT"))
+                {
                 OdfAddinLib lib = new CleverAge.OdfConverter.Word.Addin();
                 Word word = null;
-
                 try
                 {
                     bool showUserInterface = true;   
@@ -139,7 +353,8 @@ namespace OdfConverterLauncher
                         word.Visible = true;
                         word.Open(output);
                     }
-                    else {
+                    else
+                    {
                         word.Quit();
                     }
                 }
@@ -150,9 +365,8 @@ namespace OdfConverterLauncher
                     InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")",  rm);
                     infoBox.ShowDialog();
                 }
-
             }
         }
-
+        }
     }
 }

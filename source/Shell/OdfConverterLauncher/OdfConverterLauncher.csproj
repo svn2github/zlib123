@@ -70,6 +70,14 @@
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Presentation\Addin\Addin.csproj">
+      <Project>{0EACD55D-3D67-4E42-9714-8142EAF8246A}</Project>
+      <Name>Addin %28Presentation\Addin%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Spreadsheet\Addin\Addin.csproj">
+      <Project>{792B426E-9ED5-414C-9853-98137AE0CC50}</Project>
+      <Name>Addin %28Spreadsheet\Addin%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Word\Add-In\Addin.csproj">
       <Project>{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}</Project>
       <Name>Addin %28Word\Addin%29</Name>
