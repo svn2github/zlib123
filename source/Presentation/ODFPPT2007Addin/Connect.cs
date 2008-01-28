@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2007, Sonata Software Limited
  * All rights reserved.
  * 
@@ -106,6 +106,13 @@ namespace OdfPPT2007Addin
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
                 .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
+
+            if (languageVal == null)
+            {
+                languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_LOCAL_MACHINE\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
+            }
+            
             if (languageVal != null)
             {
                 int.TryParse(languageVal, out culture);
