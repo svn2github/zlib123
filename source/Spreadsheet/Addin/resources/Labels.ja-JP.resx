@@ -127,7 +127,7 @@
     <value>ODS ファイルにドラッグ アンド ドロップした画像は相対パスを使用するため、XLSX への変換時に失われます。</value>
   </data>
   <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
-    <value>Excel のヘッダー/フッターの文字列には、256 文字までしか入力できません (書式設定を含む)。256 文字を超えた場合、超過した文字は失われます。nagłówka/stopki (wraz z formatowaniem). Wszystkie znaki powyżej 256 zostaną utracone.</value>
+    <value>Excel のヘッダー/フッターの文字列には、256 文字までしか入力できません (書式設定を含む)。256 文字を超えた場合、超過した文字は失われます。</value>
   </data>
   <data name="translation.odf2oox.hyperlinkTextbox" xml:space="preserve">
     <value>ハイパーリンクは ODS のテキスト ボックス内の各単語に適用されますが、XLSX に変換するとテキスト ボックス全体に適用されます。</value>
