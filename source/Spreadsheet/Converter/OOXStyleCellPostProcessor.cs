@@ -110,7 +110,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else
                 {
                     //Start of RefNo-1 :for localization and error regarding obj ref not set to an instance of obj.
-                    this.nextWriter.WriteString(Convert.ToString(styleCellNumber[text].ToString(), System.Globalization.CultureInfo.InvariantCulture));
+                    this.nextWriter.WriteString(Convert.ToString(styleCellNumber[text], System.Globalization.CultureInfo.InvariantCulture));
                     //End of RefNo-1
                 }
             }
