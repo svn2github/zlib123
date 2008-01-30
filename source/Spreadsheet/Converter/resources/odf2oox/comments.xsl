@@ -77,10 +77,15 @@
 		   Code Changed by :Vijayeta Tilak
 		   Date            :15th Oct '07
 		   Description     :If attribute office:display is not present, then the visibility is set to true
-	 -->
+     -->
+    <!-- Defect Id :  1838531
+      Code changed by: Tomasz Mueller
+      Date:  30th Jan '08
+      Description: if attribute office:display is not present then the visibility is set to false
+    -->
     <xsl:variable name="VisibleOrHidden">
       <xsl:choose>
-        <xsl:when test="@office:display">
+        <xsl:when test="@office:display and @office:display != ''">
           <xsl:if test ="@office:display='true'">
             <xsl:value-of select ="'visible'"/>
           </xsl:if>
@@ -156,11 +161,16 @@
 		   Code Changed by :Vijayeta Tilak
 		   Date            :15th Oct '07
 		   Description     :If attribute office:display is not present, then the visibility is set to true
-	      -->
-        <xsl:if test="@office:display='true' or not(@office:display)">
+		  -->
+        <!-- Defect Id :  1838531
+          Code changed by: Tomasz Mueller
+          Date:  30th Jan '08
+          Description: if attribute office:display is not present then the visibility is set to false
+        -->
+        <xsl:if test="@office:display='true'">
           <x:Visible/>
         </xsl:if>
-        <xsl:if test="@office:display='false'">
+        <xsl:if test="@office:display='false or not(@office:display)'">
           <x:Hidden/>
         </xsl:if>
         <!--<xsl:if test="@office:display">
