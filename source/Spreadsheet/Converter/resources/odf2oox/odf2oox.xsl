@@ -839,7 +839,8 @@
 				  <xsl:value-of select ="round(substring-before(@table:end-y,'in')*96.21212)"/>
 				  <!--<xsl:call-template name="InsertEndRowOffset"/>-->
 			  </xsl:variable>
-          <xsl:if test ="draw:object">
+        <!--Additional condition added for chart as an object-->
+        <xsl:if test ="draw:object and not(./draw:object/@draw:notify-on-update-of-ranges)">
           <v:shape type="#_x0000_t75"
             style="position:absolute;margin-left:{$margin-left}pt;margin-top:{$margin-top}pt;width:{$width}pt;height:{$height}pt;z-index:{$z-index}"
             filled="t" fillcolor="window [65]" stroked="t" strokecolor="windowText [64]"
