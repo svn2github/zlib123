@@ -42,7 +42,7 @@
   xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="e oox r c xdr draw xlink">
+  exclude-result-prefixes="e oox r c xdr xlink">
 
   <!-- Insert Empty Sheet with picture -->
 
@@ -114,7 +114,6 @@
       <xsl:for-each select="key('Part', concat('xl/',$sheet))">
         <table:table-row>
 
-
           <xsl:choose>
             <xsl:when
               test="contains(concat(';', $AllRowBreakes), concat(';', $GetMinRowWithElement))">
@@ -125,7 +124,7 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:attribute name="table:style-name">
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+                <xsl:value-of select="concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
@@ -405,12 +404,10 @@
     <xsl:param name="repeat"/>
     <xsl:param name="sheet"/>
     <xsl:if test="$repeat &gt; 0">
-      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
-          table:number-rows-repeated="{$repeat}">
-          <table:table-cell table:number-columns-repeated="256"/>
-        </table:table-row>
-      </xsl:for-each>
+      <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
+        table:number-rows-repeated="{$repeat}">
+        <table:table-cell table:number-columns-repeated="256"/>
+      </table:table-row>
     </xsl:if>
   </xsl:template>
 
@@ -511,7 +508,7 @@
       </xsl:when>
       <xsl:when
         test=" ($GetMinRowWithElement &gt; $EndRow or $GetMinRowWithElement = '') and $EndRow - $prevRow &gt; 0">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+        <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
           table:number-rows-repeated="{$EndRow - $prevRow}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -546,7 +543,7 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:attribute name="table:style-name">
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+                <xsl:value-of select="concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>

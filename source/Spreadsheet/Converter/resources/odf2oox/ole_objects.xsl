@@ -104,7 +104,7 @@
 		*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
 	  -->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/')  and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/')  and not(name(parent::node()/parent::node()) = 'draw:g' )]">
       <pzip:entry pzip:target="{concat('xl/externalLinks/externalLink',position(),'.xml')}">
         <externalLink xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
           <oleLink xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -133,7 +133,7 @@
 		*                  Also an additional 'when' is added that takes care of the above mentioned condition.
 		-->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
       <pzip:entry
         pzip:target="{concat('xl/externalLinks/_rels/externalLink',position(),'.xml.rels')}">
         <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">

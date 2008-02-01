@@ -399,7 +399,7 @@
         </fill>
       </dxf>
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
         <xsl:variable name="StyleApplyStyleName">
           <xsl:value-of select="@style:apply-style-name"/>
         </xsl:variable>

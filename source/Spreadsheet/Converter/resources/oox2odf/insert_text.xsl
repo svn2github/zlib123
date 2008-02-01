@@ -39,7 +39,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="e oox r pxsi">
+  exclude-result-prefixes="e oox r pxsi v">
 
   <xsl:key name="SharedStrings" match="e:sst/e:si" use="@oox:id"/>
 

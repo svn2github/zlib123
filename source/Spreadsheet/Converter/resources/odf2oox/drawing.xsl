@@ -158,7 +158,7 @@ RefNo-1
                 <xsl:variable name="imagePath">
                   <xsl:value-of select="draw:image/@xlink:href"/>
                 </xsl:variable>
-                <xsl:for-each select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$graphicStyleName]">
+                <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$graphicStyleName]">
                   <xsl:if test="style:graphic-properties/@fo:clip">
                     <xsl:variable name="cropValue">
                       <xsl:value-of select="style:graphic-properties/@fo:clip"/>

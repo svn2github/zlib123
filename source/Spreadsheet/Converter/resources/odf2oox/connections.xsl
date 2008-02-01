@@ -69,7 +69,7 @@
     <!-- Insert conections to web site -->
     <xsl:template name="InsertConnections">        
         <connections xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-            <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+            <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
                 <connection type="4" refreshedVersion="3" background="1" saveData="1">
                     <xsl:attribute name="id">
                         <xsl:value-of select="position()"/>

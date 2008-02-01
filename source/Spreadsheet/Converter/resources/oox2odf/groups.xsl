@@ -36,7 +36,7 @@
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+    xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r v">
 
 
   <!-- Insert col groups -->

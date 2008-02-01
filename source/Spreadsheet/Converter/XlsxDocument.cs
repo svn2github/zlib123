@@ -13,11 +13,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
         protected int _partId = 0;
 
         private const string SPREADSHEET_ML_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
-        
-        public XlsxDocument(string fileName) : base(fileName)
+
+        public XlsxDocument(string fileName)
+            : base(fileName)
         {
         }
-        
+
         protected override List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName)
         {
             bool isInRel = false;
@@ -25,10 +26,17 @@ namespace CleverAge.OdfConverter.Spreadsheet
             bool isCell = false;
             List<RelationShip> rels = new List<RelationShip>();
 
-            int id = 0;
-            
+            int idFont = 0;
+            int idFill = 0;
+            int idBorder = 0;
+            int idXf = 0;
+            int idCellStyle = 0;
+            int idDxf = 0;
+            int idSi = 0;
+            int idCf = 0;
+
             RelationShip rel = new RelationShip();
-            
+
             while (xtr.Read())
             {
                 switch (xtr.NodeType)
@@ -54,7 +62,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
 
                         isCell = xtr.LocalName.Equals("c") && xtr.NamespaceURI.Equals(SPREADSHEET_ML_NS);
-                        
+
                         if (xtr.HasAttributes)
                         {
                             while (xtr.MoveToNextAttribute())
@@ -85,7 +93,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                         if (isCell)
                                         {
                                             string coord = GetColId(value).ToString(System.Globalization.CultureInfo.InvariantCulture)
-                                                + "|" 
+                                                + "|"
                                                 + GetRowId(value).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                                             xtw.WriteAttributeString(NS_PREFIX, "p", PACKAGE_NS, coord);
@@ -94,7 +102,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                         }
                                         break;
                                 }
-                            
+
                             }
                             xtr.MoveToElement();
                         }
@@ -107,42 +115,74 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                         switch (xtr.LocalName)
                         {
-                            case "fonts":
-                            case "fills":
-                            case "borders":
-                            case "cellXfs":
+                            // reset id counters
+                            case "fonts": idFont = 0; break;
+                            case "fills": idFill = 0; break;
+                            case "borders": idBorder = 0; break;
+                            case "cellXfs": 
                             case "cellStyleXfs":
-                            case "cellStyles":
-                            case "dxfs":
-                            case "sst":
-                                id = 0;
+                                idXf = 0;
                                 break;
-                            
+
+                            case "cellStyles": idCellStyle = 0; break;
+                            case "dxfs": idDxf = 0; break;
+                            case "sst": idSi = 0; break;
+
+                            // add id values
                             case "font":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idFont++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+
                             case "fill":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idFill++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+
                             case "border":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idBorder++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+
                             case "xf":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idXf++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+
                             case "cellStyle":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idCellStyle++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+
                             case "dxf":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idDxf++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+
                             case "si": // sharedStrings
-                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (id++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idSi++).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                 break;
 
                             case "worksheet":
-                                id = 0;
+                            case "chartSpace":
                                 xtw.WriteAttributeString(NS_PREFIX, "part", PACKAGE_NS, _partId.ToString(System.Globalization.CultureInfo.InvariantCulture));
                                 break;
+                            
                             case "conditionalFormatting":
                                 xtw.WriteAttributeString(NS_PREFIX, "part", PACKAGE_NS, _partId.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (id++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idCf++).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                 break;
+                            
                             case "col":
                             case "sheetFormatPr":
                             case "mergeCell":
                             case "drawing":
                             case "hyperlink":
+
+                            case "ser":
+                            case "val":
+                            case "xVal":
+                            case "cat":
+                            case "plotArea":
+                            case "grouping":
+                            case "spPr":
+                            case "errBars":
                                 xtw.WriteAttributeString(NS_PREFIX, "part", PACKAGE_NS, _partId.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                                break;                                
+                                break;
                         }
 
                         if (xtr.IsEmptyElement)
@@ -178,7 +218,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
 
             _partId++;
-            
+
             return rels;
         }
 
@@ -195,11 +235,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain");
+                namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/externalLink");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet");
+                namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing");
@@ -218,13 +260,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
             int result = 0;
 
             foreach (char c in value)
-	        {
+            {
                 if (c >= '0' && c <= '9')
-    		    {
-                    result = (10*result) + (c - '0');
+                {
+                    result = (10 * result) + (c - '0');
                 }
-	        }
-            
+            }
+
             return result;
         }
 
@@ -233,17 +275,17 @@ namespace CleverAge.OdfConverter.Spreadsheet
             int result = 0;
 
             foreach (char c in value)
-	        {
+            {
                 if (c >= 'A' && c <= 'Z')
-    		    {
-                    result = (26*result) + (c - 'A' + 1);
+                {
+                    result = (26 * result) + (c - 'A' + 1);
                 }
                 else
                 {
                     break;
                 }
-	        }
-            
+            }
+
             return result;
         }
     }

@@ -26,7 +26,8 @@
     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:odf="urn:odf"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:math="http://www.w3.org/1998/Math/MathML"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
@@ -42,7 +43,8 @@
   xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:x="urn:schemas-microsoft-com:office:excel" exclude-result-prefixes="odf style text number">
+  xmlns:x="urn:schemas-microsoft-com:office:excel" 
+  exclude-result-prefixes="odf style text number">
 
   <xsl:import href="workbook.xsl"/>
   <xsl:import href="sharedStrings.xsl"/>
@@ -85,11 +87,11 @@
     </xsl:choose>
   </xsl:variable>
 
-
+  <xsl:key name="Parts" match="odf:package/odf:part" use="@odf:full-path" />
   <xsl:key name="chart" match="office:chart" use="''"/>
   <xsl:key name="pivot" match="table:data-pilot-table" use="''"/>
 
-  <xsl:template match="/odf:source">
+  <xsl:template match="/odf:package">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
 
 
@@ -112,7 +114,7 @@
 
       <!-- main content -->
       <xsl:if
-        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+        test="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
         <pzip:entry pzip:target="xl/connections.xml">
           <xsl:call-template name="InsertConnections"/>
         </pzip:entry>
@@ -131,14 +133,14 @@
       <!-- input: content.xml -->
       <!-- output:  xl/worksheets/sheet_N_.xml -->
       <!--xsl:if
-        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/draw:frame/draw:object">
+        test="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/draw:frame/draw:object">
         <pzip:entry pzip:target="xl/media/image1.emf">
           <empty/>
         </pzip:entry>
       </xsl:if-->
 
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+        select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
         <!-- if scenario contains more than 32 changing cells, it cannot be converted to Excel -->
         <xsl:for-each select="table:scenario">
@@ -420,7 +422,7 @@
               <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
             </xsl:variable>
             <xsl:variable name="CreatePivotTable">
-              <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+              <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
                 <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
                   <xsl:with-param name="rowNumber">1</xsl:with-param>
                   <xsl:with-param name="cellStart">
@@ -629,7 +631,7 @@
 			*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
 			-->
           <xsl:when
-            test="document('content.xml')/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+            test="key('Parts', 'content.xml')/descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -647,7 +649,7 @@
 
       <!-- Insert Change Tracking -->
       <xsl:if
-        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+        test="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
         <xsl:call-template name="CreateRevisionHeadersRels"/>
         <xsl:call-template name="CreateRevisionFiles"/>
         <xsl:call-template name="revisionHeaders"/>
@@ -769,7 +771,7 @@
 
         <!--For each comment-->
         <xsl:for-each
-          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/descendant::table:table-row/table:table-cell/office:annotation">
+          select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/descendant::table:table-row/table:table-cell/office:annotation">
           <xsl:call-template name="InsertTextBox"/>
         </xsl:for-each>
 
@@ -781,8 +783,8 @@
 			* Description     :This part of code( an additional '/') was added because when a notepad is inserted as an object, an addional elemnt
 			*                  'table:shapes' is present which is absent when anyother object such as a word doc is inseretd
 			-->
-        <!--<xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:shapes/draw:frame">-->
-		  <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]//draw:frame">
+        <!--<xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:shapes/draw:frame">-->
+		  <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]//draw:frame">
 
           <xsl:variable name="width">
             <xsl:call-template name="point-measure">

@@ -46,7 +46,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" 
   xmlns:oox="urn:oox" 
-  exclude-result-prefixes="e oox r">
+  exclude-result-prefixes="e oox r v">
 
 
   <xsl:template match="e:col" mode="header">
@@ -66,9 +66,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         test="$number = 1 and @min &gt; 1 and ($headerColsStart= '' or $headerColsStart &gt; 1)">
         <table:table-column>
           <xsl:attribute name="table:style-name">
-            <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-            </xsl:for-each>
+            <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
           </xsl:attribute>
 
           <xsl:attribute name="table:default-cell-style-name">
@@ -113,9 +111,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
       <xsl:when test="preceding-sibling::e:col[1]/@max &lt; @min - 1 ">
         <table:table-column>
           <xsl:attribute name="table:style-name">
-            <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-            </xsl:for-each>
+            <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
           </xsl:attribute>
 
           <xsl:attribute name="table:number-columns-repeated">
@@ -269,7 +265,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         <!--  <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor-or-self::e:worksheet/@oox:part))"/>
             </xsl:for-each>
           </xsl:attribute>
 
@@ -311,9 +307,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="@min - 1 &gt; 0">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
 
                     <xsl:attribute name="table:default-cell-style-name">
@@ -330,9 +324,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="$headerColsStart - 1 &gt; 0">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
 
                     <xsl:attribute name="table:default-cell-style-name">
@@ -354,9 +346,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="(@min - ($ManualCol + 2) - 1) &gt; 0">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
 
                     <xsl:attribute name="table:default-cell-style-name">
@@ -374,9 +364,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="(@min - 1) &gt; 0">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
 
                     <xsl:attribute name="table:default-cell-style-name">
@@ -452,9 +440,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="$headerColsStart - preceding-sibling::e:col[1]/@max - 1 &gt; 1">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
 
                     <xsl:attribute name="table:default-cell-style-name">
@@ -477,9 +463,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="@min - $headerColsEnd - 1 &gt; 1">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
 
                     <xsl:attribute name="table:default-cell-style-name">
@@ -500,9 +484,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="@min - preceding-sibling::e:col[1]/@max - 1 &gt; 1">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
 
                     <xsl:attribute name="table:default-cell-style-name">
@@ -525,7 +507,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
             <table:table-column>
               <xsl:attribute name="table:style-name">
                 <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                  <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+                  <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor-or-self::e:worksheet/@oox:part))"/>
                 </xsl:for-each>
               </xsl:attribute>
 
@@ -550,9 +532,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="(@min - ($ManualCol + 1) - 1) &gt; 0">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
                     <xsl:attribute name="table:number-columns-repeated">
                       <xsl:value-of select="@min - ($ManualCol + 1) - 1"/>
@@ -567,9 +547,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:if test="(@min - preceding-sibling::e:col[1]/@max - 1) &gt; 0">
                   <table:table-column>
                     <xsl:attribute name="table:style-name">
-                      <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                        <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                      </xsl:for-each>
+                      <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                     </xsl:attribute>
                     <xsl:attribute name="table:number-columns-repeated">
                       <xsl:value-of select="@min - preceding-sibling::e:col[1]/@max - 1"/>
@@ -639,7 +617,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
               </table:table-column>
             </xsl:when>
             <xsl:when test="@min &gt; $headerColsStart">
-              <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}">
+              <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}">
                 <xsl:if test="@min - $headerColsStart &gt; 0">
                   <xsl:attribute name="table:number-columns-repeated">
                     <xsl:choose>
@@ -692,8 +670,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
           <xsl:for-each
             select="parent::node()/e:col[@min &lt;= 256 and @max &gt;= $headerColsStart and @min &lt;= $headerColsEnd][last()]">
             <xsl:if test="@max &lt; $headerColsEnd">
-              <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}">
-
+              <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}">
                 <xsl:attribute name="table:number-columns-repeated">
                   <xsl:value-of select="$headerColsEnd - @max"/>
                 </xsl:attribute>
@@ -747,8 +724,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
             </xsl:when>
             <xsl:otherwise>
               <!-- insert default columns between header and column -->
-              <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}">
-
+              <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}">
                 <xsl:if test="@min &gt; $headerColsEnd + 2">
                   <xsl:attribute name="table:number-columns-repeated">
                     <xsl:value-of select="@min - $headerColsEnd - 1"/>
@@ -783,8 +759,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
 
         <!-- insert default columns before header -->
         <xsl:if test="$headerColsStart &gt; @max + 1">
-          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}">
-
+          <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}">
             <xsl:if test="$headerColsStart &gt; @max + 2">
               <xsl:attribute name="table:number-columns-repeated">
                 <xsl:value-of select="$headerColsStart - @max - 1"/>
@@ -798,8 +773,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         </xsl:if>
 
         <table:table-header-columns>
-          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}">
-
+          <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}">
             <xsl:if test="$headerColsEnd  - $headerColsStart &gt; 1">
               <xsl:attribute name="table:number-columns-repeated">
                 <xsl:value-of select="$headerColsEnd  - $headerColsStart + 1"/>
@@ -902,9 +876,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         <xsl:if test="$GetMinManualColBreak - $prevManualBreak &gt; 0">
           <table:table-column>
             <xsl:attribute name="table:style-name">
-              <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-              </xsl:for-each>
+              <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
             </xsl:attribute>
 
             <xsl:attribute name="table:default-cell-style-name">
@@ -966,7 +938,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor-or-self::e:worksheet/@oox:part))"/>
             </xsl:for-each>
           </xsl:attribute>
 
@@ -1022,7 +994,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor-or-self::e:worksheet/@oox:part))"/>
             </xsl:for-each>
           </xsl:attribute>
 
@@ -1054,9 +1026,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
             <xsl:if test="($GetMinManualColBreak - $prevManualBreak) &gt; 0">
               <table:table-column>
                 <xsl:attribute name="table:style-name">
-                  <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                    <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                  </xsl:for-each>
+                  <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                 </xsl:attribute>
 
                 <xsl:attribute name="table:default-cell-style-name">
@@ -1075,9 +1045,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
             <xsl:if test="($GetMinManualColBreak - preceding-sibling::e:col[1]/@max) &gt; 0">
               <table:table-column>
                 <xsl:attribute name="table:style-name">
-                  <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                    <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-                  </xsl:for-each>
+                  <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
                 </xsl:attribute>
 
                 <xsl:attribute name="table:default-cell-style-name">
@@ -1137,7 +1105,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor-or-self::e:worksheet/@oox:part))"/>
             </xsl:for-each>
           </xsl:attribute>
 
@@ -1200,7 +1168,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor-or-self::e:worksheet/@oox:part))"/>
             </xsl:for-each>
           </xsl:attribute>
 
@@ -1392,7 +1360,6 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
           <xsl:value-of select="$ManualColBreaks"/>
         </xsl:with-param>
       </xsl:apply-templates>
-
       <xsl:variable name="LastBreakBeforeHeader">
         <!--last break between 0 and headerStart -->
         <xsl:call-template name="GetMaxValueBetweenTwoValues">
@@ -1431,7 +1398,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
                 <xsl:with-param name="sheet" select="$sheet"/>
               </xsl:call-template>
               <xsl:if test="$headerColsStart - $LastBreakBeforeHeader -1 &gt; 1">
-                <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                   table:number-columns-repeated="{$headerColsStart - $LastBreakBeforeHeader}">
                   <xsl:attribute name="table:default-cell-style-name">
                     <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1441,7 +1408,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
             </xsl:if>
           </xsl:when>
           <xsl:otherwise>
-            <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+            <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
               table:number-columns-repeated="{$headerColsStart - 1}">
               <xsl:attribute name="table:default-cell-style-name">
                 <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1488,7 +1455,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
               </xsl:call-template>
 
               <xsl:if test="$headerColsEnd - $LastBreakInsideHeader &gt; 1">
-                <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                   table:number-columns-repeated="{$headerColsEnd - $LastBreakInsideHeader - 1}">
                   <xsl:attribute name="table:default-cell-style-name">
                     <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1498,7 +1465,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
             </xsl:when>
             <!-- if there are no breakes inside header -->
             <xsl:otherwise>
-              <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+              <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                 table:number-columns-repeated="{$headerColsEnd - $headerColsStart + 1}">
                 <xsl:attribute name="table:default-cell-style-name">
                   <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1584,8 +1551,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
             <xsl:when test="not(preceding-sibling::e:brk[@id &gt; $GetMinColAfterMaxColStyle - 1])">
               <xsl:if test="$GetFirstManualColBreakAfterColWithStyle - $GetMinColAfterMaxColStyle &gt; 0">
                 <!--End of RefNo-1-->
-
-                <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                   table:number-columns-repeated="{$GetFirstManualColBreakAfterColWithStyle - $GetMinColAfterMaxColStyle}">
                   <xsl:attribute name="table:default-cell-style-name">
                     <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1598,7 +1564,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
               <xsl:variable name="brkAt" select="@id"></xsl:variable>
               <xsl:variable name="brkLastAt" select="preceding-sibling::e:brk[1]/@id"></xsl:variable>
               <xsl:if test="$brkAt - $brkLastAt &gt; 1">
-                <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                   table:number-columns-repeated="{$brkAt - $brkLastAt - 1}">
                   <xsl:attribute name="table:default-cell-style-name">
                     <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1621,7 +1587,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
       <xsl:choose>
         <xsl:when
           test="$headerColsStart != '' and not(key('Col', e:worksheet/@oox:part)[@max &gt; $headerColsEnd])">
-          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+          <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
             table:number-columns-repeated="{256 - $headerColsEnd}">
             <xsl:attribute name="table:default-cell-style-name">
               <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1647,7 +1613,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
 
 
         <xsl:when test="not(key('Col', e:worksheet/@oox:part))">
-          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+          <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
             table:number-columns-repeated="256">
             <xsl:attribute name="table:default-cell-style-name">
               <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1656,7 +1622,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="key('Col', e:worksheet/@oox:part)[last()]/@max &lt; 256">
-            <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+            <table:table-column table:style-name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
               table:number-columns-repeated="{256 - key('Col', e:worksheet/@oox:part)[last()]/@max}">
               <xsl:attribute name="table:default-cell-style-name">
                 <xsl:value-of select="$DefaultCellStyleName"/>
@@ -1920,7 +1886,6 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
       <xsl:otherwise>
 
         <table:table-column table:style-name="{generate-id(.)}">
-
           <xsl:choose>
             <!-- when this is the rest of a column range after header -->
             <xsl:when test="$afterHeader = 'true' ">
@@ -2059,9 +2024,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
         <xsl:if test="$GetMinManualColBreake - $colStart  &gt; 0">
           <table:table-column>
             <xsl:attribute name="table:style-name">
-              <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-              </xsl:for-each>
+              <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
             </xsl:attribute>
 
             <xsl:attribute name="table:default-cell-style-name">
@@ -2141,9 +2104,7 @@ RefNo-1 26-Oct-2007 Sandeep S     1757322   Modification done to handle column b
       <xsl:when test="$GetNextManualColBreake - $GetMinManualColBreake &gt; 1">
         <table:table-column>
           <xsl:attribute name="table:style-name">
-            <xsl:for-each select="key('Part', concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
-            </xsl:for-each>
+            <xsl:value-of select="concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
           </xsl:attribute>
 
           <xsl:attribute name="table:default-cell-style-name">

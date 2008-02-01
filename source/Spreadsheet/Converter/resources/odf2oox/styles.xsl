@@ -77,7 +77,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <!-- message about  not supported quarter and week date format-->
     <xsl:choose>
       <xsl:when
-        test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:quarter">
+        test="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:date-style/number:quarter">
         <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
       </xsl:when>
       <xsl:when
@@ -88,7 +88,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <!-- this message is currently not supported because is questionable -->
     <xsl:choose>
       <xsl:when
-        test="document('content.xml')/office:document-content/office:automatic-styles/number:date-style/number:week-of-year">
+        test="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:date-style/number:week-of-year">
         <xsl:message terminate="no">translation.odf2oox.WeekDateFormat</xsl:message>
       </xsl:when>
       <xsl:when
@@ -103,7 +103,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       <!-- number of all number styles in content.xml -->
       <xsl:variable name="countNumber">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:number-style)"
         />
       </xsl:variable>
 
@@ -117,7 +117,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       <!-- number of all percentage styles in content.xml -->
       <xsl:variable name="countPercentage">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
         />
       </xsl:variable>
 
@@ -131,7 +131,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       <!-- number of all currency styles in content.xml -->
       <xsl:variable name="countCurrency">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
         />
       </xsl:variable>
 
@@ -145,7 +145,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       <!-- number of all date styles in content.xml -->
       <xsl:variable name="countDate">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:date-style)"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:date-style)"
         />
       </xsl:variable>
 
@@ -159,7 +159,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       <!-- number of all time styles in content.xml -->
       <xsl:variable name="countTime">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:time-style)"
         />
       </xsl:variable>
 
@@ -178,7 +178,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <!-- apply number styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:number-style[1]"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:number-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">1</xsl:with-param>
         <xsl:with-param name="styleName"/>
@@ -196,7 +196,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <!-- apply percentage styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style[1]"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:percentage-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of select="$countNumber+$countStyleNumber+1"/>
@@ -216,7 +216,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <!-- apply currency styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:currency-style[1]"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:currency-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of
@@ -239,7 +239,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <!-- apply date styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:date-style[1]"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:date-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of
@@ -263,7 +263,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <!-- apply time styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:time-style[1]"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:time-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of
@@ -294,7 +294,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <fonts>
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)])"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(key('Parts', 'content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)])"
         />
       </xsl:attribute>
 
@@ -322,11 +322,11 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       </xsl:choose>
 
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles"
         mode="fonts"/>
 		<!--Code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
 		<xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles"
         mode="notesFonts"/>
 		<!--End of code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
@@ -336,7 +336,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       <!--hyperlink font properties-->
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)and not(ancestor::office:annotation)]">
+          test="key('Parts', 'content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)and not(ancestor::office:annotation)]">
 
           <xsl:call-template name="InsertHyperlinkTextStyle"/>
 
@@ -355,7 +355,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
         <patternFill patternType="gray125"/>
       </fill>
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles"
         mode="background-color"/>
 
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
@@ -446,7 +446,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
         <diagonal/>
       </border>
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles"
         mode="border"/>
 
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
@@ -461,9 +461,9 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <xsl:variable name="multilines">
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p[2]]">
+          test="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p[2]]">
           <xsl:for-each
-            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::text:p[last()]">
+            select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/descendant::text:p[last()]">
             <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
           </xsl:for-each>
         </xsl:when>
@@ -477,7 +477,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="numStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:number-style)"
       />
     </xsl:variable>
 
@@ -489,7 +489,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="percentStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
       />
     </xsl:variable>
 
@@ -501,7 +501,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="currencyStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
       />
     </xsl:variable>
 
@@ -513,7 +513,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="dateStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:date-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:date-style)"
       />
     </xsl:variable>
 
@@ -525,13 +525,13 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="timeStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:time-style)"
       />
     </xsl:variable>
 
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
       />
     </xsl:variable>
 
@@ -543,7 +543,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="contentFillCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:table-cell-properties)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:table-cell-properties)"
       />
     </xsl:variable>
 
@@ -617,7 +617,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/descendant::text:a[@xlink:href and not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)])"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(key('Parts', 'content.xml')/descendant::text:a[@xlink:href and not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)])"
         />
       </xsl:attribute>
 
@@ -626,7 +626,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <!-- output cell formats from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
+        select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style"
         mode="cellFormats">
         <xsl:with-param name="numStyleCount">
           <xsl:value-of select="$numStyleCount"/>
@@ -777,7 +777,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
       </xsl:for-each>
 
       <xsl:if
-        test="not(document('styles.xml')/office:document-styles/office:styles/style:style/@style:name = 'Hyperlink') and document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+        test="not(document('styles.xml')/office:document-styles/office:styles/style:style/@style:name = 'Hyperlink') and key('Parts', 'content.xml')/descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
         <cellStyle
           xfId="{count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1}"
           name="Hyperlink"/>
@@ -1832,7 +1832,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="numStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:number-style)"
       />
     </xsl:variable>
 
@@ -1844,7 +1844,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="percentStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
       />
     </xsl:variable>
 
@@ -1856,7 +1856,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="currencyStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
       />
     </xsl:variable>
 
@@ -1868,7 +1868,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="dateStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:date-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:date-style)"
       />
     </xsl:variable>
 
@@ -1880,13 +1880,13 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="timeStyleCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/number:time-style)"
       />
     </xsl:variable>
 
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
       />
     </xsl:variable>
 
@@ -1898,12 +1898,12 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
     <xsl:variable name="contentFillCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:table-cell-properties)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:table-cell-properties)"
       />
     </xsl:variable>
 
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
       <!-- string with listed columns and their styles -->
       <xsl:variable name="ColumnTable">
@@ -1992,7 +1992,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
                 <!-- when style is in content.xml -->
                 <xsl:when test="key('style',@table:style-name)">
                   <xsl:for-each
-                    select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
+                    select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
                     <xsl:call-template name="SetFormatProperties">
                       <xsl:with-param name="multiline">
                         <xsl:text>true</xsl:text>
@@ -2119,7 +2119,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
                   <xsl:variable name="contentFontCount">
                     <xsl:value-of
-                      select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
+                      select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
                     />
                   </xsl:variable>
 
@@ -2640,7 +2640,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
   <xsl:template name="InsertHyperlinksProperties">
     <xsl:if
-      test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
+      test="key('Parts', 'content.xml')/descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
 
       <xsl:variable name="xfId">
         <xsl:value-of
@@ -2650,7 +2650,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <xsl:variable name="contentFontCount">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
+          select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
         />
       </xsl:variable>
 
@@ -2780,9 +2780,9 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <xsl:param name="postStyleName" select="false"/>
 
     <!--RefNo-1<xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]">-->
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]">-->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/descendant::table:table-row/table:table-cell[descendant::text:a]">
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/descendant::table:table-row/table:table-cell[descendant::text:a]">
 
       <xsl:variable name="StyleName">
         <xsl:value-of select="@table:style-name"/>
@@ -2790,10 +2790,10 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
 
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]">
+          test="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]">
 
           <xsl:apply-templates
-            select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
+            select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
             mode="cellFormats">
             <xsl:with-param name="numStyleCount">
               <xsl:value-of select="$numStyleCount"/>
@@ -2981,7 +2981,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     </xsl:variable>
 
     <xsl:apply-templates
-      select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
+      select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
       mode="cellFormats">
       <xsl:with-param name="numStyleCount">
         <xsl:value-of select="$numStyleCount"/>
@@ -3086,10 +3086,10 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
   <xsl:template name="InsertHyperlinkTextStyle">
 
     <!--RefNo-1<xsl:apply-templates
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]"
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]"
       mode="HyperlinkText"/>-->
     <xsl:apply-templates
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table//table:table-row/table:table-cell[descendant::text:a]"
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table//table:table-row/table:table-cell[descendant::text:a]"
       mode="HyperlinkText"/>
 
   </xsl:template>
@@ -3103,9 +3103,9 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <xsl:for-each select="descendant::text:a">
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties">
+          test="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties">
           <xsl:apply-templates
-            select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties"
+            select="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]/style:text-properties"
             mode="fonts">
             <xsl:with-param name="hyperlink">
               <xsl:text>true</xsl:text>

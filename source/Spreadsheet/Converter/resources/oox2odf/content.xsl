@@ -1132,7 +1132,7 @@
               <!-- when there aren't any rows before at all -->
               <xsl:when
                 test="not(e:worksheet/e:sheetData/e:row[@r &lt; $headerRowsStart and @r &lt; 65537])">
-                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                   table:number-rows-repeated="{$headerRowsStart - 1}">
                   <table:table-cell table:number-columns-repeated="256"/>
                 </table:table-row>
@@ -1141,7 +1141,7 @@
               <xsl:otherwise>
                 <xsl:for-each
                   select="e:worksheet/e:sheetData/e:row[@r &lt; $headerRowsStart and @r &lt; 65537][last()]">
-                  <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                  <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                     table:number-rows-repeated="{$headerRowsStart - @r - 1}">
                     <table:table-cell table:number-columns-repeated="256"/>
                   </table:table-row>
@@ -1234,7 +1234,7 @@
 
               <xsl:when
                 test="not(e:worksheet/e:sheetData/e:row[@r &gt;= $headerRowsStart and @r &lt;= $headerRowsEnd and @r &lt; 65537])">
-                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                   table:number-rows-repeated="{$headerRowsEnd - $headerRowsStart + 1}">
                   <table:table-cell table:number-columns-repeated="256"/>
                 </table:table-row>
@@ -1245,7 +1245,7 @@
             <xsl:for-each
               select="e:worksheet/e:sheetData/e:row[@r &gt;= $headerRowsStart and @r &lt;= $headerRowsEnd and @r &lt; 65537][last()]">
               <xsl:if test="@r &lt; $headerRowsEnd">
-                <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+                <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                   table:number-rows-repeated="{$headerRowsEnd - @r}">
                   <table:table-cell table:number-columns-repeated="256"/>
                 </table:table-row>
@@ -1502,7 +1502,7 @@
       <xsl:when
         test="position()=1 and @r>1 and $BigMergeCell = '' and ($GetMinRowWithElement = '' or ($GetMinRowWithElement) &gt;= @r)">
 
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+        <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -1657,7 +1657,7 @@
 
         <!-- when this row is not first one and there were empty rows after previous non-empty row -->
         <xsl:if test="preceding-sibling::e:row[1]/@r &lt;  @r - 1">
-          <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+          <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
             table:number-rows-repeated="{@r -1 - preceding-sibling::e:row[1]/@r}">
             <table:table-cell table:number-columns-repeated="256"/>
           </table:table-row>
@@ -1852,7 +1852,7 @@
       <!-- when this row is the first non-empty one before header but not row 1 and there aren't Big Merge Coll -->
       <xsl:when
         test="position()=1 and @r > 1 and @r &lt; $headerRowsStart and $BigMergeCell = '' ">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+        <table:table-row table:style-name="{concat('ro', ancestor::e:worksheet/@oox:part)}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -1894,7 +1894,7 @@
 
           <!-- if the first non-empty header row isn't the first header row -->
           <xsl:when test="position() = 1 and @r &gt; $headerRowsStart">
-            <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+            <table:table-row table:style-name="{concat('ro', ancestor::e:worksheet/@oox:part)}"
               table:number-rows-repeated="{@r - $headerRowsStart}">
               <table:table-cell table:number-columns-repeated="256"/>
             </table:table-row>
@@ -1902,7 +1902,7 @@
 
           <!-- if there are empty header rows before this one header row-->
           <xsl:when test="position() &gt; 1 and @r - 1 != preceding-sibling::e:row[1]/@r">
-            <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+            <table:table-row table:style-name="{concat('ro', ancestor::e:worksheet/@oox:part)}"
               table:number-rows-repeated="{@r - preceding-sibling::e:row[1]/@r - 1}">
               <table:table-cell table:number-columns-repeated="256"/>
             </table:table-row>
@@ -1912,7 +1912,7 @@
 
       <!-- when this row is the first non-empty one after header rows and there aren't Big Merge Coll -->
       <xsl:when test="position()=1 and @r &gt; $headerRowsEnd + 1 and $BigMergeCell = '' ">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+        <table:table-row table:style-name="{concat('ro', ancestor::e:worksheet/@oox:part)}"
           table:number-rows-repeated="{@r - $headerRowsEnd - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -1950,7 +1950,7 @@
 
       <!-- when this row is not first one and there were empty rows after previous non-empty row -->
       <xsl:when test="position() != 1 and @r != preceding-sibling::e:row[1]/@r + 1">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+        <table:table-row table:style-name="{concat('ro', ancestor::e:worksheet/@oox:part)}"
           table:number-rows-repeated="{@r -1 - preceding-sibling::e:row[1]/@r}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>

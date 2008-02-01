@@ -53,7 +53,7 @@
 
   <!-- main workbook template-->
   <xsl:template name="InsertWorkbook">
-    <xsl:apply-templates select="document('content.xml')/office:document-content"/>
+    <xsl:apply-templates select="key('Parts', 'content.xml')/office:document-content"/>
   </xsl:template>
 
   <!-- workbook body template -->
@@ -211,7 +211,7 @@
             <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
           </xsl:variable>
           <xsl:variable name="CreatePivotTable">
-            <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+            <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
               <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
                 <xsl:with-param name="rowNumber">1</xsl:with-param>
                 <xsl:with-param name="cellStart">
@@ -249,7 +249,7 @@
 
     <xsl:variable name="multilines">
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
+        select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet">
         <xsl:value-of select="count(descendant::table:table-cell/text:p[2])"/>
       </xsl:for-each>
     </xsl:variable>
@@ -265,7 +265,7 @@
 
     <xsl:variable name="cellFormats">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
       />
     </xsl:variable>
 
@@ -278,7 +278,7 @@
     <xsl:variable name="CheckIfConditional">
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+          test="key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -290,7 +290,7 @@
     
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style)"
+        select="count(key('Parts', 'content.xml')/office:document-content/office:automatic-styles/style:style)"
       />
     </xsl:variable>
     
@@ -302,7 +302,7 @@
 
     <!-- convert first table -->
     <xsl:apply-templates
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[1]"
+      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[1]"
       mode="sheet">
       <xsl:with-param name="cellNumber">0</xsl:with-param>
       <xsl:with-param name="sheetId">1</xsl:with-param>
@@ -337,13 +337,13 @@
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
       <xsl:when
-        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31) = $name][2]">
+        test="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31) = $name][2]">
         <xsl:variable name="nameConflictsBefore">
           <xsl:for-each
-            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[position() = $sheetNumber]">
+            select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[position() = $sheetNumber]">
             <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
             <xsl:value-of
-              select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31) = $name and position() &lt; $sheetNumber])"
+              select="count(key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31) = $name and position() &lt; $sheetNumber])"
             />
           </xsl:for-each>
         </xsl:variable>

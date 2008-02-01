@@ -44,6 +44,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
@@ -55,7 +56,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="a e oox r number">
+  exclude-result-prefixes="a e oox r number v">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
@@ -191,7 +192,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </xsl:if>
 
     <style:style
-      style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+      style:name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
       style:family="table-column">
       <style:table-column-properties fo:break-before="auto">
         <xsl:attribute name="style:column-width">
@@ -351,7 +352,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
       <xsl:otherwise>
       End of RefNo-4-->
     <style:style
-      style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+      style:name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
       style:family="table-row">
       <style:table-row-properties fo:break-before="auto">
         <xsl:attribute name="style:row-height">
@@ -1370,25 +1371,25 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   </xsl:template>
 
   <xsl:template name="InsertCommentsBorderStyles">
-    <draw:stroke-dash draw:name="round_20_dotted" draw:display-name="round dotted" draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    <draw:stroke-dash draw:name="round_20_dotted" draw:display-name="round dotted" draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0cm"/>
 
     <draw:stroke-dash draw:name="square_20_dotted" draw:display-name="square dotted"
-      draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+      draw:style="rect" draw:dots1="1" draw:dots2="1" draw:distance="0.05cm" />
 
-    <draw:stroke-dash draw:name="dashed" draw:style="rect" draw:dots1="1" draw:dots1-length="0.15cm" draw:dots2="1" draw:dots2-length="0.15cm" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+    <draw:stroke-dash draw:name="dashed" draw:style="rect" draw:dots1="1" draw:dots1-length="0.15cm" draw:dots2="1" draw:dots2-length="0.15cm" draw:distance="0.05cm" />
 
     <draw:stroke-dash draw:name="dash_20_dot" draw:display-name="dash dot" draw:style="rect"
-      draw:dots1="1" draw:dots1-length="0.1cm" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+      draw:dots1="1" draw:dots1-length="0.1cm" draw:dots2="1" draw:distance="0.05cm"/>
 
     <draw:stroke-dash draw:name="long_20_dash" draw:display-name="long dash" draw:style="rect"
       draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="1" draw:dots2-length="0.2cm"
-      draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+      draw:distance="0.05cm"/>
 
     <draw:stroke-dash draw:name="long_20_dash_20_dot" draw:display-name="long dash dot"
-      draw:style="rect" draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="1" draw:distance="0.05cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+      draw:style="rect" draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="1" draw:distance="0.05cm"/>
 
     <draw:stroke-dash draw:name="long_20_dash_20_dot_20_dot" draw:display-name="long dash dot dot" draw:style="rect" draw:dots1="1" draw:dots1-length="0.2cm" draw:dots2="2"
-      draw:distance="0.1cm" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"/>
+      draw:distance="0.1cm"/>
   </xsl:template>
 
 </xsl:stylesheet>

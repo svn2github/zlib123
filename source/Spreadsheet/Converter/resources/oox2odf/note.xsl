@@ -45,7 +45,7 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  exclude-result-prefixes="e r draw">
+  exclude-result-prefixes="e r v">
 
   <xsl:import href="common.xsl"/>
   <xsl:import href="measures.xsl"/>

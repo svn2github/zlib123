@@ -44,7 +44,7 @@
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="e oox r c xdr draw rels xlink">
+  exclude-result-prefixes="e oox r c xdr rels xlink">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="chart.xsl"/>
@@ -1100,9 +1100,9 @@
 
       </table:shapes>
       <table:table-column
-        table:style-name="{generate-id(key('Part', 'xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}"/>
+        table:style-name="{concat('co', key('Part', 'xl/worksheets/sheet1.xml')/e:worksheet/@oox:part)}"/>
       <table:table-row
-        table:style-name="{generate-id(key('Part', 'xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}">
+        table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}">
         <table:table-cell/>
       </table:table-row>
     </table:table>

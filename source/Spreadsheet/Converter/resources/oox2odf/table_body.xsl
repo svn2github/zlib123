@@ -38,7 +38,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="e oox r">
+  exclude-result-prefixes="e oox r v">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="insert_cols.xsl"/>
@@ -77,7 +77,7 @@
       <!-- when sheet is empty  -->
       <xsl:when
         test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = '' and $NoteCell = '' and $ConditionalCell = '' and $ValidationCell = '' and $AllRowBreakes = '' ">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+        <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
           table:number-rows-repeated="65536">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
@@ -171,7 +171,7 @@
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-              <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}"
+              <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
                 table:number-rows-repeated="{65536 - e:worksheet/e:sheetData/e:row[last()]/@r}">
                 <table:table-cell table:number-columns-repeated="256"/>
               </table:table-row>
@@ -271,7 +271,7 @@
               </xsl:when>
 
               <xsl:otherwise>
-                <xsl:value-of select="generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))"/>
+                <xsl:value-of select="concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
@@ -1657,16 +1657,19 @@
       </xsl:when>
 
       <xsl:otherwise>
+        <xsl:variable name="thisCellCol">
+          <xsl:call-template name="GetColNum2">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="@oox:p"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
 
         <xsl:if test="following-sibling::e:c">
           <xsl:for-each select="following-sibling::e:c[1]">
             <xsl:call-template name="ConvertCell">
               <xsl:with-param name="prevCellCol">
-                <xsl:call-template name="GetColNum2">
-                  <xsl:with-param name="cell">
-                    <xsl:value-of select="@oox:p"/>
-                  </xsl:with-param>
-                </xsl:call-template>
+                <xsl:value-of select="$thisCellCol"/>
               </xsl:with-param>
               <xsl:with-param name="BigMergeCell">
                 <xsl:value-of select="$BigMergeCell"/>

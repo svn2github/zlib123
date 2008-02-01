@@ -617,7 +617,7 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
     <xsl:param name="Repeat"/>
     <xsl:param name="BigMergeCell"/>
 
-    <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ancestor::e:worksheet/@oox:part))}">
+    <table:table-row table:style-name="{concat('ro', ancestor::e:worksheet/@oox:part)}">
       <xsl:call-template name="InsertColumnsBigMergeColl">
         <xsl:with-param name="BigMergeCell">
           <xsl:value-of select="$BigMergeCell"/>
