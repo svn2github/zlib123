@@ -170,7 +170,7 @@
         <xsl:if test="@office:display='true'">
           <x:Visible/>
         </xsl:if>
-        <xsl:if test="@office:display='false or not(@office:display)'">
+        <xsl:if test="@office:display='false' or not(@office:display)">
           <x:Hidden/>
         </xsl:if>
         <!--<xsl:if test="@office:display">
