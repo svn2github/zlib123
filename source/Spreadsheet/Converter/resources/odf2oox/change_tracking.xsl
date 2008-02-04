@@ -41,7 +41,7 @@
 
     <xsl:template name="revisionHeaders">
         <xsl:for-each
-            select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
             <pzip:entry pzip:target="xl/revisions/revisionHeaders.xml">
                 <xsl:call-template name="revisionHeaderProperties"/>
             </pzip:entry>
@@ -51,7 +51,7 @@
     <!-- Create Revisions Files -->
     <xsl:template name="CreateRevisionFiles">
         <xsl:for-each
-            select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
             <xsl:apply-templates
                 select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']"
                 mode="revisionFiles"/>
@@ -411,7 +411,7 @@
 
 
                         <ris rId="{$rId}" sheetId="{$sheetId}"
-                            name="{concat('[]', key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[position() = $sheetId]/@table:name)}"
+                            name="{concat('[]', document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[position() = $sheetId]/@table:name)}"
                             sheetPosition="{$sheetId}"/>
 
                     </xsl:when>
@@ -468,7 +468,7 @@
         <xsl:param name="SearchRowNum"/>
 
         <xsl:for-each
-            select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[position() = $sheetId]">
+            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[position() = $sheetId]">
             <xsl:apply-templates select="table:table-row[1]" mode="changeTracking">
                 <xsl:with-param name="rowNumber">
                     <xsl:text>0</xsl:text>

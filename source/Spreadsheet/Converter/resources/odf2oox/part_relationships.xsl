@@ -44,7 +44,7 @@
 
       <!-- Sheet relationship -->
       <xsl:for-each
-        select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
         <xsl:if test="not(table:scenario)">
           <Relationship Id="{generate-id(.)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
@@ -59,7 +59,7 @@
       </xsl:for-each>
 
       <xsl:if
-        test="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
         <Relationship Id="{generate-id(.)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionHeaders"
           Target="revisions/revisionHeaders.xml"/>
@@ -79,7 +79,7 @@
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections"
         Target="connections.xml"/>
 
-      <xsl:for-each select="key('Parts', 'content.xml')">
+      <xsl:for-each select="document('content.xml')">
 
         <!--Insert OLE relationships -->
 		  <!--Defect Id     :1784784
@@ -122,7 +122,7 @@
               <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
             </xsl:variable>
             <xsl:variable name="CreatePivotTable">
-              <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+              <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
                 <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
                   <xsl:with-param name="rowNumber">1</xsl:with-param>
                   <xsl:with-param name="cellStart">
@@ -151,7 +151,7 @@
   <xsl:template name="InsertRevisionsRels">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <xsl:for-each
-        select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes/node()[name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes/node()[name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']">
         <Relationship Id="{generate-id()}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/revisionLog"
           Target="{concat('revisionLog', generate-id(), '.xml')}"/>
@@ -331,7 +331,7 @@
 
       <!-- Extrnal Link -->
       <xsl:for-each
-        select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
 
         <Relationship Id="{generate-id()}"
           Target="{concat('../queryTables/queryTable', position(), '.xml')}"
@@ -364,7 +364,7 @@
             <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
           </xsl:variable>
           <xsl:variable name="CreatePivotTable">
-            <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+            <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
               <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
                 <xsl:with-param name="rowNumber">1</xsl:with-param>
                 <xsl:with-param name="cellStart">
@@ -689,7 +689,7 @@
   <xsl:template name="InsertLinkExternalRels">
 
     <xsl:for-each
-      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
 
       <xsl:call-template name="InsertQueryTable"/>
 
@@ -703,7 +703,7 @@
       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
       guid="{concat('{', '100', '}')}" diskRevisions="1" revisionId="2" version="3">
       <xsl:for-each
-        select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
         <xsl:apply-templates
           select="node()[1][name()='table:cell-content-change' or name()='table:deletion' or name()='table:movement' or name()='table:insertion']"
           mode="revisionHeaders">
@@ -728,7 +728,7 @@
       </xsl:attribute>
       <sheetIdMap>
         <xsl:for-each
-          select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
           <sheetId>
             <xsl:attribute name="val">
               <xsl:value-of select="position()"/>

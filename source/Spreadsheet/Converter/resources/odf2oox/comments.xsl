@@ -56,7 +56,7 @@
           <xsl:number value="0"/>
         </xsl:variable>
         <xsl:apply-templates
-          select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetNum]/descendant::table:table-row/table:table-cell/office:annotation">
+          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetNum]/descendant::table:table-row/table:table-cell/office:annotation">
           <xsl:with-param name="noteId" select="$noteId+1"/>
         </xsl:apply-templates>
       </commentList>

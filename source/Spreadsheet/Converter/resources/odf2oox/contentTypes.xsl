@@ -88,7 +88,7 @@
 	*                  then the value of attibute 'xlink:href' begins from a '/' and not '../'(which offcourse means within the folder.	
 	-->
 	<xsl:template name="InsertExternalLinkTypes">
-    <xsl:for-each select="key('Parts', 'content.xml')">
+    <xsl:for-each select="document('content.xml')">
       <xsl:for-each
         select="descendant::draw:frame/draw:object[starts-with(@xlink:href,'../') or starts-with(@xlink:href,'/') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
         <Override PartName="{concat(concat('/xl/externalLinks/externalLink', position()),'.xml')}"
@@ -101,7 +101,7 @@
   <!-- Sheet content types -->
   <xsl:template name="InsertSheetContentTypes">
     <xsl:for-each
-      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
       <Override PartName="{concat(concat('/xl/worksheets/sheet', position()),'.xml')}"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
     </xsl:for-each>
@@ -109,7 +109,7 @@
 
   <xsl:template name="InsertCommentContentTypes">
     <xsl:for-each
-      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
       <xsl:if test="descendant::office:annotation">
         <Override PartName="{concat(concat('/xl/comments', position()),'.xml')}"
           ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml"/>
@@ -119,7 +119,7 @@
 
   <xsl:template name="InsertDrawingContentTypes">
     <xsl:for-each
-      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
@@ -198,7 +198,7 @@
 
   <xsl:template name="InsertConnectionContentTypes">
     <xsl:for-each
-      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
       <xsl:variable name="queryTableTarget">
         <xsl:value-of select="concat('/xl/queryTables/queryTable', position(), '.xml')"/>
       </xsl:variable>
@@ -213,7 +213,7 @@
   <xsl:template name="InsertChangeTrackingTypes">
 
     <xsl:for-each
-      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
 
       <Override PartName="/xl/revisions/revisionHeaders.xml"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.revisionHeaders+xml"/>
@@ -223,7 +223,7 @@
     </xsl:for-each>
 
     <xsl:if
-      test="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
+      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:tracked-changes">
       <Override PartName="/xl/revisions/userNames.xml"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.userNames+xml"/>
     </xsl:if>
@@ -249,7 +249,7 @@
   <xsl:template name="InsertPivotTableTypes">
 
     <xsl:for-each
-      select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
       <xsl:variable name="tableName">
         <xsl:value-of select="@table:name"/>
@@ -274,7 +274,7 @@
           <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
         </xsl:variable>
         <xsl:variable name="CreatePivotTable">
-          <xsl:for-each select="key('Parts', 'content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+          <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
             <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
               <xsl:with-param name="rowNumber">1</xsl:with-param>
               <xsl:with-param name="cellStart">

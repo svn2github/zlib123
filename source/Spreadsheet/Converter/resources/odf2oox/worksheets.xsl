@@ -52,7 +52,7 @@
   <xsl:import href="scenario.xsl"/>
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
-  <!--xsl:key name="StyleFamily" match="style:style" use="@style:family"/-->
+  <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
   <xsl:key name="tableMasterPage" match="style:style[@style:family='table']" use="@style:name"/>
   <xsl:key name="ConfigItem"
     match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item"
@@ -696,8 +696,8 @@
     <!-- compute default row height -->
     <xsl:variable name="defaultRowHeight">
       <xsl:choose>
-        <xsl:when test="child::table:table-row[@table:number-rows-repeated > 32768]">
-          <xsl:for-each select="child::table:table-row[@table:number-rows-repeated > 32768]">
+        <xsl:when test="descendant::table:table-row[@table:number-rows-repeated > 32768]">
+          <xsl:for-each select="descendant::table:table-row[@table:number-rows-repeated > 32768]">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="length">
                 <xsl:value-of
@@ -714,7 +714,7 @@
 
     <!-- Check if 256 column are hidden -->
     <xsl:variable name="CheckCollHidden">
-      <xsl:apply-templates select="child::table:table-column[1]" mode="defaultColWidth">
+      <xsl:apply-templates select="descendant::table:table-column[1]" mode="defaultColWidth">
         <xsl:with-param name="colNumber">
           <xsl:text>1</xsl:text>
         </xsl:with-param>
@@ -726,14 +726,14 @@
 
     <!-- Check if default border areexisted in default column-->
     <xsl:variable name="CheckIfDefaultBorder">
-      <xsl:apply-templates select="child::table:table-column[1]" mode="DefaultBorder"/>
+      <xsl:apply-templates select="descendant::table:table-column[1]" mode="DefaultBorder"/>
     </xsl:variable>
 
     <!-- Check if 65536 rows are hidden -->
     <xsl:variable name="CheckRowHidden">
       <xsl:choose>
         <xsl:when test="table:table-row[@table:visibility='collapse']">
-          <xsl:apply-templates select="child::table:table-row[1]" mode="zeroHeight">
+          <xsl:apply-templates select="descendant::table:table-row[1]" mode="zeroHeight">
             <xsl:with-param name="rowNumber">
               <xsl:text>0</xsl:text>
             </xsl:with-param>
@@ -784,11 +784,11 @@
 
     </sheetFormatPr>
 
-    <xsl:if test="child::table:table-column[1]">
+    <xsl:if test="descendant::table:table-column[1]">
       <cols>
 
         <!-- insert first column -->
-        <xsl:apply-templates select="child::table:table-column[1]" mode="sheet">
+        <xsl:apply-templates select="descendant::table:table-column[1]" mode="sheet">
           <xsl:with-param name="colNumber">1</xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
@@ -802,7 +802,7 @@
       </xsl:variable>
 
       <!-- insert first row -->
-      <xsl:apply-templates select="child::table:table-row[1]" mode="sheet">
+      <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
         <xsl:with-param name="rowNumber">1</xsl:with-param>
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
         <xsl:with-param name="sheetId" select="$sheetId"/>
