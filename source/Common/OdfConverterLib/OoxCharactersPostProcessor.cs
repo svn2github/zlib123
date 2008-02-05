@@ -195,9 +195,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             //Image Cropping Calculation Added by Sonata-15/11/2007
             else if (text.Contains("image-properties"))
             {
-
                 EvalImageCropping(text);
-
+            }
+            //Callout Adjustments Calculation Added by Sonata
+            else if (text.Contains("Callout-DirectAdj"))
+            {
+                this.nextWriter.WriteString(EvalCalloutAdjsExpn(text));
             }
             else
             {
@@ -212,10 +215,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          */
         private string EvalExpression(string text)
         {
-            string[] arrVal = new string[6];
-            arrVal = text.Split(':');
+            string[] arrVal =  text.Split(':');
+           
             string attVal = "";
-            if (arrVal.Length == 6)
+            if (arrVal.Length >= 6)
             {
                 double x1 = double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
                 double x2 = double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
@@ -298,20 +301,28 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 if (arrVal[1] == "cx")
                 {
+                    if (text.Contains("true"))
+                        cx =Math.Round( cx / 1588);
                     attVal = cx.ToString();
                 }
                 if (arrVal[1] == "cy")
                 {
+                    if (text.Contains("true"))
+                        cy =  Math.Round( cy / 1588);
                     attVal = cy.ToString();
                 }
                 if (arrVal[1] == "x")
                 {
                     x = Math.Round(xCenter - cx / 2);
+                    if (text.Contains("true"))
+                        x = Math.Round(x / 1588);
                     attVal = x.ToString();
                 }
                 if (arrVal[1] == "y")
                 {
                     y = Math.Round(yCenter - cy / 2);
+                    if (text.Contains("true"))
+                        y = Math.Round(y / 1588);
                     attVal = y.ToString();
 
                 }
@@ -715,6 +726,156 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             WriteEndAttribute();
         }
         //end
+
+        private string EvalCalloutAdjsExpn(string text)
+        {
+            string[] arrVal = new string[10];
+            arrVal = text.Split(':');
+            string val1 = "";
+
+            string callAdj = (arrVal[0].ToString());
+
+            double CX = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+            double CY = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+            double X = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+            double Y = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+            string mirrorH = (arrVal[5]);
+            string mirrorV = (arrVal[6]);
+            double angle = Double.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
+
+            double viewDX = 0.0;
+            double viewDY = 0.0;
+            if (arrVal[8] != "")
+            {
+                viewDX = Double.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
+            }
+            if (arrVal[9] != "")
+            {
+                viewDY = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            CX = (360000.00 * CX);
+            CY = (360000.00 * CY);
+
+            X = (360000.00 * X);
+            Y = (360000.00 * Y);
+
+            int flipH;
+            if (arrVal[5].ToString().Trim() == "true")
+            {
+                flipH = 1;
+            }
+            else
+            {
+                flipH = 0;
+            }
+
+            int flipV;
+            if (arrVal[6].ToString().Trim() == "true")
+            {
+                flipV = 1;
+            }
+            else
+            {
+                flipV = 0;
+            }
+
+            double xCenter = (X + CX / 2);
+            double yCenter = (Y + CY / 2);
+
+            double xCtrBy2;
+            if (flipH == 1)
+            {
+                xCtrBy2 = ((-1) * (CX / 2));
+            }
+            else
+            {
+                xCtrBy2 = (CX / 2);
+            }
+
+            double yCtrBy2;
+            if (flipV == 1)
+            {
+                yCtrBy2 = ((-1) * (CY / 2));
+            }
+            else
+            {
+                yCtrBy2 = (CY / 2);
+            }
+
+            double ang;
+            if (angle < 0)
+            {
+                ang = (-1 * angle);
+            }
+            else
+            {
+                ang = angle;
+            }
+
+            if (callAdj.ToString().Trim() == "Callout-DirectAdj1fmla1")
+            {
+                double X1;
+                X1 = (xCenter - Math.Cos(ang) * xCtrBy2 + Math.Sin(ang) * yCtrBy2);
+
+                double X2;
+                X2 = (xCenter + Math.Cos(ang) * xCtrBy2 - Math.Sin(ang) * yCtrBy2);
+
+                X1 = Math.Round((X1 / 360000), 3);
+
+                X2 = Math.Round((X2 / 360000), 3);
+
+                double width;
+                width = (X2 - X1);
+
+                double viewWidth = 21600;
+
+                double dxFinal;
+                dxFinal = (width * (viewDX / viewWidth));
+
+                double dxPos;
+                dxPos = (dxFinal - width / 2);
+
+                double fml1;
+                fml1 = (dxPos / width * 100000);
+
+                int FML1 = (int)fml1;
+
+                val1 = string.Concat("val" + " " + FML1.ToString());
+            }
+
+            if (callAdj.ToString().Trim() == "Callout-DirectAdj2fmla2")
+            {
+                double Y1;
+                Y1 = (yCenter - Math.Sin(ang) * xCtrBy2 - Math.Cos(ang) * yCtrBy2);
+
+                double Y2;
+                Y2 = (yCenter + Math.Sin(ang) * xCtrBy2 + Math.Cos(ang) * yCtrBy2);
+
+                Y1 = Math.Round((Y1 / 360000), 3);
+
+                Y2 = Math.Round((Y2 / 360000), 3);
+
+                double height;
+                height = (Y2 - Y1);
+
+                double viewHeight = 21600;
+
+                double dyFinal;
+                dyFinal = (height * (viewDY / viewHeight));
+
+                double dyPos;
+                dyPos = (dyFinal - height / 2);
+
+                double fml2;
+                fml2 = (dyPos / height * 100000);
+
+                int FML2 = (int)fml2;
+
+                val1 = string.Concat("val" + " " + FML2.ToString());
+            }
+            return val1.ToString();
+        }
 
         public void WriteStoredRun()
         {

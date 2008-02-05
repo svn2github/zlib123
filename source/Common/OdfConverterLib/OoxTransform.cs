@@ -74,7 +74,8 @@ namespace OdfConverter.Transforms {
 
         public OoxTransform(long xmlChx, long xmlChy, long xmlChcx, long xmlChcy,
                             long xmlX, long xmlY, long xmlCx, long xmlCy,
-                            long xmlRot, long xmlFlipH, long xmlFlipV) {
+                              long xmlRot, long xmlFlipH, long xmlFlipV)
+        {
             // 1. Scale the values
             double chx      = ((double)xmlChx) / 360000.0;
             double chy      = ((double)xmlChy) / 360000.0;
@@ -93,8 +94,8 @@ namespace OdfConverter.Transforms {
             _y              = chy;
             _cx             = chcx;
             _cy             = chcy;
-            _scaleX         = cx / chcx;
-            _scaleY         = cy / chcy;
+            _scaleX = SafeScale(cx, chcx);
+            _scaleY = SafeScale(cy, chcy);
             _rot            = rot;
             _flipH          = flipH;
             _flipV          = flipV;
@@ -102,7 +103,35 @@ namespace OdfConverter.Transforms {
         }
 
         private const double TwoPI = 2.0 * Math.PI;
-
+        public static OoxTransform CreateLine(long xmlX, long xmlY, long xmlCx, long xmlCy, long xmlRot, long xmlFlipH, long xmlFlipV)
+        {
+            OoxTransform tmp = new OoxTransform(xmlX, xmlY, xmlCx, xmlCy, xmlRot, xmlFlipH, xmlFlipV);
+            double x1, y1;
+            tmp.Transform(tmp._x, tmp._y, out x1, out y1);
+            double x2, y2;
+            tmp.Transform(tmp._x + tmp._cx, tmp._y + tmp._cy, out x2, out y2);
+            long newX1 = (long)(x1 * 360000.0);
+            long newY1 = (long)(y1 * 360000.0);
+            long newX2 = ((long)(x2 * 360000.0));
+            long newY2 = ((long)(y2 * 360000.0));
+            long newFlipH = 1;
+            long newFlipV = 1;
+            if (newX1 > newX2)
+            {
+                long tmpX = newX2;
+                newX2 = newX1;
+                newX1 = tmpX;
+                newFlipH = -1;
+            }
+            if (newY1 > newY2)
+            {
+                long tmpY = newY2;
+                newY2 = newY1;
+                newY1 = tmpY;
+                newFlipV = -1;
+            }
+            return new OoxTransform(newX1, newY1, newX2 - newX1, newY2 - newY1, 0, newFlipH, newFlipV);
+        }
         private double Normalize(double angle) {
             if (angle >= 0) {
                 // First, take a "modulo"
@@ -119,7 +148,17 @@ namespace OdfConverter.Transforms {
             }
             return angle;
         }
-
+        private static double SafeScale(double num, double denom)
+        {
+            if (denom == 0.0)
+            {
+                return 1;
+            }
+            else
+            {
+                return num / denom;
+            }
+        }
         public OoxTransform(OoxTransform outer, OoxTransform inner) {
             // Get the Bounding box of the most inner transformation
             _x = inner.X;
@@ -147,18 +186,22 @@ namespace OdfConverter.Transforms {
 
         private void CreateMatrix(double Bx, double By, double Dx, double Dy, double B1x, double B1y,
                             double D1x, double D1y, double teta, double Fx, double Fy) {
+          
             TransformationMatrix scaleTranslate = new TransformationMatrix(
-                D1x / Dx, 0.0, B1x - D1x / Dx * Bx,
-                0.0, D1y / Dy, B1y - D1y / Dy * By,
+                 SafeScale(D1x, Dx), 0.0, B1x - SafeScale(D1x, Dx) * Bx,
+                 0.0, SafeScale(D1y, Dy), B1y - SafeScale(D1y, Dy) * By,
                 0.0, 0.0, 1.0);
+            
             TransformationMatrix U = new TransformationMatrix(
                 1.0, 0.0, -(B1x + D1x / 2.0),
                 0.0, 1.0, -(B1y + D1y / 2.0),
                 0.0, 0.0, 1.0);
+            
             TransformationMatrix U1 = new TransformationMatrix(
                 1.0, 0.0, (B1x + D1x / 2.0),
                 0.0, 1.0, (B1y + D1y / 2.0),
                 0.0, 0.0, 1.0);
+            
             TransformationMatrix Tmp1 = new TransformationMatrix(
                 Math.Cos(teta), -Math.Sin(teta), 0.0,
                 Math.Sin(teta), Math.Cos(teta), 0.0,
@@ -178,7 +221,7 @@ namespace OdfConverter.Transforms {
             newY = newPt.Y;
         }
 
-        public string Odf {
+        public virtual string Odf {
             get {
                 double x, y;
                 Transform(_x, _y, out x, out y);
@@ -191,6 +234,19 @@ namespace OdfConverter.Transforms {
                     return string.Format(System.Globalization.CultureInfo.InvariantCulture, "YESROT@{0:F3}cm@{1:F3}cm@rotate ({2}) translate ({3:F3}cm {4:F3}cm)",
                         _cx * _scaleX, _cy * _scaleY, -_rot, x, y);
                 }
+            }
+        }
+        public virtual string LineOdf
+        {
+            get
+            {
+                double x1, y1;
+                Transform(_x, _y, out x1, out y1);
+                double x2, y2;
+                Transform(_x + _cx, _y + _cy, out x2, out y2);
+                return string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:F3}cm@{1:F3}cm@{2:F3}cm@{3:F3}cm",
+                    x1, y1, x2, y2);
+
             }
         }
     }

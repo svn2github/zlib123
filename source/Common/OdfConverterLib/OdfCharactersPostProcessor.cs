@@ -184,6 +184,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 EvalImageCrop(text);
             }
+            //Callout Adjustments Calculation Added by Sonata
+            else if (text.Contains("Callout-Adj"))
+            {
+                this.nextWriter.WriteString(EvalCalloutAdjustment(text));
+            }
             else
             {
                 //added by clam for bug 1785583
@@ -350,6 +355,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             List<OoxShape> _shapes = new List<OoxShape>();
            
             string strRet = "";
+            string strLineRet = "";
             string strShapeCordinates = "";
             string[] arrgroupShape = text.Split('$');
             string[] arrgroup = arrgroupShape[0].Split('@');
@@ -364,6 +370,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             long dblgrpChCX ;
             long dblgrpChCY;
             long dblgrpRot;
+            long dblgrpFlipH;
+            long dblgrpFlipV;
 
             //shape cordinates
             long dblShapeX;
@@ -371,10 +379,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             long dblShapeCX;
             long dblShapeCY;
             long dblShapeRot;
+            long dblShapeFlipH;
+            long dblShapeFlipV;
 
             OoxTransform  TopLevelgroup;
             OoxTransform Targetgroup = new OoxTransform(5495925, 3286125, 1419225, 657225, 0, 1, 1);
             OoxTransform shapeCord;
+            OoxTransform lineCord;
             OoxTransform InnerLevelgroup;
             OoxTransform Tempgroup;
 
@@ -398,6 +409,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                  dblgrpChCX = long.Parse(arrInnerGroup[6], System.Globalization.CultureInfo.InvariantCulture);
                  dblgrpChCY = long.Parse(arrInnerGroup[7], System.Globalization.CultureInfo.InvariantCulture);
                  dblgrpRot = long.Parse(arrInnerGroup[8], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpFlipH = long.Parse(arrInnerGroup[9], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpFlipV = long.Parse(arrInnerGroup[10], System.Globalization.CultureInfo.InvariantCulture);
 
                  TopLevelgroup = new OoxTransform(dblgrpChX, dblgrpChY, dblgrpChCX, dblgrpChCY, dblgrpX, dblgrpY, dblgrpCX, dblgrpCY, dblgrpRot, 1, 1);
 
@@ -417,7 +430,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                      dblgrpChCX = long.Parse(arrInnerGroup[6], System.Globalization.CultureInfo.InvariantCulture);
                      dblgrpChCY = long.Parse(arrInnerGroup[7], System.Globalization.CultureInfo.InvariantCulture);
                      dblgrpRot = long.Parse(arrInnerGroup[8], System.Globalization.CultureInfo.InvariantCulture);
-
+                    dblgrpFlipH = long.Parse(arrInnerGroup[9], System.Globalization.CultureInfo.InvariantCulture);
+                 dblgrpFlipV = long.Parse(arrInnerGroup[10], System.Globalization.CultureInfo.InvariantCulture);
                      InnerLevelgroup = new OoxTransform(dblgrpChX, dblgrpChY, dblgrpChCX, dblgrpChCY, dblgrpX, dblgrpY, dblgrpCX, dblgrpCY, dblgrpRot, 1, 1);
 
                      Targetgroup =new  OoxTransform(Tempgroup, InnerLevelgroup);
@@ -434,11 +448,27 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                  dblShapeCX = long.Parse(arrShapeCordinates[3], System.Globalization.CultureInfo.InvariantCulture);
                  dblShapeCY = long.Parse(arrShapeCordinates[4], System.Globalization.CultureInfo.InvariantCulture);
                  dblShapeRot = long.Parse(arrShapeCordinates[5], System.Globalization.CultureInfo.InvariantCulture);
+                 dblShapeFlipH = long.Parse(arrShapeCordinates[6], System.Globalization.CultureInfo.InvariantCulture);
+                 dblShapeFlipV = long.Parse(arrShapeCordinates[7], System.Globalization.CultureInfo.InvariantCulture);
+                 if (arrgroupShape[1].Contains("Line"))
+                 {
+                     if (dblShapeFlipH == 0)
+                         dblShapeFlipH = -1;
+                     if (dblShapeFlipV == 0)
+                         dblShapeFlipV = -1;
+                 }
 
                  _shapes.Clear();
-
+                 if (arrgroupShape[1].Contains("Line"))
+                 {
+                     shapeCord = OoxTransform.CreateLine(dblShapeX, dblShapeY, dblShapeCX, dblShapeCY, dblShapeRot, dblShapeFlipH, dblShapeFlipV);
+                 }
+                 else
+                 {
                  shapeCord = new OoxTransform(dblShapeX, dblShapeY, dblShapeCX, dblShapeCY, dblShapeRot, 1, 1);
+                 }
 
+        
                  _shapes.Add(new OoxShape(new OoxTransform(Targetgroup, shapeCord)));
 
             }
@@ -467,10 +497,26 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 dblShapeCX = long.Parse(arrShapeCordinates[3], System.Globalization.CultureInfo.InvariantCulture);
                 dblShapeCY = long.Parse(arrShapeCordinates[4], System.Globalization.CultureInfo.InvariantCulture);
                 dblShapeRot = long.Parse(arrShapeCordinates[5], System.Globalization.CultureInfo.InvariantCulture);
+                dblShapeFlipH = long.Parse(arrShapeCordinates[6], System.Globalization.CultureInfo.InvariantCulture);
+                dblShapeFlipV = long.Parse(arrShapeCordinates[7], System.Globalization.CultureInfo.InvariantCulture);
 
+                if (arrgroupShape[1].Contains("Line"))
+                {
+                    if (dblShapeFlipH == 0)
+                        dblShapeFlipH = -1;
+                    if (dblShapeFlipV == 0)
+                        dblShapeFlipV = -1;
+                }
                 _shapes.Clear();
 
+                if (arrgroupShape[1].Contains("Line"))
+                {
+                    shapeCord = OoxTransform.CreateLine(dblShapeX, dblShapeY, dblShapeCX, dblShapeCY, dblShapeRot, dblShapeFlipH, dblShapeFlipV);
+                }
+                else
+                {
                 shapeCord = new OoxTransform(dblShapeX, dblShapeY, dblShapeCX, dblShapeCY, dblShapeRot, 1, 1);
+                }
 
                 _shapes.Add(new OoxShape(new OoxTransform(TopLevelgroup, shapeCord)));
 
@@ -479,10 +525,65 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             foreach (OoxShape shape in _shapes)
             {
                 strRet = shape.OoxTransform.Odf;
+                strLineRet = shape.OoxTransform.LineOdf;
             }
          
-            arrFinalRet = strRet.Split('@');
+          
 
+            if (arrgroupShape[1].Contains("Line"))
+            {
+                arrFinalRet = strLineRet.Split('@');
+
+                   if (arrgroup[0].Contains("X1"))
+                    {
+                        if (arrFinalRet[1].Contains("NaN"))
+                        {
+                            strShapeCordinates = "0cm";
+                        }
+                        else
+                        {
+                            strShapeCordinates = arrFinalRet[0];
+                        }
+
+                    }
+                    else if (arrgroup[0].Contains("Y1"))
+                    {
+                        if (arrFinalRet[2].Contains("NaN"))
+                        {
+                            strShapeCordinates = "0cm";
+                        }
+                        else
+                        {
+                            strShapeCordinates = arrFinalRet[1];
+                        }
+                    }
+                    else if (arrgroup[0].Contains("X2"))
+                    {
+                        if (arrFinalRet[3].Contains("NaN"))
+                        {
+                            strShapeCordinates = "0cm";
+                        }
+                        else
+                        {
+                            strShapeCordinates = arrFinalRet[2];
+                        }
+                    }
+                    else if (arrgroup[0].Contains("Y2"))
+                    {
+                        if (arrFinalRet[3].Contains("NaN"))
+                        {
+                            strShapeCordinates = "0cm";
+                        }
+                        else
+                        {
+                            strShapeCordinates = arrFinalRet[3];
+                        }
+                    }
+                }
+                       
+            else
+            {
+            arrFinalRet = strRet.Split('@');
             if (arrFinalRet[0] == "YESROT")
             {
                 if (arrgroup[0].Contains("Width"))
@@ -567,6 +668,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
             }
             }
+            }
+            
 
 
             return strShapeCordinates;
@@ -794,6 +897,102 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         //End
 
+        private string EvalCalloutAdjustment(string text)
+        {
+            string[] arrVal = new string[10];
+            arrVal = text.Split(':');
+
+            double fm1 = 0.0;
+            double fm2 = 0.0;
+            if (arrVal[1] != "")
+            {
+                fm1 = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+            }
+            if (arrVal[2] != "")
+            {
+                fm2 = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            double X = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+            double Y = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+            double CX = Double.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
+            double CY = Double.Parse(arrVal[6], System.Globalization.CultureInfo.InvariantCulture);
+            int flipH = int.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
+            int flipV = int.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
+            double rot = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
+
+            double xCenter = (X + CX / 2);
+            double yCenter = (Y + CY / 2);
+            double ang = ((rot / 60000) * (Math.PI / 180.0));
+
+            double xCtrBy2;
+            if (flipH == 1)
+            {
+                xCtrBy2 = ((-1) * (CX / 2));
+            }
+            else
+            {
+                xCtrBy2 = (CX / 2);
+            }
+
+            double yCtrBy2;
+            if (flipV == 1)
+            {
+                yCtrBy2 = ((-1) * (CY / 2));
+            }
+            else
+            {
+                yCtrBy2 = (CY / 2);
+            }
+
+            double X1;
+            X1 = (xCenter - Math.Cos(ang) * xCtrBy2 + Math.Sin(ang) * yCtrBy2);
+
+            double Y1;
+            Y1 = (yCenter - Math.Sin(ang) * xCtrBy2 - Math.Cos(ang) * yCtrBy2);
+
+            double X2;
+            X2 = (xCenter + Math.Cos(ang) * xCtrBy2 - Math.Sin(ang) * yCtrBy2);
+
+            double Y2;
+            Y2 = (yCenter + Math.Sin(ang) * xCtrBy2 + Math.Cos(ang) * yCtrBy2);
+
+            X1 = Math.Round((X1 / 360000), 3);
+            Y1 = Math.Round((Y1 / 360000), 3);
+            X2 = Math.Round((X2 / 360000), 3);
+            Y2 = Math.Round((Y2 / 360000), 3);
+
+            double width;
+            width = (X2 - X1);
+
+            double height;
+            height = (Y2 - Y1);
+
+            double dxPos;
+            dxPos = (width * fm1 / 100000);
+
+            double dyPos;
+            dyPos = (height * fm2 / 100000);
+
+            double dxFinal;
+            dxFinal = ((width / 2) + dxPos);
+
+            double dyFinal;
+            dyFinal = ((height / 2) + dyPos);
+
+            double viewWidth = 21600;
+            double viewHeight = 21600;
+
+            double viewdxFinal;
+            viewdxFinal = (dxFinal / width * viewWidth);
+
+            double viewdyFinal;
+            viewdyFinal = (dyFinal / height * viewHeight);
+
+            string drawMod;
+            drawMod = string.Concat(viewdxFinal.ToString().Trim() + " " + viewdyFinal.ToString().Trim());
+            return drawMod.ToString();
+        }
 
         // added for Shadow calculation
         private string EvalShadowExpression(string text)
