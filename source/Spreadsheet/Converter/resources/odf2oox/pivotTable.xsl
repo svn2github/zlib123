@@ -1127,12 +1127,37 @@
 
         <xsl:variable name="rowEnd">
           <xsl:for-each select="table:source-cell-range">
+				  <xsl:variable name ="rangeTableName">
+					  <xsl:value-of select ="substring-before(substring-after(@table:cell-range-address,':'),'.')"/>
+				  </xsl:variable>
+				  <xsl:variable name ="countRow">
+					  <xsl:value-of select ="count(./parent::node()/parent::node()/parent::node()/table:table[@table:name=$rangeTableName]//table:table-row)"/>
+				  </xsl:variable>
+				  <xsl:variable name ="countRowRepeat">
+					  <xsl:value-of select ="sum(./parent::node()/parent::node()/parent::node()/table:table[@table:name=$rangeTableName]//table:table-row[@table:number-rows-repeated])"/>
+				  </xsl:variable>
+				  <xsl:variable name ="finalRowNum">
             <xsl:call-template name="GetRowNum">
               <xsl:with-param name="cell">
                 <xsl:value-of
                   select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
               </xsl:with-param>
             </xsl:call-template>
+				  </xsl:variable>
+				  <!--<xsl:value-of select ="number($countRow)"/>-->
+				  <!--<xsl:value-of select ="number($countRow) + number($countRowRepeat)"/>-->
+				  <xsl:if test ="(number($countRow) + number($countRowRepeat)) &lt;= $finalRowNum">
+					  <xsl:value-of select ="number($countRow) + number($countRowRepeat)"/>
+				  </xsl:if>
+				  <xsl:if test ="not((number($countRow) + number($countRowRepeat)) &lt; $finalRowNum)">
+					  <xsl:value-of select ="$finalRowNum"/>
+				  </xsl:if>
+				  <!--<xsl:if test ="number($countRow) &lt;= $finalRowNum">
+				  <xsl:value-of select ="number($countRow) "/>
+			  </xsl:if>
+			  <xsl:if test ="not(number($countRow) &lt; $finalRowNum)">
+				  <xsl:value-of select ="$finalRowNum"/>
+			  </xsl:if>-->
           </xsl:for-each>
         </xsl:variable>
 

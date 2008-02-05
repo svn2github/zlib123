@@ -1629,10 +1629,12 @@ RefNo-2 26-Dec-2007 Sandeep S     1805556   Changes done to include a condition 
                 <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
               </xsl:for-each>
             </xsl:variable>
-
+         <!-- Code Added By Sateesh Reddy Date:01-Feb-2008  -->
+            <xsl:if test="($cellFormats + $cellStyles + $multilineNumber - 1) != ''">
             <xsl:attribute name="s">
               <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber - 1"/>
             </xsl:attribute>
+            </xsl:if>
           </xsl:when>
 
           <!-- if it is a hyperlink  in the cell-->
@@ -1664,9 +1666,12 @@ RefNo-2 26-Dec-2007 Sandeep S     1805556   Changes done to include a condition 
                     <xsl:number count="table:table-cell[descendant::text:a]"
                       level="any"/>
                   </xsl:variable>
+                  <!-- Code Added By Sateesh Reddy Date:01-Feb-2008  -->
+                  <xsl:if test="($CountStyleTableCell + $styleFontsCount + $hyperlinkId)!= ''">
                   <xsl:attribute name="s">
                       <xsl:value-of select="$CountStyleTableCell + $styleFontsCount + $hyperlinkId"/>
                   </xsl:attribute>
+                  </xsl:if>
                 </xsl:otherwise>
               </xsl:choose>
 
@@ -1730,9 +1735,12 @@ RefNo-2 26-Dec-2007 Sandeep S     1805556   Changes done to include a condition 
                     </xsl:for-each>
                   </xsl:otherwise>
                   </xsl:choose-->
+                <!--Code Added By Sateesh Reddy Date:01-Feb-2008 -->
+                <xsl:if test="parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style/@style:name=@table:style-name and @table:style-name !=''">
                 <xsl:attribute name="style-number-change-post">
                   <xsl:value-of select="@table:style-name"/>
                 </xsl:attribute>
+                </xsl:if>
               </xsl:when>
               <!-- when style is specified in column -->
               <xsl:when test="$columnCellStyle != '' ">

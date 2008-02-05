@@ -577,30 +577,12 @@
            <xsl:value-of select="substring-before($result,',')"/>    
            </xsl:if>
          </xsl:when>
-         <xsl:when test="contains($result,':')">
-           <xsl:variable name="var_Result">
-             <xsl:value-of select="substring-after($result,':')"/>
-           </xsl:variable>
-             <xsl:variable name="var_Result1">
-               <xsl:value-of select="substring-after($var_Result,'$')"/>
-             </xsl:variable>
-             <xsl:variable name="var_Result2">
-               <xsl:value-of select="substring-after($var_Result1,'$')"/>
-             </xsl:variable>
-             <xsl:if test="$var_Result2 != ''">
-               <xsl:value-of select="$result"/>
-             </xsl:if>
-             <xsl:if test="$var_Result2 = ''">
-               <xsl:value-of select="substring-before($result,':')"/>
-             </xsl:if>
-         </xsl:when>
-         <xsl:otherwise>
+          <xsl:otherwise>
             <xsl:value-of select="$result"/>
          </xsl:otherwise>
        </xsl:choose>      
        
-       
-     </xsl:otherwise>
+       </xsl:otherwise>
      
    </xsl:choose>
     

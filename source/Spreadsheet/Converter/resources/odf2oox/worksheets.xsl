@@ -1055,7 +1055,6 @@
       <pageMargins left="0.78740157480314965" right="0.70866141732283472" top="0.74803149606299213"
         bottom="0.74803149606299213" header="0.31496062992125984" footer="0.31496062992125984">
         <xsl:if test="@fo:margin-left">
-          <xsl:attribute name="left">
             <!-- 1 inch = 1440 twips -->
             <xsl:variable name="twips">
               <xsl:call-template name="ConvertMeasure">
@@ -1065,14 +1064,22 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
+          <!-- Code Added By Sateesh Reddy  Date:01-Feb-2008-->
+          <xsl:variable name="var_left">
             <xsl:value-of select="$twips div 1440"/>
+          </xsl:variable>
+          
+          <xsl:if test="$var_left != 'NaN' ">
+            <xsl:attribute name="left">
+              <xsl:value-of select="$var_left"/>
           </xsl:attribute>
+        </xsl:if>
+          <!-- End -->
         </xsl:if>
 
 
         <xsl:if test="@fo:margin-right">
-          <xsl:attribute name="right">
-            <!-- 1 inch = 1440 twips -->
+          <!-- 1 inch = 1440 twips -->
             <xsl:variable name="twips">
               <xsl:call-template name="ConvertMeasure">
                 <xsl:with-param name="length" select="@fo:margin-right"/>
@@ -1081,8 +1088,17 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
+         <!-- Code Added By Sateesh Reddy  Date:01-Feb-2008-->
+            <xsl:variable name="var_Right">
             <xsl:value-of select="$twips div 1440"/>
+            </xsl:variable>
+
+          <xsl:if test="$var_Right != 'NaN' ">
+            <xsl:attribute name="right">
+              <xsl:value-of select="$var_Right"/>
           </xsl:attribute>
+        </xsl:if>
+        <!-- End -->
         </xsl:if>
 
         <xsl:if test="@fo:margin-top">

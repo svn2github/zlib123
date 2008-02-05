@@ -29,7 +29,7 @@
 <!--
 Modification Log
 Log		Date 	Modified   By       BugNo.		MOdification description
-RefNo-1	
+RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: Textbox with hyperlink not properly converted 
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
@@ -549,6 +549,34 @@ RefNo-1
             <xsl:text>1</xsl:text>
           </xsl:attribute>
         </xsl:if>
+         <!--Code added by Sateesh, fix for the bug 1840212
+             (Excel crashes when using the context menu of the picture (e.g. Ungroup or Edit Picture)
+             Date:29th Jan '08-->
+        <a:off>
+          <xsl:attribute name="x">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="@svg:x" />
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="y">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="@svg:y" />
+            </xsl:call-template>
+          </xsl:attribute>
+        </a:off>
+        <a:ext>
+          <xsl:attribute name="cx">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="@svg:width" />
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="cy">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="@svg:height" />
+            </xsl:call-template>
+          </xsl:attribute>
+        </a:ext>
+        <!--End-->
       </a:xfrm>
 
       <a:prstGeom prst="rect">
@@ -650,7 +678,10 @@ RefNo-1
   </xsl:template>
 
   <xsl:template match="text()" mode="text-box">
+    <!--RefNo-1-->
+    <xsl:if test=". != 'click here for the link'">
     <xsl:value-of select="."/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="text:s" mode="text-box">
