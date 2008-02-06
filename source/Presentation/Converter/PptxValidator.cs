@@ -121,7 +121,7 @@ namespace Sonata.OdfConverter.Presentation
             }
             catch (ZipException e)
             {
-                throw new NotAnOoxDocumentException("Problem opening the pptx file" + e.Message);
+                throw new NotAnOoxDocumentException("Problem opening the pptx file : " + e.Message);
             }
             catch (Exception e)
             {
