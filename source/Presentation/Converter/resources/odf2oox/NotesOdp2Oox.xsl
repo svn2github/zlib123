@@ -249,24 +249,7 @@ Copyright (c) 2007, Sonata Software Limited
                             </xsl:call-template>
                           </xsl:if>
                         </xsl:if>
-                        <!-- Added by lohith - bug fix 1731885 -->
-                        <xsl:if test="not(node())">
-                          <a:endParaRPr lang="en-US" smtClean="0">
-                            <!--Font Size -->
-                            <xsl:variable name ="textId">
-                              <xsl:value-of select ="@text:style-name"/>
-                            </xsl:variable>
-                            <xsl:if test ="not($textId ='')">
-                              <xsl:call-template name ="tmpfontStyles">
-                                <xsl:with-param name ="TextStyleID" select ="$textId" />
-                                <xsl:with-param name ="prClassName" select ="$prClassName"/>
-                                <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
-                              </xsl:call-template>
-                            </xsl:if>
-                          </a:endParaRPr>
-                        </xsl:if>
-
-                      </xsl:when >
+                         </xsl:when >
                       <xsl:when test ="name()='text:line-break'">
                         <xsl:call-template name ="processBR">
                           <xsl:with-param name ="T" select ="@text:style-name" />

@@ -202,6 +202,16 @@ Copyright (c) 2007, Sonata Software Limited
                                 <xsl:with-param name ="master" select ="'1'"/>
                                 <xsl:with-param name="picNo" select="$var_pos" />
                                 <xsl:with-param name ="fileName" select ="'styles.xml'"/>
+                                <xsl:with-param name ="grStyle" >
+                                  <xsl:choose>
+                                    <xsl:when test="./parent::node()/@draw:style-name">
+                                      <xsl:value-of select ="./parent::node()/@draw:style-name"/>
+                                    </xsl:when>
+                                    <xsl:when test="./parent::node()/@presentation:style-name">
+                                      <xsl:value-of select ="./parent::node()/@presentation:style-name"/>
+                                    </xsl:when>
+                                  </xsl:choose>
+                                </xsl:with-param >
                               </xsl:call-template>
                             </xsl:if >
                           </xsl:if >
@@ -281,16 +291,22 @@ Copyright (c) 2007, Sonata Software Limited
                                   <xsl:when test="@presentation:style-name[contains(.,'title')]">
                                     <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
                                     <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+                                      <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
+                                      </xsl:if>
                                     </xsl:for-each>
+                                    
                                   </xsl:when>
                                   <xsl:when test="not(@presentation:style-name[contains(.,'title')])">
                                     <xsl:variable name="var_titleName">
                                       <xsl:value-of select="concat($slideMasterName,'-title')"/>
                                     </xsl:variable>
                                     <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_titleName]/style:graphic-properties">
+                                      <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
+                                      </xsl:if>
                                     </xsl:for-each>
+                                    
                                   </xsl:when>
                                 </xsl:choose>
                               </xsl:when>
@@ -299,7 +315,9 @@ Copyright (c) 2007, Sonata Software Limited
                                   <xsl:when test="@presentation:style-name[contains(.,'outline')]">
                                     <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
                                     <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+                                      <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
+                                      </xsl:if>
                                     </xsl:for-each>
                                   </xsl:when>
                                   <xsl:when test="not(@presentation:style-name[contains(.,'outline')])">
@@ -307,7 +325,9 @@ Copyright (c) 2007, Sonata Software Limited
                                       <xsl:value-of select="concat($slideMasterName,'-outline1')"/>
                                     </xsl:variable>
                                     <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_outlineName]/style:graphic-properties">
+                                      <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
+                                      </xsl:if>
                                     </xsl:for-each>
                                   </xsl:when>
                                 </xsl:choose>
@@ -4579,7 +4599,9 @@ Copyright (c) 2007, Sonata Software Limited
         <!--Line Color-->
         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
         <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+          <xsl:if test="position()=1">
           <xsl:call-template name ="getLineStyle"/>
+          </xsl:if>
         </xsl:for-each>
         <!--End-->
       </p:spPr>
@@ -4795,6 +4817,11 @@ Copyright (c) 2007, Sonata Software Limited
             </a:defRPr>
           </a:lvl1pPr>
         </a:lstStyle>
+        <xsl:call-template name="tmpSMDateTimeText"/>
+      </p:txBody>
+    </p:sp >
+  </xsl:template>
+  <xsl:template name="tmpSMDateTimeText">
         <xsl:for-each select="./draw:text-box">
           <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
             <a:pPr>
@@ -4806,7 +4833,6 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:if test ="name()='text:p'" >
                 <xsl:variable name="paraId" select="@text:style-name"/>
                 <xsl:if test ="child::node()">
-
                   <xsl:for-each select ="node()">
                     <xsl:choose>
                       <xsl:when test ="name()='text:span'">
@@ -4872,17 +4898,31 @@ Copyright (c) 2007, Sonata Software Limited
                           <a:t> </a:t>
                         </a:fld>
                       </xsl:when>
+                  <xsl:when test="not(node())">
+                    <a:r>
+                      <a:rPr lang="en-US" dirty="0" smtClean="0">
+                        <xsl:variable name ="textId">
+                          <xsl:value-of select ="@text:style-name"/>
+                        </xsl:variable>
+                        <xsl:if test ="not($textId ='')">
+                          <xsl:call-template name ="tmpSMfontStyles">
+                            <xsl:with-param name ="TextStyleID" select ="$textId" />
+                          </xsl:call-template>
+                        </xsl:if>
+                      </a:rPr>
+                      <a:t>
+                        <xsl:call-template name ="insertTab" />
+                      </a:t>
+                    </a:r >
+                  </xsl:when>
                     </xsl:choose>
                   </xsl:for-each>
-
                 </xsl:if>
               </xsl:if>
             </xsl:for-each>
           </a:p>
         </xsl:for-each>
-      </p:txBody>
-    </p:sp >
-  </xsl:template>
+       </xsl:template>
   <xsl:template name ="Footer">
     <xsl:param name="slideMasterName"/>
     <xsl:param name ="prId"/>
@@ -4911,7 +4951,9 @@ Copyright (c) 2007, Sonata Software Limited
         <!--Line Color-->
         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
         <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+          <xsl:if test="position()=1">
           <xsl:call-template name ="getLineStyle"/>
+          </xsl:if>
         </xsl:for-each>
         <!--End-->
       </p:spPr>
@@ -5213,7 +5255,9 @@ Copyright (c) 2007, Sonata Software Limited
         <!--Line Color-->
         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
         <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+          <xsl:if test="position()=1">
           <xsl:call-template name ="getLineStyle"/>
+          </xsl:if>
         </xsl:for-each>
         <!--End-->
       </p:spPr>

@@ -177,12 +177,38 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="shapeName" select="$shapeName" />
                 <xsl:with-param name ="customShape" select ="'true'" />
                 <xsl:with-param name ="shapeCount" select="$var_pos" />
-              <xsl:with-param name ="grpFlag" select="$grpFlag" />
+                <xsl:with-param name ="grpFlag" select="$grpFlag" />
                 <xsl:with-param name ="UniqueId" select="generate-id()" />
                 <!--<xsl:with-param name ="NvPrId" select="$NvPrId" />-->
               </xsl:call-template>
             </xsl:if>
-          <!--</xsl:for-each>-->
+			<xsl:if test="draw:enhanced-geometry/@draw:type='fontwork-plain-text' or
+						  draw:enhanced-geometry/@draw:type='fontwork-wave' or
+						  draw:enhanced-geometry/@draw:type='fontwork-fade-up-and-right' or 
+						  draw:enhanced-geometry/@draw:type='fontwork-inflate' or
+						  draw:enhanced-geometry/@draw:type='fontwork-curve-up' or
+						  draw:enhanced-geometry/@draw:type='fontwork-slant-up' or
+						  draw:enhanced-geometry/@draw:type='fontwork-fade-up' or
+						  draw:enhanced-geometry/@draw:type='fontwork-chevron-up' or
+						  draw:enhanced-geometry/@draw:type='fontwork-triangle-down' or
+						  draw:enhanced-geometry/@draw:type='fontwork-curve-down' or
+						  draw:enhanced-geometry/@draw:type='fontwork-arch-down-pour' or 
+						  draw:enhanced-geometry/@draw:type='fontwork-arch-up-curve' or
+						  draw:enhanced-geometry/@draw:type='fontwork-fade-down' or
+						  draw:enhanced-geometry/@draw:type='fontwork-triangle-up' or
+						  draw:enhanced-geometry/@draw:type='fontwork-fade-right' or 
+						  draw:enhanced-geometry/@draw:type='fontwork-stop' or
+						  draw:enhanced-geometry/@draw:type='fontwork-chevron-down' or
+						  draw:enhanced-geometry/@draw:type='fontwork-arch-up-pour' or
+						  draw:enhanced-geometry/@draw:type='fontwork-circle-pour' or
+						  draw:enhanced-geometry/@draw:enhanced-path='V 0 0 21600 21600 ?f2 ?f3 ?f2 ?f4 N'">
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="fileName" select ="'content.xml'"/>
+					<xsl:with-param name ="shapeName" select="'TextBox '" />
+					<xsl:with-param name ="shapeCount" select="$var_pos" />
+				</xsl:call-template>
+				<!--</xsl:for-each>-->
+			</xsl:if>
         </xsl:when>
         <xsl:when test ="name()='draw:line'">
         <!--<xsl:for-each select=".">-->
@@ -519,7 +545,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name="shapeType" select="name()" />
                 <xsl:with-param name ="shapeCount" select="$shapeCount" />
                 <xsl:with-param name ="grpFlag" select="$grpFlag" />
-
+                <xsl:with-param name ="UniqueId" select="$UniqueId" />
                 <xsl:with-param name ="gr" >
                   <xsl:if test ="parent::node()/@draw:style-name">
                     <xsl:value-of select ="parent::node()/@draw:style-name"/>
@@ -541,6 +567,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="fileName" select ="$fileName" />
               <xsl:with-param name="shapeType" select="name()" />
               <xsl:with-param name ="shapeCount" select="$shapeCount" />
+              <xsl:with-param name ="UniqueId" select="$UniqueId" />
               <xsl:with-param name ="grpFlag" select="$grpFlag" />
               <xsl:with-param name ="gr" >
                 <xsl:if test ="@draw:style-name">
@@ -898,13 +925,13 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select ="concat('cxnSp:x:',$x1, ':',
 																   $x2, ':', 
 																   $y1, ':', 
-																   $y2)"/>
+																   $y2,':',$grpFlag)"/>
             </xsl:attribute>
             <xsl:attribute name ="y">
               <xsl:value-of select ="concat('cxnSp:y:',$x1, ':',
 																   $x2, ':', 
 																   $y1, ':', 
-																   $y2)"/>
+																  $y2,':',$grpFlag)"/>
             </xsl:attribute>
           </a:off>
           <a:ext>
@@ -912,13 +939,13 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select ="concat('cxnSp:cx:',$x1, ':',
 																   $x2, ':', 
 																   $y1, ':', 
-																   $y2)"/>
+																  $y2,':',$grpFlag)"/>
             </xsl:attribute>
             <xsl:attribute name ="cy">
               <xsl:value-of select ="concat('cxnSp:cy:',$x1, ':',
 																   $x2, ':', 
 																   $y1, ':', 
-																   $y2)"/>
+																  $y2,':',$grpFlag)"/>
             </xsl:attribute>
 
           </a:ext>
@@ -966,6 +993,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="grpFlag"/>
     <xsl:param name ="UniqueId"  />
     <xsl:for-each select ="document($fileName)//office:automatic-styles/style:style[@style:name=$gr]/style:graphic-properties">
+      <xsl:if test="position()=1">
       <!-- Parent style name-->
       <!--FILL-->
       <xsl:variable name="parentStyle" select="./parent::node()/@style:parent-style-name"/>
@@ -997,7 +1025,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:if>
         </xsl:when>
       </xsl:choose>
-	
+      </xsl:if>
     </xsl:for-each>
 
   </xsl:template>
@@ -1280,30 +1308,30 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
-      <!-- Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="contains($prstGeom, 'Rectangular Callout')">
-        <a:prstGeom prst="wedgeRectCallout">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
-      <!-- Rounded Rectangular Callout (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="contains($prstGeom, 'wedgeRoundRectCallout')">
-        <a:prstGeom prst="wedgeRoundRectCallout">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
-      <!-- Oval Callout (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="contains($prstGeom, 'wedgeEllipseCallout')">
-        <a:prstGeom prst="wedgeEllipseCallout">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
-      <!-- Cloud Callout (Added by A.Mathi as on 23/07/2007) -->
-      <xsl:when test ="contains($prstGeom, 'Cloud Callout')">
-        <a:prstGeom prst="cloudCallout">
-          <a:avLst/>
-        </a:prstGeom>
-      </xsl:when>
+		<!-- Rectangular Callout (modified by A.Mathi) -->
+		<xsl:when test ="contains($prstGeom, 'Rectangular Callout')">
+			<xsl:call-template name="tmpCalloutAdjustment">
+				<xsl:with-param name="prst" select="'wedgeRectCallout'"/>
+								</xsl:call-template>
+		</xsl:when>
+		<!-- Rounded Rectangular Callout (modified by A.Mathi) -->
+		<xsl:when test ="contains($prstGeom, 'wedgeRoundRectCallout')">
+			<xsl:call-template name="tmpCalloutAdjustment">
+				<xsl:with-param name="prst" select="'wedgeRoundRectCallout'"/>
+								</xsl:call-template>
+		</xsl:when>
+		<!-- Oval Callout (modified by A.Mathi) -->
+		<xsl:when test ="contains($prstGeom, 'wedgeEllipseCallout')">
+			<xsl:call-template name="tmpCalloutAdjustment">
+				<xsl:with-param name="prst" select="'wedgeEllipseCallout'"/>
+								</xsl:call-template>
+		</xsl:when>
+		<!-- Cloud Callout (modified by A.Mathi) -->
+		<xsl:when test ="contains($prstGeom, 'Cloud Callout')">
+			<xsl:call-template name="tmpCalloutAdjustment">
+				<xsl:with-param name="prst" select="'cloudCallout'"/>
+								</xsl:call-template>
+		</xsl:when>
       <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
       <xsl:when test ="contains($prstGeom, 'bentArrow')">
         <a:prstGeom prst="bentArrow">
@@ -1316,6 +1344,36 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
+		<!-- Quad Arrow -->
+		<xsl:when test ="contains($prstGeom, 'Quad Arrow')">
+			<a:prstGeom prst="quadArrow">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Block Arc -->
+		<xsl:when test ="contains($prstGeom, 'Block Arc')">
+			<a:prstGeom prst="blockArc">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Notched Right Arrow -->
+		<xsl:when test ="contains($prstGeom, 'notchedRightArrow')">
+			<a:prstGeom prst="notchedRightArrow">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Pentagon -->
+		<xsl:when test ="contains($prstGeom, 'Pentagon')">
+			<a:prstGeom prst="homePlate">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Chevron -->
+		<xsl:when test ="contains($prstGeom, 'Chevron')">
+			<a:prstGeom prst="chevron">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
 
 		<!--Equation Shapes-->
 		<!--Not Equal-->
@@ -1451,6 +1509,79 @@ Copyright (c) 2007, Sonata Software Limited
 				<a:avLst/>
 			</a:prstGeom>
 		</xsl:when>
+		<!-- Heptagon -->
+		<xsl:when test ="contains($prstGeom, 'Heptagon')">
+			<a:prstGeom prst="heptagon">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Decagon -->
+		<xsl:when test ="contains($prstGeom, 'Decagon')">
+			<a:prstGeom prst="decagon">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Dodecagon -->
+		<xsl:when test ="contains($prstGeom, 'Dodecagon')">
+			<a:prstGeom prst="dodecagon">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Half Frame -->
+		<xsl:when test="contains($prstGeom, 'Half Frame')">
+			<a:prstGeom prst="halfFrame">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Pie -->
+		<xsl:when test ="contains($prstGeom, 'Pie')">
+			<a:prstGeom prst="pie">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Frame -->
+		<xsl:when test="contains($prstGeom, 'Frame')">
+			<a:prstGeom prst="frame">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- L-Shape -->
+		<xsl:when test="contains($prstGeom, 'L-Shape')">
+			<a:prstGeom prst="corner">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Diagonal Stripe -->
+		<xsl:when test="contains($prstGeom, 'Diagonal Stripe')">
+			<a:prstGeom prst="diagStripe">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Plaque -->
+		<xsl:when test="contains($prstGeom, 'Plaque')">
+			<a:prstGeom prst="plaque">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Bevel -->
+		<xsl:when test="contains($prstGeom, 'Bevel')">
+			<a:prstGeom prst="bevel">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Donut -->
+		<xsl:when test="contains($prstGeom, 'Donut')">
+			<a:prstGeom prst="donut">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- TearDrop -->
+		<xsl:when test="contains($prstGeom, 'Teardrop')">
+			<a:prstGeom prst="teardrop">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		
       <!-- Rectangles -->
       <xsl:when test ="(contains($prstGeom, 'Rectangle')) or (contains($prstGeom, 'TextBox'))">
         <a:prstGeom prst="rect">
@@ -1662,6 +1793,49 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
       </xsl:when>
+		<!-- Action Buttons Back or Previous -->
+		<xsl:when test ="contains($prstGeom, 'actionButtonBackPrevious')">
+			<a:prstGeom prst="actionButtonBackPrevious">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Action Buttons Forward or Next -->
+		<xsl:when test ="contains($prstGeom, 'actionButtonForwardNext')">
+			<a:prstGeom prst="actionButtonForwardNext">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Action Buttons Beginning -->
+		<xsl:when test ="contains($prstGeom, 'actionButtonBeginning')">
+			<a:prstGeom prst="actionButtonBeginning">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Action Buttons end -->
+		<xsl:when test ="contains($prstGeom, 'actionButtonEnd')">
+			<a:prstGeom prst="actionButtonEnd">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Action Buttons Home -->
+		<xsl:when test ="contains($prstGeom, 'actionButtonHome')">
+			<a:prstGeom prst="actionButtonHome">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Action Buttons Information -->
+		<xsl:when test ="contains($prstGeom, 'actionButtonInformation')">
+			<a:prstGeom prst="actionButtonInformation">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		<!-- Action Buttons Return -->
+		<xsl:when test ="contains($prstGeom, 'actionButtonReturn')">
+			<a:prstGeom prst="actionButtonReturn">
+				<a:avLst/>
+			</a:prstGeom>
+		</xsl:when>
+		
     </xsl:choose>
   </xsl:template>
   <!-- Get fill details-->
@@ -2417,6 +2591,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="stroke-dash" />
     <xsl:if test ="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
       <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
+        <xsl:if test="position()=1">
         <xsl:variable name="Unit1">
           <xsl:call-template name="getConvertUnit">
             <xsl:with-param name="length" select="@draw:dots1-length"/>
@@ -2516,6 +2691,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:value-of select ="'sysDash'" />
         </xsl:otherwise>
       </xsl:choose>
+        </xsl:if>
       </xsl:for-each>
     </xsl:if >
       <xsl:if test ="not(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash])">
@@ -2946,6 +3122,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="gr" />
     <xsl:param name ="shapeName" />
     <xsl:param name ="grpFlag" />
+    <xsl:param name ="UniqueId" />
     <!--<xsl:param name ="ShapeType" />-->
     <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
     <xsl:param name ="masterPageName"/>
@@ -3024,6 +3201,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="paraId"  select="@text:style-name"/>
               <xsl:with-param name ="isBulleted" select ="'false'"/>
               <xsl:with-param name ="level" select ="'0'"/>
+              <xsl:with-param name ="grpFlag" select ="$grpFlag"/>
               <xsl:with-param name="framePresentaionStyleId" select="parent::node()/parent::node()/./@presentation:style-name" />
               <xsl:with-param name ="isNumberingEnabled" select ="'false'"/>
               <xsl:with-param name ="slideMaster" select ="$fileName"/>
@@ -3034,6 +3212,126 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:for-each select ="child::node()[position()]">
               <xsl:choose >
                 <xsl:when test ="name()='text:span'">
+                  <xsl:choose>
+                    <xsl:when test ="text:page-number">
+                      <a:fld >
+                        <xsl:attribute name ="id">
+                          <xsl:value-of select ="'{763D1470-AB83-4C4C-B3B3-7F0C9DC8E8D6}'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="type">
+                          <xsl:value-of select ="'slidenum'"/>
+                        </xsl:attribute>
+                        <a:rPr lang="en-US" dirty="0" smtClean="0">
+                          <!--Font Size -->
+                          <xsl:variable name ="textId">
+                            <xsl:value-of select ="@text:style-name"/>
+                          </xsl:variable>
+                          <xsl:if test ="not($textId ='')">
+                            <xsl:call-template name ="fontStyles">
+                              <xsl:with-param name ="Tid" select ="$textId" />
+                              <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                              <xsl:with-param name ="slideMaster" select ="$fileName"/>
+                              <xsl:with-param name ="fileName" select ="$fileName"/>
+                              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                              <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+                              <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
+                            </xsl:call-template>
+                          </xsl:if>
+                          <xsl:if test ="$textId =''">
+                            <xsl:variable name ="VarSz">
+                              <xsl:call-template name ="getDefaultFontSize">
+                                <xsl:with-param name ="className" select ="$prClsName"/>
+                              </xsl:call-template >
+                            </xsl:variable>
+                            <xsl:if test ="$VarSz!=''">
+                              <xsl:attribute name ="sz">
+                                <xsl:value-of select ="substring-before($VarSz,'pt')*100"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                          </xsl:if>
+                        </a:rPr>
+                        <a:t>
+                          <xsl:value-of select="."/>
+                        </a:t>
+                      </a:fld>
+                    </xsl:when>
+                    <xsl:when test ="text:date or presentation:date-time" >
+                      <a:fld >
+                        <xsl:attribute name ="id">
+                          <xsl:value-of select ="'{86419996-E19B-43D7-A4AA-D671C2F15715}'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="type">
+                          <xsl:choose >
+                            <xsl:when test ="@style:data-style-name ='D3'">
+                              <xsl:value-of select ="'datetime1'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='D8'">
+                              <xsl:value-of select ="'datetime2'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='D6'">
+                              <xsl:value-of select ="'datetime4'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='D5'">
+                              <xsl:value-of select ="'datetime4'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='D3T2'">
+                              <xsl:value-of select ="'datetime8'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='D3T5'">
+                              <xsl:value-of select ="'datetime8'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='T2'">
+                              <xsl:value-of select ="'datetime10'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='T3'">
+                              <xsl:value-of select ="'datetime11'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='T5'">
+                              <xsl:value-of select ="'datetime12'"/>
+                            </xsl:when>
+                            <xsl:when test ="@style:data-style-name ='T6'">
+                              <xsl:value-of select ="'datetime13'"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select ="'datetime1'"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:attribute>
+                        <a:rPr lang="en-US" dirty="0" smtClean="0">
+                          <!--Font Size -->
+                          <xsl:variable name ="textId">
+                            <xsl:value-of select ="@text:style-name"/>
+                          </xsl:variable>
+                          <xsl:if test ="not($textId ='')">
+                            <xsl:call-template name ="fontStyles">
+                              <xsl:with-param name ="Tid" select ="$textId" />
+                              <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                              <xsl:with-param name ="slideMaster" select ="$fileName"/>
+                              <xsl:with-param name ="fileName" select ="$fileName"/>
+                              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                              <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+                              <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
+                            </xsl:call-template>
+                          </xsl:if>
+                          <xsl:if test ="$textId =''">
+                            <xsl:variable name ="VarSz">
+                              <xsl:call-template name ="getDefaultFontSize">
+                                <xsl:with-param name ="className" select ="$prClsName"/>
+                              </xsl:call-template >
+                            </xsl:variable>
+                            <xsl:if test ="$VarSz!=''">
+                              <xsl:attribute name ="sz">
+                                <xsl:value-of select ="substring-before($VarSz,'pt')*100"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                          </xsl:if>
+                        </a:rPr>
+                        <a:t>
+                          <xsl:value-of select ="."/>
+                        </a:t>
+                      </a:fld>
+                    </xsl:when>
+                    <xsl:otherwise>
                   <xsl:if test="node()">
                     <a:r>
                       <a:rPr lang="en-US" smtClean="0">
@@ -3111,6 +3409,8 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:if>
                     </a:endParaRPr>
                   </xsl:if>
+                  </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:when >
                 <xsl:when test ="name()='text:line-break'">
                   <xsl:call-template name ="processBR">
@@ -3255,13 +3555,22 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select ="$paragraphId"/>
             </xsl:with-param >
             <!-- list property also included-->
-            <xsl:with-param name ="listId">
-              <xsl:value-of select ="@text:style-name"/>
-            </xsl:with-param >
+            <xsl:with-param name ="listId"  select="@text:style-name"/>
             <!-- Parameters added by vijayeta,Set bulleting as true/false,and set level -->
             <xsl:with-param name ="isBulleted" select ="'true'"/>
             <xsl:with-param name ="level" select ="$lvl"/>
+            <xsl:with-param name ="grpFlag" select ="$grpFlag"/>
             <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
+            <xsl:with-param name ="BuImgRel">
+              <xsl:choose>
+                <xsl:when test="$grpFlag='true'">
+                  <xsl:value-of select ="concat($shapeCount,$forCount,$UniqueId)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select ="concat($shapeCount,$forCount)"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param> 
             <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
             <xsl:with-param name ="slideMaster" select ="$fileName"/>
             <xsl:with-param name ="pos" select ="$forCount"/>
@@ -3300,9 +3609,7 @@ Copyright (c) 2007, Sonata Software Limited
           <!--<xsl:copy-of select="$varFrameHyperLinks"/>-->
         </a:p >
         </xsl:when>
-        <!--<xsl:when test ="name()!='text:list' and name()!='text:p'">
-          <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>
-        </xsl:when>-->
+      
       </xsl:choose>
 
     </xsl:for-each>

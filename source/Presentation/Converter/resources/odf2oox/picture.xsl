@@ -51,7 +51,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="master" />
      <xsl:param name="fileName"/>
      <xsl:param name="grpFlag"/>
-
+     <xsl:param name="grStyle"/>
  <xsl:param name ="NvPrId" />
     <!-- warn if Audio or Video -->
     <xsl:message terminate="no">translation.odf2oox.audioVideoTypeImage</xsl:message>
@@ -126,6 +126,13 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
+          <xsl:for-each select ="document('content.xml')//office:automatic-styles/style:style[@style:name=$grStyle]/style:graphic-properties">
+            <xsl:if test="position()=1">
+              <xsl:if test="@draw:color-mode='greyscale'">
+                <a:grayscl />
+              </xsl:if>
+            </xsl:if>
+          </xsl:for-each>
         </a:blip >
         <!--Image cropping-->
         <xsl:variable name="imagePath">
@@ -271,6 +278,22 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:if>
           </xsl:if>
           <xsl:if test="@xlink:href[ contains(.,'wav')] or @xlink:href[ contains(.,'WAV')]">
+            <xsl:choose>
+              <xsl:when test="starts-with(@xlink:href,'/') or starts-with(@xlink:href,'file:///')">
+                <a:audioFile>
+                  <xsl:attribute name ="r:link">
+                    <xsl:value-of select ="$audioSerialNo"/>
+                  </xsl:attribute>
+                </a:audioFile>
+              </xsl:when>
+              <xsl:when test="@xlink:href[contains(.,'http://')] or @xlink:href[contains(.,'https://')]">
+                <a:audioFile>
+                  <xsl:attribute name ="r:link">
+                    <xsl:value-of select ="$audioSerialNo"/>
+                  </xsl:attribute>
+                </a:audioFile>
+              </xsl:when>
+              <xsl:otherwise>
             <a:wavAudioFile>
               <xsl:attribute name ="r:embed">
                 <xsl:value-of select ="$audioSerialNo"/>
@@ -279,6 +302,10 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="'sound1'"/>
               </xsl:attribute>
             </a:wavAudioFile>
+              </xsl:otherwise>
+            </xsl:choose>
+           
+           
           </xsl:if>
         </p:nvPr>
       </p:nvPicPr>
@@ -306,7 +333,9 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:value-of select ="parent::node()/@draw:style-name"/>
     </xsl:param>
     <xsl:for-each select ="document($FileName)//style:style[@style:name=$grProp]/style:graphic-properties">
+      <xsl:if test="position()=1">
         <xsl:call-template name ="getLineStyle"/>
+      </xsl:if>
     </xsl:for-each>    
 
   </xsl:template>
