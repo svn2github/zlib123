@@ -100,6 +100,26 @@ namespace Sonata.OdfConverter.Presentation
                 throw new NotAnOdfDocumentException("Could not convert " + fileName
                                                     + ". Invalid OASIS OpenDocument file");
             }
+
+            // To check content.xml and styles.xml are valid xml document or not
+            //1840172
+            try
+            {
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.XmlResolver = new ZipResolver(fileName);
+                settings.ProhibitDtd = false;
+                doc = new XmlDocument();                
+                XmlReader readerStyle = XmlReader.Create("styles.xml", settings);
+                doc.Load(readerStyle);
+                XmlReader readerContent = XmlReader.Create("content.xml", settings);
+                doc.Load(readerContent);               
+            }
+            catch (Exception e)
+            {
+                throw new NotAnOdfDocumentException(e.Message);
+            }
+            // To check content.xml and styles.xml are valid xml document or not
+            //1840172
         }
 
         protected override void CheckOoxFile(string fileName)
