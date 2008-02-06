@@ -119,6 +119,10 @@ namespace Sonata.OdfConverter.Presentation
             {
                 reader = ZipFactory.OpenArchive(fileName);
             }
+            catch (ZipException e)
+            {
+                throw new NotAnOoxDocumentException("Problem opening the pptx file" + e.Message);
+            }
             catch (Exception e)
             {
                 throw new PptxValidatorException("Problem opening the pptx file : " + e.Message);
