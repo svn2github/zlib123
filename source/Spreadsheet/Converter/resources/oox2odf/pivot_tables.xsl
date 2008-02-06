@@ -265,6 +265,15 @@
 
 
               <!-- insert pilot table source range -->
+              <!--Defect Id       :1803578
+			        * Code Changed by :Sateesh Reddy
+			        * Date            :05th Jan '08
+			        * Description     :This part of code was added because when a PivotCacheDefinition contains external link file is crashing in round trip.
+                                 To avoid crash I added(xsl:if condition) this code.
+				      -->
+              <xsl:if test="not(key('Part',concat('xl/pivotCache/_rels/',substring-after($cacheFile,'/'),'.rels'))//node()[name()='Relationship' and contains(@Type,'externalLinkPath') and @TargetMode])">">
+               
+              
               <xsl:for-each select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition">
                 <xsl:for-each select="e:cacheSource/e:worksheetSource">
                   <xsl:variable name="apos">
@@ -391,6 +400,7 @@
                 </xsl:for-each>
               </xsl:for-each>
 
+              </xsl:if>
               <!-- insert pilot table fields -->
               <xsl:for-each select="e:pageFields/e:pageField">
                 <xsl:choose>

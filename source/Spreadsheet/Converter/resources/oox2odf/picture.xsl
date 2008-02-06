@@ -26,6 +26,11 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+Log		  Date 	     Modified   By       BugNo.		MOdification description
+RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: Textbox with hyperlink not properly converted 
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -343,9 +348,12 @@
                     <xsl:attribute name ="xlink:href">
                       <xsl:value-of select =" $newTarget"/>
                     </xsl:attribute>
-                    <xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>
+                    <!--RefNo-1-->
+                    <!--<xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>-->
+                    <xsl:text>click here for the link</xsl:text>
                   </text:a>
                 </text:p>
+                <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
               </draw:text-box>
             </xsl:when>
             <xsl:otherwise >
@@ -659,6 +667,21 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
+    <!-- Code added by Sateesh, fix for the bug 1840212
+         Date:29th Jan '08-->
+    <xsl:attribute name="svg:width">
+      <xsl:call-template name="ConvertEmu">
+        <xsl:with-param name="length" select="xdr:pic/xdr:spPr/a:xfrm/a:ext/@cx"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="svg:height">
+      <xsl:call-template name="ConvertEmu">
+        <xsl:with-param name="length" select="xdr:pic/xdr:spPr/a:xfrm/a:ext/@cy"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+    <!--End-->
   </xsl:template>
 
   <!-- Insert Picture Style -->

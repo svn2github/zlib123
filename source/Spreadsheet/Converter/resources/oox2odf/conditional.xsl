@@ -82,7 +82,12 @@
   <xsl:template match="e:conditionalFormatting">
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="document"/>
-
+	  <xsl:choose>
+		  <!--Defect Id: 1803593, file 'ilas_EVE_Database_V0.02.xlsx'
+		      Changes Done by: Vijayeta
+			  Date: 10th Jan '08
+			  Databar, colourscales and iconsets not supported in Open Office, hence do not execute this part of code-->
+		  <xsl:when test ="./e:cfRule and not(./e:cfRule[@type= 'dataBar'] or ./e:cfRule[@type= 'colorScale'] or ./e:cfRule[@type= 'iconSet'])">
     <xsl:variable name="colNum">
       <xsl:call-template name="GetColNum">
         <xsl:with-param name="cell">
@@ -210,7 +215,9 @@
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
+		  </xsl:when >
 
+		  </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertConditionalCell">

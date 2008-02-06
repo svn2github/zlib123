@@ -321,7 +321,9 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
     <!--Start of RefNo-4: Commeted the code to get the correct default row style for the sheet with row breaks.
     <xsl:choose>
-      <xsl:when test="key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
+      <xsl:when test="key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks">-->
+    <!--To fix internal defect :3207: Added condition to get the row style for the sheet with row breaks-->
+    <xsl:if test="key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks">
         <style:style
           style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:rowBreaks)}"
           style:family="table-row">
@@ -338,9 +340,9 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
                     </xsl:with-param>
                   </xsl:call-template>
                 </xsl:when>
-                <xsl:otherwise>-->
+                <xsl:otherwise>
     <!-- Excel application default-->
-    <!--<xsl:call-template name="ConvertToCentimeters">
+                  <xsl:call-template name="ConvertToCentimeters">
                     <xsl:with-param name="length" select="'20px'"/>
                   </xsl:call-template>
                 </xsl:otherwise>
@@ -348,9 +350,10 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
             </xsl:attribute>
           </style:table-row-properties>
         </style:style>
-      </xsl:when>
-      <xsl:otherwise>
-      End of RefNo-4-->
+    </xsl:if>
+      <!--</xsl:when>
+      <xsl:otherwise>-->
+      <!--End of RefNo-4-->
     <style:style
       style:name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
       style:family="table-row">

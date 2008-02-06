@@ -31,6 +31,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden note is shown after conversion'.
+RefNo-2 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content missing and 1832335 New line inserted in note content after roundtrip conversions
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -248,12 +249,16 @@ RefNo-1 8-Nov-2007 Sandeep S     1788390   Modification done to fix bug 'hidden 
       </xsl:variable>
       <xsl:choose >
         <xsl:when test ="contains($textContent, '&#xA;')">
+          <!--RefNo-2:Added text:p-->
+          <text:p text:style-name="{generate-id(e:text)}">
           <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
+          </text:p>
         </xsl:when>
         <xsl:otherwise >
-          <!--<text:p text:style-name="{generate-id(e:text)}">-->
+          <!--RefNo-2:Uncommented text:p-->
+          <text:p text:style-name="{generate-id(e:text)}">
           <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
-          <!--</text:p>-->
+          </text:p>
         </xsl:otherwise>
       </xsl:choose>
       <!-- End of modification for the bug 1805599-->

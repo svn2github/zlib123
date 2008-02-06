@@ -328,17 +328,44 @@
     <xsl:attribute name="table:name">
       <xsl:value-of select="translate($checkedName,' ','_')"/>
     </xsl:attribute>
-
+		<!-- Code Changed by: Vijayeta 
+     Bug number:1877156 
+	 Date:29thJAN 
+	 Desc: If the attribute is not a square ref, that is if it does nt containg ':', it lead to infinite loop. Hence a condition added to test it-->
     <xsl:variable name="colStart">
+			<xsl:choose>
+				<xsl:when test ="contains(@ref, ':')">
       <xsl:call-template name="GetColNum">
         <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
       </xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="GetColNum">
+						<xsl:with-param name="cell" select="@ref"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
     </xsl:variable>
-
+		<!-- Code Changed by: Vijayeta 
+     Bug number:1877156 
+	 Date:29thJAN 
+	 Desc: If the attribute is not a square ref, that is if it does nt containg ':', it lead to infinite loop. Hence a condition added to test it-->
     <xsl:variable name="rowStart">
+			<xsl:choose>
+				<xsl:when test ="contains(@ref, ':')">
       <xsl:call-template name="GetRowNum">
         <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
       </xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="GetRowNum">
+						<xsl:with-param name="cell" select="@ref"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+			<!--<xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
+      </xsl:call-template>-->
     </xsl:variable>
 
     <xsl:attribute name="table:target-range-address">
@@ -436,11 +463,26 @@
           <xsl:text>true</xsl:text>
         </xsl:attribute>
       </xsl:if>
-
+			<!-- Code Changed by: Vijayeta 
+     Bug number:1877156 
+	 Date:29thJAN 
+	 Desc: If the attribute is not a square ref, that is if it does nt containg ':', it lead to infinite loop. Hence a condition added to test it-->
       <xsl:variable name="colStart">
+				<xsl:choose>
+					<xsl:when test ="contains(@ref, ':')">
         <xsl:call-template name="GetColNum">
           <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
         </xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="GetColNum">
+							<xsl:with-param name="cell" select="@ref"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+				<!--<xsl:call-template name="GetColNum">
+          <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
+        </xsl:call-template>-->
       </xsl:variable>
 
       <xsl:for-each select="e:sortCondition[not(@customList)]">
@@ -487,20 +529,50 @@
           <xsl:text>true</xsl:text>
         </xsl:attribute>
       </xsl:if>
-
+			<!-- Code Changed by: Vijayeta 
+     Bug number:1877156 
+	 Date:29thJAN 
+	 Desc: If the attribute is not a square ref, that is if it does nt containg ':', it lead to infinite loop. Hence a condition added to test it-->
       <xsl:variable name="rowStart">
+				<xsl:choose>
+					<xsl:when test ="contains(@ref, ':')">
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
         </xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="GetRowNum">
+							<xsl:with-param name="cell" select="@ref"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+				<!--<xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
+        </xsl:call-template>-->
       </xsl:variable>
 
       <xsl:for-each select="e:sortCondition[not(@customList)]">
         <table:sort-by table:data-type="automatic">
-
+					<!-- Code Changed by: Vijayeta 
+     Bug number:1877156 
+	 Date:29thJAN 
+	 Desc: If the attribute is not a square ref, that is if it does nt containg ':', it lead to infinite loop. Hence a condition added to test it-->
           <xsl:variable name="rowNum">
+						<xsl:choose>
+							<xsl:when test ="contains(@ref, ':')">
             <xsl:call-template name="GetRowNum">
               <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
             </xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:call-template name="GetRowNum">
+									<xsl:with-param name="cell" select="@ref"/>
+								</xsl:call-template>
+							</xsl:otherwise>
+						</xsl:choose>
+						<!--<xsl:call-template name="GetRowNum">
+              <xsl:with-param name="cell" select="substring-before(@ref,':')"/>
+            </xsl:call-template>-->
           </xsl:variable>
 
           <xsl:attribute name="table:field-number">

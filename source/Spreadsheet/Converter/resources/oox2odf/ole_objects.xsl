@@ -82,14 +82,18 @@
     </xsl:variable>
 
     <xsl:variable name="ExternalLinkId">
-      <xsl:for-each select="key('Part', $ExternalLink)">
+<!--'key' replaced by document, as ole objects do not get converted with 'key'-->
+      <xsl:for-each select ="document($ExternalLink)">
+        <!--<xsl:for-each select="key('Part', $ExternalLink)">-->
         <xsl:value-of select="e:externalLink/e:oleLink[@progId = $ProgId]/@r:id"/>
       </xsl:for-each>
     </xsl:variable>
 
     <xsl:variable name="XlinkOLEObject">
+<!--'key' replaced by document, as ole objects do not get converted with 'key'-->
 
-      <xsl:for-each select="key('Part', $ExternalLinkRels)//node()[name()='Relationship']">
+      <xsl:for-each select ="document($ExternalLinkRels)//node()[name()='Relationship']">
+        <!--<xsl:for-each select="key('Part', $ExternalLinkRels)//node()[name()='Relationship']">-->
         <xsl:if test="./@Id = $ExternalLinkId">
           <xsl:choose>
             <!--added by chhavi for network path -->

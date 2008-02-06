@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content missing and 1832335 New line inserted in note content after roundtrip conversions                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -1266,6 +1273,9 @@
             <xsl:with-param name="MergeCell">
               <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
+             <!-- Code Added By Sateesh Reddy Date:01-Feb-2008 -->
+            <xsl:with-param name="sheetNr" select="$sheetNr"/>
+            <!-- End -->
             <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
             <xsl:with-param name="headerRowsEnd" select="$headerRowsEnd"/>
             <xsl:with-param name="removeFilter" select="$removeFilter"/>
@@ -2332,7 +2342,7 @@
   <!-- convert run into span -->
   <xsl:template match="e:r">
     <!--RefNo-1: Changes for fixing 1833074 XLSX: Cell Content missing-->
-    <xsl:param name ="textp"/>
+    <!--<xsl:param name ="textp"/>-->
     <!-- 
 	        Bug No.          :1805599
 		    Code Modified By:Vijayeta
@@ -2351,7 +2361,7 @@
         <xsl:value-of select ="concat('SonataAnnotation|',$textContent,'|',$Id)"/>
       </xsl:when>
       <!--Start of RefNo-1-->
-      <xsl:when test ="$textp='T'">
+      <!--<xsl:when test ="$textp='T'">
         <text:span>
           <xsl:if test="e:rPr">
             <xsl:attribute name="text:style-name">
@@ -2360,10 +2370,11 @@
           </xsl:if>
           <xsl:apply-templates/>
         </text:span>
-      </xsl:when>
+      </xsl:when>-->
       <!--End of RefNo-1-->
       <xsl:otherwise >
-        <text:p text:style-name="{generate-id(./parent::node())}">
+        <!--RefNo-1:Commented
+        <text:p text:style-name="{generate-id(./parent::node())}">-->
           <text:span>
             <xsl:if test="e:rPr">
               <xsl:attribute name="text:style-name">
@@ -2372,7 +2383,7 @@
             </xsl:if>
             <xsl:apply-templates/>
           </text:span>
-        </text:p >
+        <!--</text:p >-->
       </xsl:otherwise>
     </xsl:choose>
     <!-- End of modification for the bug 1805599-->

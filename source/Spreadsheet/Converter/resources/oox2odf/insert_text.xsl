@@ -26,6 +26,13 @@
       * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
       * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content missing and 1832335 New line inserted in note content after roundtrip conversions                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
@@ -115,10 +122,10 @@
               <xsl:choose>
                 <xsl:when test="contains($rSheredStrings, e:v) ">
                   <xsl:for-each select="key('SharedStrings', e:v)">
-                    <xsl:apply-templates>
+                    <xsl:apply-templates/>
                       <!--RefNo-1: Changes for fixing 1833074 XLSX: Cell Content missing-->
-                      <xsl:with-param name ="textp" select ="'T'"/>
-                    </xsl:apply-templates >
+                      <!--<xsl:with-param name ="textp" select ="'T'"/>
+                    </xsl:apply-templates >-->
                   </xsl:for-each>
                 </xsl:when>
                 <xsl:otherwise>

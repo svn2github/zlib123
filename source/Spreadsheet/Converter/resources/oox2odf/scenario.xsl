@@ -168,17 +168,17 @@
 
             <xsl:for-each select="e:inputCells">
                 <xsl:variable name="numCol">
-                    <xsl:call-template name="GetColNum2">
+                    <xsl:call-template name="GetColNum">
                         <xsl:with-param name="cell">
-                            <xsl:value-of select="@oox:p"/>
+                            <xsl:value-of select="@r"/>
                         </xsl:with-param>
                     </xsl:call-template>
                 </xsl:variable>
 
                 <xsl:variable name="numRow">
-                    <xsl:call-template name="GetRowNum2">
+                    <xsl:call-template name="GetRowNum">
                         <xsl:with-param name="cell">
-                            <xsl:value-of select="@oox:p"/>
+                            <xsl:value-of select="@r"/>
                         </xsl:with-param>
                     </xsl:call-template>
                 </xsl:variable>
@@ -243,6 +243,35 @@
 
         </xsl:if>
 
+      <!--Defect Id       :1877274(FileNames:Verpackung.xlsx,Verpackung-E.xlsx,Optimierung.xlsx)
+			  * Code Changed by :Sateesh Reddy
+			  * Date            :05th Jan '08
+				      -->
+      <xsl:variable name="lastRow">
+        <xsl:value-of select="substring-before(substring-after($ScenarioCells, ';'),':')"/>
+      </xsl:variable>
+
+      <xsl:if test="not(contains(concat(';', $ScenarioCells), concat(';', $numRow, ':')))">
+        <xsl:if test="$numRow &lt; $lastRow">
+          <table:table-row>
+            <xsl:attribute name="table:number-rows-repeated">
+              <xsl:value-of select="$lastRow - $numRow"/>
+            </xsl:attribute>
+          </table:table-row>
+          <table:table-row>
+            <xsl:call-template name="InsertCellScenario">
+              <xsl:with-param name="numRow">
+                <xsl:value-of select="$lastRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="ScenarioCells">
+                <xsl:value-of select="$ScenarioCells"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </table:table-row>
+        </xsl:if>
+      </xsl:if>
+
+     
     </xsl:template>
 
     <xsl:template name="InsertCellScenario">
