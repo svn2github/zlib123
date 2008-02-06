@@ -107,6 +107,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     this.nextWriter.WriteString(Convert.ToString(styleCellNumber[text.Substring(0, text.Length - 1)], System.Globalization.CultureInfo.InvariantCulture));
                     //End of RefNo-1 
                 }
+                else if (!styleCellNumber.ContainsKey(text) && text.Equals(text.Substring(0, text.Length / 2) + text.Substring(0, text.Length / 2)))
+                {
+                    //Start of RefNo-1 :for localization and error regarding obj ref not set to an instance of obj.
+                     this.nextWriter.WriteString(Convert.ToString(styleCellNumber[text.Substring(0, text.Length / 2)], System.Globalization.CultureInfo.InvariantCulture));
+                    //End of RefNo-1 
+                }
                 else
                 {
                     //Start of RefNo-1 :for localization and error regarding obj ref not set to an instance of obj.
