@@ -84,15 +84,46 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:variable name ="SlideFileName">
             <xsl:value-of select ="concat(concat('slide',position()),'.xml')"/>
           </xsl:variable>
+          <xsl:variable name ="slideRel">
+            <xsl:value-of select ="concat('ppt/slides/_rels/',$SlideFileName,'.rels')"/>
+          </xsl:variable>
+          <xsl:variable name ="LayoutFileNo">
+            <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
+              <xsl:value-of select ="concat('ppt',substring(.,3))"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:variable name ="newLayout" >
+            <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
+              <xsl:value-of  select ="substring-after(.,'../slideLayouts/')"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:variable name ="LayoutRel" >
+            <xsl:value-of select ="concat('ppt/slideLayouts/_rels/',$newLayout,'.rels')"/>
+          </xsl:variable>
+          <xsl:variable name ="SMName" >
+            <xsl:for-each select ="document($LayoutRel)//node()/@Target[contains(.,'slideMasters')]">
+              <xsl:value-of  select ="substring-after(.,'../slideMasters/')"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:variable name ="SMRel" >
+            <xsl:value-of select ="concat('ppt/slideMasters/_rels/',$SMName,'.rels')"/>
+          </xsl:variable>
+          <xsl:variable name ="ThemeName" >
+            <xsl:for-each select ="document($SMRel)//node()/@Target[contains(.,'theme')]">
+              <xsl:value-of  select="concat('ppt',substring-after(.,'..'))"/>
+            </xsl:for-each>
+          </xsl:variable>
           <xsl:call-template name="tmpGradientFillStyle">
             <xsl:with-param name="FilePath" select="$pageSlide"/>
             <xsl:with-param name="FileName" select="$SlideFileName"/>
             <xsl:with-param name="FileType" select="concat('slide',position())"/>
+            <xsl:with-param name="SMName" select="$SMName"/>
           </xsl:call-template>
           <xsl:call-template name="tmpBGgradientFillStyle">
             <xsl:with-param name="FilePath" select="$pageSlide"/>
             <xsl:with-param name="FileName" select="$SlideFileName"/>
             <xsl:with-param name="FileType" select="concat('slide',position())"/>
+            <xsl:with-param name="SMName" select="$SMName"/>
           </xsl:call-template>
         </xsl:for-each>
 				<xsl:call-template name ="InsertDefaultStyles" />

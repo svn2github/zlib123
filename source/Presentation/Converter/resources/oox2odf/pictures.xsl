@@ -83,7 +83,7 @@ exclude-result-prefixes="p a r xlink rels">
         <xsl:value-of select ="@Target"/>
       </xsl:for-each>
     </xsl:variable >
-    <xsl:if test="not(contains($sourceFile,'http://'))">
+    <xsl:if test="not(contains($sourceFile,'http://') or contains($sourceFile,'https://'))">
     <xsl:variable name ="targetFile">
         <xsl:value-of select ="substring-after(substring-after($sourceFile,'/'),'/')"/>
     </xsl:variable>
@@ -98,7 +98,7 @@ exclude-result-prefixes="p a r xlink rels">
     <draw:frame draw:layer="layout">
       <!--Edited by vipul to get cordinates from Layout-->
 		<xsl:attribute name ="draw:id"	>
-			<xsl:value-of select ="concat('sl',$slideId,'an',./p:nvPicPr/p:cNvPr/@id)"/>
+			<xsl:value-of select ="concat('sldraw',$slideId,'an',./p:nvPicPr/p:cNvPr/@id)"/>
 		</xsl:attribute>
  <xsl:variable  name ="GraphicId">
         <xsl:value-of select ="concat('SLPicture',$slideId,'gr',./p:nvPicPr/p:cNvPr/@id)"/>
@@ -166,6 +166,13 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:for-each>
           </xsl:if>
         </xsl:variable>
+        <xsl:variable name="TargetMode">
+          <xsl:if test="p:nvPicPr/p:nvPr/a:wavAudioFile or p:nvPicPr/p:nvPr/a:audioFile or p:nvPicPr/p:nvPr/a:videoFile ">
+            <xsl:for-each select ="document($slideRel)//node()[@Id = $audioId]">
+              <xsl:value-of select ="@TargetMode"/>
+            </xsl:for-each>
+          </xsl:if>
+        </xsl:variable>
         <xsl:variable name="audioTargetFile">
           <xsl:value-of select ="substring-after(substring-after($audioFile,'/'),'/')"/>
         </xsl:variable>
@@ -179,12 +186,35 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:attribute>-->
             <xsl:if test="not(p:nvPicPr/p:nvPr/a:wavAudioFile)">
               <xsl:attribute name ="xlink:href">
+                <xsl:choose>
+                  <xsl:when test="$TargetMode='External'">
+                    <xsl:choose>
+                      <xsl:when test="contains($audioFile,'file:///')">
+                        <xsl:if test="string-length(substring-after($audioFile,'file:///')) > 0">
+                          <xsl:value-of select ="concat('/',translate(substring-after($audioFile,'file:///'),'\','/'))"/>
+                        </xsl:if>
+                      </xsl:when>
+                      <xsl:when test="contains($audioFile,'http://') or contains($audioFile,'https://')">
+                        <xsl:value-of select ="$audioFile"/>
+                      </xsl:when>
+                    </xsl:choose>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:choose>
+                      <xsl:when test="contains($audioFile,'file:///')">
                 <xsl:if test="string-length(substring-after($audioFile,'file:///')) > 0">
                   <xsl:value-of select ="concat('/',translate(substring-after($audioFile,'file:///'),'\','/'))"/>
                 </xsl:if>
                 <xsl:if test="string-length(substring-after($audioFile,'file:///')) = 0 ">
                   <xsl:value-of select ="concat('../',$audioFile)"/>
                 </xsl:if>
+                      </xsl:when>
+                      <xsl:when test="contains($audioFile,'http://') or contains($audioFile,'https://')">
+                        <xsl:value-of select ="$audioFile"/>
+                      </xsl:when>
+                    </xsl:choose>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:attribute>
             </xsl:if>
             <xsl:if test="p:nvPicPr/p:nvPr/a:wavAudioFile">

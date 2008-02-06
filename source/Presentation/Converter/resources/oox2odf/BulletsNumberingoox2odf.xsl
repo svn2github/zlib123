@@ -37,10 +37,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 				</xsl:attribute>
 				<xsl:attribute name ="text:id" >
 					<xsl:if test ="contains($slideId,'slide')">
-						<xsl:value-of  select ="concat('sl',substring-after($slideId,'slide'),'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+						<xsl:value-of  select ="concat('slText',substring-after($slideId,'slide'),'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
 					</xsl:if>
 					<xsl:if test ="not(contains($slideId,'slide'))">
-						<xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+						<xsl:value-of  select ="concat('slText',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
 					</xsl:if>
 				</xsl:attribute>
 				<!--<xsl:attribute name ="text:id" >
@@ -180,7 +180,17 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     
 		<xsl:if test ="./a:p/a:pPr/@lvl">
 			<xsl:for-each select ="./a:p">
-        <xsl:variable name="var_level" select="a:pPr/@lvl"/>
+        <xsl:variable name="var_level">
+          <xsl:choose>
+            <xsl:when test="a:pPr/@lvl">
+              <xsl:value-of select="a:pPr/@lvl"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'0'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:variable> 
         <xsl:variable name ="nodeName">
         <xsl:choose>
           <xsl:when test="a:pPr/@lvl">
@@ -478,6 +488,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <xsl:if test="not(./@type) or ./@type='body'">
                       <xsl:call-template name ="getBulletForLevelsLayout">
                         <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                        <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
                         <xsl:with-param name ="newTextLvl" select ="$newTextLvl"/>
                         <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
                         <xsl:with-param name ="textColor" select ="$textColor"/>
@@ -741,6 +752,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <xsl:if test="not(./@type) or ./@type='body'">
                       <xsl:call-template name ="getBulletForLevelsLayout">
                         <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                        <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
                         <xsl:with-param name ="newTextLvl" select ="'1'"/>
                         <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
                         <xsl:with-param name ="textColor" select ="$textColor"/>
@@ -1046,6 +1058,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   <xsl:if test="not(./@type) or ./@type='body'">
                     <xsl:call-template name ="getBulletForLevelsLayout">
                       <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                      <xsl:with-param name ="slideLayout" select ="$slideLayout"/>
                       <xsl:with-param name ="newTextLvl" select ="'1'"/>
                       <xsl:with-param name ="levelStyle" select ="$levelStyle"/>
                       <xsl:with-param name ="textColor" select ="$textColor"/>

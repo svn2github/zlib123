@@ -881,7 +881,7 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:when>
             <xsl:when test="name()='p:grpSp'">
               <xsl:variable name ="drawAnimId">
-                <xsl:value-of select ="concat('SL',$SlidePos,'LYTan',p:nvSpPr/p:cNvPr/@id)"/>
+                <xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
               </xsl:variable>
               <xsl:variable name="var_pos" select="position()"/>
               <xsl:variable name="TopLevelgrpCordinates">
@@ -1007,7 +1007,7 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:value-of select ="concat(substring-before($SlideFile,'.xml'),'List',$var_pos)"/>
                     </xsl:variable>
 					          <xsl:variable name ="drawAnimId">
-						  <xsl:value-of select ="concat('sl',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
+						  <xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
 					</xsl:variable>
                     <xsl:variable name="var_textNode">
                       <draw:text-box>
@@ -1099,7 +1099,7 @@ exclude-result-prefixes="p a r xlink rels">
                                       <xsl:value-of select ="concat($ParaId,position())"/>
                                     </xsl:attribute>
                                     <xsl:attribute name ="text:id" >
-                                      <xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+                                      <xsl:value-of  select ="concat('slText',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
                                     </xsl:attribute>
                                     <xsl:for-each select ="node()">
                                       <xsl:if test ="name()='a:r'">
@@ -1218,7 +1218,7 @@ exclude-result-prefixes="p a r xlink rels">
                                     <xsl:value-of select ="concat($ParaId,position())"/>
                                   </xsl:attribute>
                                   <xsl:attribute name ="text:id" >
-                                    <xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+                                    <xsl:value-of  select ="concat('slText',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
                                   </xsl:attribute>
                                   <xsl:for-each select ="node()">
                                     <xsl:if test ="name()='a:r'">
@@ -1321,12 +1321,24 @@ exclude-result-prefixes="p a r xlink rels">
                             </xsl:if>
                           </xsl:if >
                           <xsl:if test ="$LayoutName = 'title' or $LayoutName ='ctrTitle'">
+                            <xsl:choose>
+                              <xsl:when test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
+                                <xsl:call-template name ="insertBulletsNumbersoox2odf">
+                                  <xsl:with-param name ="listStyleName" select ="concat($listStyleName,position())"/>
+                                  <xsl:with-param name ="ParaId" select ="$ParaId"/>
+                                  <!-- parameters 'slideRelationId' and 'slideId' added by lohith - required to set Hyperlinks for bulleted text -->
+                                  <xsl:with-param name="slideRelationId" select="$slideRel" />
+                                  <xsl:with-param name="slideId" select="substring-before($SlideFile,'.xml')" />
+                                  <xsl:with-param name="TypeId" select="$SlideID" />
+                                </xsl:call-template>
+                              </xsl:when>
+                              <xsl:otherwise>
                             <text:p >
                               <xsl:attribute name ="text:style-name">
                                 <xsl:value-of select ="concat($ParaId,position())"/>
                               </xsl:attribute>
                               <xsl:attribute name ="text:id" >
-                                <xsl:value-of  select ="concat('sl',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
+                                    <xsl:value-of  select ="concat('slText',$slideId,'an',parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@id,position())"/>
                               </xsl:attribute>
                               <xsl:for-each select ="node()">
                                 <xsl:if test ="name()='a:r'">
@@ -1424,6 +1436,9 @@ exclude-result-prefixes="p a r xlink rels">
                                 </xsl:if>
                               </xsl:for-each>
                             </text:p>
+                              </xsl:otherwise>
+                            </xsl:choose>
+
                           </xsl:if>
                         </xsl:for-each>
                       </draw:text-box >
@@ -2050,7 +2065,7 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:when>
             <xsl:when test="name()='p:grpSp'">
               <xsl:variable name ="drawAnimId">
-						  <xsl:value-of select ="concat('sl',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
+						  <xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
 					    </xsl:variable>
                <xsl:variable name="var_pos" select="position()"/>
               <xsl:variable name="TopLevelgrpCordinates">
@@ -2382,14 +2397,8 @@ exclude-result-prefixes="p a r xlink rels">
                   <!-- Added by vijayeta, to get the text box number-->
                   <xsl:variable name ="textNumber" select ="./parent::node()/p:nvSpPr/p:cNvPr/@id"/>
                   <!-- Added by vijayeta, to get the text box number-->
-                  <xsl:choose>
-                    <xsl:when test ="./parent::node()/p:spPr/a:prstGeom/@prst or ./parent::node()/child::node()[1]/child::node()[1]/@name[contains(., 'TextBox')] or ./parent::node()/child::node()[1]/child::node()[1]/@name[contains(., 'Text Box')]">
-                      <xsl:value-of select ="concat($SlideNumber,'textboxshape_List',$textNumber)"/>
-                    </xsl:when>
-                    <xsl:otherwise >
-                      <xsl:value-of select ="concat($SlideNumber,'List',$var_pos)"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                  <xsl:value-of select ="concat($SlideNumber,'List',$var_pos)"/>
+                  
                 </xsl:variable>
                 <!-- Added by vijayeta, on 16th july-->
                 <xsl:variable name ="newLayout" >
@@ -2967,10 +2976,13 @@ exclude-result-prefixes="p a r xlink rels">
                          <xsl:with-param name="var_pos" select="concat($var_pos,'-',$pos)"/>
                          <xsl:with-param name="FileType" select="$SlideNumber"/>
                          <xsl:with-param name="flagGroup" select="'True'"/>
+                      <xsl:with-param name="SMName" select="$SMName"/>
                     </xsl:call-template>
                         
                         <!--LINE COLOR-->
-                        <xsl:call-template name ="LineColor" />
+                        <xsl:call-template name ="LineColor">
+                          <xsl:with-param name="SMName" select="$SMName"/>
+                        </xsl:call-template>
                         <!--LINE STYLE-->
                         <xsl:call-template name ="LineStyle"/>
                         <!--TEXT ALIGNMENT-->
@@ -3019,9 +3031,13 @@ exclude-result-prefixes="p a r xlink rels">
                         </xsl:attribute >
                         <style:graphic-properties draw:stroke="none">
                           <!--FILL-->
-                          <xsl:call-template name ="Fill" />
+                          <xsl:call-template name ="Fill">
+                            <xsl:with-param name="SMName" select="$SMName"/>
+                          </xsl:call-template>
                           <!--LINE COLOR-->
-                          <xsl:call-template name ="LineColor" />
+                          <xsl:call-template name ="LineColor">
+                            <xsl:with-param name="SMName" select="$SMName"/>
+                          </xsl:call-template>
                           <!--LINE STYLE-->
                           <xsl:call-template name ="LineStyle"/>
                           <!--TEXT ALIGNMENT-->
@@ -3352,9 +3368,12 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:call-template name ="Fill">
                           <xsl:with-param name="var_pos" select="$var_pos"/>
                           <xsl:with-param name="FileType" select="concat('slide',$SlidePos)"/>
+                          <xsl:with-param name="SMName" select="$SMName"/>
                         </xsl:call-template>
                         <!--LINE COLOR-->
-                        <xsl:call-template name ="LineColor" />
+                        <xsl:call-template name ="LineColor" >
+                          <xsl:with-param name="SMName" select="$SMName"/>
+                        </xsl:call-template>
                         <!--LINE STYLE-->
                         <xsl:call-template name ="LineStyle">
                           <xsl:with-param name="ThemeName" select="$ThemeName"/>
@@ -3460,9 +3479,13 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute >
                   <style:graphic-properties>
                     <!--FILL-->
-                    <xsl:call-template name ="Fill" />
+                    <xsl:call-template name ="Fill">
+                      <xsl:with-param name="SMName" select="$SMName"/>
+                    </xsl:call-template>
                     <!--LINE COLOR-->
-                    <xsl:call-template name ="LineColor" />
+                    <xsl:call-template name ="LineColor">
+                      <xsl:with-param name="SMName" select="$SMName"/>
+                    </xsl:call-template>
                     <!--LINE STYLE-->
                     <xsl:call-template name ="LineStyle">
                       <xsl:with-param name="ThemeName" select="$ThemeName"/>
@@ -3487,6 +3510,7 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:call-template name="tmpShapeTextProcess">
                   <xsl:with-param name="ParaId" select="$ParaId"/>
                   <xsl:with-param name="TypeId" select="$SlideID"/>
+                  <xsl:with-param name="SMName" select="$SMName"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -3568,9 +3592,12 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:call-template name ="Fill">
                         <xsl:with-param name="var_pos" select="$var_pos"/>
                         <xsl:with-param name="FileType" select="substring-before($LayoutFileName,'.xml')"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                       <!--LINE COLOR-->
-                      <xsl:call-template name ="LineColor" />
+                      <xsl:call-template name ="LineColor">
+                        <xsl:with-param name="SMName" select="$SMName"/>
+                      </xsl:call-template>
                       <!--LINE STYLE-->
                       <xsl:call-template name ="LineStyle"/>
                       <!--TEXT ALIGNMENT-->
@@ -3594,6 +3621,7 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:with-param name="ParaId" select="$ParaId"/>
                     <xsl:with-param name="TypeId" select="concat('SL',$SlidePos)"/>
                     <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
+                    <xsl:with-param name="SMName" select="$SMName"/>
                   </xsl:call-template>
                 </xsl:if>
               </xsl:for-each>
@@ -3618,9 +3646,13 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute >
                   <style:graphic-properties>
                     <!--FILL-->
-                    <xsl:call-template name ="Fill" />
+                    <xsl:call-template name ="Fill">
+                      <xsl:with-param name="SMName" select="$SMName"/>
+                    </xsl:call-template>
                     <!--LINE COLOR-->
-                    <xsl:call-template name ="LineColor" />
+                    <xsl:call-template name ="LineColor">
+                      <xsl:with-param name="SMName" select="$SMName"/>
+                    </xsl:call-template>
                     <!--LINE STYLE-->
                     <xsl:call-template name ="LineStyle"/>
                     <!--TEXT ALIGNMENT-->
@@ -5132,7 +5164,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-      <xsl:if test ="not(a:rPr/a:latin/@typeface) and not(a:rPr/a:cs/@typeface) and not(a:rPr/a:sym/@typeface)">
+      <xsl:if test ="not(a:rPr/a:latin/@typeface)">
       <xsl:choose>
         <xsl:when test="$spType='title'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
@@ -5398,6 +5430,7 @@ exclude-result-prefixes="p a r xlink rels">
               <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
                 <xsl:call-template name ="tmpTextProperty">
                   <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
+                  <xsl:with-param name ="SMName" select ="$SMName"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -5491,6 +5524,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="AttrType" />
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
+    <xsl:param name ="SMName"/>
     <xsl:choose>
       <xsl:when test="$AttrType='Fontname'">
         <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:latin/@typeface">
@@ -5623,6 +5657,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:attribute>
         </xsl:if>
         <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+          <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
           <xsl:choose>
             <xsl:when test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:tint/@val='75000'">
               <xsl:attribute name ="fo:color">
@@ -5633,7 +5668,18 @@ exclude-result-prefixes="p a r xlink rels">
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -6396,54 +6442,63 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:call-template name ="tmpOutlineLvl1_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='1'">
                       <xsl:call-template name ="tmpOutlineLvl2_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='2'">
                       <xsl:call-template name ="tmpOutlineLvl3_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='3'">
                       <xsl:call-template name ="tmpOutlineLvl4_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='4'">
                       <xsl:call-template name ="tmpOutlineLvl5_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='5'">
                       <xsl:call-template name ="tmpOutlineLvl6_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='6'">
                       <xsl:call-template name ="tmpOutlineLvl7_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='7'">
                       <xsl:call-template name ="tmpOutlineLvl8_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$level='8'">
                       <xsl:call-template name ="tmpOutlineLvl9_TextProperty">
                         <xsl:with-param name ="AttrType" select ="'Fontcolor'"/>
                         <xsl:with-param name ="level" select ="$level+1"/>
+                        <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:when>
                   </xsl:choose>
@@ -6532,6 +6587,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='1'">
         <xsl:choose>
@@ -6641,10 +6697,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -6738,6 +6806,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='3'">
         <xsl:choose>
@@ -6847,10 +6916,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl3pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl3pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl3pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl3pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -6944,6 +7025,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='4'">
         <xsl:choose>
@@ -7053,10 +7135,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -7150,6 +7244,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='5'">
         <xsl:choose>
@@ -7259,10 +7354,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl5pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl5pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl5pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl5pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -7356,6 +7463,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='6'">
         <xsl:choose>
@@ -7465,10 +7573,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -7562,6 +7682,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='2'">
         <xsl:choose>
@@ -7671,10 +7792,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl2pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -7779,6 +7912,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='7'">
         <xsl:choose>
@@ -7888,10 +8022,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -7985,6 +8131,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='8'">
         <xsl:choose>
@@ -8094,10 +8241,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -8191,6 +8350,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="fs" />
     <xsl:param name="slideMasterName"/>
     <xsl:param name="level"/>
+    <xsl:param name="SMName"/>
     <xsl:choose>
       <xsl:when test ="$level='9'">
         <xsl:choose>
@@ -8300,10 +8460,22 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl9pPr/a:defRPr/a:solidFill/a:schemeClr/@val">
+              <xsl:variable name="var_schmClrVal" select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl9pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl9pPr/a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                    <xsl:choose>
+                      <xsl:when test="$SMName !=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schmClrVal"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$var_schmClrVal"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:with-param>
                   <xsl:with-param name ="lumMod">
                     <xsl:value-of select="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl9pPr/a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -11832,6 +12004,7 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:with-param name="var_pos" select="$var_pos"/>
       <xsl:with-param name="FileType" select="$FileType"/>
       <xsl:with-param name="slideNo" select="$slideNo"/>
+      <xsl:with-param name="SMName" select="$SMName"/>
       <xsl:with-param name="flagShape" select="'No'"/>
 <xsl:with-param name="shapePhType" select="$spType"/>
     </xsl:call-template>

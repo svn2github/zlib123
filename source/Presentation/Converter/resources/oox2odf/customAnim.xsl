@@ -79,10 +79,10 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				<xsl:for-each select ="p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par">
 					<xsl:variable name ="animationId">
 						<xsl:if test ="p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg">
-							<xsl:value-of select="concat('sl',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid ,p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg/@st +1 )" />
+							<xsl:value-of select="concat('slText',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid ,p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg/@st +1 )" />
 						</xsl:if>
 						<xsl:if test ="not(p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg)">
-							<xsl:value-of select="concat('sl',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid)" />
+							<xsl:value-of select="concat('sldraw',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid)" />
 						</xsl:if>
 					</xsl:variable>
          
@@ -107,13 +107,32 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:attribute name ="anim:iterate-interval">								
 								<xsl:value-of select ="./p:cTn/p:iterate/p:tmPct/@val div 100000"/>									
 							</xsl:attribute>
-							<xsl:attribute name ="presentation:node-type">
+							
+							<!-- commented by yeswanth on 2/1/2008 -->
+							<!--<xsl:attribute name ="presentation:node-type">
 								<xsl:if test ="position()=1">
 									<xsl:value-of select ="'on-click'"/>
 								</xsl:if>
 								<xsl:if test ="position()!=1">
 									<xsl:value-of select ="'with-previous'"/>
 								</xsl:if>
+							</xsl:attribute>-->
+							<!-- added by yeswanth to get nodetype correctly on 2/1/2008 -->							
+							<xsl:attribute name ="presentation:node-type">
+								<xsl:choose>
+									<xsl:when test="./p:cTn/@nodeType='afterEffect'">
+										<xsl:value-of select="'after-previous'"/>
+									</xsl:when>
+									<xsl:when test="./p:cTn/@nodeType='withEffect'">
+										<xsl:value-of select="'with-previous'"/>
+									</xsl:when>
+									<xsl:when test="./p:cTn/@nodeType='clickEffect'">
+										<xsl:value-of select="'on-click'"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="'on-click'"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:attribute>
 							<xsl:call-template name ="animationType">
 								<xsl:with-param name ="animType" select="$animType"/>
@@ -1520,6 +1539,19 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                 </xsl:otherwise>
               </xsl:choose >
               </xsl:when >
+						<xsl:when test ="$animType =14">
+							<xsl:choose>
+								<xsl:when test ="./p:cTn/@presetSubtype ='10'">
+									<xsl:value-of select ="'horizontal'"/>
+								</xsl:when>
+								<xsl:when test ="./p:cTn/@presetSubtype ='5'">
+									<xsl:value-of select ="'vertical'"/>
+								</xsl:when>
+								<xsl:otherwise >
+									<xsl:value-of select ="'horizontal'"/>
+								</xsl:otherwise>
+							</xsl:choose >
+						</xsl:when >
 						<xsl:otherwise>
 							<xsl:choose>
 								<xsl:when test ="./p:cTn/@presetSubtype ='4'">
@@ -1597,6 +1629,16 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 								</xsl:when>
 								<xsl:when test ="./p:cTn/@presetSubtype ='5'">
 									<xsl:value-of select ="'downward'"/>
+								</xsl:when>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:when test ="$animType = 3">
+							<xsl:choose>
+								<xsl:when test ="./p:cTn/@presetSubtype ='10'">
+									<xsl:value-of select ="'horizontal'"/>
+								</xsl:when>
+								<xsl:when test ="./p:cTn/@presetSubtype ='5'">
+									<xsl:value-of select ="'vertical'"/>
 								</xsl:when>
 							</xsl:choose>
 						</xsl:when>
