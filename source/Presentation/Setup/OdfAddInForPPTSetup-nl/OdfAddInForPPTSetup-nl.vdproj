@@ -2837,7 +2837,7 @@
                     }
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_7DF6C12EE5B94E418A9661C7533DD9DE"
                     {
-                    "Sequence" = "3:200"
+                    "Sequence" = "3:510"
                     "DisplayName" = "8:Installation Folder"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
@@ -3072,7 +3072,7 @@
                     }
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_DD51E12728D444D9B78878A1F60799B3"
                     {
-                    "Sequence" = "3:300"
+                    "Sequence" = "3:520"
                     "DisplayName" = "8:Confirm Installation"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
