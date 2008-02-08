@@ -198,7 +198,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 EvalImageCropping(text);
             }
             //Callout Adjustments Calculation Added by Sonata
-            else if (text.Contains("Callout-DirectAdj"))
+            else if (text.Contains("Callout-DirectAdj") || text.Contains("Callout-DirectLine"))
             {
                 this.nextWriter.WriteString(EvalCalloutAdjsExpn(text));
             }
@@ -727,32 +727,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         //end
 
+        //Callout Adjustments Calculation Added by Sonata
         private string EvalCalloutAdjsExpn(string text)
         {
-            string[] arrVal = new string[10];
-            arrVal = text.Split(':');
+            string[] arrVal = text.Split('@');
+            string[] arrValCallStr = arrVal[0].Split(':');
+            string[] arrCallModfr = arrVal[1].Split(' ');
+
             string val1 = "";
 
-            string callAdj = (arrVal[0].ToString());
+            string callAdj = (arrValCallStr[0].ToString());
 
-            double CX = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
-            double CY = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
-            double X = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
-            double Y = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
-            string mirrorH = (arrVal[5]);
-            string mirrorV = (arrVal[6]);
-            double angle = Double.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
-
-            double viewDX = 0.0;
-            double viewDY = 0.0;
-            if (arrVal[8] != "")
-            {
-                viewDX = Double.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
-            }
-            if (arrVal[9] != "")
-            {
-                viewDY = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
-            }
+            double CX = Double.Parse(arrValCallStr[1], System.Globalization.CultureInfo.InvariantCulture);
+            double CY = Double.Parse(arrValCallStr[2], System.Globalization.CultureInfo.InvariantCulture);
+            double X = Double.Parse(arrValCallStr[3], System.Globalization.CultureInfo.InvariantCulture);
+            double Y = Double.Parse(arrValCallStr[4], System.Globalization.CultureInfo.InvariantCulture);
+            string mirrorH = (arrValCallStr[5]);
+            string mirrorV = (arrValCallStr[6]);
+            double angle = Double.Parse(arrValCallStr[7], System.Globalization.CultureInfo.InvariantCulture);
 
             CX = (360000.00 * CX);
             CY = (360000.00 * CY);
@@ -761,7 +753,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Y = (360000.00 * Y);
 
             int flipH;
-            if (arrVal[5].ToString().Trim() == "true")
+            if (arrValCallStr[5].ToString().Trim() == "true")
             {
                 flipH = 1;
             }
@@ -771,7 +763,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
 
             int flipV;
-            if (arrVal[6].ToString().Trim() == "true")
+            if (arrValCallStr[6].ToString().Trim() == "true")
             {
                 flipV = 1;
             }
@@ -813,9 +805,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 ang = angle;
             }
 
-            if (callAdj.ToString().Trim() == "Callout-DirectAdj1fmla1")
-            {
-                double X1;
+               double X1;
                 X1 = (xCenter - Math.Cos(ang) * xCtrBy2 + Math.Sin(ang) * yCtrBy2);
 
                 double X2;
@@ -825,9 +815,40 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 X2 = Math.Round((X2 / 360000), 3);
 
-                double width;
-                width = (X2 - X1);
 
+            double Y1;
+            Y1 = (yCenter - Math.Sin(ang) * xCtrBy2 - Math.Cos(ang) * yCtrBy2);
+
+            double Y2;
+            Y2 = (yCenter + Math.Sin(ang) * xCtrBy2 + Math.Cos(ang) * yCtrBy2);
+
+            Y1 = Math.Round((Y1 / 360000), 3);
+
+            Y2 = Math.Round((Y2 / 360000), 3);
+
+                double width;
+            width = (X1 - X2);
+
+            double height;
+            height = (Y1 - Y2);
+
+
+            if ((callAdj.ToString().Trim() == "Callout-DirectAdj1Notlinefmla1") || (callAdj.ToString().Trim() == "Callout-DirectAdj2Notlinefmla2"))
+            {
+                double viewDX = 0.0;
+                double viewDY = 0.0;
+
+                if (arrCallModfr[0] != "")
+                {
+                    viewDX = Double.Parse(arrCallModfr[0], System.Globalization.CultureInfo.InvariantCulture);
+                }
+                if (arrCallModfr[1] != "")
+                {
+                    viewDY = Double.Parse(arrCallModfr[1], System.Globalization.CultureInfo.InvariantCulture);
+                }
+
+                if (callAdj.ToString().Trim() == "Callout-DirectAdj1Notlinefmla1")
+                {
                 double viewWidth = 21600;
 
                 double dxFinal;
@@ -844,22 +865,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 val1 = string.Concat("val" + " " + FML1.ToString());
             }
 
-            if (callAdj.ToString().Trim() == "Callout-DirectAdj2fmla2")
+                if (callAdj.ToString().Trim() == "Callout-DirectAdj2Notlinefmla2")
             {
-                double Y1;
-                Y1 = (yCenter - Math.Sin(ang) * xCtrBy2 - Math.Cos(ang) * yCtrBy2);
-
-                double Y2;
-                Y2 = (yCenter + Math.Sin(ang) * xCtrBy2 + Math.Cos(ang) * yCtrBy2);
-
-                Y1 = Math.Round((Y1 / 360000), 3);
-
-                Y2 = Math.Round((Y2 / 360000), 3);
-
-                double height;
-                height = (Y2 - Y1);
-
-                double viewHeight = 21600;
+               double viewHeight = 21600;
 
                 double dyFinal;
                 dyFinal = (height * (viewDY / viewHeight));
@@ -874,8 +882,221 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 val1 = string.Concat("val" + " " + FML2.ToString());
             }
+            }
+
+            if (callAdj.ToString().Trim().Contains("Callout-DirectLine"))
+            {
+                double viewDX = 0.0;
+                double viewDY = 0.0;
+                double viewDX1 = 0.0;
+                double viewDY1 = 0.0;
+                double viewDX2 = 0.0;
+                double viewDY2 = 0.0;
+                double viewDX3 = 0.0;
+                double viewDY3 = 0.0;
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine1Adj1fmla1") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj2fmla2") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj3fmla3") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj4fmla4"))
+                {
+                    if (arrCallModfr[0] != "")
+                    {
+                        viewDY1 = Double.Parse(arrCallModfr[0], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[1] != "")
+                    {
+                        viewDX1 = Double.Parse(arrCallModfr[1], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[2] != "")
+                    {
+                        viewDY = Double.Parse(arrCallModfr[2], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[3] != "")
+                    {
+                        viewDX = Double.Parse(arrCallModfr[3], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine2Adj1fmla1") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj2fmla2") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj3fmla3") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj4fmla4") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj5fmla5") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj6fmla6"))
+                {
+                    if (arrCallModfr[0] != "")
+                    {
+                        viewDY2 = Double.Parse(arrCallModfr[0], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[1] != "")
+                    {
+                        viewDX2 = Double.Parse(arrCallModfr[1], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[2] != "")
+                    {
+                        viewDY1 = Double.Parse(arrCallModfr[2], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[3] != "")
+                    {
+                        viewDX1 = Double.Parse(arrCallModfr[3], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[4] != "")
+                    {
+                        viewDY = Double.Parse(arrCallModfr[4], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[5] != "")
+                    {
+                        viewDX = Double.Parse(arrCallModfr[5], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj1fmla1") || (callAdj.ToString().Trim() == "Callout-DirectLine3Adj2fmla2") || (callAdj.ToString().Trim() == "Callout-DirectLine3Adj3fmla3") || (callAdj.ToString().Trim() == "Callout-DirectLine3Adj4fmla4") || (callAdj.ToString().Trim() == "Callout-DirectLine3Adj5fmla5") || (callAdj.ToString().Trim() == "Callout-DirectLine3Adj6fmla6") || (callAdj.ToString().Trim() == "Callout-DirectLine3Adj7fmla7") || (callAdj.ToString().Trim() == "Callout-DirectLine3Adj8fmla8"))
+                {
+                    if (arrCallModfr[0] != "")
+                    {
+                        viewDY3 = Double.Parse(arrCallModfr[0], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[1] != "")
+                    {
+                        viewDX3 = Double.Parse(arrCallModfr[1], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[2] != "")
+                    {
+                        viewDY2 = Double.Parse(arrCallModfr[2], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[3] != "")
+                    {
+                        viewDX2 = Double.Parse(arrCallModfr[3], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[4] != "")
+                    {
+                        viewDY1 = Double.Parse(arrCallModfr[4], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[5] != "")
+                    {
+                        viewDX1 = Double.Parse(arrCallModfr[5], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[6] != "")
+                    {
+                        viewDY = Double.Parse(arrCallModfr[6], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrCallModfr[7] != "")
+                    {
+                        viewDX = Double.Parse(arrCallModfr[7], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                }
+
+                double viewWidth = 21600;
+                double viewHeight = 21600;
+
+                double vdyFinal3 = viewDY3 * 1000;
+                double dyFinal3;
+                dyFinal3 = (height * (vdyFinal3 / viewHeight));
+                double dyPos3;
+                dyPos3 = (dyFinal3 - height / 2);
+                double fml8;
+                fml8 = (dyPos3 / height * 100);
+                int FML8 = (int)fml8;
+
+                double vdxFinal3 = viewDX3 * 1000;
+                double dxFinal3;
+                dxFinal3 = (width * (vdxFinal3 / viewWidth));
+                double dxPos3;
+                dxPos3 = (dxFinal3 - width / 2);
+                double fml7;
+                fml7 = (dxPos3 / width * 100);
+                int FML7 = (int)fml7;
+
+                double vdyFinal2 = viewDY2 * 1000;
+                double dyFinal2;
+                dyFinal2 = (height * (vdyFinal2 / viewHeight));
+                double dyPos2;
+                dyPos2 = (dyFinal2 - height / 2);
+                double fml6;
+                fml6 = (dyPos2 / height * 100);
+                int FML6 = (int)fml6;
+
+                double vdxFinal2 = viewDX2 * 1000;
+                double dxFinal2;
+                dxFinal2 = (width * (vdxFinal2 / viewWidth));
+                double dxPos2;
+                dxPos2 = (dxFinal2 - width / 2);
+                double fml5;
+                fml5 = (dxPos2 / width * 100);
+                int FML5 = (int)fml5;
+
+                double vdyFinal1 = viewDY1 * 1000;
+                double dyFinal1;
+                dyFinal1 = (height * (vdyFinal1 / viewHeight));
+                double dyPos1;
+                dyPos1 = (dyFinal1 - height / 2);
+                double fml4;
+                fml4 = (dyPos1 / height * 100);
+                int FML4 = (int)fml4;
+
+                double vdxFinal1 = viewDX1 * 1000;
+                double dxFinal1;
+                dxFinal1 = (width * (vdxFinal1 / viewWidth));
+                double dxPos1;
+                dxPos1 = (dxFinal1 - width / 2);
+                double fml3;
+                fml3 = (dxPos1 / width * 100);
+                int FML3 = (int)fml3;
+
+                double vdyFinal = viewDY * 1000;
+                double dyFinal;
+                dyFinal = (height * (vdyFinal / viewHeight));
+                double dyPos;
+                dyPos = (dyFinal - height / 2);
+                double fml2;
+                fml2 = (dyPos / height * 100);
+                int FML2 = (int)fml2;
+
+                double vdxFinal = viewDX * 1000;
+                double dxFinal;
+                dxFinal = (width * (vdxFinal / viewWidth));
+                double dxPos;
+                dxPos = (dxFinal - width / 2);
+                double fml1;
+                fml1 = (dxPos / width * 100);
+                int FML1 = (int)fml1;
+
+                if (callAdj.ToString().Trim() == "Callout-DirectLine3Adj8fmla8")
+                {
+                    val1 = string.Concat("val" + " " + FML8.ToString());
+                }
+
+                if (callAdj.ToString().Trim() == "Callout-DirectLine3Adj7fmla7")
+                {
+                    val1 = string.Concat("val" + " " + FML7.ToString());
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj6fmla6") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj6fmla6"))
+                {
+                    val1 = string.Concat("val" + " " + FML6.ToString());
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj5fmla5") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj5fmla5"))
+                {
+                    val1 = string.Concat("val" + " " + FML5.ToString());
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj4fmla4") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj4fmla4") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj4fmla4"))
+                {
+                    val1 = string.Concat("val" + " " + FML4.ToString());
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj3fmla3") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj3fmla3") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj3fmla3"))
+                {
+                    val1 = string.Concat("val" + " " + FML3.ToString());
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj2fmla2") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj2fmla2") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj2fmla2"))
+                {
+                    val1 = string.Concat("val" + " " + FML2.ToString());
+                }
+
+                if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj1fmla1") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj1fmla1") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj1fmla1"))
+                {
+                    val1 = string.Concat("val" + " " + FML1.ToString());
+                }
+            }
             return val1.ToString();
         }
+        //End
 
         public void WriteStoredRun()
         {

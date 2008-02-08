@@ -897,29 +897,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         //End
 
+        //Callout Adjustments Calculation Added by Sonata
         private string EvalCalloutAdjustment(string text)
         {
-            string[] arrVal = new string[10];
+            string[] arrVal = new string[16];
             arrVal = text.Split(':');
+            string drawMod = "";
 
-            double fm1 = 0.0;
-            double fm2 = 0.0;
-            if (arrVal[1] != "")
-            {
-                fm1 = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
-            }
-            if (arrVal[2] != "")
-            {
-                fm2 = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
-            }
+            string callAdjVal = (arrVal[0].ToString());
 
-            double X = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
-            double Y = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
-            double CX = Double.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
-            double CY = Double.Parse(arrVal[6], System.Globalization.CultureInfo.InvariantCulture);
-            int flipH = int.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
-            int flipV = int.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
-            double rot = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
+            double X = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+            double Y = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+            double CX = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+            double CY = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+            int flipH = int.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
+            int flipV = int.Parse(arrVal[6], System.Globalization.CultureInfo.InvariantCulture);
+            double rot = Double.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
 
             double xCenter = (X + CX / 2);
             double yCenter = (Y + CY / 2);
@@ -968,6 +961,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             double height;
             height = (Y2 - Y1);
 
+            if (callAdjVal.ToString().Trim() == "Callout-AdjNotline")
+            {
+                double fm1 = 0.0;
+                double fm2 = 0.0;
+
+                if (arrVal[8] != "")
+                {
+                    fm1 = Double.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
+                }
+                if (arrVal[9] != "")
+                {
+                    fm2 = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
+                }
+
             double dxPos;
             dxPos = (width * fm1 / 100000);
 
@@ -989,10 +996,198 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             double viewdyFinal;
             viewdyFinal = (dyFinal / height * viewHeight);
 
-            string drawMod;
-            drawMod = string.Concat(viewdxFinal.ToString().Trim() + " " + viewdyFinal.ToString().Trim());
+             drawMod = string.Concat(viewdxFinal.ToString().Trim() + " " + viewdyFinal.ToString().Trim());
+            }
+
+            if ((callAdjVal.ToString().Trim() == "Callout-AdjLine1") || (callAdjVal.ToString().Trim() == "Callout-AdjLine2") || (callAdjVal.ToString().Trim() == "Callout-AdjLine3"))
+            {
+                double fm1 = 0.0;
+                double fm2 = 0.0;
+                double fm3 = 0.0;
+                double fm4 = 0.0;
+                double fm5 = 0.0;
+                double fm6 = 0.0;
+                double fm7 = 0.0;
+                double fm8 = 0.0;
+
+                if (callAdjVal.ToString().Trim() == "Callout-AdjLine1")
+                {
+                    if (arrVal[8] != "")
+                    {
+                        fm1 = Double.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[9] != "")
+                    {
+                        fm2 = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[10] != "")
+                    {
+                        fm3 = Double.Parse(arrVal[10], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[11] != "")
+                    {
+                        fm4 = Double.Parse(arrVal[11], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                }
+
+                if (callAdjVal.ToString().Trim() == "Callout-AdjLine2")
+                {
+                    if (arrVal[8] != "")
+                    {
+                        fm1 = Double.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[9] != "")
+                    {
+                        fm2 = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[10] != "")
+                    {
+                        fm3 = Double.Parse(arrVal[10], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[11] != "")
+                    {
+                        fm4 = Double.Parse(arrVal[11], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[12] != "")
+                    {
+                        fm5 = Double.Parse(arrVal[12], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[13] != "")
+                    {
+                        fm6 = Double.Parse(arrVal[13], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                }
+
+                if (callAdjVal.ToString().Trim() == "Callout-AdjLine3")
+                {
+                    if (arrVal[8] != "")
+                    {
+                        fm1 = Double.Parse(arrVal[8], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[9] != "")
+                    {
+                        fm2 = Double.Parse(arrVal[9], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[10] != "")
+                    {
+                        fm3 = Double.Parse(arrVal[10], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[11] != "")
+                    {
+                        fm4 = Double.Parse(arrVal[11], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[12] != "")
+                    {
+                        fm5 = Double.Parse(arrVal[12], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[13] != "")
+                    {
+                        fm6 = Double.Parse(arrVal[13], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[14] != "")
+                    {
+                        fm7 = Double.Parse(arrVal[14], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    if (arrVal[15] != "")
+                    {
+                        fm8 = Double.Parse(arrVal[15], System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                }
+
+                double viewWidth = 21600;
+                double viewHeight = 21600;
+
+                double dxPos;
+                dxPos = (width * fm1 / 100);
+                double dxFinal;
+                dxFinal = ((width / 2) + dxPos);
+                double viewdxFinal;
+                viewdxFinal = (dxFinal / width * viewWidth);
+
+                viewdxFinal = (viewdxFinal / 1000);
+
+                double dyPos;
+                dyPos = (height * fm2 / 100);
+                double dyFinal;
+                dyFinal = ((height / 2) + dyPos);
+                double viewdyFinal;
+                viewdyFinal = (dyFinal / height * viewHeight);
+
+                viewdyFinal = (viewdyFinal / 1000);
+
+                double dxPos1;
+                dxPos1 = (width * fm3 / 100);
+                double dxFinal1;
+                dxFinal1 = ((width / 2) + dxPos1);
+                double viewdxFinal1;
+                viewdxFinal1 = (dxFinal1 / width * viewWidth);
+
+                viewdxFinal1 = (viewdxFinal1 / 1000);
+
+                double dyPos1;
+                dyPos1 = (height * fm4 / 100);
+                double dyFinal1;
+                dyFinal1 = ((height / 2) + dyPos1);
+                double viewdyFinal1;
+                viewdyFinal1 = (dyFinal1 / height * viewHeight);
+
+                viewdyFinal1 = (viewdyFinal1 / 1000);
+
+                double dxPos2;
+                dxPos2 = (width * fm5 / 100);
+                double dxFinal2;
+                dxFinal2 = ((width / 2) + dxPos2);
+                double viewdxFinal2;
+                viewdxFinal2 = (dxFinal2 / width * viewWidth);
+
+                viewdxFinal2 = (viewdxFinal2 / 1000);
+
+                double dyPos2;
+                dyPos2 = (height * fm6 / 100);
+                double dyFinal2;
+                dyFinal2 = ((height / 2) + dyPos2);
+                double viewdyFinal2;
+                viewdyFinal2 = (dyFinal2 / height * viewHeight);
+
+                viewdyFinal2 = (viewdyFinal2 / 1000);
+
+                double dxPos3;
+                dxPos3 = (width * fm7 / 100);
+                double dxFinal3;
+                dxFinal3 = ((width / 2) + dxPos3);
+                double viewdxFinal3;
+                viewdxFinal3 = (dxFinal3 / width * viewWidth);
+
+                viewdxFinal3 = (viewdxFinal3 / 1000);
+
+                double dyPos3;
+                dyPos3 = (height * fm8 / 100);
+                double dyFinal3;
+                dyFinal3 = ((height / 2) + dyPos3);
+                double viewdyFinal3;
+                viewdyFinal3 = (dyFinal3 / height * viewHeight);
+
+                viewdyFinal3 = (viewdyFinal3 / 1000);
+
+                if (callAdjVal.ToString().Trim() == "Callout-AdjLine1")
+                {
+                    drawMod = string.Concat(viewdyFinal1.ToString().Trim() + " " + viewdxFinal1.ToString().Trim() + " " + viewdyFinal.ToString().Trim() + " " + viewdxFinal.ToString().Trim());
+                }
+
+                if (callAdjVal.ToString().Trim() == "Callout-AdjLine2")
+                {
+                    drawMod = string.Concat(viewdyFinal2.ToString().Trim() + " " + viewdxFinal2.ToString().Trim() + " " + viewdyFinal1.ToString().Trim() + " " + viewdxFinal1.ToString().Trim() + " " + viewdyFinal.ToString().Trim() + " " + viewdxFinal.ToString().Trim());
+                }
+
+                if (callAdjVal.ToString().Trim() == "Callout-AdjLine3")
+                {
+                    drawMod = string.Concat(viewdyFinal3.ToString().Trim() + " " + viewdxFinal3.ToString().Trim() + " " + viewdyFinal2.ToString().Trim() + " " + viewdxFinal2.ToString().Trim() + " " + viewdyFinal1.ToString().Trim() + " " + viewdxFinal1.ToString().Trim() + " " + viewdyFinal.ToString().Trim() + " " + viewdxFinal.ToString().Trim());
+                }
+            }
+
             return drawMod.ToString();
         }
+        //End
 
         // added for Shadow calculation
         private string EvalShadowExpression(string text)
