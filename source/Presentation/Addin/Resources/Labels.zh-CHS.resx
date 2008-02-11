@@ -117,126 +117,126 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
-    <value>Shape Text aligned top and bottom with wrap is not resized.-zh</value>
-  </data>
-  <data name="translation.odf2oox.audioVideoTypeImage" xml:space="preserve">
-    <value>Snapshot for Audio/Video Image in Slide replaced by thumbnail of last slide snapshot.-zh</value>
-  </data>
-  <data name="translation.odf2oox.bulletTypeCustomBullet" xml:space="preserve">
-    <value>Custom Bullet replaced with Simple Bullet in Slide.-zh</value>
-  </data>
-  <data name="translation.odf2oox.bulletTypeLevel10" xml:space="preserve">
-    <value>10th level is converted to 9th (last) level.-zh</value>
-  </data>
-  <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
-    <value>Custom Bullet replaced with Simple Bullet in Slide Master.-zh</value>
-  </data>
-  <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
-    <value>Thumbnails in Handout Page, representing slides cannot be resized.-zh
-Only six slides handouts available.-zh
-Handout Page Orientation not mapped.-zh</value>
-  </data>
-  <data name="translation.oox2odf.layoutsToSlideMappingTypePicture" xml:space="preserve">
-    <value>All Picture properties in Layout are mapped to Slide.-zh</value>
-  </data>
-  <data name="translation.odf2oox.notesMasterMultipleToSingle" xml:space="preserve">
-    <value>Multiple Notes Master replaced by single Notes Master for each Slide.-zh</value>
-  </data>
-  <data name="translation.odf2oox.notesTypeShapesInNotes" xml:space="preserve">
-    <value>Shapes in Notes cannot be retained.-zh</value>
-  </data>
-  <data name="translation.odf2oox.slideShowSettingsTransitionOnClick" xml:space="preserve">
-    <value>'Transition on Click' during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.odf2oox.slideShowSettingsTypeMouseAsPen" xml:space="preserve">
-    <value>'Show Mouse Pointer As Pen' during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.odf2oox.slideShowSettingsTypeNavigator" xml:space="preserve">
-    <value>'Display Navigator' during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.odf2oox.slideShowSettingsTypePauseGreaterThanZero" xml:space="preserve">
-    <value>‘Delay in presenting slides in loop’ during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
-    <value>'Set Presentation On Top' during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.oox2odf.bulletTypeCustomBullet" xml:space="preserve">
-    <value>Custom Bullet replaced with Simple Bullet in Slide.-zh</value>
-  </data>
-  <data name="translation.oox2odf.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
-    <value>Custom Bullet replaced with Simple Bullet in Slide Master.-zh</value>
-  </data>
-  <data name="translation.oox2odf.handOutMasterTypeOrientation" xml:space="preserve">
-    <value>Handout Page Orientation cannot be retained.-zh</value>
-  </data>
   <data name="translation.oox2odf.layoutsToSlideMappingTypeLines" xml:space="preserve">
-    <value>All Line properties in Layout are mapped to Slide.-zh</value>
-  </data>
-  <data name="translation.oox2odf.layoutsToSlideMappingTypeShapes" xml:space="preserve">
-    <value>Shape properties in Layout are mapped to Slide.-zh</value>
-  </data>
-  <data name="translation.oox2odf.notesMasterSingleToMultiple" xml:space="preserve">
-    <value>Single Notes Master replaced by multiple Notes Master for each Slide.-zh</value>
-  </data>
-  <data name="translation.oox2odf.shapesTypeArrowHeadTailSize" xml:space="preserve">
-    <value>Head and Tail size of Arrows calculated approximately due to mapping not available.-zh</value>
+    <value>布局中的所有行属性已映射到幻灯片。</value>
   </data>
   <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
-    <value>Shape 'Bent Arrow' cannot be retained and is converted to shape 'Corner Arrow'.-zh</value>
+    <value>“Bent Arrow”(圆角右箭头)形状已转换成“Corner Arrow”(角箭头)形状。</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
+    <value>在幻灯片母版中，自定义项目符号已替换成简单项目符号。</value>
   </data>
   <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
-    <value>Shape 'Chord' type  cannot be retained and is converted to shape 'Ellipse'.-zh</value>
-  </data>
-  <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
-    <value>Shape Curved Arrow(Left, Right, Up, Down)  cannot be retained and is converted to Shape Circular Arrow.-zh</value>
-  </data>
-  <data name="translation.oox2odf.shapesTypeInnerShadow" xml:space="preserve">
-    <value>Inner/Perspective shadow for a shape cannot be retained.-zh</value>
+    <value>“Chord”(弦)类形状已被转换成“Ellipse”(椭圆形)形状。</value>
   </data>
   <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
-    <value>Shape 'Snip Single Corner Rectangle'  cannot be retained and is converted to shape 'FlowChart(Card Flipped)'.-zh</value>
-  </data>
-  <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
-    <value>Shape 'U-Turn Arrow'  cannot be retained and is converted to shape 'Circular Arrow'.-zh</value>
+    <value>“Snip Single Corner Rectangle”(剪去单角的矩形)形状已被转换成“FlowChart(Card Flipped)”流程图(翻转卡片)形状。</value>
   </data>
   <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
-    <value>Only the first color of the background Gradient Fill was converted in Layout.-zh</value>
-  </data>
-  <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
-    <value>Only the first color of the graphic Gradient Fill was converted in Layout.-zh</value>
-  </data>
-  <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
-    <value>Only the first color of the background Gradient Fill was converted in Slide Master.</value>
+    <value>布局仅转换背景渐变填充的第一个颜色。</value>
   </data>
   <data name="translation.oox2odf.slideShowSettingsKiosk" xml:space="preserve">
-    <value>Presentation Type 'Kiosk' not compatible, replaced by default type 'Full Screen'.-zh</value>
+    <value>演示文档类型“Kiosk”(展台)不兼容，已由默认类型“Full Screen”(全屏幕)替换。</value>
   </data>
-  <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
-    <value>'Slide Show with Narration' during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
-    <value>'Pen Color' during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.oox2odf.slideShowSettingsSlideStartEnd" xml:space="preserve">
-    <value>'Start From' during Slide Show cannot be retained.-zh</value>
-  </data>
-  <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
-    <value>Only the first color of the background Gradient Fill was converted in Slide.-zh</value>
-  </data>
-  <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
-    <value>Only the first color of the graphic Gradient Fill was converted in Slide.-zh</value>
+  <data name="translation.odf2oox.bulletTypeCustomBullet" xml:space="preserve">
+    <value>在幻灯片中，自定义项目符号已替换成简单项目符号。</value>
   </data>
   <data name="translation.oox2odf.pictureTypeProperties" xml:space="preserve">
-    <value>Picture property not converted.-zh</value>
+    <value>未转换照片属性。</value>
+  </data>
+  <data name="translation.oox2odf.bulletTypeCustomBullet" xml:space="preserve">
+    <value>在幻灯片中，自定义项目符号已替换成简单项目符号。.</value>
+  </data>
+  <data name="translation.odf2oox.notesTypeShapesInNotes" xml:space="preserve">
+    <value>无法保留注释中的形状。</value>
+  </data>
+  <data name="translation.oox2odf.notesMasterSingleToMultiple" xml:space="preserve">
+    <value>已针对每一幻灯片将单一注释母版替换成多个注释母版。</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsSlideStartEnd" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Start From”(起始位置)。</value>
+  </data>
+  <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
+    <value>幻灯片仅转换图片渐变填充的第一个颜色。</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Pen Color”(笔颜色)。</value>
+  </data>
+  <data name="translation.odf2oox.notesMasterMultipleToSingle" xml:space="preserve">
+    <value>已针对每一幻灯片将多个注释母版替换成单一注释母版。</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypeNavigator" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Display Navigator”(显示导航栏)。</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeInnerShadow" xml:space="preserve">
+    <value>无法保留形状的内阴影。</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeLevel10" xml:space="preserve">
+    <value>第 10 级被转换成第 9 级(上一级)。</value>
+  </data>
+  <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
+    <value>幻灯片仅转换背景渐变填充的第一个颜色。</value>
+  </data>
+  <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
+    <value>讲义页的缩略图，表示无法调整幻灯片的大小。
+仅包含六页幻灯片的讲义可用。
+ 未映射讲义的页面方向。</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypePauseGreaterThanZero" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Delay in presenting slides in loop”(幻灯片循环播放延迟)。</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
+    <value>曲线箭头(左、右、上、下)形状已被转换成环形箭头形状</value>
+  </data>
+  <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
+    <value>布局仅转换图片渐变填充的第一个颜色。</value>
+  </data>
+  <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
+    <value>幻灯片母版仅转换背景渐变填充的第一个颜色。</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTransitionOnClick" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Transition on Click”(单击过渡)。</value>
   </data>
   <data name="translation.oox2odf.groupingTypeExtensionChange" xml:space="preserve">
-    <value>Grouping loss due to object's extension property changed.-zh</value>
+    <value>已更换因对象的扩展属性导致的分组丢失。</value>
+  </data>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypePicture" xml:space="preserve">
+    <value>布局中的所有照片属性已映射到幻灯片。</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypeMouseAsPen" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Show Mouse Pointer As Pen”(将鼠标指针显示为笔)。</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeArrowHeadTailSize" xml:space="preserve">
+    <value>按映射大致计算箭头的头尾大小不可用。</value>
+  </data>
+  <data name="translation.odf2oox.audioVideoTypeImage" xml:space="preserve">
+    <value>幻灯片中音频/视频图片的快照已由最新幻灯片缩略图所替换。</value>
+  </data>
+  <data name="translation.oox2odf.handOutMasterTypeOrientation" xml:space="preserve">
+    <value>无法保留讲议的页面方向。</value>
+  </data>
+  <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
+    <value>未调整与换行文本上下对齐之形状文本的大小。</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
+    <value>“U-Turn Arrow”(手杖形箭头)形状已转换成“Circular Arrow”(环形箭头)形状。</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Set Presentation On Top”(始终前置演示文稿)。</value>
+  </data>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypeShapes" xml:space="preserve">
+    <value>布局中的形状属性已映射到幻灯片。</value>
+  </data>
+  <data name="translation.oox2odf.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
+    <value>在幻灯片母版中，自定义项目符号已替换成简单项目符号。.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
+    <value>在幻灯片播放期间无法保留“Slide Show with Narration”(带解说的幻灯片播放)。</value>
   </data>
   <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
-    <value>Links to applications only work if the applications are located in standard folders, e.g. WINDOWS, or in the same folder as the presentation.-zh</value>
+    <value>链接申请，只有工作，如果申请的是位于标准的文件夹，例如：窗户，或在同一个文件夹作为演示</value>
   </data>
   <data name="translation.oox2odf.shapesTypeOuterShadow" xml:space="preserve">
-    <value>Blur and Size properties are not supported in ODP.-zh</value>
+    <value>朦胧和大小属性，不支持在消耗臭氧潜能值。</value>
   </data>
 </root>
