@@ -47,7 +47,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" 
   xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"
-  exclude-result-prefixes="odf style text number draw page smil anim">
+  exclude-result-prefixes="odf style text number draw page smil anim msxsl">
 
 	<xsl:template name ="customAnimation">
 		<xsl:param name ="slideId"/>
@@ -55,138 +55,60 @@ Copyright (c) 2007, Sonata Software Limited
 
 		  <xsl:variable name ="animationVal">
 			<xsl:for-each select ="anim:par/anim:seq/anim:par">
-				<!-- Added by s1th -->
-				<xsl:for-each select="./anim:par">
-					
-					<xsl:for-each select="./node()">
-						<xsl:if test="name()='anim:par' or name()='anim:iterate'">
-
-				<xsl:variable name ="validateAnimation">
-					<xsl:call-template name ="validateAnimation"/>
-				</xsl:variable>
-				<xsl:variable name ="animationType">
-					<xsl:call-template name ="animationType"/>
-				</xsl:variable>
-				<xsl:variable name ="animationId">
-					<xsl:call-template name ="animationId">
-						<xsl:with-param name ="animationType" select ="$animationType"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:if test ="$validateAnimation!='false'">
-					<xsl:if test ="$animationId!=''">
+				<!-- Added by yeswanth.s -->
 						<p:par>
 							<p:cTn id="3" fill="hold">
 								<p:stCondLst>
-									<p:cond delay="indefinite"/>
-								</p:stCondLst>
-								<p:childTnLst>
-								
-									<p:par>
-										<p:cTn id="4" fill="hold">
-											<p:stCondLst>
-												<p:cond delay="0" />
-											</p:stCondLst>
-											<p:childTnLst>
-												<p:par>
-                          <p:cTn id="5" fill="hold">
-                            <!-- added by yeswanth , Fix for Animation Start type -->
-                            <xsl:attribute name="nodeType">
+							<p:cond>
+								<xsl:attribute name="delay">
                               <xsl:choose>
-			<xsl:when test="./@presentation:node-type='after-previous'">
-                              <xsl:value-of select="'afterEffect'"/>
-                                </xsl:when>
-			<xsl:when test="./@presentation:node-type='with-previous'">
-                                <xsl:value-of select="'withEffect'"/>
-                                </xsl:when>
-                        <xsl:when test="./@presentation:node-type='on-click'">
-                                <xsl:value-of select="'clickEffect'"/>
+										<xsl:when test="./@smil:begin='next'">
+											<xsl:value-of select="'indefinite'"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                  <xsl:value-of select="'clickEffect'"/>
-                                </xsl:otherwise>
-                              </xsl:choose>
-                            </xsl:attribute>
-                            <!-- End -->
-														<xsl:attribute name ="presetClass">
-															<xsl:value-of select ="$animationType"/>
-														</xsl:attribute>
-														<xsl:attribute name ="presetID">
-															<xsl:value-of select ="$animationId"/>
-														</xsl:attribute>
-														<xsl:variable name ="animationSubId">
-															<xsl:call-template name ="animationSubId">
-																<xsl:with-param name ="animationType" select="$animationType"/>
-																<xsl:with-param name ="animationId" select="$animationId"/>
-															</xsl:call-template>
-														</xsl:variable>
-														<xsl:attribute name ="presetSubtype">
-															<xsl:value-of select ="$animationSubId"/>
-														</xsl:attribute>
-														<p:stCondLst>
-                              <p:cond>
-                                <xsl:attribute name ="delay">
                                   <xsl:choose >
-                                    <!-- commented by chhavi-->
-                                    <!--<xsl:when test ="substring-before(@smil:begin,'s') &gt; 0">
-                                      <xsl:value-of select ="round(substring-before(@smil:begin,'s')* 1000)"/>-->
-                                    <!-- ending here-->
-                                    <!-- added by chhavi for delay in custom animation-->
-				    <xsl:when test ="substring-before(./@smil:begin,'s') &gt; 0">
-				    <xsl:value-of select ="round(substring-before(./@smil:begin,'s')* 1000)"/>
-                                      <!--ending here-->
+												<xsl:when test="./anim:par/anim:par/@presentation:node-type='on-click'">
+													<xsl:value-of select="'indefinite'"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                       <xsl:value-of select ="'0'"/>
                                     </xsl:otherwise>
                                   </xsl:choose>
+										</xsl:otherwise>
+									</xsl:choose>
                                 </xsl:attribute>
                               </p:cond>
 														</p:stCondLst>
-																<xsl:if test ="name()='anim:iterate'">
-															<p:iterate >
-																<xsl:attribute name ="type">
-																	<xsl:call-template name ="interateType" >
-																				<xsl:with-param name ="itType" select ="./@anim:iterate-type"/>
-																	</xsl:call-template>
-																</xsl:attribute>
-																<p:tmPct>
-																	<xsl:attribute name ="val">
-																		<xsl:choose >
-																					<xsl:when test ="substring-before(./@anim:iterate-interval,'s') &gt; 0 ">
-																						<xsl:value-of select ="substring-before(./@anim:iterate-interval,'s') * 100000"/>
-																			</xsl:when>
-																			<xsl:otherwise >
-																				<xsl:value-of select ="'0'"/>
-																			</xsl:otherwise>
-																		</xsl:choose>
-																	</xsl:attribute>
-																</p:tmPct >
-															</p:iterate>
-														</xsl:if>
-														<p:childTnLst>
-															<xsl:call-template name ="processAnim">
-															</xsl:call-template>
-														</p:childTnLst>
-													</p:cTn>
-												</p:par>
-											</p:childTnLst>
-										</p:cTn>
-									</p:par>
+						<p:childTnLst>
+				
+				<xsl:for-each select="./anim:par">
+					<p:par>
+						<p:cTn id="4" fill="hold">
+							<p:stCondLst>
+								<p:cond delay="0" />
+							</p:stCondLst>
+							<xsl:variable name="check_animation">
+								<xsl:call-template name="animationfifth">
 
-								</p:childTnLst>
-							</p:cTn>
+																	</xsl:call-template>
+							</xsl:variable>
+																		<xsl:choose >
+								<xsl:when test="msxsl:node-set($check_animation)/p:par">
+														<p:childTnLst>
+										<xsl:copy-of select ="$check_animation"/>
+											</p:childTnLst>
+								</xsl:when>
+							</xsl:choose>
+
+						</p:cTn>
 						</p:par>
 										
-					</xsl:if>
-				</xsl:if>
 					
-						</xsl:if>
-						
-					</xsl:for-each>
-
-		
 				</xsl:for-each>
-				<!-- commented by s1th -->
+				<!-- end of code added -->
+						</p:childTnLst>
+					</p:cTn>
+				</p:par>
 			</xsl:for-each>
 		</xsl:variable>
 		<xsl:if test ="msxsl:node-set($animationVal)/p:par">
@@ -821,6 +743,9 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@smil:attributeName ='height'">
 				<xsl:value-of select ="'ppt_h'"/>
 			</xsl:when>
+			<xsl:when test ="./@smil:attributeName ='rotate'">
+			<xsl:value-of select ="'r'"/>
+		    </xsl:when>
 			<xsl:otherwise >
 				<xsl:call-template name ="attributeNameList" />
 			</xsl:otherwise>
@@ -873,6 +798,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@smil:attributeName='font-size'">
 				<xsl:value-of select ="'style.fontSize'"/>
 			</xsl:when>
+
 
 		</xsl:choose>
 	</xsl:template>
@@ -1645,11 +1571,17 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:template>
 	<xsl:template name ="smilFilter">
 		<xsl:choose >
-			<xsl:when test ="@smil:type = 'blindsWipe' and @smil:subtype ='Horizontal' ">
+			<xsl:when test ="@smil:type = 'blindsWipe' and @smil:subtype ='horizontal' ">
 				<xsl:value-of  select ="'blinds(horizontal)'"/>
 			</xsl:when>
 			<xsl:when test ="@smil:type = 'blindsWipe' and @smil:subtype ='Vertical' ">
 				<xsl:value-of  select ="'blinds(vertical)'"/>
+			</xsl:when>
+			<xsl:when test ="@smil:type = 'blindsWipe' and @smil:subtype ='vertical' ">
+				<xsl:value-of  select ="'blinds(vertical)'"/>
+			</xsl:when>
+			<xsl:when test ="@smil:type = 'barnDoorWipe' and @smil:subtype ='horizontal' ">
+				<xsl:value-of  select ="'barn(inHorizontal)'"/>
 			</xsl:when>
 			<xsl:when test ="@smil:type = 'irisWipe' and @smil:subtype ='rectangle' and @smil:direction='reverse'">
 				<xsl:value-of  select ="'box(in)'"/>
@@ -1982,4 +1914,112 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+	<xsl:template name="animationfifth">
+		<xsl:for-each select="./node()">
+			<xsl:if test="name()='anim:par' or name()='anim:iterate'">
+
+				<xsl:variable name ="validateAnimation">
+					<xsl:call-template name ="validateAnimation"/>
+				</xsl:variable>
+				<xsl:variable name ="animationType">
+					<xsl:call-template name ="animationType"/>
+				</xsl:variable>
+				<xsl:variable name ="animationId">
+					<xsl:call-template name ="animationId">
+						<xsl:with-param name ="animationType" select ="$animationType"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test ="$validateAnimation!='false'">
+					<xsl:if test ="$animationId!=''">
+
+						<p:par>
+							<p:cTn id="5" fill="hold">
+								<!-- added by yeswanth , Fix for Animation Start type -->
+								<xsl:attribute name="nodeType">
+									<xsl:choose>
+										<xsl:when test="./@presentation:node-type='after-previous'">
+											<xsl:value-of select="'afterEffect'"/>
+										</xsl:when>
+										<xsl:when test="./@presentation:node-type='with-previous'">
+											<xsl:value-of select="'withEffect'"/>
+										</xsl:when>
+										<xsl:when test="./@presentation:node-type='on-click'">
+											<xsl:value-of select="'clickEffect'"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="'clickEffect'"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+								<!-- End -->
+								<xsl:attribute name ="presetClass">
+									<xsl:value-of select ="$animationType"/>
+								</xsl:attribute>
+								<xsl:attribute name ="presetID">
+									<xsl:value-of select ="$animationId"/>
+								</xsl:attribute>
+								<xsl:variable name ="animationSubId">
+									<xsl:call-template name ="animationSubId">
+										<xsl:with-param name ="animationType" select="$animationType"/>
+										<xsl:with-param name ="animationId" select="$animationId"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:attribute name ="presetSubtype">
+									<xsl:value-of select ="$animationSubId"/>
+								</xsl:attribute>
+								<p:stCondLst>
+									<p:cond>
+										<xsl:attribute name ="delay">
+											<xsl:choose >
+												<!-- commented by chhavi-->
+												<!--<xsl:when test ="substring-before(@smil:begin,'s') &gt; 0">
+                                      <xsl:value-of select ="round(substring-before(@smil:begin,'s')* 1000)"/>-->
+												<!-- ending here-->
+												<!-- added by chhavi for delay in custom animation-->
+												<xsl:when test ="substring-before(./@smil:begin,'s') &gt; 0">
+													<xsl:value-of select ="round(substring-before(./@smil:begin,'s')* 1000)"/>
+													<!--ending here-->
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:value-of select ="'0'"/>
+												</xsl:otherwise>
+											</xsl:choose>
+										</xsl:attribute>
+									</p:cond>
+								</p:stCondLst>
+								<xsl:if test ="name()='anim:iterate'">
+									<p:iterate >
+										<xsl:attribute name ="type">
+											<xsl:call-template name ="interateType" >
+												<xsl:with-param name ="itType" select ="./@anim:iterate-type"/>
+											</xsl:call-template>
+										</xsl:attribute>
+										<p:tmPct>
+											<xsl:attribute name ="val">
+												<xsl:choose >
+													<xsl:when test ="substring-before(./@anim:iterate-interval,'s') &gt; 0 ">
+														<xsl:value-of select ="substring-before(./@anim:iterate-interval,'s') * 100000"/>
+													</xsl:when>
+													<xsl:otherwise >
+														<xsl:value-of select ="'0'"/>
+													</xsl:otherwise>
+												</xsl:choose>
+											</xsl:attribute>
+										</p:tmPct >
+									</p:iterate>
+								</xsl:if>
+								<p:childTnLst>
+									<xsl:call-template name ="processAnim">
+									</xsl:call-template>
+								</p:childTnLst>
+							</p:cTn>
+						</p:par>
+
+					</xsl:if>
+				</xsl:if>
+
+			</xsl:if>
+
+		</xsl:for-each>
+	</xsl:template>
 </xsl:stylesheet >

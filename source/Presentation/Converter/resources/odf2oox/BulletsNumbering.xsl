@@ -51,16 +51,16 @@
           <a:buClrTx/>
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:if test ="./child::node()[1]/style:text-properties/@fo:font-size">     
-        <xsl:if test ="not(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100) ">
-          <xsl:if test ="substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') &gt; 25 ">
+        <xsl:if test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size">
+          <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')!='100'">
+            <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')&gt; 25 ">
             <a:buSzPct>
               <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
+                  <xsl:value-of select ="format-number(substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%') * 1000,'#.##')"/>
               </xsl:attribute>
             </a:buSzPct>
           </xsl:if>
-          <xsl:if test ="substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') &lt; 25 ">
+            <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')&lt; 25 ">
             <a:buSzPct>
               <xsl:attribute name ="val">
                 <xsl:value-of select ="'25000'"/>
@@ -68,8 +68,7 @@
             </a:buSzPct>
           </xsl:if>
       </xsl:if>
-      <!-- Fix for the bug 1794640-->
-      <xsl:if test ="substring-before(./child::node()[1]/style:text-properties/@fo:font-size,'%') = 100 ">
+          <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')='100'">
         <a:buSzPct>
           <xsl:attribute name ="val">
             <xsl:value-of select ="'100000'"/>
@@ -77,9 +76,7 @@
         </a:buSzPct>
       </xsl:if>
       </xsl:if>      
-      <!--End Fix for the bug 1794640-->
-
-      <xsl:for-each select="text:list-level-style-bullet[@text:level=$level]/style:text-properties">
+          <xsl:for-each select="text:list-level-style-bullet[@text:level=$level]/style:text-properties">
         <xsl:if test="position()=1">
           <xsl:if test="@fo:font-family">
       <a:buFont>

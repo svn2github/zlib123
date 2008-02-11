@@ -1437,6 +1437,7 @@ exclude-result-prefixes="p a r xlink ">
     </xsl:if>
       </xsl:template>
   
+	<!--CalloutAdjs Template (added by Mathi)-->
 	<xsl:template name="tmpCalloutAdj">
 		<xsl:param name="defaultVal"/>
 		<xsl:choose>
@@ -1490,13 +1491,121 @@ exclude-result-prefixes="p a r xlink ">
 					</xsl:choose>
 				</xsl:variable>
 				<xsl:attribute name ="draw:modifiers">
-					<xsl:value-of select ="concat('Callout-Adj:',$fmla1,':',$fmla2,':',$X,':',$Y,':',$CX,':',$CY,':',$FlipH,':',$FlipV,':',$Rot)"/>
+					<xsl:value-of select ="concat('Callout-AdjNotline:',$X,':',$Y,':',$CX,':',$CY,':',$FlipH,':',$FlipV,':',$Rot,':',$fmla1,':',$fmla2)"/>
 				</xsl:attribute>
 			</xsl:when>
 			<xsl:when test="not(p:spPr/a:prstGeom/a:avLst/a:gd)">
 				<xsl:attribute name ="draw:modifiers">
 					<xsl:value-of select="$defaultVal"/>
 				</xsl:attribute>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
+  
+	<xsl:template name="tmpCalloutLineAdj">
+		<xsl:param name="defaultVal"/>
+		<xsl:choose>
+			<xsl:when test="p:spPr/a:prstGeom/a:avLst/a:gd">
+				<xsl:variable name="fmla1">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=1]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="fmla2">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=2]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="fmla3">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=3]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="fmla4">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=4]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="fmla5">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=5]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="fmla6">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=6]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="fmla7">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=7]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="fmla8">
+					<xsl:value-of select="substring-after(p:spPr/a:prstGeom/a:avLst/child::node()[name()='a:gd'][position()=8]/@fmla,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="X">
+					<xsl:value-of select="p:spPr/a:xfrm/a:off/@x"/>
+				</xsl:variable>
+				<xsl:variable name="Y">
+					<xsl:value-of select="p:spPr/a:xfrm/a:off/@y"/>
+				</xsl:variable>
+				<xsl:variable name="CX">
+					<xsl:value-of select="p:spPr/a:xfrm/a:ext/@cx"/>
+				</xsl:variable>
+				<xsl:variable name="CY">
+					<xsl:value-of select="p:spPr/a:xfrm/a:ext/@cy"/>
+				</xsl:variable>
+				<xsl:variable name="FlipH">
+					<xsl:choose>
+						<xsl:when test="p:spPr/a:xfrm/@flipH">
+							<xsl:value-of select="p:spPr/a:xfrm/@flipH"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'0'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="FlipV">
+					<xsl:choose>
+						<xsl:when test="(p:spPr/a:xfrm/@flipV)">
+							<xsl:value-of select="(p:spPr/a:xfrm/@flipV)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'0'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name="Rot">
+					<xsl:choose>
+						<xsl:when test="(p:spPr/a:xfrm/@rot)">
+							<xsl:value-of select="(p:spPr/a:xfrm/@rot)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'0'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+
+				<xsl:if test="p:spPr/a:prstGeom/@prst='borderCallout1'">
+					<xsl:attribute name ="draw:modifiers">
+						<xsl:value-of select ="concat('Callout-AdjLine1:',$X,':',$Y,':',$CX,':',$CY,':',$FlipH,':',$FlipV,':',$Rot,':',$fmla1,':',$fmla2,':',$fmla3,':',$fmla4)"/>
+					</xsl:attribute>
+				</xsl:if>
+				<xsl:if test="p:spPr/a:prstGeom/@prst='borderCallout2'">
+					<xsl:attribute name ="draw:modifiers">
+						<xsl:value-of select ="concat('Callout-AdjLine2:',$X,':',$Y,':',$CX,':',$CY,':',$FlipH,':',$FlipV,':',$Rot,':',$fmla1,':',$fmla2,':',$fmla3,':',$fmla4,':',$fmla5,':',$fmla6)"/>
+					</xsl:attribute>
+				</xsl:if>
+				<xsl:if test="p:spPr/a:prstGeom/@prst='borderCallout3'">
+					<xsl:attribute name ="draw:modifiers">
+						<xsl:value-of select ="concat('Callout-AdjLine3:',$X,':',$Y,':',$CX,':',$CY,':',$FlipH,':',$FlipV,':',$Rot,':',$fmla1,':',$fmla2,':',$fmla3,':',$fmla4,':',$fmla5,':',$fmla6,':',$fmla7,':',$fmla8)"/>
+					</xsl:attribute>
+				</xsl:if>
+			</xsl:when>
+
+			<xsl:when test="not(p:spPr/a:prstGeom/a:avLst/a:gd)">
+				<xsl:if test="p:spPr/a:prstGeom/@prst='borderCallout1'">
+					<xsl:attribute name ="draw:modifiers">
+						<xsl:value-of select="$defaultVal"/>
+					</xsl:attribute>
+				</xsl:if>
+				<xsl:if test="p:spPr/a:prstGeom/@prst='borderCallout2'">
+					<xsl:attribute name ="draw:modifiers">
+						<xsl:value-of select="$defaultVal"/>
+					</xsl:attribute>
+				</xsl:if>
+				<xsl:if test="p:spPr/a:prstGeom/@prst='borderCallout3'">
+					<xsl:attribute name ="draw:modifiers">
+						<xsl:value-of select="$defaultVal"/>
+					</xsl:attribute>
+				</xsl:if>
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>

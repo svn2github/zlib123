@@ -4578,10 +4578,11 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='paper')">
         <xsl:value-of select ="'foldedCorner '"/>
       </xsl:when>
-      <!--  Lightning Bolt (Added by A.Mathi as on 20/07/2007) -->
-      <xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N')">
-        <xsl:value-of select ="'lightningBolt '"/>
-      </xsl:when>
+		<!--  Lightning Bolt (Added by A.Mathi as on 20/07/2007) -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:enhanced-path='M 640 233 L 221 293 506 12 367 0 29 406 431 347 145 645 99 520 0 861 326 765 209 711 640 233 640 233 Z N') or 
+					     (draw:enhanced-geometry/@draw:enhanced-path='M 8458 0 L 0 3923 7564 8416 4993 9720 12197 13904 9987 14934 21600 21600 14768 12911 16558 12016 11030 6840 12831 6120 8458 0 Z N')">
+			<xsl:value-of select ="'lightningBolt '"/>
+		</xsl:when>
 		<!--  Explosion 1 (Modified by A.Mathi) -->
 		<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt71') and 
 					   (draw:enhanced-geometry/@draw:enhanced-path='M 10901 5905 L 8458 2399 7417 6425 476 2399 4732 7722 106 8718 3828 11880 243 14689 5772 14041 4868 17719 7819 15730 8590 21600 10637 15038 13349 19840 14125 14561 18248 18195 16938 13044 21600 13393 17710 10579 21198 8242 16806 7417 18482 4560 14257 5429 14623 106 10901 5905 Z N')">
@@ -4619,6 +4620,18 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='cloud-callout')">
         <xsl:value-of select ="'Cloud Callout '"/>
       </xsl:when>
+		<!-- Line Callout 1) -->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='line-callout-1' or draw:enhanced-geometry/@draw:type='line-callout-3')">
+			<xsl:value-of select ="'borderCallout1'"/>
+		</xsl:when>
+		<!--Line Callout 2)-->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='line-callout-2')">
+			<xsl:value-of select ="'borderCallout2'"/>
+		</xsl:when>
+		<!--Line Callout 3)-->
+		<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt49') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M ?f6 ?f7 F L ?f4 ?f5 ?f2 ?f3 ?f0 ?f1 N')">
+			<xsl:value-of select ="'borderCallout3'"/>
+		</xsl:when>	
       <!-- Rectangle -->
       <xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangle') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
         <xsl:value-of select ="'Rectangle Custom '"/>
@@ -5071,115 +5084,212 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when >
          </xsl:choose>
   </xsl:template>
+
+	<!--CalloutAdjs Template (added by Mathi)-->
 	<xsl:template name="tmpCalloutAdjustment">
 		<xsl:param name="prst"/>
-		<xsl:choose>
-			<xsl:when test="not( substring-after(draw:enhanced-geometry/@draw:modifiers,' ') - substring-before(draw:enhanced-geometry/@draw:modifiers,' ') = 18000 )">
-				<xsl:variable name="convertUnit">
-					<xsl:call-template name="getConvertUnit">
-						<xsl:with-param name="length" select="@draw:transform"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:variable name="width" >
+		<xsl:variable name="convertUnit">
+			<xsl:call-template name="getConvertUnit">
+				<xsl:with-param name="length" select="@draw:transform"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="width" >
+			<xsl:call-template name="convertUnitsToCm">
+				<xsl:with-param name="length" select="@svg:width"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="height" >
+			<xsl:call-template name="convertUnitsToCm">
+				<xsl:with-param name="length" select="@svg:height"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name ="angle">
+			<xsl:choose>
+				<xsl:when test="@draw:transform">
+					<xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'0'"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="x">
+			<xsl:choose>
+				<xsl:when test="@draw:transform">
+					<xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+				</xsl:when>
+				<xsl:otherwise>
 					<xsl:call-template name="convertUnitsToCm">
-						<xsl:with-param name="length" select="@svg:width"/>
+						<xsl:with-param name="length" select="@svg:x"/>
 					</xsl:call-template>
-				</xsl:variable>
-				<xsl:variable name="height" >
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="y">
+			<xsl:choose>
+				<xsl:when test="@draw:transform">
+					<xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
+				</xsl:when>
+				<xsl:otherwise>
 					<xsl:call-template name="convertUnitsToCm">
-						<xsl:with-param name="length" select="@svg:height"/>
+						<xsl:with-param name="length" select="@svg:y"/>
 					</xsl:call-template>
-				</xsl:variable>
-				<xsl:variable name ="angle">
-					<xsl:choose>
-						<xsl:when test="@draw:transform">
-							<xsl:value-of select="substring-after(substring-before(substring-before(@draw:transform,'translate'),')'),'(')" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="'0'"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name ="x">
-					<xsl:choose>
-						<xsl:when test="@draw:transform">
-							<xsl:value-of select="substring-before(substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:call-template name="convertUnitsToCm">
-								<xsl:with-param name="length" select="@svg:x"/>
-							</xsl:call-template>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name ="y">
-					<xsl:choose>
-						<xsl:when test="@draw:transform">
-							<xsl:value-of select="substring-before(substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' '),$convertUnit)" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:call-template name="convertUnitsToCm">
-								<xsl:with-param name="length" select="@svg:y"/>
-							</xsl:call-template>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name ="flipH">
-					<xsl:choose>
-						<xsl:when test="draw:enhanced-geometry/@draw:mirror-horizontal">
-							<xsl:value-of select="(draw:enhanced-geometry/@draw:mirror-horizontal)" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="'0'"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name ="flipV">
-					<xsl:choose>
-						<xsl:when test="draw:enhanced-geometry/@draw:mirror-vertical">
-							<xsl:value-of select="(draw:enhanced-geometry/@draw:mirror-vertical)" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="'0'"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name ="viewDX">
-					<xsl:value-of select="substring-before(draw:enhanced-geometry/@draw:modifiers,' ')" />
-				</xsl:variable>
-				<xsl:variable name ="viewDY">
-					<xsl:value-of select="substring-after(draw:enhanced-geometry/@draw:modifiers,' ')" />
-				</xsl:variable>
-				<a:prstGeom>
-					<xsl:attribute name="prst">
-						<xsl:value-of select="$prst"/>
-					</xsl:attribute>
-					<a:avLst>
-						<a:gd name="adj1">
-							<xsl:attribute name="fmla">
-								<xsl:value-of select="concat('Callout-DirectAdj1fmla1:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,':',$viewDX,':',$viewDY)"/>
-							</xsl:attribute>
-						</a:gd>
-						<a:gd name="adj2">
-							<xsl:attribute name="fmla">
-								<xsl:value-of select="concat('Callout-DirectAdj2fmla2:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,':',$viewDX,':',$viewDY)"/>
-							</xsl:attribute>
-						</a:gd>
-						<xsl:if test="$prst='wedgeRoundRectCallout'">
-							<a:gd name="adj3" fmla="val 16667" />
-						</xsl:if>
-					</a:avLst>
-				</a:prstGeom>
-			</xsl:when>
-			<xsl:otherwise>
-				<a:prstGeom>
-					<xsl:attribute name="prst">
-						<xsl:value-of select="$prst"/>
-					</xsl:attribute>
-					<a:avLst/>
-				</a:prstGeom>
-			</xsl:otherwise>
-		</xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="flipH">
+			<xsl:choose>
+				<xsl:when test="draw:enhanced-geometry/@draw:mirror-horizontal">
+					<xsl:value-of select="(draw:enhanced-geometry/@draw:mirror-horizontal)" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'0'"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name ="flipV">
+			<xsl:choose>
+				<xsl:when test="draw:enhanced-geometry/@draw:mirror-vertical">
+					<xsl:value-of select="(draw:enhanced-geometry/@draw:mirror-vertical)" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'0'"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:if test ="(draw:enhanced-geometry/@draw:type='rectangular-callout'
+		                or draw:enhanced-geometry/@draw:type='round-rectangular-callout'
+						or draw:enhanced-geometry/@draw:type='round-callout'
+						or draw:enhanced-geometry/@draw:type='cloud-callout')">
+			<a:prstGeom>
+				<xsl:attribute name="prst">
+					<xsl:value-of select="$prst"/>
+				</xsl:attribute>
+				<a:avLst>
+					<a:gd name="adj1">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectAdj1Notlinefmla1:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj2">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectAdj2Notlinefmla2:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<xsl:if test="$prst='wedgeRoundRectCallout'">
+						<a:gd name="adj3" fmla="val 16667" />
+					</xsl:if>
+				</a:avLst>
+			</a:prstGeom>
+		</xsl:if>
+		<xsl:if test ="(draw:enhanced-geometry/@draw:type='line-callout-1' or draw:enhanced-geometry/@draw:type='line-callout-3')">
+			<a:prstGeom prst="borderCallout1">
+				<a:avLst>
+					<a:gd name="adj1">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine1Adj1fmla1:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj2">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine1Adj2fmla2:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj3">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine1Adj3fmla3:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj4">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine1Adj4fmla4:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+				</a:avLst>
+			</a:prstGeom>
+		</xsl:if>
+		<xsl:if test ="(draw:enhanced-geometry/@draw:type='line-callout-2')">
+			<a:prstGeom prst="borderCallout2">
+				<a:avLst>
+					<a:gd name="adj1">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine2Adj1fmla1:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj2">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine2Adj2fmla2:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj3">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine2Adj3fmla3:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj4">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine2Adj4fmla4:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj5">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine2Adj5fmla5:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj6">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine2Adj6fmla6:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+				</a:avLst>
+			</a:prstGeom>
+		</xsl:if>
+		<xsl:if test ="(draw:enhanced-geometry/@draw:type='mso-spt49') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 Z N M ?f6 ?f7 F L ?f4 ?f5 ?f2 ?f3 ?f0 ?f1 N')">
+			<a:prstGeom prst="borderCallout3">
+				<a:avLst>
+					<a:gd name="adj1">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj1fmla1:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj2">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj2fmla2:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj3">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj3fmla3:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj4">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj4fmla4:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj5">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj5fmla5:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj6">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj6fmla6:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj7">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj7fmla7:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+					<a:gd name="adj8">
+						<xsl:attribute name="fmla">
+							<xsl:value-of select="concat('Callout-DirectLine3Adj8fmla8:',$width,':',$height,':',$x,':',$y,':',$flipH,':',$flipV,':',$angle,'@',draw:enhanced-geometry/@draw:modifiers)"/>
+						</xsl:attribute>
+					</a:gd>
+				</a:avLst>
+			</a:prstGeom>
+		</xsl:if>
 	</xsl:template>
 	
   <xsl:template name="tmpHyperLnkBuImgRel">

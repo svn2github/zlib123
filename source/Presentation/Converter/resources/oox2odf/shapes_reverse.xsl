@@ -2282,6 +2282,143 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:copy-of select="$varHyperLinksForShapes" />
 			</draw:custom-shape>
 		</xsl:when>
+		<!-- Line Callout 1) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout1')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					draw:mirror-horizontal="false"
+					draw:type="line-callout-1"
+					draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M ?f0 ?f1 L ?f2 ?f3 N">
+					<xsl:call-template name="tmpCalloutLineAdj">
+						<xsl:with-param name="defaultVal" select="'-8300 24500 -1800 4000'"/>
+					</xsl:call-template>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="$1 "/>
+					<draw:equation draw:name="f2" draw:formula="$2 "/>
+					<draw:equation draw:name="f3" draw:formula="$3 "/>
+					<draw:equation draw:name="f4" draw:formula="$4 "/>
+					<draw:equation draw:name="f5" draw:formula="$5 "/>
+					<draw:equation draw:name="f6" draw:formula="$6 "/>
+					<draw:equation draw:name="f7" draw:formula="$7 "/>
+					<draw:handle draw:handle-position="$0 $1"/>
+					<draw:handle draw:handle-position="$2 $3"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Line Callout 2) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout2')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600"
+					draw:mirror-horizontal="false"
+					draw:type="line-callout-2"
+					draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M ?f0 ?f1 L ?f2 ?f3 N M ?f2 ?f3 L ?f4 ?f5 N">
+					<xsl:call-template name="tmpCalloutLineAdj">
+						<xsl:with-param name="defaultVal" select="'-10000 24500 -3600 4000 -1800 4000'"/>
+					</xsl:call-template>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="$1 "/>
+					<draw:equation draw:name="f2" draw:formula="$2 "/>
+					<draw:equation draw:name="f3" draw:formula="$3 "/>
+					<draw:equation draw:name="f4" draw:formula="$4 "/>
+					<draw:equation draw:name="f5" draw:formula="$5 "/>
+					<draw:equation draw:name="f6" draw:formula="$6 "/>
+					<draw:equation draw:name="f7" draw:formula="$7 "/>
+					<draw:handle draw:handle-position="$0 $1"/>
+					<draw:handle draw:handle-position="$2 $3"/>
+					<draw:handle draw:handle-position="$4 $5"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
+		<!-- Line Callout 3) -->
+		<xsl:when test ="(p:spPr/a:prstGeom/@prst='borderCallout3')">
+			<draw:custom-shape draw:layer="layout" >
+				<xsl:call-template name ="CreateShape">
+					<xsl:with-param name="sldId" select="$slideId" />
+					<xsl:with-param name ="grID" select ="$GraphicId" />
+					<xsl:with-param name ="prID" select ="$ParaId" />
+					<xsl:with-param name="TypeId" select ="$TypeId" />
+					<xsl:with-param name="grpBln" select ="$grpBln" />
+					<xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+					<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+					<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+					<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+				</xsl:call-template>
+				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600"
+					draw:type="mso-spt49"
+					draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M ?f6 ?f7 F L ?f4 ?f5 ?f2 ?f3 ?f0 ?f1 N">
+					<xsl:call-template name="tmpCalloutLineAdj">
+						<xsl:with-param name="defaultVal" select="'-1800 0 -3600 0 -3600 0 -1800 4000'"/>
+					</xsl:call-template>
+					<xsl:if test="p:spPr/a:xfrm/@flipH='1'">
+						<xsl:attribute name ="draw:mirror-horizontal">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="p:spPr/a:xfrm/@flipV='1'">
+						<xsl:attribute name ="draw:mirror-vertical">
+							<xsl:value-of select="'true'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<draw:equation draw:name="f0" draw:formula="$0 "/>
+					<draw:equation draw:name="f1" draw:formula="$1 "/>
+					<draw:equation draw:name="f2" draw:formula="$2 "/>
+					<draw:equation draw:name="f3" draw:formula="$3 "/>
+					<draw:equation draw:name="f4" draw:formula="$4 "/>
+					<draw:equation draw:name="f5" draw:formula="$5 "/>
+					<draw:equation draw:name="f6" draw:formula="$6 "/>
+					<draw:equation draw:name="f7" draw:formula="$7 "/>
+					<draw:handle draw:handle-position="$0 $1"/>
+					<draw:handle draw:handle-position="$2 $3"/>
+					<draw:handle draw:handle-position="$4 $5"/>
+					<draw:handle draw:handle-position="$6 $7"/>
+				</draw:enhanced-geometry>
+				<xsl:copy-of select="$varHyperLinksForShapes" />
+			</draw:custom-shape>
+		</xsl:when>
 		
       <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='bentArrow')">

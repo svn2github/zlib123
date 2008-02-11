@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -1310,28 +1310,110 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
 		<!-- Rectangular Callout (modified by A.Mathi) -->
 		<xsl:when test ="contains($prstGeom, 'Rectangular Callout')">
-			<xsl:call-template name="tmpCalloutAdjustment">
-				<xsl:with-param name="prst" select="'wedgeRectCallout'"/>
-								</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="not(draw:enhanced-geometry/@draw:modifiers='6300 24300')">
+			                <xsl:call-template name="tmpCalloutAdjustment">
+						<xsl:with-param name="prst" select="'wedgeRectCallout'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<a:prstGeom prst="wedgeRectCallout">
+						<a:avLst/>
+					</a:prstGeom>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:when>
 		<!-- Rounded Rectangular Callout (modified by A.Mathi) -->
 		<xsl:when test ="contains($prstGeom, 'wedgeRoundRectCallout')">
-			<xsl:call-template name="tmpCalloutAdjustment">
-				<xsl:with-param name="prst" select="'wedgeRoundRectCallout'"/>
-								</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="not(draw:enhanced-geometry/@draw:modifiers='6300 24300')">
+			                <xsl:call-template name="tmpCalloutAdjustment">
+						<xsl:with-param name="prst" select="'wedgeRoundRectCallout'"/>
+					</xsl:call-template>
+		                </xsl:when>
+				<xsl:otherwise>
+					<a:prstGeom prst="wedgeRoundRectCallout">
+						<a:avLst/>
+					</a:prstGeom>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:when>
 		<!-- Oval Callout (modified by A.Mathi) -->
 		<xsl:when test ="contains($prstGeom, 'wedgeEllipseCallout')">
-			<xsl:call-template name="tmpCalloutAdjustment">
-				<xsl:with-param name="prst" select="'wedgeEllipseCallout'"/>
-								</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="not(draw:enhanced-geometry/@draw:modifiers='6300 24300')">
+			                <xsl:call-template name="tmpCalloutAdjustment">
+						<xsl:with-param name="prst" select="'wedgeEllipseCallout'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<a:prstGeom prst="wedgeEllipseCallout">
+						<a:avLst/>
+					</a:prstGeom>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:when>
 		<!-- Cloud Callout (modified by A.Mathi) -->
 		<xsl:when test ="contains($prstGeom, 'Cloud Callout')">
-			<xsl:call-template name="tmpCalloutAdjustment">
-				<xsl:with-param name="prst" select="'cloudCallout'"/>
-								</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="not(draw:enhanced-geometry/@draw:modifiers='6300 24300')">
+			                <xsl:call-template name="tmpCalloutAdjustment">
+						<xsl:with-param name="prst" select="'cloudCallout'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<a:prstGeom prst="cloudCallout">
+						<a:avLst/>
+					</a:prstGeom>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:when>
+		<!-- Line Callout 1 -->
+		<xsl:when test ="contains($prstGeom, 'borderCallout1')">
+			<xsl:choose>
+				<xsl:when test="not(draw:enhanced-geometry/@draw:modifiers='-8300 24500 -1800 4000')">
+					<xsl:call-template name="tmpCalloutAdjustment" >
+						<xsl:with-param name="prst" select="'borderCallout1'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<a:prstGeom prst="borderCallout1">
+						<a:avLst/>
+					</a:prstGeom>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:when>
+		<!-- Line Callout 2 -->
+		<xsl:when test ="contains($prstGeom, 'borderCallout2')">
+			<xsl:choose>
+				<xsl:when test="not(draw:enhanced-geometry/@draw:modifiers='-10000 24500 -3600 4000 -1800 4000')">
+					<xsl:call-template name="tmpCalloutAdjustment" >
+						<xsl:with-param name="prst" select="'borderCallout2'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<a:prstGeom prst="borderCallout2">
+						<a:avLst/>
+					</a:prstGeom>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:when>
+		<!-- Line Callout 3 -->
+		<xsl:when test ="contains($prstGeom, 'borderCallout3')">
+			<xsl:choose>
+				<xsl:when test="not(draw:enhanced-geometry/@draw:modifiers='-1800 0 -3600 0 -3600 0 -1800 4000')">
+					<xsl:call-template name="tmpCalloutAdjustment" >
+						<xsl:with-param name="prst" select="'borderCallout3'"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<a:prstGeom prst="borderCallout3">
+						<a:avLst/>
+					</a:prstGeom>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:when>
+		
       <!-- Bent Arrow (Added by A.Mathi as on 23/07/2007) -->
       <xsl:when test ="contains($prstGeom, 'bentArrow')">
         <a:prstGeom prst="bentArrow">
