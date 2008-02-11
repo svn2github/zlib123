@@ -289,7 +289,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </style:style>
     <!--/xsl:if-->
 
-    <xsl:if test="following-sibling::e:col">
+    <xsl:if test="following-sibling::e:col[1]">
       <xsl:apply-templates select="following-sibling::e:col[1]" mode="automaticstyles">
         <xsl:with-param name="manualBreakes" select="$breakes"/>
       </xsl:apply-templates>
@@ -645,7 +645,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
     <xsl:apply-templates select="e:c[1]" mode="HorizontalStyle"/>
 
-    <xsl:if test="following-sibling::e:row">
+    <xsl:if test="following-sibling::e:row[1]">
       <xsl:for-each select="following-sibling::e:row[1]">
         <xsl:call-template name="ConvertHorizontalStyleForRow"/>
       </xsl:for-each>
@@ -679,7 +679,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </xsl:call-template>
       </xsl:if>
 
-      <xsl:if test="following-sibling::e:c">
+      <xsl:if test="following-sibling::e:c[1]">
         <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
       </xsl:if>
 
@@ -687,7 +687,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 
     <xsl:if test="not(e:v)">
 
-      <xsl:if test="following-sibling::e:c">
+      <xsl:if test="following-sibling::e:c[1]">
         <xsl:apply-templates select="following-sibling::e:c[1]" mode="HorizontalStyle"/>
       </xsl:if>
 
