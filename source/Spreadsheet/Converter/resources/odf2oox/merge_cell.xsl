@@ -94,7 +94,11 @@
     
     <xsl:choose>
       <!-- next row is a sibling -->
-      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ])">
+		<!-- Bug      :1803593,file, ilas_EVE_Database_V0.02.xlsx and ilas_EVE_Database_V0.03.xlsx
+		     Fixed By :Sateesh
+			 Desc     :OR condition replaced by AND, which brings down the time to a few swcondsLast
+		    <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] or following-sibling::node()[1][name() = 'table:table-row-group' ])">-->
+		<xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId] and not(following-sibling::node()[1][name() = 'table:table-header-rows' ] and following-sibling::node()[1][name() = 'table:table-row-group' ])">
         <xsl:apply-templates select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]" mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:choose>

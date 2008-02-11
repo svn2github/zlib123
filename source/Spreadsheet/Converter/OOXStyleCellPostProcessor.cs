@@ -30,6 +30,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 27-Dec-2007 Sateesh Reddy                 Changes done for localization and error regarding obj ref not set to an instance of obj.  
+RefNo-2 01-Feb-2008 Sandeep S     1738259         Changes done to Bug:Hyperlink text color is not retained after conversion
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 */
 
@@ -93,10 +94,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 if (!styleCellNumber.ContainsKey(text))
                 {
-                    if (!text.EndsWith("h") || !styleCellNumber.Contains(text.Substring(0, text.Length - 1)))
-                    {
+                    //RefNo-2
                         styleCellNumber.Add(text, this.numberCell);
-                    }
+                    //if (!text.EndsWith("h") || !styleCellNumber.Contains(text.Substring(0, text.Length - 1)))
+                    //{
+                    //    styleCellNumber.Add(text, this.numberCell);
+                    //}
                 }
             }
             else if (this.changeCellName)

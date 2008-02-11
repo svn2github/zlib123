@@ -350,7 +350,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
                     </xsl:attribute>
                     <!--RefNo-1-->
                     <!--<xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>-->
-                    <xsl:text>click here for the link</xsl:text>
+                    <!--<xsl:text>click here for the link</xsl:text>-->
                   </text:a>
                 </text:p>
                 <xsl:apply-templates select="xdr:sp/xdr:txBody"/>

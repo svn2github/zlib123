@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -237,7 +244,8 @@
       </xsl:for-each>
       <t xml:space="preserve"><xsl:value-of select="'&#xD;'"/></t>
     </r>
-    <xsl:if test="text() or text:span/text()">
+    <!--RefNo-1:Adde condition or child::*//text() to consider text() in any level-->
+    <xsl:if test="text() or text:span/text() or child::*//text()">
       <xsl:apply-templates mode="run"/>
     </xsl:if>
   </xsl:template>

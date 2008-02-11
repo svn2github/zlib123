@@ -31,6 +31,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyperlink (hyperlink within rowgroup) in the sheet.
+RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -715,10 +716,7 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
         <xsl:with-param name="postStyleName">
           <xsl:text>true</xsl:text>
         </xsl:with-param>
-      </xsl:apply-templates>
-
-      <!-- add cell formats for multiline cells, which must have wrap property -->
-      <xsl:call-template name="InsertMultilineCellFormats"/>
+      </xsl:apply-templates>      
 
       <!-- add cell formats for hyperlinks-->
 
@@ -765,6 +763,9 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
         </xsl:with-param>
       </xsl:call-template>
 
+      <!-- add cell formats for multiline cells, which must have wrap property -->
+      <!--RefNo-2:Changed the order of calling the template-->
+      <xsl:call-template name="InsertMultilineCellFormats"/>
     </cellXfs>
 
   </xsl:template>
@@ -880,6 +881,8 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <xsl:param name="postStyleName" select="false"/>
     <xsl:param name="hyperlink"/>
     <xsl:param name="hyperlinkId"/>
+    <!--RefNo-2-->
+    <xsl:param name="hypMultiLine" select="false"/>
 
 
     <!-- number format id -->
@@ -927,6 +930,8 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
           </xsl:attribute>
         </xsl:if>
         <xsl:call-template name="SetFormatProperties">
+          <!--RefNo-2-->
+          <xsl:with-param name="multiline" select="$hypMultiLine"/>
           <xsl:with-param name="FileName" select="$FileName"/>
           <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
           <xsl:with-param name="styleFontsCount">
@@ -2784,6 +2789,12 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/descendant::table:table-row/table:table-cell[descendant::text:a]">
 
+      <!--RefNo-2:variable to chk multiline-->
+      <xsl:variable name="hypMultiLine">
+         <xsl:if test="text:p[2]">
+           <xsl:text>true</xsl:text>
+         </xsl:if>        
+      </xsl:variable>
       <xsl:variable name="StyleName">
         <xsl:value-of select="@table:style-name"/>
       </xsl:variable>
@@ -2840,6 +2851,10 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
             <xsl:with-param name="hyperlinkId">
               <xsl:number count="table:table-cell[descendant::text:a]" level="any"/>
             </xsl:with-param>
+            <!--refNo-2-->
+            <xsl:with-param name="hypMultiLine">
+              <xsl:value-of select="$hypMultiLine"/>
+            </xsl:with-param>
           </xsl:apply-templates>
 
         </xsl:when>
@@ -2894,6 +2909,10 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
             <xsl:with-param name="hyperlinkId">
               <xsl:number count="table:table-cell[descendant::text:a]" level="any"/>
             </xsl:with-param>
+            <!--refNo-2-->
+            <xsl:with-param name="hypMultiLine">
+              <xsl:value-of select="$hypMultiLine"/>
+            </xsl:with-param>
           </xsl:apply-templates>
 
         </xsl:when>
@@ -2946,6 +2965,10 @@ RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyp
             </xsl:with-param>
             <xsl:with-param name="hyperlinkId">
               <xsl:number count="table:table-cell[descendant::text:a]" level="any"/>
+            </xsl:with-param>
+            <!--refNo-2-->
+            <xsl:with-param name="hypMultiLine">
+              <xsl:value-of select="$hypMultiLine"/>
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:otherwise>

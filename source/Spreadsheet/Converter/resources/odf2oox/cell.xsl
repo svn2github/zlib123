@@ -32,6 +32,7 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 06-Nov-2007 Sandeep S     1757284   Changes done to get the correct Used area-sheet after conversion. 
 RefNo-2 26-Dec-2007 Sandeep S     1805556   Changes done to include a condition to retain row grouping in case of blank cell
+RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -1629,12 +1630,29 @@ RefNo-2 26-Dec-2007 Sandeep S     1805556   Changes done to include a condition 
                 <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
               </xsl:for-each>
             </xsl:variable>
+            <!--Start of RefNo-3:checking if hyperlink inside multiline cell-->
+            <xsl:choose>
+              <xsl:when test="descendant::text:a[not(ancestor::office:annotation)]">
+                <xsl:variable name="hyperlinkId">
+                  <xsl:number count="table:table-cell[descendant::text:a]"
+                    level="any"/>
+                </xsl:variable>
          <!-- Code Added By Sateesh Reddy Date:01-Feb-2008  -->
-            <xsl:if test="($cellFormats + $cellStyles + $multilineNumber - 1) != ''">
+                <xsl:if test="($cellFormats + $cellStyles + $hyperlinkId - 1)">
             <xsl:attribute name="s">
-              <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber - 1"/>
+                    <xsl:value-of select="$cellFormats + $cellStyles + $hyperlinkId - 1"/>
             </xsl:attribute>
             </xsl:if>
+          </xsl:when>
+              <xsl:otherwise>
+                <xsl:if test="($cellFormats + $cellStyles + $multilineNumber + count(ancestor::table:table/descendant::text:a[not(ancestor::office:annotation)])- 1) != ''">
+            <xsl:attribute name="s">
+                    <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber + count(ancestor::table:table/descendant::text:a[not(ancestor::office:annotation)]) - 1"/>
+            </xsl:attribute>
+            </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
+            <!--End of RefNo-3-->
           </xsl:when>
 
           <!-- if it is a hyperlink  in the cell-->

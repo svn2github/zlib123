@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
@@ -1391,9 +1398,10 @@
           select="descendant::text:a[not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)]">
           <xsl:variable name="Check">
             <xsl:for-each select="parent::node()">
-              <xsl:if test="not(following-sibling::text:p) or not(preceding-sibling::text:p)">
+              <!--RefNo-1-->
+              <!--<xsl:if test="not(following-sibling::text:p) or not(preceding-sibling::text:p)">-->
                 <xsl:text>true</xsl:text>
-              </xsl:if>
+              <!--</xsl:if>-->
             </xsl:for-each>
           </xsl:variable>
           
@@ -1540,12 +1548,13 @@
    
     <xsl:for-each select="descendant::text:a">
       <xsl:for-each select="parent::node()">        
-        <xsl:choose>
-          <xsl:when test="not(following-sibling::text:p) and not(preceding-sibling::text:p)">
+        <!--RefNo-1-->
+        <!--<xsl:choose>
+          <xsl:when test="not(following-sibling::text:p) and not(preceding-sibling::text:p)">-->
             <xsl:text>true</xsl:text>  
-          </xsl:when>
+          <!--</xsl:when>
           <xsl:otherwise/>
-        </xsl:choose>
+        </xsl:choose>-->
       </xsl:for-each>
     </xsl:for-each>
       

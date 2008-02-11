@@ -679,9 +679,9 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
 
   <xsl:template match="text()" mode="text-box">
     <!--RefNo-1-->
-    <xsl:if test=". != 'click here for the link'">
+    <!--<xsl:if test=". != 'click here for the link'">-->
     <xsl:value-of select="."/>
-    </xsl:if>
+    <!--</xsl:if>-->
   </xsl:template>
 
   <xsl:template match="text:s" mode="text-box">

@@ -544,8 +544,44 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
               </xsl:attribute>
             </xsl:if>
             <!-- multiple print ranges with apostrophes -->
+			  <!-- Bug: 1803593, for the file U S Extreme Temperature, on round trip
+				   Fixed By: Vijayeta
+				   Print range in the input xlsx file is not in a proper format, hence in the converted ods file print range does not appear and hence,
+				   the xlsx file after round trip crashes. This part of code fixes this problem-->
             <xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">
-              <xsl:attribute name="table:print-ranges">
+				<xsl:variable name ="GetPrintRange">
+					<xsl:value-of select="./self::node()"/>
+				</xsl:variable>
+				<xsl:variable name ="newRange">
+					<xsl:choose>
+						<xsl:when test ="contains($GetPrintRange,',')">
+							<xsl:variable name ="PartOne">
+								<xsl:value-of select ="substring-before($GetPrintRange,',')"/>
+							</xsl:variable>
+							<xsl:variable name ="PartTwo">
+								<xsl:value-of select ="substring-after($GetPrintRange,',')"/>
+							</xsl:variable>
+							<xsl:variable name ="beginSheet">
+								<xsl:value-of select ="substring-before(substring-before($PartOne,':'),'!')"/>
+							</xsl:variable>
+							<xsl:variable name ="endSheet">
+								<xsl:value-of select ="substring-before(substring-before($PartTwo,':'),'!')"/>
+							</xsl:variable>
+							<xsl:variable name ="beginCol">
+								<xsl:value-of select ="substring-after(substring-before($PartOne,':'),'$')"/>
+							</xsl:variable>
+							<xsl:variable name ="endCol">
+								<xsl:value-of select ="substring-after(substring-after($PartOne,':'),'$')"/>
+							</xsl:variable>
+							<xsl:variable name ="beginRow">
+								<xsl:value-of select ="substring-after(substring-before($PartTwo,':'),'$')"/>
+							</xsl:variable>
+							<xsl:variable name ="endRow">
+								<xsl:value-of select ="substring-after(substring-after($PartTwo,':'),'$')"/>
+							</xsl:variable>
+							<xsl:value-of select ="concat($beginSheet,'.',$beginCol,$beginRow,':',$endSheet,'.',$endCol,$endRow)"/>
+						</xsl:when>
+						<xsl:otherwise>
                 <xsl:call-template name="recursive">
                   <xsl:with-param name="oldString" select="':'"/>
                   <xsl:with-param name="newString"
@@ -553,8 +589,14 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
                   <xsl:with-param name="wholeText"
                     select="translate(translate(./self::node(), '!', '.'), ',', ' ')"/>
                 </xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:attribute name="table:print-ranges">
+					<xsl:value-of select ="$newRange"/>
               </xsl:attribute>
             </xsl:if>
+			  <!-- End of fix for Bug 1803593, for the file U S Extreme Temperature, on round trip-->
           </xsl:if>
         </xsl:if>
       </xsl:for-each>
