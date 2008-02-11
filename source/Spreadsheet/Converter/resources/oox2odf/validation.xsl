@@ -106,7 +106,7 @@
             <xsl:when test="contains(@sqref, ':')">
 
                 <xsl:choose>
-                    <xsl:when test="following-sibling::e:dataValidation">
+                    <xsl:when test="following-sibling::e:dataValidation[1]">
                         <xsl:apply-templates select="following-sibling::e:dataValidation[1]">
                             <xsl:with-param name="ValidationCell">
                                 <xsl:call-template name="InsertValidationCell">
@@ -157,7 +157,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
-                    <xsl:when test="following-sibling::e:dataValidation">
+                    <xsl:when test="following-sibling::e:dataValidation[1]">
                         <xsl:apply-templates select="following-sibling::e:dataValidation[1]">
                             <xsl:with-param name="ValidationCell">
                                 <xsl:choose>

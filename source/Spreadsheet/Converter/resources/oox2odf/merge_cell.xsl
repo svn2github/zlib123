@@ -434,7 +434,7 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
     <xsl:param name="result"/>
 
     <xsl:choose>
-      <xsl:when test="following-sibling::e:mergeCell">
+      <xsl:when test="following-sibling::e:mergeCell[1]">
         <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="merge">        
           <xsl:with-param name="result">
             <xsl:value-of select="concat($result, @ref, ';')"/>
@@ -495,7 +495,7 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="following-sibling::e:mergeCell">
+      <xsl:when test="following-sibling::e:mergeCell[1]">
         <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="BigMergeColl">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -576,7 +576,7 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="following-sibling::e:mergeCell">
+      <xsl:when test="following-sibling::e:mergeCell[1]">
         <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="BigMergeRow">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>

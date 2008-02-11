@@ -1665,7 +1665,7 @@
           </xsl:call-template>
         </xsl:variable>
 
-        <xsl:if test="following-sibling::e:c">
+        <xsl:if test="following-sibling::e:c[1]">
           <xsl:for-each select="following-sibling::e:c[1]">
             <xsl:call-template name="ConvertCell">
               <xsl:with-param name="prevCellCol">

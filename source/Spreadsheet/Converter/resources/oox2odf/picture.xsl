@@ -196,7 +196,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="following-sibling::xdr:twoCellAnchor">
+      <xsl:when test="following-sibling::xdr:twoCellAnchor[1]">
         <xsl:apply-templates select="following-sibling::xdr:twoCellAnchor[1]">
           <xsl:with-param name="PictureCell">
             <xsl:value-of

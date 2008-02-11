@@ -183,7 +183,7 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="following-sibling::e:row">
+      <xsl:when test="following-sibling::e:row[1]">
         <xsl:apply-templates select="following-sibling::e:row[1]" mode="groupTag">
           <xsl:with-param name="Id">
             <xsl:value-of select="$Id"/>
@@ -276,7 +276,7 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="following-sibling::e:row">
+      <xsl:when test="following-sibling::e:row[1]">
         <xsl:apply-templates select="following-sibling::e:row[1]" mode="groupTagEnd">
           <xsl:with-param name="Id">
             <xsl:value-of select="$Id"/>
