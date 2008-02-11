@@ -462,18 +462,7 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:attribute name ="y">
 											<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
 										</xsl:attribute>
-									</p:by >-->
-
-										<xsl:if test="@smil:to">
-											<p:to>
-												<xsl:attribute name ="x">
-													<xsl:value-of select ="round(substring-before(@smil:to,',') * 100000)"/>
-												</xsl:attribute>
-												<xsl:attribute name ="y">
-													<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
-												</xsl:attribute>
-											</p:to >
-										</xsl:if>
+									</p:by >-->									
 									</xsl:otherwise>
 								</xsl:choose>
 							</p:animScale>
