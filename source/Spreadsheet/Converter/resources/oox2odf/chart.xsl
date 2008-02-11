@@ -390,11 +390,11 @@
       <!-- TO DO chart:style-name -->
       <chart:series chart:style-name="{concat('series',position())}">
         <xsl:if
-          test="(key('plotArea', c:chartSpace/@oox:part)/c:scatterChart or key('plotArea', c:chartSpace/@oox:part)/c:bubbleChart) and position() = 1">
+          test="(key('plotArea', ancestor::c:chartSpace/@oox:part)/c:scatterChart or key('plotArea', ancestor::c:chartSpace/@oox:part)/c:bubbleChart) and position() = 1">
           <chart:domain/>
         </xsl:if>
         <!-- for stock chart type 3 and type 4 -->
-        <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:stockChart and key('plotArea', c:chartSpace/@oox:part)/c:barChart">
+        <xsl:if test="key('plotArea', ancestor::c:chartSpace/@oox:part)/c:stockChart and key('plotArea', ancestor::c:chartSpace/@oox:part)/c:barChart">
           <xsl:attribute name="chart:attached-axis">
 
             <xsl:variable name="axisYId">
@@ -403,7 +403,7 @@
               </xsl:for-each>
             </xsl:variable>
 
-            <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/child::node()[contains(name(),'Ax')][2]">
+            <xsl:for-each select="key('plotArea', ancestor::c:chartSpace/@oox:part)/child::node()[contains(name(),'Ax')][2]">
               <xsl:choose>
                 <xsl:when test="c:axId/@val = $axisYId">
                   <xsl:text>primary-y</xsl:text>
@@ -434,11 +434,11 @@
           <xsl:attribute name="chart:repeated">
             <xsl:choose>
               <!-- for scatter chart -->
-              <xsl:when test="key('xNumPoints', c:chartSpace/@oox:part)/descendant::c:ptCount">
-                <xsl:value-of select="key('xNumPoints', c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
+              <xsl:when test="key('xNumPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount">
+                <xsl:value-of select="key('xNumPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="key('numPoints', c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
+                <xsl:value-of select="key('numPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
