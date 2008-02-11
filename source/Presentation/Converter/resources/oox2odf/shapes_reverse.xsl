@@ -5950,6 +5950,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:attribute>
                  </xsl:if>
           </xsl:when>
+      <xsl:when test ="not(p:spPr/a:ln)">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
   <!-- Get line styles for shape -->
