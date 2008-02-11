@@ -25,6 +25,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/*
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 22-Jan-2008 Sandeep S     1832335   to avoid New line inserted in note content after roundtrip conversions                 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+*/
 
 using System;
 using System.Xml;
@@ -159,22 +166,35 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     {
                         if (p[i] == "")
                         {
-                            WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            //RefNo-1
+                            //WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                             WriteStartElement("text", "span", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                             WriteEndElement();
+                            //RefNo-1
+                            if (i + 1 < p.Length)
+                            {
                             WriteEndElement();
+                                //RefNo-1
+                                WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            }
                         }
                         if (p[i] != "")
                         {
-                            WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            //RefNo-1
+                            //WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                             WriteStartElement("text", "span", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                             nextWriter.WriteStartAttribute("text", "style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                             nextWriter.WriteValue(style);
                             nextWriter.WriteEndAttribute();
                             this.nextWriter.WriteString(p[i]);
                             WriteEndElement();
+                            //RefNo-1
+                            if (i + 1 < p.Length)
+                            {
                             WriteEndElement();
-
+                                //RefNo-1
+                                WriteStartElement("text", "p", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+                            }
                         }
                     }
 

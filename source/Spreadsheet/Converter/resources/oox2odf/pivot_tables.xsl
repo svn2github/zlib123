@@ -142,7 +142,21 @@
         <xsl:variable name="TargetPilotFile">
           <xsl:value-of select="substring-after(@Target,'../')"/>
         </xsl:variable>
-
+		  <xsl:variable name="cacheFile">
+			  <xsl:for-each
+				select="key('Part', concat('xl/pivotTables/_rels/',substring-after($TargetPilotFile,'/'),'.rels'))//node()[name()='Relationship' and contains(@Type,'pivotCacheDefinition' )]">
+				  <xsl:value-of select="substring-after(@Target,'../')"/>
+			  </xsl:for-each>
+		  </xsl:variable>
+		  <!-- Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
+		  <xsl:variable name ="OneMoreValidation">
+			  <xsl:call-template name ="oneMoreValidation">
+				  <xsl:with-param name ="cacheFile">
+					  <xsl:value-of select ="$cacheFile"/>
+				  </xsl:with-param>
+			  </xsl:call-template>
+		  </xsl:variable>
+		  <!-- Vijayeta, 1803593,sales.xlsx-->
         <xsl:if test="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
           <xsl:for-each select="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition">
 
@@ -155,7 +169,8 @@
                 <xsl:value-of select="count(e:pivotField[@axis ='axisPage'])"/>
               </xsl:for-each>
             </xsl:variable>
-
+				  <!-- Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
+				  <xsl:if test ="$OneMoreValidation='true'">
             <table:data-pilot-table table:name="{$name}">
 
               <xsl:for-each select="e:location">
@@ -254,14 +269,14 @@
               </xsl:for-each>
 
               <!-- locate cache for this pivot table -->
-              <xsl:variable name="cacheFile">
+						  <!--<xsl:variable name="cacheFile">
                 <xsl:for-each
                   select="key('Part', concat('xl/pivotTables/_rels/',substring-after($TargetPilotFile,'/'),'.rels'))//node()[name()='Relationship' and contains(@Type,'pivotCacheDefinition' )]">
 
                   <xsl:value-of select="substring-after(@Target,'../')"/>
 
                 </xsl:for-each>
-              </xsl:variable>
+              </xsl:variable>-->
 
 
               <!-- insert pilot table source range -->
@@ -473,6 +488,8 @@
               </xsl:for-each>
 
             </table:data-pilot-table>
+				  </xsl:if>
+				  <!--End of Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
@@ -1063,5 +1080,39 @@
     </xsl:choose>
 
   </xsl:template>
+<!-- Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
+<xsl:template name ="oneMoreValidation">
+	<xsl:param name ="cacheFile"/>
+	<xsl:variable name ="validate">
+		<xsl:for-each select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition">
+			<xsl:for-each select="e:cacheSource/e:worksheetSource">
+				<xsl:variable name="apos">
+					<xsl:text>&apos;</xsl:text>
+				</xsl:variable>
 
+				<xsl:variable name="sheetSourceName">
+					<xsl:value-of select="@sheet"/>
+				</xsl:variable>
+
+				<xsl:variable name="firstSourceAdress">
+					<xsl:value-of select="substring-before(@ref,':')"/>
+				</xsl:variable>
+
+				<xsl:variable name="lastSourceAdress">
+					<xsl:value-of select="substring-after(@ref,':')"/>
+				</xsl:variable>
+				<xsl:if test ="$sheetSourceName != '' and $firstSourceAdress!='' and $lastSourceAdress!='' ">
+					<xsl:value-of select ="'true'"/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:for-each >
+	</xsl:variable>
+	<xsl:if test ="$validate='true'">
+		<xsl:value-of select ="'true'"/>
+	</xsl:if>
+	<xsl:if test ="$validate !='true'">
+		<xsl:value-of select ="'false'"/>
+	</xsl:if>
+</xsl:template>
+<!--End of Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
 </xsl:stylesheet>
