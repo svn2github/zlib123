@@ -270,23 +270,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       </xsl:otherwise>
                     </xsl:choose>
 		<style:text-properties style:font-charset="x-symbol">
-											<xsl:if test ="a:pPr/a:buFont/@typeface">
-												<xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="'StarSymbol'"/>
-													</xsl:attribute>
-												</xsl:if>
-												<xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-													<xsl:attribute name ="fo:font-family">
-														<xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-											<xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-												<xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="'StarSymbol'"/>
-												</xsl:attribute>
-											</xsl:if>
+      <xsl:call-template name="tmpBulletFont"/>
 											<xsl:if test ="a:pPr/a:buSzPct">
 												<xsl:attribute name ="fo:font-size">
 													<xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
@@ -533,23 +517,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       </xsl:choose>
                     </style:list-level-properties>
                     <style:text-properties style:font-charset="x-symbol" >
-                      <xsl:if test ="a:pPr/a:buFont/@typeface">
-                        <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-                          <xsl:attribute name ="fo:font-family">
-                            <xsl:value-of select ="'StarSymbol'"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-                          <xsl:attribute name ="fo:font-family">
-                            <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:if>
-                      <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-                        <xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="'StarSymbol'"/>
-												</xsl:attribute>
-											</xsl:if>
+                      <xsl:call-template name="tmpBulletFont"/>
 											<xsl:if test ="a:pPr/a:buSzPct">
 												<xsl:attribute name ="fo:font-size">
 													<xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
@@ -837,23 +805,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:choose>
                   </style:list-level-properties>
 									<style:text-properties style:font-charset="x-symbol">
-										<xsl:if test ="a:pPr/a:buFont/@typeface">
-											<xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-												<xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="'StarSymbol'"/>
-												</xsl:attribute>
-											</xsl:if>
-											<xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-												<xsl:attribute name ="fo:font-family">
-													<xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-												</xsl:attribute>
-											</xsl:if>
-										</xsl:if>
-										<xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-											<xsl:attribute name ="fo:font-family">
-												<xsl:value-of select ="'StarSymbol'"/>
-											</xsl:attribute>
-										</xsl:if>
+                    <xsl:call-template name="tmpBulletFont"/>
 										<xsl:if test ="a:pPr/a:buSzPct">
 											<xsl:attribute name ="fo:font-size">
 												<xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
@@ -1074,6 +1026,32 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
       </xsl:for-each>
     </xsl:if>
     <!--End  of Condition if levels are not present-->
+  </xsl:template>
+  <xsl:template name="tmpBulletFont">
+    <xsl:if test ="a:pPr/a:buFont/@typeface">
+      <xsl:choose>
+        <xsl:when test ="a:pPr/a:buFont[@typeface='Arial'] and a:pPr/a:buChar/@char='۩' ">
+          <xsl:attribute name ="fo:font-family">
+            <xsl:value-of select ="'Arial'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test ="a:pPr/a:buFont[@typeface='Arial']">
+          <xsl:attribute name ="fo:font-family">
+            <xsl:value-of select ="'StarSymbol'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test ="not(a:pPr/a:buFont[@typeface='Arial'])">
+          <xsl:attribute name ="fo:font-family">
+            <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+    <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
+      <xsl:attribute name ="fo:font-family">
+        <xsl:value-of select ="'StarSymbol'"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
   <xsl:template name="tmpListlevelProp">
     <xsl:choose>
@@ -2889,23 +2867,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							</xsl:if>
 						</style:list-level-properties>
 						<style:text-properties style:font-charset="x-symbol">
-							<xsl:if test ="a:buFont/@typeface">
-								<xsl:if test ="a:buFont[@typeface='Arial']">
-									<xsl:attribute name ="fo:font-family">
-										<xsl:value-of select ="'StarSymbol'"/>
-									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="not(a:buFont[@typeface='Arial'])">
-									<xsl:attribute name ="fo:font-family">
-										<xsl:value-of select ="a:buFont/@typeface"/>
-									</xsl:attribute>
-								</xsl:if>
-							</xsl:if>
-							<xsl:if test ="not(a:buFont/@typeface)">
-								<xsl:attribute name ="fo:font-family">
-									<xsl:value-of select ="'StarSymbol'"/>
-								</xsl:attribute>
-							</xsl:if>
+              <xsl:call-template name="tmpBulletFont"/>
 							<xsl:if test ="a:buSzPct">
 								<xsl:attribute name ="fo:font-size">
 									<xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>

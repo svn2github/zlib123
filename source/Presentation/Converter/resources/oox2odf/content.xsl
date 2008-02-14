@@ -2231,27 +2231,7 @@ exclude-result-prefixes="p a r xlink rels">
       </draw:g>
     </xsl:for-each >
   </xsl:template>
-  <xsl:template name ="FrameProperties">
-    <!--Added by Vipul for rotation-->
-    <!--Start-->
-    <xsl:call-template name="tmpWriteCordinates"/>
-    <!--End-->
-  </xsl:template>
-  <xsl:template name ="WriteTextSpan">
-    <xsl:param name ="file"/>
-    <draw:text-box>
-      <xsl:for-each select ="document(concat('ppt/',$file))/p:sld/p:cSld/p:spTree/p:sp/p:txBody/a:p">
-        <text:p text:style-name="P1">
-          <xsl:for-each select ="a:r">
-            <text:span text:style-name="T1">
-              <xsl:value-of select ="a:t"/>
-            </text:span>
-          </xsl:for-each>
-        </text:p>
-      </xsl:for-each>
-    </draw:text-box >
-  </xsl:template>
-  <xsl:template name ="GetStylesFromSlide" >
+   <xsl:template name ="GetStylesFromSlide" >
        <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
         <xsl:variable name="SlidePos" select="position()"/>
       <xsl:variable name ="SlideNumber">
@@ -3082,18 +3062,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:for-each>
         </xsl:template>
    <!--@@ Pradeep Nemadi Paragraph Tab stops code is added -End -->
-  <xsl:template name="GenerateId">
-    <xsl:param name="node"/>
-    <xsl:param name="nodetype"/>
-    <xsl:variable name="positionInGroup">
-      <xsl:for-each select="key(concat($nodetype,'s'), '')">
-        <xsl:if test="generate-id($node) = generate-id(.)">
-          <xsl:value-of select="position() + 1"/>
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:value-of select="$positionInGroup"/>
-  </xsl:template>
+ 
   <xsl:template name ="LayoutType">
     <xsl:param name ="LayoutStyle"/>
     <xsl:choose >
@@ -3819,132 +3788,9 @@ exclude-result-prefixes="p a r xlink rels">
       <number:year />
     </number:date-style>
   </xsl:template>
-  <xsl:template name ="getDefaultFontSize">
-    <xsl:param name ="prId"  />
-    <xsl:param name ="Id"  />
-    <xsl:param name ="sldName" />
-    <xsl:param name ="sz" />
-    <xsl:param name ="levelForDefFont"/>
-    <xsl:variable name ="slLtName">
-      <xsl:value-of select ="concat('ppt/slides/_rels/',$sldName,'.xml.rels')"/>
-    </xsl:variable>
-    <xsl:variable name ="layoutName">
-      <xsl:for-each  select ="document($slLtName)//node()/@Target[contains(.,'slideLayouts')]">
-        <xsl:value-of select ="concat('ppt',substring(.,3))"/>
-      </xsl:for-each >
-    </xsl:variable>
-    <!--<xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:cNvPr[@id=$prId]">
-			<xsl:value-of  select ="parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100"/>
-		</xsl:for-each>-->
-    <!--<xsl:value-of  select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$prId]/parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100"/>-->
-    <xsl:choose >
-      <xsl:when test ="$Id !='' and $prId != ''"	>
-        <xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id and @type=$prId]">
-          <!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
-          <!-- Added by vijayeta,Font Size for levels-->
-          <xsl:call-template name ="getFontSizeForLevelsFromLayout">
-            <xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
-          </xsl:call-template>
-          <!-- Added by vijayeta,Font Size for levels-->
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$prId =''  and $Id !=''">
-        <xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id]">
-          <!-- Added by vijayeta,Font Size for levels-->
-          <xsl:call-template name ="getFontSizeForLevelsFromLayout">
-            <xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
-          </xsl:call-template>
-          <!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
-          <!-- Added by vijayeta,Font Size for levels-->
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:otherwise >
-        <xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$prId]">
-          <xsl:if test ="@idx">
-            <!-- Added by vijayeta,Font Size for levels-->
-            <xsl:call-template name ="getFontSizeForLevelsFromLayout">
-              <xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
-            </xsl:call-template>
-            <!-- Added by vijayeta,Font Size for levels-->
-            <!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
-          </xsl:if>
-          <xsl:if  test ="not(@idx)">
-            <!-- Added by vijayeta,Font Size for levels-->
-            <xsl:call-template name ="getFontSizeForLevelsFromLayout">
-              <xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
-            </xsl:call-template>
-            <!-- Added by vijayeta,Font Size for levels-->
-            <!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
+  
   <!-- Template added by vijayeta to fix bug 1739076,get font family from slide layout-->
-  <xsl:template name ="FontTypeFromLayout">
-    <xsl:param name ="prId"  />
-    <xsl:param name ="Id"  />
-    <xsl:param name ="sldName" />
-    <xsl:param name ="sz" />
-    <xsl:param name ="levelForDefFont"/>
-    <xsl:param name ="DefFont"/>
-    <xsl:param name ="AttrType"/>
-    <xsl:variable name ="slLtName">
-      <xsl:value-of select ="concat('ppt/slides/_rels/',$sldName,'.xml.rels')"/>
-    </xsl:variable>
-    <xsl:variable name ="layoutName">
-      <xsl:for-each  select ="document($slLtName)//node()/@Target[contains(.,'slideLayouts')]">
-        <xsl:value-of select ="concat('ppt',substring(.,3))"/>
-      </xsl:for-each >
-    </xsl:variable>
-    <xsl:choose >
-      <xsl:when test ="$Id !='' and $prId != ''"	>
-        <xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id and @type=$prId]">
-          <xsl:call-template name ="getFontFamilyForLevelsFromLayout">
-            <xsl:with-param name ="levelForDefFont">
-              <xsl:value-of select="$levelForDefFont+1"/>
-            </xsl:with-param>
-            <xsl:with-param name ="AttrType" select ="$AttrType"/>
-            <xsl:with-param name ="DefFont" select ="$DefFont"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$prId =''  and $Id !=''">
-        <xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id]">
-          <xsl:call-template name ="getFontFamilyForLevelsFromLayout">
-            <xsl:with-param name ="levelForDefFont">
-              <xsl:value-of select="$levelForDefFont+1"/>
-            </xsl:with-param>
-
-            <xsl:with-param name ="DefFont" select ="$DefFont"/>
-            <xsl:with-param name ="AttrType" select ="$AttrType"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:otherwise >
-        <xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$prId]">
-          <xsl:if test ="@idx">
-            <xsl:call-template name ="getFontFamilyForLevelsFromLayout">
-              <xsl:with-param name ="levelForDefFont">
-                <xsl:value-of select="$levelForDefFont+1"/>
-              </xsl:with-param>
-              <xsl:with-param name ="DefFont" select ="$DefFont"/>
-              <xsl:with-param name ="AttrType" select ="$AttrType"/>
-            </xsl:call-template>
-          </xsl:if>
-          <xsl:if  test ="not(@idx)">
-            <xsl:call-template name ="getFontFamilyForLevelsFromLayout">
-              <xsl:with-param name ="levelForDefFont">
-                <xsl:value-of select="$levelForDefFont+1"/>
-              </xsl:with-param>
-              <xsl:with-param name ="DefFont" select ="$DefFont"/>
-              <xsl:with-param name ="AttrType" select ="$AttrType"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
+ 
   <xsl:template name ="GetLayOutName">
     <xsl:param name ="slideRelName"/>
     <xsl:variable name ="LtName">
@@ -12230,7 +12076,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-    <xsl:for-each select="node()/p:txBody/a:bodyPr">
+    <xsl:for-each select="p:txBody/a:bodyPr">
       <xsl:if test ="not(@anchor)">
       <xsl:choose>
         <xsl:when test="$spType='title'">
