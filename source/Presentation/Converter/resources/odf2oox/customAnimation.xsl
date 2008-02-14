@@ -462,7 +462,7 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:attribute name ="y">
 											<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
 										</xsl:attribute>
-									</p:by >-->									
+									</p:by >-->
 									</xsl:otherwise>
 								</xsl:choose>
 							</p:animScale>
