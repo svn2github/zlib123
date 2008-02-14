@@ -268,7 +268,7 @@
     <value>4</value>
   </data>
   <data name="grpDetails.Text" xml:space="preserve">
-    <value>Details</value>
+    <value>详情</value>
   </data>
   <data name="&gt;&gt;grpDetails.Name" xml:space="preserve">
     <value>grpDetails</value>

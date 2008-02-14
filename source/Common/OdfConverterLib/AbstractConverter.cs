@@ -59,6 +59,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         //static varibale is used for getting temporary input file name
         public static string inputTempFileName;
         
+        /// <summary>
+        /// Derived classed may return a precompiled stylesheet type.
+        /// </summary>
+        protected virtual Type LoadPrecompiledXslt()
+        {
+            return null;
+        }
+                
         protected AbstractConverter(Assembly resourcesAssembly)
         {
             this.resourcesAssembly = resourcesAssembly;
@@ -143,7 +151,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
       
-        protected XslCompiledTransform Load(bool computeSize)
+        protected virtual XslCompiledTransform Load(bool computeSize)
         {
             string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
             XPathDocument xslDoc = null;
@@ -155,13 +163,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     xslLocation = this.DirectTransform ? ODFToOOX_COMPUTE_SIZE_XSL : OOXToODF_COMPUTE_SIZE_XSL;
                 }
-                EmbeddedResourceResolver emr = (EmbeddedResourceResolver) resolver;
+                EmbeddedResourceResolver emr = (EmbeddedResourceResolver)resolver;
                 emr.IsDirectTransform = this.DirectTransform;
                 xslDoc = new XPathDocument(emr.GetInnerStream(xslLocation));
             }
             else
             {
-                xslDoc =  new XPathDocument(this.ExternalResources + "/" + xslLocation);
+                xslDoc = new XPathDocument(this.ExternalResources + "/" + xslLocation);
             }
 
             if (!this.compiledProcessors.Contains(xslLocation))
@@ -172,22 +180,88 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 // Activation of XSL Debugging only in "DEBUG" compilation mode
 
 #if DEBUG
-                XslCompiledTransform xslt = new XslCompiledTransform(true);
+        XslCompiledTransform xslt = new XslCompiledTransform(true);
 #else
                 XslCompiledTransform xslt = new XslCompiledTransform();
 #endif
 
                 //JP - 03/07/2007
-
-
-
                 // compile the stylesheet. 
                 // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
-                xslt.Load(xslDoc, this.XsltProcSettings, this.ResourceResolver);
+                try
+                {
+                    Type t = typeof(XslCompiledTransform);
+                    MethodInfo mi = t.GetMethod("Load", new Type[] { typeof(Type) });
+                    Type compiledStylesheet = this.LoadPrecompiledXslt();
+
+                    // check if optimization of precompiled XSLT works on current 
+                    // .Net Framework installation and with current conversion direction
+                    if (mi != null && compiledStylesheet != null)
+                    {
+                        // dynamically invoke xslt.Load(compiledStylesheet);
+                        mi.Invoke(xslt, new object[] { compiledStylesheet });
+                    }
+                    else
+                    {
+                        xslt.Load(xslDoc, this.XsltProcSettings, this.ResourceResolver);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
                 this.compiledProcessors.Add(xslLocation, xslt);
             }
-            return (XslCompiledTransform) this.compiledProcessors[xslLocation];
+            return (XslCompiledTransform)this.compiledProcessors[xslLocation];
         }
+
+        
+      
+//        protected XslCompiledTransform Load(bool computeSize)
+//        {
+//            string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
+//            XPathDocument xslDoc = null;
+//            XmlUrlResolver resolver = this.ResourceResolver;
+
+//            if (this.ExternalResources == null)
+//            {
+//                if (computeSize)
+//                {
+//                    xslLocation = this.DirectTransform ? ODFToOOX_COMPUTE_SIZE_XSL : OOXToODF_COMPUTE_SIZE_XSL;
+//                }
+//                EmbeddedResourceResolver emr = (EmbeddedResourceResolver) resolver;
+//                emr.IsDirectTransform = this.DirectTransform;
+//                xslDoc = new XPathDocument(emr.GetInnerStream(xslLocation));
+//            }
+//            else
+//            {
+//                xslDoc =  new XPathDocument(this.ExternalResources + "/" + xslLocation);
+//            }
+
+//            if (!this.compiledProcessors.Contains(xslLocation))
+//            {
+//                // create a xsl transformer
+
+//                // JP - 03/07/2007
+//                // Activation of XSL Debugging only in "DEBUG" compilation mode
+
+//#if DEBUG
+//                XslCompiledTransform xslt = new XslCompiledTransform(true);
+//#else
+//                XslCompiledTransform xslt = new XslCompiledTransform();
+//#endif
+
+//                //JP - 03/07/2007
+
+
+
+//                // compile the stylesheet. 
+//                // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
+//                xslt.Load(xslDoc, this.XsltProcSettings, this.ResourceResolver);
+//                this.compiledProcessors.Add(xslLocation, xslt);
+//            }
+//            return (XslCompiledTransform) this.compiledProcessors[xslLocation];
+//        }
 
         /// <summary>
         /// Pull the xslt settings
