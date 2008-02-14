@@ -42,6 +42,30 @@ namespace Sonata.OdfConverter.Presentation
        
         public Converter() : base(Assembly.GetExecutingAssembly()) { }
 
+        protected override Type LoadPrecompiledXslt()
+        {
+            Type stylesheet = null;
+            try
+            {
+                if (this.DirectTransform)
+                {
+                    stylesheet = Assembly.Load("PresentationConverter2Oox")
+                                            .GetType("PresentationConverter2Oox");
+                }
+                else
+                {
+                    stylesheet = Assembly.Load("PresentationConverter2Odf")
+                                            .GetType("PresentationConverter2Odf");
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return stylesheet;
+        }
+
+       
         protected override string[] DirectPostProcessorsChain
         {
             get
