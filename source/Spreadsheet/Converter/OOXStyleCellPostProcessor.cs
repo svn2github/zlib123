@@ -94,12 +94,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 if (!styleCellNumber.ContainsKey(text))
                 {
-                    //RefNo-2
-                        styleCellNumber.Add(text, this.numberCell);
-                    //if (!text.EndsWith("h") || !styleCellNumber.Contains(text.Substring(0, text.Length - 1)))
-                    //{
+                    //RefNo-2                     
                     //    styleCellNumber.Add(text, this.numberCell);
-                    //}
+                    if (!text.EndsWith("h") || !styleCellNumber.Contains(text.Substring(0, text.Length - 1)))
+                    {
+                        styleCellNumber.Add(text, this.numberCell);
+                    }
                 }
             }
             else if (this.changeCellName)

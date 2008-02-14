@@ -42,8 +42,11 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:dc="http://purl.org/dc/elements/1.1/" exclude-result-prefixes="table r text style fo dc">
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  exclude-result-prefixes="table r text style fo dc svg">
 
+<!--RefNO-2:xmlns and Exclude prefix svg is added-->
   <xsl:import href="measures.xsl"/>
 
   <!-- template which inserts sharedstringscontent -->
@@ -77,7 +80,8 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <si>
         <pxsi:maxlength xmlns:pxsi="urn:cleverage:xmlns:post-processings:cellText">        
           <xsl:choose>
-            <xsl:when test="text:span|text:p/text:span">
+            <!--RefNo-2:Added |text:p//text:a condition-->
+            <xsl:when test="text:span|text:p/text:span|text:p//text:a">
               <xsl:apply-templates mode="run" select="text:p"/>
             </xsl:when>
             <xsl:otherwise>
@@ -98,6 +102,9 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <!-- when text:span is not inside a comment -->
       <xsl:when test="($tekst != '' or text:s) and (not(name(parent::node()/parent::node()) = 'office:annotation') and not(name(parent::node()) = 'office:annotation'))">
         <r>
+          <!--Start of RefNo-2-->
+          <xsl:choose>
+            <xsl:when test="descendant::text:a|parent::text:a">
           <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
             <xsl:with-param name="parentCellStyleName">
               <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
@@ -105,7 +112,25 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
             <xsl:with-param name="defaultCellStyleName">
               <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
             </xsl:with-param>
+                <xsl:with-param name="hyperlinkExist">
+                  <xsl:value-of select="'true'"/>
+                </xsl:with-param>
+              </xsl:apply-templates>              
+            </xsl:when>
+            <xsl:otherwise>
+              <!--End of RefNo-2-->
+              <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
+                <xsl:with-param name="parentCellStyleName">
+                  <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
+                </xsl:with-param>
+                <xsl:with-param name="defaultCellStyleName">
+                  <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
+                </xsl:with-param>
           </xsl:apply-templates>
+              <!--Start of RefNo-2-->
+            </xsl:otherwise>
+          </xsl:choose>
+          <!--End of RefNo-2-->
           <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
         </r>
       </xsl:when>
@@ -130,12 +155,52 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   <!-- when there is formatted text in a string, all texts must be in runs -->
   <xsl:template match="text()" mode="run">
     <r>
+      <!--Start of RefNo-2-->
+      <xsl:choose>
+        <xsl:when test="descendant::text:a|parent::text:a">
       <xsl:apply-templates select="key('style',ancestor::table:table-cell/@table:style-name)"
         mode="textstyles">
         <xsl:with-param name="defaultCellStyleName">
           <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
         </xsl:with-param>
+            <xsl:with-param name="hyperlinkExist">
+              <xsl:value-of select="'true'"/>
+            </xsl:with-param>
       </xsl:apply-templates>
+          <xsl:if test="not(key('style',ancestor::table:table-cell/@table:style-name))">            
+            <rPr>
+              <sz val="10"/>
+              <color indexed="12"/>
+              <xsl:variable name="font">
+              <xsl:choose>
+                <xsl:when
+                  test="key('style',ancestor::table:table-column/@table:default-cell-style-name)/style:text-properties/@style:font-name">
+                  <xsl:value-of
+                    select="translate(key('font',key('style',ancestor::table:table-column/@table:default-cell-style-name)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+                />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'Arial'"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              </xsl:variable>
+              <rFont val="{$font}"/>
+              <family val="2"/>
+            </rPr>              
+          </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <!--End of RefNo-2-->
+          <xsl:apply-templates select="key('style',ancestor::table:table-cell/@table:style-name)"
+            mode="textstyles">
+            <xsl:with-param name="defaultCellStyleName">
+              <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+          <!--Start of RefNo-2-->
+        </xsl:otherwise>
+      </xsl:choose>
+      <!--End of RefNo-2-->
       <xsl:variable name="value">
         <xsl:value-of select="."/>
       </xsl:variable>
@@ -233,6 +298,9 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
     <r>
       <!-- set text formating of first span -->
       <xsl:for-each select="text:span[1]">
+        <!--Start of RefNo-2-->
+        <xsl:choose>
+          <xsl:when test="descendant::text:a|parent::text:a">
         <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
           <xsl:with-param name="parentCellStyleName">
             <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
@@ -240,7 +308,25 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           <xsl:with-param name="defaultCellStyleName">
             <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
           </xsl:with-param>
+              <xsl:with-param name="hyperlinkExist">
+                <xsl:value-of select="'true'"/>
+              </xsl:with-param>
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:otherwise>
+            <!--End of RefNo-2-->
+            <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
+              <xsl:with-param name="parentCellStyleName">
+                <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
+              </xsl:with-param>
+              <xsl:with-param name="defaultCellStyleName">
+                <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
+              </xsl:with-param>
         </xsl:apply-templates>
+            <!--Start of RefNo-2-->
+          </xsl:otherwise>
+        </xsl:choose>
+        <!--End of RefNo-2-->
       </xsl:for-each>
       <t xml:space="preserve"><xsl:value-of select="'&#xD;'"/></t>
     </r>

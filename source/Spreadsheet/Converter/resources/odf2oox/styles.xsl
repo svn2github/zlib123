@@ -1421,6 +1421,9 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   <xsl:template match="style:style" mode="textstyles">
     <xsl:param name="parentCellStyleName"/>
     <xsl:param name="defaultCellStyleName"/>
+    <!--Start of RefNo-3-->
+    <xsl:param name="hyperlinkExist" select="'false'"/>
+    <!--End of RefNo-3-->
     <xsl:if test="style:text-properties">
       <xsl:variable name="FontSize">
         <xsl:value-of select="@style:family"/>
@@ -1482,6 +1485,9 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           <xsl:apply-templates select="style:text-properties" mode="textstyles">
             <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
             <xsl:with-param name="defaultCellStyleName" select="$defaultCellStyleName"/>
+            <!--Start of RefNo-3-->
+            <xsl:with-param name="hyperlink" select="$hyperlinkExist"/>
+            <!--End of RefNo-3-->
           </xsl:apply-templates>
         </rPr>
       </xsl:if>
@@ -1735,9 +1741,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$hyperlink = 'true'">
-        <color theme="10"/>
-      </xsl:when>
+     
       <xsl:when
         test="$fontColor != '' or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
         <xsl:variable name="color">
@@ -1752,6 +1756,9 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           </xsl:choose>
         </xsl:variable>
         <color rgb="{concat('FF',substring-after($color,'#'))}"/>
+      </xsl:when>
+      <xsl:when test="$hyperlink = 'true'">
+        <color theme="10"/>
       </xsl:when>
     </xsl:choose>
 
