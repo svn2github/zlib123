@@ -115,8 +115,9 @@
             test="not(preceding-sibling::table:data-pilot-table[table:source-cell-range/@table:cell-range-address = $pivotSource])">
             
             <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them -->
+            <xsl:variable name="apos">'</xsl:variable>
             <xsl:variable name="sheetName">
-              <xsl:value-of select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+              <xsl:value-of select="translate(substring-before(table:source-cell-range/@table:cell-range-address,'.'),$apos,'')"/>
             </xsl:variable>
             <xsl:variable name="cellAddress">
               <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
@@ -358,7 +359,7 @@
           
           <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them -->
           <xsl:variable name="sheetName">
-            <xsl:value-of select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+            <xsl:value-of select="translate(substring-before(table:source-cell-range/@table:cell-range-address,'.'),$apos,'')"/>
           </xsl:variable>
           <xsl:variable name="cellAddress">
             <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>

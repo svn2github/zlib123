@@ -1094,65 +1094,83 @@
     <!-- do not process twice duplicated pivot source-->
     <xsl:for-each
       select="key('pivot','')[not(preceding-sibling::table:data-pilot-table/table:source-cell-range/@table:cell-range-address = table:source-cell-range/@table:cell-range-address)]">
-
-      <xsl:variable name="apos">
-        <xsl:text>&apos;</xsl:text>
+      <xsl:variable name="apos">'</xsl:variable>
+      <xsl:variable name="thisSheetName">
+        <xsl:value-of select="translate(substring-before(table:source-cell-range/@table:cell-range-address,'.'),$apos,'')"/>
       </xsl:variable>
-
-      <!-- check only pivot sources on this sheet -->
-      <xsl:if
-        test="substring-before(translate(table:source-cell-range/@table:cell-range-address,$apos,''), '.') = $sheetName ">
-
-        <xsl:variable name="rowStart">
-          <xsl:for-each select="table:source-cell-range">
-            <xsl:call-template name="GetRowNum">
-              <xsl:with-param name="cell">
-                <xsl:value-of
-                  select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:variable>
-
-        <xsl:variable name="colStart">
-          <xsl:for-each select="table:source-cell-range">
-            <xsl:call-template name="GetColNum">
-              <xsl:with-param name="cell">
-                <xsl:value-of
-                  select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:variable>
-
-        <xsl:variable name="rowEnd">
-          <xsl:for-each select="table:source-cell-range">				 
-            <xsl:call-template name="GetRowNum">
-              <xsl:with-param name="cell">
-                <xsl:value-of
-                  select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
-              </xsl:with-param>
-            </xsl:call-template>				
-          </xsl:for-each>
-        </xsl:variable>
-
-        <xsl:variable name="colEnd">
-          <xsl:for-each select="table:source-cell-range">
-            <xsl:call-template name="GetColNum">
-              <xsl:with-param name="cell">
-                <xsl:value-of
-                  select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:variable>
-
-        <xsl:call-template name="ListOutCellsInRange">
-          <xsl:with-param name="rowStart" select="$rowStart"/>
-          <xsl:with-param name="rowEnd" select="$rowEnd"/>
-          <xsl:with-param name="colStart" select="$colStart"/>
-          <xsl:with-param name="colEnd" select="$colEnd"/>
-        </xsl:call-template>
+      <xsl:variable name="cellAddress">
+        <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
+      </xsl:variable>
+      <xsl:variable name="CreatePivotTable">
+        <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$thisSheetName]">
+          <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
+            <xsl:with-param name="rowNumber">1</xsl:with-param>
+            <xsl:with-param name="cellStart">
+              <xsl:value-of select="substring-before(substring-after($cellAddress,'.'),':')"/>
+            </xsl:with-param>
+            <xsl:with-param name="cellEnd">
+              <xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:if test="$CreatePivotTable != 'false'">
+        
+        <!-- check only pivot sources on this sheet -->
+        <xsl:if
+          test="substring-before(translate(table:source-cell-range/@table:cell-range-address,$apos,''), '.') = $sheetName ">
+          
+          <xsl:variable name="rowStart">
+            <xsl:for-each select="table:source-cell-range">
+              <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:variable name="colStart">
+            <xsl:for-each select="table:source-cell-range">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="substring-after(substring-before(@table:cell-range-address,':'),'.')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:variable name="rowEnd">
+            <xsl:for-each select="table:source-cell-range">
+              <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:variable name="colEnd">
+            <xsl:for-each select="table:source-cell-range">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:call-template name="ListOutCellsInRange">
+            <xsl:with-param name="rowStart" select="$rowStart"/>
+            <xsl:with-param name="rowEnd" select="$rowEnd"/>
+            <xsl:with-param name="colStart" select="$colStart"/>
+            <xsl:with-param name="colEnd" select="$colEnd"/>
+          </xsl:call-template>
+        </xsl:if>
       </xsl:if>
     </xsl:for-each>
 

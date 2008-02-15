@@ -204,8 +204,9 @@
       <pivotCaches>
 
         <xsl:for-each select="table:data-pilot-table">
+          <xsl:variable name="apos">'</xsl:variable>
           <xsl:variable name="sheetName">
-            <xsl:value-of select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+            <xsl:value-of select="translate(substring-before(table:source-cell-range/@table:cell-range-address,'.'),$apos,'')"/>
           </xsl:variable>
           <xsl:variable name="cellAddress">
             <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
