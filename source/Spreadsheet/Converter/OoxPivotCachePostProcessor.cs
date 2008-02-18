@@ -72,6 +72,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
         private Hashtable[] fieldNamesText;
         private Hashtable[,] fieldItems;
         private Hashtable[,] fieldItemsText;
+        private Hashtable[,] fieldItemsLowerCaseText; //field items are case insensitive and here are stored lower-cased field items (as cell text)
         //fieldItems[i,j] (dimesion i equals number of pivotFields, dimesion j equals 2) 
         //fieldItems variable for each pivotField contains hashtable with unique values of this pivotField and a sequential number
         //at fieldItems[i,0] pivotField[i] values are the key and sequential number are the key values
@@ -835,11 +836,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             }
                             catch
                             {
-                                //if this is string value
+                                //if this is string value search for case insensitive field Item position
                                 this.nextWriter.WriteStartElement("x", EXCEL_NAMESPACE);
                                 this.nextWriter.WriteStartAttribute("v");
-                                value = pivotTable[row, col];
-                                this.nextWriter.WriteString(this.fieldItems[col, 0][value].ToString());
+                                value = pivotTable[row, col].ToString().ToLower();
+                                this.nextWriter.WriteString(this.fieldItemsLowerCaseText[col, 0][value].ToString());
                                 this.nextWriter.WriteEndAttribute();
                                 this.nextWriter.WriteEndElement();
                             }
@@ -932,6 +933,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             this.fieldNamesText = new Hashtable[2];
             this.fieldItems = new Hashtable[cols, 2];
             this.fieldItemsText = new Hashtable[cols, 2];
+            this.fieldItemsLowerCaseText = new Hashtable[cols, 2];
 
             //initialize Hashtables
             for (int i = 0; i < 2; i++)
@@ -943,6 +945,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 {
                     fieldItems[field, i] = new Hashtable();
                     fieldItemsText[field, i] = new Hashtable();
+                    fieldItemsLowerCaseText[field, i] = new Hashtable();
                 }
             }
 
@@ -985,7 +988,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         this.pivotTableText[row, col] = (string)pivotCellsText[key];
 
                         //Search for items based on cell text (Known Issue: [ 1803689 ] Duplicated field items in Calc pilot tables)
-                        if (!fieldItemsText[col,0].ContainsKey((string)pivotCellsText[key]))
+                        //fieldItems are case insensitive so compare lower-cased text
+                        if (!fieldItemsLowerCaseText[col,0].ContainsKey((string)pivotCellsText[key].ToString().ToLower()))
                         {
                             //Console.WriteLine("fielditem-" + (string)pivotCells[key]);
                             fieldItems[col,0].Add((string)pivotCells[key], index[col]);
@@ -993,6 +997,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                             fieldItemsText[col, 0].Add((string)pivotCellsText[key], index[col]);
                             fieldItemsText[col, 1].Add(index[col], (string)pivotCellsText[key]);
+
+                            fieldItemsLowerCaseText[col, 0].Add((string)pivotCellsText[key].ToString().ToLower(), index[col]);
+                            fieldItemsLowerCaseText[col, 1].Add(index[col], (string)pivotCellsText[key].ToString().ToLower());
+                            
                             index[col]++;
                         }
                     }
@@ -1009,6 +1017,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                             fieldItemsText[col, 0].Add("", index[col]);
                             fieldItemsText[col, 1].Add(index[col], "");
+
+                            fieldItemsLowerCaseText[col, 0].Add("", index[col]);
+                            fieldItemsLowerCaseText[col, 1].Add(index[col], "");
                             index[col]++;
                         }
                     }

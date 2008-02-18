@@ -346,10 +346,27 @@
           <xsl:text>&apos;</xsl:text>
         </xsl:variable>
         
+        <xsl:variable name="startRangeAddress">
+          <xsl:call-template name="GetRowNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':')"/>
+            </xsl:with-param>
+          </xsl:call-template>          
+        </xsl:variable>
+        
+        <xsl:variable name="endRangeAddress">
+          <xsl:call-template name="GetRowNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.')"/>
+            </xsl:with-param>
+          </xsl:call-template> 
+        </xsl:variable>
+        
+      
         <xsl:variable name="pivot">
           <xsl:choose>
             <xsl:when
-              test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address]">
+              test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address] and $startRangeAddress != $endRangeAddress">
              
               <xsl:text>true</xsl:text>
             </xsl:when>
