@@ -346,7 +346,7 @@
           <xsl:text>&apos;</xsl:text>
         </xsl:variable>
         
-        <xsl:variable name="startRangeAddress">
+        <xsl:variable name="startRangeAddressRow">
           <xsl:call-template name="GetRowNum">
             <xsl:with-param name="cell">
               <xsl:value-of select="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':')"/>
@@ -354,8 +354,24 @@
           </xsl:call-template>          
         </xsl:variable>
         
-        <xsl:variable name="endRangeAddress">
+        <xsl:variable name="endRangeAddressRow">
           <xsl:call-template name="GetRowNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.')"/>
+            </xsl:with-param>
+          </xsl:call-template> 
+        </xsl:variable>
+        
+        <xsl:variable name="startRangeAddressCol">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':')"/>
+            </xsl:with-param>
+          </xsl:call-template>          
+        </xsl:variable>
+        
+        <xsl:variable name="endRangeAddressCol">
+          <xsl:call-template name="GetColNum">
             <xsl:with-param name="cell">
               <xsl:value-of select="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.')"/>
             </xsl:with-param>
@@ -366,7 +382,7 @@
         <xsl:variable name="pivot">
           <xsl:choose>
             <xsl:when
-              test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address] and $startRangeAddress != $endRangeAddress">
+              test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address] and $startRangeAddressRow != $endRangeAddressRow and $startRangeAddressCol != $endRangeAddressCol">
              
               <xsl:text>true</xsl:text>
             </xsl:when>
