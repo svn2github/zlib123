@@ -29,7 +29,7 @@
 <!--
 Modification Log
 Log		Date 	Modified   By       BugNo.		MOdification description
-RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: Textbox with hyperlink not properly converted 
+RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (V1.1):For the file Match13RIX2-AMUS.ods    
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
@@ -245,16 +245,15 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
                   <xdr:cNvSpPr txBox="1"/>
                 </xdr:nvSpPr>
                 <xsl:call-template name="InsertFrameProperties"/>
+                <!--RefNo-1:Added an if condition to chk for the presence of text-->
+                <xsl:if test="draw:text-box//text:p">
                 <xdr:txBody>
-
                   <xsl:call-template name="InsertTextBoxProperties"/>
-
                   <a:lstStyle/>
-
                   <!-- insert text -->
                   <xsl:apply-templates mode="text-box"/>
-
                 </xdr:txBody>
+               </xsl:if> 
               </xdr:sp>
               <xdr:clientData/>
             </xdr:twoCellAnchor>
@@ -678,11 +677,8 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
   </xsl:template>
 
   <xsl:template match="text()" mode="text-box">
-    <!--RefNo-1-->
-    <!--<xsl:if test=". != 'click here for the link'">-->
-    <xsl:value-of select="."/>
-    <!--</xsl:if>-->
-  </xsl:template>
+        <xsl:value-of select="."/>
+   </xsl:template>
 
   <xsl:template match="text:s" mode="text-box">
     <xsl:call-template name="InsertRepeatSpaces">

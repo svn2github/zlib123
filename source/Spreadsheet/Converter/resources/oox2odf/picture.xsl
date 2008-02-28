@@ -49,7 +49,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="e oox r c xdr rels xlink">
+  exclude-result-prefixes="e oox r c xdr draw rels xlink">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="chart.xsl"/>
@@ -338,7 +338,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
           <xsl:choose >
             <xsl:when test ="$hlinkId!='' and $newTarget!=''">
               <draw:text-box>
-                <text:p>
+                <!--<text:p>
                   <xsl:if test="a:pPr">
                     <xsl:attribute name="text:style-name">
                       <xsl:value-of select="generate-id(.)"/>
@@ -348,11 +348,11 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
                     <xsl:attribute name ="xlink:href">
                       <xsl:value-of select =" $newTarget"/>
                     </xsl:attribute>
-                    <!--RefNo-1-->
-                    <!--<xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>-->
-                    <!--<xsl:text>click here for the link</xsl:text>-->
+                    --><!--RefNo-1--><!--
+                    --><!--<xsl:apply-templates select="xdr:sp/xdr:txBody/a:p/a:r/a:t"/>--><!--
+                    --><!--<xsl:text>click here for the link</xsl:text>--><!--
                   </text:a>
-                </text:p>
+                </text:p>-->
                 <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
               </draw:text-box>
             </xsl:when>
