@@ -101,81 +101,8 @@
   <ItemGroup>
     <EmbeddedResource Include="resources\customUI.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="OdfPPT2007AddinSetup-chs\PostBuild.bat" />
-    <None Include="OdfPPT2007AddinSetup-chs\Release\OdfPPT2007AddinSetup-chs.msi" />
-    <None Include="OdfPPT2007AddinSetup-de\PostBuild.bat" />
-    <None Include="OdfPPT2007AddinSetup-de\Release\OdfPPT2007AddinSetup-de.msi" />
-    <None Include="OdfPPT2007AddinSetup-fr\PostBuild.bat" />
-    <None Include="OdfPPT2007AddinSetup-fr\Release\OdfPPT2007AddinSetup-fr.msi" />
-    <None Include="OdfPPT2007AddinSetup-ja\PostBuild.bat" />
-    <None Include="OdfPPT2007AddinSetup-ja\Release\OdfPPT2007AddinSetup-ja.msi" />
-    <None Include="OdfPPT2007AddinSetup-nl\Debug\OdfPPT2007AddinSetup-nl.msi" />
-    <None Include="OdfPPT2007AddinSetup-nl\PostBuild.bat" />
-    <None Include="OdfPPT2007AddinSetup-nl\Release\OdfPPT2007AddinSetup-nl.msi" />
-    <None Include="OdfPPT2007AddinSetup-pl\Debug\OdfPPT2007AddinSetup-pl.msi" />
-    <None Include="OdfPPT2007AddinSetup-pl\PostBuild.bat" />
-    <None Include="OdfPPT2007AddinSetup-pl\Release\OdfPPT2007AddinSetup-pl.msi" />
-    <None Include="OdfPPT2007AddinSetup\Debug\KB908002\extensibilityMSM.msi" />
-    <None Include="OdfPPT2007AddinSetup\Debug\KB908002\lockbackRegKey.msi" />
-    <None Include="OdfPPT2007AddinSetup\Debug\OdfPPT2007AddinSetup.msi" />
-    <None Include="OdfPPT2007AddinSetup\KB908002\extensibilityMSM.msi" />
-    <None Include="OdfPPT2007AddinSetup\KB908002\lockbackRegKey.msi" />
-    <None Include="OdfPPT2007AddinSetup\PostBuild.bat" />
-    <None Include="OdfPPT2007AddinSetup\SetupPrepare.bat" />
+  <ItemGroup>    
     <None Include="resources\vssver.scc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="OdfPPT2007AddinSetup-chs\AddExcelCustomActions.vbs" />
-    <Content Include="OdfPPT2007AddinSetup-chs\OdfPPT2007AddinSetup-chs.vdproj" />
-    <Content Include="OdfPPT2007AddinSetup-chs\README.htm" />
-    <Content Include="OdfPPT2007AddinSetup-chs\Release\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup-de\AddExcelCustomActions.vbs" />
-    <Content Include="OdfPPT2007AddinSetup-de\OdfPPT2007AddinSetup-de.vdproj" />
-    <Content Include="OdfPPT2007AddinSetup-de\README.htm" />
-    <Content Include="OdfPPT2007AddinSetup-de\Release\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup-fr\AddExcelCustomActions.vbs" />
-    <Content Include="OdfPPT2007AddinSetup-fr\OdfPPT2007AddinSetup-fr.vdproj" />
-    <Content Include="OdfPPT2007AddinSetup-fr\README.htm" />
-    <Content Include="OdfPPT2007AddinSetup-fr\Release\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup-ja\AddExcelCustomActions.vbs" />
-    <Content Include="OdfPPT2007AddinSetup-ja\OdfPPT2007AddinSetup-ja.vdproj" />
-    <Content Include="OdfPPT2007AddinSetup-ja\README.htm" />
-    <Content Include="OdfPPT2007AddinSetup-ja\Release\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup-nl\AddExcelCustomActions.vbs" />
-    <Content Include="OdfPPT2007AddinSetup-nl\Debug\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup-nl\OdfPPT2007AddinSetup-nl.vdproj" />
-    <Content Include="OdfPPT2007AddinSetup-nl\README.htm" />
-    <Content Include="OdfPPT2007AddinSetup-nl\Release\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup-pl\AddExcelCustomActions.vbs" />
-    <Content Include="OdfPPT2007AddinSetup-pl\Debug\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup-pl\OdfPPT2007AddinSetup-pl.vdproj" />
-    <Content Include="OdfPPT2007AddinSetup-pl\README.htm" />
-    <Content Include="OdfPPT2007AddinSetup-pl\Release\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup\AddExcelCustomActions.vbs" />
-    <Content Include="OdfPPT2007AddinSetup\Debug\KB908002\office2003-kb907417sfxcab-ENU.exe" />
-    <Content Include="OdfPPT2007AddinSetup\Debug\setup.exe" />
-    <Content Include="OdfPPT2007AddinSetup\dotnetfx\de\eula.txt" />
-    <Content Include="OdfPPT2007AddinSetup\dotnetfx\de\package.xml" />
-    <Content Include="OdfPPT2007AddinSetup\dotnetfx\en\dotnetfx.exe" />
-    <Content Include="OdfPPT2007AddinSetup\dotnetfx\en\eula.txt" />
-    <Content Include="OdfPPT2007AddinSetup\dotnetfx\en\package.xml" />
-    <Content Include="OdfPPT2007AddinSetup\dotnetfx\fr\eula.txt" />
-    <Content Include="OdfPPT2007AddinSetup\dotnetfx\fr\package.xml" />
-    <Content Include="OdfPPT2007AddinSetup\KB908002\en\eula.txt" />
-    <Content Include="OdfPPT2007AddinSetup\KB908002\en\package.xml" />
-    <Content Include="OdfPPT2007AddinSetup\KB908002\office2003-kb907417sfxcab-ENU.exe" />
-    <Content Include="OdfPPT2007AddinSetup\KB908002\product.xml" />
-    <Content Include="OdfPPT2007AddinSetup\KB908002\VerifPrequisites.exe" />
-    <Content Include="OdfPPT2007AddinSetup\OdfPPT2007AddinSetup.vdproj" />
-    <Content Include="OdfPPT2007AddinSetup\README.htm" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="OdfPPT2007AddinSetup-chs\Debug\" />
-    <Folder Include="OdfPPT2007AddinSetup-de\Debug\" />
-    <Folder Include="OdfPPT2007AddinSetup-fr\Debug\" />
-    <Folder Include="OdfPPT2007AddinSetup-ja\Debug\" />
-    <Folder Include="OdfPPT2007AddinSetup\Release\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
