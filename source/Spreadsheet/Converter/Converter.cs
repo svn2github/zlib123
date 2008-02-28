@@ -19,7 +19,28 @@ namespace CleverAge.OdfConverter.Spreadsheet
         public Converter()
             : base(Assembly.GetExecutingAssembly())
         { }
-
+        protected override Type LoadPrecompiledXslt()
+        {
+            Type stylesheet = null;
+            try
+            {
+                if (this.DirectTransform)
+                {
+                    stylesheet = Assembly.Load("SpreadsheetConverter2Oox")
+                                            .GetType("SpreadsheetConverter2Oox");
+                }
+                else
+                {
+                    stylesheet = Assembly.Load("SpreadsheetConverter2Odf")
+                                            .GetType("SpreadsheetConverter2Odf");
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return stylesheet;
+        }
         protected override string[] DirectPostProcessorsChain
         {
             get
