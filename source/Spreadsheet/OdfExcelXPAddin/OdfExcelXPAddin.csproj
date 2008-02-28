@@ -82,16 +82,7 @@
       <Project>{792B426E-9ED5-414C-9853-98137AE0CC50}</Project>
       <Name>Addin %28Spreadsheet\Addin%29</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="OdfExcelXPAddinSetup-chs\OdfExcelXPAddinSetup-chs.vdproj" />
-    <Content Include="OdfExcelXPAddinSetup-de\OdfExcelXPAddinSetup-de.vdproj" />
-    <Content Include="OdfExcelXPAddinSetup-fr\OdfExcelXPAddinSetup-fr.vdproj" />
-    <Content Include="OdfExcelXPAddinSetup-ja\OdfExcelXPAddinSetup-ja.vdproj" />
-    <Content Include="OdfExcelXPAddinSetup-nl\OdfExcelXPAddinSetup-nl.vdproj" />
-    <Content Include="OdfExcelXPAddinSetup-pl\OdfExcelXPAddinSetup-pl.vdproj" />
-    <Content Include="OdfExcelXPAddinSetup\OdfExcelXPAddinSetup.vdproj" />
-  </ItemGroup>
+  </ItemGroup> 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
     <PreBuildEvent>
