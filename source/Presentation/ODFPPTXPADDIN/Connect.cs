@@ -41,6 +41,7 @@ namespace OdfPPTXPAddin
     using CleverAge.OdfConverter.OdfConverterLib;
     using Sonata.OdfConverter.OdfPowerpointAddinLib;
     using Microsoft.Win32;
+    using System.Diagnostics;
 	#region Read me for Add-in installation and setup information.
 	// When run, the Add-in wizard prepared the registry for the Add-in.
 	// At a later time, if the Add-in becomes unavailable for reasons such as:
@@ -320,11 +321,35 @@ namespace OdfPPTXPAddin
                         object isVisible = false;
                         object missing = Missing.Value;
 
+                        if (!applicationObject.ActivePresentation.FullName.ToLower().EndsWith(".pptx"))
+                        {
+                            string path = Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\Powerpoint.Show.12\Shell\Save As\Command", null, null) as string;
+                            if (string.IsNullOrEmpty(path))
+                            {
+                                System.Windows.Forms.MessageBox.Show("Microsoft Office 2007 Compatibility Pack not installed or obsolete");
+                            }
+                            else
+                            {
+                                tmpFileName = this.addinLib.GetTempFileName((string)initialName, ".ppt");
+                                path = path.ToLower();
+                                int start = path.IndexOf("moc.exe");
+                                path = path.Substring(0, start) + "ppcnvcom.exe";
+                                string parms = "-oice \"" + applicationObject.ActivePresentation.FullName + "\" \"" + tmpFileName + "\"";
+                                Process p = Process.Start(path, parms);
+                                p.WaitForExit();
+
+                                OoxToOdf((string)tmpFileName, odfFile, true);
+                            }
+                        }
+
+                        if (applicationObject.ActivePresentation.FullName.ToLower().EndsWith(".pptx"))
+                        {
+
                         // tmpFileName = this.addinLib.GetTempFileName((string)initialName,".ppt");
                         tmpFileName = this.addinLib.GetTempFileName((string)initialName, ".pptx");
                                                 
                         OoxToOdf((string)initialName, odfFile, true);
-
+                        }
 
                         if (tmpFileName != null && File.Exists((string)tmpFileName))
                         {
