@@ -683,10 +683,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl1pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl1pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -856,10 +854,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl1pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl2pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -920,10 +916,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl2pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl2pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1088,10 +1082,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl2pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl2pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1147,10 +1139,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl3pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl3pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1315,10 +1305,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl3pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl3pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1374,10 +1362,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl4pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl4pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1542,10 +1528,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl4pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl4pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1601,10 +1585,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl5pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl5pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1769,10 +1751,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl5pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl5pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1828,10 +1808,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl6pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl6pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -1996,10 +1974,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl6pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl6pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -2055,10 +2031,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl7pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl7pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -2223,10 +2197,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl7pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl7pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -2282,10 +2254,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl8pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl8pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -2450,10 +2420,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl8pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl8pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
@@ -2509,11 +2477,9 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <!--<xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl9pPr/a:buChar/@char"/>
-                  </xsl:with-param>
-                </xsl:call-template>-->
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl9pPr/a:buChar/@char" />
+                </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl9pPr/@indent">
@@ -2677,10 +2643,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:value-of select ="$pos"/>
               </xsl:attribute>
               <xsl:attribute name ="text:bullet-char">
-                <xsl:call-template name="NoteInsertBulletChar">
-                  <xsl:with-param name="character">
-                    <xsl:value-of select ="a:lvl9pPr/a:buChar/@char"/>
-                  </xsl:with-param>
+                <xsl:call-template name ="insertBulletCharacter">
+                  <xsl:with-param name ="character" select ="a:lvl9pPr/a:buChar/@char" />
                 </xsl:call-template>
               </xsl:attribute >
               <style:list-level-properties>

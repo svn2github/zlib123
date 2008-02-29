@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -74,9 +74,43 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 	<xsl:template name ="animProcess">
 		<xsl:param name ="animType"/>
 		<xsl:param name ="slideNo"/>
-		<anim:par smil:begin="next">
 			<anim:par >
-				<xsl:for-each select ="p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par">
+			<xsl:attribute name="smil:begin">
+				<xsl:choose>
+					<xsl:when test="./p:cTn/p:stCondLst/p:cond/@delay='0'">
+						<xsl:value-of select="'0s'"/>
+					</xsl:when>
+					<xsl:when test="./p:cTn/p:stCondLst/p:cond/@delay='indefinite'">
+						<xsl:value-of select="'next'"/>
+					</xsl:when>
+					<xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay!=''">
+						<xsl:value-of select ="concat(./p:cTn/p:stCondLst/p:cond/@delay div 1000,'s')"/>
+					</xsl:when>
+					<xsl:otherwise >
+						<xsl:value-of select ="'next'"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:for-each select="./p:cTn/p:childTnLst/p:par">
+			<anim:par>
+				<xsl:attribute name="smil:begin">
+					<xsl:choose>
+						<xsl:when test="./p:cTn/p:stCondLst/p:cond/@delay='0'">
+							<xsl:value-of select="'0s'"/>
+						</xsl:when>
+						<xsl:when test="./p:cTn/p:stCondLst/p:cond/@delay='indefinite'">
+							<xsl:value-of select="'next'"/>
+						</xsl:when>
+						<xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay!=''">
+							<xsl:value-of select ="concat(./p:cTn/p:stCondLst/p:cond/@delay div 1000,'s')"/>
+						</xsl:when>
+						<xsl:otherwise >
+							<xsl:value-of select ="'next'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+				
+				<xsl:for-each select ="p:cTn/p:childTnLst/p:par">
 					<xsl:variable name ="animationId">
 						<xsl:if test ="p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg">
 							<xsl:value-of select="concat('slText',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid ,p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg/@st +1 )" />
@@ -86,12 +120,16 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						</xsl:if>
 					</xsl:variable>
          
+					     
 					<!--anim:iterate-type="by-letter" anim:iterate-interval="0.05s"-->
 					<xsl:if test ="./p:cTn/p:iterate">
 						<anim:iterate smil:fill="hold" anim:iterate-type="by-letter">
               <!-- code added to get the animation time correctly -->
               <xsl:attribute name ="smil:begin">
                 <xsl:choose >
+					<xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay='indefinite'">
+						<xsl:value-of select ="'next'"/>
+					</xsl:when>
                   <xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay">
                     <xsl:value-of select ="concat(./p:cTn/p:stCondLst/p:cond/@delay div 1000,'s')"/>
                   </xsl:when>
@@ -105,7 +143,14 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 								<xsl:value-of select ="$animationId"/>
 							</xsl:attribute>
 							<xsl:attribute name ="anim:iterate-interval">								
-								<xsl:value-of select ="./p:cTn/p:iterate/p:tmPct/@val div 100000"/>									
+								<xsl:choose>
+								<xsl:when test="$animType = 15 ">
+									<xsl:value-of select ="concat(./p:cTn/p:iterate/p:tmAbs/@val div 100000,'s')"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select ="concat(./p:cTn/p:iterate/p:tmPct/@val div 100000,'s')"/>
+								</xsl:otherwise>
+								</xsl:choose>
 							</xsl:attribute>
 							
 							<!-- commented by yeswanth on 2/1/2008 -->
@@ -153,9 +198,13 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						</anim:iterate>
 					</xsl:if>
 					<xsl:if test ="not(./p:cTn/p:iterate)">
-						<anim:par smil:fill="hold">
+						<anim:par>
+							
               <xsl:attribute name ="smil:begin">
                 <xsl:choose >
+					<xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay='indefinite'">
+						<xsl:value-of select ="'next'"/>
+					</xsl:when>
                   <xsl:when test ="./p:cTn/p:stCondLst/p:cond/@delay">
                     <xsl:value-of select ="concat(./p:cTn/p:stCondLst/p:cond/@delay div 1000,'s')"/>
                     <!--<xsl:value-of select ="concat(./parent::node()/parent::node()/p:stCondLst/p:cond/@delay div 1000,'s')"/>-->
@@ -165,6 +214,12 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
+							<xsl:if test="./p:cTn/@fill='hold'">
+								<!--<xsl:if test="p:cBhvr/p:cTn/@fill='hold'">-->
+								<xsl:attribute name ="smil:fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:attribute name ="presentation:node-type">
 								<xsl:if test ="./p:cTn/@nodeType='withEffect'">
 									<xsl:value-of select ="'with-previous'"/>
@@ -198,6 +253,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 					
 				</xsl:for-each>
 			</anim:par>
+			</xsl:for-each>
 		</anim:par>
 	</xsl:template>
 	<xsl:template name ="animBody">
@@ -207,7 +263,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 			<xsl:for-each select ="node()">
 				<xsl:choose >
 					<xsl:when test ="name()='p:set'">
-						<anim:set  smil:fill="hold">
+						<anim:set>
 							<xsl:call-template name ="addDuractionNode"/>
 							<xsl:attribute name ="smil:targetElement">
 								<xsl:value-of select ="$animationId"/>
@@ -215,6 +271,26 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:if test ="./p:cBhvr/p:tgtEl/p:spTgt/p:txEl">
 								<xsl:attribute name ="anim:sub-item">
 									<xsl:value-of select ="'text'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test="p:cBhvr/p:cTn/@fill='hold'">
+							    <xsl:attribute name ="smil:fill">
+								    <xsl:value-of select="'hold'"/>
+							    </xsl:attribute>
+						    </xsl:if>
+							<xsl:if test="p:cBhvr/p:cTn/@autoRev='1'">
+								<xsl:attribute name ="smil:autoReverse">
+									<xsl:value-of select="'true'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@accel">
+								<xsl:attribute name ="smil:accelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@accel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@decel">
+								<xsl:attribute name ="smil:decelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@decel div 100000"/>
 								</xsl:attribute>
 							</xsl:if>
 							<xsl:attribute name ="smil:attributeName">
@@ -227,12 +303,22 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						</anim:set >
 					</xsl:when>
 					<xsl:when test ="name()='p:anim'">
-						<anim:animate smil:fill="hold"  presentation:additive="base">
+						<anim:animate presentation:additive="base">
+							<xsl:if test="./@calcmode!=''">
+								<xsl:attribute name="smil:calcMode">
+									<xsl:value-of select="./@calcmode"/>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:if test ="p:cBhvr/p:cTn/@tmFilter">
 								<xsl:attribute name ="smil:keySplines">
 									<xsl:value-of select ="p:cBhvr/p:cTn/@tmFilter"/>
 								</xsl:attribute>
 							</xsl:if>							
+							<xsl:if test="p:cBhvr/p:cTn/@autoRev='1'">
+								<xsl:attribute name ="smil:autoReverse">
+										<xsl:value-of select="'true'"/>
+								</xsl:attribute>								
+							</xsl:if>
 							<xsl:if test ="@from">
 								<xsl:attribute name ="smil:from">
 									<xsl:call-template name ="mapCoordinates">
@@ -264,6 +350,23 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:attribute name ="smil:targetElement">
 								<xsl:value-of select ="$animationId"/>
 							</xsl:attribute>
+							<xsl:if test="p:cBhvr/p:cTn/@fill='hold'">
+								<xsl:attribute name ="smil:fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>
+
+							<xsl:if test ="p:cBhvr/p:cTn/@accel">
+								<xsl:attribute name ="smil:accelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@accel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@decel">
+								<xsl:attribute name ="smil:decelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@decel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
+							
 							<xsl:attribute name ="smil:attributeName">
 								<xsl:call-template name ="smilAttributeName"/>
 							</xsl:attribute>
@@ -286,11 +389,13 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 								</xsl:attribute>
 							</xsl:if>
 							<xsl:if test =".//p:tavLst/p:tav/@fmla">
+								<xsl:attribute name="anim:formula">
 								<xsl:call-template name ="mapCoordinates">
 									<xsl:with-param name ="strVal">
 										<xsl:value-of select =".//p:tavLst/p:tav/@fmla"/>
 									</xsl:with-param>
 								</xsl:call-template>
+								</xsl:attribute>
 							</xsl:if>
 							<xsl:if test ="./p:cBhvr/p:attrNameLst/p:attrName='style.fontSize'">
 								<xsl:attribute name ="smil:to">
@@ -315,6 +420,28 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 									<xsl:value-of select ="p:cBhvr/p:cTn/@tmFilter"/>
 								</xsl:attribute>
 							</xsl:if>
+							<xsl:if test="p:cBhvr/p:cTn/@fill='hold'">
+								<xsl:attribute name ="smil:fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>
+
+							<xsl:if test="p:cBhvr/p:cTn/@autoRev='1'">
+								<xsl:attribute name ="smil:autoReverse">
+									<xsl:value-of select="'true'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@accel">
+								<xsl:attribute name ="smil:accelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@accel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@decel">
+								<xsl:attribute name ="smil:decelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@decel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
+							
 							<xsl:if test ="./@filter">
 								<xsl:call-template 	name="smilFilter">
 									<xsl:with-param name ="filter"
@@ -330,8 +457,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						</anim:transitionFilter >						
 					</xsl:when >
 					<xsl:when test ="name()='p:animClr'">
-						<anim:animateColor 
-										   smil:fill="hold"											   
+						<anim:animateColor 											   
 										   presentation:additive="base"										   
 										   anim:color-interpolation-direction="clockwise">
 							<xsl:if test ="p:cBhvr/p:cTn/@tmFilter">
@@ -349,6 +475,27 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 									<xsl:value-of select ="'text'"/>
 								</xsl:attribute>
 							</xsl:if>
+							<xsl:if test="p:cBhvr/p:cTn/@fill='hold'">
+								<xsl:attribute name ="smil:fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test="p:cBhvr/p:cTn/@autoRev='1'">
+								<xsl:attribute name ="smil:autoReverse">
+									<xsl:value-of select="'true'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@accel">
+								<xsl:attribute name ="smil:accelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@accel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@decel">
+								<xsl:attribute name ="smil:decelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@decel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
+							
 							<xsl:attribute name ="smil:attributeName">
 								<xsl:call-template name ="smilAttributeName"/>
 							</xsl:attribute>
@@ -358,6 +505,9 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 										<xsl:call-template 	name="getColorCode">
 											<xsl:with-param name="color" select="p:to/a:schemeClr/@val"/>
 										</xsl:call-template>
+									</xsl:when>
+									<xsl:when test ="p:to/a:srgbClr/@val">
+										<xsl:value-of select ="concat('#',p:to/a:srgbClr/@val)"/>
 									</xsl:when>
 									<xsl:when test ="a:srgbClr">
 										<xsl:value-of select ="concat('#',p:to/a:srgbClr/@val)"/>
@@ -399,8 +549,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						</anim:animateColor>
 					</xsl:when >
 					<xsl:when test ="name()='p:animMotion'">
-						<anim:animateMotion  									   
-									   smil:fill="hold" 									  									   
+						<anim:animateMotion									  									   
 									   presentation:additive="base">
 							<xsl:attribute name ="smil:targetElement">
 								<xsl:value-of select ="$animationId"/>
@@ -410,6 +559,21 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							<xsl:if test ="./p:cBhvr/p:tgtEl/p:spTgt/p:txEl">
 								<xsl:attribute name ="anim:sub-item">
 									<xsl:value-of select ="'text'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test="p:cBhvr/p:cTn/@fill='hold'">
+								<xsl:attribute name ="smil:fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@autoRev = 1">
+								<xsl:attribute name ="smil:autoReverse">
+									<xsl:value-of select ="'true'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="p:cBhvr/p:cTn/@accel">
+								<xsl:attribute name ="smil:accelerate">
+									<xsl:value-of select ="round(p:cBhvr/p:cTn/@accel div 100000)"/>
 								</xsl:attribute>
 							</xsl:if>
 							<xsl:if test ="p:cBhvr/p:cTn/@decel">
@@ -429,14 +593,31 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							</xsl:attribute>														
 							<xsl:call-template name ="addSmilbeginattr"/>
 							<xsl:call-template name ="addDuractionNode"/>
+							
+							<xsl:if test="p:cBhvr/p:cTn/@fill='hold'">
+								<xsl:attribute name ="smil:fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>
+							
+							<xsl:if test ="p:cBhvr/p:cTn/@accel">
+								<xsl:attribute name ="smil:accelerate">
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@accel div 100000"/>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:if test ="p:cBhvr/p:cTn/@decel">
 								<xsl:attribute name ="smil:decelerate">
-									<xsl:value-of select ="round(p:cBhvr/p:cTn/@decel div 100000)"/>
+									<xsl:value-of select ="./p:cBhvr/p:cTn/@decel div 100000"/>
 								</xsl:attribute>
 							</xsl:if>
 							<xsl:if test ="./p:cBhvr/p:tgtEl/p:spTgt/p:txEl">
 								<xsl:attribute name ="anim:sub-item">
 									<xsl:value-of select ="'text'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test="p:cBhvr/p:cTn/@autoRev='1'">
+								<xsl:attribute name ="smil:autoReverse">
+									<xsl:value-of select="'true'"/>
 								</xsl:attribute>
 							</xsl:if>
 							<xsl:if test ="name()='p:animRot'">
@@ -466,6 +647,13 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 											<xsl:value-of select ="concat(p:from/@x div 100000 ,',', p:from/@y div 100000)"/>
 										</xsl:attribute>
 										<xsl:if test ="./p:to">
+											<xsl:attribute name ="smil:to">
+												<xsl:value-of select ="concat(p:to/@x div 100000,',', p:to/@y div 100000)"/>
+											</xsl:attribute>
+										</xsl:if>
+									</xsl:when>									
+									<xsl:when test ="not(./p:from) and ./p:to">
+										<xsl:if test="./p:to/@x!='' and ./p:to/@y!=''">
 											<xsl:attribute name ="smil:to">
 												<xsl:value-of select ="concat(p:to/@x div 100000,',', p:to/@y div 100000)"/>
 											</xsl:attribute>
@@ -554,8 +742,36 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 					</xsl:if>
 				</xsl:variable>
 				<xsl:variable name ="newValue">
+					<xsl:choose>
+						<xsl:when test="./parent::node()/parent::node()/@valueType='clr'">
+							<xsl:choose>
+								<xsl:when test="p:val/p:clrVal/a:schemeClr/@val">
+									<xsl:call-template 	name="getColorCode">
+										<xsl:with-param name="color" select="p:val/p:clrVal/a:schemeClr/@val"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:when test="p:val/p:clrVal/a:srgbClr/@val">
+									<!--<xsl:call-template 	name="getColorCode">
+										<xsl:with-param name="color" select="p:val/p:clrVal/a:srgbClr/@val"/>
+									</xsl:call-template>-->
+									<xsl:value-of select="concat('#',p:val/p:clrVal/a:srgbClr/@val)"/>
+								</xsl:when>
+								<xsl:when test="p:val/p:strVal/@val">
+									<xsl:call-template name="decimal2Hex">
+										<xsl:with-param name ="strVal">
+											<xsl:if test="p:val/p:strVal/@val">
+												<xsl:value-of select ="p:val/p:strVal/@val"/>
+											</xsl:if>
+											<xsl:if test="not(p:val/p:strVal/@val)">
+												<xsl:value-of select ="'rgb(00,00,00)'"/>
+											</xsl:if>
+										</xsl:with-param >
+									</xsl:call-template>
+								</xsl:when>
+							</xsl:choose>							
+						</xsl:when>
+						<xsl:otherwise>
 					<xsl:call-template name ="mapCoordinates">
-
 						<xsl:with-param name ="strVal">
 							<xsl:if test="p:val/p:strVal/@val">
 								<xsl:value-of select ="p:val/p:strVal/@val"/>
@@ -565,6 +781,9 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 							</xsl:if>
 						</xsl:with-param >
 					</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
+
 				</xsl:variable>
 				<xsl:value-of select ="concat($varColon,$newValue)"/>				
 			</xsl:for-each>
@@ -614,7 +833,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				<xsl:value-of select ="'height'"/>
 			</xsl:when>
 			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='ppt_w'">
-				<xsl:value-of select ="'weight'"/>
+				<xsl:value-of select ="'width'"/>
 			</xsl:when>
 			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='ppt_x'">
 				<xsl:value-of select ="'x'"/>
@@ -623,7 +842,14 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				<xsl:value-of select ="'y'"/>
 			</xsl:when>
 			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='r'">
+				<xsl:value-of select ="'rotate'"/>
+			</xsl:when>
+			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='fill.on'">
 				<xsl:value-of select ="'font-family'"/>
+			</xsl:when>
+			
+			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='xshear'">
+				<xsl:value-of select ="'skewX'"/>
 			</xsl:when>
 			<xsl:when test ="./p:cBhvr/p:attrNameLst/p:attrName='stroke.color'">
 				<xsl:value-of select ="'stroke-color'"/>
@@ -676,7 +902,13 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 			<xsl:when test ="p:to/p:strVal/@val ='false'">
 				<xsl:value-of select ="'none'"/>
 			</xsl:when>
+			<xsl:when test ="p:to/p:strVal/@val = 0">
+				<xsl:value-of select ="'none'"/>
+			</xsl:when>		
 			<xsl:when test ="p:to/p:strVal/@val ='true'">
+				<xsl:value-of select ="'solid'"/>
+			</xsl:when>
+			<xsl:when test ="p:to/p:strVal/@val = 1">
 				<xsl:value-of select ="'solid'"/>
 			</xsl:when>
 			<xsl:when test ="p:to/p:clrVal">
@@ -685,6 +917,9 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 						<xsl:call-template 	name="getColorCode">
 							<xsl:with-param name="color" select="p:to/p:clrVal/a:schemeClr/@val"/>
 						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test ="p:to/p:clrVal/a:srgbClr/@val">
+						<xsl:value-of select ="concat('#',p:to/p:clrVal/a:srgbClr/@val)"/>
 					</xsl:when>
 					<xsl:when test ="a:srgbClr">
 						<xsl:value-of select ="concat('#',p:to/p:clrVal/a:srgbClr/@val)"/>
@@ -755,6 +990,14 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 					<xsl:value-of select ="'horizontal'"/>
 				</xsl:attribute>
 			</xsl:when>
+			<xsl:when test ="@filter='strips(downLeft)'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select ="'waterfallWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select ="'horizontalRight'"/>
+				</xsl:attribute>
+			</xsl:when>
       
       <xsl:when test ="@filter='dissolve'" >
         <xsl:attribute name ="smil:type">
@@ -769,6 +1012,18 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				</xsl:attribute>
 				<xsl:attribute name ="smil:subtype">
 					<xsl:value-of select ="'vertical'"/>
+				</xsl:attribute>
+			</xsl:when>
+			
+			<xsl:when test ="@filter='barn(inHorizontal)'" >
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select ="'barnDoorWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select ="'horizontal'"/>
+				</xsl:attribute>
+				<xsl:attribute name="smil:direction">
+					<xsl:value-of select ="'reverse'"/>
 				</xsl:attribute>
 			</xsl:when>
 			
@@ -1768,6 +2023,124 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				<xsl:value-of select ="$subAnim"/>
 			</xsl:attribute>
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="decimal2Hex">		
+		<xsl:param name ="strVal"/>
+		<xsl:variable name="hexaVal1">
+			<xsl:call-template name="hexaEqu">
+				<xsl:with-param name="decInput">
+					<xsl:choose>
+						<xsl:when test="substring-after(substring-before($strVal,','),'(') &gt; 0">
+							<xsl:value-of select="substring-after(substring-before($strVal,','),'(')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring-after(substring-before($strVal,','),'(') + 256"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
+				
+			</xsl:call-template>			
+		</xsl:variable>
+		<xsl:variable name="hexaVal2">
+			<xsl:call-template name="hexaEqu">				
+				<xsl:with-param name="decInput">
+					<xsl:choose>
+						<xsl:when test="substring-before(substring-after($strVal,','),',') &gt; 0">
+							<xsl:value-of select="substring-before(substring-after($strVal,','),',')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring-before(substring-after($strVal,','),',') + 256"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
+			</xsl:call-template>			
+		</xsl:variable>
+		<xsl:variable name="hexaVal3">
+			<xsl:call-template name="hexaEqu">				
+				<xsl:with-param name="decInput">
+					<xsl:choose>
+						<xsl:when test="substring-before(substring-after(substring-after($strVal,','),','),')') &gt; 0">
+							<xsl:value-of select="substring-before(substring-after(substring-after($strVal,','),','),')')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring-before(substring-after(substring-after($strVal,','),','),')') + 256"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
+			</xsl:call-template>			
+		</xsl:variable>
+		<xsl:value-of select="concat('#',$hexaVal3,$hexaVal2,$hexaVal1)"/>
+	</xsl:template>
+	<xsl:template name="hexaEqu">
+		<xsl:param name="decInput"/>
+		<xsl:variable name="firstval">
+			<xsl:call-template name="hexaConvertion">
+				<xsl:with-param name="inputDecimal" select="floor($decInput div 16)"/>
+			</xsl:call-template>			
+		</xsl:variable>
+		<xsl:variable name="secondval">
+			<xsl:call-template name="hexaConvertion">
+				<xsl:with-param name="inputDecimal" select="floor($decInput mod 16)"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:value-of select="concat($firstval,$secondval)"/>		
+	</xsl:template>
+	<xsl:template name="hexaConvertion">
+		<xsl:param name="inputDecimal"/>
+		<xsl:choose>
+			<xsl:when test="$inputDecimal = 0">
+				<xsl:value-of select="'0'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 1">
+				<xsl:value-of select="'1'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 2">
+				<xsl:value-of select="'2'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 3">
+				<xsl:value-of select="'3'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 4">
+				<xsl:value-of select="'4'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 5">
+				<xsl:value-of select="'5'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 6">
+				<xsl:value-of select="'6'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 7">
+				<xsl:value-of select="'7'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 8">
+				<xsl:value-of select="'8'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 9">
+				<xsl:value-of select="'9'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 10">
+				<xsl:value-of select="'a'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 11">
+				<xsl:value-of select="'b'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 12">
+				<xsl:value-of select="'c'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 13">
+				<xsl:value-of select="'d'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 14">
+				<xsl:value-of select="'e'"/>
+			</xsl:when>
+			<xsl:when test="$inputDecimal = 15">
+				<xsl:value-of select="'f'"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="'0'"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 </xsl:stylesheet>
 	

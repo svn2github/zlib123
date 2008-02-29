@@ -179,7 +179,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     <xsl:param name ="flageShape"/>
     
 		<xsl:if test ="./a:p/a:pPr/@lvl">
-			<xsl:for-each select ="./a:p">
+    	<xsl:for-each select ="./a:p">
         <xsl:variable name="var_level">
           <xsl:choose>
             <xsl:when test="a:pPr/@lvl">
@@ -249,10 +249,13 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 											<xsl:value-of select ="$textLevel + 1"/>
 										</xsl:attribute >
 										<xsl:attribute name ="text:bullet-char">
-                      <xsl:value-of select="a:pPr/a:buChar/@char"/>
+                      <xsl:call-template name ="insertBulletCharacter">
+                        <xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
+                      </xsl:call-template>
                     
-										</xsl:attribute >
 
+
+					                    </xsl:attribute >
                     <xsl:choose>
                       <xsl:when test="$flageShape='True'">
                         <style:list-level-properties>
@@ -497,10 +500,10 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="1"/>
                     </xsl:attribute >
                     <xsl:attribute name ="text:bullet-char">
-                      <xsl:value-of select="a:pPr/a:buChar/@char"/>
-                      <!--<xsl:call-template name ="insertBulletCharacter">
+                      <xsl:call-template name ="insertBulletCharacter">
                         <xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-                      </xsl:call-template>-->
+                      </xsl:call-template>
+                     
                     </xsl:attribute >
                     <style:list-level-properties>
                       <xsl:choose>
@@ -785,10 +788,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 										<xsl:value-of select ="1"/>
 									</xsl:attribute >
 									<xsl:attribute name ="text:bullet-char">
-                    <xsl:value-of select="a:pPr/a:buChar/@char"/>
-										<!--<xsl:call-template name ="insertBulletCharacter">
+                  	<xsl:call-template name ="insertBulletCharacter">
 											<xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
-										</xsl:call-template>-->
+										</xsl:call-template>
 									</xsl:attribute >
                   <style:list-level-properties>
                     <xsl:choose>
@@ -1026,7 +1028,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
       </xsl:for-each>
     </xsl:if>
     <!--End  of Condition if levels are not present-->
-  </xsl:template>
+     </xsl:template>
   <xsl:template name="tmpBulletFont">
     <xsl:if test ="a:pPr/a:buFont/@typeface">
       <xsl:choose>
@@ -1047,12 +1049,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-    <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-      <xsl:attribute name ="fo:font-family">
-        <xsl:value-of select ="'StarSymbol'"/>
-      </xsl:attribute>
-    </xsl:if>
-  </xsl:template>
+     </xsl:template>
   <xsl:template name="tmpListlevelProp">
     <xsl:choose>
       <xsl:when test="@indent &lt; 0">
@@ -2307,64 +2304,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 		</xsl:choose>
 	</xsl:template>
 	<!-- Template insertBulletCharacter-->
-  <xsl:template name ="insertBulletCharacter">
-    <xsl:param name ="character"/>
-    <xsl:choose>
-      <xsl:when test="$character= '•'">
-        <!--<xsl:value-of select ="'•'"/>-->
-        <xsl:value-of select ="'•'"/>
-      </xsl:when>
-      <xsl:when test="$character= 'Ø'">
-        <!--<xsl:value-of select ="'➢'"/>-->
-        <xsl:value-of select ="''"/>
-      </xsl:when>
-      <xsl:when test="$character= 'o'">
-        <xsl:value-of select ="'○'"/>
-      </xsl:when>
-      <xsl:when test="$character= '§' or $character='' ">
-        <xsl:value-of select ="''"/>
-        <!--<xsl:value-of select ="'■'"/>-->
-      </xsl:when>
-      <!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
-        <xsl:value-of select ="''"/>
-      </xsl:when>-->
-      <!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
-              <xsl:value-of select ="'■'"/>
-          </xsl:when>
-      <xsl:when test="a:pPr/a:buChar/@char= 'q'">
-              <xsl:value-of select ="''"/>
-          </xsl:when>-->
-      <xsl:when test="a:pPr/a:buChar/@char= 'q'">
-        <xsl:value-of select ="''"/>
-      </xsl:when>
-      <xsl:when test="$character= 'ü'">
-        <!--<xsl:value-of select ="'✔'"/>-->
-        <xsl:value-of select ="''"/>
-      </xsl:when>
-      <xsl:when test="$character = '–'">
-        <xsl:value-of select ="'–'"/>
-      </xsl:when>
-      <xsl:when test="$character = '»'">
-        <xsl:value-of select ="'»'"/>
-      </xsl:when>
-      <!-- Added by  vijayeta ,on 19th june-->
-      <xsl:when test="$character = 'è'">
-        <xsl:value-of select ="'➔'"/>
-      </xsl:when>
-      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
-      <xsl:when test ="$character=''">
-        <xsl:value-of select ="'●'"/>
-      </xsl:when>
-      <!-- Added by vijayeta ,Fix for bug 1779341, date:23rd Aug '07-->
-
-      <xsl:otherwise>
-        <!-- warn if Custom Bullet -->
-        <xsl:message terminate="no">translation.oox2odf.bulletTypeCustomBullet</xsl:message>
-        <xsl:value-of select ="'•'"/>
-      </xsl:otherwise>
-    </xsl:choose >
-  </xsl:template>
-	<xsl:template name ="insertNumber">
+  
+ 	<xsl:template name ="insertNumber">
 		<xsl:param name ="number"/>
 		<xsl:param name ="startAt"/>
 		<xsl:if test ="$number='arabicPeriod'">
@@ -2840,10 +2781,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							<xsl:value-of select ="$newTextLvl"/>
 						</xsl:attribute >
 						<xsl:attribute name ="text:bullet-char">
-              <xsl:value-of select="a:buChar/@char"/>
-							<!--<xsl:call-template name ="insertBulletCharacter">
+              <xsl:call-template name ="insertBulletCharacter">
 								<xsl:with-param name ="character" select ="a:buChar/@char" />
-							</xsl:call-template>-->
+              </xsl:call-template>
 						</xsl:attribute >
 						<style:list-level-properties>
 							<xsl:if test ="./@indent">
@@ -2867,7 +2807,30 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							</xsl:if>
 						</style:list-level-properties>
 						<style:text-properties style:font-charset="x-symbol">
-              <xsl:call-template name="tmpBulletFont"/>
+              <xsl:if test ="a:buFont/@typeface">
+                <xsl:choose>
+                  <xsl:when test ="a:buFont[@typeface='Arial'] and a:buChar/@char='۩' ">
+                    <xsl:attribute name ="fo:font-family">
+                      <xsl:value-of select ="'Arial'"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:when test ="a:buFont[@typeface='Arial']">
+                    <xsl:attribute name ="fo:font-family">
+                      <xsl:value-of select ="'StarSymbol'"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:when test ="not(a:buFont[@typeface='Arial'])">
+                    <xsl:attribute name ="fo:font-family">
+                      <xsl:value-of select ="a:buFont/@typeface"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name ="fo:font-family">
+                      <xsl:value-of select ="'StarSymbol'"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
 							<xsl:if test ="a:buSzPct">
 								<xsl:attribute name ="fo:font-size">
 									<xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
@@ -3208,10 +3171,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
               <xsl:value-of select ="$newTextLvl"/>
             </xsl:attribute >
             <xsl:attribute name ="text:bullet-char">
-              <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buChar/@char"/>
-              <!--<xsl:call-template name ="insertBulletCharacter">
+                <xsl:call-template name ="insertBulletCharacter">
                 <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buChar/@char" />
-              </xsl:call-template>-->
+              </xsl:call-template>
             </xsl:attribute >
                     <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/@marL">
@@ -3243,12 +3205,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   </xsl:attribute>
                 </xsl:if>
               </xsl:if>
-              <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buFont/@typeface)">
-                <xsl:attribute name ="fo:font-family">
-                  <xsl:value-of select ="'StarSymbol'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buSzPct">
+                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buSzPct">
                 <xsl:attribute name ="fo:font-size">
                   <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:buSzPct/@val div 1000),'%')"/>
                 </xsl:attribute>
@@ -3491,10 +3448,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buChar/@char"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                 <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                   <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/@marL">
@@ -3526,12 +3482,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                 </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buSzPct">
+                       <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buSzPct">
                   <xsl:attribute name ="fo:font-size">
                     <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:buSzPct/@val div 1000),'%')"/>
                   </xsl:attribute>
@@ -3774,10 +3725,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buChar"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                   <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                             <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/@marL">
@@ -3809,12 +3759,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                 </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buSzPct">
+                   <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buSzPct">
                   <xsl:attribute name ="fo:font-size">
                     <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:buSzPct/@val div 1000),'%')"/>
                   </xsl:attribute>
@@ -4050,10 +3995,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buChar/@char"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                    <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                    <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/@marL">
@@ -4086,12 +4030,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                 </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buSzPct">
+                         <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buSzPct">
                   <xsl:attribute name ="fo:font-size">
                     <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:buSzPct/@val div 1000),'%')"/>
                   </xsl:attribute>
@@ -4333,10 +4272,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buChar/@char"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                  <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                           <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/@marL">
@@ -4368,12 +4306,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                 </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buSzPct">
+                  <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buSzPct">
                   <xsl:attribute name ="fo:font-size">
                     <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:buSzPct/@val div 1000),'%')"/>
                   </xsl:attribute>
@@ -4613,10 +4546,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:buChar/@char"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                   <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                 <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/@marL">
@@ -4890,10 +4822,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar/@char"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                  <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                 <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/@marL">
@@ -4925,12 +4856,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                 </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct">
+                               <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct">
                   <xsl:attribute name ="fo:font-size">
                     <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:buSzPct/@val div 1000),'%')"/>
                   </xsl:attribute>
@@ -5169,10 +5095,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buChar/@char"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                   <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/@marL">
@@ -5205,12 +5130,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                 </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buSzPct">
+                       <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buSzPct">
                   <xsl:attribute name ="fo:font-size">
                     <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:buSzPct/@val div 1000),'%')"/>
                   </xsl:attribute>
@@ -5449,10 +5369,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <xsl:value-of select ="$newTextLvl"/>
               </xsl:attribute >
               <xsl:attribute name ="text:bullet-char">
-                <xsl:value-of select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buChar/@char"/>
-                <!--<xsl:call-template name ="insertBulletCharacter">
+                   <xsl:call-template name ="insertBulletCharacter">
                   <xsl:with-param name ="character" select ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buChar/@char" />
-                </xsl:call-template>-->
+                </xsl:call-template>
               </xsl:attribute >
                <xsl:choose>
                 <xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/@marL">
@@ -5484,12 +5403,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                 </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buSzPct">
+                      <xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buSzPct">
                   <xsl:attribute name ="fo:font-size">
                     <xsl:value-of select ="concat((./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:buSzPct/@val div 1000),'%')"/>
                   </xsl:attribute>

@@ -2186,6 +2186,9 @@ exclude-result-prefixes="p a r xlink rels">
               <xsl:variable name="InnerLevelgrpCordinates">
                 <xsl:call-template name="tmpGetgroupTransformValues"/>
               </xsl:variable>
+				<!--<xsl:variable name ="drawAnimIdGrp">
+					<xsl:value-of select ="concat('sldraw',$SlideID,'an',./p:nvGrpSpPr/p:cNvPr/@id)"/>
+				</xsl:variable>-->
               <xsl:call-template name ="tmpGroupedShapes">
                 <xsl:with-param name ="SlidePos"  select ="$SlidePos" />
                 <xsl:with-param name ="SlideID"  select ="$SlideID" />
