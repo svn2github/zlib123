@@ -50,14 +50,17 @@ Copyright (c) 2007, Sonata Software Limited
   exclude-result-prefixes="odf style text number draw page smil anim msxsl">
 
 	<xsl:template name ="customAnimation">
-		<xsl:param name ="slideId"/>
-		<!--<xsl:if test ="anim:par/anim:seq/anim:par">-->
-
+		<xsl:param name ="slideId"/>		
 		  <xsl:variable name ="animationVal">
 			<xsl:for-each select ="anim:par/anim:seq/anim:par">
 				<!-- Added by yeswanth.s -->
 						<p:par>
 							<p:cTn id="3" fill="hold">
+								<!--<xsl:if test ="./@smil:fill='hold'">
+									<xsl:attribute name="fill">
+										<xsl:value-of select="'hold'"/>
+									</xsl:attribute>
+								</xsl:if>-->
 								<p:stCondLst>
 							<p:cond>
 								<xsl:attribute name="delay">
@@ -65,32 +68,50 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:when test="./@smil:begin='next'">
 											<xsl:value-of select="'indefinite'"/>
                                 </xsl:when>
-                                <xsl:otherwise>
-                                  <xsl:choose >
-												<xsl:when test="./anim:par/anim:par/@presentation:node-type='on-click'">
-													<xsl:value-of select="'indefinite'"/>
+											   <xsl:when test="./@smil:begin='0s'">
+												   <xsl:value-of select="'0'"/>
+											   </xsl:when>
+											   <xsl:when test ="substring-before(./@smil:begin,'s') &gt; 0">
+												   <xsl:value-of select ="round(substring-before(./@smil:begin,'s')* 1000)"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                       <xsl:value-of select ="'0'"/>
                                     </xsl:otherwise>
                                   </xsl:choose>
-										</xsl:otherwise>
-									</xsl:choose>
                                 </xsl:attribute>
                               </p:cond>
 														</p:stCondLst>
-						<p:childTnLst>
-				
+						<p:childTnLst>				
 				<xsl:for-each select="./anim:par">
 					<p:par>
 						<p:cTn id="4" fill="hold">
+							<!--<xsl:if test ="./@smil:fill='hold'">
+								<xsl:attribute name="fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>-->
 							<p:stCondLst>
-								<p:cond delay="0" />
+								<p:cond>
+									<xsl:attribute name ="delay">
+										<xsl:choose >
+											<xsl:when test="./@smil:begin='next'">
+												<xsl:value-of select="'indefinite'"/>
+											</xsl:when>
+											<xsl:when test="./@smil:begin='0s'">
+												<xsl:value-of select="'0'"/>
+											</xsl:when>
+											<xsl:when test ="substring-before(./@smil:begin,'s') &gt; 0">
+												<xsl:value-of select ="round(substring-before(./@smil:begin,'s')* 1000)"/>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:value-of select ="'0'"/>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:attribute>
+								</p:cond>
 							</p:stCondLst>
 							<xsl:variable name="check_animation">
-								<xsl:call-template name="animationfifth">
-
-																	</xsl:call-template>
+								<xsl:call-template name="animationfifth"/>									
 							</xsl:variable>
 																		<xsl:choose >
 								<xsl:when test="msxsl:node-set($check_animation)/p:par">
@@ -99,11 +120,8 @@ Copyright (c) 2007, Sonata Software Limited
 											</p:childTnLst>
 								</xsl:when>
 							</xsl:choose>
-
 						</p:cTn>
-						</p:par>
-										
-					
+						</p:par>					
 				</xsl:for-each>
 				<!-- end of code added -->
 						</p:childTnLst>
@@ -111,8 +129,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</p:par>
 			</xsl:for-each>
 		</xsl:variable>
-		<xsl:if test ="msxsl:node-set($animationVal)/p:par">
-			
+		<xsl:if test ="msxsl:node-set($animationVal)/p:par">			
 			<!--<xsl:if test =" $animationVal !='' or ($animationVal)">-->
 			<p:timing>
 				<p:tnLst>
@@ -162,7 +179,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:when test ="name(.)='anim:set'">
               <p:set>
 							<p:cBhvr>
-								<p:cTn id="6" fill="hold">
+								<p:cTn id="6">
 									<xsl:attribute name ="dur">
 										<xsl:choose >
 											<xsl:when test ="./@smil:dur='indefinite'">
@@ -182,6 +199,26 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:otherwise>
                       </xsl:choose>
 									</xsl:attribute>
+							<xsl:if test ="./@smil:fill='hold'">
+								<xsl:attribute name="fill">
+									<xsl:value-of select="'hold'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="@smil:autoReverse='true'">
+								<xsl:attribute name ="autoRev">
+									<xsl:value-of select ="'1'"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="@smil:accelerate">
+								<xsl:attribute name ="accel">
+									<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:if test ="@smil:decelerate">
+								<xsl:attribute name ="decel">
+									<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+								</xsl:attribute>
+							</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
 								</p:cTn>
 								<p:tgtEl>
@@ -212,7 +249,22 @@ Copyright (c) 2007, Sonata Software Limited
 						</p:set>
 					</xsl:when >
 					<xsl:when test ="name(.)='anim:animate'">
-						<p:anim valueType="num">
+						<p:anim>
+							<xsl:if test="./@smil:calcMode!=''">
+								<xsl:attribute name="calcmode">
+									<xsl:value-of select="./@smil:calcMode"/>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:attribute name="valueType">
+								<xsl:choose>
+									<xsl:when test="./@smil:attributeName='color' or ./@smil:attributeName='fill-color'">
+										<xsl:value-of select="'clr'"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="'num'"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
 							<xsl:if test ="@smil:calcMode">
 								<xsl:attribute name ="calcmode">
 									<xsl:value-of select ="@smil:calcMode"/>
@@ -243,7 +295,7 @@ Copyright (c) 2007, Sonata Software Limited
 								</xsl:attribute>
 							</xsl:if>
 							<p:cBhvr additive="base">
-								<p:cTn id="31" fill="hold" >
+								<p:cTn id="31">
 									<xsl:attribute name ="dur">
 										<xsl:choose >
 											<xsl:when test ="substring-before(./@smil:dur,'s') &gt; 0 ">
@@ -254,12 +306,17 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:otherwise>
 										</xsl:choose>
 									</xsl:attribute>
+									<xsl:if test ="./@smil:fill='hold'">
+										<xsl:attribute name="fill">
+											<xsl:value-of select="'hold'"/>
+										</xsl:attribute>
+									</xsl:if>
 									<xsl:if test ="@smil:keySplines">
 										<xsl:attribute name ="tmFilter">
 											<xsl:value-of select ="@smil:keySplines"/>
 										</xsl:attribute>
 									</xsl:if>
-									<xsl:if test ="smil:autoReverse='true' ">
+									<xsl:if test ="@smil:autoReverse='true' ">
 										<xsl:attribute name ="autoRev">
 											<xsl:value-of select ="'1'"/>
 										</xsl:attribute>
@@ -269,6 +326,12 @@ Copyright (c) 2007, Sonata Software Limited
 											<xsl:value-of select ="round(@smil:accelerate * 100000)"/>
 										</xsl:attribute>
 									</xsl:if>
+									<xsl:if test ="@smil:decelerate">
+										<xsl:attribute name ="decel">
+											<xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+										</xsl:attribute>
+									</xsl:if>
+
 									<xsl:call-template name ="smilBegin"/>
 								</p:cTn >
 								<p:tgtEl>
@@ -295,8 +358,7 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:when>
 											<xsl:otherwise >
 												<p:tavLst>
-													<xsl:call-template name ="tavListValues">
-													</xsl:call-template>
+													<xsl:call-template name ="tavListValues"/>													
 												</p:tavLst>
 											</xsl:otherwise>
 										</xsl:choose>
@@ -306,7 +368,17 @@ Copyright (c) 2007, Sonata Software Limited
 						</p:anim>
 					</xsl:when >
 					<xsl:when test ="name(.)='anim:transitionFilter'">
-						<p:animEffect transition="in" >
+						<p:animEffect>
+							<xsl:attribute name="transition">
+								<xsl:choose>
+									<xsl:when test="./@smil:mode='out'">
+									    <xsl:value-of select="'out'"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="'in'"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
 							<xsl:variable name ="smilFilter">
 								<xsl:call-template name ="smilFilter"/>
 							</xsl:variable>
@@ -327,6 +399,26 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:otherwise>
 										</xsl:choose>
 									</xsl:attribute>
+									<xsl:if test ="./@smil:fill='hold'">
+										<xsl:attribute name="fill">
+											<xsl:value-of select="'hold'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:autoReverse='true'">
+										<xsl:attribute name ="autoRev">
+											<xsl:value-of select ="'1'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:accelerate">
+										<xsl:attribute name ="accel">
+											<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:decelerate">
+										<xsl:attribute name ="decel">
+											<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+										</xsl:attribute>
+									</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
 								</p:cTn >
 								<p:tgtEl>
@@ -343,7 +435,7 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:value-of select ="@anim:color-interpolation"/>
 							</xsl:attribute>
 							<p:cBhvr >
-								<p:cTn id="10"  fill="hold">
+								<p:cTn id="10">
 									<xsl:attribute name ="dur">
 										<xsl:choose >
 											<xsl:when test ="substring-before(./@smil:dur,'s') &gt; 0 ">
@@ -354,6 +446,26 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:otherwise>
 										</xsl:choose>
 									</xsl:attribute>
+									<xsl:if test ="./@smil:fill='hold'">
+										<xsl:attribute name="fill">
+											<xsl:value-of select="'hold'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:autoReverse='true'">
+										<xsl:attribute name ="autoRev">
+											<xsl:value-of select ="'1'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:accelerate">
+										<xsl:attribute name ="accel">
+											<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:decelerate">
+										<xsl:attribute name ="decel">
+											<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+										</xsl:attribute>
+									</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
 								</p:cTn >
 								<p:tgtEl>
@@ -402,7 +514,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:if test ="@svg:type='scale'">
 							<p:animScale>
 								<p:cBhvr>
-									<p:cTn id="14" fill="hold">
+									<p:cTn id="14">
 										<xsl:attribute name ="dur">
 											<xsl:choose >
 												<xsl:when test ="substring-before(./@smil:dur,'s') &gt; 0 ">
@@ -413,6 +525,26 @@ Copyright (c) 2007, Sonata Software Limited
 												</xsl:otherwise>
 											</xsl:choose>
 										</xsl:attribute>
+										<xsl:if test ="./@smil:fill='hold'">
+											<xsl:attribute name="fill">
+												<xsl:value-of select="'hold'"/>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="@smil:autoReverse='true'">
+											<xsl:attribute name ="autoRev">
+												<xsl:value-of select ="'1'"/>
+											</xsl:attribute>
+										</xsl:if>										
+										<xsl:if test ="@smil:accelerate">
+											<xsl:attribute name ="accel">
+												<xsl:value-of select ="round(./@smil:accelerate * 100000)"/>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="@smil:decelerate">
+											<xsl:attribute name ="decel">
+												<xsl:value-of select ="round(./@smil:decelerate * 100000)"/>
+											</xsl:attribute>
+										</xsl:if>
 										<xsl:call-template name ="smilBegin"/>
 									</p:cTn >
 									<p:tgtEl>
@@ -439,6 +571,18 @@ Copyright (c) 2007, Sonata Software Limited
 												<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
 											</xsl:attribute>
 										</p:to >
+									</xsl:when>
+									<xsl:when test ="@smil:to and not(@smil:from)">
+										<xsl:if test="@smil:to!=''">
+										<p:to>
+											<xsl:attribute name ="x">
+												<xsl:value-of select ="round(substring-before(@smil:to,',') * 100000)"/>
+											</xsl:attribute>
+											<xsl:attribute name ="y">
+												<xsl:value-of select ="round(substring-after(@smil:to,',') * 100000)"/>
+											</xsl:attribute>
+										</p:to >
+										</xsl:if>
 									</xsl:when>
 									<xsl:otherwise >
 										<!--  Added by vijayeta, bug number 1775269,
@@ -473,7 +617,7 @@ Copyright (c) 2007, Sonata Software Limited
 									<xsl:value-of select ="round(@smil:by * 60000)"/>
 								</xsl:attribute>
 								<p:cBhvr>
-									<p:cTn id="18"  fill="hold">
+									<p:cTn id="18">
 										<xsl:attribute name ="dur">
 											<xsl:choose >
 												<xsl:when test ="substring-before(./@smil:dur,'s') &gt; 0 ">
@@ -484,6 +628,26 @@ Copyright (c) 2007, Sonata Software Limited
 												</xsl:otherwise>
 											</xsl:choose>
 										</xsl:attribute>
+										<xsl:if test ="./@smil:fill='hold'">
+										<xsl:attribute name="fill">
+											<xsl:value-of select="'hold'"/>
+										</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="@smil:autoReverse='true'">
+											<xsl:attribute name ="autoRev">
+												<xsl:value-of select ="'1'"/>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="@smil:accelerate">
+											<xsl:attribute name ="accel">
+												<xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="@smil:decelerate">
+											<xsl:attribute name ="decel">
+												<xsl:value-of select ="round(@smil:decelerate * 100000)"/>
+											</xsl:attribute>
+										</xsl:if>
 										<xsl:call-template name ="smilBegin"/>
 									</p:cTn >
 									<p:tgtEl>
@@ -505,7 +669,7 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:value-of select ="@svg:path"/>
 							</xsl:attribute>
 							<p:cBhvr>
-								<p:cTn id="108" fill="hold">
+								<p:cTn id="108">
 									<xsl:attribute name ="dur">
 										<xsl:choose >
 											<xsl:when test ="substring-before(./@smil:dur,'s') &gt; 0 ">
@@ -516,16 +680,26 @@ Copyright (c) 2007, Sonata Software Limited
 											</xsl:otherwise>
 										</xsl:choose>
 									</xsl:attribute>
-									<xsl:attribute name ="decel">
-										<xsl:choose >
-											<xsl:when test ="@smil:decelerate &gt; 0 ">
-												<xsl:value-of select ="round(@smil:decelerate * 100000)"/>
-											</xsl:when>
-											<xsl:otherwise >
-												<xsl:value-of select ="'0'"/>
-											</xsl:otherwise>
-										</xsl:choose>
+									<xsl:if test ="./@smil:fill='hold'">
+										<xsl:attribute name="fill">
+											<xsl:value-of select="'hold'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:autoReverse='true'">
+										<xsl:attribute name ="autoRev">
+											<xsl:value-of select ="'1'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:accelerate">
+										<xsl:attribute name ="accel">
+											<xsl:value-of select ="round(@smil:accelerate * 100000)"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="@smil:decelerate">
+									<xsl:attribute name ="decel">										
+												<xsl:value-of select ="round(@smil:decelerate * 100000)"/>											
 									</xsl:attribute>
+									</xsl:if>
 									<xsl:call-template name ="smilBegin"/>
 								</p:cTn>
 								<p:tgtEl>
@@ -552,7 +726,7 @@ Copyright (c) 2007, Sonata Software Limited
 					<!--<xsl:value-of select ="round(@smil:keyTimes * 1000)"/>-->
 					<xsl:choose >
 						<xsl:when test ="substring-before(@smil:keyTimes,';') &gt; 0">
-							<xsl:value-of select ="round(substring-before(@smil:keyTimes,';') * 1000)"/>
+							<xsl:value-of select ="round(substring-before(@smil:keyTimes,';') * 100000)"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select ="'0'"/>
@@ -561,11 +735,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 				<p:val>
 					<p:clrVal>
-						<a:srgbClr >
-							<xsl:attribute name ="val">
-								<xsl:value-of select ="substring-after(substring-before(@smil:values,';'),'#')"/>
-							</xsl:attribute>
-						</a:srgbClr >
+						<a:srgbClr val="{substring-after(substring-before(@smil:values,';'),'#')}"/>
 					</p:clrVal>
 				</p:val>
 			</p:tav>
@@ -573,7 +743,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:attribute name ="tm">
 					<xsl:choose >
 						<xsl:when test ="substring-after(@smil:keyTimes,';') &gt; 0">
-							<xsl:value-of select ="round(substring-after(@smil:keyTimes,';') * 1000)"/>
+							<xsl:value-of select ="round(substring-after(@smil:keyTimes,';') * 100000)"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select ="'0'"/>
@@ -582,11 +752,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 				<p:val>
 					<p:clrVal>
-						<a:srgbClr >
-							<xsl:attribute name ="val">
-								<xsl:value-of select ="substring-after(substring-after(@smil:values,';'),'#')"/>
-							</xsl:attribute >
-						</a:srgbClr >
+						<a:srgbClr val="{substring-after(substring-after(@smil:values,';'),'#')}"/>
 					</p:clrVal>
 				</p:val>
 			</p:tav>
@@ -765,12 +931,18 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@smil:attributeName ='height'">
 				<xsl:value-of select ="'ppt_h'"/>
 			</xsl:when>
+			<xsl:when test ="./@smil:attributeName ='skewX'">
+				<xsl:value-of select ="'xshear'"/>
+			</xsl:when>
 			<xsl:when test ="./@smil:attributeName ='visibility'">
 				<xsl:value-of select ="'style.visibility'"/>
 			</xsl:when>
 			<xsl:when test ="./@smil:attributeName='font-family'">
-				<xsl:value-of select ="'style.fontFamily'"/>
+				<xsl:value-of select ="'fill.on'"/>
 			</xsl:when>
+			<!--<xsl:when test ="./@smil:attributeName='font-family'">
+				<xsl:value-of select ="'style.fontFamily'"/>
+			</xsl:when>-->
 			<xsl:when test ="./@smil:attributeName='color'">
 				<xsl:value-of select ="'style.color'"/>
 			</xsl:when>
@@ -811,6 +983,9 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="./@smil:to='visible'">
 				<p:strVal val="visible"/>
 			</xsl:when>
+			<xsl:when test ="./@smil:to='solid'">
+				<p:strVal val="true"/>
+			</xsl:when>
 			<xsl:when  test ="./@anim:color-interpolation='rgb'">
 				<a:srgbClr val="{substring-after(./@smil:to,'#')}" />
 			</xsl:when>
@@ -818,15 +993,19 @@ Copyright (c) 2007, Sonata Software Limited
 				<p:strVal val="'./@smil:to'" />
 			</xsl:when>
 			<xsl:when test ="./@smil:to='font-weight'">
-				<p:strVal val="'style.fontWeight"/>
+				<p:strVal val="style.fontWeight"/>
 			</xsl:when>
 			<xsl:when test ="./@smil:attributeName='color' or ./@smil:attributeName='fill-color'">
 				<a:srgbClr val="{substring-after(./@smil:to,'#')}" />
 			</xsl:when>
-			<xsl:when test ="./@smil:attributeName='text-underline'">
+			<xsl:when test ="./@smil:attributeName='text-underline' and ./@smil:to!='none'">
 				<p:strVal val="true"/>
 			</xsl:when >
+			<xsl:when test ="./@smil:attributeName='text-underline' and ./@smil:to='none'">
+				<p:strVal val="flase"/>
+			</xsl:when >
 			<xsl:otherwise >
+				<!--<a:strVal val="{substring-after(./@smil:to,'#')}"/>-->
 				<p:strVal val="{./@smil:to}"/>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -1012,6 +1191,7 @@ Copyright (c) 2007, Sonata Software Limited
 				</p:val>
 			</p:tav>
 		</xsl:if>
+			
 	</xsl:template>
 	<xsl:template name ="animationType">
 		<xsl:choose>
@@ -1580,9 +1760,14 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:when test ="@smil:type = 'blindsWipe' and @smil:subtype ='vertical' ">
 				<xsl:value-of  select ="'blinds(vertical)'"/>
 			</xsl:when>
-			<xsl:when test ="@smil:type = 'barnDoorWipe' and @smil:subtype ='horizontal' ">
+			
+			<xsl:when test ="@smil:type = 'barnDoorWipe' and @smil:subtype ='horizontal' and @smil:direction='reverse'">
 				<xsl:value-of  select ="'barn(inHorizontal)'"/>
 			</xsl:when>
+			<xsl:when test ="@smil:type = 'waterfallWipe' and @smil:subtype ='horizontalRight' ">
+				<xsl:value-of  select ="'strips(downLeft)'"/>
+			</xsl:when>
+			
 			<xsl:when test ="@smil:type = 'irisWipe' and @smil:subtype ='rectangle' and @smil:direction='reverse'">
 				<xsl:value-of  select ="'box(in)'"/>
 			</xsl:when>
@@ -1740,6 +1925,20 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:template>
 	<xsl:template name ="mapCoordinates">
 		<xsl:param name ="strVal"/>
+
+		<xsl:variable name="appendPie">
+			<xsl:choose>
+				<xsl:when test="./parent::node()/@presentation:preset-id='ooo-exit-boomerang'
+				or ./parent::node()/@presentation:preset-id='ooo-exit-bounce'
+					or ./parent::node()/@presentation:preset-id='ooo-exit-magnify'
+					or ./parent::node()/@presentation:preset-id='ooo-exit-center-revolve'">
+					<xsl:value-of select="''"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'#'"/>
+				</xsl:otherwise>				
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:variable name ="strVal1">
 			<xsl:value-of select ="$strVal"/>
 		</xsl:variable>
@@ -1747,28 +1946,28 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:call-template name ="stringReplace">
 				<xsl:with-param name ="text" select ="$strVal1"/>
 				<xsl:with-param name ="replace" select ="'x'" />
-				<xsl:with-param name ="with" select ="'#ppt_x'"/>
+				<xsl:with-param name ="with" select ="concat($appendPie,'ppt_x')"/>
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:variable name ="strValppt_y">
 			<xsl:call-template name ="stringReplace">
 				<xsl:with-param name ="text" select ="$strValppt_x"/>
 				<xsl:with-param name ="replace" select ="'y'" />
-				<xsl:with-param name ="with" select ="'#ppt_y'"/>
+				<xsl:with-param name ="with" select ="concat($appendPie,'ppt_y')"/>
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:variable name ="strValppt_h">
 			<xsl:call-template name ="stringReplace">
 				<xsl:with-param name ="text" select ="$strValppt_y"/>
 				<xsl:with-param name ="replace" select ="'height'" />
-				<xsl:with-param name ="with" select ="'#ppt_h'"/>
+				<xsl:with-param name ="with" select ="concat($appendPie,'ppt_h')"/>
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:variable name ="strValppt_w">
 			<xsl:call-template name ="stringReplace">
 				<xsl:with-param name ="text" select ="$strValppt_h"/>
 				<xsl:with-param name ="replace" select ="'width'" />
-				<xsl:with-param name ="with" select ="'#ppt_w'"/>
+				<xsl:with-param name ="with" select ="concat($appendPie,'ppt_w')"/>
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:value-of select ="$strValppt_w"/>
@@ -1914,6 +2113,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+	
 	<xsl:template name="animationfifth">
 		<xsl:for-each select="./node()">
 			<xsl:if test="name()='anim:par' or name()='anim:iterate'">
@@ -1933,7 +2133,30 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:if test ="$animationId!=''">
 
 						<p:par>
-							<p:cTn id="5" fill="hold">
+							<p:cTn id="5">
+								
+								<xsl:attribute name ="presetID">
+									<xsl:value-of select ="$animationId"/>
+								</xsl:attribute>
+								<xsl:attribute name ="presetClass">
+									<xsl:value-of select ="$animationType"/>
+								</xsl:attribute>
+
+								<xsl:variable name ="animationSubId">
+									<xsl:call-template name ="animationSubId">
+										<xsl:with-param name ="animationType" select="$animationType"/>
+										<xsl:with-param name ="animationId" select="$animationId"/>
+									</xsl:call-template>
+								</xsl:variable>
+								
+								<xsl:attribute name ="presetSubtype">
+									<xsl:value-of select ="$animationSubId"/>
+								</xsl:attribute>
+								<xsl:if test="./@smil:fill='hold'">
+									<xsl:attribute name ="fill">
+										<xsl:value-of select ="'hold'"/>
+									</xsl:attribute>	
+								</xsl:if>								
 								<!-- added by yeswanth , Fix for Animation Start type -->
 								<xsl:attribute name="nodeType">
 									<xsl:choose>
@@ -1952,33 +2175,20 @@ Copyright (c) 2007, Sonata Software Limited
 									</xsl:choose>
 								</xsl:attribute>
 								<!-- End -->
-								<xsl:attribute name ="presetClass">
-									<xsl:value-of select ="$animationType"/>
-								</xsl:attribute>
-								<xsl:attribute name ="presetID">
-									<xsl:value-of select ="$animationId"/>
-								</xsl:attribute>
-								<xsl:variable name ="animationSubId">
-									<xsl:call-template name ="animationSubId">
-										<xsl:with-param name ="animationType" select="$animationType"/>
-										<xsl:with-param name ="animationId" select="$animationId"/>
-									</xsl:call-template>
-								</xsl:variable>
-								<xsl:attribute name ="presetSubtype">
-									<xsl:value-of select ="$animationSubId"/>
-								</xsl:attribute>
+								
+								
 								<p:stCondLst>
 									<p:cond>
 										<xsl:attribute name ="delay">
 											<xsl:choose >
-												<!-- commented by chhavi-->
-												<!--<xsl:when test ="substring-before(@smil:begin,'s') &gt; 0">
-                                      <xsl:value-of select ="round(substring-before(@smil:begin,'s')* 1000)"/>-->
-												<!-- ending here-->
-												<!-- added by chhavi for delay in custom animation-->
+												<xsl:when test="./@smil:begin='next'">
+													<xsl:value-of select="'indefinite'"/>
+												</xsl:when>
+												<xsl:when test="./@smil:begin='0s'">
+													<xsl:value-of select="'0'"/>
+												</xsl:when>
 												<xsl:when test ="substring-before(./@smil:begin,'s') &gt; 0">
-													<xsl:value-of select ="round(substring-before(./@smil:begin,'s')* 1000)"/>
-													<!--ending here-->
+													<xsl:value-of select ="round(substring-before(./@smil:begin,'s')* 1000)"/>												
 												</xsl:when>
 												<xsl:otherwise>
 													<xsl:value-of select ="'0'"/>
@@ -1994,6 +2204,22 @@ Copyright (c) 2007, Sonata Software Limited
 												<xsl:with-param name ="itType" select ="./@anim:iterate-type"/>
 											</xsl:call-template>
 										</xsl:attribute>
+										<xsl:choose>
+											<xsl:when test="$animationId = 15">
+												<p:tmAbs>
+													<xsl:attribute name ="val">
+														<xsl:choose >
+															<xsl:when test ="substring-before(./@anim:iterate-interval,'s') &gt; 0 ">
+																<xsl:value-of select ="substring-before(./@anim:iterate-interval,'s') * 100000"/>
+															</xsl:when>
+															<xsl:otherwise >
+																<xsl:value-of select ="'0'"/>
+															</xsl:otherwise>
+														</xsl:choose>
+													</xsl:attribute>
+												</p:tmAbs>
+											</xsl:when>
+											<xsl:otherwise>
 										<p:tmPct>
 											<xsl:attribute name ="val">
 												<xsl:choose >
@@ -2006,11 +2232,12 @@ Copyright (c) 2007, Sonata Software Limited
 												</xsl:choose>
 											</xsl:attribute>
 										</p:tmPct >
+											</xsl:otherwise>			
+										</xsl:choose>
 									</p:iterate>
 								</xsl:if>
 								<p:childTnLst>
-									<xsl:call-template name ="processAnim">
-									</xsl:call-template>
+									<xsl:call-template name ="processAnim"/>									
 								</p:childTnLst>
 							</p:cTn>
 						</p:par>
