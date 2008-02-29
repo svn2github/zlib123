@@ -403,31 +403,70 @@
        <xsl:variable name="col1">
          <xsl:value-of select="substring-before(substring-after($range,'.'),$row1)"/>
        </xsl:variable>
-       
+       <!-- 
+       Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
+		   Changes by: Vijayeta
+		   Desc:Many a times, the print range is not present in the correct format, because of which the template 'GetRowNum' for the variable 'endCell' goes into infinite loop,
+            and col2 is also not  correctly found. Hence, additional changes to check for
+       -->
+       <xsl:variable name="PrintRange1">
+         <xsl:choose>
+           <xsl:when test="contains(substring-after($range, '.'), ' ')">
+             <xsl:value-of select="substring-before($range, ' ')"/>
+           </xsl:when>
+           <xsl:when test="$range != ''">
+             <xsl:value-of select="$range"/>
+           </xsl:when>
+         </xsl:choose>
+       </xsl:variable>
+       <xsl:variable name ="sheet">
+         <xsl:value-of select ="substring-before($PrintRange1,'.')"/>
+       </xsl:variable>
        <xsl:variable name="row2">
          <xsl:variable name="endCell">
            <xsl:choose>
-             <!-- when there is next range there is a space before -->
-             <xsl:when test="contains(substring-after(substring-after($range,'.'),'.'),' ')">
-               <xsl:value-of
-                 select="substring-before(substring-after(substring-after($range,'.'),'.'),' ')"/>
+             <xsl:when test ="contains(substring-after($PrintRange1,':'),$sheet)">
+               <xsl:choose>
+                 <!-- when there is next range there is a space before -->
+                 <xsl:when test="contains(substring-after(substring-after($range,'.'),'.'),' ')">
+                   <xsl:value-of
+                     select="substring-before(substring-after(substring-after($range,'.'),'.'),' ')"/>
+                 </xsl:when>
+                 <xsl:otherwise>
+                   <xsl:value-of select="substring-after(substring-after($range,'.'),'.')"/>
+                 </xsl:otherwise>
+               </xsl:choose>
              </xsl:when>
-             <xsl:otherwise>
-               <xsl:value-of select="substring-after(substring-after($range,'.'),'.')"/>
+             <xsl:otherwise >
+               <xsl:choose>
+                 <!-- when there is next range there is a space before -->
+                 <xsl:when test="contains(substring-after(substring-after($range,'.'),':'),' ')">
+                   <xsl:value-of
+                     select="substring-before(substring-after(substring-after($range,'.'),':'),' ')"/>
+                 </xsl:when>
+                 <xsl:otherwise>
+                   <xsl:value-of select="substring-after(substring-after($range,'.'),':')"/>
+                 </xsl:otherwise>
+               </xsl:choose>
              </xsl:otherwise>
            </xsl:choose>
          </xsl:variable>
-         
          <xsl:call-template name="GetRowNum">
            <xsl:with-param name="cell" select="$endCell"/>
          </xsl:call-template>
        </xsl:variable>
-       
        <xsl:variable name="col2">
-         <xsl:value-of
-           select="substring-before(substring-after(substring-after($range,'.'),'.'),$row2)"/>
-       </xsl:variable>
-       
+         <xsl:choose>
+           <xsl:when test ="contains(substring-after($PrintRange1,':'),$sheet)">
+             <xsl:value-of
+        select="substring-before(substring-after(substring-after($range,'.'),'.'),$row2)"/>
+           </xsl:when>
+           <xsl:otherwise >
+             <xsl:value-of
+        select="substring-before(substring-after(substring-after($range,'.'),':'),$row2)"/>
+           </xsl:otherwise>
+         </xsl:choose>
+       </xsl:variable>       
        <!-- if sheet name contains space then name has to be inside apostrophes -->
        <xsl:variable name="sheetName">
          <xsl:text>'</xsl:text>
@@ -514,8 +553,15 @@
          <xsl:if test="contains($PrintRange, '$')">
            <xsl:choose>
              <xsl:when test="not(contains($PrintRange,':'))">
-               <xsl:value-of
-                 select="concat($sheetName,'!',substring-before(substring-after($PrintRange,'.'),$row1),'', $row1,':$',$row1)"/> 
+             <!-- Defect : 1877279 
+				          File Name: _TestSuite - DB_Shipwreck.xlsx (on roundtrip)
+					        Fix By: Vijayeta
+					        Desc: This gives the right print range in case of single cell as print range
+             -->
+               <!--<xsl:value-of
+                 select="concat($sheetName,'!',substring-before(substring-after($PrintRange,'.'),$row1),'', $row1,':$',$row1)"/>-->
+               <xsl:value-of 
+                 select="concat($sheetName,'!',substring-before(substring-after($PrintRange,'.'),$row1),'', $row1)"/>
              </xsl:when>
              <xsl:otherwise>
            <xsl:value-of

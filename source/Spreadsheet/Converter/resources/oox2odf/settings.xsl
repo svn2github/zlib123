@@ -33,6 +33,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   exclude-result-prefixes="e r w">
 
@@ -64,9 +65,48 @@
                     <xsl:value-of select="."/>
                   </xsl:for-each>
                 </config:config-item>
-
+                <!-- Defect : 1877279 
+				             File Name: mastereval-v3.xlsx (on roundtrip)
+					           Fix By: Vijayeta
+					           Desc: to make sure that the zoom value is taken from the active tab, 
+					                 and also the fact is considered that the active sheet not necessarily be a worksheet, can also  be a chartsheet, with the path different from the worksheet.
+			          -->
                 <config:config-item config:name="ZoomValue" config:type="int">
-                  <xsl:for-each
+                  <xsl:variable name ="rId">
+                    <xsl:value-of select="key('Part', 'xl/workbook.xml')//e:workbook/e:sheets/e:sheet[position() = $ActiveTabNumber + 1]/@r:id"/>
+                  </xsl:variable>
+                  <xsl:variable name ="sheetNamePath">
+                    <xsl:for-each select ="key('Part', 'xl/_rels/workbook.xml.rels')//rels:Relationships/rels:Relationship[@Id=$rId]">
+                      <xsl:value-of select ="@Target"/>
+                    </xsl:for-each>
+                  </xsl:variable>
+                  <xsl:choose >
+                    <xsl:when test ="contains($sheetNamePath,'chartsheets')">
+                      <xsl:for-each select="key('Part', concat('xl/',$sheetNamePath))/e:chartsheet/e:sheetViews/e:sheetView">
+                        <xsl:choose>
+                          <xsl:when test="not(@view = 'pageBreakPreview') and @zoomScale">
+                            <xsl:value-of select="@zoomScale"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:text>100</xsl:text>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:for-each select="key('Part', concat('xl/',$sheetNamePath))/e:worksheet/e:sheetViews/e:sheetView">
+                        <xsl:choose>
+                          <xsl:when test="not(@view = 'pageBreakPreview') and @zoomScale">
+                            <xsl:value-of select="@zoomScale"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:text>100</xsl:text>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:for-each>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <!--<xsl:for-each
                     select="key('Part', concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
                     <xsl:choose>
                       <xsl:when test="not(@view = 'pageBreakPreview') and @zoomScale">
@@ -76,7 +116,7 @@
                         <xsl:text>100</xsl:text>
                       </xsl:otherwise>
                     </xsl:choose>
-                  </xsl:for-each>
+                  </xsl:for-each>-->
                 </config:config-item>
 
                 <config:config-item config:name="PageViewZoomValue" config:type="int">
@@ -104,7 +144,7 @@
                     </xsl:choose>
                   </xsl:for-each>
                 </config:config-item>
-                
+
                 <config:config-item config:name="HasColumnRowHeaders" config:type="boolean">
                   <xsl:for-each
                     select="key('Part', concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
@@ -117,7 +157,7 @@
                   </xsl:for-each>
                 </config:config-item>
               </xsl:for-each>
-              
+
               <config:config-item-map-named config:name="Tables">
                 <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
                   <xsl:call-template name="InsertCursorPosition">

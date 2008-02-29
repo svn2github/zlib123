@@ -111,13 +111,13 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       </office:font-face-decls>
       <office:automatic-styles>
         <xsl:call-template name="InsertColumnStyles"/>
-        
+
         <!--xsl:comment>Row Styles</xsl:comment-->
         <xsl:call-template name="InsertRowStyles"/>
-        
+
         <!--xsl:comment>Number Styles</xsl:comment-->
         <xsl:call-template name="InsertNumberStyles"/>
-        
+
         <!--xsl:comment>Cell Styles</xsl:comment-->
         <xsl:call-template name="InsertCellStyles"/>
 
@@ -128,17 +128,17 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <xsl:if test="key('Part', 'xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf/e:alignment/@horizontal = 'centerContinuous'">
           <xsl:call-template name="InsertHorizontalCellStyles"/>
         </xsl:if>
-        
+
         <!--xsl:comment>Table Styles</xsl:comment-->
         <xsl:call-template name="InsertStyleTableProperties"/>
-        
+
         <!--xsl:comment>Text Styles</xsl:comment-->
         <xsl:call-template name="InsertTextStyles"/>
-        
+
         <!--xsl:comment>Text Box Styles</xsl:comment-->
         <xsl:call-template name="InsertTextBoxTextStyles"/>
         <!-- Insert Picture properties -->
-        
+
         <!--xsl:comment>Picture Styles</xsl:comment-->
         <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="PictureStyle">
           <xsl:with-param name="number">1</xsl:with-param>
@@ -328,13 +328,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       </xsl:call-template>
     </xsl:variable>
 
+	  <!-- Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
+		   Changes by: Vijayeta
+		   Desc:‘-‘ is removed from the list of symbols to get the value of ‘checkedName’.,line 342 
+		   This is done because some of the sheets in the file ‘03706191.CONFIDENTIAL.xlsx’ have names such as ‘E3-SITES’, N2-L, and so on
+      -->
     <xsl:variable name="checkedName">
       <xsl:call-template name="CheckSheetName">
         <xsl:with-param name="sheetNumber">
           <xsl:value-of select="$number"/>
         </xsl:with-param>
         <xsl:with-param name="name">
-          <xsl:value-of select="translate(@name,'!-$#():,.+','')"/>
+					<xsl:value-of select="translate(@name,'!$#():,.+','')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -532,71 +537,107 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <!-- for the current sheet -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
           <!-- if print range with apostrophes -->
-          <xsl:if test="contains(./self::node(), concat($apostrof, $checkedName)) and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
+          <!--
+		         Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
+		         Changes by: Vijayeta
+		         Desc:variable 'sheetNamePrntRnge', to prevent, a situation where a sheet name is E3 and there might be another sheet as E3-GS   
+        -->
+          <xsl:variable name ="sheetNamePrntRnge">
+            <xsl:value-of select ="substring-before(./self::node(),'!')"/>
+          </xsl:variable>
+          <!--<xsl:if test="contains(./self::node(), concat($apostrof, $checkedName)) and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">-->
+          <xsl:if test="(($sheetNamePrntRnge = concat($apostrof, $checkedName,$apostrof)) and (@name = '_xlnm.Print_Area'))">
             <!-- one print range with apostrophes -->
             <xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">
-              <xsl:attribute name="table:print-ranges">
+              <xsl:variable name ="prntRnge">
                 <xsl:call-template name="recursive">
                   <xsl:with-param name="oldString" select="':'"/>
                   <xsl:with-param name="newString" select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
                   <xsl:with-param name="wholeText" select="translate(./self::node(), '!', '.')"/>
                 </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name ="PartOne">
+                <xsl:value-of select ="substring-before($prntRnge,':')"/>
+              </xsl:variable>
+              <xsl:variable name ="PartTwo">
+                <xsl:value-of select ="substring-after($prntRnge,':')"/>
+              </xsl:variable>
+              <xsl:variable name ="beginSheet">
+                <xsl:value-of select ="substring-before($PartOne,'.')"/>
+              </xsl:variable>
+              <xsl:variable name ="endSheet">
+                <xsl:value-of select ="substring-before($PartTwo,'.')"/>
+              </xsl:variable>
+              <xsl:variable name ="beginCol">
+                <xsl:choose >
+                  <xsl:when test ="contains(substring-after($PartOne,'$'),'$')">
+                    <xsl:value-of select ="substring-before(substring-after($PartOne,'$'),'$')"/>
+                  </xsl:when>
+                  <xsl:otherwise >
+                    <xsl:value-of select ="substring-after($PartOne,'$')"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name ="endCol">
+                <xsl:choose >
+                  <xsl:when test ="contains(substring-after($PartTwo,'$'),'$')">
+                    <xsl:value-of select ="substring-before(substring-after($PartTwo,'$'),'$')"/>
+                  </xsl:when>
+                  <xsl:otherwise >
+                    <xsl:value-of select ="substring-after($PartTwo,'$')"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name ="beginRow">
+                <xsl:choose >
+                  <xsl:when test ="contains(substring-after($PartOne,'$'),'$')">
+                    <xsl:value-of select ="substring-after(substring-after($PartOne,'$'),'$')"/>
+                  </xsl:when>
+                  <xsl:otherwise >
+                    <xsl:value-of select ="1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name ="endRow">
+                <xsl:choose >
+                  <xsl:when test ="contains(substring-after($PartTwo,'$'),'$')">
+                    <xsl:value-of select ="substring-after(substring-after($PartTwo,'$'),'$')"/>
+                  </xsl:when>
+                  <xsl:otherwise >
+                    <xsl:value-of select ="65536"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name ="newPrntRnge">
+                <xsl:if test ="$endSheet!=''">
+                  <xsl:value-of select ="concat($beginSheet,'.',$beginCol,$beginRow,':',$endSheet,'.',$endCol,$endRow)"/>
+                </xsl:if>
+                <xsl:if test ="$endSheet=''">
+                  <xsl:value-of select ="concat($beginSheet,'.',$beginCol,$beginRow,':',$beginSheet,'.',$endCol,$endRow)"/>
+                </xsl:if>
+              </xsl:variable>
+              <xsl:attribute name="table:print-ranges">
+                <xsl:value-of select ="$newPrntRnge"/>
               </xsl:attribute>
             </xsl:if>
             <!-- multiple print ranges with apostrophes -->
-			  <!-- Bug: 1803593, for the file U S Extreme Temperature, on round trip
-				   Fixed By: Vijayeta
-				   Print range in the input xlsx file is not in a proper format, hence in the converted ods file print range does not appear and hence,
-				   the xlsx file after round trip crashes. This part of code fixes this problem-->
+            <!-- Bug: 1803593, for the file U S Extreme Temperature, on round trip
+				         Fixed By: Vijayeta
+				         Desc: Print range in the input xlsx file is not in a proper format, hence in the converted ods file print range does not appear and hence,
+				            the xlsx file after round trip crashes. This part of code fixes this problem
+					   -->
             <xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">
-				<xsl:variable name ="GetPrintRange">
-					<xsl:value-of select="./self::node()"/>
-				</xsl:variable>
-				<xsl:variable name ="newRange">
-					<xsl:choose>
-						<xsl:when test ="contains($GetPrintRange,',')">
-							<xsl:variable name ="PartOne">
-								<xsl:value-of select ="substring-before($GetPrintRange,',')"/>
-							</xsl:variable>
-							<xsl:variable name ="PartTwo">
-								<xsl:value-of select ="substring-after($GetPrintRange,',')"/>
-							</xsl:variable>
-							<xsl:variable name ="beginSheet">
-								<xsl:value-of select ="substring-before(substring-before($PartOne,':'),'!')"/>
-							</xsl:variable>
-							<xsl:variable name ="endSheet">
-								<xsl:value-of select ="substring-before(substring-before($PartTwo,':'),'!')"/>
-							</xsl:variable>
-							<xsl:variable name ="beginCol">
-								<xsl:value-of select ="substring-after(substring-before($PartOne,':'),'$')"/>
-							</xsl:variable>
-							<xsl:variable name ="endCol">
-								<xsl:value-of select ="substring-after(substring-after($PartOne,':'),'$')"/>
-							</xsl:variable>
-							<xsl:variable name ="beginRow">
-								<xsl:value-of select ="substring-after(substring-before($PartTwo,':'),'$')"/>
-							</xsl:variable>
-							<xsl:variable name ="endRow">
-								<xsl:value-of select ="substring-after(substring-after($PartTwo,':'),'$')"/>
-							</xsl:variable>
-							<xsl:value-of select ="concat($beginSheet,'.',$beginCol,$beginRow,':',$endSheet,'.',$endCol,$endRow)"/>
-						</xsl:when>
-						<xsl:otherwise>
-                <xsl:call-template name="recursive">
-                  <xsl:with-param name="oldString" select="':'"/>
-                  <xsl:with-param name="newString"
-                    select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
-                  <xsl:with-param name="wholeText"
-                    select="translate(translate(./self::node(), '!', '.'), ',', ' ')"/>
-                </xsl:call-template>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:attribute name="table:print-ranges">
-					<xsl:value-of select ="$newRange"/>
+              <xsl:variable name ="GetPrintRange">
+                <xsl:value-of select="./self::node()"/>
+              </xsl:variable>
+              <xsl:variable name ="newRange">
+                <xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>
+              </xsl:variable>
+              <xsl:attribute name="table:print-ranges">
+                <xsl:value-of select ="$newRange"/>
               </xsl:attribute>
             </xsl:if>
-			  <!-- End of fix for Bug 1803593, for the file U S Extreme Temperature, on round trip-->
+            <!-- End of fix for Bug 1803593, for the file U S Extreme Temperature, on round trip-->
           </xsl:if>
         </xsl:if>
       </xsl:for-each>
@@ -604,8 +645,13 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <!-- for the current sheet -->
         <!-- if the print range is without apostrophes -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
-          <xsl:if
-            test="string($checkedName) = translate(substring-before(self::node(), '!'), '!-$#:(),.+','') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
+        <!-- 
+		      Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
+		      Changes by: Vijayeta
+		      Desc:‘-‘ is removed from the list of symbols,line 653 
+		            This is done because some of the sheets in the file ‘03706191.CONFIDENTIAL.xlsx’ have names such as ‘E3-SITES’, N2-L, and so on
+        -->
+          <xsl:if test="string($checkedName) = translate(substring-before(self::node(), '!'), '!$#:(),.+','') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
             <!-- one print range without apostrophes -->
             <xsl:if test="not(contains(./self::node(), concat(',', $checkedName)))">
               <xsl:variable name="temporary">
@@ -616,14 +662,7 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
                 </xsl:call-template>
               </xsl:variable>
               <xsl:attribute name="table:print-ranges">
-                <!-- <xsl:value-of
-              select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
-                />-->
-                <xsl:call-template name="recursive">
-                  <xsl:with-param name="wholeText" select="$temporary"/>
-                  <xsl:with-param name="oldString" select="substring-before($temporary, '$')"/>
-                  <xsl:with-param name="newString" select="concat($checkedName, '.')"/>
-                </xsl:call-template>
+                <xsl:value-of select ="translate(translate($temporary, '!', '.'),'$','')"/>
               </xsl:attribute>
             </xsl:if>
             <!-- multiple print ranges without apostrophes -->
@@ -631,8 +670,7 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
               <xsl:attribute name="table:print-ranges">
                 <xsl:call-template name="recursive">
                   <xsl:with-param name="newString" select="concat(':', $checkedName, '.')"/>
-                  <xsl:with-param name="wholeText"
-                    select="translate(translate(./self::node(), '!', '.'), ',', ' ')"/>
+								<xsl:with-param name="wholeText" select="translate(translate(translate(./self::node(), '!', '.'), ',', ' '),'$','')"/>
                   <xsl:with-param name="oldString" select="':'"/>
                 </xsl:call-template>
               </xsl:attribute>
@@ -640,9 +678,6 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
           </xsl:if>
         </xsl:if>
       </xsl:for-each>
-
-
-
       <xsl:variable name="GroupRowStart">
         <xsl:call-template name="GroupRow">
           <xsl:with-param name="Id">
@@ -1315,7 +1350,7 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
             <xsl:with-param name="MergeCell">
               <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
-             <!-- Code Added By Sateesh Reddy Date:01-Feb-2008 -->
+            <!-- Code Added By Sateesh Reddy Date:01-Feb-2008 -->
             <xsl:with-param name="sheetNr" select="$sheetNr"/>
             <!-- End -->
             <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
@@ -2417,14 +2452,14 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       <xsl:otherwise >
         <!--RefNo-1:Commented
         <text:p text:style-name="{generate-id(./parent::node())}">-->
-          <text:span>
-            <xsl:if test="e:rPr">
-              <xsl:attribute name="text:style-name">
-                <xsl:value-of select="generate-id(.)"/>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates/>
-          </text:span>
+        <text:span>
+          <xsl:if test="e:rPr">
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:apply-templates/>
+        </text:span>
         <!--</text:p >-->
       </xsl:otherwise>
     </xsl:choose>

@@ -577,7 +577,13 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           <xsl:variable name="zoom">
             <xsl:choose>
               <!-- normal view-->
-              <xsl:when test="$pageBreakView = 'false' ">
+              <!-- Defect : 1877279 
+				           File Name: mastereval-v3.xlsx (on roundtrip)
+					         Fix By: Vijayeta
+					         Desc: additional condion added, to check if the variable,pageBreakView is not blank.
+			        -->
+              <!--<xsl:when test="$pageBreakView = 'false'">-->
+              <xsl:when test="$pageBreakView = 'false' or $pageBreakView =''">
                 <xsl:choose>
                   <xsl:when test="key('ConfigItem', 'ZoomValue')">
                     <xsl:value-of select="key('ConfigItem', 'ZoomValue')"/>
