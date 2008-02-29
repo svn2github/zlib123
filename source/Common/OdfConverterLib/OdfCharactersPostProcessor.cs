@@ -217,6 +217,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             str = DateTime.Now.ToShortDateString();
             return str;
         }
+
         private string EvalShadeExpression(string text)
         {
             string[] arrVal = new string[5];
@@ -242,7 +243,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 sG = 2.4865 * dblGreen;
 
             }
-            else {
+            else
+            {
 
                 sG = (Math.Pow(((dblGreen + 14.025) / 269.025), 2.4) ) * 8192;
             
@@ -344,12 +346,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             hexRed = String.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:x}", intRed);
             hexGreen = String.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:x}", intGreen );
             hexBlue = String.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:x}", intBlue );  
+
             return ('#' + hexRed.ToUpper()   + hexGreen.ToUpper ()  + hexBlue.ToUpper()  );
 
         }
+
         //Added by sonata\Vipul for multilevel grouping
         private string EvalGroupingExpression(string text)
         {
+
             List<OoxShape> _shapes = new List<OoxShape>();
            
             string strRet = "";
@@ -666,7 +671,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             }
             
-            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", strShapeCordinates);
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", strShapeCordinates);
         }
 
         private string EvalExpression(string text)
@@ -711,6 +716,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             return strRet + "cm";
         }
+
         // added by vipul for Shape Rotation
         //Start
         private string EvalRotationExpression(string text)
@@ -807,9 +813,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                } 
             }
 
-            strRotate = "rotate (" + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", dblRotAngle) + ")";
+            strRotate = "rotate (" + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.########}", dblRotAngle) + ")";
                           
-            strTranslate = "translate (" + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", dblX2) + "cm " + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", dblY2) + "cm)";
+            strTranslate = "translate (" + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", dblX2) + "cm " + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", dblY2) + "cm)";
 
                  return strRotate+" "+strTranslate;
         }
@@ -882,6 +888,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             double odpBottom = bottom * cy / 100000;
 
             string result = string.Concat("rect(", string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpTop) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpRight) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpBottom) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpLeft) + "cm", ")");
+
             this.nextWriter.WriteString(result);
         }
         //End
@@ -995,8 +1002,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             double viewdyFinal;
             viewdyFinal = (dyFinal / height * viewHeight);
 
-                strviewdxFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal);
-                strviewdyFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal);
+                strviewdxFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdxFinal);
+                strviewdyFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdyFinal);
 
                 drawMod = strviewdxFinal + " " + strviewdyFinal;
             }
@@ -1171,15 +1178,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 viewdyFinal3 = (viewdyFinal3 / 1000);
 
-                 strviewdyFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal);
-                 strviewdyFinal1 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal1);
-                 strviewdyFinal2 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal2);
-                 strviewdyFinal3 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal3);
+                 strviewdyFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdyFinal);
+                 strviewdyFinal1 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdyFinal1);
+                 strviewdyFinal2 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdyFinal2);
+                 strviewdyFinal3 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdyFinal3);
 
-                 strviewdxFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal);
-                 strviewdxFinal1 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal1);
-                 strviewdxFinal2 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal2);
-                 strviewdxFinal3 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal3);
+                 strviewdxFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdxFinal);
+                 strviewdxFinal1 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdxFinal1);
+                 strviewdxFinal2 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdxFinal2);
+                 strviewdxFinal3 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", viewdxFinal3);
 
                 if (callAdjVal.ToString().Trim() == "Callout-AdjLine1")
                 {
@@ -1224,7 +1231,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     //x =Math.Cos((arrDir)) * (arrDist / 360000);
                 }
             }        
-            string strRet = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", x);
+            string strRet = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", x);
 
             return strRet + "cm";        
             }
