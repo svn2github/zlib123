@@ -114,7 +114,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteEndElement()
         {
-
             if (IsRun())
             {
                 WriteStoredRun();
@@ -220,10 +219,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string attVal = "";
             if (arrVal.Length >= 6)
             {
-                double x1 = double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
-                double x2 = double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
-                double y1 = double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
-                double y2 = double.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
+                double x1 = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+                double x2 = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+                double y1 = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+                double y2 = Double.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
 
                 double xCenter = (x1 + x2) * 360000 / 2;
                 double yCenter = (y1 + y2) * 360000 / 2;
@@ -303,27 +302,27 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     if (text.Contains("true"))
                         cx =Math.Round( cx / 1588);
-                    attVal = cx.ToString();
+                    attVal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", cx);
                 }
                 if (arrVal[1] == "cy")
                 {
                     if (text.Contains("true"))
                         cy =  Math.Round( cy / 1588);
-                    attVal = cy.ToString();
+                    attVal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", cy);
                 }
                 if (arrVal[1] == "x")
                 {
                     x = Math.Round(xCenter - cx / 2);
                     if (text.Contains("true"))
                         x = Math.Round(x / 1588);
-                    attVal = x.ToString();
+                    attVal =string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", x);
                 }
                 if (arrVal[1] == "y")
                 {
                     y = Math.Round(yCenter - cy / 2);
                     if (text.Contains("true"))
                         y = Math.Round(y / 1588);
-                    attVal = y.ToString();
+                    attVal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", y);
 
                 }
             }
@@ -351,7 +350,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Double centreY = 0.0;
             Double dblRotation = 0.0;
            
-
             if (arrVal.Length == 7)
             {
                 double arrValueWidth = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
@@ -395,22 +393,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (strXY.Contains("YGroup"))
                 dblY2 = dblY2 / 1588;
 
-
-
             if (strXY.Contains("X"))
             {
 
-                strReturn=( (int) Math.Round(dblX2)).ToString();
+                strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", (int)Math.Round(dblX2));
 
             }
             if (strXY.Contains("Y"))
             {
-                strReturn = ((int)Math.Round(dblY2)).ToString();
+                strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", (int)Math.Round(dblY2));
 
             }
             if (strXY.Contains("ROT"))
             {
-                strReturn = dblRotation.ToString();
+                strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", dblRotation);
 
             }
             return strReturn;
@@ -442,6 +438,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                  string[] arrCords = arrVal[intCount].Split(':');
           
+                if (arrCords[0] == "")
+                    arrCords[0] = "0";
+                if (arrCords[1] == "")
+                    arrCords[1] = "0";
+                if (arrCords[2] == "")
+                    arrCords[2] = "0";
+                if (arrCords[3] == "")
+                    arrCords[3] = "0";
+                if (arrCords[4] == "")
+                    arrCords[4] = "0";
+
                  dblX = Double.Parse(arrCords[0], System.Globalization.CultureInfo.InvariantCulture);
                  dblY = Double.Parse(arrCords[1], System.Globalization.CultureInfo.InvariantCulture);
                  dblWidth = Double.Parse(arrCords[2], System.Globalization.CultureInfo.InvariantCulture);
@@ -474,9 +481,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 tempVal = dblY + Math.Cos(dblRot) * dblHeight;
                 arrListY.Add(tempVal);
 
-            
-
-            }
+              }
            
             string strXY = arrVal[0];
 
@@ -545,42 +550,45 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                    if (strXY.Contains("InnerGroup"))
                    {
                        if (strXY.Contains("onlyX"))
-                           strReturn = ChOffX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChOffX);
                        else if (strXY.Contains("onlyY"))
-                           strReturn = ChOffY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChOffY);
                        else if (strXY.Contains("onlyCX"))
-                           strReturn = ChExtX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChExtX);
                        else if (strXY.Contains("onlyCY"))
-                           strReturn = ChExtY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChExtY);
                        else if (strXY.Contains("onlyChX"))
-                           strReturn = ChOffX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChOffX);
                        else if (strXY.Contains("onlyChY"))
-                           strReturn = ChOffY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChOffY);
                        else if (strXY.Contains("onlyChCX"))
-                           strReturn = ChExtX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChExtX);
+
                        else if (strXY.Contains("onlyChCY"))
-                           strReturn = ChExtY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChExtY);
+
+
 
                    }
                    else
                    {
 
                        if (strXY.Contains("onlyX"))
-                           strReturn = OffX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", OffX);
                        else if (strXY.Contains("onlyY"))
-                           strReturn = OffY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", OffY);
                        else if (strXY.Contains("onlyCX"))
-                           strReturn = ExtX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ExtX);
                        else if (strXY.Contains("onlyCY"))
-                           strReturn = ExtY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ExtY);
                        else if (strXY.Contains("onlyChX"))
-                           strReturn = ChOffX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChOffX);
                        else if (strXY.Contains("onlyChY"))
-                           strReturn = ChOffY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChOffY);
                        else if (strXY.Contains("onlyChCX"))
-                           strReturn = ChExtX.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChExtX);
                        else if (strXY.Contains("onlyChCY"))
-                           strReturn = ChExtY.ToString();
+                    strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", ChExtY);
 
             }
            
@@ -598,8 +606,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Double x = 0;
             if (arrVal.Length == 3)
             {
-                double arrValue1 = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
-                double arrValue2 = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValue1 = Double.Parse(arrVal[1].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+                double arrValue2 = Double.Parse(arrVal[2].ToString(), System.Globalization.CultureInfo.InvariantCulture);
 
                 if (arrVal[0].Contains("a-outerShdw-dist"))
                 {
@@ -634,11 +642,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         x = Math.Abs(10800000 - x);
                     }
                 }
-
             }
+            string strRet = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", x);
 
-            return x.ToString();
-
+          
+            return strRet;
         }
 
         //Resolve relative path to absolute path
@@ -683,10 +691,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string[] arrVal = new string[6];
             arrVal = text.Split(':');
             string source = arrVal[1].ToString();
-            double top = double.Parse(arrVal[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-            double right = double.Parse(arrVal[3].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-            double bottom = double.Parse(arrVal[4].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-            double left = double.Parse(arrVal[5].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double top = Double.Parse(arrVal[2].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            double right = Double.Parse(arrVal[3].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            double bottom = Double.Parse(arrVal[4].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            double left = Double.Parse(arrVal[5].ToString(), System.Globalization.CultureInfo.InvariantCulture);
 
 
             string tempFileName = AbstractConverter.inputTempFileName.ToString();
@@ -699,9 +707,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             string[] arrValues = new string[3];
             arrValues = widht_height_res.Split(':');
-            double width = double.Parse(arrValues[0].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-            double height = double.Parse(arrValues[1].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-            double res = double.Parse(arrValues[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
+            double width = Double.Parse(arrValues[0].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            double height = Double.Parse(arrValues[1].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            double res = Double.Parse(arrValues[2].ToString(), System.Globalization.CultureInfo.InvariantCulture);
 
             double cx = width * 2.54 / res;
             double cy = height * 2.54 / res;
@@ -713,16 +721,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
 
             WriteStartAttribute("l");
-            this.WriteString(pptLeft.ToString());
+            this.WriteString(string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", pptLeft));
             WriteEndAttribute();
             WriteStartAttribute("r");
-            this.WriteString(pptRight.ToString());
+            this.WriteString(string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", pptRight));
             WriteEndAttribute();
             WriteStartAttribute("t");
-            this.WriteString(pptTop.ToString());
+            this.WriteString(string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", pptTop));
             WriteEndAttribute();
             WriteStartAttribute("b");
-            this.WriteString(pptBottom.ToString());
+            this.WriteString(string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", pptBottom));
             WriteEndAttribute();
         }
         //end
@@ -734,7 +742,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string[] arrValCallStr = arrVal[0].Split(':');
             string[] arrCallModfr = arrVal[1].Split(' ');
 
-            string val1 = "";
+            int val1 =0;
 
             string callAdj = (arrValCallStr[0].ToString());
 
@@ -862,7 +870,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 int FML1 = (int)fml1;
 
-                val1 = string.Concat("val" + " " + FML1.ToString());
+                    val1 = FML1;
             }
 
                 if (callAdj.ToString().Trim() == "Callout-DirectAdj2Notlinefmla2")
@@ -880,7 +888,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 int FML2 = (int)fml2;
 
-                val1 = string.Concat("val" + " " + FML2.ToString());
+                    val1 = FML2;
             }
             }
 
@@ -1056,45 +1064,48 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 if (callAdj.ToString().Trim() == "Callout-DirectLine3Adj8fmla8")
                 {
-                    val1 = string.Concat("val" + " " + FML8.ToString());
+                    val1 = FML8;
                 }
 
                 if (callAdj.ToString().Trim() == "Callout-DirectLine3Adj7fmla7")
                 {
-                    val1 = string.Concat("val" + " " + FML7.ToString());
+                    val1 = FML7;
                 }
 
                 if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj6fmla6") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj6fmla6"))
                 {
-                    val1 = string.Concat("val" + " " + FML6.ToString());
+                    val1 = FML6;
                 }
 
                 if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj5fmla5") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj5fmla5"))
                 {
-                    val1 = string.Concat("val" + " " + FML5.ToString());
+                    val1 = FML5;
                 }
 
                 if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj4fmla4") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj4fmla4") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj4fmla4"))
                 {
-                    val1 = string.Concat("val" + " " + FML4.ToString());
+                    val1 = FML4;
                 }
 
                 if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj3fmla3") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj3fmla3") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj3fmla3"))
                 {
-                    val1 = string.Concat("val" + " " + FML3.ToString());
+                    val1 = FML3;
                 }
 
                 if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj2fmla2") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj2fmla2") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj2fmla2"))
                 {
-                    val1 = string.Concat("val" + " " + FML2.ToString());
+                    val1 = FML2;
                 }
 
                 if ((callAdj.ToString().Trim() == "Callout-DirectLine3Adj1fmla1") || (callAdj.ToString().Trim() == "Callout-DirectLine2Adj1fmla1") || (callAdj.ToString().Trim() == "Callout-DirectLine1Adj1fmla1"))
                 {
-                    val1 = string.Concat("val" + " " + FML1.ToString());
+                    val1 = FML1;
                 }
             }
-            return val1.ToString();
+
+
+
+            return "val " + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", val1);
         }
         //End
 

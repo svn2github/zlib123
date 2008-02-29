@@ -101,7 +101,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.currentNode.Pop();
         }
 
-
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
             this.currentNode.Push(new Attribute(prefix, localName, ns));
@@ -217,7 +216,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string str = "";
             str = DateTime.Now.ToShortDateString();
             return str;
-
         }
         private string EvalShadeExpression(string text)
         {
@@ -528,9 +526,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 strLineRet = shape.OoxTransform.LineOdf;
             }
          
-          
-
-            if (arrgroupShape[1].Contains("Line"))
+                      if (arrgroupShape[1].Contains("Line"))
             {
                 arrFinalRet = strLineRet.Split('@');
 
@@ -670,10 +666,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             }
             
-
-
-            return strShapeCordinates;
-
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", strShapeCordinates);
         }
 
         private string EvalExpression(string text)
@@ -714,8 +707,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 
             }
+            string strRet = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.####}", x);
 
-            return x.ToString().Replace(',','.') + "cm";
+            return strRet + "cm";
         }
         // added by vipul for Shape Rotation
         //Start
@@ -751,7 +745,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 double arrValueRot = Double.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
 
                
-
                 if (arrVal[0].Contains("draw-transform"))
                 {
 
@@ -812,11 +805,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     dblY2 = Math.Round((centreY + (dblRadius * Math.Sin(dblgammaR))) / 360036.00, 3);
              
                } 
-
             }
-                strRotate="rotate (" + dblRotAngle.ToString().Replace(',', '.') +")";
+
+            strRotate = "rotate (" + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", dblRotAngle) + ")";
                           
-                strTranslate = "translate (" + dblX2.ToString().Replace(',', '.') + "cm " + dblY2.ToString().Replace(',', '.') + "cm)";
+            strTranslate = "translate (" + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", dblX2) + "cm " + string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", dblY2) + "cm)";
 
                  return strRotate+" "+strTranslate;
         }
@@ -867,7 +860,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             int top = int.Parse(arrVal[4].ToString(),System.Globalization.CultureInfo.InvariantCulture);
             int bottom = int.Parse(arrVal[5].ToString(),System.Globalization.CultureInfo.InvariantCulture);
 
-
             string tempFileName = AbstractConverter.inputTempFileName.ToString();
             ZipResolver zipResolverObj = new ZipResolver(tempFileName);
             OdfZipUtils.ZipArchiveWriter zipobj = new OdfZipUtils.ZipArchiveWriter(zipResolverObj);
@@ -875,13 +867,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             zipResolverObj.Dispose();
             zipobj.Close();
 
-
             string[] arrValues = new string[3];
             arrValues = widht_height_res.Split(':');
-            double width = double.Parse(arrValues[0].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-            double height = double.Parse(arrValues[1].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-            double res = double.Parse(arrValues[2].ToString(),System.Globalization.CultureInfo.InvariantCulture);
-
+            double width = Double.Parse(arrValues[0].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            double height = Double.Parse(arrValues[1].ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            double res = Double.Parse(arrValues[2].ToString(), System.Globalization.CultureInfo.InvariantCulture);
 
             double cx = width * 2.54 / res;
             double cy = height * 2.54 / res;
@@ -893,7 +883,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             string result = string.Concat("rect(", string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpTop) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpRight) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpBottom) + "cm" + " " + string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:0.##}", odpLeft) + "cm", ")");
             this.nextWriter.WriteString(result);
-
         }
         //End
 
@@ -913,6 +902,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             int flipH = int.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
             int flipV = int.Parse(arrVal[6], System.Globalization.CultureInfo.InvariantCulture);
             double rot = Double.Parse(arrVal[7], System.Globalization.CultureInfo.InvariantCulture);
+
+            string strviewdyFinal = "";
+            string strviewdyFinal1 = "";
+            string strviewdyFinal2 = "";
+            string strviewdyFinal3 = "";
+
+            string strviewdxFinal = "";
+            string strviewdxFinal1 = "";
+            string strviewdxFinal2 = "";
+            string strviewdxFinal3 = "";
 
             double xCenter = (X + CX / 2);
             double yCenter = (Y + CY / 2);
@@ -996,7 +995,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             double viewdyFinal;
             viewdyFinal = (dyFinal / height * viewHeight);
 
-             drawMod = string.Concat(viewdxFinal.ToString().Trim() + " " + viewdyFinal.ToString().Trim());
+                strviewdxFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal);
+                strviewdyFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal);
+
+                drawMod = strviewdxFinal + " " + strviewdyFinal;
             }
 
             if ((callAdjVal.ToString().Trim() == "Callout-AdjLine1") || (callAdjVal.ToString().Trim() == "Callout-AdjLine2") || (callAdjVal.ToString().Trim() == "Callout-AdjLine3"))
@@ -1169,19 +1171,29 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 viewdyFinal3 = (viewdyFinal3 / 1000);
 
+                 strviewdyFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal);
+                 strviewdyFinal1 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal1);
+                 strviewdyFinal2 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal2);
+                 strviewdyFinal3 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdyFinal3);
+
+                 strviewdxFinal = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal);
+                 strviewdxFinal1 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal1);
+                 strviewdxFinal2 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal2);
+                 strviewdxFinal3 = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", viewdxFinal3);
+
                 if (callAdjVal.ToString().Trim() == "Callout-AdjLine1")
                 {
-                    drawMod = string.Concat(viewdyFinal1.ToString().Trim() + " " + viewdxFinal1.ToString().Trim() + " " + viewdyFinal.ToString().Trim() + " " + viewdxFinal.ToString().Trim());
+                    drawMod = strviewdyFinal1 + " " + strviewdxFinal1 + " " + strviewdyFinal + " " + strviewdxFinal;
                 }
 
                 if (callAdjVal.ToString().Trim() == "Callout-AdjLine2")
                 {
-                    drawMod = string.Concat(viewdyFinal2.ToString().Trim() + " " + viewdxFinal2.ToString().Trim() + " " + viewdyFinal1.ToString().Trim() + " " + viewdxFinal1.ToString().Trim() + " " + viewdyFinal.ToString().Trim() + " " + viewdxFinal.ToString().Trim());
+                    drawMod = strviewdyFinal2 + " " + strviewdxFinal2 + " " + strviewdyFinal1 + " " + strviewdxFinal1 + " " + strviewdyFinal + " " + strviewdxFinal;
                 }
 
                 if (callAdjVal.ToString().Trim() == "Callout-AdjLine3")
                 {
-                    drawMod = string.Concat(viewdyFinal3.ToString().Trim() + " " + viewdxFinal3.ToString().Trim() + " " + viewdyFinal2.ToString().Trim() + " " + viewdxFinal2.ToString().Trim() + " " + viewdyFinal1.ToString().Trim() + " " + viewdxFinal1.ToString().Trim() + " " + viewdyFinal.ToString().Trim() + " " + viewdxFinal.ToString().Trim());
+                    drawMod = strviewdyFinal3 + " " + strviewdxFinal3 + " " + strviewdyFinal2 + " " + strviewdxFinal2 + " " + strviewdyFinal1 + " " + strviewdxFinal1 + " " + strviewdyFinal + " " + strviewdxFinal;
                 }
             }
 
@@ -1194,7 +1206,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             string[] arrVal = new string[2];
             arrVal = text.Split(':');
-            Double x = 0;
+            double x = 0;
             if (arrVal.Length == 3)
             {
                 double arrDist = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
@@ -1203,19 +1215,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 arrDir = (arrDir / 60000) * (Math.PI / 180.0);
                 if (arrVal[0].Contains("shadow-offset-x"))
                 {
-                    x = Math.Sin((arrDir)) * (arrDist / 360000);
+                    x = Math.Round(Math.Sin((arrDir)) * (arrDist / 360000), 3);
+                    //x = Math.Sin((arrDir)) * (arrDist / 360000);
                 }
                 else if (arrVal[0].Contains("shadow-offset-y"))
                 {
-                    x = Math.Cos((arrDir)) * (arrDist / 360000);
+                    x = Math.Round(Math.Cos((arrDir)) * (arrDist / 360000), 3);
+                    //x =Math.Cos((arrDir)) * (arrDist / 360000);
                 }
+            }        
+            string strRet = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", x);
 
+            return strRet + "cm";        
             }
 
-            return x.ToString() + "cm";
-
-        }
-        public void WriteStoredSpan()
+          public void WriteStoredSpan()
         {
             Element e = (Element)this.store.Peek();
 
