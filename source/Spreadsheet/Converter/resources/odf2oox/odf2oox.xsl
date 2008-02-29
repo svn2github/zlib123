@@ -447,7 +447,7 @@
           <xsl:for-each
             select="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName]">
             
-            <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them -->
+            <!-- don't convert pivot tables with empty cells in first row since Excel doesn't support them, and don't convert hidden, one cell or one row pivot tables (Excel doesn't support it too)-->
             <xsl:variable name="sheetName">
               <xsl:value-of select="translate(substring-before(table:source-cell-range/@table:cell-range-address,'.'),$apos,'')"/>
             </xsl:variable>

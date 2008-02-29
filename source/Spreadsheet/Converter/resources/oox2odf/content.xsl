@@ -390,28 +390,60 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
     <!-- Check If Conditionals are in this sheet -->
 
     <xsl:variable name="ConditionalCell">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+      <!--xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell"/>
-      </xsl:for-each>
+      </xsl:for-each-->
     </xsl:variable>
 
     <xsl:variable name="ConditionalRow">
-      <xsl:call-template name="ConditionalRow">
+      <!--xsl:call-template name="ConditionalRow">
         <xsl:with-param name="ConditionalCell">
           <xsl:value-of select="$ConditionalCell"/>
         </xsl:with-param>
-      </xsl:call-template>
+      </xsl:call-template-->
     </xsl:variable>
 
     <xsl:variable name="ConditionalCellStyle">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+      <!--xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell">
           <xsl:with-param name="document">
             <xsl:text>style</xsl:text>
           </xsl:with-param>
         </xsl:call-template>
+      </xsl:for-each-->
+    </xsl:variable>
+    
+    <xsl:variable name="ConditionalCellCol">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+          <xsl:call-template name="ConditionalCellCol">        
+          </xsl:call-template>
+       </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="ConditionalCellAll">
+      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+        <xsl:call-template name="ConditionalCellAll">          
+        </xsl:call-template>
       </xsl:for-each>
     </xsl:variable>
+    
+    <xsl:variable name="ConditionalCellSingle">
+      <xsl:call-template name="ConditionalCellSingle">
+        <xsl:with-param name="sqref">
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    
+    <xsl:variable name="ConditionalCellMultiple">
+      <xsl:call-template name="ConditionalCellMultiple">
+        <xsl:with-param name="sqref">
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
 
     <!-- Check If Data Validation are in this sheet -->
     <xsl:variable name="ValidationCell">
@@ -739,6 +771,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <xsl:with-param name="ConditionalRow">
           <xsl:value-of select="$ConditionalRow"/>
         </xsl:with-param>
+        <xsl:with-param name="ConditionalCellCol">
+          <xsl:value-of select="$ConditionalCellCol"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellAll">
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellMultiple"/>
+        </xsl:with-param>
         <xsl:with-param name="PictureCell">
           <xsl:value-of select="$PictureCell"/>
         </xsl:with-param>
@@ -1055,6 +1099,10 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="removeFilter"/>
     <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationRow"/>
@@ -1300,6 +1348,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
                   <xsl:with-param name="ConditionalRow">
                     <xsl:value-of select="$ConditionalRow"/>
                   </xsl:with-param>
+                  <xsl:with-param name="ConditionalCellCol">
+                    <xsl:value-of select="$ConditionalCellCol"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="ConditionalCellAll">
+                    <xsl:value-of select="$ConditionalCellAll"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="ConditionalCellSingle">
+                    <xsl:value-of select="$ConditionalCellSingle"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="ConditionalCellMultiple">
+                    <xsl:value-of select="$ConditionalCellMultiple"/>
+                  </xsl:with-param>
                   <xsl:with-param name="sheetNr" select="$sheetNr"/>
                   <xsl:with-param name="ValidationCell">
                     <xsl:value-of select="$ValidationCell"/>
@@ -1405,6 +1465,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
                 <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
                 </xsl:with-param>
+                <xsl:with-param name="ConditionalCellCol">
+                  <xsl:value-of select="$ConditionalCellCol"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellAll">
+                  <xsl:value-of select="$ConditionalCellAll"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellSingle">
+                  <xsl:value-of select="$ConditionalCellSingle"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellMultiple">
+                  <xsl:value-of select="$ConditionalCellMultiple"/>
+                </xsl:with-param>
                 <xsl:with-param name="removeFilter" select="$removeFilter"/>
                 <xsl:with-param name="ValidationCell">
                   <xsl:value-of select="$ValidationCell"/>
@@ -1475,6 +1547,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
                 <xsl:with-param name="ConditionalRow">
                   <xsl:value-of select="$ConditionalRow"/>
                 </xsl:with-param>
+                <xsl:with-param name="ConditionalCellCol">
+                  <xsl:value-of select="$ConditionalCellCol"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellAll">
+                  <xsl:value-of select="$ConditionalCellAll"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellSingle">
+                  <xsl:value-of select="$ConditionalCellSingle"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellMultiple">
+                  <xsl:value-of select="$ConditionalCellMultiple"/>
+                </xsl:with-param>
                 <xsl:with-param name="sheetNr" select="$sheetNr"/>
                 <xsl:with-param name="ValidationCell">
                   <xsl:value-of select="$ValidationCell"/>
@@ -1518,6 +1602,10 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="removeFilter"/>
     <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationRow"/>
@@ -1628,6 +1716,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
           <xsl:with-param name="ConditionalRow">
             <xsl:value-of select="$ConditionalRow"/>
           </xsl:with-param>
+          <xsl:with-param name="ConditionalCellCol">
+            <xsl:value-of select="$ConditionalCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellAll">
+            <xsl:value-of select="$ConditionalCellAll"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellSingle">
+            <xsl:value-of select="$ConditionalCellSingle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellMultiple">
+            <xsl:value-of select="$ConditionalCellMultiple"/>
+          </xsl:with-param>
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
           <xsl:with-param name="EndRow">
             <xsl:value-of select="@r - 1"/>
@@ -1717,6 +1817,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
           <xsl:with-param name="ConditionalRow">
             <xsl:value-of select="$ConditionalRow"/>
           </xsl:with-param>
+          <xsl:with-param name="ConditionalCellCol">
+            <xsl:value-of select="$ConditionalCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellAll">
+            <xsl:value-of select="$ConditionalCellAll"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellSingle">
+            <xsl:value-of select="$ConditionalCellSingle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellMultiple">
+            <xsl:value-of select="$ConditionalCellMultiple"/>
+          </xsl:with-param>
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
           <xsl:with-param name="EndRow">
             <xsl:value-of select="@r - 1"/>
@@ -1803,6 +1915,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       <xsl:with-param name="ConditionalCellStyle">
         <xsl:value-of select="$ConditionalCellStyle"/>
       </xsl:with-param>
+      <xsl:with-param name="ConditionalCellCol">
+        <xsl:value-of select="$ConditionalCellCol"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellAll">
+        <xsl:value-of select="$ConditionalCellAll"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellSingle">
+        <xsl:value-of select="$ConditionalCellSingle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellMultiple">
+        <xsl:value-of select="$ConditionalCellMultiple"/>
+      </xsl:with-param>
       <xsl:with-param name="removeFilter" select="$removeFilter"/>
       <xsl:with-param name="ValidationCell">
         <xsl:value-of select="$ValidationCell"/>
@@ -1874,6 +1998,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         </xsl:with-param>
         <xsl:with-param name="ConditionalRow">
           <xsl:value-of select="$ConditionalRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellCol">
+          <xsl:value-of select="$ConditionalCellCol"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellAll">
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellMultiple"/>
         </xsl:with-param>
         <xsl:with-param name="sheetNr" select="$sheetNr"/>
         <xsl:with-param name="EndRow">
@@ -2088,6 +2224,10 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="ValidationCell"/>
     <xsl:param name="ValidationRow"/>
     <xsl:param name="ValidationCellStyle"/>
@@ -2246,6 +2386,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       <xsl:with-param name="ConditionalCol">
         <xsl:value-of select="$ConditionalColl"/>
       </xsl:with-param>
+      <xsl:with-param name="ConditionalCellCol">
+        <xsl:value-of select="$ConditionalCellCol"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellAll">
+        <xsl:value-of select="$ConditionalCellAll"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellSingle">
+        <xsl:value-of select="$ConditionalCellSingle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellMultiple">
+        <xsl:value-of select="$ConditionalCellMultiple"/>
+      </xsl:with-param>
       <xsl:with-param name="ValidationCell">
         <xsl:value-of select="$ValidationCell"/>
       </xsl:with-param>
@@ -2317,6 +2469,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       </xsl:with-param>
       <xsl:with-param name="ConditionalCellStyle">
         <xsl:value-of select="$ConditionalCellStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellCol">
+        <xsl:value-of select="$ConditionalCellCol"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellAll">
+        <xsl:value-of select="$ConditionalCellAll"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellSingle">
+        <xsl:value-of select="$ConditionalCellSingle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellMultiple">
+        <xsl:value-of select="$ConditionalCellMultiple"/>
       </xsl:with-param>
       <xsl:with-param name="ValidationCell">
         <xsl:value-of select="$ValidationCell"/>
@@ -2395,6 +2559,18 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
       </xsl:with-param>
       <xsl:with-param name="ConnectionsCell">
         <xsl:value-of select="$ConnectionsCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellCol">
+        <xsl:value-of select="$ConditionalCellCol"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellAll">
+        <xsl:value-of select="$ConditionalCellAll"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellSingle">
+        <xsl:value-of select="$ConditionalCellSingle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellMultiple">
+        <xsl:value-of select="$ConditionalCellMultiple"/>
       </xsl:with-param>
       <xsl:with-param name="ValidationCell">
         <xsl:value-of select="$ValidationCell"/>

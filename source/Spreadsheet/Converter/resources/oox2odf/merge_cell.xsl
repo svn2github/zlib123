@@ -1447,6 +1447,10 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="ConvertRepeat" select="0"/>
 
     <xsl:variable name="GetMinColWithElement">
@@ -1519,6 +1523,18 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
           </xsl:with-param>
           <xsl:with-param name="ConditionalCellStyle">
             <xsl:value-of select="$ConditionalCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellCol">
+            <xsl:value-of select="$ConditionalCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellAll">
+            <xsl:value-of select="$ConditionalCellAll"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellSingle">
+            <xsl:value-of select="$ConditionalCellSingle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellMultiple">
+            <xsl:value-of select="$ConditionalCellMultiple"/>
           </xsl:with-param>
           <xsl:with-param name="EndColl">
             <xsl:value-of select="number(substring-after($CheckIfMerge, ':'))"/>
@@ -1627,6 +1643,18 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
           <xsl:with-param name="ConditionalCellStyle">
             <xsl:value-of select="$ConditionalCellStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="ConditionalCellCol">
+          <xsl:value-of select="$ConditionalCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellAll">
+          <xsl:value-of select="$ConditionalCellAll"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellMultiple"/>
+          </xsl:with-param>
           <xsl:with-param name="ConvertRepeat">
             <xsl:value-of select="$GetMinColWithElement + 1"/>
           </xsl:with-param>
@@ -1696,6 +1724,10 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="EndColl"/>
 
 
@@ -1826,6 +1858,18 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
           </xsl:with-param>
           <xsl:with-param name="ConditionalCellStyle">
             <xsl:value-of select="$ConditionalCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellCol">
+            <xsl:value-of select="$ConditionalCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellAll">
+            <xsl:value-of select="$ConditionalCellAll"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellSingle">
+            <xsl:value-of select="$ConditionalCellSingle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellMultiple">
+            <xsl:value-of select="$ConditionalCellMultiple"/>
           </xsl:with-param>
           <xsl:with-param name="EndColl">
             <!--Start of RefNo-1-->

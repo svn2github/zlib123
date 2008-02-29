@@ -48,11 +48,11 @@
     <xsl:param name="sheet"/>
     <xsl:param name="document"/>
 
-    <xsl:apply-templates select="e:worksheet/e:conditionalFormatting[1]">
+    <!--xsl:apply-templates select="e:worksheet/e:conditionalFormatting[1]">
       <xsl:with-param name="document">
         <xsl:value-of select="$document"/>
       </xsl:with-param>
-    </xsl:apply-templates>
+    </xsl:apply-templates-->
   </xsl:template>
 
   <!-- Get Row with Conditional -->
@@ -77,7 +77,7 @@
     </xsl:choose>
   </xsl:template>
 
-
+ 
 
   <xsl:template match="e:conditionalFormatting">
     <xsl:param name="ConditionalCell"/>
@@ -435,19 +435,19 @@
     <!-- Check If Conditionals are in this sheet -->
 
     <xsl:variable name="ConditionalCell">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+      <!--xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell"/>
-      </xsl:for-each>
+      </xsl:for-each-->
     </xsl:variable>
 
     <xsl:variable name="ConditionalCellStyle">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+      <!--xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCell">
           <xsl:with-param name="document">
             <xsl:text>style</xsl:text>
           </xsl:with-param>
         </xsl:call-template>
-      </xsl:for-each>
+      </xsl:for-each-->
     </xsl:variable>
 
     <xsl:for-each select="key('Part', concat('xl/',$Id))">
@@ -653,6 +653,495 @@
     </xsl:if>
 
   </xsl:template>
+  
+  
+  <!-- Get cell when the conditional is starting and ending -->
+  <xsl:template name="ConditionalCellCol">
+    <xsl:param name="sheet"/>
+    <xsl:param name="document"/>
+    
+    <xsl:apply-templates select="e:worksheet/e:conditionalFormatting[1]" mode="Col">
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    
+  </xsl:template>
+  
+  <xsl:template match="e:conditionalFormatting" mode="Col">
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="document"/>
+    
+    <xsl:choose>
+      
+      <xsl:when test="following-sibling::e:conditionalFormatting">
+        
+        <xsl:apply-templates select="following-sibling::e:conditionalFormatting[1]" mode="Col">
+          <xsl:with-param name="ConditionalCellCol">
+            <xsl:call-template name="InsertConditionalCol">
+              <xsl:with-param name="result">
+                <xsl:value-of select="$ConditionalCellCol"/>
+              </xsl:with-param>
+              <xsl:with-param name="sqref">
+                <xsl:value-of select="@sqref"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:value-of select="$document"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+        
+      </xsl:when>
+      
+      <xsl:otherwise>
+        
+        <xsl:call-template name="InsertConditionalCol">
+          <xsl:with-param name="result">
+            <xsl:value-of select="$ConditionalCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="sqref">
+            <xsl:value-of select="@sqref"/>
+          </xsl:with-param>
+        </xsl:call-template>  
+        
+      </xsl:otherwise>
+      
+    </xsl:choose>
+    
+    
+      
+    
+    
+  </xsl:template>
+  
+  <xsl:template name="InsertConditionalCol">
+    <xsl:param name="sqref"/>
+    <xsl:param name="result"/>
+ 
+    <xsl:choose>
+      <xsl:when test="substring-before($sqref, ' ') != ''">
+        <xsl:call-template name="InsertConditionalCol">
+          <xsl:with-param name="sqref">
+            <xsl:value-of select="substring-after($sqref, ' ')"/>
+          </xsl:with-param>
+          <xsl:with-param name="result">
+            <xsl:call-template name="SingleCol">
+              <xsl:with-param name="result">
+                <xsl:value-of select="$result"/>
+              </xsl:with-param>
+              <xsl:with-param name="sqref">
+                <xsl:value-of select="substring-before($sqref, ' ')"/>
+              </xsl:with-param>
+            </xsl:call-template>            
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="substring-before($sqref, ' ') = '' and $sqref != ''">
+        <xsl:call-template name="SingleCol">
+          <xsl:with-param name="result">
+            <xsl:value-of select="$result"/>
+          </xsl:with-param>
+          <xsl:with-param name="sqref">
+            <xsl:value-of select="$sqref"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$result"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    
+  </xsl:template>
+  
+  <xsl:template name="SingleCol">
+    <xsl:param name="result"/>
+    <xsl:param name="sqref"/>
+    
+    <xsl:choose>
+      <xsl:when test="contains($sqref, ':')">
+        
+        <xsl:variable name="StartColNum">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="substring-before($sqref, ':')"/>
+             </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>        
+        
+        
+        <xsl:variable name="EndColNum">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="substring-after($sqref, ':')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:choose>
+          <xsl:when test="$StartColNum = $EndColNum and $StartColNum &lt; 257">            
+           
+            <xsl:choose>
+              <xsl:when test="not(contains(concat(':', $result), concat(':', $StartColNum, ':')))">           
+                <xsl:value-of select="concat($result, $StartColNum, ':')"/>    
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$result"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            
+          </xsl:when>
+          <xsl:otherwise>
+         
+            <xsl:call-template name="RepeatCol">
+              <xsl:with-param name="result">
+                <xsl:value-of select="$result"/>
+              </xsl:with-param>
+              <xsl:with-param name="start">
+                <xsl:value-of select="$StartColNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="end">
+                <xsl:value-of select="$EndColNum"/>
+              </xsl:with-param>
+            </xsl:call-template>
+            
+          </xsl:otherwise>
+        </xsl:choose>
+        
+      </xsl:when>
+      
+      <xsl:otherwise>
+        
+        <xsl:variable name="ColNr">
+        <xsl:call-template name="GetColNum">
+          <xsl:with-param name="cell">
+            <xsl:value-of select="$sqref"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:choose>
+          <xsl:when test="not(contains(concat(':', $result), concat(':', $ColNr, ':'))) and $ColNr &lt; 257">
+            <xsl:value-of select="concat($result, $ColNr, ':')"/>    
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$result"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        
+        
+        
+      </xsl:otherwise>
+      
+    </xsl:choose>
+    
+  </xsl:template>
+  
+  <xsl:template name="RepeatCol">
+    <xsl:param name="result"/>
+    <xsl:param name="start"/>
+    <xsl:param name="end"/>
+    
+    <xsl:choose>
+      <xsl:when test="$start=$end and $start &lt; 257">        
+        <xsl:value-of select="concat($result, $start, ':')"/>    
+      </xsl:when>
+      
+      <xsl:when test="$start &lt; $end and $start &lt; 257">  
+        
+        <xsl:call-template name="RepeatCol">
+          <xsl:with-param name="result">
+            
+            <xsl:choose>
+              <xsl:when test="not(contains(concat(':', $result), concat(':', $start, ':'))) and $start &lt; 257"> 
+                <xsl:value-of select="concat($result, $start, ':')"/>    
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$result"/>
+              </xsl:otherwise>
+            </xsl:choose>            
+            
+          </xsl:with-param>
+          <xsl:with-param name="start">
+            <xsl:value-of select="$start+1"/>
+          </xsl:with-param>
+          <xsl:with-param name="end">
+            <xsl:value-of select="$end"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$result"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+  </xsl:template>
 
+
+
+  <xsl:template name="ConditionalCellAll">
+    <xsl:param name="sheet"/>
+    <xsl:param name="document"/>
+    
+    <xsl:apply-templates select="e:worksheet/e:conditionalFormatting[1]" mode="All">
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalBefore">
+        <xsl:text>0</xsl:text>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    
+  </xsl:template>
+  
+  <xsl:template match="e:conditionalFormatting" mode="All">
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="document"/>
+    <xsl:param name="ConditionalBefore"/>
+    
+    
+    <xsl:choose>
+      
+      <xsl:when test="following-sibling::e:conditionalFormatting">
+        
+        <xsl:apply-templates select="following-sibling::e:conditionalFormatting[1]" mode="All">
+          <xsl:with-param name="ConditionalCellAll">
+            <xsl:choose>
+              <xsl:when test="$ConditionalCellAll != '' and @sqref != ''">
+                <xsl:value-of select="concat($ConditionalCellAll, ' ', @sqref, ' -', $ConditionalBefore)"/>    
+              </xsl:when>
+              <xsl:when test="@sqref != ''">
+                <xsl:value-of select="concat(@sqref, ' -', $ConditionalBefore)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$ConditionalCellAll"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:value-of select="$document"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalBefore">
+            <xsl:value-of select="$ConditionalBefore + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+        
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <xsl:choose>
+        <xsl:when test="$ConditionalCellAll != '' and @sqref != ''">
+          <xsl:value-of select="concat($ConditionalCellAll, ' ', @sqref, ' -', $ConditionalBefore)"/>    
+        </xsl:when>
+        <xsl:when test="@sqref != ''">
+          <xsl:value-of select="concat(@sqref, ' -', $ConditionalBefore)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:otherwise>
+      </xsl:choose>        
+      </xsl:otherwise>
+      
+    </xsl:choose>
+    
+  </xsl:template>
+  
+  <xsl:template name="ConditionalCellSingle">
+    <xsl:param name="result"/>
+    <xsl:param name="sqref"/>
+    
+    <xsl:variable name="ConditionalBefore">
+      <xsl:choose>
+        <xsl:when test="substring-before(substring-after($sqref, '-'), ' ') != ''">
+          <xsl:value-of select="substring-before(substring-after($sqref, '-'), ' ')"/>     
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after($sqref, '-')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="substring-before($sqref, ' ') != ''">
+                  <xsl:call-template name="ConditionalCellSingle">
+                    <xsl:with-param name="result">
+                      <xsl:choose>
+                        <xsl:when test="not(contains(substring-before($sqref, ' '), ':')) and not(contains(substring-before($sqref, ' '), '-'))">
+                          <xsl:value-of select="concat(substring-before($sqref, ' '), '-', $ConditionalBefore, ':', $result)"/>    
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$result"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:with-param>
+                    <xsl:with-param name="sqref">
+                      <xsl:value-of select="substring-after($sqref, ' ')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="not(contains($sqref, ':')) and $sqref != ''  and not(contains($sqref, '-'))">
+            <xsl:value-of select="concat($sqref, ':', $result)"/>    
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$result"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    
+  </xsl:template>
+  
+  <xsl:template name="ConditionalCellMultiple">
+    <xsl:param name="result"/>
+    <xsl:param name="sqref"/>
+    
+    <xsl:variable name="ConditionalBefore">
+      <xsl:choose>
+        <xsl:when test="substring-before(substring-after($sqref, '-'), ' ') != ''">
+          <xsl:value-of select="substring-before(substring-after($sqref, '-'), ' ')"/>     
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after($sqref, '-')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+     
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="substring-before($sqref, ' ') != ''">
+        <xsl:call-template name="ConditionalCellMultiple">
+          <xsl:with-param name="result">
+            <xsl:choose>
+              <xsl:when test="contains(substring-before($sqref, ' '), ':')  and not(contains(substring-before($sqref, ' '), '-'))">
+                <xsl:value-of select="concat(substring-before($sqref, ' '),  '-', $ConditionalBefore,';', $result)"/>    
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$result"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="sqref">
+            <xsl:value-of select="substring-after($sqref, ' ')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="contains($sqref, ':') and $sqref != ''  and not(contains(substring-before($sqref, ' '), '-'))">
+            <xsl:value-of select="concat($sqref,  '-', $ConditionalBefore, ';', $result)"/>    
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$result"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    
+  </xsl:template>
+  
+  <xsl:template name="CheckIfConditionalInThisCell">
+    <xsl:param name="rowNum"/>
+    <xsl:param name="colNum"/>
+    <xsl:param name="ConditionalCellMultiple"/>
+
+  <xsl:choose>
+    <xsl:when test="$ConditionalCellMultiple != ''">
+      
+      
+      
+      <xsl:variable name="CellMultiple">
+        <xsl:value-of select="substring-before($ConditionalCellMultiple, ';')"/>
+      </xsl:variable>
+      
+      <xsl:variable name="StartColNum">
+        <xsl:call-template name="GetColNum">
+          <xsl:with-param name="cell">
+            <xsl:value-of select="substring-before($CellMultiple, ':')"/>
+          </xsl:with-param>
+        </xsl:call-template>        
+      </xsl:variable>
+      
+      <xsl:variable name="StartRowNum">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell">
+            <xsl:value-of select="substring-before($CellMultiple, ':')"/>
+          </xsl:with-param>
+        </xsl:call-template>    
+      </xsl:variable>
+      
+      <xsl:variable name="EndColNum">
+        <xsl:call-template name="GetColNum">
+          <xsl:with-param name="cell">
+            <xsl:value-of select="substring-before(substring-after($CellMultiple, ':'), '-')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:variable name="EndRowNum">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell">
+            <xsl:value-of select="substring-before(substring-after($CellMultiple, ':'), '-')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <!--xsl:value-of select="concat($StartColNum, '-', $colNum, '-', $StartRowNum, '-', $rowNum, '-', $colNum, '-', $EndColNum, '-', $rowNum, '-', $EndRowNum)"/-->
+      
+      <xsl:choose>
+        <xsl:when test="($StartColNum - 1) &lt; $colNum and ($StartRowNum - 1) &lt; $rowNum and $colNum &lt; ($EndColNum + 1) and $rowNum &lt; ($EndRowNum + 1)">
+          <xsl:value-of select="$CellMultiple"/>
+        </xsl:when>
+        <xsl:otherwise>
+        
+          <xsl:call-template name="CheckIfConditionalInThisCell">
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellMultiple">
+              <xsl:value-of select="substring-after($ConditionalCellMultiple, ';')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+          
+        </xsl:otherwise>
+      </xsl:choose>
+      
+    </xsl:when>
+    
+    <xsl:otherwise>
+      <xsl:text>false</xsl:text>
+    </xsl:otherwise>
+    
+  </xsl:choose>
+  
+  </xsl:template>
+  
+  <xsl:template name="GetMinRowWithConditional">
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
+    <xsl:param name="AfterRow"/>
+    
+    <xsl:call-template name="GetMinRowWithConditionalSingle">
+      <xsl:with-param name="ConditionalCellSingle">
+        <xsl:value-of select="$ConditionalCellSingle"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    
+  </xsl:template>
+  
+  <xsl:template name="GetMinRowWithConditionalSingle">
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="AfterRow"/>
+    
+  </xsl:template>
 
 </xsl:stylesheet>

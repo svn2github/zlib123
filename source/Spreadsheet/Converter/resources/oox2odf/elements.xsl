@@ -56,6 +56,10 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="prevRow" select="0"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="ValidationCell"/>
@@ -75,6 +79,22 @@
       <xsl:value-of
         select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow, $AllRowBreakes)"/>
     </xsl:variable>
+
+    <!--xsl:variable name="GetMinRowWithConditional">
+      <xsl:call-template name="GetMinRowWithConditional">
+        <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$prevRow + 1"/>
+        </xsl:with-param>
+       </xsl:call-template>
+    </xsl:variable-->
+    
+   
 
     <xsl:variable name="GetMinRowWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
@@ -154,6 +174,18 @@
             <xsl:with-param name="ConditionalCellStyle">
               <xsl:value-of select="$ConditionalCellStyle"/>
             </xsl:with-param>
+            <xsl:with-param name="ConditionalCellCol">
+              <xsl:value-of select="$ConditionalCellCol"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellAll">
+              <xsl:value-of select="$ConditionalCellAll"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellSingle">
+              <xsl:value-of select="$ConditionalCellSingle"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellMultiple">
+              <xsl:value-of select="$ConditionalCellMultiple"/>
+            </xsl:with-param>
             <xsl:with-param name="ElementsColl">
               <xsl:value-of select="$CollsWithElements"/>
             </xsl:with-param>
@@ -202,6 +234,18 @@
         <xsl:with-param name="ConditionalCellStyle">
           <xsl:value-of select="$ConditionalCellStyle"/>
         </xsl:with-param>
+        <xsl:with-param name="ConditionalCellCol">
+          <xsl:value-of select="$ConditionalCellCol"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellAll">
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellMultiple"/>
+        </xsl:with-param>
         <xsl:with-param name="prevRow">
           <xsl:value-of select="$GetMinRowWithElement"/>
         </xsl:with-param>
@@ -235,6 +279,10 @@
     <xsl:param name="NoteRow"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="ElementsColl"/>
     <xsl:param name="prevColl" select="0"/>
     <xsl:param name="rowNum"/>
@@ -374,6 +422,18 @@
         <xsl:with-param name="ConditionalCellStyle">
           <xsl:value-of select="$ConditionalCellStyle"/>
         </xsl:with-param>
+        <xsl:with-param name="ConditionalCellCol">
+          <xsl:value-of select="$ConditionalCellCol"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellAll">
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellMultiple"/>
+        </xsl:with-param>
         <xsl:with-param name="ElementsColl">
           <xsl:value-of select="$ElementsColl"/>
         </xsl:with-param>
@@ -461,6 +521,10 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="prevRow" select="0"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="EndRow"/>
@@ -482,6 +546,20 @@
       <xsl:value-of
         select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow, $AllRowBreakes)"/>
     </xsl:variable>
+    
+    <!--xsl:variable name="GetMinRowWithConditional">
+      <xsl:call-template name="GetMinRowWithConditional">
+        <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$prevRow + 1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable-->
 
     <xsl:variable name="GetMinRowWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
@@ -573,6 +651,18 @@
             <xsl:with-param name="ConditionalCellStyle">
               <xsl:value-of select="$ConditionalCellStyle"/>
             </xsl:with-param>
+            <xsl:with-param name="ConditionalCellCol">
+              <xsl:value-of select="$ConditionalCellCol"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellAll">
+              <xsl:value-of select="$ConditionalCellAll"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellSingle">
+              <xsl:value-of select="$ConditionalCellSingle"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellMultiple">
+              <xsl:value-of select="$ConditionalCellMultiple"/>
+            </xsl:with-param>
             <xsl:with-param name="ElementsColl">
               <xsl:value-of select="$CollsWithElements"/>
             </xsl:with-param>
@@ -618,6 +708,18 @@
         <xsl:with-param name="ConditionalCellStyle">
           <xsl:value-of select="$ConditionalCellStyle"/>
         </xsl:with-param>
+        <xsl:with-param name="ConditionalCellCol">
+          <xsl:value-of select="$ConditionalCellCol"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellAll">
+          <xsl:value-of select="$ConditionalCellAll"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellSingle">
+          <xsl:value-of select="$ConditionalCellSingle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellMultiple">
+          <xsl:value-of select="$ConditionalCellMultiple"/>
+        </xsl:with-param>
         <xsl:with-param name="prevRow">
           <xsl:value-of select="$GetMinRowWithElement"/>
         </xsl:with-param>
@@ -654,6 +756,10 @@
     <xsl:param name="NoteRow"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConditionalCellCol"/>
+    <xsl:param name="ConditionalCellAll"/>
+    <xsl:param name="ConditionalCellSingle"/>
+    <xsl:param name="ConditionalCellMultiple"/>
     <xsl:param name="ElementsColl"/>
     <xsl:param name="prevColl" select="0"/>
     <xsl:param name="rowNum"/>
@@ -790,6 +896,18 @@
             </xsl:with-param>
             <xsl:with-param name="ConditionalCellStyle">
               <xsl:value-of select="$ConditionalCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellCol">
+              <xsl:value-of select="$ConditionalCellCol"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellAll">
+              <xsl:value-of select="$ConditionalCellAll"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellSingle">
+              <xsl:value-of select="$ConditionalCellSingle"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellMultiple">
+              <xsl:value-of select="$ConditionalCellMultiple"/>
             </xsl:with-param>
             <xsl:with-param name="ElementsColl">
               <xsl:value-of select="$ElementsColl"/>
