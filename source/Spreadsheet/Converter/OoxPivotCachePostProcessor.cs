@@ -856,7 +856,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     int fieldNum = Convert.ToInt32(fieldNamesText[0][pageField]);
                     this.nextWriter.WriteStartAttribute("item");
                     //output value increased by 1
-                    this.nextWriter.WriteString((Convert.ToInt32(fieldItems[fieldNum, 0][pageItem]) + 1).ToString());
+                    this.nextWriter.WriteString((Convert.ToInt32(fieldItems[fieldNum, 0][pageItem]) ).ToString());
                     this.nextWriter.WriteEndAttribute();
 
                     this.isInPageItem = false;
