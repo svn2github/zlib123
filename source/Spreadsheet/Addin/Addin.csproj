@@ -51,6 +51,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="resources\Labels.cs-CZ.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\Labels.de-DE.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
