@@ -676,78 +676,33 @@
       
     
     
-    
-    <xsl:choose>
-      <xsl:when test="$Hanging != '0'">
+    <!--text:space-before-->
 
-        <!--text:space-before-->
+    <xsl:attribute name="text:space-before">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+           <xsl:value-of select="$Left - $SpaceToNextTab"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
 
-        <xsl:attribute name="text:space-before">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-               <xsl:value-of select="$Left - $SpaceToNextTab"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
+    <!--text:min-label-width-->
 
-        <!--text:min-label-width-->
-
-        <xsl:attribute name="text:min-label-width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <!--<xsl:choose>
-                <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
-                <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
-                <xsl:otherwise>-->
-                  <xsl:value-of select="$SpaceToNextTab"/>
-                <!--</xsl:otherwise>
-              </xsl:choose>-->
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      
-      </xsl:when>
-
-      <xsl:otherwise>
-
-        <!--no hanging-->
-
-        <!--text:space-before-->
-
-        <xsl:attribute name="text:space-before">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$Left - $SpaceToNextTab"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-
-        <!--text:min-label-width-->
-
-        <xsl:attribute name="text:min-label-width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <!--<xsl:choose>
-                <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
-                <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
-                <xsl:otherwise>-->
-                  <xsl:value-of select="$SpaceToNextTab"/>
-                <!--</xsl:otherwise>
-              </xsl:choose>-->
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>    
-      </xsl:otherwise>
-      
-    </xsl:choose>
-        
-        
-        
-
+    <xsl:attribute name="text:min-label-width">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+          <!--<xsl:choose>
+            <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
+            <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
+            <xsl:otherwise>-->
+              <xsl:value-of select="$SpaceToNextTab"/>
+            <!--</xsl:otherwise>
+          </xsl:choose>-->
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
 
     <!--<xsl:choose>
       <xsl:when test="$Ind/@w:hanging">
@@ -1532,12 +1487,17 @@
                     </xsl:choose>
                   </xsl:attribute>
                 </xsl:if>
-                <xsl:if test="./w:lvlText/@w:val != ''">
+                <!--math, dialogika: Bugfix #1948002 Insert style:num-format="" if numFmt = 'none' -->
+                <!--<xsl:if test="./w:lvlText/@w:val != ''">-->
                   <xsl:call-template name="NumFormat">
                     <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
-                    <xsl:with-param name="BeforeAfterNum" select="./w:lvlText/@w:val"/>
+                    <xsl:with-param name="BeforeAfterNum">                      
+                      <xsl:if test="./w:numFmt/@w:val != 'none'">
+                         <xsl:value-of select="./w:lvlText/@w:val" />
+                      </xsl:if>                      
+                    </xsl:with-param> 
                   </xsl:call-template>
-                </xsl:if>
+                <!--</xsl:if>-->
                 <xsl:variable name="display">
                   <xsl:call-template name="CountDisplayListLevels">
                     <xsl:with-param name="string">
@@ -1561,13 +1521,16 @@
                     </xsl:attribute>-->
 
                   <!--math, dialogika: changed for correct indentation calculation BEGIN -->
-                  <!--added parameter <xsl:with-param name="numId">-->                  
+                  <!--added parameter <xsl:with-param name="numId">-->
 
-                  <xsl:call-template name="InsertListLevelProperties">
-                    <xsl:with-param name="numId">
-                      <xsl:value-of select="$numid"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
+                  <!--math, dialogika: Bugfix #1948002 InsertListLevelProperties only if numFmt is != none -->
+                  <xsl:if test="./w:numFmt/@w:val != 'none'">                  
+                    <xsl:call-template name="InsertListLevelProperties">
+                      <xsl:with-param name="numId">
+                        <xsl:value-of select="$numid"/>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:if>
 
                   <!--math, dialogika: changed for correct indentation calculation END -->                  
                   

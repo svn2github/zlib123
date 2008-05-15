@@ -2836,11 +2836,34 @@
         <xsl:otherwise>NaN</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
+    <!--math, dialogika: ilvl needed for bugfix #1948002-->
+    <xsl:variable name="ilvl">
+      <xsl:choose>
+
+        <xsl:when test="w:numPr/w:ilvl/@w:val">
+          <xsl:value-of select ="w:numPr/w:ilvl/@w:val" />
+        </xsl:when>
+
+        <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val">
+          <xsl:value-of select ="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val" />
+        </xsl:when>
+
+        <xsl:when test="key('StyleId', $StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
+          <xsl:value-of select ="key('StyleId', $StyleId)/w:pPr/w:numPr/w:ilvl/@w:val" />
+        </xsl:when>
+
+        <xsl:otherwise>NaN</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>    
+
     <xsl:choose>
       <!--math, dialogika: bugfix #1827476 BEGIN-->
       <xsl:when test="$numId = '0'">false</xsl:when>
-      <!--math, dialogika: bugfix #1827476 END-->      
+      <!--math, dialogika: bugfix #1827476 END-->
+
+      <!--math, dialogika: Bugfix #1948002 if numFmt = 'none' return false-->
+      <xsl:when test="key('abstractNumId', key('numId', $numId)/w:abstractNumId/@w:val)/w:lvl[@w:ilvl=$ilvl]/w:numFmt/@w:val='none'">false</xsl:when>
       <xsl:when test="$numId != 'NaN' and key('numId', $numId)">true</xsl:when>
       <xsl:when test="key('StyleId', $StyleId)/w:basedOn/@w:val">
         <xsl:call-template name="CheckIfList">
