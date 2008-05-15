@@ -60,6 +60,10 @@
         <xsl:apply-templates select="dc:subject" mode="core"/>
         <!-- title -->
         <xsl:apply-templates select="dc:title" mode="core"/>
+		<!-- category -->
+		<xsl:apply-templates select="meta:user-defined[@meta:name = 'Category']" mode="core"/>
+		<!-- content status -->
+		<xsl:apply-templates select="meta:user-defined[@meta:name = 'Content Status']" mode="core"/>
     </xsl:template>
 
     <xsl:template match="/office:document-meta/office:meta" mode="custom">
@@ -209,6 +213,22 @@
         </dc:title>
     </xsl:template>
 
+	<xsl:template match="meta:user-defined[@meta:name = 'Category']" mode="core">
+		<!-- @Description: Category -->
+		<cp:category
+            xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+			<xsl:value-of select="."/>
+		</cp:category>
+	</xsl:template>
+
+	<xsl:template match="meta:user-defined[@meta:name = 'Content Status']" mode="core">
+		<!-- @Description: Content Status -->
+		<cp:contentStatus
+            xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+			<xsl:value-of select="."/>
+		</cp:contentStatus>
+	</xsl:template>
+
     <!-- report lost properties -->
     <xsl:template match="meta:auto-reload" mode="core">
         <!-- @Description: Auto reload property -->
@@ -221,8 +241,12 @@
     </xsl:template>
 
     <!-- user defined properties -->
-  <xsl:template match="/office:document-meta/office:meta/meta:user-defined[@meta:name != '' ]">
+  <xsl:template match="/office:document-meta/office:meta/meta:user-defined[@meta:name != '' 
+							and @meta:name != 'Company' and @meta:name != 'Manager' and @meta:name != 'HyperlinkBase' 
+							and @meta:name != 'Category' and @meta:name != 'Content Status']">
         <!-- @Description: User defined properties -->
+		<!-- NOTE: the properties Company, Manager and HyperlinkBase are not translated into custom.xml but into app.xml
+				and the properties category and contentStatus are translated into core.xml -->
         <property xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
             xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
             <xsl:attribute name="fmtid">{D5CDD505-2E9C-101B-9397-08002B2CF9AE}</xsl:attribute>
@@ -232,11 +256,43 @@
             <xsl:attribute name="name">
                 <xsl:value-of select="@meta:name"/>
             </xsl:attribute>
-            <vt:lpwstr>
-                <xsl:value-of select="text()"/>
-            </vt:lpwstr>
-        </property>
-    </xsl:template>
+			<xsl:choose>
+				<xsl:when test="@meta:value-type='boolean'">
+					<vt:bool>
+						<xsl:value-of select="text()"/>
+					</vt:bool>
+				</xsl:when>
+				<xsl:when test="@meta:value-type='date' 
+						  and number(substring(text(), 1, 4)) != 'NaN'
+						  and substring(text(), 5, 1) = '-'
+						  and number(substring(text(), 6, 2)) != 'NaN'
+						  and substring(text(), 8, 1) = '-'
+						  and number(substring(text(), 9, 2)) != 'NaN'
+						  and substring(text(), 11, 1) = 'T'
+						  and number(substring(text(), 12, 2)) != 'NaN'
+						  and substring(text(), 14, 1) = ':'
+						  and number(substring(text(), 15, 2)) != 'NaN'
+						  and substring(text(), 17, 1) = ':'
+						  and number(substring(text(), 18, 2)) != 'NaN'">
+					<!-- filetime values must be in the format yyyy-mm-ddThh:mm:ss -->
+					<vt:filetime>
+						<xsl:value-of select="text()"/>
+					</vt:filetime>
+				</xsl:when>
+				<xsl:when test="@meta:value-type='float'">
+					<!-- 8byte real values are created for any number -->
+					<vt:r8>
+						<xsl:value-of select="text()"/>
+					</vt:r8>
+				</xsl:when>
+				<xsl:otherwise>
+					<vt:lpwstr>
+						<xsl:value-of select="text()"/>
+					</vt:lpwstr>
+				</xsl:otherwise>
+			</xsl:choose>
+		</property>
+	</xsl:template>
 
     <!-- page count statistics extended property -->
     <xsl:template match="@meta:page-count">
@@ -259,8 +315,7 @@
         <!-- @Description: Application extended properties -->
         <!-- @Context: Any -->
         <Application
-            xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">ODF
-            Converter</Application>
+            xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">OpenXML/ODF Translator</Application>
     </xsl:template>
 
     <!-- document security extended property -->

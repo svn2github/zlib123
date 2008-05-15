@@ -26,7 +26,7 @@
         <office:document-meta>
             <office:meta>
                 <!-- generator -->
-                <meta:generator>ODF Converter <xsl:if test="$app-version">v<xsl:value-of
+                <meta:generator>OpenXML/ODF Translator <xsl:if test="$app-version"><xsl:value-of
                             select="$app-version"/></xsl:if></meta:generator>
                 <!-- title -->
                 <xsl:apply-templates
@@ -73,12 +73,17 @@
                 <!-- language -->
                 <xsl:apply-templates
                     select="document('docProps/core.xml')/cp:coreProperties/dc:language" mode="meta"/>
-                <!-- document statistics -->
+				<!-- category -->
+                <xsl:apply-templates
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:category" mode="meta"/>
+				<!-- content status -->
+				<xsl:apply-templates
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:contentStatus" mode="meta"/>
+				<!-- document statistics -->
                 <xsl:call-template name="GetDocumentStatistics"/>
-                <!-- Total editing time (Spreadsheet)-->
-                <xsl:for-each select="document('docProps/app.xml')/ex:Properties">
-                    <xsl:apply-templates select="ex:TotalTime" mode="meta"/>
-                </xsl:for-each>
+                <!-- Total editing time and other app properties -->
+				<xsl:apply-templates 
+					select="document('docProps/app.xml')/ex:Properties/*" mode="meta"/>
             </office:meta>
         </office:document-meta>
     </xsl:template>
@@ -207,6 +212,37 @@
         </meta:editing-duration>
     </xsl:template>
 
+	<xsl:template match="ex:Manager" mode="meta">
+		<!-- @Description: preserve property Manager as user-defined property -->
+		<!-- @Context: Any &lt;Manager&gt; element-->
+
+		<meta:user-defined meta:name="Manager">
+			<xsl:value-of select="text()"/>
+		</meta:user-defined>
+	</xsl:template>
+
+	<xsl:template match="ex:Company" mode="meta">
+		<!-- @Description: preserve property Manager as user-defined property -->
+		<!-- @Context: Any &lt;Manager&gt; element-->
+
+		<meta:user-defined meta:name="Company">
+			<xsl:value-of select="text()"/>
+		</meta:user-defined>
+	</xsl:template>
+
+	<xsl:template match="ex:HyperlinkBase" mode="meta">
+	<!-- @Description: preserve property Manager as user-defined property -->
+	<!-- @Context: Any &lt;Manager&gt; element-->
+
+	<meta:user-defined meta:name="HyperlinkBase" meta:value-type="string">
+		<xsl:value-of select="text()"/>
+	</meta:user-defined>
+	</xsl:template>
+
+	<xsl:template match="ex:*" mode="meta">
+		<!-- by default do not retain any element -->
+	</xsl:template>
+				  
     <xsl:template match="cp:revision" mode="meta">
         <!-- @Description: Generates the &lt;meta:editing-cycles&gt; element -->
         <!-- @Context: Any &lt;cp:revision&gt; element -->
@@ -225,22 +261,34 @@
 
         <xsl:for-each select=".">
             <meta:user-defined meta:name="{@name}">
-                <xsl:attribute name="meta:type">
+                <xsl:attribute name="meta:value-type">
                     <xsl:choose>
                         <xsl:when test="vt:bool">
                             <xsl:text>boolean</xsl:text>
                         </xsl:when>
-                        <xsl:when test="vt:filetime">
+                        <xsl:when test="vt:filetime | vt:date">
                             <xsl:text>date</xsl:text>
                         </xsl:when>
+						<xsl:when test="vt:i1 | vt:i2 | vt:i4 | vt:i8 | vt:int | vt:ui1 | vt:ui2 | vt:ui4 | vt:ui8 | vt:uint | vt:decimal">
+							<!--- translate any number to a float value -->
+							<xsl:text>float</xsl:text>
+						</xsl:when>
                         <xsl:otherwise>
                             <xsl:text>string</xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
-                <xsl:value-of select="child::node()/text()"/>
-            </meta:user-defined>
-        </xsl:for-each>
+				<xsl:choose>
+					<xsl:when test="vt:filetime | vt:date">
+						<!-- workaround for problems with date time in OOo: cut trailing 'Z' -->
+						<xsl:value-of select="substring(child::node()/text(), 1, 19)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="child::node()/text()"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</meta:user-defined>
+		</xsl:for-each>
     </xsl:template>
 
 
@@ -257,6 +305,24 @@
         </meta:keyword>
     </xsl:template>
 
+	<xsl:template match="cp:category" mode="meta">
+		<!-- @Description: Preserve the OOXML category property as user-defined property) -->
+		<!-- @Context: Any &lt;cp:category&gt; element-->
+		
+		<meta:user-defined meta:name="Category">
+			<xsl:value-of select="text()"/>
+		</meta:user-defined>
+	</xsl:template>
+
+	<xsl:template match="cp:contentStatus" mode="meta">
+		<!-- @Description: Preserve the OOXML contentStatus property as user-defined property) -->
+		<!-- @Context: Any &lt;cp:category&gt; element-->
+
+		<meta:user-defined meta:name="Content Status">
+			<xsl:value-of select="text()"/>
+		</meta:user-defined>
+	</xsl:template>
+	
     <xsl:template match="dc:language" mode="meta">
         <!-- @Description: Generates the &lt;dc:language&gt; element -->
         <!-- @Context: Any &lt;dc:language&gt; element-->

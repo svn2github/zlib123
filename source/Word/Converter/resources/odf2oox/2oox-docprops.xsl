@@ -29,50 +29,55 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" exclude-result-prefixes="office meta">
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+  exclude-result-prefixes="office meta">
 
-  <xsl:import href="common-meta.xsl"/>
-  
+  <xsl:import href="common-meta.xsl"/>  
 
   <xsl:template name="docprops-app">
     <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
       xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-      <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta" mode="app"
-      />
+		<xsl:for-each select="document('meta.xml')/office:document-meta/office:meta">
+			<!-- page count -->
+			<xsl:apply-templates select="meta:document-statistic/@meta:page-count"/>
+			<!-- word count -->
+			<xsl:apply-templates select="meta:document-statistic/@meta:word-count"/>
+			<!-- application property -->
+			<xsl:call-template name="GetApplicationExtendedProperty"/>
+			<!-- doc security -->
+			<xsl:call-template name="GetDocSecurityExtendedProperty"/>
+			<!-- paragraph count -->
+			<xsl:apply-templates select="meta:document-statistic/@meta:paragraph-count"/>
+			<!-- editing duration -->
+			<xsl:apply-templates select="meta:editing-duration"/>
+			<ScaleCrop>false</ScaleCrop>
+			<LinksUpToDate>false</LinksUpToDate>
+			<!-- character statistics -->
+			<xsl:apply-templates select="meta:document-statistic/@meta:character-count"/>
+			<!-- non white space character statistics -->
+			<xsl:apply-templates select="meta:document-statistic/@meta:non-whitespace-character-count"/>
+			<SharedDoc>false</SharedDoc>
+			<HyperlinksChanged>false</HyperlinksChanged>
+			<AppVersion>
+				<xsl:value-of select="$app-version"/>
+			</AppVersion>
+			<xsl:for-each select="meta:user-defined[@meta:name = 'Company']">
+				<Company>
+					<xsl:value-of select="text()"/>
+				</Company>
+			</xsl:for-each>
+			<xsl:for-each select="meta:user-defined[@meta:name = 'Manager']">
+				<Manager>
+					<xsl:value-of select="text()"/>
+				</Manager>
+			</xsl:for-each>
+			<xsl:for-each select="meta:user-defined[@meta:name = 'HyperlinkBase']">
+				<HyperlinkBase>
+					<xsl:value-of select="text()"/>
+				</HyperlinkBase>
+			</xsl:for-each>		
+		</xsl:for-each>
     </Properties>
   </xsl:template>  
-
-  
-
-  <xsl:template match="/office:document-meta/office:meta" mode="app">
-    <!-- page count -->
-    <xsl:apply-templates select="meta:document-statistic/@meta:page-count"/>
-    <!-- word count -->
-    <xsl:apply-templates select="meta:document-statistic/@meta:word-count"/>
-    <!-- application property -->
-    <xsl:call-template name="GetApplicationExtendedProperty"/>
-    <!-- doc security -->
-    <xsl:call-template name="GetDocSecurityExtendedProperty"/>
-   <!-- paragraph count -->
-    <xsl:apply-templates select="meta:document-statistic/@meta:paragraph-count"/>
-    <!-- editing duration -->
-    <xsl:apply-templates select="meta:editing-duration"/>
-    <ScaleCrop xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
-      >false</ScaleCrop>
-    <LinksUpToDate xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
-      >false</LinksUpToDate>
-    <!-- character statistics -->
-    <xsl:apply-templates select="meta:document-statistic/@meta:character-count"/>
-    <!-- non white space character statistics -->
-    <xsl:apply-templates select="meta:document-statistic/@meta:non-whitespace-character-count"/>
-    <SharedDoc xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
-      >false</SharedDoc>
-    <HyperlinksChanged
-      xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">false</HyperlinksChanged>
-    <AppVersion xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-      <xsl:value-of select="$app-version"/>
-    </AppVersion>
-  </xsl:template>
-
 
 </xsl:stylesheet>
