@@ -342,6 +342,10 @@
       <Project>{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}</Project>
       <Name>Converter %28Presentation\Converter%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Spreadsheet\Addin\Addin.csproj">
+      <Project>{792B426E-9ED5-414C-9853-98137AE0CC50}</Project>
+      <Name>Addin %28Spreadsheet\Addin%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Spreadsheet\Converter\Converter.csproj">
       <Project>{E7055581-7C0C-429F-8134-99D3413C5756}</Project>
       <Name>Converter %28Spreadsheet\Converter%29</Name>

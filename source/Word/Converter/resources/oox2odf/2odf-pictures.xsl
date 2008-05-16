@@ -38,6 +38,7 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:o="urn:schemas-microsoft-com:office:office" 
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
@@ -73,6 +74,34 @@
 
   <xsl:template match="w:drawing">
     <xsl:apply-templates select="wp:inline | wp:anchor"/>
+  </xsl:template>
+
+  <!-- 
+  Summary: inserts horizontal ruler as image
+  Author: Clever Age
+  -->
+  <xsl:template match="v:imagedata[not(../../o:OLEObject)]">
+    <xsl:variable name="document">
+      <xsl:call-template name="GetDocumentName">
+        <xsl:with-param name="rootId">
+          <xsl:value-of select="generate-id(/node())"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:call-template name="CopyPictures">
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+      </xsl:with-param>
+      <xsl:with-param name="rId" select="@r:id"/>
+    </xsl:call-template>
+    <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+      <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
+        <xsl:call-template name="InsertImageHref">
+          <xsl:with-param name="document" select="$document"/>
+          <xsl:with-param name="rId" select="@r:id"/>
+        </xsl:call-template>
+      </xsl:if>
+    </draw:image>
   </xsl:template>
 
   <xsl:template match="w:drawing" mode="automaticstyles">

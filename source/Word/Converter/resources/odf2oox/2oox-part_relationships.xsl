@@ -285,7 +285,7 @@
 
     <xsl:for-each select="$images">
       <xsl:variable name="supported">
-        <xsl:call-template name="image-support">
+        <xsl:call-template name="IsImageSupportedByWord">
           <xsl:with-param name="name" select="@xlink:href"/>
         </xsl:call-template>
       </xsl:variable>

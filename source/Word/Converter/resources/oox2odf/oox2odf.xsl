@@ -42,6 +42,7 @@
   <xsl:import href="2odf-pictures.xsl"/>
   <xsl:import href="2odf-styles.xsl"/>
   <xsl:import href="2odf-frames.xsl"/>
+  <xsl:import href="2odf-shapes.xsl"/>
   <xsl:import href="2odf-ole.xsl"/>
   <xsl:import href="2odf-settings.xsl"/>
   <xsl:import href="2odf-relationships.xsl"/>

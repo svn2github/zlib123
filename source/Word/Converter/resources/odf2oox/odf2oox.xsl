@@ -46,6 +46,8 @@
   <xsl:import href="2oox-dataStyles.xsl"/>
   <xsl:import href="2oox-frames.xsl"/>
   <xsl:import href="2oox-ole.xsl"/>
+  <xsl:import href="2oox-pictures.xsl"/>
+  <xsl:import href="2oox-shapes.xsl"/>
   <xsl:import href="2oox-settings.xsl"/>
   <xsl:import href="2oox-sections.xsl"/>
   <xsl:import href="2oox-part_relationships.xsl"/>
@@ -74,12 +76,10 @@
   <xsl:template match="/odf:source">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
 
-   
     <pzip:archive pzip:target="{$outputFile}">
 
       <!-- sections preformatting -->
       <xsl:call-template name="sectionsPreProcessing"/>
-      
       
       <!-- Document core properties -->
       <pzip:entry pzip:target="docProps/core.xml">

@@ -118,14 +118,14 @@
       <xsl:variable name="styleName" select="@draw:style-name"/>
       <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
       <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-      <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+      <xsl:variable name="frameStyle" select="$automaticStyle | $officeStyle"/>
       
-      <xsl:call-template name="InsertShapeProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="shapeProperties" select="."/>
+      <xsl:call-template name="FrameToShapeProperties">
+        <xsl:with-param name="frameStyle" select="$frameStyle"/>
+        <xsl:with-param name="frame" select="."/>
       </xsl:call-template>
-      <xsl:call-template name="InsertShapeWrap">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      <xsl:call-template name="FrameToShapeWrap">
+        <xsl:with-param name="frameStyle" select="$frameStyle"/>
       </xsl:call-template>
       <xsl:call-template name="InsertObjectPreview" />
       
