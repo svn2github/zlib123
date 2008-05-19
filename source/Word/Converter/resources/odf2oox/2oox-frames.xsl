@@ -2036,11 +2036,12 @@
 
   
   <!-- 
-  Summary:  Computes vertical margin of a frame.
+  Summary:  Computes vertical margin of a draw:frame.
   Author:   Clever Age
   -->
   <xsl:template name="ComputeMarginY">
     <xsl:param name="parent"/>
+    
     <xsl:choose>
       <xsl:when test="$parent">
         <xsl:variable name="recursive_result">
@@ -2136,16 +2137,14 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
+            
             <xsl:variable name="svgy">
               <xsl:choose>
+                
                 <xsl:when test="$verticalPos='from-top' ">
                   <xsl:choose>
-                    <!-- page -->
-                    <xsl:when test="$verticalRel = 'page' ">
-                      <xsl:value-of select="$fromTop + $translation"/>
-                    </xsl:when>
-                    <!-- page-content, paragraph -->
-                    <xsl:when test="$verticalRel = 'page-content' or $verticalRel = 'paragraph' ">
+                    <!-- page, page-content, paragraph-content, line -->
+                    <xsl:when test="$verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph' or $verticalRel = 'line'">
                       <xsl:value-of select="$fromTop + $translation"/>
                     </xsl:when>
                     <!-- paragraph-content -->
@@ -2161,6 +2160,7 @@
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
+                
                 <xsl:when test="$verticalPos='top' and $frameMarginTop != '' ">
                   <xsl:choose>
                     <!-- page -->
@@ -2184,6 +2184,7 @@
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
+                
                 <xsl:when test="$verticalPos='bottom' and $frameMarginBottom != '' ">
                   <xsl:choose>
                     <!-- page -->
@@ -2214,6 +2215,7 @@
                     <xsl:otherwise>0</xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
+                
                 <xsl:otherwise>
                   <xsl:choose>
                     <xsl:when test="$parent[1]/@svg:y">
@@ -2226,6 +2228,7 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
+            
             <xsl:value-of select="$svgy+$recursive_result"/>
           </xsl:otherwise>
         </xsl:choose>

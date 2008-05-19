@@ -362,9 +362,10 @@
     <!-- @Private -->
     <!-- @Description: Convert to emu (1cm = 360000 emu) -->
     <!-- @Context: None -->
-    
-    <xsl:param name="length"/> <!-- (string) The length including the unit -->
-    
+
+    <!-- (string) The length including the unit -->
+    <xsl:param name="length"/>
+
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 360000)"/>

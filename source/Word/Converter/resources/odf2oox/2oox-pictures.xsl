@@ -424,20 +424,18 @@
       <xsl:call-template name="emu-measure">
         <xsl:with-param name="length">
           <xsl:call-template name="ComputeMarginX">
-            <xsl:with-param name="frame"
-              select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+            <xsl:with-param name="frame" select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
           </xsl:call-template>
           <xsl:text>pt</xsl:text>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="oy">
+     <xsl:variable name="oy">
       <xsl:call-template name="emu-measure">
         <xsl:with-param name="length">
           <xsl:call-template name="ComputeMarginY">
-            <xsl:with-param name="parent"
-              select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+            <xsl:with-param name="parent" select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
           </xsl:call-template>
           <xsl:text>pt</xsl:text>
         </xsl:with-param>
@@ -466,6 +464,7 @@
         <xsl:choose>
           <xsl:when test="$horizontalRel='page'">page</xsl:when>
           <xsl:when test="$horizontalRel='paragraph'">column</xsl:when>
+          <xsl:when test="$horizontalRel='paragraph-content'">column</xsl:when>
           <xsl:otherwise>margin</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>

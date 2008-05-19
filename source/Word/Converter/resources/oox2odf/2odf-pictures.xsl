@@ -48,66 +48,26 @@
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   exclude-result-prefixes="w uri draw a pic r rels wp w xlink oox rels">
 
+  <!--
+  *************************************************************************
+  SUMMARY
+  *************************************************************************
+  This stylesheet handles the conversion of DrawingML pictures.
+  *************************************************************************
+  -->
+  
   <!-- 
   *************************************************************************
   MATCHING TEMPLATES
   *************************************************************************
   -->
-  <!--
-  Summary: Converts picture shapes
-  Author: Clever Age
-  -->
-  <xsl:template match="v:shape[v:imagedata]">
-    <draw:frame>
-      <xsl:call-template name="InsertCommonShapeProperties">
-        <xsl:with-param name="shape" select="." />
-      </xsl:call-template>
-      <xsl:call-template name="InsertShapeZindex"/>
-
-      <xsl:apply-templates/>
-      <!-- some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
-      <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
-    </draw:frame>
-  </xsl:template>
   
-  <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
-
   <xsl:template match="w:drawing">
     <xsl:apply-templates select="wp:inline | wp:anchor"/>
   </xsl:template>
 
-  <!-- 
-  Summary: inserts horizontal ruler as image
-  Author: Clever Age
-  -->
-  <xsl:template match="v:imagedata[not(../../o:OLEObject)]">
-    <xsl:variable name="document">
-      <xsl:call-template name="GetDocumentName">
-        <xsl:with-param name="rootId">
-          <xsl:value-of select="generate-id(/node())"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:call-template name="CopyPictures">
-      <xsl:with-param name="document">
-        <xsl:value-of select="$document"/>
-      </xsl:with-param>
-      <xsl:with-param name="rId" select="@r:id"/>
-    </xsl:call-template>
-    <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-      <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
-        <xsl:call-template name="InsertImageHref">
-          <xsl:with-param name="document" select="$document"/>
-          <xsl:with-param name="rId" select="@r:id"/>
-        </xsl:call-template>
-      </xsl:if>
-    </draw:image>
-  </xsl:template>
-
   <xsl:template match="w:drawing" mode="automaticstyles">
-
     <style:style style:name="{generate-id(.)}" style:family="graphic">
-
       <!--in Word there are no parent style for image - make default Graphics in OO -->
       <xsl:attribute name="style:parent-style-name">
         <xsl:text>Graphics</xsl:text>
@@ -327,7 +287,13 @@
         <xsl:when test="wp:positionV/@relativeFrom = 'line'">
           <xsl:call-template name="ConvertEmu">
             <xsl:with-param name="length">
+              <!--
+              makz, 19.5.2008:
+              The previous code here was:
               <xsl:value-of select="-wp:positionV/wp:posOffset"/>
+              I don't know why the value should get inverted. I removed for a bugfix.
+              -->
+              <xsl:value-of select="wp:positionV/wp:posOffset"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -421,6 +387,8 @@
     </xsl:for-each>
   </xsl:template>
 
+  <!--
+  -->
   <xsl:template name="InsertPictureProperties">
     <xsl:call-template name="InsertImagePosH"/>
     <xsl:call-template name="InsertImagePosV"/>

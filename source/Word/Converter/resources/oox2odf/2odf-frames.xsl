@@ -601,6 +601,9 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>page-content</xsl:text>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>

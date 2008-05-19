@@ -51,7 +51,7 @@
   *************************************************************************
   SUMMARY
   *************************************************************************
-  This stylesheet handles the conversion of shapes.
+  This stylesheet handles the conversion of VML shapes and VML images.
   *************************************************************************
   -->
   
@@ -61,6 +61,50 @@
   *************************************************************************
   -->
 
+  <!--
+  Summary: Converts picture shapes
+  Author: Clever Age
+  -->
+  <xsl:template match="v:shape[v:imagedata]">
+    <draw:frame>
+      <xsl:call-template name="InsertCommonShapeProperties">
+        <xsl:with-param name="shape" select="." />
+      </xsl:call-template>
+      <xsl:call-template name="InsertShapeZindex"/>
+
+      <xsl:apply-templates/>
+      <!-- some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
+      <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
+    </draw:frame>
+  </xsl:template>
+
+  <!-- 
+  Summary: inserts horizontal ruler as image
+  Author: Clever Age
+  -->
+  <xsl:template match="v:imagedata[not(../../o:OLEObject)]">
+    <xsl:variable name="document">
+      <xsl:call-template name="GetDocumentName">
+        <xsl:with-param name="rootId">
+          <xsl:value-of select="generate-id(/node())"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:call-template name="CopyPictures">
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+      </xsl:with-param>
+      <xsl:with-param name="rId" select="@r:id"/>
+    </xsl:call-template>
+    <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+      <xsl:if test="key('Part', concat('word/_rels/',$document,'.rels'))">
+        <xsl:call-template name="InsertImageHref">
+          <xsl:with-param name="document" select="$document"/>
+          <xsl:with-param name="rId" select="@r:id"/>
+        </xsl:call-template>
+      </xsl:if>
+    </draw:image>
+  </xsl:template>
 
   <!--
   Summary: Converts textbox shapes
@@ -472,7 +516,7 @@
   -->
   <xsl:template match="w:pict[not(o:OLEObject)]" mode="automaticpict">
     <xsl:variable name="vmlElement" select="v:shape | v:rect | v:line | v:group" />
-
+    
     <style:style>
       <xsl:attribute name="style:name">
         <xsl:value-of select="generate-id($vmlElement)"/>
@@ -558,6 +602,11 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--
+  Summary:  Inserts the properties of a draw shape's style.
+  Author:   CleverAge
+  Params:   shape: The VML shape
+  -->
   <xsl:template name="InsertShapeStyleProperties">
     <xsl:param name="shape" select="." />
 
@@ -888,6 +937,9 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!--
+  Inserts the absolute or relative position of draw:shapes
+  -->
   <xsl:template name="InsertShapeHorizontalPos">
     <xsl:param name="shape" select="."/>
 
@@ -898,30 +950,16 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="horizontalPos">
-      <xsl:choose>
-        <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:xAlign"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-position-horizontal'"/>
-            <xsl:with-param name="shape" select="$shape"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-horizontal'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="horizontalRel">
-      <xsl:choose>
-        <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:hAnchor"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
-            <xsl:with-param name="shape" select="$shape"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
     </xsl:variable>
 
     <xsl:choose>
@@ -955,34 +993,25 @@
     </xsl:call-template>
   </xsl:template>
 
+  <!--
+  Summary:  Inserts the vertical position of a shape.
+  Author:   CleverAge
+  Params:   shape: The VML shape
+  -->
   <xsl:template name="InsertShapeVerticalPos">
     <xsl:param name="shape" select="."/>
 
     <xsl:variable name="verticalPos">
-      <xsl:choose>
-        <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:yAlign"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-position-vertical'"/>
-            <xsl:with-param name="shape" select="$shape"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-vertical'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="verticalRelative">
-      <xsl:choose>
-        <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:vAnchor"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
-            <xsl:with-param name="shape" select="$shape"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:call-template name="InsertVerticalPos">
       <xsl:with-param name="vAlign" select="$verticalPos"/>
@@ -991,16 +1020,6 @@
       <xsl:with-param name="vRel" select="$verticalRelative"/>
       <xsl:with-param name="vPos" select="$verticalPos" />
     </xsl:call-template>
-    <!--
-    <xsl:call-template name="InsertGraphicPosV">
-      <xsl:with-param name="align" select="$verticalPos"/>
-      <xsl:with-param name="relativeFrom" select="$verticalRelative"/>
-    </xsl:call-template>
-    <xsl:call-template name="InsertGraphicPosRelativeV">
-      <xsl:with-param name="relativeFrom" select="$verticalRelative"/>
-      <xsl:with-param name="align" select="$verticalPos"/>
-    </xsl:call-template>
-    -->
   </xsl:template>
 
   <xsl:template name="InsertShapeWrap">
@@ -1524,6 +1543,10 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!--
+  Summary: 
+  -->
+  
   <!--
   Summary: inserts the svg:x and svg:y attribute
   Author: Clever Age

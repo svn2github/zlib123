@@ -9,7 +9,8 @@
                 xmlns:v="urn:schemas-microsoft-com:vml"
                 xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
                 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-                exclude-result-prefixes="xlink draw">
+                exclude-result-prefixes="xlink draw oox"
+                xmlns:oox="urn:oox">
 
   <!-- 
   *************************************************************************
@@ -31,8 +32,14 @@
 
       <xsl:variable name="objectId" select="@r:id" />
       <xsl:variable name="imageId" select="../v:shape/v:imagedata/@r:id" />
-      <xsl:variable name="objectPath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$objectId]/@Target" />
-      <xsl:variable name="imagePath" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$imageId]/@Target" />
+      
+      <!-- get the hosting document (headerX.xml, document.xml) -->
+      <xsl:variable name="hostingDoc" select="ancestor::oox:part/@oox:name" />
+      <xsl:variable name="relFile" select="concat('word/_rels/', concat(substring-after($hostingDoc, '/'), '.rels'))" />
+      
+      <xsl:variable name="objectPath" select="key('Part', $relFile)/rels:Relationships/rels:Relationship[@Id=$objectId]/@Target" />
+      <xsl:variable name="imagePath" select="key('Part', $relFile)/rels:Relationships/rels:Relationship[@Id=$imageId]/@Target" />
+      
       <xsl:variable name="objectName">
         <xsl:choose>
           <!-- Internal object -->
@@ -96,10 +103,15 @@
   <xsl:template name="InsertOlePreviewName">
     <xsl:param name="thisId" />
 
-    <xsl:variable name="olePreview" select="key('Part', 'word/document.xml')/w:document/w:body//v:shape/v:imagedata[@r:id=$thisId]" />
+    <!-- get the hosting document (headerX.xml, document.xml) -->
+    <xsl:variable name="hostingDoc" select="ancestor::oox:part/@oox:name" />
+    <xsl:variable name="relFile" select="concat('word/_rels/', concat(substring-after($hostingDoc, '/'), '.rels'))" />
+      
+    <xsl:variable name="olePreview" select="key('Part', $hostingDoc)//v:shape/v:imagedata[@r:id=$thisId]" />
     <xsl:variable name="oleId" select="$olePreview/../../o:OLEObject/@r:id" />
-    <xsl:variable name="allRels" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship" />
+    <xsl:variable name="allRels" select="key('Part', $relFile)/rels:Relationships/rels:Relationship" />
     <xsl:variable name="previewRelTarget" select="$allRels[@Id=$oleId]/@Target" />
+    
     <xsl:value-of select="substring-before(substring-after($previewRelTarget, '/'), '.')" />
   </xsl:template>
   
