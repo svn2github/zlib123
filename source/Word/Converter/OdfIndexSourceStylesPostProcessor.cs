@@ -30,6 +30,7 @@ using System;
 using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.Collections.Generic;
 
 namespace CleverAge.OdfConverter.Word
 {
@@ -65,31 +66,85 @@ namespace CleverAge.OdfConverter.Word
                 this.nextWriter.WriteStartAttribute(prefix, localName, ns);
             }
         }
+
+        // math, dialogika: Bugfix #1841783: Parsing of styles and levels was wrong. 
+
         public override void WriteString(string text)
         {
             if (IsIndexSourceStyleProcessed)
             {
-                //check each style level
+                bool indexSourceStylesContained = false;
                 for (int i = 1; i < 11; i++)
                 {
                     if (text.Contains(":" + i))
                     {
-                        //create an arraylist of all styles
-
-                        ArrayList AllStyles = new ArrayList();
-
-                        //create text:index-source-styles element with appropriate text:outline-level
-
-                        Element IndexSourceStyles = new Element("text", "index-source-styles", TEXT_NAMESPACE);
-                        IndexSourceStyles.AddAttribute(new Attribute("text", "outline-level",""+i+"", TEXT_NAMESPACE));
-                        
-                        //add child nodes recursively
-                        WriteIndexSourceStyles(IndexSourceStyles, text, i, AllStyles);
-
-                        //write text:index-source-styles element
-
-                        IndexSourceStyles.Write(this.nextWriter);
+                        indexSourceStylesContained =true;
+                        break;
                     }
+                }
+
+                if (!indexSourceStylesContained)
+                {
+                    return;
+                }
+
+                List<string>[] styles = new List<string>[11];
+                string[] stylesWithLevel = text.Split('.');
+                try
+                {
+                    foreach (string s in stylesWithLevel)
+                    {
+                        if (s != "")
+                        {
+                            uint level = Convert.ToUInt32(s.Substring(s.IndexOf(':') + 1));
+                            string style = s.Substring(0, s.IndexOf(':'));
+                            
+                            if (styles[level] == null)
+                            {
+                                styles[level] = new List<string>();
+                            }
+                            styles[level].Add(style);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    return;
+                }
+
+
+                //check each style level
+                for (int i = 1; i < 11; i++)
+                {
+
+                    if (styles[i] == null)
+                    {
+                        continue;
+                    }
+
+                    //create an arraylist of all styles
+
+                    ArrayList AllStyles = new ArrayList();
+
+                    //create text:index-source-styles element with appropriate text:outline-level
+
+                    Element IndexSourceStyles = new Element("text", "index-source-styles", TEXT_NAMESPACE);
+                    IndexSourceStyles.AddAttribute(new Attribute("text", "outline-level",""+i+"", TEXT_NAMESPACE));                      
+
+                    foreach (string thisStyle in styles[i])
+                    {
+                        //create text:index-source-style element
+                        Element IndexSourceStyleElement = new Element("text", "index-source-style", TEXT_NAMESPACE);
+                        if (!AllStyles.Contains(thisStyle))
+                        {
+                            //add text:index-source-style element to allStyles arraylist and, as a child, to text:index-source-styles-element, if it wasn't added before
+                            IndexSourceStyleElement.AddAttribute(new Attribute("text", "style-name", thisStyle, TEXT_NAMESPACE));
+                            AllStyles.Add(thisStyle);
+                            IndexSourceStyles.AddChild(IndexSourceStyleElement);
+                        }
+                    }
+                        
+                    IndexSourceStyles.Write(this.nextWriter);
                 }
             }
             else
@@ -115,28 +170,28 @@ namespace CleverAge.OdfConverter.Word
                 this.nextWriter.WriteEndElement();
             }
         }
-        private void WriteIndexSourceStyles(Element IndexSourceStylesElement,string IndexSourceStylesText,int level,ArrayList AllStyles)
-        {
-            //create text:index-source-style element
-            Element IndexSourceStyleElement = new Element("text", "index-source-style", TEXT_NAMESPACE);
-            if (IndexSourceStylesText.Substring(0,IndexSourceStylesText.IndexOf(":" + level)).Contains("."))
-            {
-                IndexSourceStylesText = IndexSourceStylesText.Substring(IndexSourceStylesText.IndexOf(".") + 1);
-            }
-            string thisStyle = IndexSourceStylesText.Substring(0, IndexSourceStylesText.IndexOf(":" + level));
+        //private void WriteIndexSourceStyles(Element IndexSourceStylesElement,string IndexSourceStylesText,int level,ArrayList AllStyles)
+        //{
+        //    //create text:index-source-style element
+        //    Element IndexSourceStyleElement = new Element("text", "index-source-style", TEXT_NAMESPACE);
+        //    if (IndexSourceStylesText.Substring(0,IndexSourceStylesText.IndexOf(":" + level)).Contains("."))
+        //    {
+        //        IndexSourceStylesText = IndexSourceStylesText.Substring(IndexSourceStylesText.IndexOf(".") + 1);
+        //    }
+        //    string thisStyle = IndexSourceStylesText.Substring(0, IndexSourceStylesText.IndexOf(":" + level));
             
-            if (!AllStyles.Contains(thisStyle))
-            {
-                //add text:index-source-style element to allStyles arraylist and, as a child, to text:index-source-styles-element, if it wasn't added before
-                IndexSourceStyleElement.AddAttribute(new Attribute("text", "style-name", thisStyle, TEXT_NAMESPACE));
-                AllStyles.Add(thisStyle);
-                IndexSourceStylesElement.AddChild(IndexSourceStyleElement);
-            }
-            if (IndexSourceStylesText.Substring(IndexSourceStylesText.IndexOf(level + ".")).Contains(":" + level))
-            {
-                //add other index-source-style elements recursively
-                WriteIndexSourceStyles(IndexSourceStylesElement, IndexSourceStylesText.Substring(IndexSourceStylesText.IndexOf(level + ".")+2), level, AllStyles);
-            }
-        }
+        //    if (!AllStyles.Contains(thisStyle))
+        //    {
+        //        //add text:index-source-style element to allStyles arraylist and, as a child, to text:index-source-styles-element, if it wasn't added before
+        //        IndexSourceStyleElement.AddAttribute(new Attribute("text", "style-name", thisStyle, TEXT_NAMESPACE));
+        //        AllStyles.Add(thisStyle);
+        //        IndexSourceStylesElement.AddChild(IndexSourceStyleElement);
+        //    }
+        //    if (IndexSourceStylesText.Substring(IndexSourceStylesText.IndexOf(level + ".")).Contains(":" + level))
+        //    {
+        //        //add other index-source-style elements recursively
+        //        WriteIndexSourceStyles(IndexSourceStylesElement, IndexSourceStylesText.Substring(IndexSourceStylesText.IndexOf(level + ".")+2), level, AllStyles);
+        //    }
+        //}
     }
 }

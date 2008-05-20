@@ -562,6 +562,12 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
+      
+      <!--math, dialogika: Bugfix #1841783: Use outline level only if \o is present-->
+      <xsl:if test="substring-before(substring-after(substring-after($instrTextContent,'\o'),'&quot;'),'&quot;') = '' ">
+        <xsl:attribute name="text:use-outline-level">false</xsl:attribute>
+      </xsl:if>
+      
       <xsl:attribute name="text:use-index-source-styles">true</xsl:attribute>
       <xsl:call-template name="InsertContentOfIndexProperties">
         <xsl:with-param name="styleName">Contents_20_Heading</xsl:with-param>
@@ -643,11 +649,38 @@
     <xsl:if test="$type='TOC'">
       
       <!-- create string of index source styles included in TOC -->
+      <!--math, dialogika: Added for bugfix #1841783-->
+      <xsl:variable name="stylesWithLevelIncludedViaOptionT">
+        <xsl:call-template name ="FormatStyleList">
+          <xsl:with-param name ="string">
+            <xsl:call-template name ="ExtractOptionTFromTOCDefinition">
+              <xsl:with-param name ="string">
+                <xsl:value-of select="$instrTextContent" />
+              </xsl:with-param>
+            </xsl:call-template>
+              <!--<xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>-->
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <!--math, dialogika: Changed for bugfix #1841783-->      
       <xsl:variable name="stylesOfTOC">
         <xsl:apply-templates select="." mode="stylesOfTOC">
-          <xsl:with-param name="stylesWithLevel"/>
-        </xsl:apply-templates>
-      </xsl:variable>
+          <xsl:with-param name="stylesWithLevel">
+            <!--<xsl:call-template name="StringReplace">
+              <xsl:with-param name ="string">-->
+                <xsl:value-of select="$stylesWithLevelIncludedViaOptionT"/>
+              <!--</xsl:with-param>
+              <xsl:with-param name="substring1">
+                <xsl:text> </xsl:text>
+              </xsl:with-param>
+              <xsl:with-param name="substring2">
+                <xsl:text>_20_</xsl:text>                
+              </xsl:with-param>
+            </xsl:call-template>-->
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:variable>
       
       <!-- post-processor creates text:index-source-styles elements from string -->
       <pxsi:index-source-styles xmlns:pxsi="urn:cleverage:xmlns:post-processings:source-styles">
@@ -656,6 +689,93 @@
       
     </xsl:if>
   </xsl:template>
+
+
+  <!--math, dialogika: Added for bugfix #1841783-->
+  <!--Append several \t in TOC definition into one stringAppend several \t in TOC definition into one string-->
+  <xsl:template name="ExtractOptionTFromTOCDefinition">
+    <xsl:param name ="string" />
+    <xsl:param name ="result" />
+    <xsl:choose>
+      <xsl:when test="contains($string,'\t')">
+        <xsl:call-template name="ExtractOptionTFromTOCDefinition">
+          <xsl:with-param name="string">
+            <xsl:value-of select="substring-after($string,'\t')" />
+          </xsl:with-param>
+          <xsl:with-param name="result">
+            <xsl:value-of select="concat($result,substring-before(substring-after(substring-after($string,'\t'),'&quot;'),'&quot;'))" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$result" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <!--math, dialogika: Replace occurences of substring1 in string with substring2-->
+  <xsl:template name="StringReplace">
+    <xsl:param name ="string" />
+    <xsl:param name ="substring1" />
+    <xsl:param name ="substring2" />
+    <xsl:choose>
+      <xsl:when test ="contains($string,$substring1)">
+        <xsl:call-template name="StringReplace">
+          <xsl:with-param name="string">
+            <xsl:value-of select="concat(substring-before($string,$substring1),$substring2,substring-after($string,$substring1))" />
+          </xsl:with-param>
+          <xsl:with-param name="substring1">
+            <xsl:value-of select="$substring1" />
+          </xsl:with-param>
+          <xsl:with-param name="substring2">
+            <xsl:value-of select="$substring2" />
+          </xsl:with-param>          
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$string" />
+      </xsl:otherwise>      
+    </xsl:choose>
+  </xsl:template>
+
+  <!--math, dialogika: Added for bugfix #1841783-->
+  <!--Format string list for the post processor (StyleId:Level.StyleId:Level. ...)-->
+  <xsl:template name="FormatStyleList">
+    <xsl:param name ="string" />
+    <xsl:param name ="result" />
+
+    <xsl:choose>
+      <xsl:when test="$string != ''">
+        <xsl:call-template name="FormatStyleList">
+          <xsl:with-param name="string">
+            <xsl:value-of select="substring-after(substring-after($string,';'),';')" />
+          </xsl:with-param>
+          <xsl:with-param name="result">
+            <xsl:variable name="styleId">
+              <xsl:variable name="styleName">
+                <xsl:value-of select="substring-before($string,';')" />
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="key('StyleId', $styleName)" >
+                  <xsl:value-of select ="$styleName"/>
+                </xsl:when>
+                <xsl:otherwise>                  
+                     <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[w:name/@w:val=$styleName]/@w:styleId" />                                      
+                </xsl:otherwise>                  
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:value-of select="concat($result,$styleId,':',substring(substring-after($string,';'),1,1),'.')" />
+          </xsl:with-param>          
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$result" />
+      </xsl:otherwise>        
+    </xsl:choose>
+
+  </xsl:template>
+  
   
   <!-- insert entry properties -->
   <xsl:template name="InsertIndexEntryProperties">

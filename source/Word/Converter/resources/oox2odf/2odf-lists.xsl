@@ -1065,7 +1065,8 @@
               <xsl:with-param name="numId" select="$numId"/>
               <xsl:with-param name="listLevel" select="$currentListLevel"/>
               <xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
-              <xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>
+              <!--math, dialogika: unused parameter-->
+              <!--<xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>-->
             </xsl:call-template>
           </text:list>
         
@@ -1092,7 +1093,8 @@
     <xsl:param name="numId"/>
     <xsl:param name="listLevel"/>
     <xsl:param name="dummyOutlineLevel"/>
-    <xsl:param name="isPrecedingHeading"/>
+    <!--math, dialogika: unused parameter-->
+    <!--<xsl:param name="isPrecedingHeading"/>-->
 
     <xsl:variable name="isNestedList">
       <xsl:call-template name="IsNestedList">
