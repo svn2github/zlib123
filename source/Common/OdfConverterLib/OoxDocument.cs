@@ -54,6 +54,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected const string CONTENT_TYPES = "[Content_Types].xml";
         protected const string CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types";
 
+        protected const string R_PREFIX = "xmlns";
+        protected const string R_TYPES_NS = "http://www.w3.org/2000/xmlns";
+
         public OoxDocument(string fileName)
         {
             this._fileName = fileName;
@@ -113,7 +116,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
                         xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, CONTENT_TYPES);
                         xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, CONTENT_TYPES_NS);
-                        CopyPart(reader, xtw, CONTENT_TYPES_NS, CONTENT_TYPES);
+                        CopyPart(reader, xtw, CONTENT_TYPES_NS, CONTENT_TYPES, archive);
                         _copiedParts.Add(CONTENT_TYPES, true);
                         reader.Close();
                         xtw.WriteEndElement();
@@ -155,7 +158,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     xtw.WriteStartElement(NS_PREFIX, "part", PACKAGE_NS);
                     xtw.WriteAttributeString(NS_PREFIX, "name", PACKAGE_NS, relFile);
                     xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, RELATIONSHIP_NS);
-                    rels = CopyPart(reader, xtw, RELATIONSHIP_NS, relFile);
+                    rels = CopyPart(reader, xtw, RELATIONSHIP_NS, relFile, archive);
                     _copiedParts.Add(relFile, true);
                     reader.Close();
                     xtw.WriteEndElement();
@@ -187,7 +190,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                                     xtw.WriteAttributeString(NS_PREFIX, "type", PACKAGE_NS, rel.Type);
                                     xtw.WriteAttributeString(NS_PREFIX, "rId", PACKAGE_NS, rel.Id);
 
-                                    CopyPart(reader, xtw, rel.Type, partName);
+                                    CopyPart(reader, xtw, rel.Type, partName, archive);
                                     _copiedParts.Add(partName, true);
                                     reader.Close();
 
@@ -211,7 +214,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        protected virtual List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName)
+        protected virtual List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName, ZipReader archive)
         {
             bool isInRel = false;
             bool extractRels = ns.Equals(RELATIONSHIP_NS);

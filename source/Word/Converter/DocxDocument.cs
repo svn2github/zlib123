@@ -30,7 +30,7 @@ namespace CleverAge.OdfConverter.Word
             base.CopyLevel(archive, relFile, xtw, namespaces);
         }
 
-        protected override List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName)
+        protected override List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName, ZipReader archive)
         {
             bool isInRel = false;
             bool extractRels = ns.Equals(RELATIONSHIP_NS);

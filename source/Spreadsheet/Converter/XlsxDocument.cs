@@ -19,7 +19,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
         {
         }
 
-        protected override List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName)
+        protected override List<RelationShip> CopyPart(XmlReader xtr, XmlTextWriter xtw, string ns, string partName, ZipReader archive)
         {
             bool isInRel = false;
             bool extractRels = ns.Equals(RELATIONSHIP_NS);
@@ -35,9 +35,22 @@ namespace CleverAge.OdfConverter.Spreadsheet
             int idSi = 0;
             int idCf = 0;
 
+            int RowNumber= 0;
+            int PrevRowNumber = 0;
+
+            int ColNumber = 0;
+            int PrevColNumber = 0;
+
+            String ConditionalCell = "";
+            String ConditionalCellRow = "";
+            List<int> ConditionalCellRowList = new List<int>();
+            Boolean CheckIfBigConditional = new Boolean();
+
+            XmlReader SearchConditionalReader; 
+            
             RelationShip rel = new RelationShip();
 
-            while (xtr.Read())
+          while (xtr.Read())
             {
                 switch (xtr.NodeType)
                 {
@@ -53,15 +66,80 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         xtw.WriteDocType(xtr.Name, null, null, null);
                         break;
                     case XmlNodeType.Element:
+                        if (String.Compare(xtr.LocalName, "sheetData") == 0)
+                        {
+                            SearchConditionalReader = XmlReader.Create(archive.GetEntry(partName));
+                            ConditionalCell = Conditional(SearchConditionalReader, ns, partName);
+                            CheckIfBigConditional = CheckIfBigConditionalRow(ConditionalCell);
+
+                            if (!CheckIfBigConditional)
+                            {
+                                ConditionalCellRowList = ConditionalCellRowNumberList(ConditionalCell);
+                            }
+
+                            ConditionalCellRowList.Sort();                            
+                            
+                        }
+
                         if (extractRels && xtr.LocalName == "Relationship" && xtr.NamespaceURI == RELATIONSHIP_NS)
                         {
                             isInRel = true;
                             rel = new RelationShip();
                         }
 
-                        xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
+                        if (xtr.LocalName.Equals("row") && (ConditionalCell != ""))
+                        {
+                            
+                            if (xtr.HasAttributes)
+                            {
+                                while (xtr.MoveToNextAttribute())
+                                {
+                                    if (xtr.LocalName.Equals("r"))
+                                    {
+                                        RowNumber = System.Int32.Parse(xtr.Value.ToString()); 
+                                    }                                
+                                }
 
-                        isCell = xtr.LocalName.Equals("c") && xtr.NamespaceURI.Equals(SPREADSHEET_ML_NS);
+                                InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, RowNumber, PrevRowNumber, CheckIfBigConditional);
+                                xtr.MoveToElement();
+
+                                xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
+
+                                if (xtr.HasAttributes)
+                                {
+                                    while (xtr.MoveToNextAttribute())
+                                    {
+                                        xtw.WriteAttributeString(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI, xtr.Value);
+                                    }
+                                }                                                                
+
+                               
+                            }
+                            PrevRowNumber = RowNumber;
+                        }
+                        else
+                        {
+
+                            
+
+                            isCell = xtr.LocalName.Equals("c") && xtr.NamespaceURI.Equals(SPREADSHEET_ML_NS);
+
+                            if (xtr.HasAttributes && isCell && ConditionalCell != "")
+                            {
+                                while (xtr.MoveToNextAttribute())
+                                {
+                                    if (xtr.LocalName == "r")
+                                    {
+                                        ColNumber = GetColId(xtr.Value);
+                                        InsertCellInRow(RowNumber, ConditionalCell, xtw, PrevColNumber, ColNumber);
+                                        PrevColNumber = ColNumber;
+                                    }                                   
+
+                                }
+                                xtr.MoveToElement();
+                            }
+
+                            xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
 
                         if (xtr.HasAttributes)
                         {
@@ -105,6 +183,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                             }
                             xtr.MoveToElement();
+                        }
+
                         }
 
                         if (isInRel)
@@ -187,10 +267,27 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                         if (xtr.IsEmptyElement)
                         {
+                            if (string.Compare(xtr.LocalName.ToString(), "ConditionalCell") != 0 && string.Compare(xtr.LocalName.ToString(), "sheetData") == 0)
+                            {
+                                InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, 65537, 0, CheckIfBigConditional);                                
+                            }
+
                             xtw.WriteEndElement();
                         }
                         break;
                     case XmlNodeType.EndElement:
+                        if (string.Compare(xtr.LocalName.ToString(), "sheetData") == 0 && (ConditionalCell != ""))
+                        {
+                          
+                            InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, 65537, PrevRowNumber, CheckIfBigConditional);
+                            
+                        }
+                        if (string.Compare(xtr.LocalName.ToString(), "row") == 0 && (ConditionalCell != ""))
+                        {
+                            InsertCellInRow(RowNumber, ConditionalCell, xtw, PrevColNumber, 257);
+
+                        }
+                        
                         xtw.WriteEndElement();
                         break;
                     case XmlNodeType.EntityReference:
@@ -288,5 +385,432 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
             return result;
         }
+
+        public string NumbersToChars(int num)
+        {
+            string letter1 = "";
+            num--;
+            if (num > 25)
+            {
+                int val2 = ((int)Math.Floor(num / 26.0));
+                letter1 = NumbersToChars(val2);
+                num = num - val2 * 26;
+            }
+
+            return "" + letter1 + "" + ((char)(num + 65)) + "";
+        }
+
+        protected string Conditional(XmlReader xtr, string ns, string partName)
+        {
+            bool isInRel = false;
+            bool extractRels = ns.Equals(RELATIONSHIP_NS);
+            bool isCell = false;
+            List<RelationShip> rels = new List<RelationShip>();
+
+            int idFont = 0;
+            int idFill = 0;
+            int idBorder = 0;
+            int idXf = 0;
+            int idCellStyle = 0;
+            int idDxf = 0;
+            int idSi = 0;
+            int idCf = 0;
+            String ConditionalCellSheet = "";
+
+            RelationShip rel = new RelationShip();
+
+            int sqrefExist = 0;
+
+             while (xtr.Read())
+             {
+                 switch (xtr.NodeType)
+                 {
+                     case XmlNodeType.Attribute:
+                         break;
+                     case XmlNodeType.CDATA:                        
+                         break;
+                     case XmlNodeType.Comment:                        
+                         break;
+                     case XmlNodeType.DocumentType:                        
+                         break;
+                     case XmlNodeType.Element:
+
+                         
+
+                         if (String.Compare(xtr.LocalName, "conditionalFormatting") == 0)
+                         {
+
+                                                 
+
+                         if (xtr.HasAttributes)
+                         {                            
+                             while (xtr.MoveToNextAttribute())
+                             {
+
+                                 if (String.Compare(xtr.LocalName, "sqref") == 0)
+                                 {
+
+                                     string Cell = ConditionalCellNumber(xtr.Value);
+
+                                     
+                                     if (String.Compare(Cell, "false") != 0)
+                                     {                                         
+                                         sqrefExist = 1;
+                                         ConditionalCellSheet = ConditionalCellSheet + " " + ConditionalCellNumber(xtr.Value);                                         
+                                     }
+                                 }
+                                 string value = xtr.Value;
+                             }
+                         } 
+                             xtr.MoveToElement();
+                         }
+
+                         if (String.Compare(xtr.LocalName, "cfRule") == 0)
+                         {
+
+                             if (xtr.HasAttributes)
+                             {
+                                 while (xtr.MoveToNextAttribute())
+                                 {
+
+                                     if (String.Compare(xtr.LocalName, "dxfId") == 0 && sqrefExist == 1)
+                                     {
+                                         ConditionalCellSheet = ConditionalCellSheet + " " + xtr.Value + "=";
+                                         sqrefExist = 0;
+                                         
+                                     }
+                                     string value = xtr.Value;
+                                 }
+                             }
+                             xtr.MoveToElement();
+                         }
+
+                         break;
+                     case XmlNodeType.EndElement:                  
+                         break;
+                     case XmlNodeType.EntityReference:                       
+                         break;
+                     case XmlNodeType.ProcessingInstruction:                       
+                         break;
+                     case XmlNodeType.SignificantWhitespace:                   
+                         break;
+                     case XmlNodeType.Text:
+                         break;
+                     case XmlNodeType.Whitespace:                 
+                         break;
+                     case XmlNodeType.XmlDeclaration:                      
+                         break;
+                     default:                         
+                         break;
+                 }
+             }
+
+
+             return ConditionalCellSheet;
+        }
+
+        private string ConditionalCellNumber(string sqref)
+        {
+            string result = "";
+            int RowStart = 0;
+            int RowEnd = 0;
+            int ColStart = 0;
+            int ColEnd = 0;
+
+
+            foreach (string value in sqref.Split())
+            {
+                if (value.Contains(":"))
+                {
+                    ColStart = GetColId(value.Substring(0, value.IndexOf(':')));
+                    RowStart = GetRowId(value.Substring(0, value.IndexOf(':')));
+
+                    ColEnd = GetColId(value.Substring(value.IndexOf(':') + 1));
+                    RowEnd = GetRowId(value.Substring(value.IndexOf(':') + 1));
+
+                    if (ColStart <= 256 && RowStart <= 65536)
+                    {
+
+                        if (ColEnd > 256) ColEnd = 256;
+                        if (RowEnd > 65536) RowEnd = 65536;
+
+                        result = result + ColStart + "|" + RowStart + "-" + ColEnd + "|" + RowEnd;
+
+
+                    }
+                    else
+                    {
+                        result = "false";
+                    }
+
+                }
+                else
+                {
+                    ColStart = GetColId(value);
+                    RowStart = GetRowId(value);
+
+                    if (ColStart <= 256 && RowStart <= 65536)
+                        result = result + GetColId(value) + "|" + GetRowId(value);
+                    else
+                        result = "false";
+                }       
+            }
+            
+            return result;
+        }
+
+        private string ConditionalCellRowNumber(string ConditionalCell)
+        {
+            string result = "|";
+
+            
+            foreach (string value in ConditionalCell.Split())
+            {
+                if (value.Contains("-"))
+                {
+                    string CellStart = value.Substring(0, value.IndexOf('-'));
+                    string CellEnd = value.Substring(value.IndexOf('-') + 1);
+
+                    for (int CellNr = System.Int32.Parse(CellStart.Substring(CellStart.IndexOf('|') + 1)); CellNr <= System.Int32.Parse(CellEnd.Substring(CellEnd.IndexOf('|') + 1)); CellNr++)
+                    {
+                        if (!result.Contains("|" + CellNr + "|"))
+                        {
+                        result = result + CellNr + "|";
+                        }
+                    }
+                }
+                else if (value.Contains("|"))
+                {
+                    if (!result.Contains("|" + value.Substring(value.IndexOf('|') + 1) + "|"))
+                    {
+                        result = result + value.Substring(value.IndexOf('|') + 1) + "|";
+                    }
+                }
+            }
+            
+            return result;
+        }
+
+        private void InsertEmptyRowsWithConditional(List<int> intListRow, String ConditionalCell, XmlTextWriter xtw, int RowNumber, int PrevRowNumber, Boolean CheckIfBigConditional)
+        {
+
+            if (CheckIfBigConditional)
+            {
+                for (int count = PrevRowNumber + 1; count < RowNumber; count++)
+                {
+
+                    xtw.WriteStartElement(null, "row", SPREADSHEET_ML_NS);
+
+                    xtw.WriteStartAttribute(null, "r", null);
+                    xtw.WriteString(count.ToString());
+                    xtw.WriteEndAttribute();
+
+                    InsertCellInRow(count, ConditionalCell, xtw, 0, 256);
+
+                    xtw.WriteEndElement();                        
+
+                }
+            }
+            else
+            {
+              
+                for (int count = 0; count < intListRow.Count; count++)
+                {
+
+                    if (PrevRowNumber < intListRow[count] && intListRow[count] < RowNumber)
+                    {                        
+                        xtw.WriteStartElement(null, "row", SPREADSHEET_ML_NS);
+
+                        xtw.WriteStartAttribute(null, "r", null);
+                        xtw.WriteString(intListRow[count].ToString());
+                        xtw.WriteEndAttribute();
+
+                        InsertCellInRow(intListRow[count], ConditionalCell, xtw, 0, 256);
+
+                        xtw.WriteEndElement();
+
+                    }
+                    else if (RowNumber < intListRow[count])
+                    {
+                        break;
+                    }
+
+                }
+            }
+
+        }
+
+        private void InsertCellInRow(int RowNumber, String ConditionalCell, XmlTextWriter xtw, int CollNrStart, int CollNrEnd)
+        {
+
+            List<int> intListCol = new List<int>();
+            List<int> intListColStyle = new List<int>();
+            String ConditionalCellStyle = "";
+            String Style = "";
+
+            
+            
+            foreach (string value in ConditionalCell.Split())
+            {
+                if (value.Contains("-"))
+                {
+                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value) + value.Length);
+                    Style = ConditionalCellStyle.Substring(0, ConditionalCellStyle.IndexOf('='));
+
+                    string CellStart = value.Substring(0, value.IndexOf('-'));
+                    string CellEnd = value.Substring(value.IndexOf('-') + 1);
+
+                    int RowStart = System.Int32.Parse(CellStart.Substring(CellStart.IndexOf('|') + 1));
+                    int ColStart = System.Int32.Parse(CellStart.Substring(0, CellStart.IndexOf('|')));
+
+                    int RowEnd = System.Int32.Parse(CellEnd.Substring(CellEnd.IndexOf('|') + 1));
+                    int ColEnd = System.Int32.Parse(CellEnd.Substring(0, CellEnd.IndexOf('|')));
+
+                    if ((RowStart <= RowNumber) && (RowNumber <= RowEnd))
+                    {
+                        for (int CollNr = ColStart; CollNr <= ColEnd; CollNr++)
+                        {
+                            if (!intListCol.Contains(CollNr))
+                            {
+                                if (CollNrStart < CollNr && CollNr < CollNrEnd)
+                                {
+                                    intListCol.Add(CollNr);
+                                    intListColStyle.Add(System.Int32.Parse(Style));
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+                else if (value.Contains("|"))
+                {
+
+                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value) + value.Length);
+                    Style = ConditionalCellStyle.Substring(0, ConditionalCellStyle.IndexOf('='));
+                   
+                    int CollNr = System.Int32.Parse(value.Substring(0, value.IndexOf('|')));
+
+                    int Row = System.Int32.Parse(value.Substring(value.IndexOf('|') + 1));
+
+                    if (Row == RowNumber)
+                    {   
+                        
+                            if (!intListCol.Contains(CollNr))
+                            {
+                                if (CollNrStart < CollNr && CollNr < CollNrEnd)
+                                {
+                                    intListCol.Add(CollNr);
+                                    intListColStyle.Add(System.Int32.Parse(Style));
+                                }
+                            }
+                        
+                    }                  
+                }
+            }
+
+            intListCol.Sort();
+
+            for (int count = 0; count < intListCol.Count; count++)
+            {
+
+                string cell = NumbersToChars(intListCol[count]) + RowNumber.ToString();
+
+               
+                 xtw.WriteStartElement(null, "c", null);
+
+                 xtw.WriteStartAttribute(null, "r", null);
+                 xtw.WriteString(cell);
+                 xtw.WriteEndAttribute();
+
+                 string coord = intListCol[count].ToString(System.Globalization.CultureInfo.InvariantCulture)
+                              + "|"
+                              + RowNumber.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+                 xtw.WriteAttributeString(NS_PREFIX, "p", PACKAGE_NS, coord);
+
+                 xtw.WriteEndElement();                
+                
+            }
+
+        }
+
+
+       private List<int> ConditionalCellRowNumberList(string ConditionalCell)
+        {
+            List<int> result = new List<int>();
+
+            foreach (string value in ConditionalCell.Split())
+            {
+                if (value.Contains("-"))
+                {
+                    string CellStart = value.Substring(0, value.IndexOf('-'));
+                    string CellEnd = value.Substring(value.IndexOf('-') + 1);
+
+                    int Start = System.Int32.Parse(CellStart.Substring(CellStart.IndexOf('|') + 1));
+                    int End = System.Int32.Parse(CellEnd.Substring(CellEnd.IndexOf('|') + 1));
+
+                    if (End > 65537)
+                    {
+                        End = 65537;
+                    }
+
+                    if (Start < 65537)
+                    {
+
+                        for (int CellNr = Start; CellNr <= End; CellNr++)
+                        {
+                            if (!result.Contains(CellNr))
+                            {
+
+                                result.Add(CellNr);
+                            }
+                        }
+                    }
+                }
+                else if (value.Contains("|"))
+                {     
+                        int CellNr = System.Int32.Parse(value.Substring(value.IndexOf('|') + 1));    
+
+                        if (!result.Contains(System.Int32.Parse(value.Substring(value.IndexOf('|') + 1))) && CellNr < 65537)
+                        {
+
+                            result.Add(System.Int32.Parse(value.Substring(value.IndexOf('|') + 1)));
+                        }
+                    
+                }
+            }
+
+            return result;
+        }
+
+        private bool CheckIfBigConditionalRow(string ConditionalCell)
+        {
+
+            Boolean result = false;
+
+            foreach (string value in ConditionalCell.Split())
+            {
+                if (value.Contains("-"))
+                {
+                    string CellStart = value.Substring(0, value.IndexOf('-'));
+                    string CellEnd = value.Substring(value.IndexOf('-') + 1);
+
+                    int Start = System.Int32.Parse(CellStart.Substring(CellStart.IndexOf('|') + 1));
+                    int End = System.Int32.Parse(CellEnd.Substring(CellEnd.IndexOf('|') + 1));
+
+
+                    if (Start == 1 && End >= 65536)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+                
+            }
+
+            return result;
+        }
+
+
     }
 }
