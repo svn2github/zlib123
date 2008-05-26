@@ -240,6 +240,24 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name ="CheckDefaultHeading">
+    <xsl:param name="Name" />
+    <xsl:param name="Counter" select="1"/>
+
+    <xsl:choose>
+      <xsl:when test="$Counter &gt; 9" >false</xsl:when>
+      <xsl:when test="concat('heading_20_',$Counter) = $Name">true</xsl:when>
+      <xsl:when test="concat('Heading_20_',$Counter) = $Name">true</xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="CheckDefaultHeading">
+          <xsl:with-param name="Name" select="$Name" />
+          <xsl:with-param name="Counter">
+            <xsl:value-of select="$Counter + 1" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>  
   
   <!--Returns the maximum consecutive outline level that is defined in a paragraph starting from min up to max-->
   <xsl:template name="GetMaxConsecutiveHeadingWithOutline">
