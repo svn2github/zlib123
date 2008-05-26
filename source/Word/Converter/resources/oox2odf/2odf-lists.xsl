@@ -997,7 +997,6 @@
   </xsl:template>
 
 
-
   <!-- paragraph which is the first element in list level-->
   <xsl:template match="w:p" mode="list">
     <xsl:param name="numId"/>
@@ -1047,7 +1046,24 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:if test="$isFirstListItem = 'true' or ($dummyOutlineLevel!='' and $isPrecedingHeading='true')">
+    <!-- math, dialogika: bugfix #1841780 START-->
+        
+    <xsl:variable name="StyleId">
+       <xsl:value-of select="w:pPr/w:pStyle/@w:val" />
+    </xsl:variable>
+
+    <xsl:variable name="IsDefaultHeading">
+      <xsl:call-template name ="CheckDefaultHeading">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="key('StyleId',$StyleId)/w:name/@w:val" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!--<xsl:if test="$isFirstListItem = 'true' or ($dummyOutlineLevel!='' and $isPrecedingHeading='true')">-->
+    <xsl:if test="$isFirstListItem = 'true' or ($dummyOutlineLevel!='' and $isPrecedingHeading='true') or $IsDefaultHeading='true'">
+
+    <!-- math, dialogika: bugfix #1841780 END-->
       
           <text:list text:style-name="{$listNum}">
             
