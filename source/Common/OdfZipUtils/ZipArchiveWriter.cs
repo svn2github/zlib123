@@ -112,6 +112,8 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// </summary>
         private Hashtable binaries;
 
+        private string outputFile;
+
         private struct ImageValue
         {
             public int Width;
@@ -169,6 +171,32 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             delegateSettings.ConformanceLevel = ConformanceLevel.Document;
 
             resolver = res;
+
+            //Debug.Listeners.Add(new TextWriterTraceListener("debug.txt"));
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ZipArchiveWriter(XmlResolver res, string outputFile)
+        {
+            elements = new Stack();
+            attributes = new Stack();
+
+            delegateSettings = new XmlWriterSettings();
+            delegateSettings.OmitXmlDeclaration = false;
+            delegateSettings.CloseOutput = false;
+            delegateSettings.Encoding = Encoding.UTF8;
+            delegateSettings.Indent = false;
+            // If we use a new delegate per entry in the archive, 
+            // XML conformance will be checked at the document level.
+            // It is not possible to check XML conformance at the docuement level
+            // with a single delegate that writes all the entries.
+            // We must then use ConformanceLevel.Fragment and the xml declaration will be missing.
+            delegateSettings.ConformanceLevel = ConformanceLevel.Document;
+
+            resolver = res;
+            this.outputFile = outputFile;
 
             //Debug.Listeners.Add(new TextWriterTraceListener("debug.txt"));
         }
@@ -427,13 +455,13 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     }
 
                 }
-                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makeabspath#"))
+                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makeWordPath#"))
                 {
-                    text = MakeAbsPath(text);
+                    text = MakeWordPath(text);
                 }
-                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makerelpath#"))
+                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makeOdfPath#"))
                 {
-                    text = MakeRelPath(text);
+                    text = MakeOdfPath(text);
                 }
                 else if (text.Contains("COMPUTEODFCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "graphic-properties"))
                 {
@@ -594,56 +622,44 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
         }
 
-        private string MakeAbsPath(string text)
+        private string MakeWordPath(string text)
         {
-            int pos = "http://www.dialogika.de/odf-converter/makeabspath#".Length;
+            int pos = "http://www.dialogika.de/odf-converter/makeWordPath#".Length;
             string relativePath = text.Remove(0, pos);
-            string path = "";
+            DirectoryInfo outputPath = new DirectoryInfo(this.outputFile);
 
-            // for Commandline tool
-            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
-            {
-                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
-                    path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
-            }
-            //for addins
-            if (path == "")
-            {
-                path = Environment.CurrentDirectory;
-            }
-
-
-            string absolutePath = Path.GetFullPath(path + relativePath).Replace(" ", "%20");
+            string absolutePath = Path.GetFullPath(outputPath.FullName + relativePath).Replace(" ", "%20");
             return "file:///" + absolutePath;
         }
 
-        private string MakeRelPath(string text)
+        private string MakeOdfPath(string text)
         {
-            int pos = "http://www.dialogika.de/odf-converter/makerelpath#".Length;
-            string absolutePath = text.Remove(0, pos);
-            absolutePath = absolutePath.Replace("%20", " ");
-            string path = "";
+            int pos = "http://www.dialogika.de/odf-converter/makeOdfPath#".Length;
+            string wordPath = text.Remove(0, pos);
+            DirectoryInfo outputPath = new DirectoryInfo(this.outputFile);
 
-            //do not change network paths 
-            if (absolutePath.StartsWith("\\\\"))
+            if (wordPath.StartsWith("\\\\"))
             {
-                return absolutePath;
+                //it's a windows network path
+                string server = wordPath.Remove(0, 2);
+                server = server.Remove(server.IndexOf("\\"));
+                if (outputPath.FullName.StartsWith("\\\\" + server))
+                {
+                    //on the same server
+                    string relativePath = MakeWinPathRelative(outputPath.FullName, wordPath);
+                    return relativePath.Replace("\\", "/");
+                }
+                else 
+                {
+                    return wordPath;
+                }
             }
             else
             {
-                // for Commandline tool
-                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
-                {
-                    if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
-                        path = Path.GetDirectoryName(Environment.GetCommandLineArgs()[i + 1]);
-                }
-                //for addins
-                if (path == "")
-                {
-                    path = Environment.CurrentDirectory;
-                }
-                string relativePath = MakeWinPathRelative(path, absolutePath);
-                return relativePath.Replace("\\", "/");
+                //mounted local or network drive
+                //transform it into the ODF format
+                string odfPath = "/" + wordPath.Replace("\\", "/");
+                return odfPath;
             }           
         }
 
@@ -683,7 +699,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 relativePath.Append(relativeDirectories[index] + "\\");
             relativePath.Append(relativeDirectories[relativeDirectories.Length - 1]);
 
-            return "../" + relativePath.ToString();
+            return relativePath.ToString();
         }
 
         public override void WriteFullEndElement()

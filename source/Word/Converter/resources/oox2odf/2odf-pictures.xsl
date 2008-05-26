@@ -75,7 +75,9 @@
       </xsl:attribute>
 
       <style:graphic-properties>
-        <xsl:call-template name="InsertPictureProperties"/>
+        <xsl:call-template name="InsertPictureProperties">
+          <xsl:with-param name="drawing" select="." />
+        </xsl:call-template>
       </style:graphic-properties>
     </style:style>
   </xsl:template>
@@ -134,6 +136,10 @@
       <!-- anchor type-->
       <xsl:call-template name="InsertImageAnchorType"/>
 
+      <xsl:call-template name="DrawingMLToZindex" >
+        <xsl:with-param name="wpAnchor" select="." />
+      </xsl:call-template>
+
       <!--style name-->
       <xsl:attribute name="draw:style-name">
         <xsl:value-of select="generate-id(ancestor::w:drawing)"/>
@@ -169,6 +175,60 @@
   *************************************************************************
   -->
 
+  <!--
+  Summary:  Inserts the z-index for a draw:frame.
+  Author:   makz (DIaLOGIKa)
+  Params:   wpAnchor: the wp:anchor element of the DrawingML picture.
+  -->
+  <xsl:template name="DrawingMLToZindex" >
+    <xsl:param name="wpAnchor" />
+
+    <xsl:variable name="index" select="$wpAnchor/@relativeHeight" />
+    
+    <!--
+    makz:
+    Z-Index normalization:
+    We put the values in new reserved ranges:
+    hdr/ftr background: 0 - 500.000.000
+    hdr/ftr foreground: 500.000.001 - 1.000.000.000
+    maindoc background: 1.000.000.001 - 1.500.000.000
+    maindoc foreground: 1.500.000.001 - 2.147.483.647
+    -->
+    <xsl:variable name="normalizedIndex">
+      <xsl:choose>
+        <xsl:when test ="ancestor::*[w:hdr] or ancestor::*[w:ftr]">
+          <xsl:choose>
+            <xsl:when test="$wpAnchor/@behindDoc='1'">
+              <!-- DML in hdr ftr background -->
+              <xsl:value-of select="0 + $index" />
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- DML in hdr ftr foreground -->
+              <xsl:value-of select="500000001 + $index" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$wpAnchor/@behindDoc='1'">
+              <!-- DML in main doc background -->
+              <xsl:value-of select="1500000000 - $index" />
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- DML in main doc foreground -->
+              <xsl:value-of select="1500000001 + $index" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:attribute name="draw:z-index">
+      <xsl:value-of select="$normalizedIndex"/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  
   <!--
   Summary: Writes the anchor-type attribute
   Author: Clever Age
@@ -390,11 +450,15 @@
   <!--
   -->
   <xsl:template name="InsertPictureProperties">
+    <xsl:param name="drawing" />
+    
     <xsl:call-template name="InsertImagePosH"/>
     <xsl:call-template name="InsertImagePosV"/>
     <xsl:call-template name="InsertImageFlip"/>
     <xsl:call-template name="InsertImageCrop"/>
-    <xsl:call-template name="InsertImageWrap"/>
+    <xsl:call-template name="InsertImageWrap">
+      <xsl:with-param name="wpAnchor" select="$drawing/wp:anchor" />
+    </xsl:call-template>
     <xsl:call-template name="InsertImageMargins"/>
     <xsl:call-template name="InsertImageFlowWithtText"/>
     <xsl:call-template name="InsertImageBorder"/>
@@ -473,51 +537,68 @@
   </xsl:template>
 
   <!--
-  Author: Clever Age
+  Summary:  Inserts the style:wrap attribute for a draw:frame
+  Author:   Clever Age
   Modified: makz (DIaLOGIKa)
-  Date: 15.10.2007
+  Params:   wpAnchor: The wp:anchor element of the DML picture
   -->
   <xsl:template name="InsertImageWrap">
-    <!-- current context is <w:drawing> -->
+    <xsl:param name="wpAnchor" />
 
-    <xsl:if test="wp:anchor/wp:wrapSquare or wp:anchor/wp:wrapTight or wp:anchor/wp:wrapTopAndBottom or wp:anchor/wp:wrapThrough or wp:anchor/wp:wrapNone">
+    <xsl:if test="$wpAnchor/wp:wrapSquare or 
+            $wpAnchor/wp:wrapTight or 
+            $wpAnchor/wp:wrapTopAndBottom or 
+            $wpAnchor/wp:wrapThrough or 
+            $wpAnchor/wp:wrapNone">
 
       <xsl:attribute name="style:wrap">
-        <!-- set the wrap attribute -->
         <xsl:choose>
-          <xsl:when test="wp:anchor/wp:wrapSquare">
+          <xsl:when test="$wpAnchor/wp:wrapSquare">
             <xsl:call-template name="InsertSquareWrap">
-              <xsl:with-param name="wrap" select="wp:anchor/wp:wrapSquare/@wrapText"/>
+              <xsl:with-param name="wrap" select="$wpAnchor/wp:wrapSquare/@wrapText"/>
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="wp:anchor/wp:wrapTight">
+          <xsl:when test="$wpAnchor/wp:wrapTight">
             <xsl:call-template name="InsertSquareWrap">
-              <xsl:with-param name="wrap" select="wp:anchor/wp:wrapTight/@wrapText"/>
+              <xsl:with-param name="wrap" select="$wpAnchor/wp:wrapTight/@wrapText"/>
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="wp:anchor/wp:wrapTopAndBottom">
+          <xsl:when test="$wpAnchor/wp:wrapTopAndBottom">
             <xsl:text>none</xsl:text>
           </xsl:when>
-          <xsl:when test="wp:anchor/wp:wrapThrough">
+          <xsl:when test="$wpAnchor/wp:wrapThrough">
             <xsl:call-template name="InsertSquareWrap">
-              <xsl:with-param name="wrap" select="wp:anchor/wp:wrapThrough/@wrapText"/>
+              <xsl:with-param name="wrap" select="$wpAnchor/wp:wrapThrough/@wrapText"/>
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="wp:anchor/wp:wrapNone">
+          <xsl:when test="$wpAnchor/wp:wrapNone">
             <xsl:text>run-through</xsl:text>
           </xsl:when>
         </xsl:choose>
       </xsl:attribute>
-
-      <!--decide if in backround or in front of text-->
-      <xsl:if test="wp:anchor/@behindDoc='1'">
-        <xsl:attribute name="style:run-through">
-          <xsl:text>background</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
     </xsl:if>
-      
+    
+    <!--
+    makz:
+    If no wrap is specified, Word wraps the picture in front of the text.
+    If the picture is in a header or footer it will be rendered behind the text of the main document.
+    If the behindDoc attribute is set, it will also be rendered behind the text.
+    -->
+    <xsl:if test="$wpAnchor/wp:wrapNone">
+      <xsl:attribute name="style:run-through">
+        <xsl:choose>
+          <xsl:when test="$wpAnchor/@behindDoc='1'">
+            <xsl:text>background</xsl:text>
+          </xsl:when>
+          <xsl:when test="ancestor::*[w:hdr] or ancestor::*[w:ftr]" >
+            <xsl:text>background</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>foreground</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertImageMargins">

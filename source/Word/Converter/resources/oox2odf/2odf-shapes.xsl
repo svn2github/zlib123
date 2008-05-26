@@ -298,6 +298,7 @@
               <xsl:call-template name="InsertShapeWidth"/>
               <xsl:call-template name="InsertShapeHeight"/>
               <xsl:call-template name="InsertshapeAbsolutePos"/>
+              <xsl:call-template name="InsertShapeZindex"/>
 
               <xsl:apply-templates select="v:textbox"/>
 
@@ -635,9 +636,6 @@
       <xsl:with-param name="shape" select="$shape" />
     </xsl:call-template>
     <xsl:call-template name="InsertShapeBackgroundColor">
-      <xsl:with-param name="shape" select="$shape" />
-    </xsl:call-template>
-    <xsl:call-template name="InsertShapeZindex">
       <xsl:with-param name="shape" select="$shape" />
     </xsl:call-template>
     <xsl:call-template name="InsertShapeWrappedParagraph">
@@ -1043,6 +1041,13 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--
+  Summary:  Inserts the style:wrap attributes for draw:frames or draw:shapes
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+  Params:   shape: The VML shape
+            wrap: The wrap value of the shape
+  -->
   <xsl:template name="InsertShapeWrapAttributes">
     <xsl:param name="shape"/>
     <xsl:param name="wrap"/>
@@ -1055,14 +1060,25 @@
     </xsl:variable>
 
     <!--
-    makz: style:run-through="background" must always be written for negative z-index
+    makz:
+    If no wrap is specified, Word wraps the shape in front of the text.
+    If the shape is in a header or footer it will be rendered behind the text of the main document.
+    If the zindex of the shapeis negative, it will also be rendered behind the text.
     -->
-    <xsl:if test="$zindex &lt; 0 and not($wrap/@type) and not(@w:wrap)">
-      <xsl:attribute name="style:run-through">
-        <xsl:text>background</xsl:text>
-      </xsl:attribute>
-    </xsl:if>
-
+    <xsl:attribute name="style:run-through">
+      <xsl:choose>
+        <xsl:when test="not($wrap/@type) and not(@w:wrap) and $zindex &lt; 0">
+          <xsl:text>background</xsl:text>
+        </xsl:when>
+        <xsl:when test="not($wrap/@type) and not(@w:wrap) and (ancestor::*[w:hdr] or ancestor::*[w:ftr])">
+          <xsl:text>background</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>foreground</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    
     <xsl:attribute name="style:wrap">
       <xsl:choose>
         <xsl:when test="not($wrap)">
@@ -1794,19 +1810,64 @@
     </xsl:if>
   </xsl:template>
 
+  <!--
+  Summary:  Inserts the z-index for a draw:shape or draw.frame
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+  Params:   shape: The VML shape
+  -->
   <xsl:template name="InsertShapeZindex">
     <xsl:param name="shape" select="."/>
-    <xsl:variable name="zindex">
+    
+    <xsl:variable name="index">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="shape" select="$shape"/>
         <xsl:with-param name="propertyName" select="'z-index'"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:if test="$zindex != ''">
-      <xsl:attribute name="draw:z-index">
-        <xsl:value-of select="$zindex"/>
-      </xsl:attribute>
-    </xsl:if>
+    
+    <!--
+    makz:
+    Z-Index normalization:
+    We put the values in new reserved ranges:
+    hdr/ftr background: 0 - 500.000.000
+    hdr/ftr foreground: 500.000.001 - 1.000.000.000
+    maindoc background: 1.000.000.001 - 1.500.000.000
+    maindoc foreground: 1.500.000.001 - 2.147.483.647
+    -->
+    <xsl:variable name="normalizedIndex">
+      <xsl:choose>
+        <xsl:when test ="ancestor::*[w:hdr] or ancestor::*[w:ftr]">
+          <xsl:choose>
+            <xsl:when test="$index &lt; 0">
+              <!-- VML in hdr ftr background -->
+              <xsl:value-of select="500000000 - $index" />
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- VML in hdr ftr foreground -->
+              <xsl:value-of select="500000001 + $index" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$index &lt; 0">
+              <!-- VML in main doc background -->
+              <xsl:value-of select="1500000000 - $index" />
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- VML in main doc foreground -->
+              <xsl:value-of select="1500000001 + $index" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:attribute name="draw:z-index">
+      <xsl:value-of select="$normalizedIndex"/>
+    </xsl:attribute>
+
   </xsl:template>
 
   <xsl:template name="InsertShapeStyleName">

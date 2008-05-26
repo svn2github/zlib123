@@ -368,7 +368,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     XmlWriter finalWriter;
                     if (this.packaging)
                     {
-                        finalWriter = new ZipArchiveWriter(zipResolver);
+                        finalWriter = new ZipArchiveWriter(zipResolver, outputFile);
                     }
                     else
                     {

@@ -159,7 +159,7 @@
 
           <xsl:call-template name="HandleOleObject">
             <xsl:with-param name="oleId" select="$oleId" />
-            <xsl:with-param name="target" select="concat('http://www.dialogika.de/odf-converter/makeabspath#', @xlink:href)" />
+            <xsl:with-param name="target" select="concat('http://www.dialogika.de/odf-converter/makeWordPath#', @xlink:href)" />
             <xsl:with-param name="mode" select="'External'" />
           </xsl:call-template>
 

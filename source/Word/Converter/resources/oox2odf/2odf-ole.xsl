@@ -144,7 +144,7 @@
       <xsl:otherwise>
         <draw:object>
           <xsl:call-template name="InsertObjectHref">
-            <xsl:with-param name="link" select="concat('http://www.dialogika.de/odf-converter/makerelpath#', substring-after($oldFilePath, 'file:///'))" />
+            <xsl:with-param name="link" select="concat('http://www.dialogika.de/odf-converter/makeOdfPath#', substring-after($oldFilePath, 'file:///'))" />
           </xsl:call-template>
           <xsl:call-template name="InsertObjectShow" />
           <xsl:call-template name="InsertObjectType" />
