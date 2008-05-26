@@ -58,8 +58,17 @@
           
           A frame which iss not aligned to the page (in horiz. or vert. direction) 
           needs a paragraph due to it's anchor.
+
+          Frames in header/footer need a surrounding text:p, otherwise, OpenOffice will not show them
           -->
           <xsl:choose>
+            <xsl:when test="ancestor::*[name()='w:hdr'] or ancestor::*[name()='w:ftr']">
+              <text:p>
+                <xsl:call-template name="InsertFrame">
+                  <xsl:with-param name="framePr" select="w:pPr/w:framePr" />
+                </xsl:call-template>
+              </text:p>
+            </xsl:when>
             <xsl:when test="w:pPr/w:framePr/@w:hAnchor='page' and w:pPr/w:framePr/@w:vAnchor='page'">
               <xsl:call-template name="InsertFrame">
                 <xsl:with-param name="framePr" select="w:pPr/w:framePr" />
@@ -119,6 +128,8 @@
             <xsl:call-template name ="InsertFrameBackgroundForStyle">
               <xsl:with-param name="pPr" select ="w:pPr" />
             </xsl:call-template>
+
+            <xsl:call-template name="InsertFrameFlowForStyle" />
 
             <xsl:apply-templates select="w:pPr" mode="pPrChildren"/>
           </style:graphic-properties>
@@ -236,6 +247,10 @@
     -->
     <xsl:attribute name="text:anchor-type">
       <xsl:choose>
+
+        <xsl:when test="ancestor::*[name()='w:hdr'] or ancestor::*[name()='w:ftr']">
+          <xsl:text>paragraph</xsl:text>
+        </xsl:when>
         <xsl:when test="$framePr/@w:vAnchor='text' or $framePr/@w:hAnchor='text'">
           <xsl:text>paragraph</xsl:text>
         </xsl:when>
@@ -245,6 +260,9 @@
         <xsl:when test="$framePr/@w:vAnchor='page' and $framePr/@w:hAnchor='page'">
           <xsl:text>page</xsl:text>
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>paragraph</xsl:text>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
@@ -285,6 +303,7 @@
         <xsl:with-param name="vPos" select="$yAlign" />
       </xsl:call-template>
     </xsl:if>
+    
     <xsl:if test ="count($xAlign)>0 or count($hAnchor)>0">
       <xsl:call-template name="InsertHorizontalPos">
         <xsl:with-param name="xAlign" select="$xAlign" />
@@ -294,6 +313,7 @@
         <xsl:with-param name="hPos" select="$xAlign" />
       </xsl:call-template>
     </xsl:if>
+    
   </xsl:template>
 
 
@@ -305,15 +325,15 @@
   <xsl:template name="InsertFrameBordersForStyle">
     <xsl:param name="pPr" />
 
-      <!--
+    <!--
       The border properties of a border can be defined in the automatic styles of the content.xml
       or in the styles.xml
       That happens if a predefined paragraph style is made to a frame.
       -->
-      <xsl:variable name="styleId" select="$pPr/w:pStyle/@w:val"/>
-      <xsl:variable name="externalBorderStyle" select="key('StyleId', $styleId)"/>
-    
-      <xsl:choose>
+    <xsl:variable name="styleId" select="$pPr/w:pStyle/@w:val"/>
+    <xsl:variable name="externalBorderStyle" select="key('StyleId', $styleId)"/>
+
+    <xsl:choose>
       <!-- The border is defined in the document -->
       <xsl:when test="$pPr/w:pBdr">
         <xsl:call-template name="InsertBorders">
@@ -339,7 +359,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <!--
   Summary:  Inserts the shading/background into the style of a draw:frame
   Author:   makz (DIaLOGIKa)
@@ -351,29 +371,43 @@
     <xsl:choose>
       <!-- The shading is defined in the document -->
       <xsl:when test="$pPr/w:shd">
-        
+
         <xsl:attribute name="fo:background-color">
-          <xsl:value-of select="concat('#', $pPr/w:shd/@w:color)"/>
+          <xsl:variable name="fill">
+            <xsl:choose>
+              <xsl:when test="$pPr/w:shd/@w:fill = 'auto'">
+                <xsl:text>000000</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$pPr/w:shd/@w:fill"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          
+          <xsl:value-of select="concat('#', $fill)"/>
         </xsl:attribute>
-        
+
         <xsl:attribute name="style:background-transparency">
           <xsl:variable name="percent">
             <xsl:choose>
-              <xsl:when test="$pPr/w:shd/@w:val='solid'">
+              <xsl:when test="$pPr/w:shd/@w:val='clear' or $pPr/w:shd/@w:val='nil' or $pPr/w:shd/@w:val='solid'">
                 <xsl:text>0</xsl:text>
               </xsl:when>
-              <xsl:otherwise>
+              <xsl:when test="substring($pPr/w:shd/@w:val, 0, 3) = 'pct'">
                 <xsl:value-of select="substring($pPr/w:shd/@w:val, 4, 2)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>0</xsl:text>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
 
           <xsl:value-of select ="concat($percent, '%')"/>
         </xsl:attribute>
-        
+
       </xsl:when>
     </xsl:choose>
-    
+
   </xsl:template>
 
 
@@ -386,40 +420,53 @@
     <xsl:param name="framePr" />
 
     <!-- vertical margin -->
-    <xsl:if test="$framePr/@w:vSpace">
-      <xsl:variable name="vertMargin">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="$framePr/@w:vSpace" />
-          <xsl:with-param name="unit" select="'cm'" />
-        </xsl:call-template>
-      </xsl:variable>
-      
-      <xsl:attribute name="fo:margin-bottom">
-        <xsl:value-of select="$vertMargin"/>
-      </xsl:attribute>
-      <xsl:attribute name="fo:margin-top">
-        <xsl:value-of select="$vertMargin"/>
-      </xsl:attribute>
-    </xsl:if>
+    <xsl:variable name="vertMargin">
+      <xsl:choose>
+        <xsl:when test="$framePr/@w:vSpace">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length" select="$framePr/@w:vSpace" />
+            <xsl:with-param name="unit" select="'cm'" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0.32cm</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
     <!-- horizontal margin -->
-    <xsl:if test="$framePr/@w:hSpace">
-      <xsl:variable name="horzMargin">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length" select="$framePr/@w:vSpace" />
-          <xsl:with-param name="unit" select="'cm'" />
-        </xsl:call-template>
-      </xsl:variable>
+    <xsl:variable name="horzMargin">
+      <xsl:choose>
+        <xsl:when test="$framePr/@w:hSpace">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length" select="$framePr/@w:vSpace" />
+            <xsl:with-param name="unit" select="'cm'" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0cm</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:attribute name="fo:margin-bottom">
+      <xsl:value-of select="$vertMargin"/>
+    </xsl:attribute>
+    
+    <xsl:attribute name="fo:margin-top">
+      <xsl:value-of select="$vertMargin"/>
+    </xsl:attribute>
 
-      <xsl:attribute name="fo:margin-left">
-        <xsl:value-of select="$horzMargin"/>
-      </xsl:attribute>
-      <xsl:attribute name="fo:margin-right">
-        <xsl:value-of select="$horzMargin"/>
-      </xsl:attribute>
-    </xsl:if>
+    <xsl:attribute name="fo:margin-left">
+      <xsl:value-of select="$horzMargin"/>
+    </xsl:attribute>
+    
+    <xsl:attribute name="fo:margin-right">
+      <xsl:value-of select="$horzMargin"/>
+    </xsl:attribute>
+
   </xsl:template>
-  
+
 
   <!--
   Summary: Inserts the paragraphs in a frame
@@ -427,7 +474,7 @@
   -->
   <xsl:template name="InsertParagraphToFrame">
     <xsl:param name="paragraph" select="."/>
-    
+
     <text:p>
       <xsl:attribute name="text:style-name">
         <xsl:choose>
@@ -441,7 +488,7 @@
       </xsl:attribute>
       <xsl:apply-templates select="$paragraph/node()"/>
     </text:p>
-    
+
     <!-- if there is another paragraph with framePr -->
     <xsl:variable name="followingP" select="$paragraph/following-sibling::*[1]" />
     <xsl:if test="$followingP/w:pPr/w:framePr">
@@ -460,6 +507,7 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
+
 
   <!--
   Summary: Inserts the attribute for vertical position
@@ -502,6 +550,7 @@
     </xsl:attribute>
   </xsl:template>
 
+
   <!--
   Summary: Inserts the attribute for horizontal position
   Author: makz (DIaLOGIKa)
@@ -509,7 +558,7 @@
   -->
   <xsl:template name="InsertHorizontalPos">
     <xsl:param name="xAlign" />
-    
+
     <xsl:attribute name="style:horizontal-pos">
       <xsl:choose>
         <xsl:when test="$xAlign='center'">
@@ -534,6 +583,7 @@
     </xsl:attribute >
   </xsl:template>
 
+
   <!--
   Summary: Inserts the attribute for horizontal relation
   Author: makz (DIaLOGIKa)
@@ -542,7 +592,7 @@
   <xsl:template name="InsertHorizontalRel">
     <xsl:param name="hRel" />
     <xsl:param name="hPos" />
-    
+
     <xsl:attribute name="style:horizontal-rel">
       <xsl:choose>
         <xsl:when test="$hRel='margin'">
@@ -580,6 +630,7 @@
     </xsl:attribute>
   </xsl:template>
 
+
   <!--
   Summary: Inserts the attribute for vertical relation
   Author: makz (DIaLOGIKa)
@@ -588,7 +639,7 @@
   <xsl:template name="InsertVerticalRel">
     <xsl:param name="vRel" />
     <xsl:param name="vPos" />
-    
+
     <xsl:attribute name="style:vertical-rel">
       <xsl:choose>
         <xsl:when test="$vRel='page'">
@@ -626,6 +677,7 @@
     </xsl:attribute>
   </xsl:template>
 
+
   <!--
   Summary: Inserts the attribute for wrap
   Author: makz (DIaLOGIKa)
@@ -633,7 +685,7 @@
   -->
   <xsl:template name="InsertWrap">
     <xsl:param name="wrap" />
-               
+
     <xsl:attribute name="style:wrap">
       <xsl:choose>
         <xsl:when test="not($wrap) or $wrap ='none'">
@@ -657,7 +709,7 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-   
+
 
   <!--
   Summary:  Compares 2 OOX frames based on their attributes
@@ -690,6 +742,31 @@
         <xsl:text>false</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template> 
-  
+  </xsl:template>
+
+
+  <!--
+  Summary:  Inserts a flow attribute into the style of a draw:frame
+  Author:   makz (DIaLOGIKa)
+  -->
+  <xsl:template name="InsertFrameFlowForStyle">
+    <!--
+    ODF Spec says:
+    The style:flow-with-text attribute specifies the behavior of 
+    drawing shapes that are positioned at a certain distance below an anchor 
+    and do not fit on the page where the anchor is. 
+    If the value of the property is true, such drawing objects follow the text flow, 
+    that is, they a displayed on the next page. If the attribute value is false, 
+    such drawing objects are displayed outside the page's text area.
+    -->
+    <!--
+    makz: 
+    Setting this to false will emulate the behavior of Word.
+    Frames in headers/footers MUST have flow-with-text: false, 
+    but I think it doesn't affect frames in main document, that's why it will always be written.
+    -->
+    <xsl:attribute name="style:flow-with-text">
+      <xsl:text>false</xsl:text>
+    </xsl:attribute>
+  </xsl:template>
 </xsl:stylesheet>

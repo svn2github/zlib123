@@ -72,6 +72,14 @@
           </config:config-item>
           <!--divo, dialogika: retain Use Printer Metrics compatibility setting END -->
 
+          
+          <!--
+          makz (DIaLOGIKa): 
+          Use new text wrapping to emulate Word text wrapping
+          -->
+          <config:config-item config:name="UseFormerTextWrapping" config:type="boolean">
+            <xsl:value-of select="'false'"/>
+          </config:config-item>
         </config:config-item-set >
 
         </office:settings>

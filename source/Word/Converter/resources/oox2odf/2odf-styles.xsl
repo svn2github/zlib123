@@ -2424,6 +2424,9 @@
     <xsl:param name="object"/>
 
     <!-- dynamic spacing always false : no spacing defined in OOX -->
+    <!--
+    
+    -->
     <xsl:attribute name="style:dynamic-spacing">false</xsl:attribute>
 
     <!-- no spacing in OOX. -->
