@@ -118,48 +118,53 @@
     </xsl:choose>
   </xsl:template>
   
-  <!-- Compute shading : call this template int the context of w:shd -->
+  <!-- 
+  Summary:  Compute shading : call this template int the context of w:shd 
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+  -->
   <xsl:template name="ComputeShading">
+    <xsl:param name="shd" select="." />
     
     <xsl:choose>
       <!-- clear pattern -->
-      <xsl:when test="@w:val = 'clear' ">
+      <xsl:when test="$shd/@w:val = 'clear' ">
         <xsl:choose>
-          <xsl:when test="@w:fill != 'auto' ">
-            <xsl:value-of select="concat('#', @w:fill)"/>
+          <xsl:when test="$shd/@w:fill != 'auto' ">
+            <xsl:value-of select="concat('#', $shd/@w:fill)"/>
           </xsl:when>
           <xsl:otherwise>#ffffff</xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <!-- solid pattern -->
-      <xsl:when test="@w:val = 'solid'">
+      <xsl:when test="$shd/@w:val = 'solid'">
         <xsl:choose>
-          <xsl:when test="@w:color = 'auto' and @w:fill = 'auto'"><xsl:text>#000000</xsl:text></xsl:when>
-          <xsl:when test="@w:color != 'auto'">
-            <xsl:value-of select="concat('#', @w:color)"/>
+          <xsl:when test="$shd/@w:color = 'auto' and $shd/@w:fill = 'auto'"><xsl:text>#000000</xsl:text></xsl:when>
+          <xsl:when test="$shd/@w:color != 'auto'">
+            <xsl:value-of select="concat('#', $shd/@w:color)"/>
           </xsl:when>
           <xsl:otherwise><xsl:text>#ffffff</xsl:text></xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <!-- percentage pattern -->
-      <xsl:when test="starts-with(@w:val, 'pct')">
-        <xsl:variable name="pct" select="number(substring-after(@w:val, 'pct'))" />
+      <xsl:when test="starts-with($shd/@w:val, 'pct')">
+        <xsl:variable name="pct" select="number(substring-after($shd/@w:val, 'pct'))" />
         <xsl:choose>
-          <xsl:when test="@w:color= 'auto' and @w:fill = 'auto'">
+          <xsl:when test="$shd/@w:color= 'auto' and $shd/@w:fill = 'auto'">
             <xsl:call-template name="AlphaBlend">
               <xsl:with-param name="pct" select="$pct" />
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="@w:color != 'auto' and @w:fill = 'auto'">
+          <xsl:when test="$shd/@w:color != 'auto' and $shd/@w:fill = 'auto'">
             <xsl:call-template name="AlphaBlend">
-              <xsl:with-param name="fg" select="@w:color" />
+              <xsl:with-param name="fg" select="$shd/@w:color" />
               <xsl:with-param name="pct" select="$pct" />
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="@w:color != 'auto' and @w:fill != 'auto'">
+          <xsl:when test="$shd/@w:color != 'auto' and $shd/@w:fill != 'auto'">
             <xsl:call-template name="AlphaBlend">
-              <xsl:with-param name="fg" select="@w:color" />
-              <xsl:with-param name="bg" select="@w:fill" />
+              <xsl:with-param name="fg" select="$shd/@w:color" />
+              <xsl:with-param name="bg" select="$shd/@w:fill" />
               <xsl:with-param name="pct" select="$pct" />
             </xsl:call-template>
           </xsl:when>
@@ -168,21 +173,21 @@
       <!-- unmanaged patterns : 25% blending -->
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="@w:color= 'auto' and @w:fill = 'auto'">
+          <xsl:when test="$shd/@w:color= 'auto' and $shd/@w:fill = 'auto'">
             <xsl:call-template name="AlphaBlend">
               <xsl:with-param name="pct" select="25" />
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="@w:color != 'auto' and @w:fill = 'auto'">
+          <xsl:when test="$shd/@w:color != 'auto' and $shd/@w:fill = 'auto'">
             <xsl:call-template name="AlphaBlend">
-              <xsl:with-param name="fg" select="@w:color" />
+              <xsl:with-param name="fg" select="$shd/@w:color" />
               <xsl:with-param name="pct" select="25" />
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="@w:color != 'auto' and @w:fill != 'auto'">
+          <xsl:when test="$shd/@w:color != 'auto' and $shd/@w:fill != 'auto'">
             <xsl:call-template name="AlphaBlend">
-              <xsl:with-param name="fg" select="@w:color" />
-              <xsl:with-param name="bg" select="@w:fill" />
+              <xsl:with-param name="fg" select="$shd/@w:color" />
+              <xsl:with-param name="bg" select="$shd/@w:fill" />
               <xsl:with-param name="pct" select="25" />
             </xsl:call-template>
           </xsl:when>

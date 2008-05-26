@@ -799,13 +799,25 @@
       <xsl:call-template name="InsertParagraphShadow"/>
     </xsl:if>
   </xsl:template>
-  
 
-  <!-- bg color -->
+
+  <!-- 
+  Summary: Template inserts paragraph shading
+  Author: Clever Age
+  Modified: makz (DIaLOGIKa)
+  Date: 26.05.2008
+  -->
   <xsl:template match="w:shd" mode="pPrChildren">
-    <xsl:attribute name="fo:background-color">
-      <xsl:call-template name="ComputeShading"/>
-    </xsl:attribute>
+    <!-- 
+    Do not insert the shading if the paragraph is a frame.
+    In this case the paragraph is inserted as draw:frame and 
+    the conversion of the shading is handled by the frame conversion
+    -->
+    <xsl:if test="not(parent::node()/w:framePr)">
+      <xsl:attribute name="fo:background-color">
+        <xsl:call-template name="ComputeShading"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <!-- font weigth -->

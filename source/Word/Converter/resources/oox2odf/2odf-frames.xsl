@@ -108,35 +108,17 @@
               <xsl:with-param name="framePr" select="w:pPr/w:framePr"/>
             </xsl:call-template>
 
-            <!--
-            The border properties of a border can be defined in the automatic styles of the content.xml
-            or in the styles.xml
-            That happens if a predefined paragraph style is made to a frame.
-            -->
-            <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
-            <xsl:variable name="externalBorderStyle" select="key('StyleId', $styleId)"/>
-            <xsl:choose>
-              <!-- The border is defined in context.xml -->
-              <xsl:when test="w:pPr/w:pBdr">
-                <xsl:call-template name="InsertBorders">
-                  <xsl:with-param name="border" select="w:pPr/w:pBdr"/>
-                </xsl:call-template>
-                <xsl:call-template name="InsertParagraphShadow"/>
-              </xsl:when>
-              <!-- The border is defined in styles.xml -->
-              <xsl:when test="$externalBorderStyle/w:pPr/w:pBdr">
-                <xsl:call-template name="InsertBorders">
-                  <xsl:with-param name="border" select="$externalBorderStyle/w:pPr/w:pBdr"/>
-                </xsl:call-template>
-                <xsl:call-template name="InsertParagraphShadow"/>
-              </xsl:when>
-              <!-- No border is defined -->
-              <xsl:otherwise>
-                <xsl:attribute name="fo:border">
-                  <xsl:text>none</xsl:text>
-                </xsl:attribute>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:call-template name="InsertFrameMarginForStyle">
+              <xsl:with-param name="framePr" select="w:pPr/w:framePr"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="InsertFrameBordersForStyle">
+              <xsl:with-param name="pPr" select ="w:pPr" />
+            </xsl:call-template>
+
+            <xsl:call-template name ="InsertFrameBackgroundForStyle">
+              <xsl:with-param name="pPr" select ="w:pPr" />
+            </xsl:call-template>
 
             <xsl:apply-templates select="w:pPr" mode="pPrChildren"/>
           </style:graphic-properties>
@@ -173,11 +155,11 @@
       <xsl:call-template name="InsertFramePosition">
         <xsl:with-param name="framePr" select="$framePr"/>
       </xsl:call-template>
-      
+
       <xsl:call-template name="InsertFrameAnchor">
         <xsl:with-param name="framePr" select="$framePr"/>
       </xsl:call-template>
-      
+
       <draw:text-box>
         <xsl:call-template name="InsertParagraphToFrame"/>
       </draw:text-box>
@@ -200,7 +182,7 @@
         <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:attribute>
-    
+
     <xsl:attribute name="svg:height">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
@@ -211,7 +193,7 @@
     </xsl:attribute>
   </xsl:template>
 
-  
+
   <!--
   Summary:  Inserts the absolute position for a draw:frame
   Author:   makz (DIaLOGIKa)
@@ -247,7 +229,7 @@
   -->
   <xsl:template name="InsertFrameAnchor">
     <xsl:param name="framePr" />
-    
+
     <!--
     OOX knows a vertical anchor and a horizontal anchor.
     ODF only knows a anchor type.
@@ -258,7 +240,7 @@
           <xsl:text>paragraph</xsl:text>
         </xsl:when>
         <xsl:when test="$framePr/@w:vAnchor='margin' or $framePr/@w:hAnchor='margin'">
-          <xsl:text>paragraph</xsl:text>  
+          <xsl:text>paragraph</xsl:text>
         </xsl:when>
         <xsl:when test="$framePr/@w:vAnchor='page' and $framePr/@w:hAnchor='page'">
           <xsl:text>page</xsl:text>
@@ -313,95 +295,131 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
-  <xsl:template name="InsertTextBoxPadding">
-    <xsl:param name="shape" select="."/>
 
-    <xsl:variable name="textBoxInset" select="@inset"/>
 
-    <xsl:attribute name="fo:padding-left">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="1"/>
-            <xsl:with-param name="text" select="$textBoxInset"/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:attribute>
+  <!--
+  Summary:  Inserts the borders into the style of a draw:frame
+  Author:   makz (DIaLOGIKa)
+  Params:   pPr: The properties of the paragraph
+  -->
+  <xsl:template name="InsertFrameBordersForStyle">
+    <xsl:param name="pPr" />
 
-    <xsl:attribute name="fo:padding-top">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="2"/>
-            <xsl:with-param name="text" select="$textBoxInset"/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:attribute>
-
-    <xsl:attribute name="fo:padding-right">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="3"/>
-            <xsl:with-param name="text" select="$textBoxInset"/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:attribute>
-
-    <xsl:attribute name="fo:padding-bottom">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="4"/>
-            <xsl:with-param name="text" select="$textBoxInset"/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:attribute>
-  </xsl:template>
-  
-  <xsl:template name="ExplodeValues">
-    <xsl:param name="elementNum"/>
-    <xsl:param name="text"/>
-    <xsl:param name="counter" select="1"/>
-    <xsl:choose>
-      <xsl:when test="$elementNum = $counter">
-        <xsl:variable name="length">
-          <xsl:choose>
-            <xsl:when test="contains($text,',')">
-              <xsl:value-of select="substring-before($text,',')"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$text"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:choose>
-          <!-- default values -->
-          <xsl:when test="$length = '' and ($counter = 1 or $counter = 3)">0.1in</xsl:when>
-          <xsl:when test="$length = '' and ($counter = 2 or $counter = 4)">0.05in</xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$length"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="ExplodeValues">
-          <xsl:with-param name="elementNum" select="$elementNum"/>
-          <xsl:with-param name="text" select="substring-after($text,',')"/>
-          <xsl:with-param name="counter" select="$counter+1"/>
+      <!--
+      The border properties of a border can be defined in the automatic styles of the content.xml
+      or in the styles.xml
+      That happens if a predefined paragraph style is made to a frame.
+      -->
+      <xsl:variable name="styleId" select="$pPr/w:pStyle/@w:val"/>
+      <xsl:variable name="externalBorderStyle" select="key('StyleId', $styleId)"/>
+    
+      <xsl:choose>
+      <!-- The border is defined in the document -->
+      <xsl:when test="$pPr/w:pBdr">
+        <xsl:call-template name="InsertBorders">
+          <xsl:with-param name="border" select="$pPr/w:pBdr"/>
         </xsl:call-template>
+        <xsl:call-template name="InsertParagraphShadow"/>
+      </xsl:when>
+
+      <!-- The border is defined in styles.xml -->
+      <xsl:when test="$externalBorderStyle/w:pPr/w:pBdr">
+        <xsl:call-template name="InsertBorders">
+          <xsl:with-param name="border" select="$externalBorderStyle/w:pPr/w:pBdr"/>
+        </xsl:call-template>
+        <xsl:call-template name="InsertParagraphShadow"/>
+      </xsl:when>
+
+      <!-- No border is defined -->
+      <xsl:otherwise>
+        <xsl:attribute name="fo:border">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  
+  <!--
+  Summary:  Inserts the shading/background into the style of a draw:frame
+  Author:   makz (DIaLOGIKa)
+  Params:   pPr: The properties of the paragraph
+  -->
+  <xsl:template name="InsertFrameBackgroundForStyle">
+    <xsl:param name="pPr" />
+
+    <xsl:choose>
+      <!-- The shading is defined in the document -->
+      <xsl:when test="$pPr/w:shd">
+        
+        <xsl:attribute name="fo:background-color">
+          <xsl:value-of select="concat('#', $pPr/w:shd/@w:color)"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="style:background-transparency">
+          <xsl:variable name="percent">
+            <xsl:choose>
+              <xsl:when test="$pPr/w:shd/@w:val='solid'">
+                <xsl:text>0</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring($pPr/w:shd/@w:val, 4, 2)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <xsl:value-of select ="concat($percent, '%')"/>
+        </xsl:attribute>
+        
+      </xsl:when>
+    </xsl:choose>
+    
+  </xsl:template>
+
+
+  <!--
+  Summary:  Inserts the margin into the style of a draw:frame
+  Author:   makz (DIaLOGIKa)
+  Params:   framePr: The properties of the paragraph frame
+  -->
+  <xsl:template name="InsertFrameMarginForStyle">
+    <xsl:param name="framePr" />
+
+    <!-- vertical margin -->
+    <xsl:if test="$framePr/@w:vSpace">
+      <xsl:variable name="vertMargin">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length" select="$framePr/@w:vSpace" />
+          <xsl:with-param name="unit" select="'cm'" />
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:attribute name="fo:margin-bottom">
+        <xsl:value-of select="$vertMargin"/>
+      </xsl:attribute>
+      <xsl:attribute name="fo:margin-top">
+        <xsl:value-of select="$vertMargin"/>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- horizontal margin -->
+    <xsl:if test="$framePr/@w:hSpace">
+      <xsl:variable name="horzMargin">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length" select="$framePr/@w:vSpace" />
+          <xsl:with-param name="unit" select="'cm'" />
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:attribute name="fo:margin-left">
+        <xsl:value-of select="$horzMargin"/>
+      </xsl:attribute>
+      <xsl:attribute name="fo:margin-right">
+        <xsl:value-of select="$horzMargin"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
 
   <!--
   Summary: Inserts the paragraphs in a frame
@@ -642,9 +660,9 @@
    
 
   <!--
-  Summary: Compares 2 OOX frames based on their attributes
-  Author: makz (DIaLOGIKa)
-  Date: 29.10.2007
+  Summary:  Compares 2 OOX frames based on their attributes
+  Author:   makz (DIaLOGIKa)
+  Date:     29.10.2007
   -->
   <xsl:template name="CompareFrames">
     <xsl:param name="frame1" />
@@ -672,6 +690,6 @@
         <xsl:text>false</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
+  </xsl:template> 
   
 </xsl:stylesheet>

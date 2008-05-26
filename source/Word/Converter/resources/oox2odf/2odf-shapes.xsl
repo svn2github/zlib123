@@ -2023,6 +2023,97 @@
     </xsl:choose>
   </xsl:template>
 
+
+  <xsl:template name="InsertTextBoxPadding">
+    <xsl:param name="shape" select="."/>
+
+    <xsl:variable name="textBoxInset" select="$shape/@inset"/>
+
+    <xsl:attribute name="fo:padding-left">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="1"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:attribute name="fo:padding-top">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="2"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:attribute name="fo:padding-right">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="3"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:attribute name="fo:padding-bottom">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="4"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:attribute>
+  </xsl:template>
+
+
+  <xsl:template name="ExplodeValues">
+    <xsl:param name="elementNum"/>
+    <xsl:param name="text"/>
+    <xsl:param name="counter" select="1"/>
+    <xsl:choose>
+      <xsl:when test="$elementNum = $counter">
+        <xsl:variable name="length">
+          <xsl:choose>
+            <xsl:when test="contains($text,',')">
+              <xsl:value-of select="substring-before($text,',')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$text"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+          <!-- default values -->
+          <xsl:when test="$length = '' and ($counter = 1 or $counter = 3)">0.1in</xsl:when>
+          <xsl:when test="$length = '' and ($counter = 2 or $counter = 4)">0.05in</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$length"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="ExplodeValues">
+          <xsl:with-param name="elementNum" select="$elementNum"/>
+          <xsl:with-param name="text" select="substring-after($text,',')"/>
+          <xsl:with-param name="counter" select="$counter+1"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="InsertShapeRelativeWidth">
     <xsl:param name="shape" select="."/>
 
