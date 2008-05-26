@@ -228,132 +228,151 @@
 
     <!-- if cell style has condition -->
     <!-- there was a case where condition was "cell-content()=#NAME?G$45" and it caused a crash (but there can be #NAME condition as text occurence) -->
-    <xsl:if
-      test="key('style',$styleName)/style:map[@style:condition != '' and not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
 
-      <conditionalFormatting>
-        <xsl:variable name="ColChar">
-          <xsl:call-template name="NumbersToChars">
-            <xsl:with-param name="num">
-              <xsl:value-of select="$colNumber"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:attribute name="sqref">
-          <xsl:choose>
-            <!-- if condition is applied to merged cell then enter merged cell range -->
-            <xsl:when test="contains($MergeCell,concat($ColChar, $rowNumber))">
-              <xsl:value-of
-                select="concat($ColChar, $rowNumber,substring-before(substring-after($MergeCell,concat($ColChar, $rowNumber)),';'))"
-              />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when test="$RepetedRow != ''">
-                  <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColChar, $rowNumber + $RepetedRow)"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat($ColChar, $rowNumber)"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-
-        <xsl:variable name="cellName">
-          <xsl:choose>
-            <!-- if condition is applied to merged cell then enter merged cell range -->
-            <xsl:when test="contains($MergeCell,concat($ColChar, $rowNumber))">
-              <xsl:value-of
-                select="concat($ColChar, $rowNumber,substring-before(substring-after($MergeCell,concat($ColChar, $rowNumber)),';'))"
-              />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when test="$RepetedRow != ''">
-                  <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColChar, $rowNumber + $RepetedRow)"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat($ColChar, $rowNumber)"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-
-        <xsl:for-each
-          select="key('style', $styleName)/style:map[not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
-          <cfRule type="cellIs" priority="{position()}">
-            <xsl:if test="contains(@style:condition,'is-true-formula')">
-              <xsl:attribute name="type">
-                <xsl:text>expression</xsl:text>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="dxfId">
-              <!-- style:map can also be in number style so we are counting only having style:style as a parent -->
-              <xsl:value-of
-                select="count(preceding::style:map[name(parent::node()) = 'style:style']) + 1"/>
+<xsl:choose>
+  <xsl:when test="key('style',$styleName)/style:map[@style:condition != '' and not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
+    <conditionalFormatting>
+      <xsl:variable name="ColChar">
+        <xsl:call-template name="NumbersToChars">
+          <xsl:with-param name="num">
+            <xsl:value-of select="$colNumber"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:variable name="ColCharEnd">
+        <xsl:call-template name="NumbersToChars">
+          <xsl:with-param name="num">
+            <xsl:choose>
+              <xsl:when test="@table:number-columns-repeated != ''">
+                        <xsl:value-of select="$colNumber + @table:number-columns-repeated - $RepetedCol + 1"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$colNumber"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:attribute name="sqref">
+        <xsl:choose>
+          <!-- if condition is applied to merged cell then enter merged cell range -->
+          <xsl:when test="contains($MergeCell,concat($ColChar, $rowNumber))">
+            <xsl:value-of
+              select="concat($ColChar, $rowNumber,substring-before(substring-after($MergeCell,concat($ColChar, $rowNumber)),';'))"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$RepetedRow != ''">
+                <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColCharEnd, $rowNumber + $RepetedRow + 1)"/>
+              </xsl:when>
+              <xsl:when test="$ColChar != $ColCharEnd">
+                <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColCharEnd, $rowNumber)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat($ColChar, $rowNumber)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      
+      <xsl:variable name="cellName">
+        <xsl:choose>
+          <!-- if condition is applied to merged cell then enter merged cell range -->
+          <xsl:when test="contains($MergeCell,concat($ColChar, $rowNumber))">
+            <xsl:value-of
+              select="concat($ColChar, $rowNumber,substring-before(substring-after($MergeCell,concat($ColChar, $rowNumber)),';'))"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$RepetedRow != ''">
+                <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColChar, $rowNumber + $RepetedRow)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat($ColChar, $rowNumber)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <xsl:for-each
+        select="key('style', $styleName)/style:map[not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
+        <cfRule type="cellIs" priority="{position()}">
+          <xsl:if test="contains(@style:condition,'is-true-formula')">
+            <xsl:attribute name="type">
+              <xsl:text>expression</xsl:text>
             </xsl:attribute>
-            <xsl:if test="not(contains(@style:condition,'is-true-formula'))">
-              <xsl:attribute name="operator">
-                <xsl:choose>
-                  <xsl:when test="contains(@style:condition, '&lt;=')">
-                    <xsl:text>lessThanOrEqual</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="contains(@style:condition, '&lt;')">
-                    <xsl:text>lessThan</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="contains(@style:condition, '&gt;=')">
-                    <xsl:text>greaterThanOrEqual</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="contains(@style:condition, '&gt;')">
-                    <xsl:text>greaterThan</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="contains(@style:condition, '!=')">
-                    <xsl:text>notEqual</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="contains(@style:condition, 'cell-content-is-between')">
-                    <xsl:text>between</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="contains(@style:condition, 'cell-content-is-not-between')">
-                    <xsl:text>notBetween</xsl:text>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:text>equal</xsl:text>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:variable name="styleCondition">
-              <xsl:value-of select="@style:condition"/>
-            </xsl:variable>
-            <xsl:if test="contains($styleCondition, concat('cell-content()=', $quot))">
-              <xsl:attribute name="type">
-                <xsl:value-of select="'cellIs'"/>
-              </xsl:attribute>
-              <xsl:attribute name="text">
-                <xsl:value-of select="substring-after($styleCondition, '=')"/>
-              </xsl:attribute>
-              <xsl:attribute name="operator">
-                <xsl:value-of select="'equal'"/>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="not(contains($styleCondition, concat('cell-content()=', $quot)))">
-                <xsl:call-template name="InsertCoditionalFormula">
-                <xsl:with-param name="tableName" select="$tableName"/>
-              </xsl:call-template>
-            </xsl:if>
-            <xsl:if test="contains($styleCondition, concat('cell-content()=', $quot))">
-              <formula>
-                <xsl:value-of select="substring-after($styleCondition, '=')"/>
-              </formula>
-            </xsl:if>
-          </cfRule>
-        </xsl:for-each>
-      </conditionalFormatting>
-    </xsl:if>
-
+          </xsl:if>
+          <xsl:attribute name="dxfId">
+            <!-- style:map can also be in number style so we are counting only having style:style as a parent -->
+            <xsl:value-of
+              select="count(preceding::style:map[name(parent::node()) = 'style:style']) + 1"/>
+          </xsl:attribute>
+          <xsl:if test="not(contains(@style:condition,'is-true-formula'))">
+            <xsl:attribute name="operator">
+              <xsl:choose>
+                <xsl:when test="contains(@style:condition, '&lt;=')">
+                  <xsl:text>lessThanOrEqual</xsl:text>
+                </xsl:when>
+                <xsl:when test="contains(@style:condition, '&lt;')">
+                  <xsl:text>lessThan</xsl:text>
+                </xsl:when>
+                <xsl:when test="contains(@style:condition, '&gt;=')">
+                  <xsl:text>greaterThanOrEqual</xsl:text>
+                </xsl:when>
+                <xsl:when test="contains(@style:condition, '&gt;')">
+                  <xsl:text>greaterThan</xsl:text>
+                </xsl:when>
+                <xsl:when test="contains(@style:condition, '!=')">
+                  <xsl:text>notEqual</xsl:text>
+                </xsl:when>
+                <xsl:when test="contains(@style:condition, 'cell-content-is-between')">
+                  <xsl:text>between</xsl:text>
+                </xsl:when>
+                <xsl:when test="contains(@style:condition, 'cell-content-is-not-between')">
+                  <xsl:text>notBetween</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>equal</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:variable name="styleCondition">
+            <xsl:value-of select="@style:condition"/>
+          </xsl:variable>
+          <xsl:if test="contains($styleCondition, concat('cell-content()=', $quot))">
+            <xsl:attribute name="type">
+              <xsl:value-of select="'cellIs'"/>
+            </xsl:attribute>
+            <xsl:attribute name="text">
+              <xsl:value-of select="substring-after($styleCondition, '=')"/>
+            </xsl:attribute>
+            <xsl:attribute name="operator">
+              <xsl:value-of select="'equal'"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="not(contains($styleCondition, concat('cell-content()=', $quot)))">
+            <xsl:call-template name="InsertCoditionalFormula">
+              <xsl:with-param name="tableName" select="$tableName"/>
+            </xsl:call-template>
+          </xsl:if>
+          <xsl:if test="contains($styleCondition, concat('cell-content()=', $quot))">
+            <formula>
+              <xsl:value-of select="substring-after($styleCondition, '=')"/>
+            </formula>
+          </xsl:if>
+        </cfRule>
+      </xsl:for-each>
+    </conditionalFormatting>
+  </xsl:when>
+  <xsl:otherwise>
+    
     <xsl:if test="@table:number-columns-repeated!= '' and @table:number-columns-repeated &gt; $RepetedCol">
       <xsl:call-template name="InsertConditionalCol">
         <xsl:with-param name="colNumber">
@@ -379,6 +398,9 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
+    
+  </xsl:otherwise>
+</xsl:choose>
 
   </xsl:template>
 
