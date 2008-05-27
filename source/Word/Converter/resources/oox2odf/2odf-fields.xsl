@@ -1095,7 +1095,16 @@
   </xsl:template>
 
   <xsl:template name="InsertPageCount">
-    <text:page-count/>
+    <xsl:choose>
+      <xsl:when test="./w:r/w:t">
+        <text:page-count>
+          <xsl:value-of select="./w:r/w:t"/>
+        </text:page-count>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:page-count/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertSequence">
