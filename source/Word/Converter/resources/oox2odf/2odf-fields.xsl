@@ -44,6 +44,7 @@
         <xsl:with-param name="fieldCode" select="$fieldCode"/>
       </xsl:call-template>
     </xsl:if>
+   
   </xsl:template>
 
   <!-- process a field code -->
@@ -218,6 +219,12 @@
         <!--document subject SUBJECT, DOCPROPERTY Subject-->
         <xsl:when test="contains($fieldCode,'SUBJECT') or contains($fieldCode,'Subject') or contains($fieldCode,'subject')">
           <xsl:call-template name="InsertSubject"/>
+        </xsl:when>
+        <xsl:when test="contains($fieldCode, 'DOCPROPERTY')">
+          <!--bugfix: 1759893-->
+          <xsl:if test="../following-sibling::w:r/w:t and ../following-sibling::w:r/w:fldChar[@w:fldCharType = 'separate']">
+            <xsl:value-of select="../following-sibling::w:r/w:t"></xsl:value-of>
+          </xsl:if>
         </xsl:when>
       </xsl:choose>
     </text:span>
