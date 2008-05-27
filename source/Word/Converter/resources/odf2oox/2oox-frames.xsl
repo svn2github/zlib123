@@ -145,6 +145,7 @@
 
           <xsl:call-template name="InsertTextBox">
             <xsl:with-param name="frameStyle" select="$frameStyle"/>
+            <xsl:with-param name="frame" select="parent::draw:frame"/>
           </xsl:call-template>
         </v:shape>
       </w:pict>
@@ -821,23 +822,30 @@
 
       <!-- vertical position (overrides margin-top) -->
       <xsl:choose>
-        <!-- centered position -->
-        <xsl:when test="$verticalPos = 'middle' ">
-          <xsl:text>mso-position-vertical:center;</xsl:text>
+        <xsl:when test="ancestor::*[name()='style:header'] or ancestor::*[name()='style:footer']">
+          <!-- shape is placed in header or footer -->
+          <xsl:text>mso-position-vertical:paragraph;</xsl:text>
         </xsl:when>
-        <!-- relative to page, page-content, paragraph, paragraph-content, char -->
-        <xsl:when test="$verticalRel='page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content'  or $verticalRel = 'char' 
-          or $verticalRel = 'char' or $verticalRel = 'baseline' or $verticalRel = 'line' or $verticalRel = 'text' ">
-          <xsl:text>mso-position-vertical:</xsl:text>
+        <xsl:otherwise>
+          <!-- shape is placed in main document -->
           <xsl:choose>
-            <xsl:when test="$verticalPos='middle'">center</xsl:when>
-            <xsl:when test="$verticalPos='below'">bottom</xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$verticalPos"/>
-            </xsl:otherwise>
+            <xsl:when test="$verticalPos = 'middle' ">
+              <xsl:text>mso-position-vertical:center;</xsl:text>
+            </xsl:when>
+            <xsl:when test="$verticalRel='page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content'  or $verticalRel = 'char' 
+                      or $verticalRel = 'char' or $verticalRel = 'baseline' or $verticalRel = 'line' or $verticalRel = 'text' ">
+              <xsl:text>mso-position-vertical:</xsl:text>
+              <xsl:choose>
+                <xsl:when test="$verticalPos='middle'">center</xsl:when>
+                <xsl:when test="$verticalPos='below'">bottom</xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$verticalPos"/>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:text>;</xsl:text>
+            </xsl:when>
           </xsl:choose>
-          <xsl:text>;</xsl:text>
-        </xsl:when>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
   </xsl:template>
@@ -1248,9 +1256,11 @@
   Author:   Clever Age
   Modified: makz (DIaLOGIKa)
   Params:   frameStyle: The automatic style of the draw:frame
+            frame: The draw:frame
   -->
   <xsl:template name="InsertTextBox">
     <xsl:param name="frameStyle"/>
+    <xsl:param name="frame"/>
 
     <v:textbox>
       <xsl:attribute name="style">
@@ -1262,9 +1272,11 @@
         <xsl:if test="self::draw:text-box">
           <!-- comment : OpenOffice will rather use fo:min-width when parent style defined, and draw:auto-grow-width if not -->
           <xsl:choose>
+            <xsl:when test="$frame/@svg:width='0' and $frame/@svg:height='0'">
+              <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
+            </xsl:when>
             <xsl:when test="$frameStyle/@style:parent-style-name">
-              <xsl:if
-                test="@fo:min-height or parent::draw:frame/@fo:min-width
+              <xsl:if test="@fo:min-height or parent::draw:frame/@fo:min-width
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>

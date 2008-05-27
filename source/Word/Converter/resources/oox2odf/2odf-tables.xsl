@@ -79,6 +79,12 @@
           <xsl:attribute name="table:style-name">
             <xsl:value-of select="generate-id(self::w:tr)"/>
           </xsl:attribute>
+
+          <!-- Insert empty cells for gridBefore -->
+          <xsl:call-template name="InsertEmptyCells">
+            <xsl:with-param name="count" select="w:trPr/w:gridBefore/@w:val" />
+          </xsl:call-template>
+
           <xsl:apply-templates />
         </table:table-row>
       </xsl:otherwise>
@@ -176,6 +182,28 @@
   *************************************************************************
   -->
 
+  <!--
+  Summary:  Inserts a certain amount of empty cells into a row
+  Author:   makz (DIaLOGIKa)
+  Params:   count: The count of cells
+            iterator: This params is only used internally by the recursive call
+  -->
+  <xsl:template name="InsertEmptyCells">
+    <xsl:param name="count" select="'0'" />
+    <xsl:param name="iterator" select="'0'"/>
+
+    <xsl:if test="$iterator &lt; $count">
+      <table:table-cell>
+        <text:p/>
+      </table:table-cell>
+           
+      <xsl:call-template name="InsertEmptyCells">
+        <xsl:with-param name="iterator" select ="$iterator + 1" />
+        <xsl:with-param name="count" select ="$count" />
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+  
   <!-- compute the number of rows that are spanned by context cell -->
   <xsl:template name="ComputeNumberRowsSpanned">
     <xsl:param name="cellPosition"/>
