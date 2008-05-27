@@ -530,8 +530,18 @@
       <!--  check if the paragraf is list element (it can be a heading but only if it's style is NOT linked to a list level 
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
 
+      <!--math, dialogika: bugfix #1947995 BEGIN
+      It seems that outline numbering is only created for heading styles which have a numId defined in styles.xml.
+      These headings should not be put into a text:list element and used with the next case (xsl:apply-templates select="." mode="heading")-->
+
       <xsl:when
-        test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">
+        test="not($outlineLevel != '' and $IsDefaultHeading='true' and key('StyleId',$styleId)/w:pPr/w:numPr/w:numId) and $numId != '' and $level &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">
+
+      <!--<xsl:when
+      test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">-->
+
+      <!--math, dialogika: bugfix #1947995 END-->
+
         <!--xsl:when
           test="$numId != '' and $level &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
           and not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
