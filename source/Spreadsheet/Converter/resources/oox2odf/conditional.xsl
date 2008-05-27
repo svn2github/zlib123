@@ -493,6 +493,24 @@
 
   <!-- Insert Conditional -->
   <xsl:template name="InsertConditional">
+
+    <xsl:variable name="sqref">
+      <xsl:value-of select="@sqref"/>
+    </xsl:variable>
+    
+    <xsl:variable name="s">
+      <xsl:value-of select="parent::e:worksheet/e:sheetData/e:row/e:c[@r = $sqref]/@s"/>
+    </xsl:variable>
+    
+    <xsl:if test="$s != ''">
+   
+      <style:text-properties>
+        <xsl:apply-templates select="key('Part', 'xl/styles.xml')/e:styleSheet/e:fonts/e:font[@oox:id = key('Xf', $s)/@fontId]"
+          mode="style"/>
+      </style:text-properties>
+      
+    </xsl:if>
+    
     <xsl:for-each select="e:cfRule">
       <xsl:sort select="@priority"/>
       <style:map>
