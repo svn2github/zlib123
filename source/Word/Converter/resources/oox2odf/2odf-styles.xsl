@@ -621,12 +621,46 @@
     </xsl:if>
   </xsl:template>
 
+
+  <!--math: Added for bugfix #1934315 START-->
+  <xsl:template name ="CheckDefaultTOCStyle">
+    <xsl:param name="Name" />
+    <xsl:param name="Counter" select="1"/>
+    <xsl:choose>
+      <xsl:when test="$Counter &gt; 9" >false</xsl:when>
+      <xsl:when test="concat('TOC',$Counter) = $Name">true</xsl:when>
+      <xsl:when test="$Name = 'TOCHeading'">true</xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="CheckDefaultTOCStyle">
+          <xsl:with-param name="Name" select="$Name" />
+          <xsl:with-param name="Counter">
+            <xsl:value-of select="$Counter + 1" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!--math: Added for bugfix #1934315 END-->
+
+
+
   <!-- create styles -->
   <xsl:template match="w:style[@w:type != 'numbering' ]">
     <xsl:message terminate="no">progress:w:style</xsl:message>
     <xsl:variable name="currentStyleId">
       <xsl:value-of select="@w:styleId"/>
     </xsl:variable>
+
+    <!--math: Added for bugfix #1934315 START-->    
+    <xsl:variable name="isDefaultTOCStyle">
+      <xsl:call-template name ="CheckDefaultTOCStyle">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="$currentStyleId" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!--math: Added for bugfix #1934315 END-->    
+    
     <xsl:choose>
       <!-- do not add anchor and symbol styles if there are there allready-->
       <xsl:when
@@ -661,13 +695,34 @@
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:when>
-      <xsl:when test="contains($currentStyleId,'TOC')">
-        <style:style style:name="{concat('Contents_20_',substring-after($currentStyleId,'TOC'))}"
+      
+      <!--math: bugfix #1934315 START-->
+      <!--<xsl:when test="contains($currentStyleId,'TOC')">-->
+      <xsl:when test="$isDefaultTOCStyle = 'true'">      
+      <style:style style:name="{concat('Contents_20_',substring-after($currentStyleId,'TOC'))}"
           style:display-name="{concat('Contents',substring-after(self::node()/w:name/@w:val,'toc'))}">
           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
             <xsl:attribute name="style:parent-style-name">
-              <xsl:value-of select="w:basedOn/@w:val"/>
+              <xsl:variable name="isParentDefaultTOCStyle">
+                <xsl:call-template name ="CheckDefaultTOCStyle">
+                  <xsl:with-param name="Name">
+                    <xsl:value-of select="w:basedOn/@w:val" />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>              
+              <xsl:choose>
+                <xsl:when test ="$isParentDefaultTOCStyle='true'">
+                  <xsl:variable name ="parentStyle">
+                    <xsl:value-of select ="w:basedOn/@w:val"/>
+                  </xsl:variable>
+                  <xsl:value-of select="concat('Contents_20_',substring-after($parentStyle,'TOC'))" />                  
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="w:basedOn/@w:val"/>
+                </xsl:otherwise>
+              </xsl:choose>
+      <!--math: Added for bugfix #1934315 END-->              
             </xsl:attribute>
           </xsl:if>
           <xsl:call-template name="InsertStyleProperties"/>
