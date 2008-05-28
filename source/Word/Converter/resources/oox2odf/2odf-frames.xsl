@@ -97,6 +97,19 @@
     </xsl:choose>
   </xsl:template>
 
+  
+  <!--
+  Summary:  Sometimes Word puts "invisible" frames immediatly after table that is inserted in another table.
+            I can only suppose that this is a workaround for preventing some display issues.
+            These frames shall not be converted.
+            Inserted for bugfix 1948030.
+  Author:   makz (DIaLOGIKa)
+  -->
+  <xsl:template match="w:p[w:pPr/w:framePr and w:pPr/w:suppressOverlap and ancestor::w:tc]">
+    <!-- do nothing -->
+  </xsl:template>
+
+  
   <!--
   Summary: Convert the frame properties into automatic styles
   Author: Clever Age

@@ -623,6 +623,12 @@
                 <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
               </xsl:call-template>
             </xsl:when>
+            <xsl:when test="$styleId = 'TableGrid'">
+              <!-- use the default border -->
+              <xsl:call-template name="InsertDefaultCellBorder">
+                <xsl:with-param name="sideName" select="'left'" />
+              </xsl:call-template>
+            </xsl:when>
             <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
               <!-- use the style -->
               <xsl:choose>
@@ -644,12 +650,6 @@
                 </xsl:when>
               </xsl:choose>
             </xsl:when>
-            <xsl:otherwise>
-              <!-- use the default border -->
-              <xsl:call-template name="InsertDefaultCellBorder">
-                <xsl:with-param name="sideName" select="'left'" />
-              </xsl:call-template>
-            </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
@@ -671,6 +671,12 @@
                 <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
               </xsl:call-template>
             </xsl:when>
+            <xsl:when test="$styleId = 'TableGrid'">
+              <!-- use the default border -->
+              <xsl:call-template name="InsertDefaultCellBorder">
+                <xsl:with-param name="sideName" select="'left'" />
+              </xsl:call-template>
+            </xsl:when>
             <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
               <!-- use the style -->
               <xsl:choose>
@@ -692,12 +698,6 @@
                 </xsl:when>
               </xsl:choose>
             </xsl:when>
-            <xsl:otherwise>
-              <!-- use the default border -->
-              <xsl:call-template name="InsertDefaultCellBorder">
-                <xsl:with-param name="sideName" select="'left'" />
-              </xsl:call-template>
-            </xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
@@ -738,6 +738,12 @@
               <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
             </xsl:call-template>
           </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'right'" />
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
             <!-- use the style -->
             <xsl:choose>
@@ -759,12 +765,6 @@
               </xsl:when>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise>
-            <!-- use the default border -->
-            <xsl:call-template name="InsertDefaultCellBorder">
-              <xsl:with-param name="sideName" select="'right'" />
-            </xsl:call-template>
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
@@ -786,6 +786,12 @@
               <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
             </xsl:call-template>
           </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'right'" />
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
             <!-- use the style -->
             <xsl:choose>
@@ -807,12 +813,6 @@
               </xsl:when>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise>
-            <!-- use the default border -->
-            <xsl:call-template name="InsertDefaultCellBorder">
-              <xsl:with-param name="sideName" select="'right'" />
-            </xsl:call-template>
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
@@ -856,6 +856,12 @@
               <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
             </xsl:call-template>
           </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'top'" />
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
             <!-- use the style -->
             <xsl:choose>
@@ -879,12 +885,6 @@
               </xsl:when>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise>
-            <!-- use the default border -->
-            <xsl:call-template name="InsertDefaultCellBorder">
-              <xsl:with-param name="sideName" select="'top'" />
-            </xsl:call-template>
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
@@ -906,6 +906,12 @@
               <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
             </xsl:call-template>
           </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'top'" />
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
             <!-- use the style -->
             <xsl:choose>
@@ -929,12 +935,6 @@
               </xsl:when>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise>
-            <!-- use the default border -->
-            <xsl:call-template name="InsertDefaultCellBorder">
-              <xsl:with-param name="sideName" select="'top'" />
-            </xsl:call-template>
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
@@ -980,6 +980,12 @@
               <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
             </xsl:call-template>
           </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'bottom'" />
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
             <!-- use the style -->
             <xsl:choose>
@@ -1003,12 +1009,6 @@
               </xsl:when>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise>
-            <!-- use the default border -->
-            <xsl:call-template name="InsertDefaultCellBorder">
-              <xsl:with-param name="sideName" select="'bottom'" />
-            </xsl:call-template>
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
@@ -1030,6 +1030,12 @@
               <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
             </xsl:call-template>
           </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'bottom'" />
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
             <!-- use the style -->
             <xsl:choose>
@@ -1053,12 +1059,6 @@
               </xsl:when>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise>
-            <!-- use the default border -->
-            <xsl:call-template name="InsertDefaultCellBorder">
-              <xsl:with-param name="sideName" select="'bottom'" />
-            </xsl:call-template>
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
