@@ -825,12 +825,15 @@
   Params:   styleId: The style id of the w:tbl to which the cell belongs
             tcBorders: The w:tcBorders element of the cell
             tblBorders: The w:tblBorders of the w:table to which the cell belongs
+            contextCell: The cell itself
             contextRow: The row to which the cell belongs
+            contextCell: The cell itself
   -->
   <xsl:template name="InsertTopCellBorder">
     <xsl:param name="styleId" select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     <xsl:param name="tcBorders" select="w:tcBorders"/>
     <xsl:param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+    <xsl:param name="contextCell" select="parent::w:tc"/>
     <xsl:param name="contextRow" select="ancestor::w:tr"/>
 
     <xsl:choose>
@@ -859,6 +862,7 @@
               <xsl:when test="key('StyleId', $styleId)">
                 <xsl:call-template name="InsertTopCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
@@ -867,6 +871,7 @@
               <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
                 <xsl:call-template name="InsertTopCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
@@ -907,6 +912,7 @@
               <xsl:when test="key('StyleId', $styleId)">
                 <xsl:call-template name="InsertTopCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
@@ -915,6 +921,7 @@
               <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
                 <xsl:call-template name="InsertTopCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
@@ -940,16 +947,21 @@
   Params:   styleId: The style id of the w:tbl to which the cell belongs
             tcBorders: The w:tcBorders element of the cell
             tblBorders: The w:tblBorders of the w:table to which the cell belongs
+            contextCell: The cell itself
             contextRow: The row to which the cell belongs
   -->
   <xsl:template name="InsertBottomCellBorder">
     <xsl:param name="styleId" select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     <xsl:param name="tcBorders" select="w:tcBorders"/>
     <xsl:param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+    <xsl:param name="contextCell" select="parent::w:tc"/>
     <xsl:param name="contextRow" select="ancestor::w:tr"/>
 
+    <xsl:variable name="cellPos" select="count($contextCell/preceding-sibling::*) + 1"  />
+    <xsl:variable name="isMerged" select="$contextRow/following-sibling::w:tr[1]/w:tc[$cellPos]/w:tcPr/w:vMerge"/>
+    
     <xsl:choose>
-      <xsl:when test="$contextRow/following-sibling::w:tr">
+      <xsl:when test="$contextRow/following-sibling::w:tr and not($isMerged)">
         <!-- the cell is somewhere in the table -->
         <xsl:choose>
           <xsl:when test="$tcBorders/w:bottom">
@@ -974,6 +986,7 @@
               <xsl:when test="key('StyleId', $styleId)">
                 <xsl:call-template name="InsertBottomCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
@@ -982,6 +995,7 @@
               <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
                 <xsl:call-template name="InsertBottomCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
@@ -1022,6 +1036,7 @@
               <xsl:when test="key('StyleId', $styleId)">
                 <xsl:call-template name="InsertBottomCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
@@ -1030,6 +1045,7 @@
               <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
                 <xsl:call-template name="InsertBottomCellBorder">
                   <xsl:with-param name="contextRow" select="$contextRow"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
                   <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
                   <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
