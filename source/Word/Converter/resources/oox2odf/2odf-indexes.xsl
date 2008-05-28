@@ -564,7 +564,7 @@
       </xsl:attribute>
       
       <!--math, dialogika: Bugfix #1841783: Use outline level only if \o is present-->
-      <xsl:if test="substring-before(substring-after(substring-after($instrTextContent,'\o'),'&quot;'),'&quot;') = '' ">
+      <xsl:if test="substring-before(substring-after(substring-after($instrTextContent,'\o'),'&quot;'),'&quot;') = '' and contains($instrTextContent,'\t')">
         <xsl:attribute name="text:use-outline-level">false</xsl:attribute>
       </xsl:if>
       
