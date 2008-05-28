@@ -4848,13 +4848,16 @@
   </xsl:template>
 
   <!--
-  Summary: Template writes the value of a border side
-  Author: makz (DIaLOGIKa)
-  Date: 22.10.2007
+  Summary:  Template writes the value of a border side
+  Author:   makz (DIaLOGIKa)
+  Date:     22.10.2007
+  Params:   side: The w:left, w:right, w:top ... elements
+            sideName: The name that the border shall have
   -->
   <xsl:template name="InsertBorderSide">
     <xsl:param name="side"/>
     <xsl:param name="sideName"/>
+    <xsl:param name="emulateOpenOfficeTableBorders" select="'false'" />
 
     <xsl:choose>
     <xsl:when test="$side/@w:val">
@@ -4865,6 +4868,7 @@
           <xsl:when test="$side/@w:val">
             <xsl:call-template name="GetBorderStyle">
               <xsl:with-param name="style" select="$side/@w:val"/>
+              <xsl:with-param name="emulateOpenOfficeTableBorders" select="$emulateOpenOfficeTableBorders" />
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
@@ -4933,7 +4937,7 @@
 
       <!-- write double style attribute -->
       <xsl:if test="$style='double'">
-        <xsl:attribute name="{concat('fo:border-line-width-',$sideName)}">
+        <xsl:attribute name="{concat('style:border-line-width-',$sideName)}">
           <xsl:call-template name="ComputeDoubleBorderWidth">
             <xsl:with-param name="style" select="$side/@w:val"/>
             <xsl:with-param name="borderWidth" select="$side/@w:sz"/>
@@ -4999,7 +5003,10 @@
   -->
   <xsl:template name="GetBorderStyle">
     <xsl:param name="style"/>
+    <xsl:param name="emulateOpenOfficeTableBorders" select="'false'" />
+    
     <xsl:choose>
+      <xsl:when test="$emulateOpenOfficeTableBorders = 'true'">solid</xsl:when>
       <xsl:when test="$style='basicBlackDashes'">dashed</xsl:when>
       <xsl:when test="$style='basicBlackDots'">dotted</xsl:when>
       <xsl:when test="$style='basicThinLines'">double</xsl:when>
@@ -5020,9 +5027,7 @@
       <xsl:when test="$style='thinThickSmallGap'">double</xsl:when>
       <xsl:when test="$style='thinThickMediumGap'">double</xsl:when>
       <xsl:when test="$style='thinThickLargeGap'">double</xsl:when>
-      <xsl:otherwise>
-        <!-- empty string -->
-      </xsl:otherwise>
+      <xsl:otherwise>solid</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
