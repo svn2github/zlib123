@@ -1011,13 +1011,17 @@
                 test="self::w:autoSpaceDN or self::w:autoSpaceDE and not(key('default-styles', 'paragraph')[last()]/w:rPr[w:autoSpaceDN or w:autoSpaceDE])">
                 <xsl:call-template name="InsertParagraphAutoSpace"/>
               </xsl:when>
+              <!--clam, dialogika: bugfix 1911687-->
               <xsl:otherwise>
-                <!-- insert attributes using match -->
+                <xsl:apply-templates select="." mode="pPrChildren"/>
+              </xsl:otherwise>
+              <!--<xsl:otherwise>
+                --><!-- insert attributes using match --><!--
                 <xsl:if
                   test="not(key('default-styles', 'paragraph')[last()]/w:pPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="pPrChildren"/>
                 </xsl:if>
-              </xsl:otherwise>
+              </xsl:otherwise>-->
             </xsl:choose>
           </xsl:for-each>
         </style:paragraph-properties>
@@ -2797,7 +2801,8 @@
         </xsl:if>
 
         <!-- add default paragraph propeties to Normal or Default style (it can't be in style:default-style becouse of OO bug ? (see #1593148 image partly lost))-->
-        <xsl:if test="self::node()/@w:styleId = 'Normal' or self::node()/@w:styleId = 'Default'">
+        <!--clam, dialogika: bugfix 1911687-->
+        <!--<xsl:if test="self::node()/@w:styleId = 'Normal' or self::node()/@w:styleId = 'Default'">
           <xsl:for-each select="ancestor::w:styles/w:docDefaults">
             <xsl:if test="w:pPrDefault/w:pPr">
               <xsl:for-each select="w:pPrDefault/w:pPr">
@@ -2805,7 +2810,7 @@
               </xsl:for-each>
             </xsl:if>
           </xsl:for-each>
-        </xsl:if>
+        </xsl:if>-->
 
         <xsl:if
           test="contains(self::node()/@w:styleId,'TOC') or contains(self::node()/@w:styleId,'TableofFigures') and not(w:pPr/w:tabs)">
