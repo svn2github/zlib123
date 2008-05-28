@@ -2449,22 +2449,9 @@
     <!--
     
     -->
-    <xsl:attribute name="style:dynamic-spacing">false</xsl:attribute>
-
-    <!-- no spacing in OOX. -->
-    <xsl:choose>
-      <xsl:when test="$object = 'header' ">
-        <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:attribute name="fo:margin-left">0cm</xsl:attribute>
-    <xsl:attribute name="fo:margin-right">0cm</xsl:attribute>
-
+   
     <!-- min height calculated with page Margins properties. -->
-    <xsl:attribute name="fo:min-height">
+    <xsl:variable name="min-height">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="unit">cm</xsl:with-param>
         <xsl:with-param name="length">
@@ -2553,7 +2540,30 @@
           </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
+    </xsl:variable>
+   
+
+    <!-- no spacing in OOX. -->
+    <xsl:choose>
+      <xsl:when test="$object = 'header' ">
+        <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+        <xsl:attribute name="style:dynamic-spacing">false</xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <!--clam, dialogika: bugfix 1911678-->
+        <xsl:attribute name="style:dynamic-spacing">true</xsl:attribute>
+        <xsl:attribute name="fo:margin-top">
+          <xsl:value-of select="$min-height"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:attribute name="fo:margin-left">0cm</xsl:attribute>
+    <xsl:attribute name="fo:margin-right">0cm</xsl:attribute>
+    
+    <xsl:attribute name="fo:min-height">
+      <xsl:value-of select="$min-height"/>
     </xsl:attribute>
+    
   </xsl:template>
 
   <xsl:template name="InsertStyleFamily">
