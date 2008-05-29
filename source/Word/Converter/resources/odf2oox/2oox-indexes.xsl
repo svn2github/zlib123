@@ -215,7 +215,7 @@
   </xsl:template>
 
 
-  <!--math, dialogika: Added to calculate range for TOC entries (for /o) BEGIN-->
+  <!--math, dialogika: Added to calculate range for TOC entries (for \o) BEGIN-->
   
   <xsl:template name="GetMinOutlineLvlDefined">
     <xsl:param name="min" select="1" />
@@ -301,7 +301,7 @@
 
     </xsl:choose>
   </xsl:template>
-  <!--math, dialogika: Added to calculate range of TOC entries (for /o) END-->
+  <!--math, dialogika: Added to calculate range of TOC entries (for \o) END-->
 
 
   <!-- table of content -->
@@ -473,17 +473,21 @@
             <xsl:for-each select="key('styles', $levelStyleName)">
               <xsl:choose>
                 <xsl:when test="@style:display-name">
-                  <xsl:value-of select="@style:display-name"/>
-                  <xsl:text>;</xsl:text>
+                  <xsl:value-of select="@style:display-name"/>                  
+                  <!--<xsl:text>;</xsl:text>-->
+                  <xsl:text>[INSERTSEPARATOR]</xsl:text>
                   <xsl:value-of select="$level"/>
-                  <xsl:text>;</xsl:text>
+                  <!--<xsl:text>;</xsl:text>-->
+                  <xsl:text>[INSERTSEPARATOR]</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:if test="@style:name">
                     <xsl:value-of select="@style:name"/>
-                    <xsl:text>;</xsl:text>
+                    <!--<xsl:text>;</xsl:text>-->
+                    <xsl:text>[INSERTSEPARATOR]</xsl:text>
                     <xsl:value-of select="$level"/>
-                    <xsl:text>;</xsl:text>
+                    <!--<xsl:text>;</xsl:text>-->
+                    <xsl:text>[INSERTSEPARATOR]</xsl:text>
                   </xsl:if>
                 </xsl:otherwise>
               </xsl:choose>

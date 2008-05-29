@@ -260,7 +260,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
         /// <param name="args">Command Line arguments</param>
         public static void Main(String[] args)
         {
-            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            // math, dialogika: Comment this out as we need the culture info for the list of TOC.
+            // Moreover, changing the culture info only for the command-line-tool changes the
+            // behaviour between add-in and command-line-tool which makes detecting and fixing bugs more difficult
+            // System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             OdfConverter tester = new OdfConverter();
             ControlHandlerFonction myHandler = new ControlHandlerFonction(tester.MyHandler);
             SetConsoleCtrlHandler(myHandler, true);
