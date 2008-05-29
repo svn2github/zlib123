@@ -1096,6 +1096,16 @@
 
           <!-- Insert fill -->
           <xsl:choose>
+            <xsl:when test="a:gradFill">
+              <xsl:attribute name="draw:fill">
+                <xsl:text>gradient</xsl:text>
+              </xsl:attribute>
+              <xsl:for-each select="a:gradFill">
+              <xsl:attribute name="draw:fill-gradient-name">
+                <xsl:value-of select="generate-id()"/>
+              </xsl:attribute>
+              </xsl:for-each>
+            </xsl:when>
             <xsl:when test="a:blipFill">
               <xsl:call-template name="InsertBitmapFill"/>
             </xsl:when>
@@ -1120,6 +1130,16 @@
           <xsl:for-each select="c:spPr">
             <!-- Insert fill -->
             <xsl:choose>
+              <xsl:when test="a:gradFill">
+                <xsl:attribute name="draw:fill">
+                  <xsl:text>gradient</xsl:text>
+                </xsl:attribute>                
+                <xsl:for-each select="a:gradFill">
+                  <xsl:attribute name="draw:fill-gradient-name">
+                    <xsl:value-of select="generate-id()"/>
+                  </xsl:attribute>
+                </xsl:for-each>
+              </xsl:when>
               <xsl:when test="a:blipFill">
                 <xsl:call-template name="InsertBitmapFill"/>
               </xsl:when>
@@ -1175,6 +1195,16 @@
           <xsl:for-each select="c:spPr">
             <!-- Insert fill -->
             <xsl:choose>
+              <xsl:when test="a:gradFill">
+                <xsl:attribute name="draw:fill">
+                  <xsl:text>gradient</xsl:text>
+                </xsl:attribute>
+                <xsl:for-each select="a:gradFill">
+                  <xsl:attribute name="draw:fill-gradient-name">
+                    <xsl:value-of select="generate-id()"/>
+                  </xsl:attribute>
+                </xsl:for-each>
+              </xsl:when>
               <xsl:when test="a:blipFill">
                 <xsl:call-template name="InsertBitmapFill"/>
               </xsl:when>
@@ -1238,6 +1268,16 @@
           <xsl:for-each select="c:spPr">
             <!-- Insert fill -->
             <xsl:choose>
+              <xsl:when test="a:gradFill">
+                <xsl:attribute name="draw:fill">
+                  <xsl:text>gradient</xsl:text>
+                </xsl:attribute>
+                <xsl:for-each select="a:gradFill">
+                  <xsl:attribute name="draw:fill-gradient-name">
+                    <xsl:value-of select="generate-id()"/>
+                  </xsl:attribute>
+                </xsl:for-each>
+              </xsl:when>
               <xsl:when test="a:blipFill">
                 <xsl:call-template name="InsertBitmapFill"/>
               </xsl:when>
@@ -1311,6 +1351,16 @@
           <xsl:for-each select="c:spPr">
             <!-- Insert fill -->
             <xsl:choose>
+              <xsl:when test="a:gradFill">
+                <xsl:attribute name="draw:fill">
+                  <xsl:text>gradient</xsl:text>
+                </xsl:attribute>
+                <xsl:for-each select="a:gradFill">
+                  <xsl:attribute name="draw:fill-gradient-name">
+                    <xsl:value-of select="generate-id()"/>
+                  </xsl:attribute>
+                </xsl:for-each>
+              </xsl:when>
               <xsl:when test="a:blipFill">
                 <xsl:call-template name="InsertBitmapFill"/>
               </xsl:when>
@@ -1758,6 +1808,16 @@
 
             <!-- Insert fill -->
             <xsl:choose>
+              <xsl:when test="a:gradFill">
+                <xsl:attribute name="draw:fill">
+                  <xsl:text>gradient</xsl:text>
+                </xsl:attribute>
+                <xsl:for-each select="a:gradFill">
+                  <xsl:attribute name="draw:fill-gradient-name">
+                    <xsl:value-of select="generate-id()"/>
+                  </xsl:attribute>
+                </xsl:for-each>
+              </xsl:when>
               <xsl:when test="a:blipFill">
                 <xsl:call-template name="InsertBitmapFill"/>
               </xsl:when>
@@ -1816,6 +1876,16 @@
 
           <!-- Insert fill -->
           <xsl:choose>
+            <xsl:when test="a:gradFill">
+              <xsl:attribute name="draw:fill">
+                <xsl:text>gradient</xsl:text>
+              </xsl:attribute>
+              <xsl:for-each select="a:gradFill">
+                <xsl:attribute name="draw:fill-gradient-name">
+                  <xsl:value-of select="generate-id()"/>
+                </xsl:attribute>
+              </xsl:for-each>
+            </xsl:when>
             <xsl:when test="a:blipFill">
               <xsl:call-template name="InsertBitmapFill"/>
             </xsl:when>
@@ -1879,6 +1949,21 @@
         </xsl:attribute>
       </draw:fill-image>
     </xsl:for-each>
+    <xsl:for-each select="key('spPr', c:chartSpace/@oox:part)/a:gradFill">
+      
+      
+        <draw:gradient>
+          <xsl:attribute name="draw:name">
+           <xsl:value-of select="generate-id()"/>
+          </xsl:attribute>
+          <xsl:attribute name="draw:display-name">
+              <xsl:value-of select="generate-id()"/>
+          </xsl:attribute>
+          <xsl:call-template name="tmpGradientFillTiletoRect"/>
+        </draw:gradient>
+      </xsl:for-each>
+      
+
 
   </xsl:template>
 
@@ -2086,5 +2171,522 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="tmpGradientFillTiletoRect">
+    <xsl:param name="SMName"/>
+    <xsl:for-each select="a:gsLst/a:gs">
+      <xsl:if test="position()=1">
+        <xsl:choose>
+          <xsl:when test="a:srgbClr/@val">
+            <xsl:attribute name="draw:start-color">
+              <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="a:schemeClr/@val">
+            <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
+            <xsl:attribute name="draw:start-color">
+              <xsl:call-template name="getColorCode">
+                <xsl:with-param name="color">
+                  <!--xsl:choose>
+                    <xsl:when test="$SMName!=''">
+                      <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                        <xsl:call-template name="tmpThemeClr">
+                          <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+                        </xsl:call-template>
+                      </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise-->
+                      <xsl:value-of select="a:schemeClr/@val" />
+                    <!--/xsl:otherwise>
+                  </xsl:choose-->
+                  <!--<xsl:value-of select="a:schemeClr/@val"/>-->
+                </xsl:with-param>
+                <xsl:with-param name="lumMod">
+                  <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
+                </xsl:with-param>
+                <xsl:with-param name="lumOff">
+                  <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
+                </xsl:with-param>
+                <xsl:with-param name ="shade">
+                  <xsl:for-each select="a:schemeClr/a:shade/@val">
+                    <xsl:value-of select=". div 1000"/>
+                  </xsl:for-each>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      <xsl:if test="position()=last()">
+        <xsl:choose>
+          <xsl:when test="a:srgbClr/@val">
+            <xsl:attribute name="draw:end-color">
+              <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="a:schemeClr/@val">
+            <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
+            <xsl:attribute name="draw:end-color">
+              <xsl:call-template name="getColorCode">
+                <xsl:with-param name="color">
+                  <!--<xsl:value-of select="a:schemeClr/@val"/>-->
+                  <!--xsl:choose>
+                    <xsl:when test="$SMName!=''">
+                      <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                        <xsl:call-template name="tmpThemeClr">
+                          <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+                        </xsl:call-template>
+                      </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise-->
+                      <xsl:value-of select="a:schemeClr/@val" />
+                    <!--/xsl:otherwise>
+                  </xsl:choose-->
+                </xsl:with-param>
+                <xsl:with-param name="lumMod">
+                  <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
+                </xsl:with-param>
+                <xsl:with-param name="lumOff">
+                  <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
+                </xsl:with-param>
+                <xsl:with-param name ="shade">
+                  <xsl:for-each select="a:schemeClr/a:shade/@val">
+                    <xsl:value-of select=". div 1000"/>
+                  </xsl:for-each>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:for-each select="a:lin">
+      <xsl:attribute name="draw:style">
+        <xsl:value-of select="'linear'"/>
+      </xsl:attribute>
+    </xsl:for-each>
+    <xsl:for-each select="a:path">
+      <xsl:choose>
+        <xsl:when test="@path='circle'">
+          <xsl:attribute name="draw:style">
+            <xsl:value-of select="'radial'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@path='shape'">
+          <xsl:attribute name="draw:style">
+            <xsl:value-of select="'ellipsoid'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@path='rect'">
+          <xsl:attribute name="draw:style">
+            <xsl:value-of select="'rectangular'"/>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:for-each select="a:fillToRect">
+        <xsl:choose>
+          <xsl:when test="@l and @r and @t and @b">
+            <xsl:attribute name="draw:cx">
+              <xsl:variable name="var_cx">
+                <xsl:value-of select="number(format-number(( (@l+ @r) div 2 ) div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat(100 - $var_cx,'%') "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:variable name="var_cy">
+                <xsl:value-of select="number(format-number(( (@t+ @b) div 2 ) div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat(100 - $var_cy,'%') "/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="@l and @b">
+            <xsl:attribute name="draw:cx">
+              <xsl:variable name="var_cx">
+                <xsl:value-of select="number(format-number( @l  div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat($var_cx,'%') "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:value-of select="'0%' "/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="@l and @t">
+            <xsl:attribute name="draw:cx">
+              <xsl:variable name="var_cx">
+                <xsl:value-of select="number(format-number( @l  div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat($var_cx,'%') "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:variable name="var_cy">
+                <xsl:value-of select="number(format-number( @t  div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat($var_cy,'%') "/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="@r and @b">
+            <xsl:attribute name="draw:cx">
+              <xsl:value-of select="'0%' "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:value-of select="'0%' "/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="@r and @t">
+            <xsl:attribute name="draw:cx">
+              <xsl:value-of select="'0%' "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:variable name="var_cy">
+                <xsl:value-of select="number(format-number( @t  div 1000,'#')) "/>
+              </xsl:variable>
+              <xsl:value-of select="concat($var_cy,'%') "/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="draw:cx">
+              <xsl:value-of select="'100%' "/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:cy">
+              <xsl:value-of select="'100%' "/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template name="getColorCode">
+    <xsl:param name="color"/>
+    <xsl:param name ="lumMod"/>
+    <xsl:param name ="lumOff"/>
+    <xsl:param  name ="shade"/>
+    <xsl:message terminate="no">progress:a:p</xsl:message>
+    <xsl:message terminate="no">progress:p:cSld</xsl:message>
+    <xsl:variable name ="ThemeColor">
+      <xsl:for-each select ="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
+        <xsl:for-each select ="node()">
+          <xsl:if test ="name() =concat('a:',$color)">
+            <xsl:choose >
+              <xsl:when test ="contains(node()/@val,'window') ">
+                <xsl:value-of select ="node()/@lastClr"/>
+              </xsl:when>
+              <xsl:otherwise >
+                <xsl:value-of select ="node()/@val"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>			
+    </xsl:variable>
+    <xsl:variable name ="BgTxColors">
+      <xsl:if test ="$color ='bg2'">
+        <xsl:value-of select ="document('xl/theme/theme1.xml') //a:lt2/a:srgbClr/@val"/>
+      </xsl:if>
+      <xsl:if test ="$color ='bg1'">
+        <!--<xsl:value-of select ="document('xl/theme/theme1.xml') //a:lt1/node()/@lastClr" />-->
+        <xsl:choose>
+          <xsl:when test ="document('xl/theme/theme1.xml') //a:lt1/a:srgbClr/@val">
+            <xsl:value-of select ="document('xl/theme/theme1.xml') //a:lt1/a:srgbClr/@val" />
+          </xsl:when>
+          <xsl:when test="document('xl/theme/theme1.xml') //a:lt1/node()/@lastClr">
+            <xsl:value-of select ="document('xl/theme/theme1.xml') //a:lt1/node()/@lastClr" />
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      <!--<xsl:if test ="$color ='tx1'">
+        <xsl:value-of select ="document('xl/theme/theme1.xml') //a:dk1/node()/@lastClr"/>
+        </xsl:if>-->
+      <xsl:if test ="$color ='tx1'">
+        <xsl:choose>
+          <xsl:when test ="document('xl/theme/theme1.xml') //a:dk1/node()/@lastClr">
+            <xsl:value-of select ="document('xl/theme/theme1.xml') //a:dk1/node()/@lastClr"/>
+          </xsl:when>
+          <xsl:when test ="document('xl/theme/theme1.xml') //a:dk1/node()/@val">
+            <xsl:value-of select ="document('xl/theme/theme1.xml') //a:dk1/node()/@val"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      <xsl:if test ="$color ='tx2'">
+        <xsl:value-of select ="document('xl/theme/theme1.xml') //a:dk2/a:srgbClr/@val"/>
+      </xsl:if>			
+    </xsl:variable>
+    <xsl:variable name ="NewColor">
+      <xsl:if test ="$ThemeColor != ''">
+        <xsl:value-of select ="$ThemeColor"/>
+      </xsl:if>
+      <xsl:if test ="$BgTxColors !=''">
+        <xsl:value-of select ="$BgTxColors"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:call-template name ="ConverThemeColor">
+      <xsl:with-param name="color" select="$NewColor" />
+      <xsl:with-param name ="lumMod" select ="$lumMod"/>
+      <xsl:with-param name ="lumOff" select ="$lumOff"/>
+      <xsl:with-param name ="shade" select ="$shade"/>
+    </xsl:call-template>
+  </xsl:template>
+  
+  <xsl:template name="ConverThemeColor">
+    <xsl:param name="color"/>
+    <xsl:param name ="lumMod"/>
+    <xsl:param name ="lumOff"/>
+    <xsl:param name ="shade"/>
+    <xsl:message terminate="no">progress:p:cSld</xsl:message>
+    <xsl:variable name ="Red">
+      <xsl:call-template name ="HexToDec">
+        <xsl:with-param name ="number" select ="substring($color,1,2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name ="Green">
+      <xsl:call-template name ="HexToDec">
+        <xsl:with-param name ="number" select ="substring($color,3,2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name ="Blue">
+      <xsl:call-template name ="HexToDec">
+        <xsl:with-param name ="number" select ="substring($color,5,2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$shade!=''">
+      <xsl:call-template name ="calculateShade">
+        <xsl:with-param name ="Red" select ="$Red" />
+        <xsl:with-param name ="Green" select ="$Green"/>
+        <xsl:with-param name ="Blue" select ="$Blue"/>
+        <xsl:with-param name ="shade" select ="$shade"/>
+      </xsl:call-template >
+    </xsl:if>
+    <xsl:if test="$shade=''">
+      <xsl:choose >
+        <xsl:when test ="$lumOff = '' and $lumMod != '' ">
+          <xsl:variable name ="NewRed">
+            <xsl:value-of  select =" floor($Red * $lumMod div 100000) "/>
+          </xsl:variable>
+          <xsl:variable name ="NewGreen">
+            <xsl:value-of  select =" floor($Green * $lumMod div 100000)"/>
+          </xsl:variable>
+          <xsl:variable name ="NewBlue">
+            <xsl:value-of  select =" floor($Blue * $lumMod div 100000)"/>
+          </xsl:variable>
+          <xsl:call-template name ="CreateRGBColor">
+            <xsl:with-param name ="Red" select ="$NewRed"/>
+            <xsl:with-param name ="Green" select ="$NewGreen"/>
+            <xsl:with-param name ="Blue" select ="$NewBlue"/>
+          </xsl:call-template>
+        </xsl:when>			
+        <xsl:when test ="$lumMod = '' and $lumOff != ''">
+          <!-- TBD Not sure whether this condition will occure-->
+        </xsl:when>
+        <xsl:when test ="$lumMod = '' and $lumOff =''">
+          <xsl:value-of  select ="concat('#',$color)"/>
+        </xsl:when>
+        <xsl:when test ="$lumOff != '' and $lumMod!= '' ">
+          <xsl:variable name ="NewRed">
+            <xsl:value-of select ="floor(((255 - $Red) * (1 - ($lumMod  div 100000)))+ $Red )"/>
+          </xsl:variable>
+          <xsl:variable name ="NewGreen">
+            <xsl:value-of select ="floor(((255 - $Green) * ($lumOff  div 100000)) + $Green )"/>
+          </xsl:variable>
+          <xsl:variable name ="NewBlue">
+            <xsl:value-of select ="floor(((255 - $Blue) * ($lumOff div 100000)) + $Blue) "/>
+          </xsl:variable>
+          <xsl:call-template name ="CreateRGBColor">
+            <xsl:with-param name ="Red" select ="$NewRed"/>
+            <xsl:with-param name ="Green" select ="$NewGreen"/>
+            <xsl:with-param name ="Blue" select ="$NewBlue"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+    
+  </xsl:template>
+  
+  <xsl:template name ="calculateShade">
+    <xsl:param name ="Red"/>
+    <xsl:param name ="Green"/>
+    <xsl:param name ="Blue"/>
+    <xsl:param name ="shade"/>
+    <xsl:value-of select ="concat('shade-tint:',$Red,':',$Green,':',$Blue ,':',$shade )"/>
+  </xsl:template>
+  
+  <!-- Converts Hexa Decimal Value to Decimal-->
+  <xsl:template name="HexToDec">
+    <!-- @Description: This is a recurive algorithm converting a hex to decimal -->
+    <!-- @Context: None -->
+    <xsl:param name="number"/>
+    <!-- (string|number) The hex number to convert -->
+    <xsl:param name="step" select="0"/>
+    <!-- (number) The exponent (only used during convertion)-->
+    <xsl:param name="value" select="0"/>
+    <!-- (number) The result from the previous digit's convertion (only used during convertion) -->
+    <xsl:variable name="number1">
+      <!-- translates all letters to lower case -->
+      <xsl:value-of select="translate($number,'ABCDEF','abcdef')"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="string-length($number1) &gt; 0">
+        <xsl:variable name="one">
+          <!-- The last digit in the hex number -->
+          <xsl:choose>
+            <xsl:when test="substring($number1,string-length($number1) ) = 'a'">
+              <xsl:text>10</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'b'">
+              <xsl:text>11</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'c'">
+              <xsl:text>12</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'd'">
+              <xsl:text>13</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'e'">
+              <xsl:text>14</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'f'">
+              <xsl:text>15</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring($number1,string-length($number1))"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="power">
+          <!-- The result of the exponent calculation -->
+          <xsl:call-template name="Power">
+            <xsl:with-param name="base">16</xsl:with-param>
+            <xsl:with-param name="exponent">
+              <xsl:value-of select="number($step)"/>
+            </xsl:with-param>
+            <xsl:with-param name="value1">16</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="string-length($number1) = 1">
+            <xsl:value-of select="($one * $power )+ number($value)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="HexToDec">
+              <xsl:with-param name="number">
+                <xsl:value-of select="substring($number1,1,string-length($number1) - 1)"/>
+              </xsl:with-param>
+              <xsl:with-param name="step">
+                <xsl:value-of select="number($step) + 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="value">
+                <xsl:value-of select="($one * $power) + number($value)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- Converts Decimal Value to Hexadecimal-->
+  <xsl:template name="DecToHex">
+    <xsl:param name="number"/>
+    <xsl:variable name="high">
+      <xsl:call-template name="HexMap">
+        <xsl:with-param name="value">
+          <xsl:value-of select="floor($number div 16)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="low">
+      <xsl:call-template name="HexMap">
+        <xsl:with-param name="value">
+          <xsl:value-of select="$number mod 16"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="concat($high,$low)"/>
+  </xsl:template>
+  
+  <!-- calculates power function -->
+  <xsl:template name="HexMap">
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="$value = 10">
+        <xsl:text>A</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 11">
+        <xsl:text>B</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 12">
+        <xsl:text>C</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 13">
+        <xsl:text>D</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 14">
+        <xsl:text>E</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 15">
+        <xsl:text>F</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name ="CreateRGBColor">
+    <xsl:param name ="Red"/>
+    <xsl:param name ="Green"/>
+    <xsl:param name ="Blue"/>
+    <xsl:message terminate="no">progress:p:cSld</xsl:message>
+    <xsl:variable name ="NewRed">
+      <xsl:call-template name ="DecToHex">
+        <xsl:with-param name ="number" select ="$Red"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name ="NewGreen">
+      <xsl:call-template name ="DecToHex">
+        <xsl:with-param name ="number" select ="$Green"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name ="NewBlue">
+      <xsl:call-template name ="DecToHex">
+        <xsl:with-param name ="number" select ="$Blue"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+    <xsl:value-of  select ="translate(concat('#',$NewRed,$NewGreen,$NewBlue),ucletters,lcletters)"/>
+  </xsl:template>
+  
+  <xsl:template name="Power">
+    <xsl:param name="base"/>
+    <xsl:param name="exponent"/>
+    <xsl:param name="value1" select="$base"/>
+    <xsl:choose>
+      <xsl:when test="$exponent = 0">
+        <xsl:text>1</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$exponent &gt; 1">
+            <xsl:call-template name="Power">
+              <xsl:with-param name="base">
+                <xsl:value-of select="$base"/>
+              </xsl:with-param>
+              <xsl:with-param name="exponent">
+                <xsl:value-of select="$exponent -1"/>
+              </xsl:with-param>
+              <xsl:with-param name="value1">
+                <xsl:value-of select="$value1 * $base"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$value1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 
 </xsl:stylesheet>
