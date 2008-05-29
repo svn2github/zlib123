@@ -155,15 +155,22 @@
         </xsl:attribute>
       </xsl:if>
       <style:table-cell-properties>
-        <xsl:call-template name="InsertCellsProperties"/>
+        <xsl:call-template name="InsertCellsProperties" >
+          <xsl:with-param name="tcPr" select="." />
+        </xsl:call-template>
       </style:table-cell-properties>
     </style:style>
   </xsl:template>
 
   <xsl:template match="w:gridCol" mode="automaticstyles">
+    <xsl:variable name="colPos" select="position()" />    
+    
     <style:style style:name="{generate-id(self::w:gridCol)}" style:family="table-column">
       <style:table-column-properties>
-        <xsl:call-template name="InsertColumnProperties"/>
+        <xsl:call-template name="InsertColumnWidthForStyle">
+          <xsl:with-param name="tblW" select="ancestor::w:tbl/w:tblPr/w:tblW" />
+          <xsl:with-param name="tcW" select="ancestor::w:tbl/w:tr[1]/w:tc[$colPos]/w:tcPr/w:tcW" />
+        </xsl:call-template>
       </style:table-column-properties>
     </style:style>
   </xsl:template>
@@ -344,6 +351,10 @@
       </xsl:when>
     </xsl:choose>
 
+    <xsl:call-template name="InsertTableIndent">
+      <xsl:with-param name="wTblPr" select="." />
+    </xsl:call-template>
+    
     <xsl:if test="w:tblInd">
       <xsl:attribute name="fo:margin-left">
         <xsl:call-template name="ConvertTwips">
@@ -415,18 +426,77 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  insert column properties: width-->
-  <xsl:template name="InsertColumnProperties">
-    <xsl:attribute name="style:column-width">
-      <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length">
-          <xsl:value-of select="./@w:w"/>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
-    </xsl:attribute>
+  <!--
+  Summary:  Inserts the column width or relative column width of the column 
+  Author:   makz (DIaLOGIKa)
+  Params:   tblW: The w:tblW node of the table
+            tcW: The w:tcW node of a cell in that column
+  -->
+  <xsl:template name="InsertColumnWidthForStyle">
+    <xsl:param name="tblW" />
+    <xsl:param name="tcW" />
+    
+    <xsl:choose>
+      
+      <!-- table and cell width are relative values -->
+      <xsl:when test="$tblW/@w:type='pct' and $tcW/@w:type='pct'">
+        <xsl:attribute name="style:rel-column-width">
+          <xsl:value-of select="concat(($tcW/@w:w * 10000) div $tblW/@w:w, '*')" />
+        </xsl:attribute>
+      </xsl:when>
+      
+      <!-- table and cell width are absolute values -->
+      <xsl:when test="$tblW/@w:type='dxa' and $tcW/@w:type='dxa'">
+        <xsl:attribute name="style:column-width">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="$tcW/@w:w"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+      
+    </xsl:choose>
   </xsl:template>
+  
 
+  <!--
+  Summary:  Inserts the indent of a table.
+  Author:   makz (DIaLOGIKa)
+  Params:   wTblPr: The w:tblPr node of the table
+  -->
+  <xsl:template name="InsertTableIndent">
+    <xsl:param name="wTblPr" />
+
+    <xsl:choose>
+      <xsl:when test="$wTblPr/w:tblInd">
+        <!-- use direct formatting -->
+        <xsl:attribute name="fo:margin-left">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="$wTblPr/w:tblInd/@w:w"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$wTblPr/w:tblStyle">
+        <!-- use style -->
+        <xsl:variable name="styleId" select="$wTblPr/w:tblStyle/@w:val" />
+        <xsl:call-template name="InsertTableIndent">
+          <xsl:with-param name="wTblPr" select="key('StyleId', $styleId)/w:tblPr" />
+        </xsl:call-template> 
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- 0cm margin (default of Word) -->
+        <xsl:attribute name="fo:margin-left">
+          <xsl:text>0cm</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!--
   Summary: insert cells properties: vertical align, margins, borders  
   Author: Clever Age
@@ -434,6 +504,7 @@
   Date: 26.10.2007
   -->
   <xsl:template name="InsertCellsProperties">
+    <xsl:param name="tcPr" select="." />
 
     <!-- vertical align -->
     <xsl:call-template name="InsertCellVAlign"/>
@@ -512,7 +583,7 @@
       </xsl:otherwise>
     </xsl:choose>
     
-    <!--    borders-->
+    <!-- borders -->
     <xsl:call-template name="InsertLeftCellBorder" />
     <xsl:call-template name="InsertRightCellBorder" />
     <xsl:call-template name="InsertBottomCellBorder" />
@@ -587,7 +658,6 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-
   
   <!--
   Summary:  Inserts the left border of the cell

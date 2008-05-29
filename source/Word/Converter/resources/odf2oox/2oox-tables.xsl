@@ -109,7 +109,7 @@
       </xsl:if>
     </w:tc>
   </xsl:template>
-  
+
   <!-- 
   Summary: Converts covered table cells
   Author: makz (DIaLOGIKa)
@@ -132,7 +132,7 @@
         </xsl:if>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xsl:if test="not(contains($isPartOfHorizontalMerge, 'true'))">
       <w:tc>
         <w:tcPr>
@@ -161,9 +161,9 @@
 
   <!-- Inserts table properties -->
   <xsl:template name="InsertTableProperties">
-    
+
     <w:tblStyle w:val="{@table:style-name}"/>
-    
+
     <xsl:variable name="tableProp" select="key('automatic-styles', @table:style-name)/style:table-properties" />
 
     <!-- report lost attributes -->
@@ -238,8 +238,7 @@
     <w:tblCellMar>
       <xsl:for-each select="descendant::table:table-cell[1]">
         <xsl:call-template name="InsertCellMargins">
-          <xsl:with-param name="cellProp"
-            select="key('automatic-styles', @table:style-name)/style:table-cell-properties"/>
+          <xsl:with-param name="cellProp" select="key('automatic-styles', @table:style-name)/style:table-cell-properties"/>
           <xsl:with-param name="defaultMargin">true</xsl:with-param>
         </xsl:call-template>
       </xsl:for-each>
@@ -416,22 +415,30 @@
     <w:tblLayout w:type="fixed"/>
   </xsl:template>
 
-  <!-- Insert the table indent if margin-left defined, or if cell-padding greater than 0. -->
+  <!-- 
+  Insert the table indent if margin-left defined, 
+  or if cell-padding greater than 0. 
+  -->
   <xsl:template name="InsertTableIndent">
+
     <xsl:variable name="marginLeft">
       <xsl:choose>
         <xsl:when
           test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != ''  ">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length"
-              select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left"
-            />
+              select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left" />
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <!-- get left padding from cells (ignore subcells padding) -->
+
+    <!-- 
+    CleverAge:  get left padding from cells (ignore subcells padding) 
+    makz: I have no idea why we should add the cell padding to the table margin.
+          This behavior cause sthe bug 1947883, so I commented it out.
+         
     <xsl:variable name="padding">
       <xsl:choose>
         <xsl:when
@@ -439,8 +446,7 @@
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
               <xsl:value-of
-                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding"
-              />
+                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding" />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
@@ -449,18 +455,18 @@
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
               <xsl:value-of
-                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding-left"
-              />
+                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding-left" />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    -->
 
     <w:tblInd w:type="{$type}">
       <xsl:attribute name="w:w">
-        <xsl:value-of select="$marginLeft + $padding"/>
+        <xsl:value-of select="$marginLeft"/>
       </xsl:attribute>
     </w:tblInd>
   </xsl:template>
@@ -610,7 +616,7 @@
   <!-- Cell properties -->
   <xsl:template name="InsertCellProperties">
     <!-- current context is table:table-cell -->
-    
+
     <xsl:variable name="cellStyleName">
       <xsl:choose>
         <xsl:when test="@table:style-name">
@@ -679,14 +685,18 @@
   <!-- Inserts the cell width -->
   <xsl:template name="InsertCellWidth">
     <xsl:param name="tableProp"/>
+
     <xsl:variable name="cellWidth">
       <xsl:call-template name="GetCellWidth"/>
     </xsl:variable>
+
     <xsl:if test="number($cellWidth)">
       <w:tcW>
         <xsl:attribute name="w:type">
           <xsl:choose>
-            <xsl:when test="$tableProp/@style:rel-width">pct</xsl:when>
+            <xsl:when test="$tableProp/@style:rel-width">
+              <xsl:text>pct</xsl:text>
+            </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$type"/>
             </xsl:otherwise>
@@ -705,7 +715,7 @@
   Date: 26.10.2007
   -->
   <xsl:template name="InsertCellSpan">
-    
+
     <!-- vertical merge -->
     <xsl:choose>
       <xsl:when test="@table:number-rows-spanned">
@@ -715,7 +725,7 @@
         <w:vMerge w:val="continue" />
       </xsl:when>
     </xsl:choose>
-    
+
     <!-- horizontal merge -->
     <xsl:choose>
       <xsl:when test="@table:number-columns-spanned">
@@ -755,7 +765,7 @@
         <w:gridSpan w:val="{$gridSpan}" />
       </xsl:when>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <!--
@@ -780,7 +790,7 @@
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:call-template name="GetPrecedingPos">
           <xsl:with-param name="iterator" select="$iterator + $addValue" />
           <xsl:with-param name="row" select="$row" />
@@ -792,7 +802,7 @@
         <xsl:value-of select="$pos" />
       </xsl:otherwise>
     </xsl:choose>
-   
+
   </xsl:template>
 
   <!-- Inserts the cell borders -->
