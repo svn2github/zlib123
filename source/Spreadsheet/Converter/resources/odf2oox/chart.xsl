@@ -1812,6 +1812,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             <xsl:call-template name="InsertRingPointsShapeProperties">
               <xsl:with-param name="totalPoints" select="$numPoints"/>
               <xsl:with-param name="series" select="$number"/>
+              <xsl:with-param name="ChartDirecotry">
+                <xsl:value-of select="$chartDirectory"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -1821,6 +1824,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             <xsl:call-template name="InsertDataPointsShapeProperties">
               <xsl:with-param name="parentStyleName" select="$styleName"/>
               <xsl:with-param name="reverse" select=" 'true' "/>
+              <xsl:with-param name="ChartDirectory">
+                <xsl:value-of select="$chartDirectory"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
@@ -1829,6 +1835,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <xsl:for-each select="key('series','')[position() = $number]/child::node()[1]">
             <xsl:call-template name="InsertDataPointsShapeProperties">
               <xsl:with-param name="parentStyleName" select="$styleName"/>
+              <xsl:with-param name="ChartDirectory">
+                <xsl:value-of select="$chartDirectory"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:otherwise>
@@ -2357,24 +2366,60 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
   <xsl:template name="InsertSpPr">
     <xsl:param name="chartDirectory"/>
     <xsl:param name="defaultFill"/>
+ 
+    <c:spPr>
 
+    <xsl:choose>
+      
+      <xsl:when test="key('style',@chart:style-name)/style:graphic-properties/@draw:fill='gradient'">
+        <xsl:for-each select="key('style',@chart:style-name)/style:graphic-properties">
+          <xsl:call-template name="tmpGradientFill">
+            <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+            <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+            <xsl:with-param name="ChartDirectory">
+              <xsl:value-of select="$chartDirectory"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+ 
     <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
-      <c:spPr>
+      
         <xsl:call-template name="InsertDrawingFill">
           <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
           <xsl:with-param name="default" select="$defaultFill"/>
         </xsl:call-template>
 
         <xsl:call-template name="InsertDrawingBorder"/>
-      </c:spPr>
-    </xsl:for-each>
 
+    </xsl:for-each>
+      </xsl:otherwise>
+      </xsl:choose>
+    </c:spPr>
+    
   </xsl:template>
 
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="styleName"/>
     <xsl:param name="parentStyleName"/>
-
+    <xsl:param name="ChartDirectory"/>
+ 
+<xsl:choose>
+ 
+  <xsl:when test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill='gradient'">
+    <xsl:for-each select="key('style',$styleName)/style:graphic-properties">
+    <xsl:call-template name="tmpGradientFill">
+      <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+      <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
+      <xsl:with-param name="ChartDirectory">
+          <xsl:value-of select="$ChartDirectory"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    </xsl:for-each>
+  </xsl:when>
+  <xsl:otherwise>
+    
     <!-- series shape property -->
     <c:spPr>
 
@@ -2432,6 +2477,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </a:ln>
       </xsl:if>
     </c:spPr>
+    
+  </xsl:otherwise>
+</xsl:choose>
 
   </xsl:template>
 
@@ -2442,6 +2490,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:param name="parentStyleName"/>
     <xsl:param name="reverse"/>
     <xsl:param name="count" select="0"/>
+    <xsl:param name="ChartDirectory"/>
 
     <xsl:variable name="points">
       <xsl:choose>
@@ -2461,6 +2510,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:call-template name="InsertShapeProperties">
           <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
           <xsl:with-param name="styleName" select="@chart:style-name"/>
+          <xsl:with-param name="ChartDirectory">
+              <xsl:value-of select="$ChartDirectory"/>
+          </xsl:with-param>
         </xsl:call-template>
       </c:dPt>
     </xsl:if>
@@ -2475,6 +2527,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
               <xsl:with-param name="reverse" select="$reverse"/>
               <xsl:with-param name="count" select="$count + $points"/>
+              <xsl:with-param name="ChartDirectory">
+                <xsl:value-of select="$ChartDirectory"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:if>
@@ -2486,6 +2541,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             <xsl:call-template name="InsertDataPointsShapeProperties">
               <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
               <xsl:with-param name="count" select="$count + $points"/>
+              <xsl:with-param name="ChartDirectory">
+                <xsl:value-of select="$ChartDirectory"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:if>
@@ -2839,6 +2897,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:param name="totalPoints"/>
     <xsl:param name="series"/>
     <xsl:param name="count" select="0"/>
+    <xsl:param name="ChartDirecotry"/>
 
     <xsl:variable name="dataPointStyle">
       <xsl:for-each
@@ -2864,6 +2923,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       <c:idx val="{$count}"/>
       <xsl:call-template name="InsertShapeProperties">
         <xsl:with-param name="styleName" select="$styleName"/>
+        <xsl:with-param name="ChartDirectory">
+          <xsl:value-of select="$ChartDirecotry"/>
+        </xsl:with-param>
       </xsl:call-template>
     </c:dPt>
 
@@ -2872,6 +2934,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:with-param name="totalPoints" select="$totalPoints"/>
         <xsl:with-param name="series" select="$series"/>
         <xsl:with-param name="count" select="$count + 1"/>
+        <xsl:with-param name="ChartDirecotry">
+          <xsl:value-of select="$ChartDirecotry"/>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:for-each>
 
@@ -3092,6 +3157,150 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       </xsl:otherwise>
     </xsl:choose>
 
+  </xsl:template>
+  
+  <xsl:template name="tmpGradientFill">
+    <xsl:param name="gradStyleName"/>
+    <xsl:param name="opacity"/>
+    <xsl:param name="ChartDirectory"/>
+    
+    <a:gradFill flip="none" rotWithShape="1">
+     
+     
+
+      <xsl:for-each select="document(concat($ChartDirectory, '/', 'styles.xml'))//draw:gradient[@draw:name= $gradStyleName]">
+        <a:gsLst>
+          <a:gs pos="0">
+            <a:srgbClr>
+              <xsl:attribute name="val">
+                <xsl:if test="@draw:start-color">
+                  <xsl:value-of select="substring-after(@draw:start-color,'#')" />
+                </xsl:if>
+                <xsl:if test="not(@draw:start-color)">
+                  <xsl:value-of select="'ffffff'" />
+                </xsl:if>
+              </xsl:attribute>
+              <xsl:call-template name="tmpshapeTransperancy">
+                <xsl:with-param name="tranparency" select="$opacity"/>
+              </xsl:call-template>
+            </a:srgbClr >
+          </a:gs>
+          <a:gs pos="100000">
+            <a:srgbClr>
+              <xsl:attribute name="val">
+                <xsl:if test="@draw:end-color">
+                  <xsl:value-of select="substring-after(@draw:end-color,'#')" />
+                </xsl:if>
+                <xsl:if test="not(@draw:end-color)">
+                  <xsl:value-of select="'ffffff'" />
+                </xsl:if>
+              </xsl:attribute>
+              <xsl:call-template name="tmpshapeTransperancy">
+                <xsl:with-param name="tranparency" select="$opacity"/>
+              </xsl:call-template>
+            </a:srgbClr>
+          </a:gs>
+        </a:gsLst>
+        <xsl:choose>
+          <xsl:when test="@draw:style='radial'">
+            <a:path path="circle">
+              <xsl:call-template name="tmpFillToRect"/>
+            </a:path>
+            <xsl:call-template name="tmpTileToRect"/>
+          </xsl:when>
+          <xsl:when test="@draw:style='ellipsoid'">
+            <a:path path="shape">
+              <xsl:call-template name="tmpFillToRect"/>
+            </a:path>
+            <xsl:call-template name="tmpTileToRect"/>
+          </xsl:when>
+          <xsl:when test="@draw:style='linear'">
+            <a:lin ang="0" scaled="1"/>
+            <a:tileRect/>
+          </xsl:when>
+          <xsl:when test="@draw:style='rectangular' or @draw:style='square'">
+            <a:path path="rect">
+              <xsl:call-template name="tmpFillToRect"/>
+            </a:path>
+            <xsl:call-template name="tmpTileToRect"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <a:lin ang="0" scaled="1"/>
+            <a:tileRect/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </a:gradFill>
+  </xsl:template>
+  
+  <xsl:template name="tmpTileToRect">
+    <xsl:choose>
+      <xsl:when test="@draw:cx and @draw:cy">
+        <xsl:choose>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 100">
+            <a:tileRect/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 0">
+            <a:tileRect l="-100000" t="-100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 0">
+            <a:tileRect r="-100000" t="-100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 100">
+            <a:tileRect l="-100000" b="-100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') > 0 and substring-before(@draw:cy,'%') > 0">
+            <a:tileRect/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <a:tileRect/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="tmpFillToRect">
+    <xsl:choose>
+      <xsl:when test="@draw:cx and @draw:cy">
+        <xsl:choose>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 100">
+            <a:fillToRect l="50000" t="50000" r="50000" b="50000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 0">
+            <a:fillToRect r="100000" b="100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =100 and substring-before(@draw:cy,'%') = 0">
+            <a:fillToRect l="100000" b="100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') =0 and substring-before(@draw:cy,'%') = 100">
+            <a:fillToRect r="100000" t="100000"/>
+          </xsl:when>
+          <xsl:when test="substring-before(@draw:cx,'%') > 0 and substring-before(@draw:cy,'%') > 0">
+            <a:fillToRect l="100000" t="100000" r="100000" b="100000"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <a:fillToRect/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="tmpshapeTransperancy" >
+    <xsl:param name="tranparency"/>
+    <xsl:choose>
+      <xsl:when test ="$tranparency ='0'">
+        <a:alpha val="0"/>
+      </xsl:when>
+      <xsl:when test="$tranparency !=''">
+        <a:alpha>
+          <xsl:attribute name="val">
+            <xsl:value-of select="format-number($tranparency * 1000,'#')" />
+          </xsl:attribute>
+        </a:alpha>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
