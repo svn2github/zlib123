@@ -48,18 +48,43 @@
         <xsl:value-of select="generate-id(self::w:tbl)"/>
       </xsl:attribute>
       <!--TODO: @table:style-name -->
-      <xsl:apply-templates select="w:tblGrid/w:gridCol"/>
+      <xsl:apply-templates select="w:tblGrid"/>
       <xsl:apply-templates select="w:tr"/>
     </table:table>
   </xsl:template>
 
-  <xsl:template match="w:gridCol">
-    <table:table-column>
-      <xsl:attribute name="table:style-name">
-        <xsl:value-of select="generate-id(self::w:gridCol)"/>
-      </xsl:attribute>
-      <!--TODO: @table:style-name -->
-    </table:table-column>
+  <xsl:template match="w:tblGrid">
+    <xsl:for-each select="w:gridCol">
+      <table:table-column>
+        <xsl:attribute name="table:style-name">
+          <xsl:value-of select="generate-id(self::w:gridCol)"/>
+        </xsl:attribute>
+      </table:table-column>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="w:tblGrid" mode="automaticstyles">
+    
+    <xsl:variable name="totalGridWidth">
+      <xsl:call-template name="ComputeGridWidth">
+        <xsl:with-param name="grid" select="."/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="tblW" select="ancestor::w:tbl/w:tblPr/w:tblW" />
+
+    <xsl:for-each select="w:gridCol">
+
+      <style:style style:name="{generate-id(self::w:gridCol)}" style:family="table-column">
+        <style:table-column-properties>
+          <xsl:call-template name="InsertColumnWidthForStyle">
+            <xsl:with-param name="gridCol" select="." />
+            <xsl:with-param name="gridWidth" select="$totalGridWidth" />
+            <xsl:with-param name="tblW" select="$tblW" />
+          </xsl:call-template>
+        </style:table-column-properties>
+      </style:style>
+        
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="w:tr">
@@ -93,7 +118,7 @@
 
   <xsl:template match="w:tc">
     <xsl:choose>
-      <!-- for w:vMerge="continuous" cells, create a table:covered-table-cell element --> 
+      <!-- for w:vMerge="continuous" cells, create a table:covered-table-cell element -->
       <xsl:when test="w:tcPr/w:vMerge and not(w:tcPr/w:vMerge/@w:val = 'restart')">
         <table:covered-table-cell table:style-name="{generate-id()}">
           <xsl:apply-templates/>
@@ -121,7 +146,9 @@
               <xsl:choose>
                 <!-- patch: can't have number-rows-spanned < 2 -->
                 <xsl:when test="$number-rows-spanned &lt; 2">2</xsl:when>
-                <xsl:otherwise><xsl:value-of select="$number-rows-spanned"/></xsl:otherwise>
+                <xsl:otherwise>
+                  <xsl:value-of select="$number-rows-spanned"/>
+                </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
           </xsl:if>
@@ -159,19 +186,6 @@
           <xsl:with-param name="tcPr" select="." />
         </xsl:call-template>
       </style:table-cell-properties>
-    </style:style>
-  </xsl:template>
-
-  <xsl:template match="w:gridCol" mode="automaticstyles">
-    <xsl:variable name="colPos" select="position()" />    
-    
-    <style:style style:name="{generate-id(self::w:gridCol)}" style:family="table-column">
-      <style:table-column-properties>
-        <xsl:call-template name="InsertColumnWidthForStyle">
-          <xsl:with-param name="tblW" select="ancestor::w:tbl/w:tblPr/w:tblW" />
-          <xsl:with-param name="tcW" select="ancestor::w:tbl/w:tr[1]/w:tc[$colPos]/w:tcPr/w:tcW" />
-        </xsl:call-template>
-      </style:table-column-properties>
     </style:style>
   </xsl:template>
 
@@ -430,33 +444,32 @@
   Summary:  Inserts the column width or relative column width of the column 
   Author:   makz (DIaLOGIKa)
   Params:   tblW: The w:tblW node of the table
-            tcW: The w:tcW node of a cell in that column
+            gridCol:
+            gridWidth: The total dxa width of the grid
   -->
   <xsl:template name="InsertColumnWidthForStyle">
+    <xsl:param name="gridCol" />
+    <xsl:param name="gridWidth" />
     <xsl:param name="tblW" />
-    <xsl:param name="tcW" />
-    
-    <xsl:choose>
-      
-      <!-- table and cell width are relative values -->
-      <xsl:when test="$tblW/@w:type='pct' and $tcW/@w:type='pct'">
+
+      <xsl:choose>
+        <xsl:when test="$tblW/@w:type='pct'">
+        <!-- table and cell width are relative values -->
         <xsl:attribute name="style:rel-column-width">
-          <xsl:value-of select="concat(($tcW/@w:w * 10000) div $tblW/@w:w, '*')" />
+          <xsl:value-of select="concat(($gridCol/@w:w * 10000) div $gridWidth, '*')" />
         </xsl:attribute>
       </xsl:when>
-      
-      <!-- table and cell width are absolute values -->
-      <xsl:when test="$tblW/@w:type='dxa' and $tcW/@w:type='dxa'">
+      <xsl:otherwise>
+        <!-- use absolute value -->
         <xsl:attribute name="style:column-width">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="$tcW/@w:w"/>
+              <xsl:value-of select="$gridCol/@w:w"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
-      </xsl:when>
-      
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   
@@ -1185,4 +1198,29 @@
     </xsl:attribute>
   </xsl:template>
 
+
+  <!--
+  Summary:  Computes the total width of a table grid
+  Author:   makz (DIaLOGIKa)
+  Params:   grid: The w:tblGrid node
+  -->
+  <xsl:template name="ComputeGridWidth">
+    <xsl:param name="grid" />
+    <xsl:param name="width" select="'0'" />
+    <xsl:param name="iterator" select="'0'" />
+
+    <xsl:choose>
+      <xsl:when test="$iterator &lt; count($grid/w:gridCol)">
+        <xsl:call-template name="ComputeGridWidth">
+          <xsl:with-param name="grid" select="$grid" />
+          <xsl:with-param name="iterator" select="$iterator + 1"/>
+          <xsl:with-param name="width" select="$width + $grid/w:gridCol/@w:w"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$width"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>
