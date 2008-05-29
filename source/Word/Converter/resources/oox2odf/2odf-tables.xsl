@@ -53,6 +53,22 @@
     </table:table>
   </xsl:template>
 
+  <xsl:template match="w:tblPr" mode="automaticstyles">
+    <style:style style:name="{generate-id(parent::w:tbl)}" style:family="table">
+      <xsl:if test="w:tblStyle">
+        <xsl:attribute name="style:parent-style-name">
+          <xsl:value-of select="w:tblStyle/@w:val"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:call-template name="MasterPageName"/>
+      <style:table-properties table:border-model="collapsing">
+        <xsl:call-template name="InsertTableProperties">
+          <xsl:with-param name="Default">StyleTableProperties</xsl:with-param>
+        </xsl:call-template>
+      </style:table-properties>
+    </style:style>
+  </xsl:template>
+
   <xsl:template match="w:tblGrid">
     <xsl:for-each select="w:gridCol">
       <table:table-column>
@@ -64,7 +80,7 @@
   </xsl:template>
 
   <xsl:template match="w:tblGrid" mode="automaticstyles">
-    
+
     <xsl:variable name="totalGridWidth">
       <xsl:call-template name="ComputeGridWidth">
         <xsl:with-param name="grid" select="."/>
@@ -83,7 +99,7 @@
           </xsl:call-template>
         </style:table-column-properties>
       </style:style>
-        
+
     </xsl:for-each>
   </xsl:template>
 
@@ -116,6 +132,16 @@
     </xsl:choose>
   </xsl:template>
 
+  
+  <xsl:template match="w:trPr" mode="automaticstyles">
+    <style:style style:name="{generate-id(parent::w:tr)}" style:family="table-row">
+      <style:table-row-properties>
+        <xsl:call-template name="InsertRowProperties"/>
+      </style:table-row-properties>
+    </style:style>
+  </xsl:template>
+
+  
   <xsl:template match="w:tc">
     <xsl:choose>
       <!-- for w:vMerge="continuous" cells, create a table:covered-table-cell element -->
@@ -158,22 +184,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:tblPr" mode="automaticstyles">
-    <style:style style:name="{generate-id(parent::w:tbl)}" style:family="table">
-      <xsl:if test="w:tblStyle">
-        <xsl:attribute name="style:parent-style-name">
-          <xsl:value-of select="w:tblStyle/@w:val"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:call-template name="MasterPageName"/>
-      <style:table-properties table:border-model="collapsing">
-        <xsl:call-template name="InsertTableProperties">
-          <xsl:with-param name="Default">StyleTableProperties</xsl:with-param>
-        </xsl:call-template>
-      </style:table-properties>
-    </style:style>
-  </xsl:template>
-
+  
   <xsl:template match="w:tcPr" mode="automaticstyles">
     <style:style style:name="{generate-id(parent::w:tc)}" style:family="table-cell">
       <xsl:if test="w:tcStyle">
@@ -184,19 +195,13 @@
       <style:table-cell-properties>
         <xsl:call-template name="InsertCellsProperties" >
           <xsl:with-param name="tcPr" select="." />
+          <xsl:with-param name="tableStyleId" select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val" />
         </xsl:call-template>
       </style:table-cell-properties>
     </style:style>
   </xsl:template>
 
-  <xsl:template match="w:trPr" mode="automaticstyles">
-    <style:style style:name="{generate-id(parent::w:tr)}" style:family="table-row">
-      <style:table-row-properties>
-        <xsl:call-template name="InsertRowProperties"/>
-      </style:table-row-properties>
-    </style:style>
-  </xsl:template>
-
+  
   <!-- 
   *************************************************************************
   CALLED TEMPLATES
@@ -511,12 +516,14 @@
   </xsl:template>
   
   <!--
-  Summary: insert cells properties: vertical align, margins, borders  
-  Author: Clever Age
+  Summary:  Insert cells properties: vertical align, margins, borders  
+  Author:   Clever Age
   Modified: makz (DIaLOGIKa)
-  Date: 26.10.2007
+  Params:   tableStyleId: The style id of the table that hosts the cell
+            tcPr: The w:tcPr node of the cell
   -->
   <xsl:template name="InsertCellsProperties">
+    <xsl:param name="tableStyleId" />
     <xsl:param name="tcPr" select="." />
 
     <!-- vertical align -->
@@ -603,16 +610,14 @@
     <xsl:call-template name="InsertTopCellBorder" />
 
     <!-- Background color -->
-    <xsl:if test="w:shd">
-      <xsl:attribute name="fo:background-color">
-        <xsl:for-each select="w:shd">
-          <xsl:call-template name="ComputeShading"/>
-          </xsl:for-each>
-      </xsl:attribute>
-    </xsl:if>
-    
+    <xsl:call-template name="InsertBackgroundColorForStyle">
+      <xsl:with-param name="tcPr" select="$tcPr" />
+      <xsl:with-param name="tableStyleId" select="$tableStyleId" />
+    </xsl:call-template>
+
   </xsl:template>
- 
+
+
   <!-- insert table cell content vertical alignment -->
   <xsl:template name="InsertCellVAlign">
     <xsl:if test="w:vAlign">
@@ -631,7 +636,7 @@
     </xsl:if>
   </xsl:template>
 
-  
+
   <!--  insert cell margins-->
   <xsl:template name="InsertCellMargins">
     <xsl:param name="tcMar"/>
@@ -671,6 +676,38 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
+
+  <!--
+  Summary:  Inserts the background color for a table cell style
+  Author:   makz (DIaLOGIKa)
+  Params:   tcPr: The w:tcPr node of the cell
+            tableStyleId: The style id of the table that hosts the cell
+  -->
+  <xsl:template name="InsertBackgroundColorForStyle">
+    <xsl:param name="tcPr" />
+    <xsl:param name="tableStyleId" />
+
+    <xsl:choose>
+      <xsl:when test="$tcPr/w:shd">
+        <!-- use direct formatting -->
+        <xsl:attribute name="fo:background-color">
+          <xsl:call-template name="ComputeShading">
+            <xsl:with-param name="shd" select="$tcPr/w:shd" />
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- use style -->
+        <xsl:call-template name="InsertBackgroundColorForStyle">
+          <xsl:with-param name="tcPr" select="key('StyleId', $tableStyleId)/w:tcPr" />
+          <xsl:with-param name="tableStyleId" select="key('StyleId', $tableStyleId)/w:basedOn/@w:val" />
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+  
   
   <!--
   Summary:  Inserts the left border of the cell
