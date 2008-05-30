@@ -697,13 +697,13 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="key('StyleId', $tableStyleId)">
         <!-- use style -->
         <xsl:call-template name="InsertBackgroundColorForStyle">
           <xsl:with-param name="tcPr" select="key('StyleId', $tableStyleId)/w:tcPr" />
           <xsl:with-param name="tableStyleId" select="key('StyleId', $tableStyleId)/w:basedOn/@w:val" />
         </xsl:call-template>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
 
   </xsl:template>

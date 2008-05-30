@@ -655,10 +655,20 @@
     <xsl:if test="$tableProp/@style:rotation-align">
       <xsl:message terminate="no">translation.odf2oox.cellRotationAlignment</xsl:message>
     </xsl:if>
-
+    
+    <!--
     <xsl:call-template name="InsertCellWidth">
       <xsl:with-param name="tableProp" select="$tableProp"/>
     </xsl:call-template>
+    -->
+    
+    <xsl:call-template name="InsertCellWidthMakz">
+      <xsl:with-param name="cellPos" select="position()" />
+      <xsl:with-param name="cells" select="ancestor::table:table-row/table:table-cell" />
+      <xsl:with-param name="columns" select="ancestor::table:table/table:table-column" />
+    </xsl:call-template>
+
+
     <xsl:call-template name="InsertCellSpan" />
     <xsl:call-template name="InsertCellBorders">
       <xsl:with-param name="cellProp" select="$cellProp"/>
@@ -681,6 +691,7 @@
       <xsl:with-param name="cellProp" select="$cellProp"/>
     </xsl:call-template>
   </xsl:template>
+  
 
   <!-- Inserts the cell width -->
   <xsl:template name="InsertCellWidth">
@@ -709,6 +720,167 @@
     </xsl:if>
   </xsl:template>
 
+  
+  <!--
+  Summary:
+  Author:   makz (DIaLOGIKa)
+  Params:   cellPos: the position() of the cell
+            cells: The node set with all cells in this row
+            columns: The node set with all column definitions of this table
+  -->
+  <xsl:template name="InsertCellWidthMakz">
+    <xsl:param name="cellPos" />
+    <xsl:param name="cells" />
+    <xsl:param name="columns" />
+
+    <xsl:variable name="colPos">
+      <xsl:call-template name="GetColPos">
+        <xsl:with-param name="cellPos" select="$cellPos" />
+        <xsl:with-param name="cells" select="$cells" />
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!-- get the colspan -->
+    <xsl:variable name="colSpan">
+      <xsl:choose>
+        <xsl:when test="$cells[number($cellPos)]/@table:number-columns-spanned">
+          <xsl:value-of select="$cells[number($cellPos)]/@table:number-columns-spanned"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="cellWidth">
+      <xsl:call-template name="GetTotalCellWidth">
+        <xsl:with-param name="colPos" select="$colPos" />
+        <xsl:with-param name="colEndPos" select="$colPos + $colSpan" />
+        <xsl:with-param name="columns" select="$columns" />
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!-- choose if width is relative or absolute -->
+    <w:tcW>
+      <xsl:variable name="styleId" select="$columns[number($colPos)]/@table:style-name" />
+      <xsl:variable name="relWidth" select="key('automatic-styles', $styleId)/style:table-column-properties/@style:rel-column-width"/>
+      
+      <xsl:attribute name="w:type">
+        <xsl:choose>
+          <xsl:when test="$relWidth">
+            <xsl:text>pct</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>dxa</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+
+      <xsl:attribute name="w:w">
+        <xsl:choose>
+          <xsl:when test="$relWidth">
+            <xsl:value-of select="($cellWidth * 5000) div 10000"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="concat($cellWidth, 'cm')" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </w:tcW>
+  </xsl:template>
+
+
+  <!--
+  Summary:  Adds the width values of the columns to get the total width of the cell that
+            spans over the columns.
+  Author:   makz (DIaLOGIKa)
+  Params:   colPos: The starting position in the column grid
+            colEndPos: The last column which width shall be added
+            columns: The node set of columns (the column grid)
+  -->
+  <xsl:template name="GetTotalCellWidth">
+    <xsl:param name="colPos" />
+    <xsl:param name="colEndPos" />
+    <xsl:param name="columns" />
+    <xsl:param name="cellWidth">0</xsl:param>
+
+    <xsl:choose>
+      <xsl:when test="$colPos &lt; $colEndPos">
+        <!-- get the width of this column -->
+        <xsl:variable name="width">
+          <xsl:variable name="styleId" select="$columns[number($colPos)]/@table:style-name" />
+          <xsl:variable name="widthString" select="key('automatic-styles', $styleId)/style:table-column-properties/@style:column-width"/>
+          <xsl:variable name="relWidthString" select="key('automatic-styles', $styleId)/style:table-column-properties/@style:rel-column-width"/>
+          
+          <xsl:choose>
+            <xsl:when test="$relWidthString">
+              <xsl:value-of select="substring-before($relWidthString, '*')" />
+            </xsl:when>
+            <xsl:when test="$widthString">
+              <xsl:value-of select="substring-before($widthString, 'cm')" />
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <!-- add the next width -->
+        <xsl:call-template name="GetTotalCellWidth">
+          <xsl:with-param name="colPos" select="$colPos + 1" />
+          <xsl:with-param name="colEndPos" select="$colEndPos" />
+          <xsl:with-param name="columns" select="$columns" />
+          <xsl:with-param name="cellWidth" select="$cellWidth + $width" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- return the value -->
+        <xsl:value-of select="$cellWidth"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
+  <!--
+  Summary:  This template takes the colspan of the cells into account to find 
+            the column that matches the given cell position.
+  Author:   makz (DIaLOGIKa)
+  Params:   cellPos: The position of the cell, which column should be found
+            cells: The node set of all cells in the row
+  -->
+  <xsl:template name="GetColPos">
+    <xsl:param name="cellPos" />
+    <xsl:param name="cells" />
+    <xsl:param name="colPos">1</xsl:param>
+    <xsl:param name="iterator">1</xsl:param>
+    
+    <xsl:choose>
+      <xsl:when test="$iterator &lt; $cellPos">
+        
+        <!-- get the colspan of the current cell-->
+        <xsl:variable name="colSpan">
+          <xsl:choose>
+            <xsl:when test="$cells[number($iterator)]/@table:number-columns-spanned">
+              <xsl:value-of select="$cells[number($iterator)]/@table:number-columns-spanned"/>
+            </xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <!-- add this colspan to the current colPos -->
+        <xsl:call-template name="GetColPos">
+          <xsl:with-param name="cells" select="$cells" />
+          <xsl:with-param name="cellPos" select="$cellPos" />
+          <xsl:with-param name="iterator" select="$iterator + 1"/>
+          <xsl:with-param name="colPos" select="$colPos + $colSpan" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- return the value -->
+        <xsl:value-of select="$colPos"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  
   <!-- 
   Summary: Inserts the cell span 
   Author: makz (DIaLOGIKa)
@@ -731,6 +903,7 @@
       <xsl:when test="@table:number-columns-spanned">
         <w:gridSpan w:val="{@table:number-columns-spanned}" />
       </xsl:when>
+      
       <!-- covered table cells can also have a colspan if the parent vMerge node has a colspan -->
       <xsl:when test="name(.)='table:covered-table-cell'">
 
@@ -1160,19 +1333,19 @@
     </xsl:param>
     <xsl:param name="currentColNumber">1</xsl:param>
     <xsl:param name="currentPosInColumns">1</xsl:param>
+    
     <xsl:variable name="rangeColNumber">
       <xsl:choose>
-        <xsl:when
-          test="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]/@table:number-columns-repeated">
-          <xsl:value-of
-            select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]/@table:number-columns-repeated"
-          />
+        <xsl:when test="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]/@table:number-columns-repeated">
+          <xsl:value-of select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]/@table:number-columns-repeated" />
         </xsl:when>
         <xsl:otherwise>1</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:choose>
       <xsl:when test="$colNumber &lt; ($currentColNumber + $rangeColNumber)">
+        
         <xsl:variable name="currentColumnWidth">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
@@ -1182,6 +1355,7 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+        
         <xsl:choose>
           <xsl:when test="($colNumber + $colSpan) &lt;= ($currentColNumber + $rangeColNumber)">
             <xsl:value-of select="$currentColumnWidth * $colSpan"/>
@@ -1190,16 +1364,13 @@
             <xsl:variable name="remainingCellWidth">
               <xsl:call-template name="GetCellWidth">
                 <xsl:with-param name="colNumber" select="$currentColNumber + $rangeColNumber"/>
-                <xsl:with-param name="colSpan"
-                  select="$colNumber + $colSpan - $currentColNumber - $rangeColNumber"/>
+                <xsl:with-param name="colSpan" select="$colNumber + $colSpan - $currentColNumber - $rangeColNumber"/>
                 <xsl:with-param name="currentColNumber" select="$currentColNumber + $rangeColNumber"/>
                 <xsl:with-param name="currentPosInColumns" select="$currentPosInColumns + 1"/>
               </xsl:call-template>
             </xsl:variable>
             <!-- we have to do this round(x*10000) div 10000 to avoid decimal artifacts -->
-            <xsl:value-of
-              select="round(($remainingCellWidth + ($currentColNumber + $rangeColNumber - $colNumber) * $currentColumnWidth) * 10000) div 10000"
-            />
+            <xsl:value-of select="round(($remainingCellWidth + ($currentColNumber + $rangeColNumber - $colNumber) * $currentColumnWidth) * 10000) div 10000" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
