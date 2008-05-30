@@ -99,6 +99,7 @@
     <EmbeddedResource Include="resources\oox2odf\change_tracking.xsl" />
     <EmbeddedResource Include="resources\oox2odf\database-ranges.xsl" />
     <EmbeddedResource Include="resources\oox2odf\pivot_tables.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\Gradient.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />
     <Compile Include="OoxMaximumCellTextPostProcessor.cs" />
