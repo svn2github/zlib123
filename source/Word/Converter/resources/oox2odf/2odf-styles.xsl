@@ -621,29 +621,6 @@
     </xsl:if>
   </xsl:template>
 
-
-  <!--math: Added for bugfix #1934315 START-->
-  <xsl:template name ="CheckDefaultTOCStyle">
-    <xsl:param name="Name" />
-    <xsl:param name="Counter" select="1"/>
-    <xsl:choose>
-      <xsl:when test="$Counter &gt; 9" >false</xsl:when>
-      <xsl:when test="concat('TOC',$Counter) = $Name">true</xsl:when>
-      <xsl:when test="$Name = 'TOCHeading'">true</xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="CheckDefaultTOCStyle">
-          <xsl:with-param name="Name" select="$Name" />
-          <xsl:with-param name="Counter">
-            <xsl:value-of select="$Counter + 1" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  <!--math: Added for bugfix #1934315 END-->
-
-
-
   <!-- create styles -->
   <xsl:template match="w:style[@w:type != 'numbering' ]">
     <xsl:message terminate="no">progress:w:style</xsl:message>
@@ -704,14 +681,12 @@
           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
             <xsl:attribute name="style:parent-style-name">
-              <xsl:variable name="isParentDefaultTOCStyle">
-                <xsl:call-template name ="CheckDefaultTOCStyle">
-                  <xsl:with-param name="Name">
-                    <xsl:value-of select="w:basedOn/@w:val" />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:variable>              
-              <xsl:choose>
+              <xsl:call-template name="TocToContent">
+                <xsl:with-param name="styleValue">
+                  <xsl:value-of select="w:basedOn/@w:val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <!--<xsl:choose>
                 <xsl:when test ="$isParentDefaultTOCStyle='true'">
                   <xsl:variable name ="parentStyle">
                     <xsl:value-of select ="w:basedOn/@w:val"/>
@@ -721,7 +696,7 @@
                 <xsl:otherwise>
                   <xsl:value-of select="w:basedOn/@w:val"/>
                 </xsl:otherwise>
-              </xsl:choose>
+              </xsl:choose>-->
       <!--math: Added for bugfix #1934315 END-->              
             </xsl:attribute>
           </xsl:if>
@@ -2855,7 +2830,7 @@
   </xsl:template>
 
   <!-- Compute style and text properties of context style. -->
-  <xsl:template name="InsertStyleProperties">
+  <xsl:template name="InsertStyleProperties">     
 
     <xsl:if test="self::node()/@w:type = 'paragraph'">
       <style:paragraph-properties>
@@ -2877,8 +2852,16 @@
           </xsl:for-each>
         </xsl:if>-->
 
-        <xsl:if
-          test="contains(self::node()/@w:styleId,'TOC') or contains(self::node()/@w:styleId,'TableofFigures') and not(w:pPr/w:tabs)">
+        <xsl:variable name="isDefaultTOCStyle">
+          <xsl:call-template name ="CheckDefaultTOCStyle">
+            <xsl:with-param name="Name">
+              <xsl:value-of select="self::node()/@w:styleId" />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <!--<xsl:if test="contains(self::node()/@w:styleId,'TOC') or contains(self::node()/@w:styleId,'TableofFigures') and not(w:pPr/w:tabs)">-->
+        <xsl:if test="$isDefaultTOCStyle='true' or contains(self::node()/@w:styleId,'TableofFigures') and not(w:pPr/w:tabs)">          
           <xsl:call-template name="InsertExtraTabs">
             <xsl:with-param name="currentStyleId">
               <xsl:value-of select="self::node()/@w:styleId"/>
@@ -3346,13 +3329,22 @@
   <xsl:template name="getStyleLeftChars">
     <xsl:param name="StyleId" />
 
+    <xsl:variable name="isDefaultTOCStyle">
+      <xsl:call-template name ="CheckDefaultTOCStyle">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="$StyleId" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
     <xsl:choose>
       <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
       <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:leftChars != ''">
         <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:leftChars "/>
       </xsl:when>
 
-      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:leftChars != ''">
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:leftChars != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:leftChars != ''">        
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:leftChars" />
       </xsl:when>
 
@@ -3380,6 +3372,14 @@
   <xsl:template name="getStyleTextIndChars">
     <xsl:param name="StyleId" />
 
+    <xsl:variable name="isDefaultTOCStyle">
+      <xsl:call-template name ="CheckDefaultTOCStyle">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="$StyleId" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>    
+
     <xsl:choose>
 
       <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:hangingChars != ''">
@@ -3390,15 +3390,15 @@
         <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:firstLineChars"/>
       </xsl:when>
 
-
-      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hangingChars != ''">
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hangingChars != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hangingChars != ''">        
         <xsl:value-of select="-key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hangingChars" />
       </xsl:when>
 
-      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLineChars != ''">
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLineChars != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLineChars != ''">
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLineChars" />
       </xsl:when>
-
 
       <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:hangingChars">
         <xsl:value-of select="-w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:hangingChars" />
@@ -3498,6 +3498,14 @@
 
   <xsl:template name="getStyleFontSize">
     <xsl:param name="StyleId" />
+
+    <xsl:variable name="isDefaultTOCStyle">
+      <xsl:call-template name ="CheckDefaultTOCStyle">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="$StyleId" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>    
    
     <xsl:choose>
 
@@ -3508,13 +3516,14 @@
       <xsl:when test="key('StyleId',$StyleId)/w:rPr/w:szCs/@w:val != ''">
         <xsl:value-of select="key('StyleId',$StyleId)/w:rPr/w:szCs/@w:val "/>
       </xsl:when>
-
       
-      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:sz/@w:val != ''">
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:sz/@w:val != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:sz/@w:val != ''">      
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:sz/@w:val" />
       </xsl:when>
       
-      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:szCs/@w:val != ''">
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:szCs/@w:val != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:szCs/@w:val != ''">        
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:rPr/w:szCs/@w:val" />
       </xsl:when>
 
@@ -3556,13 +3565,22 @@
     <xsl:template name="getStyleLeftInd">
       <xsl:param name="StyleId" />
 
+      <xsl:variable name="isDefaultTOCStyle">
+        <xsl:call-template name ="CheckDefaultTOCStyle">
+          <xsl:with-param name="Name">
+            <xsl:value-of select="$StyleId" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
       <xsl:choose>
         <!-- Regression JP 24.08.2007 <xsl:when test="not($context/parent::w:p) and key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">-->
         <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
           <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
         </xsl:when>
 
-        <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
+        <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">-->
+        <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
           <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left" />
         </xsl:when>
 
@@ -3609,16 +3627,25 @@
       </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="getStyleRightInd">
-      <xsl:param name="StyleId" />
+  <xsl:template name="getStyleRightInd">
+    <xsl:param name="StyleId" />
 
-      <xsl:choose>
-        <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right != ''">
-          <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right "/>
-        </xsl:when>
+    <xsl:variable name="isDefaultTOCStyle">
+      <xsl:call-template name ="CheckDefaultTOCStyle">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="$StyleId" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>      
+    
+    <xsl:choose>
+      <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right != ''">
+        <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:right "/>
+      </xsl:when>
 
-        <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right != ''">
-          <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right" />
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right != ''">          
+        <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right" />
       </xsl:when>
 
       <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right">
@@ -3670,6 +3697,14 @@
   <xsl:template name="getStyleTextInd">
     <xsl:param name="StyleId" />
 
+    <xsl:variable name="isDefaultTOCStyle">
+      <xsl:call-template name ="CheckDefaultTOCStyle">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="$StyleId" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <xsl:choose>
       
       <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''">
@@ -3681,11 +3716,13 @@
       </xsl:when>
       
 
-      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hanging != ''">
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hanging != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hanging != ''">                
         <xsl:value-of select="-key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:hanging" />
       </xsl:when>
 
-      <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLine != ''">
+      <!--<xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLine != ''">-->
+      <xsl:when test="$isDefaultTOCStyle='true' and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLine != ''">        
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:firstLine" />
       </xsl:when>      
       

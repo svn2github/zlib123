@@ -892,12 +892,46 @@
       <xsl:with-param name="type" select="$type"/>
     </xsl:call-template>
   </xsl:template>
+
+
+  <!--math: Added for bugfix #1934315 START-->
+  <xsl:template name ="CheckDefaultTOCStyle">
+    <xsl:param name="Name" />
+    <xsl:param name="Counter" select="1"/>
+    <xsl:choose>
+      <xsl:when test="$Counter &gt; 9" >false</xsl:when>
+      <xsl:when test="concat('TOC',$Counter) = $Name">true</xsl:when>
+      <xsl:when test="$Name = 'TOCHeading'">true</xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="CheckDefaultTOCStyle">
+          <xsl:with-param name="Name" select="$Name" />
+          <xsl:with-param name="Counter">
+            <xsl:value-of select="$Counter + 1" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!--math: Added for bugfix #1934315 END-->
+  
   
   <!--template which changes style 'TOC' to style 'Contents_20'-->
   <xsl:template name="TocToContent">
     <xsl:param name="styleValue"/>
+
+    <!--math: Added for bugfix #1934315 START-->
+    <xsl:variable name="isDefaultTOCStyle">
+      <xsl:call-template name ="CheckDefaultTOCStyle">
+        <xsl:with-param name="Name">
+          <xsl:value-of select="$styleValue" />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!--math: Added for bugfix #1934315 END-->
+
     <xsl:choose>
-      <xsl:when test="contains($styleValue,'TOC')">
+      <!--<xsl:when test="contains($styleValue,'TOC')">-->
+      <xsl:when test="$isDefaultTOCStyle = 'true'">
         <xsl:value-of select="concat('Contents_20_',substring-after($styleValue,'TOC'))"/>
       </xsl:when>
       <xsl:otherwise>
@@ -905,6 +939,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  
   
   <!-- searches entry properties through all toc -->
   <xsl:template name="EntryIterator">

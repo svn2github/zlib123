@@ -184,8 +184,17 @@
     <xsl:choose>
       <xsl:when test="w:pStyle">
         <xsl:attribute name="style:parent-style-name">
+
+          <xsl:variable name="isDefaultTOCStyle">
+            <xsl:call-template name ="CheckDefaultTOCStyle">
+              <xsl:with-param name="Name">
+                <xsl:value-of select="w:pStyle/@w:val" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>          
+          
           <xsl:choose>
-            <xsl:when test="contains(w:pStyle/@w:val,'TOC')">
+            <xsl:when test="$isDefaultTOCStyle='true'">
               <xsl:value-of select="concat('Contents_20_',substring-after(w:pStyle/@w:val,'TOC'))"/>
             </xsl:when>
             <xsl:when test="w:pStyle/@w:val='FootnoteText'">
