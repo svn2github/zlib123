@@ -456,6 +456,10 @@
   <xsl:template name="InsertCoditionalFormula">
     <xsl:param name="tableName"/>
 
+	<xsl:variable name="apos">
+  		<xsl:text>&apos;</xsl:text>
+	</xsl:variable>
+
     <xsl:choose>
       <xsl:when test="contains(@style:condition, '.$#REF!$#REF!')">
         <formula/>
@@ -483,31 +487,52 @@
 
       <!-- Condition: Cell content is less than -->
       <xsl:when test="contains(@style:condition, '&lt;')">
-        <formula>
-          <xsl:if
-            test="substring-after(@style:condition, '&lt;') ='&quot;'
-            or substring-after(@style:condition, '&lt;') ='['
-            or number(substring-after(@style:condition, '&lt;'))">
-            <xsl:call-template name="TranslateFormula">
-              <xsl:with-param name="formula" select="substring-after(@style:condition,'&lt;')"/>
-              <xsl:with-param name="tableName" select="$tableName"/>
-            </xsl:call-template>
-          </xsl:if>
+      <formula>
+          <xsl:choose>
+            <xsl:when test="substring-after(@style:condition, '&lt;') ='&quot;'
+              or substring-after(@style:condition, '&lt;') ='['
+              or number(substring-after(@style:condition, '&lt;'))">
+              <xsl:call-template name="TranslateFormula">
+                <xsl:with-param name="formula" select="substring-after(@style:condition,'&lt;')"/>
+                <xsl:with-param name="tableName" select="$tableName"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="substring-before(substring-after(@style:condition, '&lt;'), $apos) = '['">
+              <xsl:call-template name="TranslateFormula">
+                <xsl:with-param name="formula" select="substring-after(@style:condition,'&lt;')"/>
+                <xsl:with-param name="tableName" select="$tableName"/>
+              </xsl:call-template>  
+            </xsl:when>
+            <xsl:otherwise>              
+              <xsl:value-of select="number(substring-after(@style:condition, '&lt;'))"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          
         </formula>
       </xsl:when>
 
       <!-- Condition: Cell content is greater than or equal to-->
       <xsl:when test="contains(@style:condition, '&gt;=')">
         <formula>
-          <xsl:if
-            test="substring-after(@style:condition, '&gt;=') ='&quot;'
-            or substring-after(@style:condition, '&gt;=') ='['
-            or number(substring-after(@style:condition, '&gt;='))">
-            <xsl:call-template name="TranslateFormula">
-              <xsl:with-param name="formula" select="substring-after(@style:condition,'&gt;=')"/>
-              <xsl:with-param name="tableName" select="$tableName"/>
-            </xsl:call-template>
-          </xsl:if>
+          <xsl:choose>
+            <xsl:when test="substring-after(@style:condition, '&gt;=') ='&quot;'
+              or substring-after(@style:condition, '&gt;=') ='['
+              or number(substring-after(@style:condition, '&gt;='))">
+              <xsl:call-template name="TranslateFormula">
+                <xsl:with-param name="formula" select="substring-after(@style:condition,'&gt;=')"/>
+                <xsl:with-param name="tableName" select="$tableName"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="substring-before(substring-after(@style:condition, '&gt;='), $apos) = '['">
+              <xsl:call-template name="TranslateFormula">
+                <xsl:with-param name="formula" select="substring-after(@style:condition,'&gt;=')"/>
+                <xsl:with-param name="tableName" select="$tableName"/>
+              </xsl:call-template>  
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="number(substring-after(@style:condition, '&gt;='))"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </formula>
       </xsl:when>
 
@@ -515,6 +540,20 @@
       <xsl:when test="contains(@style:condition, '&gt;')">
         <formula>
           <xsl:choose>
+          <xsl:when test="substring-after(@style:condition, '&gt;') ='&quot;'
+            or substring-after(@style:condition, '&gt;') ='['
+            or number(substring-after(@style:condition, '&gt;'))">
+              <xsl:call-template name="TranslateFormula">
+                <xsl:with-param name="formula" select="substring-after(@style:condition,'&gt;')"/>
+                <xsl:with-param name="tableName" select="$tableName"/>
+              </xsl:call-template>
+          </xsl:when>
+            <xsl:when test="substring-before(substring-after(@style:condition, '&gt;'), $apos) = '['">
+              <xsl:call-template name="TranslateFormula">
+                <xsl:with-param name="formula" select="substring-after(@style:condition,'&gt;')"/>
+                <xsl:with-param name="tableName" select="$tableName"/>
+              </xsl:call-template>
+            </xsl:when>
           <xsl:when test="substring-after(@style:condition, '&gt;') ='&quot;'
             or substring-after(@style:condition, '&gt;') ='['
             or number(substring-after(@style:condition, '&gt;'))">
@@ -548,15 +587,31 @@
       <!-- Condition: Cell content is equal to -->
       <xsl:when test="contains(@style:condition, '=')">
         <formula>
-          <xsl:if
-            test="substring-after(@style:condition, '=') ='&quot;'
+         <xsl:choose>
+           <xsl:when test="substring-after(@style:condition, '=') ='&quot;'
             or substring-after(@style:condition, '=') ='['
             or number(substring-after(@style:condition, '='))">
             <xsl:call-template name="TranslateFormula">
               <xsl:with-param name="formula" select="substring-after(@style:condition,'=')"/>
               <xsl:with-param name="tableName" select="$tableName"/>
             </xsl:call-template>
-          </xsl:if>
+           </xsl:when>
+           <xsl:when test = "substring-before(substring-after(@style:condition, '='), '$') = '['">
+             <xsl:call-template name="TranslateFormula">
+               <xsl:with-param name="formula" select="substring-after(@style:condition,'=')"/>
+               <xsl:with-param name="tableName" select="$tableName"/>
+             </xsl:call-template>             
+           </xsl:when>
+           <xsl:when test = "substring-before(substring-after(@style:condition, '='), $apos) = '['">
+             <xsl:call-template name="TranslateFormula">
+               <xsl:with-param name="formula" select="substring-after(@style:condition,'=')"/>
+               <xsl:with-param name="tableName" select="$tableName"/>
+             </xsl:call-template>             
+           </xsl:when>           
+           <xsl:when test="substring-after(@style:condition, '=')">
+             <xsl:value-of select="number(substring-after(@style:condition, '='))"/>
+          </xsl:when>
+         </xsl:choose>
         </formula>
       </xsl:when>
 
