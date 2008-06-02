@@ -302,6 +302,7 @@
       
       <xsl:for-each
         select="key('style', $styleName)/style:map[not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
+        <xsl:if test="not(contains(@style:condition,'is-true-formula'))">
         <cfRule type="cellIs" priority="{position()}">
           <xsl:if test="contains(@style:condition,'is-true-formula')">
             <xsl:attribute name="type">
@@ -368,6 +369,7 @@
             </formula>
           </xsl:if>
         </cfRule>
+         </xsl:if>
       </xsl:for-each>
     </conditionalFormatting>
   </xsl:when>

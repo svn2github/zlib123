@@ -513,6 +513,8 @@
     
     <xsl:for-each select="e:cfRule">
       <xsl:sort select="@priority"/>
+      <!-- Formulas are not implemented, skip conditional with formulas-->
+      <xsl:if test="not(@operator='containsText')">
       <style:map>
         <xsl:attribute name="style:apply-style-name">
           <xsl:variable name="PositionStyle">
@@ -579,6 +581,15 @@
               />
             </xsl:attribute>
           </xsl:when>
+          <xsl:when test="@operator='containsText'">
+            <xsl:attribute name="style:condition">             
+              <xsl:value-of select="concat('is-true-formula(', substring-before(e:formula, '&quot;,'), '&quot;;', substring-after(e:formula, '&quot;,'), ')')"
+              />
+            </xsl:attribute>
+            <xsl:attribute name="style:base-cell-address">
+              <xsl:value-of select="substring-before(substring-after(e:formula, '&quot;,'), ')')"/>
+            </xsl:attribute>
+          </xsl:when>
           <xsl:otherwise>
             <xsl:attribute name="style:condition">
               <xsl:text>is-true-formula(FALSE)</xsl:text>
@@ -587,6 +598,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </style:map>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
 
