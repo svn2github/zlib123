@@ -869,7 +869,7 @@
     <xsl:param name="frame"/>
 
     <!-- wrapping of text (horizontal adjustment) -->
-    <xsl:if test="$frame/@fo:min-width or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
+    <xsl:if test="$frame/@fo:min-width or $frame/draw:text-box/@fo:min-height or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
       <!--
       makz: was uncommented in r2655 by rebet
       I commented it in for bugfix 1827515
