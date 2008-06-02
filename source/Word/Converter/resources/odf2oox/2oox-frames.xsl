@@ -517,7 +517,7 @@
             <xsl:choose>
               <xsl:when test="$anchor = 'page' ">mso-position-horizontal-relative:page;</xsl:when>
               <xsl:when test="$anchor = 'paragraph' or $anchor = 'frame' "
-                >mso-position-horizontal-relative:text;</xsl:when>
+>mso-position-horizontal-relative:text;</xsl:when>
               <xsl:when test="$anchor = 'char' ">mso-position-horizontal-relative:char;</xsl:when>
               <xsl:otherwise>
                 <!-- as-char anchor already handled (cf above). In case nothing is ever specified : use default = text -->
@@ -568,7 +568,13 @@
           <xsl:when test="$verticalRel='baseline'">
             <xsl:choose>
               <xsl:when test="$anchor='paragraph'">
+                <!-- 
+                makz:
+                paragraph anchor should be converted to paragraph ...
+                commented out for bugfix 1947870:
                 <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
+                -->
+                <xsl:text>mso-position-vertical-relative:paragraph;</xsl:text>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>mso-position-vertical-relative:char;</xsl:text>
