@@ -893,9 +893,26 @@
         <xsl:value-of select="parent::node()/@text:style-name"/>
       </xsl:when>
       <xsl:when test="ancestor::node()[(self::text:a or self::text:span) and @text:style-name]">
-        <xsl:value-of
+        <xsl:variable name="myStyles" select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name]/@text:style-name"></xsl:variable>
+        <xsl:variable name="firstStyle" select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name][1]/@text:style-name"></xsl:variable>
+        <xsl:variable name="IsAutomaticStyle" select="document('content.xml')//office:document-content/office:automatic-styles/style:style[@style:name=$firstStyle]">
+        </xsl:variable> 
+        <xsl:choose>
+          <!--clam, dialogika: bugfix 1947633-->
+          <xsl:when test="count($myStyles) > 1 and $IsAutomaticStyle">
+            <xsl:value-of
+              select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name][2]/@text:style-name"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of
+              select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name][1]/@text:style-name"
+            />
+          </xsl:otherwise>
+        </xsl:choose>
+        <!--<xsl:value-of
           select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name][1]/@text:style-name"
-        />
+        />-->
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="@text:style-name"/>
