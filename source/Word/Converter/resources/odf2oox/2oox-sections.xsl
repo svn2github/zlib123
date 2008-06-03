@@ -449,6 +449,20 @@
           <xsl:apply-templates
             select="key('page-layouts', @style:page-layout-name)[1]/style:page-layout-properties"
             mode="master-page"/>
+
+          <!--clam, dialogika: bugfix 1947998-->
+          <xsl:variable name="all-master-pages" select="document('styles.xml')//style:master-page"></xsl:variable>
+          <xsl:if test ="//text:page-number[@text:select-page = 'previous']">
+            <xsl:choose>
+              <xsl:when test ="@style:next-style-name = 'Standard'">
+                <w:pgNumType w:start="0"/>
+              </xsl:when>
+              <xsl:when test="count($all-master-pages) = 1">
+                <w:pgNumType w:start="0"/>
+              </xsl:when>
+            </xsl:choose>           
+          </xsl:if>
+          
         </psect:master-page>
       </xsl:for-each>
     </psect:master-pages>
