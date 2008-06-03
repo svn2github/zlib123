@@ -952,7 +952,7 @@
     <!-- second condition in xsl:when checks if there isn't another w:p node before decendant -->
     <xsl:choose>
       <xsl:when
-        test="$node/descendant::w:numPr[not(ancestor::w:pPrChange)] and 
+        test="$node/descendant::w:numPr[not(ancestor::w:pPrChange)] and $node/descendant::w:numPr/child::node()[name() = $property] and
         generate-id($node)=generate-id($node/descendant::w:numPr[not(ancestor::w:pPrChange)]/ancestor::w:p[1])">
         <xsl:value-of select="$node/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
       </xsl:when>
@@ -1159,7 +1159,6 @@
     <xsl:choose>
       <!--      if this paragraph is attached to preceding in track changes mode-->
       <xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
-
            
       <xsl:otherwise>
         <text:list-item>
