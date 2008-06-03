@@ -1056,24 +1056,9 @@
           
           <xsl:variable name="CheckIfConditional">
             <xsl:choose>
-              <xsl:when test="contains(concat(':', $ConditionalCellSingle),  concat(':', $ColChars, $rowNum, '-'))">
-                <xsl:value-of select="concat(':', $ColChars, $rowNum, '-', substring-before(substring-after(concat(':', $ConditionalCellSingle),  concat(':', $ColChars, $rowNum, '-')), ':'))"/>
+              <xsl:when test="@oox:ConditionalStyle">
+                <xsl:text>true</xsl:text>    
               </xsl:when>
-              <xsl:when test="contains(concat(':', $ConditionalCellCol), concat(':', $colNum, ':'))">
-              
-                <xsl:call-template name="CheckIfConditionalInThisCell">
-                  <xsl:with-param name="rowNum">
-                    <xsl:value-of select="$rowNum"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="colNum">
-                    <xsl:value-of select="$colNum"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="ConditionalCellMultiple">
-                    <xsl:value-of select="$ConditionalCellMultiple"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-                
-              </xsl:when>              
               <xsl:otherwise>
                 <xsl:text>false</xsl:text>
               </xsl:otherwise>
@@ -1093,14 +1078,14 @@
             
               <xsl:when test="$CheckIfConditional != 'false'">
                 <xsl:variable name="ConditionalStyleID">
-                  <xsl:value-of select="substring-before($CheckIfConditional, '-')"/>
+                  <xsl:value-of select="@oox:ConditionalStyle"/>
                 </xsl:variable>
                 
                 
                 <xsl:attribute name="table:style-name">
                   
                   <xsl:value-of
-                    select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = substring-after($CheckIfConditional, '-')])"
+                    select="generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID])"
                   />
                   
                 </xsl:attribute>

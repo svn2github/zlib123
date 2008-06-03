@@ -5,6 +5,7 @@ using CleverAge.OdfConverter.OdfConverterLib;
 using System.Xml;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.Diagnostics;
+using System.Collections;
 
 namespace CleverAge.OdfConverter.Spreadsheet
 {
@@ -13,6 +14,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
         protected int _partId = 0;
 
         private const string SPREADSHEET_ML_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+        private Hashtable styleCellNumber;
 
         public XlsxDocument(string fileName)
             : base(fileName)
@@ -175,6 +177,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                                 + GetRowId(value).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                                             xtw.WriteAttributeString(NS_PREFIX, "p", PACKAGE_NS, coord);
+                                            if (ConditionalCell != "")
+                                            {
+                                                int ConditionalStyle = CheckIfConditional(GetRowId(value), GetColId(value), ConditionalCell);
+                                                if (ConditionalStyle != -1)
+                                                {                                                    
+                                                    xtw.WriteAttributeString(NS_PREFIX, "ConditionalStyle", PACKAGE_NS, ConditionalStyle.ToString());
+                                                }
+                                                
+                                            }
                                             //xtw.WriteAttributeString(NS_PREFIX, "c", PACKAGE_NS, GetColId(value).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                             //xtw.WriteAttributeString(NS_PREFIX, "r", PACKAGE_NS, GetRowId(value).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                         }
@@ -416,6 +427,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             int idSi = 0;
             int idCf = 0;
             String ConditionalCellSheet = "";
+            int idConditional = 0;
 
             RelationShip rel = new RelationShip();
 
@@ -475,8 +487,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                                      if (String.Compare(xtr.LocalName, "dxfId") == 0 && sqrefExist == 1)
                                      {
-                                         ConditionalCellSheet = ConditionalCellSheet + " " + xtr.Value + "=";
+                                         ConditionalCellSheet = ConditionalCellSheet + " " + idConditional.ToString() + "=";
                                          sqrefExist = 0;
+                                         idConditional++;
                                          
                                      }
                                      string value = xtr.Value;
@@ -644,10 +657,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
         {
 
             List<int> intListCol = new List<int>();
-            List<int> intListColStyle = new List<int>();
             String ConditionalCellStyle = "";
             String Style = "";
-
+            styleCellNumber = new Hashtable();
             
             
             foreach (string value in ConditionalCell.Split())
@@ -675,7 +687,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                 if (CollNrStart < CollNr && CollNr < CollNrEnd)
                                 {
                                     intListCol.Add(CollNr);
-                                    intListColStyle.Add(System.Int32.Parse(Style));
+                                    styleCellNumber.Add(CollNr, System.Int32.Parse(Style));
                                 }
                                 
                             }
@@ -700,7 +712,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                 if (CollNrStart < CollNr && CollNr < CollNrEnd)
                                 {
                                     intListCol.Add(CollNr);
-                                    intListColStyle.Add(System.Int32.Parse(Style));
+                                    styleCellNumber.Add(CollNr, System.Int32.Parse(Style));
                                 }
                             }
                         
@@ -728,7 +740,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                  xtw.WriteAttributeString(NS_PREFIX, "p", PACKAGE_NS, coord);
 
-                 xtw.WriteEndElement();                
+                 xtw.WriteAttributeString(NS_PREFIX, "ConditionalStyle", PACKAGE_NS, styleCellNumber[intListCol[count]].ToString());
+
+                 xtw.WriteEndElement();
                 
             }
 
@@ -809,6 +823,65 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
 
             return result;
+        }
+
+        private int CheckIfConditional(int RowNumber, int ColNumber, String ConditionalCell)
+        {
+
+            List<int> intListCol = new List<int>();
+            List<int> intListColStyle = new List<int>();
+            String ConditionalCellStyle = "";
+            String Style = "-1";
+
+
+
+            foreach (string value in ConditionalCell.Split())
+            {
+                if (value.Contains("-"))
+                {
+                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value) + value.Length);
+                    Style = ConditionalCellStyle.Substring(0, ConditionalCellStyle.IndexOf('='));
+
+                    string CellStart = value.Substring(0, value.IndexOf('-'));
+                    string CellEnd = value.Substring(value.IndexOf('-') + 1);
+
+                    int RowStart = System.Int32.Parse(CellStart.Substring(CellStart.IndexOf('|') + 1));
+                    int ColStart = System.Int32.Parse(CellStart.Substring(0, CellStart.IndexOf('|')));
+
+                    int RowEnd = System.Int32.Parse(CellEnd.Substring(CellEnd.IndexOf('|') + 1));
+                    int ColEnd = System.Int32.Parse(CellEnd.Substring(0, CellEnd.IndexOf('|')));
+
+                    if ((RowStart <= RowNumber) && (RowNumber <= RowEnd) && (ColStart <= ColNumber) && (ColNumber <= ColEnd))
+                    {
+                        break;
+                    }
+                    Style = "-1";
+                }
+                else if (value.Contains("|"))
+                {
+
+                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value) + value.Length);
+                    Style = ConditionalCellStyle.Substring(0, ConditionalCellStyle.IndexOf('='));
+
+                    int CollNr = System.Int32.Parse(value.Substring(0, value.IndexOf('|')));
+
+                    int Row = System.Int32.Parse(value.Substring(value.IndexOf('|') + 1));
+
+                    if ((Row == RowNumber) && (CollNr == ColNumber))
+                    {
+                        break; 
+                    }
+
+                    Style = "-1";
+                }
+                
+            }
+
+            return Int32.Parse(Style.ToString());
+
+          
+            
+
         }
 
 
