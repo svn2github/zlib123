@@ -757,18 +757,22 @@ namespace CleverAge.OdfConverter.Word
             Stack tmp = new Stack();
             Element element = (Element)this.currentNode.Peek();
             string id = element.GetAttributeValue("id", PCT_NAMESPACE);
-            Element region = (Element)this.currentInsertionRegion.Pop();
-            while (!id.Equals(region.GetAttributeValue("id", PCT_NAMESPACE)))
+            if (this.currentInsertionRegion.Count > 0)
             {
-                tmp.Push(region);
-                region = (Element)this.currentInsertionRegion.Pop();
+                Element region = (Element)this.currentInsertionRegion.Pop();
+                while (!id.Equals(region.GetAttributeValue("id", PCT_NAMESPACE)))
+                {
+                    tmp.Push(region);
+                    region = (Element)this.currentInsertionRegion.Pop();
+                }
+            
+                while (tmp.Count > 0)
+                {
+                    this.currentInsertionRegion.Push(tmp.Pop());
+                }
+                // save the last region in case we need it before closing a paragraph
+                this.lastInsertionRegion = region;
             }
-            while (tmp.Count > 0)
-            {
-                this.currentInsertionRegion.Push(tmp.Pop());
-            }
-            // save the last region in case we need it before closing a paragraph
-            this.lastInsertionRegion = region;
         }
 
 
