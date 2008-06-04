@@ -82,6 +82,7 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
   <xsl:key name="SheetFormatPr" match="e:sheetFormatPr" use="@oox:part"/>
   <xsl:key name="Col" match="e:col" use="@oox:part"/>
   <xsl:key name="ConditionalFormatting" match="e:worksheet/e:conditionalFormatting" use="@oox:part"/>
+  <xsl:key name="ConditionalInheritance" match="e:worksheet/e:conditionalFormatting" use="@oox:id"/>
 
   <!-- recursive search and replace -->
   <xsl:template name="recursive">
@@ -149,6 +150,17 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <xsl:apply-templates select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="ConditionalStyle">
           <xsl:with-param name="number">1</xsl:with-param>
         </xsl:apply-templates>
+       
+		<!-- Insert Conditional Inheritance -->
+        <xsl:if test="key('ConditionalInheritance', 0)">
+        <xsl:call-template name="ConditionalInheritance">
+          <xsl:with-param name="id">
+            <xsl:text>0</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+        </xsl:if>
+          
+       
 
         <!-- Insert Scenario properties -->
         <!--xsl:comment>Scenario Styles</xsl:comment-->
@@ -330,8 +342,8 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
 
 	  <!-- Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
 		   Changes by: Vijayeta
-		   Desc:‘-‘ is removed from the list of symbols to get the value of ‘checkedName’.,line 342 
-		   This is done because some of the sheets in the file ‘03706191.CONFIDENTIAL.xlsx’ have names such as ‘E3-SITES’, N2-L, and so on
+		   Desc:�?-�? is removed from the list of symbols to get the value of �?checkedName’.,line 342 
+		   This is done because some of the sheets in the file �?03706191.CONFIDENTIAL.xlsx’ have names such as �?E3-SITES’, N2-L, and so on
       -->
     <xsl:variable name="checkedName">
       <xsl:call-template name="CheckSheetName">
@@ -680,8 +692,8 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <!-- 
 		      Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
 		      Changes by: Vijayeta
-		      Desc:‘-‘ is removed from the list of symbols,line 653 
-		            This is done because some of the sheets in the file ‘03706191.CONFIDENTIAL.xlsx’ have names such as ‘E3-SITES’, N2-L, and so on
+		      Desc:�?-�? is removed from the list of symbols,line 653 
+		            This is done because some of the sheets in the file �?03706191.CONFIDENTIAL.xlsx’ have names such as �?E3-SITES’, N2-L, and so on
         -->
           <xsl:if test="string($checkedName) = translate(substring-before(self::node(), '!'), '!$#:(),.+','') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
             <!-- one print range without apostrophes -->

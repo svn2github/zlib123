@@ -6,6 +6,7 @@ using System.Xml;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.Diagnostics;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace CleverAge.OdfConverter.Spreadsheet
 {
@@ -15,6 +16,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         private const string SPREADSHEET_ML_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         private Hashtable styleCellNumber;
+        private Hashtable intConditionalWithStyle;
 
         public XlsxDocument(string fileName)
             : base(fileName)
@@ -47,6 +49,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
             String ConditionalCellRow = "";
             List<int> ConditionalCellRowList = new List<int>();
             Boolean CheckIfBigConditional = new Boolean();
+            intConditionalWithStyle = new Hashtable();
+            string s = "";
+            int ConditionalStyle = -1;
 
             XmlReader SearchConditionalReader; 
             
@@ -179,7 +184,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                             xtw.WriteAttributeString(NS_PREFIX, "p", PACKAGE_NS, coord);
                                             if (ConditionalCell != "")
                                             {
-                                                int ConditionalStyle = CheckIfConditional(GetRowId(value), GetColId(value), ConditionalCell);
+                                                ConditionalStyle = CheckIfConditional(GetRowId(value), GetColId(value), ConditionalCell);
                                                 if (ConditionalStyle != -1)
                                                 {                                                    
                                                     xtw.WriteAttributeString(NS_PREFIX, "ConditionalStyle", PACKAGE_NS, ConditionalStyle.ToString());
@@ -190,10 +195,38 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                             //xtw.WriteAttributeString(NS_PREFIX, "r", PACKAGE_NS, GetRowId(value).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                         }
                                         break;
-                                }
+                                    case "s":
+                                        s = xtr.Value;
+                                        break;
+                                }                               
 
                             }
+
+                            
+                            if (ConditionalStyle > -1)
+                            {
+
+                                if (intConditionalWithStyle.Contains(ConditionalStyle))
+                                {                                 
+                                    String OldValue = Convert.ToString(intConditionalWithStyle[ConditionalStyle]);                                                                        
+
+                                    if (!("|" + OldValue).Contains("|" + s + "|"))
+                                    {                                                     
+                                        intConditionalWithStyle.Remove(ConditionalStyle);
+                                        intConditionalWithStyle.Add(ConditionalStyle, (OldValue + s + "|"));
+                                       
+                                    }
+                                }
+                                else
+                                {
+                                    intConditionalWithStyle.Add(ConditionalStyle, (s + "|"));   
+                                }
+                            }
+
+                            ConditionalStyle = -1;
+                                
                             xtr.MoveToElement();
+
                         }
 
                         }
@@ -256,6 +289,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             case "conditionalFormatting":
                                 xtw.WriteAttributeString(NS_PREFIX, "part", PACKAGE_NS, _partId.ToString(System.Globalization.CultureInfo.InvariantCulture));
                                 xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idCf++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                if (intConditionalWithStyle.Contains(idCf - 1))
+                                {
+                                    xtw.WriteAttributeString(NS_PREFIX, "ConditionalInheritance", PACKAGE_NS, Convert.ToString(intConditionalWithStyle[idCf - 1]));
+                                }
                                 break;
                             
                             case "col":
@@ -468,7 +505,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                      if (String.Compare(Cell, "false") != 0)
                                      {                                         
                                          sqrefExist = 1;
-                                         ConditionalCellSheet = ConditionalCellSheet + " " + ConditionalCellNumber(xtr.Value);                                         
+                                         ConditionalCellSheet = ConditionalCellSheet + " " + ConditionalCellNumber(xtr.Value);
                                      }
                                  }
                                  string value = xtr.Value;

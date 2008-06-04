@@ -1075,7 +1075,21 @@
             test="@s  or $CheckIfConditional != 'false'">
             <xsl:choose>
             
-            
+              <xsl:when test="$CheckIfConditional != 'false' and @s != ''">
+                <xsl:variable name="ConditionalStyleID">
+                  <xsl:value-of select="@oox:ConditionalStyle"/>
+                </xsl:variable>
+                
+                
+                <xsl:attribute name="table:style-name">
+                  
+                  <xsl:value-of
+                    select="concat(generate-id(key('ConditionalFormatting', ancestor::e:worksheet/@oox:part)[@oox:id = $ConditionalStyleID]), @s)"
+                  />
+                  
+                </xsl:attribute>
+              </xsl:when>
+              
               <xsl:when test="$CheckIfConditional != 'false'">
                 <xsl:variable name="ConditionalStyleID">
                   <xsl:value-of select="@oox:ConditionalStyle"/>

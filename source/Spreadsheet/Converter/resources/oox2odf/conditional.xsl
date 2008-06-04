@@ -36,12 +36,19 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" 
   xmlns:oox="urn:oox"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="e oox r">
 
   <xsl:import href="common.xsl"/>
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="styles.xsl"/>
+  
+  <xsl:key name="XfStyle" match="e:xf" use="@oox:id"/>
 
   <!-- Get cell when the conditional is starting and ending -->
   <xsl:template name="ConditionalCell">
@@ -1171,6 +1178,73 @@
   <xsl:template name="GetMinRowWithConditionalSingle">
     <xsl:param name="ConditionalCellSingle"/>
     <xsl:param name="AfterRow"/>
+    
+  </xsl:template>
+  
+  <xsl:template name="ConditionalInheritance">
+    <xsl:param name="id"/>
+    
+    <xsl:for-each select="key('ConditionalInheritance', $id)">
+      <xsl:if test="@oox:ConditionalInheritance != ''">
+        <xsl:call-template name="ConditionalInheritanceStyle">
+          <xsl:with-param name="id">
+            <xsl:value-of select="$id"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalInheritance">
+            <xsl:value-of select="@oox:ConditionalInheritance"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:for-each>
+    
+    <xsl:if test="key('ConditionalInheritance', $id+1)">
+      <xsl:call-template name="ConditionalInheritance">
+        <xsl:with-param name="id">
+          <xsl:value-of select="$id+1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
+  </xsl:template>
+  
+  <xsl:template name="ConditionalInheritanceStyle">
+    <xsl:param name="id"/>
+    <xsl:param name="ConditionalInheritance"/>
+    
+    <xsl:if test="substring-before($ConditionalInheritance, '|') != ''">      
+      
+      <style:style style:family="table-cell"
+      style:parent-style-name="Default">
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="concat(generate-id(.), substring-before($ConditionalInheritance, '|'))"/>  
+        </xsl:attribute>
+        
+        <xsl:for-each select="key('Xf', substring-before($ConditionalInheritance, '|'))">
+          <xsl:call-template name="InsertCellFormat">
+            <xsl:with-param name="CheckConditional">
+              <xsl:text>true</xsl:text>
+            </xsl:with-param>
+          </xsl:call-template>
+          </xsl:for-each>
+      
+      <xsl:call-template name="InsertConditional"/>
+      
+      </style:style>
+      
+    </xsl:if>
+    
+    <xsl:if test="substring-after($ConditionalInheritance, '|') != ''">
+
+      <xsl:call-template name="ConditionalInheritanceStyle">
+        <xsl:with-param name="id">
+          <xsl:value-of select="$id"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalInheritance">
+          <xsl:value-of select="substring-after($ConditionalInheritance, '|')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    
+    </xsl:if>
     
   </xsl:template>
 
