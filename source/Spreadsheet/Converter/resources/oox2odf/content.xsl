@@ -342,8 +342,8 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
 
 	  <!-- Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
 		   Changes by: Vijayeta
-		   Desc:�?-�? is removed from the list of symbols to get the value of �?checkedName’.,line 342 
-		   This is done because some of the sheets in the file �?03706191.CONFIDENTIAL.xlsx’ have names such as �?E3-SITES’, N2-L, and so on
+		   Desc:â€?-â€? is removed from the list of symbols to get the value of â€?checkedNameâ€™.,line 342 
+		   This is done because some of the sheets in the file â€?03706191.CONFIDENTIAL.xlsxâ€™ have names such as â€?E3-SITESâ€™, N2-L, and so on
       -->
     <xsl:variable name="checkedName">
       <xsl:call-template name="CheckSheetName">
@@ -692,8 +692,8 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <!-- 
 		      Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
 		      Changes by: Vijayeta
-		      Desc:�?-�? is removed from the list of symbols,line 653 
-		            This is done because some of the sheets in the file �?03706191.CONFIDENTIAL.xlsx’ have names such as �?E3-SITES’, N2-L, and so on
+		      Desc:â€?-â€? is removed from the list of symbols,line 653 
+		            This is done because some of the sheets in the file â€?03706191.CONFIDENTIAL.xlsxâ€™ have names such as â€?E3-SITESâ€™, N2-L, and so on
         -->
           <xsl:if test="string($checkedName) = translate(substring-before(self::node(), '!'), '!$#:(),.+','') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
             <!-- one print range without apostrophes -->
