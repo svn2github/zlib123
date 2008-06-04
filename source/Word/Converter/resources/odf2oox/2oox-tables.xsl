@@ -740,6 +740,7 @@
       <xsl:call-template name="GetColPos">
         <xsl:with-param name="cellPos" select="$cellPos" />
         <xsl:with-param name="cells" select="$cells" />
+        <xsl:with-param name="columns" select="$columns" />
       </xsl:call-template>
     </xsl:variable>
 
@@ -763,12 +764,24 @@
 
     <!-- choose if width is relative or absolute -->
     <w:tcW>
-      <xsl:variable name="styleId" select="$columns[number($colPos)]/@table:style-name" />
-      <xsl:variable name="relWidth" select="key('automatic-styles', $styleId)/style:table-column-properties/@style:rel-column-width"/>
+      <xsl:variable name="isRelTable">
+        <xsl:for-each select="$columns[1]">
+          <!-- context switch foreach -->
+          <xsl:variable name="tableStyleName" select="parent::table:table/@table:style-name"/>
+          <xsl:choose>
+            <xsl:when test="key('automatic-styles', $tableStyleName)/style:table-properties/@style:rel-width != ''">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:variable>
       
       <xsl:attribute name="w:type">
         <xsl:choose>
-          <xsl:when test="$relWidth">
+          <xsl:when test="$isRelTable='true'">
             <xsl:text>pct</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -802,6 +815,20 @@
     <xsl:choose>
       <xsl:when test="$colPos &lt; $colEndPos">
 
+        <xsl:variable name="isRelTable">
+          <xsl:for-each select="$columns[1]">
+            <!-- context switch foreach -->
+            <xsl:variable name="tableStyleName" select="parent::table:table/@table:style-name"/>
+            <xsl:choose>
+              <xsl:when test="key('automatic-styles', $tableStyleName)/style:table-properties/@style:rel-width != ''">
+                <xsl:text>true</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:variable>
         <xsl:variable name="styleId" select="$columns[number($colPos)]/@table:style-name" />
         <xsl:variable name="widthString" select="key('automatic-styles', $styleId)/style:table-column-properties/@style:column-width"/>
         <xsl:variable name="relWidthString" select="key('automatic-styles', $styleId)/style:table-column-properties/@style:rel-column-width"/>
@@ -809,10 +836,10 @@
         <!-- get the width of this column -->
         <xsl:variable name="width">
           <xsl:choose>
-            <xsl:when test="$relWidthString">
+            <xsl:when test="$isRelTable='true' and $relWidthString">
               <xsl:value-of select="substring-before($relWidthString, '*')" />
             </xsl:when>
-            <xsl:when test="$widthString">
+            <xsl:when test="$isRelTable='false' and $widthString">
               <xsl:value-of select="substring-before($widthString, 'cm')" />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
@@ -827,8 +854,8 @@
           <xsl:with-param name="cellWidth" select="$cellWidth + $width" />
           <xsl:with-param name="widthType">
             <xsl:choose>
-              <xsl:when test="$widthType = 'default' and $relWidthString">relative</xsl:when>
-              <xsl:when test="$widthType = 'default' and $widthString">absolute</xsl:when>
+              <xsl:when test="$widthType = 'default' and $isRelTable='true'">relative</xsl:when>
+              <xsl:when test="$widthType = 'default' and $isRelTable='false'">absolute</xsl:when>
             </xsl:choose>
           </xsl:with-param>
         </xsl:call-template>
@@ -852,16 +879,15 @@
   
   
   <!--
-  Summary:  This template takes the colspan of the cells into account to find 
-            the column that matches the given cell position.
+  Summary:  This template adds the colspan of the cells to get the theoretical index of the column
   Author:   makz (DIaLOGIKa)
   Params:   cellPos: The position of the cell, which column should be found
             cells: The node set of all cells in the row
   -->
-  <xsl:template name="GetColPos">
+  <xsl:template name="GetColIndex">
     <xsl:param name="cellPos" />
     <xsl:param name="cells" />
-    <xsl:param name="colPos">1</xsl:param>
+    <xsl:param name="index">1</xsl:param>
     <xsl:param name="iterator">1</xsl:param>
     
     <xsl:choose>
@@ -878,16 +904,72 @@
         </xsl:variable>
         
         <!-- add this colspan to the current colPos -->
-        <xsl:call-template name="GetColPos">
+        <xsl:call-template name="GetColIndex">
           <xsl:with-param name="cells" select="$cells" />
           <xsl:with-param name="cellPos" select="$cellPos" />
           <xsl:with-param name="iterator" select="$iterator + 1"/>
-          <xsl:with-param name="colPos" select="$colPos + $colSpan" />
+          <xsl:with-param name="index" select="$index + $colSpan" />
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <!-- return the value -->
+        <xsl:value-of select="$index"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
+  <!--
+  Summary:  This templates get the position of the column to which the given cell belongs
+  Author:   makz (DIaLOGIKa)
+  Params:   cellPos: The position of the cell, which column should be found
+            cells: The node set of all cells in the row
+            columns: The node set of all columns
+  -->
+  <xsl:template name="GetColPos">
+    <xsl:param name="cellPos" />
+    <xsl:param name="cells" />
+    <xsl:param name="columns" />
+    <xsl:param name="colPos">1</xsl:param>
+    <xsl:param name="index">
+      <xsl:call-template name="GetColIndex">
+        <xsl:with-param name="cells" select="$cells" />
+        <xsl:with-param name="cellPos" select="$cellPos" />
+      </xsl:call-template>
+    </xsl:param>
+    <xsl:param name="repeated">
+      <xsl:choose>
+        <xsl:when test="$columns[1]/@table:number-columns-repeated">
+          <xsl:value-of select="$columns[1]/@table:number-columns-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+
+    <xsl:choose>
+      <xsl:when test="not($index &gt; $repeated)">
+        <!-- return the value -->
         <xsl:value-of select="$colPos"/>
+      </xsl:when>
+      <xsl:otherwise>
+
+        <xsl:variable name="nextRepeat">
+          <xsl:choose>
+            <xsl:when test="$repeated + $columns[number($colPos)+1]/@table:number-columns-repeated">
+              <xsl:value-of select="$repeated + $columns[number($colPos)+1]/@table:number-columns-repeated"/>
+            </xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:call-template name="GetColPos">
+          <xsl:with-param name="cellPos" select="$cellPos" />
+          <xsl:with-param name="cells" select="$cells" />
+          <xsl:with-param name="columns" select="$columns" />
+          <xsl:with-param name="index" select="$index" />
+          <xsl:with-param name="colPos" select="$colPos + 1" />
+          <xsl:with-param name="repeated" select="$repeated + $nextRepeat" />
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

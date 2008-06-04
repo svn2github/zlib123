@@ -214,20 +214,31 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  inserts document elements-->
+  
+  <!--
+  Summary:  Converts the child elements of the body and handels the section conversion
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+  -->
   <xsl:template name="InsertDocumentBody">
     <xsl:choose>
-      <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-        <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body"
-          mode="sections"/>
+      <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr" >
+        <!--
+        There is more than the default sectPr, we need to write an own section for each sectPr.
+        -->
+        <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr" mode="sections" />
       </xsl:when>
-      <!-- divo: what is the else case here??? -->
+      <xsl:otherwise>
+        <!--
+        There is only the default section, so we convert the childs directly. 
+        The properties of the default sectPr are applied tho the "Standard" master page
+        -->
+        <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()" />
+      </xsl:otherwise>
     </xsl:choose>
-    <xsl:apply-templates
-      select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"
-    />
   </xsl:template>
 
+  
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template
     match="w:pPr[parent::w:p]|w:r[parent::w:p[not(child::w:pPr)] and (child::w:br[@w:type='page' or @w:type='column'] or contains(child::w:pict/v:shape/@style,'mso-position-horizontal-relative:char'))]"
@@ -1235,8 +1246,7 @@
         <xsl:choose>
           <xsl:when test="$followingSectPr">
             <xsl:choose>
-              <xsl:when
-                test="$followingSectPr/w:titlePg">
+              <xsl:when test="$followingSectPr/w:titlePg">
                 <xsl:attribute name="style:master-page-name">
                   <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
                 </xsl:attribute>
@@ -1250,8 +1260,7 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
-              <xsl:when
-                test="$mainSectPr/w:titlePg">
+              <xsl:when test="$mainSectPr/w:titlePg">
                 <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
               </xsl:when>
               <xsl:otherwise>
@@ -1266,8 +1275,7 @@
         <!--<xsl:if test="preceding::w:p[parent::w:body|parent::w:tbl/tr/tv][1]/w:pPr/w:sectPr">-->
         <xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr">
           <xsl:choose>
-            <xsl:when
-              test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
+            <xsl:when test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
               <xsl:attribute name="style:master-page-name">
                 <!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
                 master page names should be reviewed and unified : many names not consistent, many styles never used -->
@@ -1295,8 +1303,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
-                    <xsl:when
-                      test="$mainSectPr/w:titlePg">
+                    <xsl:when test="$mainSectPr/w:titlePg">
                       <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
                     </xsl:when>
                     <xsl:otherwise>

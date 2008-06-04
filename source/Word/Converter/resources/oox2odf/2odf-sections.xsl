@@ -7,7 +7,21 @@
   xmlns:oox="urn:oox"
   exclude-result-prefixes="oox">
 
-  <xsl:template match="w:sectPr[parent::w:pPr]" mode="sections">
+  <!-- 
+  *************************************************************************
+  MATCHING TEMPLATES
+  *************************************************************************
+  -->
+
+  <!--
+  Summary:  Writes a <text:section> for each sectPr that is applied.
+            Sometimes it is not neccessary to write a section for each sectPr (if there is only the default sectPr)
+            The descission is made by "InsertDocumentBody"
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+            Changed from <xsl:template match="w:sectPr[parent::w:pPr]" mode="sections">
+  -->
+  <xsl:template match="w:sectPr" mode="sections">
     <xsl:variable name="id">
       <xsl:value-of select="generate-id(preceding::w:p/w:pPr/w:sectPr)"/>
     </xsl:variable>
@@ -18,12 +32,9 @@
       <xsl:when
         test="preceding::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]
         or parent::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]">
-        <xsl:apply-templates
-          select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"
-        />
+        <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]" />
       </xsl:when>
       <xsl:otherwise>
-
         <text:section>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="$id2"/>
@@ -31,22 +42,44 @@
           <xsl:attribute name="text:name">
             <xsl:value-of select="concat('S_',$id2)"/>
           </xsl:attribute>
-          <xsl:apply-templates
-            select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"
-          />
+          <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"/>
         </text:section>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  
+  <!--
+  Summary:  Writes a the style of the section
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+            Changed from <xsl:template match="w:sectPr[parent::w:pPr]" mode="automaticstyles">
+  -->
+  <xsl:template match="w:sectPr" mode="automaticstyles">
+    <style:style style:name="{generate-id(.)}" style:family="section">
+      <style:section-properties>
+        <xsl:call-template name="InsertColumns"/>
+        <xsl:call-template name="InsertSectionNotesConfig"/>
+      </style:section-properties>
+    </style:style>
+  </xsl:template>
 
+  <!-- 
+  *************************************************************************
+  CALLED TEMPLATES
+  *************************************************************************
+  -->
+  
   <xsl:template name="InsertColumns">
 
     <xsl:choose>
       <xsl:when test="w:cols/@w:num">
         <style:columns>
+
           <xsl:attribute name="fo:column-count">
             <xsl:value-of select="w:cols/@w:num"/>
           </xsl:attribute>
+
           <xsl:choose>
             <xsl:when test="w:cols/@w:equalWidth = '0'"> </xsl:when>
             <xsl:otherwise>
@@ -60,9 +93,11 @@
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
+
           <xsl:if test="w:cols/@w:sep = '1'">
             <style:column-sep style:width="0.002cm" style:color="#000000" style:height="100%"/>
           </xsl:if>
+
           <xsl:for-each select="w:cols/w:col">
             <style:column>
               <xsl:attribute name="style:rel-width">
@@ -129,15 +164,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:sectPr[parent::w:pPr]" mode="automaticstyles">
-    <style:style style:name="{generate-id(.)}" style:family="section">
-      <style:section-properties>
-        <xsl:call-template name="InsertColumns"/>
-        <xsl:call-template name="InsertSectionNotesConfig"/>
-      </style:section-properties>
-    </style:style>
-  </xsl:template>
-
   <xsl:template name="InsertSectionNotesConfig">
     <!-- TODO : more attributes -->
     <xsl:if test="w:footnotePr/w:pos/@w:val = 'beneathText' ">
@@ -152,5 +178,6 @@
     </xsl:if>
   </xsl:template>
 
+  
   <xsl:template match="text()" mode="sections"/>
 </xsl:stylesheet>
