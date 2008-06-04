@@ -50,7 +50,11 @@
               <xsl:otherwise>false</xsl:otherwise>
             </xsl:choose>
           </config:config-item>
-          
+
+          <!--clam, dialogika: bugfix 1948059-->
+          <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
+          <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
+
           <!--math, dialogika: Added for correct indentation calculation BEGIN -->
           
           <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">
