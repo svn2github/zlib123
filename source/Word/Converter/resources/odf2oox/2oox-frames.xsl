@@ -133,12 +133,17 @@
           <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
           <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
           <xsl:variable name="frameStyle" select="$automaticStyle | $officeStyle"/>
-
+          <!-- Sona Added Fill Color Property to text -->
+          <xsl:variable name ="color" select ="($automaticStyle)/style:graphic-properties/@draw:fill-color"></xsl:variable>
           <xsl:call-template name="FrameToShapeProperties">
             <xsl:with-param name="frameStyle" select="$frameStyle"/>
             <xsl:with-param name="frame" select="parent::draw:frame"/>
           </xsl:call-template>
-
+          <xsl:if test ="$color!=''">
+            <xsl:attribute name="fillcolor">
+              <xsl:value-of select ="$color"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:call-template name="FrameToShapeWrap">
             <xsl:with-param name="frameStyle" select="$frameStyle"/>
           </xsl:call-template>
