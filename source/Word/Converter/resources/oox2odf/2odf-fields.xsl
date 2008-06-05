@@ -44,20 +44,37 @@
         <xsl:with-param name="fieldCode" select="$fieldCode"/>
       </xsl:call-template>
     </xsl:if>
-   
+
+  </xsl:template>
+
+  <xsl:template name="left-trim">
+    <xsl:param name="s" />
+    <xsl:choose>
+      <xsl:when test="substring($s, 1, 1) = ''">
+        <xsl:value-of select="$s"/>
+      </xsl:when>
+      <xsl:when test="normalize-space(substring($s, 1, 1)) = ''">
+        <xsl:call-template name="left-trim">
+          <xsl:with-param name="s" select="substring($s, 2)" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$s" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- process a field code -->
   <xsl:template match="w:instrText">
     <xsl:param name="parentRunNode"/>
-    
+
     <text:span text:style-name="{generate-id(parent::w:r)}">
-      
+
       <!-- rebuild the field code using a series of instrText, in current run or followings -->
       <xsl:variable name="fieldCode">
         <xsl:call-template name="BuildFieldCode"/>
       </xsl:variable>
-      
+
       <!-- first field instruction. Should contains field type. If not, switch to next instruction -->
       <xsl:variable name="fieldType">
         <xsl:variable name="field">
@@ -67,7 +84,7 @@
         </xsl:variable>
         <xsl:value-of select="translate($field, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
       </xsl:variable>
-      
+
       <xsl:choose>
         <!-- XE -->
         <xsl:when test="$fieldType='XE'">
@@ -98,7 +115,7 @@
             </xsl:call-template>
           </xsl:variable>
           <xsl:variable name="referencedItem" select="key('bookmarksByName', $fieldName)" />
-          
+
           <xsl:choose>
             <!-- Is the referenced field a bookmark? -->
             <xsl:when test="$referencedItem">
@@ -112,7 +129,7 @@
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
-          
+
         </xsl:when>
         <!-- USERINITIALS -->
         <xsl:when test="$fieldType='USERINITIALS'">
@@ -225,6 +242,18 @@
           <xsl:if test="../following-sibling::w:r/w:t and ../following-sibling::w:r/w:fldChar[@w:fldCharType = 'separate']">
             <xsl:value-of select="../following-sibling::w:r/w:t"></xsl:value-of>
           </xsl:if>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'MACROBUTTON'">
+          <xsl:variable name="WithoutMACROBUTTON">
+            <xsl:call-template name="left-trim">
+              <xsl:with-param name="s" select="substring-after($fieldCode,'MACROBUTTON ')" />
+            </xsl:call-template>
+            <!--<xsl:value-of select="substring-after($fieldCode,'MACROBUTTON ')"/>-->
+          </xsl:variable>
+          <xsl:variable name="WithoutFirstArgument">
+            <xsl:value-of select="substring-after($WithoutMACROBUTTON,' ')"/>
+          </xsl:variable>
+          <xsl:value-of select="$WithoutFirstArgument"/>
         </xsl:when>
       </xsl:choose>
     </text:span>
