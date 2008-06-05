@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -1051,6 +1051,16 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   <xsl:template match="e:sz" mode="style">
     <xsl:attribute name="fo:font-size">
       <xsl:value-of select="round(@val)"/>
+    </xsl:attribute>
+    <!-- Fix for the bug 1802600 by chhavi -->
+    <xsl:attribute name="style:font-size-asian">
+      <xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
+    </xsl:attribute>
+    <xsl:attribute name="style:font-size-complex">
+      <xsl:value-of select="concat(round(./parent::node()/e:sz/@val),'pt')"/>
+    </xsl:attribute>
+    <xsl:attribute name="style:font-name-asian">
+      <xsl:value-of select="./parent::node()/e:name/@val"/>
     </xsl:attribute>
   </xsl:template>
 

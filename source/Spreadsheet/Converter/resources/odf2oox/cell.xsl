@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -33,6 +33,11 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 RefNo-1 06-Nov-2007 Sandeep S     1757284   Changes done to get the correct Used area-sheet after conversion. 
 RefNo-2 26-Dec-2007 Sandeep S     1805556   Changes done to include a condition to retain row grouping in case of blank cell
 RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
+RefNo-4 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in grouped columns lost
+                                  1877455   Changes done to retain the cell style in case of blank cell with column style.
+RefNo-5 03-Jun-2008 Sandeep S     1780009   Parts of borders of merged cells are not retained(Grouped rows)
+RefNo-6 03-Jun-2008 sandeep S     1704269   Changes done to retain the cell style in case of merged cell.
+RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merged cell style i.e. To deferentiate b/w A3 and AA3
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -1133,7 +1138,9 @@ RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
     <xsl:message terminate="no">progress:table:table-cell</xsl:message>
     <!--RefNo-1-->
-    <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name) or (256 = ($colNumber + @table:number-columns-repeated))))">
+    <!--RefNo-6: or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'-->
+    
+    <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name) or (256 = ($colNumber + @table:number-columns-repeated)))) or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'">
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -1443,11 +1450,14 @@ RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
                   in $TableColumnTagNum there should be 'K' ($TableColumnTagNum contains listed default-cell-style-name from backward) -->
       <xsl:when test="not(@table:style-name) and not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') 
         or contains($TableColumnTagNum,concat('K',$colNumber))) and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p)"> </xsl:when>
-
+      <!--RefNo-4:added $columnCellStyle-->
+      <!--RefNo-6:added condition or name()='table:covered-table-cell'-->
       <xsl:when
-        test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p or $columnCellStyle != '')">
+        test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated and (@table:style-name or following-sibling::node() or text:p or $columnCellStyle != '' or name()='table:covered-table-cell')">
+   
         <!--RefNo-1-->
-        <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name) or (256 = ($colNumber + @table:number-columns-repeated))))">
+        <!--RefNo-6: added or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'-->
+        <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name) or (256 = ($colNumber + @table:number-columns-repeated)))) or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'">
         <xsl:call-template name="InsertConvertCell">
           <xsl:with-param name="colNumber">
             <xsl:value-of select="$colNumber + 1"/>
@@ -1611,8 +1621,9 @@ RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
     </xsl:variable>
 
 
+    <!--RefNo-4: Added condition or $columnCellStyle != ''-->
     <xsl:if
-      test="parent::node()/@table:number-rows-repeated or child::text:p or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
+      test="parent::node()/@table:number-rows-repeated or child::text:p or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != '' or $columnCellStyle != ''">
 
       <c>
 
@@ -1697,12 +1708,18 @@ RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
           <xsl:otherwise>
             <xsl:choose>
+              <!--RefNo-7:Changed condition to check for the correct merged cell To deferentiate b/w A3 and AA3
+              substring-before(substring-after(concat(';',$MergeCellStyle), concat(';',$cellNum, ':')), ';') != ''-->
               <xsl:when
-                test="(name() = 'table:covered-table-cell'  or name() = 'table:table-cell' )and substring-before(substring-after($MergeCellStyle, concat($cellNum, ':')), ';') != ''">
+                test="(name() = 'table:covered-table-cell'  or name() = 'table:table-cell' )and (substring-before(substring-after(concat(';',$MergeCellStyle), concat(';',$cellNum, ':')), ';') != '')">
                 <xsl:variable name="style">
+                  <!--Start of RefNo-7
                   <xsl:value-of
                     select="substring-before(substring-after($MergeCellStyle, concat($cellNum, ':')), ';')"
-                  />
+                  />-->
+                  <xsl:value-of
+                      select="substring-before(substring-after(concat(';',$MergeCellStyle), concat(';',$cellNum, ':')), ';')"/>
+                  <!--End of RefNo-7-->
                 </xsl:variable>
                 <xsl:choose>
                   <xsl:when test="key('style', $style)">
@@ -1754,7 +1771,9 @@ RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
                   </xsl:otherwise>
                   </xsl:choose-->
                 <!--Code Added By Sateesh Reddy Date:01-Feb-2008 -->
-                <xsl:if test="parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style/@style:name=@table:style-name and @table:style-name !=''">
+                <!--RefNo-5: Changed if condition to chk for the styles in case of grouping.-->
+                <!--<xsl:if test="parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style/@style:name=@table:style-name and @table:style-name !=''">-->
+                <xsl:if test="//office:automatic-styles/style:style/@style:name=@table:style-name and @table:style-name !=''">
                 <xsl:attribute name="style-number-change-post">
                   <xsl:value-of select="@table:style-name"/>
                 </xsl:attribute>
@@ -2126,7 +2145,8 @@ RefNo-3 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           <xsl:otherwise>
             <xsl:choose>
               <!-- when last possible row was reached -->
-              <xsl:when test="$count + $rows = 65536">
+              <!--RefNo-4(1898009):Added greater than condition-->
+              <xsl:when test="$count + $rows &gt;= 65536">
                 <xsl:text>true</xsl:text>
               </xsl:when>
               <xsl:otherwise>

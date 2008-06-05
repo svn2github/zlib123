@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2007, Clever Age
   * All rights reserved.
@@ -794,8 +794,18 @@
     </xsl:if>
 
   </xsl:template>
-
+	<!--
+	    * Defect Id       :1898488
+		* Code Changed by :Vijayeta Tilak
+		* Date            :20th May '08
+		* Description     :On roundtrip, the change data source option in xlsx gives the file name and its path 
+		                   along with the source data range. To prevent this, additional function 'translate' added to set the 
+						   value of attribute 'sheet'.
+    -->
   <xsl:template name="InsertCacheDefinition">
+	  <xsl:variable name ="apos">
+		  <xsl:text >&apos;</xsl:text>
+	  </xsl:variable>
     <!-- @Context: table:data-pilot-table -->
     <pivotCacheDefinition r:id="{generate-id(.)}" refreshedBy="Author"
       refreshedDate="39328.480206134256" createdVersion="3" refreshedVersion="3"
@@ -808,13 +818,12 @@
               select="substring-after(substring-before(table:source-cell-range/@table:cell-range-address,':'),'.')"/>
             <xsl:text>:</xsl:text>
             <xsl:value-of
-              select="substring-after(substring-after(table:source-cell-range/@table:cell-range-address,':'),'.')"
-            />
+              select="substring-after(substring-after(table:source-cell-range/@table:cell-range-address,':'),'.')"/>
           </xsl:attribute>
 
           <xsl:attribute name="sheet">
             <xsl:value-of
-              select="substring-before(table:source-cell-range/@table:cell-range-address,'.')"/>
+              select="translate(substring-before(table:source-cell-range/@table:cell-range-address,'.'),$apos,'')"/>
           </xsl:attribute>
         </worksheetSource>
       </cacheSource>

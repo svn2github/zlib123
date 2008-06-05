@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -42,9 +42,15 @@
     <xsl:variable name="apos">
       <xsl:text>&apos;</xsl:text>
     </xsl:variable>
-
+	  <!-- 
+	  Defect Id       :1958534
+	  Defect Fixed By :Vijayeta
+	  Date            :12/5/08
+	  Desc            :An ODS file should have only a single filter option, when more than one present in XML,
+	                   first filter option should only be considered.
+	  -->
     <xsl:for-each
-      select="parent::node()/table:database-ranges/table:database-range[(table:filter or @table:display-filter-buttons = 'true') and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName]">
+		   select="parent::node()/table:database-ranges/table:database-range[(table:filter or @table:display-filter-buttons = 'true') and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName and position()=1]">
 
       <xsl:variable name="andFieldNumber">
         <xsl:value-of

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -482,12 +482,43 @@
          </xsl:call-template>
          <xsl:text>'</xsl:text>
        </xsl:variable>
-       
+		 <!--
+		     Defect    :1954140
+		     Changes by: Sateesh Reddy		   
+         -->
        <xsl:variable name="StringRange">
        <xsl:if test="not(contains($range, '$'))">
+         <xsl:variable name="val1">
+           <xsl:value-of select="substring-before(substring-after($range,'.'),$row1)"/>
+         </xsl:variable>
+         <xsl:choose>
+           <xsl:when test="val1!=''">
+             <xsl:value-of
+               select="concat($sheetName,'!$',substring-before(substring-after($range,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"/>
+           </xsl:when>
+           <xsl:otherwise>
+             <xsl:variable name="val2">
+               <xsl:if test="contains($row1,'.')">
+                 <xsl:choose>
+                   <xsl:when test="substring-before($row1,'.')!=''">
+                     <xsl:value-of select="substring-before($row1,'.')"/>
+                   </xsl:when>
+                   <xsl:when test="substring-after($row1,'.')!=''">
+                     <xsl:value-of select="substring-after($row1,'.')"/>
+                   </xsl:when>
+                 </xsl:choose>
+               </xsl:if>
+             </xsl:variable>
+             <xsl:if test="$val2 !=''">
+               <xsl:value-of
+                 select="concat($sheetName,'!$', $val2,':','$', $row2)"/>
+             </xsl:if>
+             <xsl:if test="$val2 =''">
          <xsl:value-of
            select="concat($sheetName,'!$',substring-before(substring-after($range,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"/>
-         
+             </xsl:if>
+           </xsl:otherwise>
+         </xsl:choose>         
        </xsl:if>
        <xsl:if test="contains($range, '$')">
          <xsl:value-of

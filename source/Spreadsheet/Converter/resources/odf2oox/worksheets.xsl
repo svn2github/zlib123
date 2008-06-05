@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -31,6 +31,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
+RefNo-2 19-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pane
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -632,6 +633,103 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           </xsl:attribute>
         </xsl:if>
 
+        <!--Start of RefNo-2-->
+        <xsl:variable name="HSplit">
+          <xsl:choose>
+            <xsl:when
+              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitMode']">
+              <xsl:value-of
+                select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitMode']"
+                    />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="VSplit">
+          <xsl:choose>
+            <xsl:when
+              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitMode']">
+              <xsl:value-of
+                select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitMode']"
+                    />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+
+        <xsl:if test="$HSplit = 2 or $VSplit = 2">
+          <xsl:variable name="VSPosition">
+            <xsl:choose>
+              <xsl:when
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitPosition']">
+                <xsl:value-of
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitPosition']"
+                    />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>0</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <xsl:variable name="HSPosition">
+            <xsl:choose>
+              <xsl:when
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitPosition']">
+                <xsl:value-of
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitPosition']"
+                    />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>0</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <pane>
+            <xsl:if test="$VSplit = 2">
+              <xsl:attribute name="ySplit">
+                <xsl:value-of select="$VSPosition"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$HSplit = 2">
+              <xsl:attribute name="xSplit">
+                <xsl:value-of select="$HSPosition"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="topLeftCell">
+              <xsl:variable name="spltCell">
+                <xsl:call-template name="NumbersToChars">
+                  <xsl:with-param name="num" select="$HSPosition"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="concat($spltCell,($VSPosition + 1))"/>
+            </xsl:attribute>
+            <xsl:attribute name="activePane">
+              <xsl:choose>
+                <xsl:when test="$VSplit = 2 and $HSplit = 0">
+                  <xsl:value-of select="'bottomLeft'"/>
+                </xsl:when>
+                <xsl:when test="$VSplit = 0 and $HSplit = 2">
+                  <xsl:value-of select="'topRight'"/>
+                </xsl:when>
+                <xsl:when test="$VSplit = 2 and $HSplit = 2">
+                  <xsl:value-of select="'bottomRight'"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+            <xsl:attribute name="state">
+              <xsl:value-of select="'frozen'"/>
+            </xsl:attribute>
+          </pane>
+        </xsl:if>
+        <!--End of RefNo-2-->
+        
         <selection>
 
           <xsl:variable name="col">
@@ -680,6 +778,24 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           <xsl:attribute name="sqref">
             <xsl:value-of select="concat($col,$checkedRow)"/>
           </xsl:attribute>
+          
+          <!--Start of RefNo-2-->
+          <xsl:if test="$HSplit = 2 or $VSplit = 2">
+            <xsl:attribute name="pane">
+              <xsl:choose>
+                <xsl:when test="$VSplit = 2 and $HSplit = 0">
+                  <xsl:value-of select="'bottomLeft'"/>
+                </xsl:when>
+                <xsl:when test="$VSplit = 0 and $HSplit = 2">
+                  <xsl:value-of select="'topRight'"/>
+                </xsl:when>
+                <xsl:when test="$VSplit = 2 and $HSplit = 2">
+                  <xsl:value-of select="'bottomRight'"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+          <!--End of RefNo-2-->
         </selection>
       </sheetView>
     </sheetViews>

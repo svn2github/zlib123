@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -88,7 +88,7 @@
 
   <xsl:key name="chart" match="office:chart" use="''"/>
   <xsl:key name="pivot" match="table:data-pilot-table" use="''"/>
-
+	<xsl:key name="table" match="table:table" use="''"/>
   <xsl:template match="/odf:source">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
 
@@ -378,13 +378,32 @@
           </xsl:call-template> 
         </xsl:variable>
         
-      
+	     <!--
+	      Defect Id :1957957(roundtrip), Internal defect-5843
+		  Date      :5th June '08
+		  Changes by:Vijayeta		  
+	      Desc      :Error occurs when the source table does not exist, but the name is mentioned in the attribute 'table:cell-range-address'(ods)
+					 Hence, handled here by an additional condition to check if the attribute value is a table in the Worksheet
+		  -->
         <xsl:variable name="pivot">
           <xsl:choose>
             <xsl:when
               test="key('pivot','')[translate(substring-before(@table:target-range-address,'.'),$apos,'') = $tableName and table:source-cell-range/@table:cell-range-address] and $startRangeAddressRow != $endRangeAddressRow and $startRangeAddressCol != $endRangeAddressCol">
-             
+				<xsl:variable name="sourceSheetName1">
+					<xsl:value-of select="key('pivot','')/table:source-cell-range/@table:cell-range-address"/>
+				</xsl:variable>
+				<xsl:variable name ="sourceSheetName">
+					<xsl:value-of select ="translate(substring-before($sourceSheetName1,'.'),$apos,'')"/>
+				</xsl:variable>
+				<xsl:choose >
+					<xsl:when test ="key('table','')[@table:name=$sourceSheetName]">
               <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+              <!--<xsl:text>true</xsl:text>-->
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>false</xsl:text>
@@ -746,7 +765,7 @@
     </xsl:variable>
     <xsl:if
       test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true' or $textBox = 'true' or table:table-row/table:table-cell/table:cell-range-source or $OLEObject = 'true'
-      or $pivot = 'true' ">
+      or ($pivot = 'true' ) ">
       <!-- package relationship item -->
       <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
         <xsl:call-template name="InsertWorksheetsRels">

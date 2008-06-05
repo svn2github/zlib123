@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -25,6 +25,13 @@
   * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 16-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pane                                              
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -62,7 +69,20 @@
                 <config:config-item config:name="ActiveTable" config:type="string">
                   <xsl:for-each
                     select="e:workbook/e:sheets/e:sheet[position() = $ActiveTabNumber + 1]/@name">
-                    <xsl:value-of select="."/>
+                    <!--Start of RefNo-1: To remove special charecters in the sheet name.-->
+                    <xsl:variable name="checkedName">
+                      <xsl:call-template name="CheckSheetName">
+                        <xsl:with-param name="sheetNumber">
+                          <xsl:value-of select="$ActiveTabNumber + 1"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="name">
+                          <xsl:value-of select="translate(.,'!$#():,.+','')"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <!--<xsl:value-of select="."/>-->
+                    <xsl:value-of select="$checkedName"/>
+                    <!--End of RefNo-1-->
                   </xsl:for-each>
                 </config:config-item>
                 <!-- Defect : 1877279 
@@ -181,7 +201,135 @@
 
   <xsl:template name="InsertCursorPosition">
     <xsl:param name="sheet"/>
-    <config:config-item-map-entry config:name="{@name}">
+    <!--Start of RefNo-1-->
+    <xsl:variable name="checkedName">
+      <xsl:call-template name="CheckSheetName">
+        <xsl:with-param name="sheetNumber">
+          <xsl:value-of select="position()"/>
+        </xsl:with-param>
+        <xsl:with-param name="name">
+          <xsl:value-of select="translate(@name,'!$#():,.+','')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!--<config:config-item-map-entry config:name="{@name}">-->
+    <config:config-item-map-entry config:name="{$checkedName}">
+      <xsl:variable name="HSplitPossition">
+        <xsl:choose>
+          <xsl:when
+            test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:pane/@xSplit">
+            <xsl:value-of
+               select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:pane/@xSplit"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="''"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="VSplitPossition">
+        <xsl:choose>
+          <xsl:when
+            test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:pane/@ySplit">
+            <xsl:value-of
+               select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:pane/@ySplit"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="''"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="actPane">
+        <xsl:choose>
+          <xsl:when
+            test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:pane/@activePane">
+            <xsl:value-of
+               select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:pane/@activePane"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="''"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="actCell">
+        <xsl:choose>
+          <xsl:when test="$actPane != ''">
+            <xsl:choose>
+              <xsl:when test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection[@pane = $actPane]/@activeCell">
+                <xsl:value-of
+                 select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection[@pane = $actPane]/@activeCell"
+                  />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'A1'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="''"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="actCellX">
+        <xsl:choose>
+          <xsl:when test="$HSplitPossition != '' or $VSplitPossition != ''">
+            <xsl:variable name="col">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell" select="$actCell"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$col - 1"/>
+          </xsl:when>
+          <xsl:when
+            test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+            <xsl:variable name="col">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+                  />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$col - 1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="actCellY">
+        <xsl:choose>
+          <xsl:when test="$HSplitPossition != '' or $VSplitPossition != ''">
+            <xsl:variable name="row">
+              <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell" select="$actCell"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$row - 1"/>
+          </xsl:when>
+          <xsl:when
+            test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+            <xsl:variable name="row">
+              <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+                  />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$row - 1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <config:config-item config:name="CursorPositionX" config:type="int">
         <xsl:choose>
           <xsl:when
@@ -222,6 +370,120 @@
           </xsl:otherwise>
         </xsl:choose>
       </config:config-item>
+      <xsl:if test="$HSplitPossition != '' or $VSplitPossition != ''">
+        <config:config-item config:name="HorizontalSplitMode" config:type="short">
+          <xsl:choose>
+            <xsl:when
+              test="$HSplitPossition = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>2</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </config:config-item>
+        <config:config-item config:name="VerticalSplitMode" config:type="short">
+          <xsl:choose>
+            <xsl:when
+              test="$VSplitPossition = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>2</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </config:config-item>
+        <config:config-item config:name="HorizontalSplitPosition" config:type="int">
+          <xsl:choose>
+            <xsl:when
+              test="$HSplitPossition = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$HSplitPossition"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </config:config-item>
+        <config:config-item config:name="VerticalSplitPosition" config:type="int">
+          <xsl:choose>
+            <xsl:when
+              test="$VSplitPossition = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$VSplitPossition"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </config:config-item>
+        <config:config-item config:name="ActiveSplitRange" config:type="short">
+          <xsl:choose>
+            <xsl:when test="$actCell != ''">
+              <xsl:choose>
+                <xsl:when test="$VSplitPossition = ''">
+                  <xsl:choose>
+                    <xsl:when test="$actCellY &gt;= $VSplitPossition">
+                      <xsl:text>3</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>2</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:when test="$HSplitPossition = ''">
+                  <xsl:choose>
+                    <xsl:when test="$actCellX &gt;= $HSplitPossition">
+                      <xsl:text>2</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>0</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:when test="$actCellY &gt;= $VSplitPossition and $actCellX &gt;= $HSplitPossition">
+                  <xsl:text>3</xsl:text>
+                </xsl:when>
+                <xsl:when test="$actCellY &gt;= $VSplitPossition and $actCellX &lt; $HSplitPossition">
+                  <xsl:text>1</xsl:text>
+                </xsl:when>
+                <xsl:when test="$actCellY &lt; $VSplitPossition and $actCellX &lt; $HSplitPossition">
+                  <xsl:text>0</xsl:text>
+                </xsl:when>
+                <xsl:when test="$actCellY &lt; $VSplitPossition and $actCellX &gt;= $HSplitPossition">
+                  <xsl:text>2</xsl:text>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>3</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </config:config-item>
+        <config:config-item config:name="PositionLeft" config:type="int">0</config:config-item>
+        <config:config-item config:name="PositionRight" config:type="int">
+          <xsl:choose>
+            <xsl:when
+              test="$HSplitPossition = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$HSplitPossition"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </config:config-item>
+        <config:config-item config:name="PositionTop" config:type="int">0</config:config-item>
+        <config:config-item config:name="PositionBottom" config:type="int">
+          <xsl:choose>
+            <xsl:when
+              test="$VSplitPossition = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$VSplitPossition"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </config:config-item>
+      </xsl:if>
+      <!--End of RefNo-1-->
     </config:config-item-map-entry>
   </xsl:template>
 </xsl:stylesheet>

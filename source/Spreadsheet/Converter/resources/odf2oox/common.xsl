@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -375,8 +375,17 @@
 
     <!-- modification due to Excel date bug(leap year 1900) -->
     <xsl:choose>
-      <xsl:when test="$realValue &lt; 61">
+      <xsl:when test="$realValue &lt; 61 and $realValue &gt;= 2">
         <xsl:value-of select="$realValue -1"/>
+      </xsl:when>
+	  <!--
+	      Defect Id :1873854
+		  Date      :5th June '08
+		  Changes by:Shabeer		  
+	      Desc      : Condition included to check dates less than 1/1/1900 and converting it to the base date (1/1/1900)-->
+      <xsl:when test="$realValue &lt; 1">
+		  <xsl:message terminate="no">translation.odf2oox.baseDate</xsl:message>
+        <xsl:value-of select="'1'"/>       
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$realValue"/>
