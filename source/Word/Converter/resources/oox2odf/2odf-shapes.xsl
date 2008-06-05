@@ -45,7 +45,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:oox="urn:oox"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w r draw number wp xlink v w10 o oox">
+  exclude-result-prefixes="w r draw number wp xlink v w10 o oox pic a rels">
 
   <!--
   *************************************************************************
@@ -110,7 +110,9 @@
   Summary: Converts textbox shapes
   Author: Clever Age
   -->
+  <!-- Sona : Removed as drawing a frame is not required-->
   <xsl:template match="v:shape[v:textbox]">
+    <!--<xsl:if test ="@type='#_x0000_t202'">
     <draw:frame>
       <xsl:call-template name="InsertCommonShapeProperties">
         <xsl:with-param name="shape" select="." />
@@ -118,16 +120,889 @@
       <xsl:call-template name="InsertShapeZindex"/>
 
       <xsl:apply-templates/>
-      <!-- some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
+       --><!--some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox--><!--
       <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
     </draw:frame>
+    </xsl:if>-->
   </xsl:template>
 
+  <!--Summary: Creates variuos shapes based on the path
+      Author: Sona
+  -->
+  <xsl:template name="GetShape">
+    <xsl:param name="currentShape"></xsl:param>
+    <xsl:param name="shapeTypeId"></xsl:param>
+    <xsl:param name="pathId"></xsl:param>
+    <xsl:choose>
+      <!--Isosceles Triangle -->
+      <xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m@0,l,21600r21600,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select =".">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" mode="XXX">
+            <xsl:with-param name ="shapetype" select ="'isosceles-triangle'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 ?f1 10800 0 21600 10800 21600 21600 21600 ?f7 10800" 
+            draw:text-areas="?f1 10800 ?f2 18000 ?f3 7200 ?f4 21600" draw:type="isosceles-triangle" draw:modifiers="10800" draw:enhanced-path="M ?f0 0 L 21600 21600 0 21600 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 /2"/>
+            <draw:equation draw:name="f2" draw:formula="?f1 +10800"/>
+            <draw:equation draw:name="f3" draw:formula="$0 *2/3"/>
+            <draw:equation draw:name="f4" draw:formula="?f3 +7200"/>
+            <draw:equation draw:name="f5" draw:formula="21600-?f0 "/>
+            <draw:equation draw:name="f6" draw:formula="?f5 /2"/>
+            <draw:equation draw:name="f7" draw:formula="21600-?f6 "/>
+            <draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!--Right Triangle -->
+      <xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,xe'"   >
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'right-triangle'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 0 21600 10800 21600 21600 21600 16200 10800" draw:text-areas="1900 12700 12700 19700" draw:type="right-triangle" draw:enhanced-path="M 0 0 L 21600 21600 0 21600 0 0 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Flowchart Process-->
+      <!--<xsl:when test ="@path='m,l,21600r21600,l21600,xe' and following-sibling::v:shape/@type='#_x0000_t109'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,l21600,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Flowchart Process'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
+            draw:type="flowchart-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Flowchart Alternate Process-->
+      <!--<xsl:when test ="@path='m@0,qx0@0l0@2qy@0,21600l@1,21600qx21600@2l21600@0qy@1,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,qx0@0l0@2qy@0,21600l@1,21600qx21600@2l21600@0qy@1,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Flowchart Alternate Process'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
+            draw:text-areas="?f4 ?f6 ?f5 ?f7" draw:type="flowchart-alternate-process" 
+            draw:enhanced-path="M 0 ?f2 Y ?f0 0 L ?f1 0 X 21600 ?f2 L 21600 ?f3 Y ?f1 21600 L ?f0 21600 X 0 ?f3 Z N">
+            <draw:equation draw:name="f0" draw:formula="left+2540"/>
+            <draw:equation draw:name="f1" draw:formula="right-2540"/>
+            <draw:equation draw:name="f2" draw:formula="top+2540"/>
+            <draw:equation draw:name="f3" draw:formula="bottom-2540"/>
+            <draw:equation draw:name="f4" draw:formula="left+800"/>
+            <draw:equation draw:name="f5" draw:formula="right-800"/>
+            <draw:equation draw:name="f6" draw:formula="top+800"/>
+            <draw:equation draw:name="f7" draw:formula="bottom-800"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Flowchart Decision-->
+      <!--<xsl:when test ="@path='m10800,l,10800,10800,21600,21600,10800xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,l,10800,10800,21600,21600,10800xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Flowchart Decision'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-decision" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 0 10800 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Flowchart Data-->
+      <!--<xsl:when test ="@path='m4321,l21600,,17204,21600,,21600xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m4321,l21600,,17204,21600,,21600xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Flowchart Data'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="12960 0 10800 0 2160 10800 8600 21600 10800 21600 19400 10800" draw:text-areas="4230 0 17370 21600" draw:type="flowchart-data" draw:enhanced-path="M 4230 0 L 21600 0 17370 21600 0 21600 4230 0 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Flowchart Predefined Process-->
+      <!--<xsl:when test ="@path='m,l,21600r21600,l21600,xem2610,nfl2610,21600em18990,nfl18990,21600e'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,l21600,xem2610,nfl2610,21600em18990,nfl18990,21600e'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Flowchart Predefined Process'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="2540 0 19060 21600" draw:type="flowchart-predefined-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 2540 0 L 2540 21600 N M 19060 0 L 19060 21600 N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Internal Storage -->
+      <!--<xsl:when test ="@path='m,l,21600r21600,l21600,xem4236,nfl4236,21600em,4236nfl21600,4236e'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,l21600,xem4236,nfl4236,21600em,4236nfl21600,4236e'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Internal Storage'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="4230 4230 21600 21600" draw:type="flowchart-internal-storage" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 4230 0 L 4230 21600 N M 0 4230 L 21600 4230 N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Document -->
+      <!--<xsl:when test ="@path='m,20172v945,400,1887,628,2795,913c3587,21312,4342,21370,5060,21597v2037,,2567,-227,3095,-285c8722,21197,9325,20970,9855,20800v490,-228,945,-400,1472,-740c11817,19887,12347,19660,12875,19375v567,-228,1095,-513,1700,-740c15177,18462,15782,18122,16537,17950v718,-113,1398,-398,2228,-513c19635,17437,20577,17322,21597,17322l21597,,,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,20172v945,400,1887,628,2795,913c3587,21312,4342,21370,5060,21597v2037,,2567,-227,3095,-285c8722,21197,9325,20970,9855,20800v490,-228,945,-400,1472,-740c11817,19887,12347,19660,12875,19375v567,-228,1095,-513,1700,-740c15177,18462,15782,18122,16537,17950v718,-113,1398,-398,2228,-513c19635,17437,20577,17322,21597,17322l21597,,,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Document'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 20320 21600 10800" draw:text-areas="0 0 21600 17360" draw:type="flowchart-document" draw:enhanced-path="M 0 0 L 21600 0 21600 17360 C 13050 17220 13340 20770 5620 21600 2860 21100 1850 20700 0 20120 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Multi Document -->
+      <!--<xsl:when test ="@path='m,20465v810,317,1620,452,2397,725c3077,21325,3790,21417,4405,21597v1620,,2202,-180,2657,-272c7580,21280,8002,21010,8455,20917v422,-135,810,-405,1327,-542c10205,20150,10657,19967,11080,19742v517,-182,970,-407,1425,-590c13087,19017,13605,18745,14255,18610v615,-180,1262,-318,1942,-408c16975,18202,17785,18022,18595,18022r,-1670l19192,16252r808,l20000,14467r722,-75l21597,14392,21597,,2972,r,1815l1532,1815r,1860l,3675,,20465xem1532,3675nfl18595,3675r,12677em2972,1815nfl20000,1815r,12652e'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,20465v810,317,1620,452,2397,725c3077,21325,3790,21417,4405,21597v1620,,2202,-180,2657,-272c7580,21280,8002,21010,8455,20917v422,-135,810,-405,1327,-542c10205,20150,10657,19967,11080,19742v517,-182,970,-407,1425,-590c13087,19017,13605,18745,14255,18610v615,-180,1262,-318,1942,-408c16975,18202,17785,18022,18595,18022r,-1670l19192,16252r808,l20000,14467r722,-75l21597,14392,21597,,2972,r,1815l1532,1815r,1860l,3675,,20465xem1532,3675nfl18595,3675r,12677em2972,1815nfl20000,1815r,12652e'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Multi Document'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 19890 21600 10800" draw:text-areas="0 3600 18600 18009" draw:type="flowchart-multidocument" draw:enhanced-path="M 0 3600 L 1500 3600 1500 1800 3000 1800 3000 0 21600 0 21600 14409 20100 14409 20100 16209 18600 16209 18600 18009 C 11610 17893 11472 20839 4833 21528 2450 21113 1591 20781 0 20300 Z N M 1500 3600 F L 18600 3600 18600 16209 N M 3000 1800 F L 20100 1800 20100 14409 N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Terminator -->
+      <!--<xsl:when test ="@path='m3475,qx,10800,3475,21600l18125,21600qx21600,10800,18125,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m3475,qx,10800,3475,21600l18125,21600qx21600,10800,18125,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="4">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Terminator'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="1060 3180 20540 18420" draw:type="flowchart-terminator" draw:enhanced-path="M 3470 21600 X 0 10800 3470 0 L 18130 0 X 21600 10800 18130 21600 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Collate -->
+      <!--<xsl:when test ="@path='m21600,21600l,21600,21600,,,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m21600,21600l,21600,21600,,,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Collate'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 10800 10800 10800 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-collate" draw:enhanced-path="M 0 0 L 21600 21600 0 21600 21600 0 0 0 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Sort -->
+      <!--<xsl:when test ="@path='m10800,l,10800,10800,21600,21600,10800xem,10800nfl21600,10800e'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,l,10800,10800,21600,21600,10800xem,10800nfl21600,10800e'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Sort'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-sort" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 Z N M 0 10800 L 21600 10800 N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Extract -->
+      <!--<xsl:when test ="@path='m10800,l21600,21600,,21600xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,l21600,21600,,21600xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Extract'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 10800 16200 21600" draw:type="flowchart-extract" draw:enhanced-path="M 10800 0 L 21600 21600 0 21600 10800 0 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Merge -->
+      <!--<xsl:when test ="@path='m,l21600,,10800,21600xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l21600,,10800,21600xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Merge'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 0 16200 10800" draw:type="flowchart-merge" draw:enhanced-path="M 0 0 L 21600 0 10800 21600 0 0 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Sorted Data -->
+      <!--<xsl:when test ="@path='m3600,21597c2662,21202,1837,20075,1087,18440,487,16240,75,13590,,10770,75,8007,487,5412,1087,3045,1837,1465,2662,337,3600,l21597,v-937,337,-1687,1465,-2512,3045c18485,5412,18072,8007,17997,10770v75,2820,488,5470,1088,7670c19910,20075,20660,21202,21597,21597xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m3600,21597c2662,21202,1837,20075,1087,18440,487,16240,75,13590,,10770,75,8007,487,5412,1087,3045,1837,1465,2662,337,3600,l21597,v-937,337,-1687,1465,-2512,3045c18485,5412,18072,8007,17997,10770v75,2820,488,5470,1088,7670c19910,20075,20660,21202,21597,21597xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="4">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Sorted Data'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 18000 10800" draw:text-areas="3600 0 18000 21600" draw:type="flowchart-stored-data" draw:enhanced-path="M 3600 21600 X 0 10800 3600 0 L 21600 0 X 18000 10800 21600 21600 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Delay -->
+      <!--<xsl:when test ="@path='m10800,qx21600,10800,10800,21600l,21600,,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,qx21600,10800,10800,21600l,21600,,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Delay'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 3100 18500 18500" draw:type="flowchart-delay" draw:enhanced-path="M 10800 0 X 21600 10800 10800 21600 L 0 21600 0 0 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Sequential Access Storage -->
+      <!--<xsl:when test ="@path='ar,,21600,21600,18685,18165,10677,21597l20990,21597r,-3432xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='ar,,21600,21600,18685,18165,10677,21597l20990,21597r,-3432xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Sequential Access Storage'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-sequential-access" draw:enhanced-path="M 20980 18150 L 20980 21600 10670 21600 C 4770 21540 0 16720 0 10800 0 4840 4840 0 10800 0 16740 0 21600 4840 21600 10800 21600 13520 20550 16160 18670 18170 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Magnetic Disk -->
+      <!--<xsl:when test ="@path='m10800,qx,3391l,18209qy10800,21600,21600,18209l21600,3391qy10800,xem,3391nfqy10800,6782,21600,3391e'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,qx,3391l,18209qy10800,21600,21600,18209l21600,3391qy10800,xem,3391nfqy10800,6782,21600,3391e'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Magnetic Disk'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 6800 10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 6800 21600 18200" draw:type="flowchart-magnetic-disk" draw:enhanced-path="M 0 3400 Y 10800 0 21600 3400 L 21600 18200 Y 10800 21600 0 18200 Z N M 0 3400 Y 10800 6800 21600 3400 N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Direct Access Storage -->
+      <!--<xsl:when test ="@path='m21600,10800qy18019,21600l3581,21600qx,10800,3581,l18019,qx21600,10800xem18019,21600nfqx14438,10800,18019,e'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m21600,10800qy18019,21600l3581,21600qx,10800,3581,l18019,qx21600,10800xem18019,21600nfqx14438,10800,18019,e'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Direct Access Storage'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 14800 10800 21600 10800" draw:text-areas="3400 0 14800 21600" draw:type="flowchart-direct-access-storage" draw:enhanced-path="M 18200 0 X 21600 10800 18200 21600 L 3400 21600 X 0 10800 3400 0 Z N M 18200 0 X 14800 10800 18200 21600 N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart Display -->
+      <!--<xsl:when test ="@path='m17955,v862,282,1877,1410,2477,3045c21035,5357,21372,7895,21597,10827v-225,2763,-562,5300,-1165,7613c19832,20132,18817,21260,17955,21597r-14388,l,10827,3567,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m17955,v862,282,1877,1410,2477,3045c21035,5357,21372,7895,21597,10827v-225,2763,-562,5300,-1165,7613c19832,20132,18817,21260,17955,21597r-14388,l,10827,3567,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="4">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'FlowChart Display'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3600 0 17800 21600" draw:type="flowchart-display" draw:enhanced-path="M 3600 0 L 17800 0 X 21600 10800 17800 21600 L 3600 21600 0 10800 Z N"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Rectangular Callout -->
+      <!--<xsl:when test ="@path='m,l0@8@12@24,0@9,,21600@6,21600@15@27@7,21600,21600,21600,21600@9@18@30,21600@8,21600,0@7,0@21@33@6,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l0@8@12@24,0@9,,21600@6,21600@15@27@7,21600,21600,21600,21600@9@18@30,21600@8,21600,0@7,0@21@33@6,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Rectangular Callout'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800 ?f40 ?f41" 
+            draw:text-areas="0 0 21600 21600" draw:type="rectangular-callout" draw:modifiers="2030 43750" 
+            draw:enhanced-path="M 0 0 L 0 3590 ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 0 21600 3590 21600 ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 21600 21600 21600 18010 ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 21600 0 18010 0 ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 3590 0 0 0 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 -10800"/>
+            <draw:equation draw:name="f1" draw:formula="$1 -10800"/>
+            <draw:equation draw:name="f2" draw:formula="if(?f18 ,$0 ,0)"/>
+            <draw:equation draw:name="f3" draw:formula="if(?f18 ,$1 ,6280)"/>
+            <draw:equation draw:name="f4" draw:formula="if(?f23 ,$0 ,0)"/>
+            <draw:equation draw:name="f5" draw:formula="if(?f23 ,$1 ,15320)"/>
+            <draw:equation draw:name="f6" draw:formula="if(?f26 ,$0 ,6280)"/>
+            <draw:equation draw:name="f7" draw:formula="if(?f26 ,$1 ,21600)"/>
+            <draw:equation draw:name="f8" draw:formula="if(?f29 ,$0 ,15320)"/>
+            <draw:equation draw:name="f9" draw:formula="if(?f29 ,$1 ,21600)"/>
+            <draw:equation draw:name="f10" draw:formula="if(?f32 ,$0 ,21600)"/>
+            <draw:equation draw:name="f11" draw:formula="if(?f32 ,$1 ,15320)"/>
+            <draw:equation draw:name="f12" draw:formula="if(?f34 ,$0 ,21600)"/>
+            <draw:equation draw:name="f13" draw:formula="if(?f34 ,$1 ,6280)"/>
+            <draw:equation draw:name="f14" draw:formula="if(?f36 ,$0 ,15320)"/>
+            <draw:equation draw:name="f15" draw:formula="if(?f36 ,$1 ,0)"/>
+            <draw:equation draw:name="f16" draw:formula="if(?f38 ,$0 ,6280)"/>
+            <draw:equation draw:name="f17" draw:formula="if(?f38 ,$1 ,0)"/>
+            <draw:equation draw:name="f18" draw:formula="if($0 ,-1,?f19 )"/>
+            <draw:equation draw:name="f19" draw:formula="if(?f1 ,-1,?f22 )"/>
+            <draw:equation draw:name="f20" draw:formula="abs(?f0 )"/>
+            <draw:equation draw:name="f21" draw:formula="abs(?f1 )"/>
+            <draw:equation draw:name="f22" draw:formula="?f20 -?f21 "/>
+            <draw:equation draw:name="f23" draw:formula="if($0 ,-1,?f24 )"/>
+            <draw:equation draw:name="f24" draw:formula="if(?f1 ,?f22 ,-1)"/>
+            <draw:equation draw:name="f25" draw:formula="$1 -21600"/>
+            <draw:equation draw:name="f26" draw:formula="if(?f25 ,?f27 ,-1)"/>
+            <draw:equation draw:name="f27" draw:formula="if(?f0 ,-1,?f28 )"/>
+            <draw:equation draw:name="f28" draw:formula="?f21 -?f20 "/>
+            <draw:equation draw:name="f29" draw:formula="if(?f25 ,?f30 ,-1)"/>
+            <draw:equation draw:name="f30" draw:formula="if(?f0 ,?f28 ,-1)"/>
+            <draw:equation draw:name="f31" draw:formula="$0 -21600"/>
+            <draw:equation draw:name="f32" draw:formula="if(?f31 ,?f33 ,-1)"/>
+            <draw:equation draw:name="f33" draw:formula="if(?f1 ,?f22 ,-1)"/>
+            <draw:equation draw:name="f34" draw:formula="if(?f31 ,?f35 ,-1)"/>
+            <draw:equation draw:name="f35" draw:formula="if(?f1 ,-1,?f22 )"/>
+            <draw:equation draw:name="f36" draw:formula="if($1 ,-1,?f37 )"/>
+            <draw:equation draw:name="f37" draw:formula="if(?f0 ,?f28 ,-1)"/>
+            <draw:equation draw:name="f38" draw:formula="if($1 ,-1,?f39 )"/>
+            <draw:equation draw:name="f39" draw:formula="if(?f0 ,-1,?f28 )"/>
+            <draw:equation draw:name="f40" draw:formula="$0 "/>
+            <draw:equation draw:name="f41" draw:formula="$1 "/>
+            <draw:handle draw:handle-position="$0 $1"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Rounded Rectangular Callout -->
+      <!--<xsl:when test ="@path='m3600,qx,3600l0@8@12@24,0@9,,18000qy3600,21600l@6,21600@15@27@7,21600,18000,21600qx21600,18000l21600@9@18@30,21600@8,21600,3600qy18000,l@7,0@21@33@6,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m3600,qx,3600l0@8@12@24,0@9,,18000qy3600,21600l@6,21600@15@27@7,21600,18000,21600qx21600,18000l21600@9@18@30,21600@8,21600,3600qy18000,l@7,0@21@33@6,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Rounded Rectangular Callout'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="800 800 20800 20800" draw:type="round-rectangular-callout" draw:modifiers="4250 45000" draw:enhanced-path="M 3590 0 X 0 3590 L ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 Y 3590 21600 L ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 X 21600 18010 L ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 Y 18010 0 L ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 -10800"/>
+            <draw:equation draw:name="f1" draw:formula="$1 -10800"/>
+            <draw:equation draw:name="f2" draw:formula="if(?f18 ,$0 ,0)"/>
+            <draw:equation draw:name="f3" draw:formula="if(?f18 ,$1 ,6280)"/>
+            <draw:equation draw:name="f4" draw:formula="if(?f23 ,$0 ,0)"/>
+            <draw:equation draw:name="f5" draw:formula="if(?f23 ,$1 ,15320)"/>
+            <draw:equation draw:name="f6" draw:formula="if(?f26 ,$0 ,6280)"/>
+            <draw:equation draw:name="f7" draw:formula="if(?f26 ,$1 ,21600)"/>
+            <draw:equation draw:name="f8" draw:formula="if(?f29 ,$0 ,15320)"/>
+            <draw:equation draw:name="f9" draw:formula="if(?f29 ,$1 ,21600)"/>
+            <draw:equation draw:name="f10" draw:formula="if(?f32 ,$0 ,21600)"/>
+            <draw:equation draw:name="f11" draw:formula="if(?f32 ,$1 ,15320)"/>
+            <draw:equation draw:name="f12" draw:formula="if(?f34 ,$0 ,21600)"/>
+            <draw:equation draw:name="f13" draw:formula="if(?f34 ,$1 ,6280)"/>
+            <draw:equation draw:name="f14" draw:formula="if(?f36 ,$0 ,15320)"/>
+            <draw:equation draw:name="f15" draw:formula="if(?f36 ,$1 ,0)"/>
+            <draw:equation draw:name="f16" draw:formula="if(?f38 ,$0 ,6280)"/>
+            <draw:equation draw:name="f17" draw:formula="if(?f38 ,$1 ,0)"/>
+            <draw:equation draw:name="f18" draw:formula="if($0 ,-1,?f19 )"/>
+            <draw:equation draw:name="f19" draw:formula="if(?f1 ,-1,?f22 )"/>
+            <draw:equation draw:name="f20" draw:formula="abs(?f0 )"/>
+            <draw:equation draw:name="f21" draw:formula="abs(?f1 )"/>
+            <draw:equation draw:name="f22" draw:formula="?f20 -?f21 "/>
+            <draw:equation draw:name="f23" draw:formula="if($0 ,-1,?f24 )"/>
+            <draw:equation draw:name="f24" draw:formula="if(?f1 ,?f22 ,-1)"/>
+            <draw:equation draw:name="f25" draw:formula="$1 -21600"/>
+            <draw:equation draw:name="f26" draw:formula="if(?f25 ,?f27 ,-1)"/>
+            <draw:equation draw:name="f27" draw:formula="if(?f0 ,-1,?f28 )"/>
+            <draw:equation draw:name="f28" draw:formula="?f21 -?f20 "/>
+            <draw:equation draw:name="f29" draw:formula="if(?f25 ,?f30 ,-1)"/>
+            <draw:equation draw:name="f30" draw:formula="if(?f0 ,?f28 ,-1)"/>
+            <draw:equation draw:name="f31" draw:formula="$0 -21600"/>
+            <draw:equation draw:name="f32" draw:formula="if(?f31 ,?f33 ,-1)"/>
+            <draw:equation draw:name="f33" draw:formula="if(?f1 ,?f22 ,-1)"/>
+            <draw:equation draw:name="f34" draw:formula="if(?f31 ,?f35 ,-1)"/>
+            <draw:equation draw:name="f35" draw:formula="if(?f1 ,-1,?f22 )"/>
+            <draw:equation draw:name="f36" draw:formula="if($1 ,-1,?f37 )"/>
+            <draw:equation draw:name="f37" draw:formula="if(?f0 ,?f28 ,-1)"/>
+            <draw:equation draw:name="f38" draw:formula="if($1 ,-1,?f39 )"/>
+            <draw:equation draw:name="f39" draw:formula="if(?f0 ,-1,?f28 )"/>
+            <draw:equation draw:name="f40" draw:formula="$0 "/>
+            <draw:equation draw:name="f41" draw:formula="$1 "/>
+            <draw:handle draw:handle-position="$0 $1"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Oval Callout -->
+      <!--<xsl:when test ="@path='wr,,21600,21600@15@16@17@18l@21@22xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='wr,,21600,21600@15@16@17@18l@21@22xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Oval Callout'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160 ?f14 ?f15" draw:text-areas="3200 3200 18400 18400" draw:type="round-callout" draw:modifiers="4965 38560" draw:enhanced-path="W 0 0 21600 21600 ?f22 ?f23 ?f18 ?f19 L ?f14 ?f15 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 -10800"/>
+            <draw:equation draw:name="f1" draw:formula="$1 -10800"/>
+            <draw:equation draw:name="f2" draw:formula="?f0 *?f0 "/>
+            <draw:equation draw:name="f3" draw:formula="?f1 *?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f2 +?f3 "/>
+            <draw:equation draw:name="f5" draw:formula="sqrt(?f4 )"/>
+            <draw:equation draw:name="f6" draw:formula="?f5 -10800"/>
+            <draw:equation draw:name="f7" draw:formula="atan2(?f1 ,?f0 )/(pi/180)"/>
+            <draw:equation draw:name="f8" draw:formula="?f7 -10"/>
+            <draw:equation draw:name="f9" draw:formula="?f7 +10"/>
+            <draw:equation draw:name="f10" draw:formula="10800*cos(?f7 *(pi/180))"/>
+            <draw:equation draw:name="f11" draw:formula="10800*sin(?f7 *(pi/180))"/>
+            <draw:equation draw:name="f12" draw:formula="?f10 +10800"/>
+            <draw:equation draw:name="f13" draw:formula="?f11 +10800"/>
+            <draw:equation draw:name="f14" draw:formula="if(?f6 ,$0 ,?f12 )"/>
+            <draw:equation draw:name="f15" draw:formula="if(?f6 ,$1 ,?f13 )"/>
+            <draw:equation draw:name="f16" draw:formula="10800*cos(?f8 *(pi/180))"/>
+            <draw:equation draw:name="f17" draw:formula="10800*sin(?f8 *(pi/180))"/>
+            <draw:equation draw:name="f18" draw:formula="?f16 +10800"/>
+            <draw:equation draw:name="f19" draw:formula="?f17 +10800"/>
+            <draw:equation draw:name="f20" draw:formula="10800*cos(?f9 *(pi/180))"/>
+            <draw:equation draw:name="f21" draw:formula="10800*sin(?f9 *(pi/180))"/>
+            <draw:equation draw:name="f22" draw:formula="?f20 +10800"/>
+            <draw:equation draw:name="f23" draw:formula="?f21 +10800"/>
+            <draw:handle draw:handle-position="$0 $1"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Right Arrow -->
+      <!--<xsl:when test ="@path='m@0,l@0@1,0@1,0@2@0@2@0,21600,21600,10800xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l@0@1,0@1,0@2@0@2@0,21600,21600,10800xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Right Arrow'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="0 ?f0 ?f5 ?f2" draw:type="right-arrow" draw:modifiers="16200 5400" draw:enhanced-path="M 0 ?f0 L ?f1 ?f0 ?f1 0 21600 10800 ?f1 21600 ?f1 ?f2 0 ?f2 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$0 $1" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Left Arrow -->
+      <!--<xsl:when test ="@path='m@0,l@0@1,21600@1,21600@2@0@2@0,21600,,10800xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l@0@1,21600@1,21600@2@0@2@0,21600,,10800xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Left Arrow'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="?f7 ?f0 21600 ?f2" draw:type="left-arrow" draw:modifiers="5400 5400" draw:enhanced-path="M 21600 ?f0 L ?f1 ?f0 ?f1 0 0 10800 ?f1 21600 ?f1 ?f2 21600 ?f2 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$0 $1" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Up Arrow -->
+      <!--<xsl:when test ="@path='m0@0l@1@0@1,21600@2,21600@2@0,21600@0,10800,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m0@0l@1@0@1,21600@2,21600@2@0,21600@0,10800,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Up Arrow'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="?f0 ?f7 ?f2 21600" draw:type="up-arrow" draw:modifiers="5400 5400" draw:enhanced-path="M ?f0 21600 L ?f0 ?f1 0 ?f1 10800 0 21600 ?f1 ?f2 ?f1 ?f2 21600 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$1 $0" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="21600"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Down Arrow -->
+      <!--<xsl:when test ="@path='m0@0l@1@0@1,0@2,0@2@0,21600@0,10800,21600xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m0@0l@1@0@1,0@2,0@2@0,21600@0,10800,21600xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="$currentShape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Down Arrow'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="?f0 0 ?f2 ?f5" draw:type="down-arrow" draw:modifiers="16200 5400" draw:enhanced-path="M ?f0 0 L ?f0 ?f1 0 ?f1 10800 21600 21600 ?f1 ?f2 ?f1 ?f2 0 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$1 $0" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="21600"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Trapezoid -->
+      <!--<xsl:when test ="@path='m,l@0,21600@1,21600,21600,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l@0,21600@1,21600,21600,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Trapezoid'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="?f6 10800 10800 21600 ?f5 10800 10800 0" draw:text-areas="?f3 ?f3 ?f4 ?f4" draw:type="trapezoid" draw:modifiers="5400" draw:enhanced-path="M 0 0 L 21600 0 ?f0 21600 ?f1 21600 Z N">
+            <draw:equation draw:name="f0" draw:formula="21600-$0 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="$0 *10/18"/>
+            <draw:equation draw:name="f3" draw:formula="?f2 +1750"/>
+            <draw:equation draw:name="f4" draw:formula="21600-?f3 "/>
+            <draw:equation draw:name="f5" draw:formula="$0 /2"/>
+            <draw:equation draw:name="f6" draw:formula="21600-?f5 "/>
+            <draw:handle draw:handle-position="$0 bottom" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Can -->
+      <!--<xsl:when test ="@path='m10800,qx0@1l0@2qy10800,21600,21600@2l21600@1qy10800,xem0@1qy10800@0,21600@1nfe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,qx0@1l0@2qy10800,21600,21600@2l21600@1qy10800,xem0@1qy10800@0,21600@1nfe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Can'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 88 21600" draw:glue-points="44 ?f6 44 0 0 10800 44 21600 88 10800" draw:text-areas="0 ?f6 88 ?f3" draw:type="can" draw:modifiers="5400" draw:enhanced-path="M 44 0 C 20 0 0 ?f2 0 ?f0 L 0 ?f3 C 0 ?f4 20 21600 44 21600 68 21600 88 ?f4 88 ?f3 L 88 ?f0 C 88 ?f2 68 0 44 0 Z N M 44 0 C 20 0 0 ?f2 0 ?f0 0 ?f5 20 ?f6 44 ?f6 68 ?f6 88 ?f5 88 ?f0 88 ?f2 68 0 44 0 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 *2/4"/>
+            <draw:equation draw:name="f1" draw:formula="?f0 *6/11"/>
+            <draw:equation draw:name="f2" draw:formula="?f0 -?f1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f0 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 +?f1 "/>
+            <draw:equation draw:name="f5" draw:formula="?f0 +?f1 "/>
+            <draw:equation draw:name="f6" draw:formula="$0 *2/2"/>
+            <draw:equation draw:name="f7" draw:formula="44"/>
+            <draw:handle draw:handle-position="?f7 $0" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="10800"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Cube -->
+      <!--<xsl:when test ="@path='m@0,l0@0,,21600@1,21600,21600@2,21600,xem0@0nfl@1@0,21600,em@1@0nfl@1,21600e'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l0@0,,21600@1,21600,21600@2,21600,xem0@0nfl@1@0,21600,em@1@0nfl@1,21600e'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Cube'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="?f7 0 ?f6 ?f1 0 ?f10 ?f6 21600 ?f4 ?f10 21600 ?f9" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="0 ?f1 ?f4 ?f12" draw:type="cube" draw:modifiers="5400" draw:enhanced-path="M 0 ?f12 L 0 ?f1 ?f2 0 ?f11 0 ?f11 ?f3 ?f4 ?f12 Z N M 0 ?f1 L ?f2 0 ?f11 0 ?f4 ?f1 Z N M ?f4 ?f12 L ?f4 ?f1 ?f11 0 ?f11 ?f3 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="top+?f0 "/>
+            <draw:equation draw:name="f2" draw:formula="left+?f0 "/>
+            <draw:equation draw:name="f3" draw:formula="bottom-?f0 "/>
+            <draw:equation draw:name="f4" draw:formula="right-?f0 "/>
+            <draw:equation draw:name="f5" draw:formula="right-?f2 "/>
+            <draw:equation draw:name="f6" draw:formula="?f5 /2"/>
+            <draw:equation draw:name="f7" draw:formula="?f2 +?f6 "/>
+            <draw:equation draw:name="f8" draw:formula="bottom-?f1 "/>
+            <draw:equation draw:name="f9" draw:formula="?f8 /2"/>
+            <draw:equation draw:name="f10" draw:formula="?f1 +?f9 "/>
+            <draw:equation draw:name="f11" draw:formula="right"/>
+            <draw:equation draw:name="f12" draw:formula="bottom"/>
+            <draw:handle draw:handle-position="left $0" draw:handle-switched="true" draw:handle-range-y-minimum="0" draw:handle-range-y-maximum="21600"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Octagon -->
+      <!--<xsl:when test ="@path='m@0,l0@0,0@2@0,21600@1,21600,21600@2,21600@0@1,xe'">-->
+      <xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l0@0,0@2@0,21600@1,21600,21600@2,21600@0@1,xe'">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="@id"/>
+          </xsl:attribute>
+          <!--<xsl:for-each select ="parent::node()/v:shape">-->
+          <xsl:call-template name="InsertAnchorType"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:apply-templates select="v:textbox" >
+            <xsl:with-param name ="shapetype" select ="'Octagon'"/>
+          </xsl:apply-templates >
+          <!--</xsl:for-each>-->
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f5 ?f6 ?f7 ?f8" draw:type="octagon" draw:modifiers="5000" draw:enhanced-path="M ?f0 0 L ?f2 0 21600 ?f1 21600 ?f3 ?f2 21600 ?f0 21600 0 ?f3 0 ?f1 Z N">
+            <draw:equation draw:name="f0" draw:formula="left+$0 "/>
+            <draw:equation draw:name="f1" draw:formula="top+$0 "/>
+            <draw:equation draw:name="f2" draw:formula="right-$0 "/>
+            <draw:equation draw:name="f3" draw:formula="bottom-$0 "/>
+            <draw:equation draw:name="f4" draw:formula="$0 /2"/>
+            <draw:equation draw:name="f5" draw:formula="left+?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="top+?f4 "/>
+            <draw:equation draw:name="f7" draw:formula="right-?f4 "/>
+            <draw:equation draw:name="f8" draw:formula="bottom-?f4 "/>
+            <draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
+          </draw:enhanced-geometry>
+        </draw:custom-shape>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
   <!--
   Summary: Template writes rectangles/lines.
   Author: Clever Age
   -->
-  <xsl:template match="v:rect | v:line">
+  <xsl:template match="v:rect | v:line|v:shapetype|v:oval|v:roundrect">
     <!-- version 1.1-->
     <xsl:choose>
       <xsl:when test="v:imagedata">
@@ -285,11 +1160,83 @@
             </draw:line>
           </xsl:when>
           <xsl:otherwise>
+            <!--<xsl:variable name="OldshapeType">
+              <xsl:value-of select="substring-after(self::v:shape/@type,'#')"/>
+            </xsl:variable>
+            <xsl:variable name ="shapeTypeId">
+              <xsl:choose>
+                <xsl:when  test ="parent::node()/v:shapetype/@id" >
+                <xsl:value-of select ="parent::node()/v:shapetype/@id"/>
+              </xsl:when>
+                <xsl:when  test ="not(parent::node()/v:shapetype/@id)">                  
+                  <xsl:value-of select="./parent::node()/parent::node()/preceding-sibling::w:r/w:pict/v:shapetype[@id=$OldshapeType]/@id"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name ="pathId">
+              <xsl:choose>
+                <xsl:when  test ="parent::node()/v:shapetype/@id" >
+                  <xsl:value-of select ="parent::node()/v:shapetype/@path"/>
+                </xsl:when>
+                <xsl:when  test ="not(parent::node()/v:shapetype/@id)">                  
+                  <xsl:value-of select="./parent::node()/parent::node()/preceding-sibling::w:r/w:pict/v:shapetype[@id=$OldshapeType]/@path"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:variable>-->
+            <!--<xsl:variable name="OldshapeType">
+              <xsl:value-of select="concat('#',./@id)"/>
+            </xsl:variable>-->
+            <xsl:variable name ="shapeTypeId">
+              <xsl:value-of select ="parent::node()/v:shapetype/@id"/>
+              <!--<xsl:choose>                
+                <xsl:when  test ="parent::node()/v:shape/@type" >
+                  <xsl:value-of select ="parent::node()/v:shapetype/@id"/>
+                </xsl:when>
+                <xsl:when  test ="not(parent::node()/v:shape/@type)">
+                  <xsl:value-of select="substring-after(./parent::node()/parent::node()/following-sibling::w:r[1]/w:pict/v:shape[@type=$OldshapeType]/@type,'#')"/>
+                </xsl:when>
+              </xsl:choose>-->
+            </xsl:variable>
+            <xsl:variable name ="pathId">
+              <!--<xsl:choose>
+                <xsl:when  test ="parent::node()/v:shape/@type" >-->
+              <xsl:value-of select ="parent::node()/v:shapetype/@path"/>
+              <!--</xsl:when>
+                <xsl:when  test ="not(parent::node()/v:shape/@id)">
+                  <xsl:value-of select="./parent::node()/parent::node()/following-sibling::w:r[1]/w:pict/v:shape[@type=$OldshapeType]/@path"/>
+                </xsl:when>
+              </xsl:choose>-->
+            </xsl:variable>
+            <!--<xsl:choose>-->
+            <xsl:if  test ="parent::node()/v:shape">
+              <xsl:for-each select ="parent::node()/v:shape">
+                <xsl:call-template name="GetShape">
+                  <xsl:with-param name ="currentShape" select="." />
+                  <xsl:with-param name="shapeTypeId" select="$shapeTypeId"></xsl:with-param>
+                  <xsl:with-param name="pathId" select="$pathId"></xsl:with-param>
+                </xsl:call-template>
+              </xsl:for-each>
+            </xsl:if>
+            <xsl:if test="./parent::node()/parent::node()/following-sibling::w:r/w:pict/v:shape and ./parent::node()/parent::node()/following-sibling::w:r/w:pict/v:shape/@type=concat('#',$shapeTypeId)">
+              <xsl:for-each select ="./parent::node()/parent::node()/following-sibling::w:r/w:pict/v:shape">
+                <xsl:call-template name="GetShape">
+                  <xsl:with-param name ="currentShape" select="." />
+                  <xsl:with-param name="shapeTypeId" select="$shapeTypeId"></xsl:with-param>
+                  <xsl:with-param name="pathId" select="$pathId"></xsl:with-param>
+                </xsl:call-template>
+              </xsl:for-each>
+            </xsl:if>
+            <!--</xsl:choose>-->
+
+            <xsl:choose>
+              <!--Rectangle -->
+              <xsl:when  test ="self::v:rect" >
             <draw:rect>
               <xsl:attribute name="draw:style-name">
-                <xsl:value-of select="generate-id(.)"/>
+                    <xsl:value-of select="parent::node()/v:rect/@id"/>
               </xsl:attribute>
               <!--TODO-->
+                  <xsl:for-each select ="parent::node()/v:rect">
               <xsl:attribute name="draw:name">
                 <xsl:text>Frame1</xsl:text>
               </xsl:attribute>
@@ -299,11 +1246,66 @@
               <xsl:call-template name="InsertShapeHeight"/>
               <xsl:call-template name="InsertshapeAbsolutePos"/>
               <xsl:call-template name="InsertShapeZindex"/>
-
-              <xsl:apply-templates select="v:textbox"/>
-
+                    <xsl:apply-templates select="v:textbox">
+                      <xsl:with-param name ="shapetype" select ="'Rectangle'"/>
+                    </xsl:apply-templates >
               <!--<xsl:call-template name="InsertParagraphToFrame"/>-->
+                  </xsl:for-each>
             </draw:rect>
+              </xsl:when>
+              <!-- Oval -->
+              <xsl:when  test ="self::v:oval">
+                <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
+                  <xsl:attribute name="draw:style-name">
+                    <xsl:value-of select="parent::node()/v:oval/@id"/>
+                  </xsl:attribute>
+                  <xsl:for-each select ="parent::node()/v:oval">
+                    <xsl:call-template name="InsertAnchorType"/>
+                    <xsl:call-template name="InsertShapeWidth"/>
+                    <xsl:call-template name="InsertShapeHeight"/>
+                    <xsl:call-template name="InsertshapeAbsolutePos"/>
+                    <xsl:call-template name="InsertShapeZindex"/>
+                    <xsl:apply-templates select="v:textbox" >
+                      <xsl:with-param name ="shapetype" select ="'Oval'"/>
+                    </xsl:apply-templates >
+                  </xsl:for-each>
+                  <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3200 3200 18400 18400" draw:type="ellipse"/>
+                </draw:custom-shape>
+              </xsl:when>
+              <!-- Rounded Rectangle -->
+              <xsl:when  test ="self::v:roundrect">
+                <draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
+                  <xsl:attribute name="draw:style-name">
+                    <xsl:value-of select="parent::node()/v:roundrect/@id"/>
+                  </xsl:attribute>
+                  <xsl:for-each select ="parent::node()/v:roundrect">
+                    <xsl:call-template name="InsertAnchorType"/>
+                    <xsl:call-template name="InsertShapeWidth"/>
+                    <xsl:call-template name="InsertShapeHeight"/>
+                    <xsl:call-template name="InsertshapeAbsolutePos"/>
+                    <xsl:call-template name="InsertShapeZindex"/>
+                    <xsl:apply-templates select="v:textbox" >
+                      <xsl:with-param name ="shapetype" select ="'Rounded Rectangle'"/>
+                    </xsl:apply-templates >
+                  </xsl:for-each>
+                  <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
+                    <draw:equation draw:name="f0" draw:formula="45"/>
+                    <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
+                    <draw:equation draw:name="f2" draw:formula="?f1 *3163/7636"/>
+                    <draw:equation draw:name="f3" draw:formula="left+?f2 "/>
+                    <draw:equation draw:name="f4" draw:formula="top+?f2 "/>
+                    <draw:equation draw:name="f5" draw:formula="right-?f2 "/>
+                    <draw:equation draw:name="f6" draw:formula="bottom-?f2 "/>
+                    <draw:equation draw:name="f7" draw:formula="left+$0 "/>
+                    <draw:equation draw:name="f8" draw:formula="top+$0 "/>
+                    <draw:equation draw:name="f9" draw:formula="bottom-$0 "/>
+                    <draw:equation draw:name="f10" draw:formula="right-$0 "/>
+                    <draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
+                  </draw:enhanced-geometry>
+
+                </draw:custom-shape>
+              </xsl:when>
+            </xsl:choose>  
           </xsl:otherwise>
         </xsl:choose>
 
@@ -448,16 +1450,23 @@
   Author: Clever Age
   -->
   <xsl:template match="v:textbox">
+    <xsl:param name ="shapetype"/>
     <xsl:if test="parent::v:stroke/@dashstyle">
       <xsl:message terminate="no">translation.oox2odf.textbox.boder.dashed</xsl:message>
     </xsl:if>
     <xsl:if test="contains(parent::node()/@style, 'v-text-anchor')">
       <xsl:message terminate="no">translation.odf2oox.valignInsideTextbox</xsl:message>
     </xsl:if>
+    <xsl:if test ="$shapetype!='' ">
+      <xsl:call-template name="InsertTextBoxAutomaticHeight"/>
+      <xsl:apply-templates select="w:txbxContent/child::node()"/>
+    </xsl:if>
+    <xsl:if test ="$shapetype=''">
     <draw:text-box>
       <xsl:call-template name="InsertTextBoxAutomaticHeight"/>
       <xsl:apply-templates select="w:txbxContent/child::node()"/>
     </draw:text-box>
+    </xsl:if>
   </xsl:template>
 
   <!--
@@ -516,17 +1525,34 @@
   Author: Clever Age
   -->
   <xsl:template match="w:pict[not(o:OLEObject)]" mode="automaticpict">
-    <xsl:variable name="vmlElement" select="v:shape | v:rect | v:line | v:group" />
+    <xsl:variable name="vmlElement" select="v:shape | v:rect | v:line | v:group|v:oval|v:roundrect" />
     
     <style:style>
+      <!--Sona-->
       <xsl:attribute name="style:name">
+        <xsl:choose>
+          <xsl:when test ="$vmlElement[1]=v:shape">
+            <xsl:value-of  select ="v:shape/@id"/>
+          </xsl:when>
+          <xsl:when test ="$vmlElement[1]=v:oval">
+            <xsl:value-of  select ="v:oval/@id"/>
+          </xsl:when>
+          <xsl:when test ="$vmlElement[1]=v:rect">
+            <xsl:value-of  select ="v:rect/@id"/>
+          </xsl:when>
+          <xsl:when test ="$vmlElement[1]=v:roundrect">
+            <xsl:value-of  select ="v:roundrect/@id"/>
+          </xsl:when>
+          <xsl:otherwise>
         <xsl:value-of select="generate-id($vmlElement)"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
       <!--in Word there are no parent style for image - make default Graphics in OO -->
-      <xsl:attribute name="style:parent-style-name">
+      <!--<xsl:attribute name="style:parent-style-name">
         <xsl:text>Graphics</xsl:text>
         <xsl:value-of select="w:tblStyle/@w:val"/>
-      </xsl:attribute>
+      </xsl:attribute>-->
       <xsl:attribute name="style:family">
         <xsl:text>graphic</xsl:text>
       </xsl:attribute>
@@ -638,12 +1664,23 @@
     <xsl:call-template name="InsertShapeBackgroundColor">
       <xsl:with-param name="shape" select="$shape" />
     </xsl:call-template>
+    <xsl:call-template name="InsertShapeZindex">
+      <xsl:with-param name="shape" select="$shape" />
+    </xsl:call-template>
     <xsl:call-template name="InsertShapeWrappedParagraph">
       <xsl:with-param name="shape" select="$shape" />
     </xsl:call-template>
     <xsl:call-template name="InsertShapeShadow">
       <xsl:with-param name="shape" select="$shape" />
     </xsl:call-template>
+    <!--####prad-->
+    <xsl:attribute name ="draw:auto-grow-height">
+      <xsl:value-of select ="'false'"/>
+    </xsl:attribute>
+    <xsl:attribute name ="draw:auto-grow-width">
+      <xsl:value-of select ="'false'"/>
+    </xsl:attribute>
+    
     <xsl:for-each select="$shape/v:textbox">
       <xsl:call-template name="InsertTexboxTextDirection"/>
       <xsl:call-template name="InsertTextBoxPadding"/>
@@ -1873,7 +2910,7 @@
   <xsl:template name="InsertShapeStyleName">
     <xsl:param name="shape" select="ancestor::w:pict | ancestor::w:object"/>
     <xsl:attribute name="draw:style-name">
-      <xsl:value-of select="generate-id($shape)"/>
+      <xsl:value-of select="./@id"/>
     </xsl:attribute>
     <!--TODO-->
     <xsl:attribute name="draw:name">
