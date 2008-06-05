@@ -433,11 +433,12 @@ HRESULT CConnect::OdtToDocx()
 			goto Cleanup;
 		}
 
+		/*clam, dialogika: task 1837107
 		hr = pNewDoc->get_Fields(&pFields);
 		if (SUCCEEDED(hr)) {
 			long nbUpdated = 0;
 			pFields->Update(&nbUpdated);
-		}
+		}*/
 
 		// Finally activate the document
 		hr = pNewDoc->Activate();
