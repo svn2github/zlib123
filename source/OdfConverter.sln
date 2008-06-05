@@ -105,8 +105,6 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-nl", 
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-pl", "Spreadsheet\Setup\OdfAddInForExcelSetup-pl\OdfAddInForExcelSetup-pl.vdproj", "{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-cz", "Spreadsheet\Setup\OdfAddInForExcelSetup-cz\OdfAddInForExcelSetup-cz.vdproj", "{891516CF-3890-4C40-BB67-2E2475DFFFA3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
