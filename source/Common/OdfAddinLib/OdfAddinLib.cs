@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -134,9 +134,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             if (form.HasLostElements)
                             {
                                 ArrayList elements = form.LostElements;
+                                ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
+                                configMan.LoadConfig();
+                                if (configMan.IsErrorIgnored == false)
+                                {
                                 InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
                                 infoBox.ShowDialog();
                             }
+                        }
                         }
                         else
                         {
@@ -232,8 +237,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         if (form.HasLostElements)
                         {
                             ArrayList elements = form.LostElements;
+                            ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
+                            configMan.LoadConfig();
+                            if (configMan.IsErrorIgnored == false)
+                            {
                             InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
                             infoBox.ShowDialog();
+                        }
                         }
 
                         if (form.Exception != null)
