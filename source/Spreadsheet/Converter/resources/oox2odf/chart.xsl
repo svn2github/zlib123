@@ -859,6 +859,26 @@
             </text:p>
           </chart:title>
         </xsl:when>
+        
+        <xsl:when test="parent::c:valAx/c:title/c:tx">
+          <chart:title chart:style-name="axis-x_title">
+            <text:p>
+              
+              <xsl:for-each select="parent::c:valAx/c:title/c:tx/c:rich/a:p">
+                
+                <!-- [ENTER] -->
+                <xsl:if test="preceding-sibling::node()[1][name() = 'a:p']">
+                  <xsl:value-of select="'&#xD;&#xA;'"/>
+                </xsl:if>
+                
+                <xsl:for-each select="a:r">
+                  <xsl:value-of select="a:t"/>
+                </xsl:for-each>
+              </xsl:for-each>
+              
+            </text:p>
+          </chart:title>
+        </xsl:when>
 
         <!-- default Axis-X title -->
         <xsl:when test="c:title">
@@ -903,6 +923,7 @@
     <!-- @Context: inside input chart file -->
 
     <chart:axis chart:dimension="y" chart:name="primary-y" chart:style-name="axis-y">
+     
       <xsl:if test="$primaryOrSecondary = 'secondary-y'">
         <xsl:attribute name="chart:name">
           <xsl:text>secondary-y</xsl:text>
