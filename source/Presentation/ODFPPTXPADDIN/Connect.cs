@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2007, Sonata Software Limited
  * All rights reserved.
  * 
@@ -207,6 +207,26 @@ namespace OdfPPTXPAddin
             exportButton.Visible = true;
             exportButton.Enabled = true;
             
+            // Add options button
+            try
+            {
+                // if item already exists, use it (should never happen)
+                optionButton = (CommandBarButton)commandBar1.Controls[this.addinLib.GetString("OdfFileOptionsLabel")];
+            }
+            catch (Exception)
+            {
+                // otherwise, create a new one
+                optionButton = (CommandBarButton)commandBar1.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 5, true);
+                optionButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.optionButton_Click);
+            }
+            // set item's label
+            optionButton.Caption = this.addinLib.GetString("OdfFileOptionsLabel");
+            optionButton.Tag = this.addinLib.GetString("OdfFileOptionsLabel");
+            // set action
+            //importButton.OnAction = "!<OdfConverterPPT2003Addin.Connect>";
+            optionButton.OnAction = "!<OdfPPT2003Addin.Connect>";
+            optionButton.Visible = true;
+            
 		}
 
         private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
@@ -216,7 +236,7 @@ namespace OdfPPTXPAddin
             fd.AllowMultiSelect = true;
             // add filter for ODS files
             fd.Filters.Clear();
-            fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.odp", Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString("OdfPPTFileType"), "*.odp", Type.Missing);
             fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
             // set title
             fd.Title = this.addinLib.GetString("OdfImportLabel");
@@ -294,7 +314,7 @@ namespace OdfPPTXPAddin
                     //sfd.SupportMultiDottedExtensions = true;
                     sfd.AddExtension = true;
                     sfd.DefaultExt = "odp";
-                    sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.odp)|*.odp|"
+                    sfd.Filter = this.addinLib.GetString("OdfPPTFileType") + " (*.odp)|*.odp|"
                             + this.addinLib.GetString("AllFileType") + " (*.*)|*.*";
                     sfd.InitialDirectory = pres.Path;
                     //sfd.OverwritePrompt = true;
@@ -367,6 +387,24 @@ namespace OdfPPTXPAddin
                 System.Threading.Thread.CurrentThread.CurrentCulture = ci;
             }
         }
+
+        private void optionButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
+        {
+            System.Globalization.CultureInfo ci;
+            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            try
+            {
+                using (ConfigForm cfgForm = new ConfigForm())
+                {
+                    cfgForm.ShowDialog();
+                }
+            }
+            finally
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+            }
+        }
+
 		/// <summary>
 		///      Implements the OnBeginShutdown method of the IDTExtensibility2 interface.
 		///      Receives notification that the host application is being unloaded.
@@ -380,6 +418,8 @@ namespace OdfPPTXPAddin
             CommandBarButton button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfImportLabel"), Type.Missing);
             button.Delete(Type.Missing);
             button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfExportLabel"), Type.Missing);
+            button.Delete(Type.Missing);
+            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfFileOptionsLabel"), Type.Missing);
             button.Delete(Type.Missing);
 
         }
@@ -418,7 +458,7 @@ namespace OdfPPTXPAddin
 
         private PowerPoint.Application applicationObject;
         private OdfAddinLib addinLib;
-        private CommandBarButton importButton, exportButton;
+        private CommandBarButton importButton, exportButton,optionButton;
 
 
 

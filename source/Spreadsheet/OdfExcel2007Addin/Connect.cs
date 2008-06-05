@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -57,7 +57,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
 	[GuidAttribute("ACA16CE6-4077-4DD6-825F-CA913B9649A5"), ProgId("OdfExcel2007Addin.Connect")]
     public class Connect : Object, Extensibility.IDTExtensibility2,IRibbonExtensibility, IOdfConverter
 	{
-		   private const string ODF_FILE_TYPE = "OdfFileType";
+        private const string ODF_FILE_TYPE = "OdfExcelFileType";
         private const string ALL_FILE_TYPE = "AllFileType";
         private const string IMPORT_ODF_FILE_FILTER = "*.ods";
         private const string IMPORT_ALL_FILE_FILTER = "*.*";
@@ -409,6 +409,18 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// ODF Options
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
+        public void ODFOptions(IRibbonControl control)
+        {
+            using (ConfigForm cfgForm = new ConfigForm())
+            {
+                cfgForm.ShowDialog();
+            }
         }
 
         private MSExcel.Application applicationObject;

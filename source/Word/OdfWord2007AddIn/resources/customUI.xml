@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--
 * Copyright (c) 2006, Clever Age
 * All rights reserved.
@@ -33,6 +33,7 @@
       <menu id="OdfMenu" getLabel="GetLabel" insertAfterMso="FileSaveAsMenu" itemSize="large" getImage="GetImage">
         <button id="OdfImport" imageMso="FileOpen" getLabel="GetLabel" onAction="ImportODF" getDescription="GetDescription" />
         <button id="OdfExport" imageMso="FileSave" getLabel="GetLabel" onAction="ExportODF" getDescription="GetDescription" enabled="true" />
+	<button id="OdfFileOptions" imageMso="ApplicationOptionsDialog" getLabel="GetLabel" onAction="ODFOptions" getDescription="GetDescription"/>
       </menu>
     </officeMenu>
   </ribbon>

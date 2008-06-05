@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -369,6 +369,18 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 }
             }
 		}
+
+        /// <summary>
+        /// ODF Options.
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
+        public void ODFOptions(IRibbonControl control)
+        {
+            using (ConfigForm cfgForm = new ConfigForm())
+            {
+                cfgForm.ShowDialog();
+            }
+        }
 
         /// <summary>
         /// Get an image

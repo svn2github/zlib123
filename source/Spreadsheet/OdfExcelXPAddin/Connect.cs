@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -206,8 +206,10 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                     bool enabled = _openButton.Enabled;
                     importButton1.Enabled = enabled;
                     exportButton1.Enabled = enabled;
+                    optionButton1.Enabled = enabled;
                     importButton2.Enabled = enabled;
                     exportButton2.Enabled = enabled;
+                    optionButton2.Enabled = enabled;
                 } else {
                     ODS("cbee_OnUpdate : no Open Button");
                 }
@@ -220,6 +222,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             // Add import button
             CommandBarButton importButton;
             CommandBarButton exportButton;
+            CommandBarButton optionButton;
             try
             {
                 // if item already exists, use it (should never happen)
@@ -261,12 +264,43 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             if (addHandler) {
                 exportButton.Click += exportButton_Click;
             }
-            if (addHandler) {
+
+            // Add option button
+            try
+            {
+                // if item already exists, use it (should never happen)
+                optionButton = (CommandBarButton)controls[this.addinLib.GetString("OdfFileOptionsLabel")];
+            }
+            catch (Exception)
+            {
+                // otherwise, create a new one
+                optionButton = (CommandBarButton)controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 5, true);
+            }
+            // set item's label
+            optionButton.Caption = this.addinLib.GetString("OdfFileOptionsLabel");
+            optionButton.Tag = this.addinLib.GetString("OdfFileOptionsLabel");
+            // set action
+            optionButton.OnAction = "!<OdfExcelXPAddin.Connect>";
+            optionButton.Visible = true;
+            optionButton.Enabled = true;
+
+            if (addHandler)
+            {
+                optionButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.optionButton_Click);
+            }
+
+            if (addHandler)
+            {
                 importButton1 = importButton;
                 exportButton1 = exportButton;
-            } else {
+                optionButton1 = optionButton;
+
+            }
+            else
+            {
                 importButton2 = importButton;
                 exportButton2 = exportButton;
+                optionButton2 = optionButton;
             }
         }
 
@@ -304,6 +338,8 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             button.Delete(Type.Missing);
             button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfExportLabel"), Type.Missing);
             button.Delete(Type.Missing);
+            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfFileOptionsLabel"), Type.Missing);
+            button.Delete(Type.Missing);
         }
 
 
@@ -322,7 +358,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                 fd.AllowMultiSelect = true;
                 // add filter for ODS files
                 fd.Filters.Clear();
-                fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.ods", Type.Missing);
+                fd.Filters.Add(this.addinLib.GetString("OdfExcelFileType"), "*.ods", Type.Missing);
                 // set title
                 fd.Title = this.addinLib.GetString("OdfImportLabel");
                 // display the dialog
@@ -415,7 +451,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                     // sfd.SupportMultiDottedExtensions = true;
                     sfd.AddExtension = true;
                     sfd.DefaultExt = "ods";
-                    sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.ods)|*.ods";
+                    sfd.Filter = this.addinLib.GetString("OdfExcelFileType") + " (*.ods)|*.ods";
                     sfd.InitialDirectory = wb.Path;
                     sfd.OverwritePrompt = true;
                     sfd.Title = this.addinLib.GetString("OdfExportLabel");
@@ -506,10 +542,26 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             }
         }
 
+        private void optionButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
+        {
+            System.Globalization.CultureInfo ci;
+            ci = System.Threading.Thread.CurrentThread.CurrentCulture;            
+            try
+            {
+                using (ConfigForm cfgForm = new ConfigForm())
+                {
+                    cfgForm.ShowDialog();
+                }
+            }
+            finally
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = ci;               
+            }
+        }
 
         private MSExcel.Application applicationObject;
         private OdfAddinLib addinLib;
-        private CommandBarButton importButton1, exportButton1, importButton2, exportButton2;
+        private CommandBarButton importButton1, exportButton1, optionButton1, importButton2, exportButton2, optionButton2;
 
         #region IOdfConverter Members
 

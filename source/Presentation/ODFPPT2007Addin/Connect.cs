@@ -56,7 +56,7 @@ namespace OdfPPT2007Addin
 	[GuidAttribute("87F900FB-EF94-4EC9-A797-AEA118ECE682"), ProgId("OdfPPT2007Addin.Connect")]
     public class Connect : Object, Extensibility.IDTExtensibility2, IRibbonExtensibility, IOdfConverter
 	{
-        private const string ODF_FILE_TYPE = "OdfFileType";
+        private const string ODF_FILE_TYPE = "OdfPPTFileType";
         private const string ALL_FILE_TYPE = "AllFileType";
         private const string IMPORT_ODF_FILE_FILTER = "*.odp";
         private const string IMPORT_ALL_FILE_FILTER = "*.*";
@@ -370,6 +370,18 @@ namespace OdfPPT2007Addin
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// ODF Options.
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
+        public void ODFOptions(IRibbonControl control)
+        {
+            using (ConfigForm cfgForm = new ConfigForm())
+            {
+                cfgForm.ShowDialog();
+            }
         }
 
 

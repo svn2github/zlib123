@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -242,6 +242,27 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             exportButton.Enabled = true;
             exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
 
+
+            // Add option button
+            try
+            {
+                // if item already exists, use it (should never happen)
+                optionButton = (CommandBarButton)commandBar.Controls[this.addinLib.GetString("OdfFileOptionsLabel")];
+            }
+            catch (Exception)
+            {
+                // otherwise, create a new one
+                optionButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 5, true);
+            }
+            // set item's label
+            optionButton.Caption = this.addinLib.GetString("OdfFileOptionsLabel");
+            optionButton.Tag = this.addinLib.GetString("OdfFileOptionsLabel");
+            // set action
+            optionButton.OnAction = "!<OdfWord2003Addin.Connect>";
+            optionButton.Visible = true;
+            optionButton.Enabled = true;
+            optionButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.optionButton_Click);
+
             // Tell Word that the Normal.dot template should not be saved (unless the user later on makes it dirty)
 	        applicationObject.NormalTemplate.Saved = true;
         }
@@ -261,6 +282,8 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             CommandBarButton button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfImportLabel"), Type.Missing);
             button.Delete(Type.Missing);
             button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfExportLabel"), Type.Missing);
+            button.Delete(Type.Missing);
+            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfFileOptionsLabel"), Type.Missing);
             button.Delete(Type.Missing);
         }
 
@@ -457,9 +480,26 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             }
         }
 
+        private void optionButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
+        {
+            System.Globalization.CultureInfo ci;
+            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            try
+            {
+                using (ConfigForm cfgForm = new ConfigForm())
+                {
+                    cfgForm.ShowDialog();
+                }
+            }
+            finally
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+            }
+        }
+
         private MSword.Application applicationObject;
         private OdfAddinLib addinLib;
-        private CommandBarButton importButton, exportButton;
+        private CommandBarButton importButton, exportButton, optionButton;
 
         #region IOdfConverter Members
 
