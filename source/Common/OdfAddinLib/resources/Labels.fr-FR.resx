@@ -199,4 +199,16 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="ProgressBarLoadLabel" xml:space="preserve">
     <value>Chargement des tables de traduction…</value>
   </data>
+  <data name="OdfExcelFileType" xml:space="preserve">
+    <value>OpenDocument Spreadsheet fichiers</value>
+  </data>
+  <data name="OdfPPTFileType" xml:space="preserve">
+    <value>Présentation des fichiers OpenDocument</value>
+  </data>
+  <data name="OdfFileOptionsDescription" xml:space="preserve">
+    <value>Activer / Désactiver FidelityMessage boîte de dialogue</value>
+  </data>
+  <data name="OdfFileOptionsLabel" xml:space="preserve">
+    <value>Options ODF</value>
+  </data>
   </root>

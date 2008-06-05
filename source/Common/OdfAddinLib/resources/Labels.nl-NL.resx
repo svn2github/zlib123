@@ -198,4 +198,16 @@
   <data name="ProgressBarLoadLabel" xml:space="preserve">
     <value>Loading vertaling tabellen…</value>
   </data>
+  <data name="OdfExcelFileType" xml:space="preserve">
+    <value>OpenDocument Spreadsheet bestanden</value>
+  </data>
+  <data name="OdfPPTFileType" xml:space="preserve">
+    <value>OpenDocument presentatie bestanden</value>
+  </data>
+  <data name="OdfFileOptionsDescription" xml:space="preserve">
+    <value>Activeren / deactiveren FidelityMessage dialoogvenster</value>
+  </data>
+  <data name="OdfFileOptionsLabel" xml:space="preserve">
+    <value>ODF Opties</value>
+  </data>
 </root>

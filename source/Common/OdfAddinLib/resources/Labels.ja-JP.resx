@@ -198,4 +198,16 @@
   <data name="ProgressBarLoadLabel" xml:space="preserve">
     <value>変換テーブルの読み込み…</value>
   </data>
+  <data name="OdfExcelFileType" xml:space="preserve">
+    <value>OpenDocumentスプレッドシートファイル</value>
+  </data>
+  <data name="OdfPPTFileType" xml:space="preserve">
+    <value>プレゼンテーションファイルのopenDocument</value>
+  </data>
+  <data name="OdfFileOptionsDescription" xml:space="preserve">
+    <value>有効化/無効化]ダイアログボックスでfidelitymessage</value>
+  </data>
+  <data name="OdfFileOptionsLabel" xml:space="preserve">
+    <value>odfオプション</value>
+  </data>
 </root>

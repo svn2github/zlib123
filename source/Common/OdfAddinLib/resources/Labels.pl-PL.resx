@@ -198,4 +198,16 @@
   <data name="OdfConversionCanceled" xml:space="preserve">
     <value>Konwersja została anulowana przez użytkownika.</value>
   </data>
+  <data name="OdfExcelFileType" xml:space="preserve">
+    <value>OpenDocument Spreadsheet pliki</value>
+  </data>
+  <data name="OdfPPTFileType" xml:space="preserve">
+    <value>OpenDocument prezentacji pliki</value>
+  </data>
+  <data name="OdfFileOptionsDescription" xml:space="preserve">
+    <value>Włącz / Wyłącz FidelityMessage Okno dialogowe</value>
+  </data>
+  <data name="OdfFileOptionsLabel" xml:space="preserve">
+    <value>ODF Opcje</value>
+  </data>
 </root>
