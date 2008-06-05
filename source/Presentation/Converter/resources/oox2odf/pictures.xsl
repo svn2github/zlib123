@@ -54,6 +54,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name ="slideRel"/>
     <xsl:param name="audio"/>
 	  <xsl:param name ="slideId"/>
+	  <xsl:param name ="source"/>
 <xsl:param name ="sourceName"/>
     <xsl:param name ="PicPosition"/>
     <xsl:param name ="MasterId"/>
@@ -97,9 +98,16 @@ exclude-result-prefixes="p a r xlink rels">
     </xsl:if>
     <draw:frame draw:layer="layout">
       <!--Edited by vipul to get cordinates from Layout-->
+		<xsl:choose>
+			<xsl:when test="$source='Layout'"/>
+			<xsl:when test="$grpBln='true'"/>
+			<xsl:otherwise>
 		<xsl:attribute name ="draw:id"	>
-			<xsl:value-of select ="concat('sldraw',$slideId,'an',./p:nvPicPr/p:cNvPr/@id)"/>
+					<xsl:value-of select ="concat('Picsldraw',$slideId,'an',./p:nvPicPr/p:cNvPr/@id)"/>
 		</xsl:attribute>
+			</xsl:otherwise>
+		</xsl:choose>
+		
  <xsl:variable  name ="GraphicId">
         <xsl:value-of select ="concat('SLPicture',$slideId,'gr',./p:nvPicPr/p:cNvPr/@id)"/>
       </xsl:variable>

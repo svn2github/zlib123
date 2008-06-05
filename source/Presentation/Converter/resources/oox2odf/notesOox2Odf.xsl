@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -122,16 +122,18 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                 <xsl:value-of select="'0'"/>
               </xsl:if>
             </xsl:variable>
-            <!--If bullets present-->
-            <!--    <xsl:if test ="(a:p/a:pPr/a:buChar) or (a:p/a:pPr/a:buAutoNum) or (a:p/a:pPr/a:buBlip) ">
-              <xsl:call-template name ="tmpNotesBulletStyle">
+       
+                <xsl:if test ="(a:p/a:pPr/a:buChar) or (a:p/a:pPr/a:buAutoNum) or (a:p/a:pPr/a:buBlip) ">
+              <xsl:call-template name ="insertBulletStyleforNotes">
                 <xsl:with-param name ="ParaId" select ="$ParaId"/>
-                <xsl:with-param name ="NoteMasterFile" select ="$NoteMasterFile"/>
+                <xsl:with-param name ="notesMaster" select ="$NoteMasterFile"/>
                 <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
                 <xsl:with-param name ="var_TextBoxType" select ="$var_TextBoxType"/>
                 <xsl:with-param name ="var_index" select ="$var_index"/>
+                <xsl:with-param name ="notesRel" select ="$var_index"/>
+                
               </xsl:call-template>
-            </xsl:if>-->
+            </xsl:if>
             <xsl:for-each select ="a:p">
               <xsl:variable name ="levelForDefFont">
                 <xsl:if test ="a:pPr/@lvl">
@@ -149,7 +151,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                   <xsl:call-template name="tmpSlideParagraphStyle">
                     <xsl:with-param name="lnSpcReduction" select="$var_lnSpcReduction"/>
                   </xsl:call-template>
-                  <!--<xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip ">
+                  <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip ">
                     <xsl:choose>
                       <xsl:when test ="not(a:r/a:t)">
                         <xsl:attribute name="text:enable-numbering">
@@ -162,7 +164,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                         </xsl:attribute>
                       </xsl:otherwise>
                     </xsl:choose>
-                  </xsl:if>-->
+                  </xsl:if>
                   <xsl:if test ="a:pPr/a:tabLst/a:tab">
                     <xsl:call-template name ="paragraphTabstops" />
                   </xsl:if>
@@ -404,14 +406,16 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                       <xsl:value-of select ="'0'"/>
                     </xsl:if>
                   </xsl:variable>
-                  <!--<xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
-                    <xsl:call-template name ="tmpinsertMultipleLevels">
+
+                  <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
+                    <xsl:call-template name ="insertBulletsNumbersoox2odfforNotes">
                       <xsl:with-param name ="listStyleName" select ="concat($listStyleName,position())"/>
                       <xsl:with-param name ="ParaId" select ="$ParaId"/>
                       <xsl:with-param name="NotesNumber" select="$NotesNumber" />
                       <xsl:with-param name="levelCount" select="$levelForDefFont+1" />
+                      <xsl:with-param name="TypeId" select="concat($NotesNumber,'-Text-')" />
                     </xsl:call-template>
-                  </xsl:if>-->
+                  </xsl:if>
                   <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum) and not(a:pPr/a:buBlip)">
                     <text:p>
                       <xsl:attribute name ="style:name">
@@ -681,4 +685,660 @@ exclude-result-prefixes="p a r xlink rels xmlns">
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name ="insertBulletsNumbersoox2odfforNotes">
+    <xsl:param name ="listStyleName" />
+    <xsl:param  name ="ParaId"/>
+    <xsl:param  name ="TypeId"/>
+    <xsl:param name="slideRelationId" />
+    <xsl:param name="slideId" />
+    <xsl:param name="levelCount" />
+    
+    <xsl:variable name ="textSpanNode">
+      <text:p >
+        <xsl:attribute name ="text:style-name">
+          <xsl:value-of select ="concat($ParaId,position())"/>
+        </xsl:attribute>
+        <xsl:for-each select ="node()">
+          <xsl:if test ="name()='a:r'">
+            <text:span>
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="concat($TypeId,generate-id())"/>
+              </xsl:attribute>
+              <xsl:variable name="nodeTextSpan">
+                <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                <xsl:choose >
+                  <xsl:when test ="a:rPr[@cap='all']">
+                    <xsl:choose >
+                      <xsl:when test =".=''">
+                        <text:s/>
+                      </xsl:when>
+                      <xsl:when test ="not(contains(.,'  '))">
+                        <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                      </xsl:when>
+                      <xsl:when test =". =' '">
+                        <text:s/>
+                      </xsl:when>
+                      <xsl:otherwise >
+                        <xsl:call-template name ="InsertWhiteSpaces">
+                          <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                        </xsl:call-template>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:when>
+                  <xsl:when test ="a:rPr[@cap='small']">
+                    <xsl:choose >
+                      <xsl:when test =".=''">
+                        <text:s/>
+                      </xsl:when>
+                      <xsl:when test ="not(contains(.,'  '))">
+                        <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                      </xsl:when>
+                      <xsl:when test =".= ' '">
+                        <text:s/>
+                      </xsl:when>
+                      <xsl:otherwise >
+                        <xsl:call-template name ="InsertWhiteSpaces">
+                          <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                        </xsl:call-template>
+                      </xsl:otherwise>
+                    </xsl:choose >
+                  </xsl:when>
+                  <xsl:otherwise >
+                    <xsl:choose >
+                      <xsl:when test =".=''">
+                        <text:s/>
+                      </xsl:when>
+                      <xsl:when test ="not(contains(.,'  '))">
+                        <xsl:value-of select ="."/>
+                      </xsl:when>
+                      <xsl:otherwise >
+                        <xsl:call-template name ="InsertWhiteSpaces">
+                          <xsl:with-param name ="string" select ="."/>
+                        </xsl:call-template>
+                      </xsl:otherwise >
+                    </xsl:choose>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+                <xsl:copy-of select="$nodeTextSpan"/>
+            </text:span>
+          </xsl:if >
+          <xsl:if test ="name()='a:br'">
+            <text:line-break/>
+          </xsl:if>
+          <xsl:if test ="name()='a:endParaRPr'">
+            <text:span>
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="concat($TypeId,generate-id())"/>
+              </xsl:attribute>
+            </text:span >
+          </xsl:if >
+        </xsl:for-each>
+      </text:p>
+    </xsl:variable>
+      <xsl:call-template name ="insertMultipleLevelsForNotes">
+        <xsl:with-param name ="levelCount" select="$levelCount"/>
+        <xsl:with-param name ="ParaId" select ="$ParaId"/>
+        <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+        <xsl:with-param name ="TypeId" select ="$TypeId"/>
+        <xsl:with-param name ="textSpanNode" select ="$textSpanNode"/>
+      </xsl:call-template>
+   
+  </xsl:template>
+  <xsl:template name ="insertBulletStyleforNotes">
+    <xsl:param name ="notesRel" />
+    <xsl:param name ="ParaId" />
+    <xsl:param name ="listStyleName"/>
+    <xsl:param name ="notesMaster" />
+    <xsl:param name ="var_TextBoxType" />
+    <xsl:param name ="var_index" />
+      <xsl:for-each select ="./a:p">
+        <xsl:variable name="var_level">
+          <xsl:choose>
+            <xsl:when test="a:pPr/@lvl">
+              <xsl:value-of select="a:pPr/@lvl"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'0'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name ="nodeName">
+          <xsl:choose>
+            <xsl:when test="a:pPr/@lvl">
+              <xsl:value-of select ="concat('a:lvl',$var_level+1 ,'pPr')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select ="'a:lvl1pPr'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name ="textColor">
+          <xsl:for-each select ="a:r">
+            <xsl:if test ="position()= '1'">
+              <xsl:if test ="a:rPr">
+                <xsl:if test ="./a:rPr/a:solidFill">
+                  <xsl:if test ="./a:rPr/a:solidFill/a:srgbClr">
+                    <xsl:value-of select ="concat('#',./a:rPr/a:solidFill/a:srgbClr/@val)"/>
+                  </xsl:if>
+                  <xsl:if test ="./a:rPr/a:solidFill/a:schemeClr">
+                    <xsl:call-template name ="getColorCode">
+                      <xsl:with-param name ="color">
+                        <xsl:value-of select="./a:rPr/a:solidFill/a:schemeClr/@val"/>
+                      </xsl:with-param>
+                    </xsl:call-template >
+                  </xsl:if>
+                </xsl:if>
+                <xsl:if test ="not(./a:rPr/a:solidFill)">
+                  <xsl:value-of select ="'0'"/>
+                </xsl:if>
+              </xsl:if>
+              <xsl:if test ="not(./a:rPr)">
+                <xsl:value-of select ="'0'"/>
+              </xsl:if>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:if test ="not(a:pPr/a:buNone)">
+        
+            <xsl:variable name ="levelStyle">
+              <xsl:value-of select ="concat($listStyleName,position(),'lvl',$var_level+1)"/>
+            </xsl:variable>
+            <xsl:variable name ="textLevel" select ="a:pPr/@lvl"/>
+            <xsl:variable name ="newTextLvl" select ="$textLevel+1"/>
+            <xsl:choose >
+              <xsl:when test ="a:pPr/a:buChar">
+                <text:list-style>
+                  <xsl:attribute name ="style:name">
+                    <xsl:value-of select ="$levelStyle"/>
+                  </xsl:attribute >
+                  <text:list-level-style-bullet>
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select ="$var_level + 1"/>
+                    </xsl:attribute >
+                    <xsl:attribute name ="text:bullet-char">
+                      <xsl:call-template name ="insertBulletCharacter">
+                        <xsl:with-param name ="character" select ="a:pPr/a:buChar/@char" />
+                      </xsl:call-template>
+
+
+
+                    </xsl:attribute >
+                    <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle/child::node()[name()=$nodeName]">
+                      <xsl:call-template name="tmpListlevelProp"/>
+                    </xsl:for-each >
+                    <style:text-properties style:font-charset="x-symbol">
+                      <xsl:call-template name="tmpBulletFont"/>
+                      <xsl:if test ="a:pPr/a:buSzPct">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buSzPct)">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="'100%'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:pPr/a:buClr">
+                        <xsl:if test ="a:pPr/a:buClr/a:srgbClr">
+                          <xsl:variable name ="color" select ="a:pPr/a:buClr/a:srgbClr/@val"/>
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="concat('#',$color)"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:pPr/a:buClr/a:schemeClr">
+                          <xsl:variable name ="schemeColor" select ="a:pPr/a:buClr/a:schemeClr/@val"/>
+                          <xsl:variable name ="levelColor" >
+                            <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle">
+                              <xsl:call-template name ="getColorMap">
+                                <xsl:with-param name ="schemeColor" select ="$schemeColor"/>
+                              </xsl:call-template>
+                            </xsl:for-each >
+                          </xsl:variable>
+                          <xsl:call-template name ="getColorCode">
+                            <xsl:with-param name ="color">
+                              <xsl:value-of select="$levelColor"/>
+                            </xsl:with-param>
+                          </xsl:call-template >
+                        </xsl:if>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buClr)">
+                     
+                        <xsl:if test ="$textColor !='0'">
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="$textColor"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="$textColor='0'">
+                          <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle">
+                            <xsl:variable name ="levelColor" >
+                              <xsl:call-template name ="getLevelColor">
+                                <xsl:with-param name ="levelNum" select ="$newTextLvl"/>
+                                <xsl:with-param name ="textColor" select="$textColor" />
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:attribute name ="fo:color">
+                              <xsl:value-of select ="$levelColor"/>
+                            </xsl:attribute>
+                          </xsl:for-each>
+                        </xsl:if>
+                   
+
+                      </xsl:if>
+                    </style:text-properties >
+                  </text:list-level-style-bullet>
+                </text:list-style>
+              </xsl:when>
+              <xsl:when test ="a:pPr/a:buAutoNum">
+                <text:list-style>
+                  <xsl:attribute name ="style:name">
+                    <xsl:value-of select ="$levelStyle"/>
+                  </xsl:attribute >
+                  <text:list-level-style-number>
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select ="$var_level + 1"/>
+                    </xsl:attribute >
+                    <xsl:variable name ="startAt">
+                      <xsl:if test ="a:pPr/a:buAutoNum/@startAt">
+                        <xsl:value-of select ="a:pPr/a:buAutoNum/@startAt" />
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buAutoNum/@startAt)">
+                        <xsl:value-of select ="'1'" />
+                      </xsl:if>
+                    </xsl:variable>
+                    <xsl:call-template name ="insertNumber">
+                      <xsl:with-param name ="number" select ="a:pPr/a:buAutoNum/@type"/>
+                      <xsl:with-param name ="startAt" select ="$startAt"/>
+                    </xsl:call-template>
+                    <style:list-level-properties>
+                      <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle/child::node()[name()=$nodeName]">
+                        <xsl:call-template name="tmpListlevelProp"/>
+                      </xsl:for-each >
+                    </style:list-level-properties>
+                    <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
+                      <xsl:if test ="a:pPr/a:buFont/@typeface">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="'Arial'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buSzPct)">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="'100%'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:pPr/a:buClr">
+                        <xsl:if test ="a:p/a:pPr/a:buClr/a:srgbClr">
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="concat('#',a:p/a:pPr/a:buClr/a:srgbClr/@val)"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:pPr/a:buClr/a:schemeClr">
+                          <xsl:variable name ="schemeColor" select ="a:pPr/a:buClr/a:schemeClr/@val"/>
+                          <xsl:variable name ="levelColor" >
+                            <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle">
+                              <xsl:call-template name ="getColorMap">
+                                <xsl:with-param name ="schemeColor" select ="$schemeColor"/>
+                              </xsl:call-template>
+                            </xsl:for-each >
+                          </xsl:variable>
+                          <xsl:call-template name ="getColorCode">
+                            <xsl:with-param name ="color">
+                              <xsl:value-of select="$levelColor"/>
+                            </xsl:with-param>
+                          </xsl:call-template >
+                        </xsl:if>
+                      </xsl:if>
+                      <!-- Code added by vijayeta, bug fix 1746350-->
+                      <xsl:if test ="not(a:pPr/a:buClr)">
+                        <!-- Vijayeta,Custom Bullet Colour-->
+                        <xsl:if test ="$textColor !='0'">
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="$textColor"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="$textColor='0'">
+                          <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle">
+                            <xsl:variable name ="levelColor" >
+                              <xsl:call-template name ="getLevelColor">
+                                <xsl:with-param name ="levelNum" select ="$newTextLvl"/>
+                                <xsl:with-param name ="textColor" select="$textColor" />
+                              </xsl:call-template>
+                            </xsl:variable>
+                            <xsl:attribute name ="fo:color">
+                              <xsl:value-of select ="$levelColor"/>
+                            </xsl:attribute>
+                          </xsl:for-each>
+                        </xsl:if>
+                        <!-- Vijayeta,Custom Bullet Colour-->
+
+                      </xsl:if>
+                      <!--End of Code added by vijayeta, bug fix 1746350-->
+                    </style:text-properties>
+                  </text:list-level-style-number>
+                </text:list-style>
+              </xsl:when>
+              <xsl:when test ="a:pPr/a:buBlip">
+                <xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
+                <xsl:variable name="XlinkHref">
+                  <xsl:variable name="pzipsource">
+                    <xsl:value-of select="document($notesRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+                  </xsl:variable>
+                  <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+                </xsl:variable>
+                <xsl:call-template name="copyPictures">
+                  <xsl:with-param name="document">
+                    <xsl:value-of select="$notesRel"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="rId">
+                    <xsl:value-of select ="$rId"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <text:list-style>
+                  <xsl:attribute name ="style:name">
+                    <xsl:value-of select ="$levelStyle"/>
+                  </xsl:attribute >
+                  <text:list-level-style-image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select="$newTextLvl"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="xlink:href">
+                      <xsl:value-of select="$XlinkHref"/>
+                    </xsl:attribute>
+                    <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+                  </text:list-level-style-image>
+                </text:list-style>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
+        
+      </xsl:for-each>
+  </xsl:template>
+	<xsl:template name ="insertMultipleLevelsForNotes">
+		<xsl:param name ="levelCount"/>
+		<xsl:param name ="ParaId"/>
+		<xsl:param name ="listStyleName"/>
+		<xsl:param name ="sldRelId"/>
+		<xsl:param name ="sldId"/>
+		<xsl:param name ="TypeId"/>
+		<xsl:param name ="textSpanNode"/>
+		<xsl:choose>
+			<xsl:when test ="$levelCount='1'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<!--<text:list-item>
+						<text:list>-->
+					<text:list-item>
+						<xsl:copy-of select ="$textSpanNode"/>
+					</text:list-item>
+					<!--</text:list>
+					</text:list-item>-->
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='2'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<!--<text:list>
+									<text:list-item>-->
+								<xsl:copy-of select ="$textSpanNode"/>
+							</text:list-item>
+						</text:list>
+						<!--</text:list-item>
+						</text:list>-->
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='3'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<text:list>
+									<text:list-item>
+										<!--<text:list>
+											<text:list-item>-->
+										<xsl:copy-of select ="$textSpanNode"/>
+										<!--</text:list-item>
+										</text:list>-->
+									</text:list-item>
+								</text:list>
+							</text:list-item>
+						</text:list>
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='4'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<text:list>
+									<text:list-item>
+										<text:list>
+											<text:list-item>
+												<!--<text:list>
+													<text:list-item>-->
+												<xsl:copy-of select ="$textSpanNode"/>
+												<!--</text:list-item>
+												</text:list>-->
+											</text:list-item>
+										</text:list>
+									</text:list-item>
+								</text:list>
+							</text:list-item>
+						</text:list>
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='5'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<text:list>
+									<text:list-item>
+										<text:list>
+											<text:list-item>
+												<text:list>
+													<text:list-item>
+														<!--<text:list>
+															<text:list-item>-->
+														<xsl:copy-of select ="$textSpanNode"/>
+														<!--</text:list-item>
+														</text:list>-->
+													</text:list-item>
+												</text:list>
+											</text:list-item>
+										</text:list>
+									</text:list-item>
+								</text:list>
+							</text:list-item>
+						</text:list>
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='6'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<text:list>
+									<text:list-item>
+										<text:list>
+											<text:list-item>
+												<text:list>
+													<text:list-item>
+														<text:list>
+															<text:list-item>
+																<!--<text:list>
+																	<text:list-item>-->
+																<xsl:copy-of select ="$textSpanNode"/>
+																<!--</text:list-item>
+																</text:list>-->
+															</text:list-item>
+														</text:list>
+													</text:list-item>
+												</text:list>
+											</text:list-item>
+										</text:list>
+									</text:list-item>
+								</text:list>
+							</text:list-item>
+						</text:list>
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='7'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<text:list>
+									<text:list-item>
+										<text:list>
+											<text:list-item>
+												<text:list>
+													<text:list-item>
+														<text:list>
+															<text:list-item>
+																<text:list>
+																	<text:list-item>
+																		<!--<text:list>
+																			<text:list-item>-->
+																		<xsl:copy-of select ="$textSpanNode"/>
+																		<!--</text:list-item>
+																		</text:list>-->
+																	</text:list-item>
+																</text:list>
+															</text:list-item>
+														</text:list>
+													</text:list-item>
+												</text:list>
+											</text:list-item>
+										</text:list>
+									</text:list-item>
+								</text:list>
+							</text:list-item>
+						</text:list>
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='8'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<text:list>
+									<text:list-item>
+										<text:list>
+											<text:list-item>
+												<text:list>
+													<text:list-item>
+														<text:list>
+															<text:list-item>
+																<text:list>
+																	<text:list-item>
+																		<text:list>
+																			<text:list-item>
+																				<!--<text:list>
+																					<text:list-item>-->
+																				<xsl:copy-of select ="$textSpanNode"/>
+																				<!--</text:list-item>
+																				</text:list>-->
+																			</text:list-item>
+																		</text:list>
+																	</text:list-item>
+																</text:list>
+															</text:list-item>
+														</text:list>
+													</text:list-item>
+												</text:list>
+											</text:list-item>
+										</text:list>
+									</text:list-item>
+								</text:list>
+							</text:list-item>
+						</text:list>
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+			<xsl:when test ="$levelCount='9'">
+				<text:list>
+					<xsl:attribute name ="text:style-name">
+						<xsl:value-of select ="concat($listStyleName,'lvl',$levelCount)"/>
+					</xsl:attribute>
+					<text:list-item>
+						<text:list>
+							<text:list-item>
+								<text:list>
+									<text:list-item>
+										<text:list>
+											<text:list-item>
+												<text:list>
+													<text:list-item>
+														<text:list>
+															<text:list-item>
+																<text:list>
+																	<text:list-item>
+																		<text:list>
+																			<text:list-item>
+																				<text:list>
+																					<text:list-item>
+																						<!--<text:list>
+																							<text:list-item>-->
+																						<xsl:copy-of select ="$textSpanNode"/>
+																						<!--</text:list-item>
+																						</text:list>-->
+																					</text:list-item>
+																				</text:list>
+																			</text:list-item>
+																		</text:list>
+																	</text:list-item>
+																</text:list>
+															</text:list-item>
+														</text:list>
+													</text:list-item>
+												</text:list>
+											</text:list-item>
+										</text:list>
+									</text:list-item>
+								</text:list>
+							</text:list-item>
+						</text:list>
+					</text:list-item>
+				</text:list>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
 </xsl:stylesheet>

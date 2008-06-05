@@ -646,13 +646,15 @@ Copyright (c) 2007, Sonata Software Limited
 
         <xsl:call-template name="OutlineTen"/>
       </text:list-style>
-      <xsl:if test ="p:txBody/a:bodyPr/@vert='vert'">
+      <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
+      <xsl:if test="p:txBody/a:bodyPr/@vert">
         <style:paragraph-properties>
-          <xsl:attribute name ="style:writing-mode">
-            <xsl:value-of select ="'tb-rl'"/>
-          </xsl:attribute>
+            <xsl:call-template name="getTextDirection">
+              <xsl:with-param name="vert" select="p:txBody/a:bodyPr/@vert"/>
+            </xsl:call-template>
         </style:paragraph-properties>
       </xsl:if>
+      <!--End of Bug no-1958740-->
     </style:graphic-properties>
       </xsl:if>
     </xsl:for-each>
@@ -2745,11 +2747,13 @@ Copyright (c) 2007, Sonata Software Limited
           <!--<xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='body']">-->
           <xsl:for-each select="./parent::node()/parent::node()/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='body']">
             <!--<xsl:if test ="./parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">-->
-            <xsl:if test ="./parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
+            <xsl:if test="contains(parent::node()/parent::node()/p:txBody/a:bodyPr/@vert,'vert')">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
             </xsl:if>
+            <!--End of Bug no-1958740-->
           </xsl:for-each>
         </xsl:if>
       </style:paragraph-properties>
@@ -3131,11 +3135,13 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:for-each select="p:txBody//a:lvl1pPr">
         <xsl:call-template name="NMParagraphStyle"/>
       </xsl:for-each>
-      <xsl:if test ="p:txBody/a:bodyPr/@vert='vert'">
-        <xsl:attribute name ="style:writing-mode">
-          <xsl:value-of select ="'tb-rl'"/>
-        </xsl:attribute>
+      <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
+      <xsl:if test="p:txBody/a:bodyPr/@vert">
+         <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
       </xsl:if>
+      <!--End of Bug no-1958740-->
     </style:paragraph-properties>
    
     <xsl:for-each select="p:txBody//a:lvl1pPr">

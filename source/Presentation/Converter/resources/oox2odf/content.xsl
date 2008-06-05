@@ -28,6 +28,8 @@ Copyright (c) 2007, Sonata Software Limited
 -->
 <xsl:stylesheet version="1.0" 
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
 xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
 xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
@@ -51,6 +53,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
 xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" 
 xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"	
+xmlns:msxsl="urn:schemas-microsoft-com:xslt"
 exclude-result-prefixes="p a r xlink rels">  
   <xsl:strip-space elements="*"/>
   <!--main document-->
@@ -93,6 +96,13 @@ exclude-result-prefixes="p a r xlink rels">
       <!--<xsl:value-of select ="."/>-->
     </xsl:for-each >
   </xsl:variable>
+	<!--changes made by yeswanth for openoffice2.3-->
+	<xsl:variable name="FolderNameGUID">
+		<xsl:call-template name="GenerateGUIDForFolderName">
+			<xsl:with-param name="RootNode" select="." />
+		</xsl:call-template>
+	</xsl:variable>
+	<!--end-->
   <xsl:template name="InsertStyles">
     <!-- page Properties-->
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
@@ -139,6 +149,12 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:value-of select ="concat('dp',position())"/>
         </xsl:attribute>
         <style:drawing-page-properties>
+			
+			<!--added by yeswanth-->
+			<xsl:call-template name="SlideTransition">
+				<xsl:with-param name="slidenum" select="document($pageSlide)"/>
+			</xsl:call-template>
+			<!--end of code added by yeswanth-->
           <xsl:attribute name ="presentation:background-visible" >
             <xsl:value-of select ="'true'"/>
           </xsl:attribute>
@@ -514,6 +530,21 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:attribute name="draw:fill-image-name">
                     <xsl:value-of select="concat(substring-before($Layout,'.xml'),'BackImg')"/>
                   </xsl:attribute>
+                  <!--Code Added by Sanjay to fixed the  Bug-1877299-->
+                  <xsl:choose>
+                    <xsl:when test="p:bgPr/a:blipFill/a:stretch/a:fillRect">
+                      <xsl:attribute name="style:repeat">
+                        <xsl:value-of select="'stretch'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="draw:fill-image-width">
+                        <xsl:value-of select ="'0cm'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="draw:fill-image-height">
+                        <xsl:value-of select ="'0cm'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                  </xsl:choose>
+                  <!--End of 1877299-->
                 </xsl:when>
                 <xsl:when test="p:bgRef/@idx &gt; 1000">
                   <xsl:variable name="idx" select="p:bgRef/@idx - 1000"/>
@@ -643,6 +674,23 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:for-each>
           </xsl:if>
           <!--End-->
+
+			<!--added by yeswanth-->
+			<!--transition sound-->
+			<xsl:variable name ="relSlideNumber">
+				<xsl:call-template name="retString">
+					<xsl:with-param name="string2rev" select="$pageSlide"/>
+				</xsl:call-template>
+			</xsl:variable>
+
+			<xsl:call-template name="TransSound">
+				<xsl:with-param name="slidenum" select="document($pageSlide)"/>
+				<xsl:with-param name="pageSlide" select="concat('ppt/slides/_rels/',$relSlideNumber,'.rels')"/>
+				<xsl:with-param name="FolderNameGUID" select="$FolderNameGUID"/>
+			</xsl:call-template>
+			<!--end of code added by yeswanth-->
+			
+			
         </style:drawing-page-properties>
       </style:style>
          </xsl:for-each >
@@ -651,12 +699,9 @@ exclude-result-prefixes="p a r xlink rels">
         <xsl:attribute name ="draw:fill-color" >
           <xsl:value-of select ="'#ffffff'"/>
         </xsl:attribute>
-        <xsl:attribute name ="draw:auto-grow-height" >
-          <xsl:value-of select ="'false'"/>
-        </xsl:attribute>
-        <!--<xsl:attribute name ="fo:min-height" >
-          <xsl:value-of select ="'12.573cm'"/>
-        </xsl:attribute>-->
+        <xsl:for-each select="./p:txBody">
+          <xsl:call-template name="tmpWrapSpAutoFit"/>
+        </xsl:for-each>
       </style:graphic-properties>
     </style:style>
     <xsl:call-template name ="GetStylesFromSlide"/>
@@ -759,6 +804,14 @@ exclude-result-prefixes="p a r xlink rels">
         <xsl:attribute name ="presentation:use-date-time-name">
           <xsl:value-of select ="concat('dtd',position())"/>
         </xsl:attribute>
+		  <!--code added for draw:id attribute in OpenOffice.org 2.3-->
+		  <xsl:variable name="dpageid">
+			  <xsl:value-of select="concat('pid',position())"/>
+		  </xsl:variable>
+		  <xsl:attribute name="draw:id">
+			  <xsl:value-of select="$dpageid"/>
+		  </xsl:attribute>
+		  <!--end-->
         <xsl:variable name ="lyoutName">
           <xsl:call-template name ="GetLayOutName">
             <xsl:with-param name ="slideRelName" select ="concat(concat('slide',position()),'.xml')"/>
@@ -777,6 +830,8 @@ exclude-result-prefixes="p a r xlink rels">
 		  <xsl:call-template name ="customAnimation">
 			  <xsl:with-param name ="slideId" select ="concat(concat('ppt/slides/slide',position()),'.xml')" />
 			  <xsl:with-param name ="slideNo" select ="position()"/>
+			  <xsl:with-param name="pageid" select="$dpageid"/>
+			  <xsl:with-param name="FolderNameGUID" select="$FolderNameGUID"/>
 		  </xsl:call-template >
 		  <!-- call for cutom animation  end-->
         <!--End-->
@@ -820,6 +875,9 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:value-of select ="concat('ppt',substring(.,3))"/>
         </xsl:for-each>
       </xsl:variable>
+        <xsl:variable name ="var_LayoutName">
+            <xsl:value-of select ="substring-after($LayoutFileNoo,'slideLayouts/')"/>
+        </xsl:variable>
       <xsl:variable name="lytFileName">
         <xsl:value-of select="substring-after(substring-after($LayoutFileNoo,'/'),'/')"/>
       </xsl:variable>
@@ -830,10 +888,16 @@ exclude-result-prefixes="p a r xlink rels">
             <xsl:when test="name()='p:pic'">
               <!-- warn, layouts to slide mapping-->
               <xsl:message terminate="no">translation.oox2odf.layoutsToSlideMappingTypePicture</xsl:message>
+              <!--Added by sanjay -->
               <xsl:for-each select=".">            
+                <xsl:if test="not(p:nvPicPr/p:nvPr/a:audioFile or p:nvPicPr/p:nvPr/a:wavAudioFile or p:nvPicPr/p:nvPr/a:videoFile)">
                 <xsl:call-template name="InsertPicture">
-                  <xsl:with-param name ="slideRel" select ="concat('ppt/slideLayouts/_rels/',$lytFileName,'.rels')"/>
+                  <xsl:with-param name ="slideRel" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
+                    <xsl:with-param name="sourceName" select="'content'"/>
+                    <xsl:with-param name ="slideId" select ="$slideId"/>
+					<xsl:with-param name ="source" select ="'Layout'"/>
                 </xsl:call-template>
+                </xsl:if>
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:sp'">
@@ -854,7 +918,7 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:with-param name ="ParaId" select="$ParaId" />
                  <xsl:with-param name ="TypeId" select="concat('SL',$SlidePos)" />
                    <xsl:with-param name ="slideId"  select ="$SlideID"/>
-                   <xsl:with-param name="SlideRelationId" select ="$slideRel" />
+                   <xsl:with-param name="SlideRelationId" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
                  </xsl:call-template>
              </xsl:if>
           </xsl:for-each>
@@ -875,13 +939,15 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:with-param name ="ParaId" select="$ParaId" />
                   <xsl:with-param name ="TypeId" select="concat('SL',$SlidePos)" />
                   <xsl:with-param name ="slideId"  select ="$SlideID"/>
-                  <xsl:with-param name="SlideRelationId" select ="$slideRel" />
+                  <xsl:with-param name="SlideRelationId" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:grpSp'">
               <xsl:variable name ="drawAnimId">
-                <xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
+				  <!--changes made by yeswanth on 29/April/08-->
+				  <!--<xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>-->
+				  <xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvGrpSpPr/p:cNvPr/@id)"/>
               </xsl:variable>
               <xsl:variable name="var_pos" select="position()"/>
               <xsl:variable name="TopLevelgrpCordinates">
@@ -892,7 +958,7 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:with-param name ="SlideID"  select ="$SlideID" />
                 <xsl:with-param name ="pos"  select ="$var_pos" />
                 <xsl:with-param name ="drawAnimId"  select ="$drawAnimId" />
-                <xsl:with-param name ="SlideRelationId" select="$slideRel" />
+                <xsl:with-param name ="SlideRelationId" select ="concat('ppt/slideLayouts/_rels/',$var_LayoutName,'.rels')"/>
                 <xsl:with-param name ="grpCordinates" select ="$TopLevelgrpCordinates" />
               </xsl:call-template>
             </xsl:when>
@@ -2064,8 +2130,9 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='p:grpSp'">
-              <xsl:variable name ="drawAnimId">
-						  <xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>
+              <xsl:variable name ="drawAnimIdGrp">
+			 <xsl:value-of select ="concat('sldraw',$slideId,'an',./p:nvGrpSpPr/p:cNvPr/@id)"/>
+			 <!--<xsl:value-of select ="concat('sldraw',$slideId,'an',p:nvSpPr/p:cNvPr/@id)"/>-->
 					    </xsl:variable>
                <xsl:variable name="var_pos" select="position()"/>
               <xsl:variable name="TopLevelgrpCordinates">
@@ -2075,15 +2142,162 @@ exclude-result-prefixes="p a r xlink rels">
                 <xsl:with-param name ="SlidePos"  select ="$SlidePos" />
                 <xsl:with-param name ="SlideID"  select ="$SlideID" />
                 <xsl:with-param name ="pos"  select ="$var_pos" />
-              <xsl:with-param name ="drawAnimId"  select ="$drawAnimId" />
+              <xsl:with-param name ="drawAnimId"  select ="$drawAnimIdGrp" />
                 <xsl:with-param name ="SlideRelationId" select="$slideRel" />
                 <xsl:with-param name ="grpCordinates" select ="$TopLevelgrpCordinates" />
               </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="name()='p:graphicFrame'">
+              <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+                  <xsl:call-template name="tmpOLEObjects">
+                    <xsl:with-param name ="SlideRelationId" select="$slideRel" />
+                  </xsl:call-template>
+              </xsl:if>
+           
+             
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
       </xsl:for-each>
     </xsl:for-each>
+  </xsl:template>
+  <xsl:template name ="tmpOLEObjects">
+    <xsl:param name ="SlideRelationId"/>
+    <xsl:param name ="grpBln"/>
+    <xsl:param name ="grpCordinates"/>
+ 
+    <xsl:variable name="RelationId">
+      <xsl:value-of select="./a:graphic/a:graphicData/p:oleObj/@r:id"/>
+    </xsl:variable>
+    <xsl:variable name="vmldrawing">
+      <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing']/@Target"/>
+    </xsl:variable>
+    <xsl:variable name="Target">
+      <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Target"/>
+    </xsl:variable>
+    <xsl:variable name="type">
+      <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Type"/>
+    </xsl:variable>
+    <xsl:variable name="spid">
+      <xsl:value-of select="./a:graphic/a:graphicData/p:oleObj/@spid"/>
+    </xsl:variable>
+    <xsl:variable name="OleImageRel">
+      <xsl:for-each select="document(concat('ppt',substring-after($vmldrawing,'..')))/node()/v:shape[@id=$spid]/v:imagedata">
+        <xsl:value-of  select="@o:relid"/>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="OleImage">
+        <xsl:value-of select="document(concat('ppt/drawings/_rels/',substring-after($vmldrawing,'../drawings/'),'.rels'))/rels:Relationships/rels:Relationship[@Id=$OleImageRel]/@Target"/>
+    </xsl:variable>
+    <xsl:variable name="extensionType">
+      <xsl:value-of select="concat('.',substring-after(substring-after($Target,'../embeddings/'),'.'))"/>
+    </xsl:variable>
+    <xsl:variable name="targetOLE">
+      <xsl:choose>
+        <xsl:when test="contains($Target,'.pptx')">
+          <xsl:value-of select="substring-after($Target,'../embeddings/')"/>
+        </xsl:when>
+        <xsl:when test="contains($Target,'.docx')">
+          <xsl:value-of select="substring-after($Target,'../embeddings/')"/>
+        </xsl:when>
+        <xsl:when test="contains($Target,'.xslx')">
+          <xsl:value-of select="substring-after($Target,'../embeddings/')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('Oleobject',generate-id())"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="targetImage">
+      <xsl:choose>
+        <xsl:when test="contains($Target,'.pptx')">
+          <xsl:value-of select="substring-after($OleImage,'../media/')"/>
+        </xsl:when>
+        <xsl:when test="contains($Target,'.docx')">
+          <xsl:value-of select="substring-after($OleImage,'../media/')"/>
+        </xsl:when>
+        <xsl:when test="contains($Target,'.xslx')">
+          <xsl:value-of select="substring-after($OleImage,'../media/')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('Oleobject',generate-id())"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <draw:frame draw:layer="layout">
+      <xsl:choose>
+        <xsl:when test="$grpBln='true'">
+          <xsl:call-template name="tmpGropingWriteCordinates">
+            <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+            <xsl:with-param name ="isOLE" select ="'true'" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name ="svg:x">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="p:xfrm/a:off/@x"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name ="svg:y">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="p:xfrm/a:off/@y"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name ="svg:width">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="p:xfrm/a:ext/@cx"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name ="svg:height">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="p:xfrm/a:ext/@cy"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+
+        <xsl:choose>
+          <xsl:when test="./a:graphic/a:graphicData/p:oleObj/p:link">
+            <xsl:choose>
+              <xsl:when test="contains($Target,'file:///\\')">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of select="concat('//',translate(substring-after($Target, 'file:///\\'),'\','/'))"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="contains($Target,'file:///')">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of select="concat('/',translate(substring-after($Target,'file:///'),'\','/'))"/>
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="./a:graphic/a:graphicData/p:oleObj/p:embed">
+                <xsl:attribute name="xlink:href">
+              <xsl:value-of select="concat('./',$targetOLE)"/>
+            </xsl:attribute>
+               </xsl:when>
+        </xsl:choose>
+      </draw:object>
+      <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+        <xsl:attribute name="xlink:href">
+          <xsl:value-of select="concat('./ObjectReplacements/',$targetImage)"/>
+        </xsl:attribute>
+      </draw:image>
+    </draw:frame>
+    <xsl:if test="./a:graphic/a:graphicData/p:oleObj/p:embed">
+      <pzip:copy pzip:source="{concat('ppt',substring-after($Target,'..'))}"
+                  pzip:target="{$targetOLE}"/>
+    </xsl:if>
+    <xsl:if test="$OleImage!=''">
+      <pzip:copy pzip:source="{concat('ppt',substring-after($OleImage,'..'))}"
+                pzip:target="{concat('ObjectReplacements/',$targetImage)}"/>
+    </xsl:if>
   </xsl:template>
  
   <!-- Gets all caps attribute from Layout -->
@@ -2181,15 +2395,23 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
+             <xsl:when test="name()='p:graphicFrame'">
+               <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+                 <xsl:call-template name="tmpOLEObjects">
+                   <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
+                   <xsl:with-param name ="grpBln" select="'true'" />
+                   <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
+                 </xsl:call-template>
+               </xsl:if>
+
+              
+             </xsl:when>
             <xsl:when test="name()='p:grpSp'">
               <xsl:variable name="var_pos" select="position()"/>
               <xsl:variable name="InnerLevelgrpCordinates">
                 <xsl:call-template name="tmpGetgroupTransformValues"/>
               </xsl:variable>
-				<!--<xsl:variable name ="drawAnimIdGrp">
-					<xsl:value-of select ="concat('sldraw',$SlideID,'an',./p:nvGrpSpPr/p:cNvPr/@id)"/>
-				</xsl:variable>-->
-              <xsl:call-template name ="tmpGroupedShapes">
+	       <xsl:call-template name ="tmpGroupedShapes">
                 <xsl:with-param name ="SlidePos"  select ="$SlidePos" />
                 <xsl:with-param name ="SlideID"  select ="$SlideID" />
                 <xsl:with-param name ="pos"  select ="concat($pos,'-',$var_pos)" />
@@ -2417,14 +2639,7 @@ exclude-result-prefixes="p a r xlink rels">
                   <!-- Added by  vijayeta ,on 19th june-->
                   <!--Bug fix 1739611,by vijayeta,June 21st-->
                   <xsl:if test="$var_TextBoxType='outline' or $var_TextBoxType='subtitle'">
-                    <!--<xsl:if test ="./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')]
-                    or ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Subtitle')]                   
-                    or ./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'subTitle')]
-                    or ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'outline')]
-                    or (./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Rectangle')])
-                    or (./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">-->
-                    <!-- Change made by vijayeta,on 9/7/07,cosider Rectangle as content-->
-                    <!-- Added by  vijayeta ,on 19th june-->
+                                       <!-- Added by  vijayeta ,on 19th june-->
                     <xsl:call-template name ="insertDefaultBulletNumberStyle">
                       <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
                       <xsl:with-param name ="slideLayout" select ="$layout"/>
@@ -2588,7 +2803,28 @@ exclude-result-prefixes="p a r xlink rels">
                       <!-- @@Code for Paragraph tabs Pradeep Nemadi -->
                       <!-- Starts-->
                       <xsl:if test ="a:pPr/a:tabLst/a:tab">
-                        <xsl:call-template name ="paragraphTabstops" />
+                       
+                          <xsl:call-template name ="paragraphTabstops">
+                            <xsl:with-param name="spType" select="$var_TextBoxType"/>
+                            <xsl:with-param name="LayoutFileName" select="$LayoutFileName"/>
+                            <xsl:with-param name="index" select="$var_index"/>
+                            <xsl:with-param name ="slideMasterName" select ="$SMName"/>
+                            <xsl:with-param name="level" select="$levelForDefFont + 1"/>
+                          </xsl:call-template>
+                     
+                        
+                      </xsl:if>
+                      <xsl:if test = "not(a:pPr/a:tabLst/a:tab)">
+                        <xsl:call-template name ="paragraphTabstops">
+                            <xsl:with-param name ="defaultPos" select ="'914400'"/>
+                            <xsl:with-param name="spType" select="$var_TextBoxType"/>
+                            <xsl:with-param name="LayoutFileName" select="$LayoutFileName"/>
+                            <xsl:with-param name="index" select="$var_index"/>
+                            <xsl:with-param name ="slideMasterName" select ="$SMName"/>
+                            <xsl:with-param name="level" select="$levelForDefFont + 1"/>
+                        </xsl:call-template >
+
+
                       </xsl:if>
                       <!-- Ends -->
                     </style:paragraph-properties >
@@ -2931,6 +3167,12 @@ exclude-result-prefixes="p a r xlink rels">
                           </xsl:call-template>
                           <!--TEXT ALIGNMENT-->
                           <xsl:call-template name ="TextLayout" />
+                <!--Added by sanjay for Bright & Contrast-->
+                          <xsl:if test="p:blipFill/a:blip/a:lum">
+                            <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                              <xsl:call-template name="BrightContrast"/>
+                            </xsl:for-each>
+                          </xsl:if>
                         </style:graphic-properties >
                       </style:style>
                     </xsl:for-each>
@@ -2961,7 +3203,6 @@ exclude-result-prefixes="p a r xlink rels">
                          <xsl:with-param name="flagGroup" select="'True'"/>
                       <xsl:with-param name="SMName" select="$SMName"/>
                     </xsl:call-template>
-                        
                         <!--LINE COLOR-->
                         <xsl:call-template name ="LineColor">
                           <xsl:with-param name="SMName" select="$SMName"/>
@@ -2977,12 +3218,10 @@ exclude-result-prefixes="p a r xlink rels">
                       </style:graphic-properties >
                       <xsl:if test ="p:txBody/a:bodyPr/@vert">
                         <style:paragraph-properties>
-                          <xsl:attribute name ="style:writing-mode">
                             <xsl:call-template name ="getTextDirection">
                               <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                             </xsl:call-template>
-                          </xsl:attribute>
-                        </style:paragraph-properties>
+                          </style:paragraph-properties>
                       </xsl:if>
                     </style:style>
                     <xsl:call-template name="tmpShapeTextProcess">
@@ -3032,12 +3271,11 @@ exclude-result-prefixes="p a r xlink rels">
                         </style:graphic-properties >
                         <xsl:if test ="p:txBody/a:bodyPr/@vert">
                           <style:paragraph-properties>
-                            <xsl:attribute name ="style:writing-mode">
-                              <xsl:call-template name ="getTextDirection">
+                            <!--Commented for Bug no1958740-->
+                               <xsl:call-template name ="getTextDirection">
                                 <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                               </xsl:call-template>
-                            </xsl:attribute>
-                          </style:paragraph-properties>
+                           </style:paragraph-properties>
                         </xsl:if>
                       </style:style>
                       <xsl:call-template name="tmpShapeTextProcess">
@@ -3359,12 +3597,17 @@ exclude-result-prefixes="p a r xlink rels">
                       </style:graphic-properties >
                       <xsl:if test ="p:txBody/a:bodyPr/@vert">
                         <style:paragraph-properties>
-                          <xsl:attribute name ="style:writing-mode">
-                            <xsl:call-template name ="getTextDirection">
+                          <!--Commented for Bug no1958740-->
+                             <xsl:call-template name ="getTextDirection">
                               <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                             </xsl:call-template>
-                          </xsl:attribute>
-                        </style:paragraph-properties>
+                          <!--Added by Sanjay-->
+                          <xsl:if test="p:blipFill/a:blip/a:lum">
+                            <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                              <xsl:call-template name="BrightContrast"/>
+                            </xsl:for-each>
+                          </xsl:if>
+                           </style:paragraph-properties>
                       </xsl:if>
                     </style:style>
                     <xsl:call-template name="tmpShapeTextProcess">
@@ -3408,6 +3651,12 @@ exclude-result-prefixes="p a r xlink rels">
                         <xsl:value-of  select ="concat(substring-before($SlideId,'.xml'),'pr',$var_pos)"/>
                       </xsl:attribute>
                       <style:graphic-properties>
+                        <!--Added by sanjay-->
+                        <xsl:if test="p:blipFill/a:blip/a:lum">
+                          <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                            <xsl:call-template name="BrightContrast"/>
+                          </xsl:for-each>
+                        </xsl:if>
                         <xsl:call-template name="tmpCommanGraphicProperty">
                           <xsl:with-param name="spType" select="$var_TextBoxType"/>
                           <xsl:with-param name="LayoutFileName" select="$LayoutFileName"/>
@@ -3420,10 +3669,10 @@ exclude-result-prefixes="p a r xlink rels">
                         </xsl:call-template>
                       </style:graphic-properties>
                       <style:paragraph-properties>
-                        <xsl:if test ="p:txBody/a:bodyPr/@vert='vert'">
-                          <xsl:attribute name ="style:writing-mode">
-                            <xsl:value-of select ="'tb-rl'"/>
-                          </xsl:attribute>
+                        <xsl:if test="p:txBody/a:bodyPr/@vert">
+                          <xsl:call-template name="getTextDirection">
+                            <xsl:with-param name="vert" select="p:txBody/a:bodyPr/@vert"/>
+                          </xsl:call-template>
                         </xsl:if>
                       </style:paragraph-properties>
                     </style:style>
@@ -3468,14 +3717,21 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:if test="p:spPr/a:effectLst/a:outerShdw ">
                       <xsl:call-template name ="ShapesShadow"/>
                     </xsl:if>
+                    <!--Added by sanjay-->
+                    <xsl:if test="p:blipFill/a:blip/a:lum">
+                      <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                        <xsl:call-template name="BrightContrast"/>
+                      </xsl:for-each>
+                    </xsl:if>
                   </style:graphic-properties >
                   <xsl:if test ="p:txBody/a:bodyPr/@vert">
                     <style:paragraph-properties>
-                      <xsl:attribute name ="style:writing-mode">
+                      <!--Commented for Bug no1958740-->
+                    
                         <xsl:call-template name ="getTextDirection">
                           <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                         </xsl:call-template>
-                      </xsl:attribute>
+                 
                     </style:paragraph-properties>
                   </xsl:if>
                 </style:style>
@@ -3507,6 +3763,13 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:call-template name="tmpImageCropping">
                         <xsl:with-param name="slideRel" select="$slideRel"/>
                       </xsl:call-template>
+                      <!--Added by Sanjay to Fixed the Bug No-1877163  Luminance-->
+                      <xsl:if test="p:blipFill/a:blip/a:lum">
+                        <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                        <xsl:call-template name="BrightContrast"/>
+                        </xsl:for-each>
+                      </xsl:if>
+                      <!--End of Bug No-1877163-->
                     </style:graphic-properties >
                   </style:style>
                  
@@ -3536,10 +3799,39 @@ exclude-result-prefixes="p a r xlink rels">
       </xsl:for-each>
       <!--Added by Vipul to insert style for Layout shapes-->
       <!--Start-->
-    
-      <xsl:for-each select ="document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree">
+          <xsl:for-each select ="document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree">
         <xsl:for-each select="node()">
           <xsl:choose>
+            <!--Picture Border-->
+            <xsl:when test="name()='p:pic'">
+              <xsl:for-each select=".">
+                <xsl:variable  name ="GraphicId">
+                  <xsl:value-of select ="concat('SLPicture',$SlidePos,'gr',./p:nvPicPr/p:cNvPr/@id)"/>
+                </xsl:variable>
+                <style:style style:family="graphic" style:parent-style-name="standard">
+                  <xsl:attribute name ="style:name">
+                    <xsl:value-of select ="$GraphicId"/>
+                  </xsl:attribute >
+                  <style:graphic-properties>
+                    <!--LINE STYLE-->
+                    <xsl:if test="p:spPr/a:ln">
+                      <xsl:call-template name ="LineStyle"/>
+                      <xsl:call-template name ="PictureBorderColor" />
+                    </xsl:if>
+                    <!--End-->
+                    <!--Image Cropping-->
+                    <xsl:call-template name="tmpImageCropping">
+                      <xsl:with-param name="slideRel" select="$LayoutRel"/>
+                    </xsl:call-template>
+                    <xsl:if test="p:blipFill/a:blip/a:lum">
+                      <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                        <xsl:call-template name="BrightContrast"/>
+                      </xsl:for-each>
+                    </xsl:if>
+                  </style:graphic-properties >
+                </style:style>
+              </xsl:for-each>
+            </xsl:when>
             <xsl:when test="name()='p:sp'">
               <xsl:variable name="var_pos" select="position()"/>
               <xsl:for-each select=".">
@@ -3581,11 +3873,12 @@ exclude-result-prefixes="p a r xlink rels">
                     </style:graphic-properties >
                     <xsl:if test ="p:txBody/a:bodyPr/@vert">
                       <style:paragraph-properties>
-                        <xsl:attribute name ="style:writing-mode">
+                        <!--Commented for Bug no1958740-->
+                     
                           <xsl:call-template name ="getTextDirection">
                             <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                           </xsl:call-template>
-                        </xsl:attribute>
+                    
                       </style:paragraph-properties>
                     </xsl:if>
                   </style:style>
@@ -3636,11 +3929,9 @@ exclude-result-prefixes="p a r xlink rels">
                   </style:graphic-properties >
                   <xsl:if test ="p:txBody/a:bodyPr/@vert">
                     <style:paragraph-properties>
-                      <xsl:attribute name ="style:writing-mode">
-                        <xsl:call-template name ="getTextDirection">
+                     <xsl:call-template name ="getTextDirection">
                           <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                         </xsl:call-template>
-                      </xsl:attribute>
                     </style:paragraph-properties>
                   </xsl:if>
                 </style:style>
@@ -3671,6 +3962,34 @@ exclude-result-prefixes="p a r xlink rels">
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
+  <!--Template for set brightness & contrast-->
+  <xsl:template name="BrightContrast">
+    <xsl:if test="@bright">
+      <xsl:choose>
+        <xsl:when test="@bright">
+          <xsl:variable name="brightVal">
+            <xsl:value-of select="@bright"/>
+          </xsl:variable>
+          <xsl:attribute name="draw:luminance">
+            <xsl:value-of select="concat($brightVal div 1000,'%')"/>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if >
+    <xsl:if test="@contrast">
+      <xsl:choose>
+        <xsl:when test="@contrast">
+          <xsl:variable name="contrastVal">
+            <xsl:value-of select="@contrast"/>
+          </xsl:variable>
+          <xsl:attribute name="draw:contrast">
+            <xsl:value-of select="concat($contrastVal div 1000,'%')"/>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if >
+  </xsl:template>
+  <!--End of Template for set brightness & contrast-->
   <!--Maps the footer date format with pptx to odp -->
   <xsl:template name ="FooterDateFormat">
     <xsl:param name ="type" />
@@ -5578,6 +5897,7 @@ exclude-result-prefixes="p a r xlink rels">
       </xsl:when>
       <xsl:when test="$AttrType='strike'">
         <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@strike">
+          <xsl:if  test="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr[@strike!='noStrike']">
           <xsl:attribute name ="style:text-line-through-style">
             <xsl:value-of select ="'solid'"/>
           </xsl:attribute>
@@ -5593,6 +5913,7 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:when>
           </xsl:choose>
+        </xsl:if>
         </xsl:if>
       </xsl:when>
       <xsl:when test="$AttrType='Textshadow'">
@@ -6604,6 +6925,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl1pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -6619,6 +6941,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -6823,6 +7146,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl3pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl3pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -6838,6 +7162,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -7042,6 +7367,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -7057,6 +7383,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -7261,6 +7588,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl5pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl5pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -7276,6 +7604,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -7480,6 +7809,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -7495,6 +7825,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -7699,6 +8030,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl2pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl2pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -7714,6 +8046,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -7929,6 +8262,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -7944,6 +8278,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -8148,6 +8483,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -8163,6 +8499,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -8367,6 +8704,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:when>
           <xsl:when test="$AttrType='strike'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl9pPr/a:defRPr/@strike">
+              <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl9pPr/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
               </xsl:attribute>
@@ -8382,6 +8720,7 @@ exclude-result-prefixes="p a r xlink rels">
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+            </xsl:if>
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='Textshadow'">
@@ -8665,7 +9004,7 @@ exclude-result-prefixes="p a r xlink rels">
       </xsl:when>
     </xsl:choose>
 
-    <xsl:if test ="not(parent::node()/a:bodyPr/@vert='vert')">
+      <xsl:if test="not(p:txBody/a:bodyPr/@vert)">
       <xsl:choose>
         <xsl:when test="$spType='title'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
@@ -8797,11 +9136,13 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:attribute>
         </xsl:if>
       </xsl:when>
+<!--Added by sanjay to fixed the bug no1958-->
       <xsl:when test="$AttrType='Textdirection'">
-        <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-          <xsl:attribute name ="style:writing-mode">
-            <xsl:value-of select ="'tb-rl'"/>
-          </xsl:attribute>
+             <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+          <xsl:call-template name="getTextDirection">
+            <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+          </xsl:call-template>
+         <!--End of bug no1958740-->
         </xsl:if>
       </xsl:when>
     </xsl:choose>
@@ -9222,12 +9563,24 @@ exclude-result-prefixes="p a r xlink rels">
 
       <xsl:when test ="not(a:pPr/a:spcAft/a:spcPct/@val) and not(a:pPr/a:spcAft/a:spcPts/@val)">
         <xsl:variable name="var_MaxFntSize">
+          <xsl:choose>
+            <xsl:when test="./a:r/a:rPr/@sz">
           <xsl:for-each select="./a:r/a:rPr/@sz">
             <xsl:sort data-type="number" order="descending"/>
             <xsl:if test="position()=1">
               <xsl:value-of select="."/>
             </xsl:if>
           </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="./a:endParaRPr/@sz">
+              <xsl:for-each select="./a:endParaRPr/@sz">
+                <xsl:sort data-type="number" order="descending"/>
+                <xsl:if test="position()=1">
+                  <xsl:value-of select="."/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+          </xsl:choose>
         </xsl:variable>
         <xsl:if test="$spType='outline'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
@@ -9408,7 +9761,8 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:for-each>
       </xsl:if>
     </xsl:if>
-    <xsl:if test ="not(parent::node()/a:bodyPr/@vert='vert')">
+<!--Added by sanjay to fixed the bug no1958740-->
+    <xsl:if test="not(./parent::node()/p:txBody/a:bodyPr/@vert)">
       <xsl:if test="$spType='outline'">
         <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph">
           <xsl:if test ="./@idx=$index">
@@ -9726,11 +10080,13 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:if>
             <!-- End of snippet Added by vijayeta, Fix for the bug 1780902 , date:24th Aug '07 -->
           </xsl:when>
+<!--Added by sanjay to fixed the bug no1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
+<!--End of bug no1958740-->
             </xsl:if>
           </xsl:when>
         </xsl:choose>
@@ -9746,11 +10102,13 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:choose>
       <xsl:when test ="$level='2'">
         <xsl:choose>
+<!--Added by sanjay to fixed the bug no1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
+<!--End of bug no1958740-->
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='TextAlignment'">
@@ -10010,13 +10368,15 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:choose>
       <xsl:when test ="$level='3'">
         <xsl:choose>
+<!--Added by sanjay to fixed the bug no1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
             </xsl:if>
           </xsl:when>
+<!--End of bug no1958740-->
           <xsl:when test="$AttrType='TextAlignment'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl3pPr/@algn">
               <xsl:attribute name ="fo:text-align">
@@ -10273,11 +10633,13 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:when test ="$level='4'">
         <xsl:choose>
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
             </xsl:if>
+            <!--End of 1958740-->
           </xsl:when>
           <xsl:when test="$AttrType='TextAlignment'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl4pPr/@algn">
@@ -10535,12 +10897,14 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:choose>
       <xsl:when test ="$level='5'">
         <xsl:choose>
+          <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
             </xsl:if>
+            <!--End of 1958740-->
           </xsl:when>
           <xsl:when test="$AttrType='TextAlignment'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl5pPr/@algn">
@@ -10797,12 +11161,14 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:choose>
       <xsl:when test ="$level='6'">
         <xsl:choose>
+          <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
             </xsl:if>
+            <!--End of 1958740-->
           </xsl:when>
           <xsl:when test="$AttrType='TextAlignment'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl6pPr/@algn">
@@ -11059,12 +11425,14 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:choose>
       <xsl:when test ="$level='7'">
         <xsl:choose>
+          <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
             </xsl:if>
+            <!--End of 1958740-->
           </xsl:when>
           <xsl:when test="$AttrType='TextAlignment'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl7pPr/@algn">
@@ -11322,13 +11690,15 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:choose>
       <xsl:when test ="$level='8'">
         <xsl:choose>
+<!--Added by sanjay to fixed the bug no1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
+            <xsl:if test ="contains(parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert,'vert')">
               <xsl:attribute name ="style:writing-mode">
                 <xsl:value-of select ="'tb-rl'"/>
               </xsl:attribute>
             </xsl:if>
           </xsl:when>
+<!--End of bug no1958740-->
           <xsl:when test="$AttrType='TextAlignment'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl8pPr/@algn">
               <xsl:attribute name ="fo:text-align">
@@ -11585,13 +11955,15 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:choose>
       <xsl:when test ="$level='9'">
         <xsl:choose>
+          <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
           <xsl:when test="$AttrType='Textdirection'">
-            <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-              <xsl:attribute name ="style:writing-mode">
-                <xsl:value-of select ="'tb-rl'"/>
-              </xsl:attribute>
+            <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+              <xsl:call-template name="getTextDirection">
+                <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+              </xsl:call-template>
             </xsl:if>
           </xsl:when>
+          <!--End of 1958740-->
           <xsl:when test="$AttrType='TextAlignment'">
             <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody//a:lvl9pPr/@algn">
               <xsl:attribute name ="fo:text-align">
@@ -12225,7 +12597,8 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-    <xsl:if test ="not(p:txBody/a:bodyPr/@vert='vert')">
+<!--Added by sanjay to fixed the bug no1958740-->
+    <xsl:if test ="not(p:txBody/a:bodyPr/@vert)">
       <xsl:choose>
         <xsl:when test="$spType='title'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ctrTitle' or @type= 'title']">
@@ -12234,6 +12607,7 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
+<!--End of bug no1958740-->
         <xsl:when test="$spType='subtitle'">
           <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type='subTitle']">
             <xsl:call-template name ="tmpLayoutGraphicProperty">
@@ -12608,11 +12982,9 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:if>
       </xsl:when>
       <xsl:when test="$AttrType='spAutoFit'">
-        <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/a:spAutoFit">
-          <xsl:attribute name ="draw:auto-grow-height" >
-            <xsl:value-of select ="'true'"/>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:for-each select="parent::node()/parent::node()/parent::node()/p:txBody">
+          <xsl:call-template name="tmpWrapSpAutoFit"/>
+        </xsl:for-each>
       </xsl:when>
       <xsl:when test="$AttrType='VertAlign'">
         <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@anchor">
@@ -12646,12 +13018,14 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:attribute>
         </xsl:if>
       </xsl:when>
+      <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
       <xsl:when test="$AttrType='Textdirection'">
-        <xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert='vert'">
-          <xsl:attribute name ="style:writing-mode">
-            <xsl:value-of select ="'tb-rl'"/>
-          </xsl:attribute>
+        <xsl:if test="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert">
+          <xsl:call-template name="getTextDirection">
+            <xsl:with-param name="vert" select="parent::node()/parent::node()/parent::node()/p:txBody/a:bodyPr/@vert"/>
+          </xsl:call-template>
         </xsl:if>
+        <!--End of Bug no-1958740-->
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -12852,5 +13226,627 @@ exclude-result-prefixes="p a r xlink rels">
   <!--End of Snippet Added By Vijayeta HandOut text for header footer and date in content.xml-->
    <!--End-->
 
-  <!--End-->
+ 
+	<!--template added by yeswanth-->	
+	<xsl:template name="SlideTransition">
+		<xsl:param name="slidenum"/>
+		<xsl:choose>
+			<xsl:when test="(msxsl:node-set($slidenum)/p:sld/p:transition/@advClick) and not(msxsl:node-set($slidenum)/p:sld/p:transition/@advTm)">
+				<xsl:attribute name ="presentation:transition-type">
+					<xsl:value-of select="'semi-automatic'"/>
+				</xsl:attribute>
+			</xsl:when>
+			<xsl:when test="(msxsl:node-set($slidenum)/p:sld/p:transition/@advClick) and (msxsl:node-set($slidenum)/p:sld/p:transition/@advTm)">
+				<xsl:attribute name ="presentation:transition-type">
+					<xsl:value-of select="'automatic'"/>
+				</xsl:attribute>
+			</xsl:when>
+			<xsl:when test="not(msxsl:node-set($slidenum)/p:sld/p:transition/@advClick) and (msxsl:node-set($slidenum)/p:sld/p:transition/@advTm)">
+				<xsl:attribute name ="presentation:transition-type">
+					<xsl:value-of select="'automatic'"/>
+				</xsl:attribute>				
+			</xsl:when>
+			<xsl:otherwise>
+				<!--don't add the attribute  presentation:transition-type-->				
+			</xsl:otherwise>
+		</xsl:choose>
+
+		<xsl:if test="msxsl:node-set($slidenum)/p:sld/p:transition/@advTm">
+			<xsl:call-template name="PresDuration">
+				<xsl:with-param name="TmVal" select="msxsl:node-set($slidenum)/p:sld/p:transition/@advTm div 1000"/>
+			</xsl:call-template>
+		</xsl:if>
+
+		<xsl:attribute name ="presentation:transition-speed">
+			<xsl:choose>
+				<xsl:when test="msxsl:node-set($slidenum)/p:sld/p:transition/@spd='slow'">
+					<xsl:value-of select="'slow'"/>
+				</xsl:when>
+				<xsl:when test="msxsl:node-set($slidenum)/p:sld/p:transition/@spd='med'">
+					<xsl:value-of select="'medium'"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'fast'"/>
+				</xsl:otherwise>
+			</xsl:choose>			
+		</xsl:attribute>
+		
+		<xsl:call-template name="SlideTransSmilType">
+			<xsl:with-param name="slidenum" select="$slidenum/p:sld/p:transition/child::node()"/>
+		</xsl:call-template>
+
+		
+		
+	</xsl:template>
+
+	<xsl:template name="SlideTransSmilType">
+		<xsl:param name="slidenum"/>
+		<xsl:choose>
+			<!--dissolve-->
+			<xsl:when test="name($slidenum)='p:dissolve'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'dissolve'"/>
+				</xsl:attribute>
+			</xsl:when>
+
+			<!--wipe-->
+			<xsl:when test="name($slidenum)='p:wipe'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'barWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='u'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'topToBottom'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='r'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'leftToRight'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='d'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'topToBottom'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'leftToRight'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>				
+			</xsl:when>
+
+			<!--wheel-->
+			<xsl:when test="name($slidenum)='p:wheel'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'pinWheelWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:choose>
+						<xsl:when test="$slidenum/@spokes='1'">
+							<xsl:value-of select="'oneBlade'"/>							
+						</xsl:when>
+						<xsl:when test="$slidenum/@spokes='2'">
+							<xsl:value-of select="'twoBladeVertical'"/>
+						</xsl:when>
+						<xsl:when test="$slidenum/@spokes='3'">
+							<xsl:value-of select="'threeBlade'"/>
+						</xsl:when>
+						<xsl:when test="$slidenum/@spokes='8'">
+							<xsl:value-of select="'eightBlade'"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'fourBlade'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+			</xsl:when>
+
+			<!--pull-->
+			<xsl:when test="name($slidenum)='p:pull'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'slideWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='d'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromTop'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='r'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromLeft'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='u'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromBottom'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='ld'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromTopRight'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='lu'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromBottomRight'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='rd'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromTopLeft'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='ru'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromBottomLeft'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromRight'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--randombar-->
+			<xsl:when test="name($slidenum)='p:randomBar'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'randomBarWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='vert'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'vertical'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontal'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--checker-->
+			<xsl:when test="name($slidenum)='p:checker'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'checkerBoardWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='vert'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'down'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'across'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--plus-->
+			<xsl:when test="name($slidenum)='p:plus'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'fourBoxWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select="'cornersOut'"/>
+				</xsl:attribute>
+			</xsl:when>
+
+			<!--circle-->
+			<xsl:when test="name($slidenum)='p:circle'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'ellipseWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select="'circle'"/>
+				</xsl:attribute>
+			</xsl:when>
+
+			<!--diamond-->
+			<xsl:when test="name($slidenum)='p:diamond'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'irisWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select="'diamond'"/>
+				</xsl:attribute>
+			</xsl:when>
+
+			<!--wedge-->
+			<xsl:when test="name($slidenum)='p:wedge'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'fanWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select="'centerTop'"/>
+				</xsl:attribute>
+			</xsl:when>
+
+			<!--blinds-->
+			<xsl:when test="name($slidenum)='p:blinds'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'blindsWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='vert'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'vertical'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontal'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--fade-->
+			<xsl:when test="name($slidenum)='p:fade'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'fade'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@thruBlk='1'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fadeOverColor'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:fadeColor">
+							<xsl:value-of select="'#000000'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'crossfade'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:fadeColor">
+							<xsl:value-of select="'#000000'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+
+			</xsl:when>
+
+			<!--cover-->
+			<xsl:when test="name($slidenum)='p:cover'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'slideWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='d'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromTop'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='r'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromLeft'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='u'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromBottom'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='ld'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromTopRight'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='lu'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromBottomRight'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='rd'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromTopLeft'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='ru'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromBottomLeft'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromRight'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--random-->
+			<xsl:when test="name($slidenum)='p:random'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'random'"/>
+				</xsl:attribute>
+			</xsl:when>
+
+			<!--push-->
+			<xsl:when test="name($slidenum)='p:push'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'pushWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='u'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromBottom'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='r'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromLeft'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='d'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromTop'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'fromRight'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--split-->
+			<xsl:when test="name($slidenum)='p:split'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'barnDoorWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@orient='vert'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'vertical'"/>
+						</xsl:attribute>
+						<xsl:if test="$slidenum/@dir='in'">
+							<xsl:attribute name ="smil:direction">
+								<xsl:value-of select="'reverse'"/>
+							</xsl:attribute>
+						</xsl:if>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='in' and not($slidenum/@orient)">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontal'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>					
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontal'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--strips-->
+			<xsl:when test="name($slidenum)='p:strips'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'waterfallWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='ld'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontalRight'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='rd'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontalLeft'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$slidenum/@dir='ru'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontalRight'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'horizontalLeft'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--zoom-->
+			<xsl:when test="name($slidenum)='p:zoom'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'irisWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='in'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'rectangle'"/>
+						</xsl:attribute>
+						<xsl:attribute name ="smil:direction">
+							<xsl:value-of select="'reverse'"/>
+						</xsl:attribute>						
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'rectangle'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+
+			<!--newsflash-->
+			<xsl:when test="name($slidenum)='p:newsflash'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'fourBoxWipe'"/>
+				</xsl:attribute>
+				<xsl:attribute name ="smil:subtype">
+					<xsl:value-of select="'cornersOut'"/>
+				</xsl:attribute>				
+			</xsl:when>
+
+			<!--comb-->
+			<xsl:when test="name($slidenum)='p:comb'">
+				<xsl:attribute name ="smil:type">
+					<xsl:value-of select="'pushWipe'"/>
+				</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="$slidenum/@dir='vert'">
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'combVertical'"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name ="smil:subtype">
+							<xsl:value-of select="'combHorizontal'"/>
+						</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			
+
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="PresDuration">
+		<xsl:param name="TmVal"/>
+		<xsl:variable name="Hours">
+			<xsl:value-of select="floor($TmVal div 3600)"/>
+		</xsl:variable>
+		<xsl:variable name="Hr2Min">
+			<xsl:value-of select="$TmVal mod 3600"/>
+		</xsl:variable>
+		<xsl:variable name="Minutes">
+			<xsl:value-of select="floor($Hr2Min div 60)"/>
+		</xsl:variable>
+		<!--<xsl:variable name="Min2Sec">
+			<xsl:value-of select="$Hr2Min mod 60"/>
+		</xsl:variable>-->
+		<xsl:variable name="Seconds">
+			<xsl:value-of select="floor($Hr2Min mod 60)"/>
+		</xsl:variable>
+				
+		<xsl:attribute name="presentation:duration">
+			<xsl:choose>
+				<xsl:when test="($Minutes &gt; 16) or ($Hours &gt; 0)">
+					<xsl:value-of select="concat('PT00H','16M39S')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="concat('PT00H',concat($Minutes,concat('M',concat($Seconds,'S'))))"/>
+				</xsl:otherwise>
+			</xsl:choose>
+
+		</xsl:attribute>
+		
+	</xsl:template>
+
+	<!--template added by yeswanth.s-->
+	<!--transition sound-->
+	<xsl:template name="TransSound">
+		<xsl:param name="slidenum"/>
+		<xsl:param name="pageSlide"/>
+		<xsl:param name="FolderNameGUID"/>
+		<xsl:if test="msxsl:node-set($slidenum)/p:sld/p:transition/p:sndAc">			
+			<presentation:sound xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+				<xsl:variable name="hyperlinkrid">
+					<xsl:value-of select="msxsl:node-set($slidenum)/p:sld/p:transition/p:sndAc/p:stSnd/p:snd/@r:embed"/>
+				</xsl:variable>				
+				
+				<xsl:variable name="soundfilename">
+					<xsl:for-each select="document($pageSlide)/rels:Relationships/rels:Relationship">
+						<xsl:if test="$hyperlinkrid=@Id">
+							<xsl:call-template name="retString">
+								<xsl:with-param name="string2rev" select="./@Target"/>
+							</xsl:call-template>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name="extractfilename">
+					<xsl:choose>
+						<xsl:when test="contains($soundfilename,'%20')">
+							<xsl:value-of select="translate($soundfilename,'%20',' ')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$soundfilename"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
+				<xsl:variable name="varDestMediaFileTargetPath">
+					<xsl:value-of select="concat($FolderNameGUID,'|',$extractfilename)"/>
+				</xsl:variable>
+				<xsl:variable name="varMediaFilePathForOdp">
+					<xsl:value-of select="concat('../',$FolderNameGUID,'/',$soundfilename)"/>
+				</xsl:variable>
+				<xsl:attribute name ="xlink:href">
+					<xsl:value-of select ="$varMediaFilePathForOdp"/>
+				</xsl:attribute>
+				<!--some code here-->
+				<pzip:extract pzip:source="{concat('ppt/media/',$soundfilename)}" pzip:target="{$varDestMediaFileTargetPath}" />
+				<!--end-->
+				
+			</presentation:sound>			
+		</xsl:if>
+	</xsl:template>
+
+	<!--template added by yeswanth.s-->
+	<xsl:template name="retString">
+		<xsl:param name="string2rev"/>
+		<xsl:choose>
+			<xsl:when test="contains($string2rev,'/')">
+				<xsl:call-template name="retString">
+					<xsl:with-param name="string2rev" select="substring-after($string2rev,'/')"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$string2rev"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 </xsl:stylesheet>

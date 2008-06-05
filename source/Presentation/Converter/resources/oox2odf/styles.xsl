@@ -53,7 +53,8 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" 
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
-  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships" >
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+  exclude-result-prefixes="xlink form">
 
 
 	<!-- Shape constants-->

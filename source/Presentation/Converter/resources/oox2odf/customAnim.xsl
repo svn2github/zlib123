@@ -51,11 +51,78 @@ xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:dcterms="http://purl.org/dc/terms/"
 xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" 
 xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"
+ xmlns:msxsl="urn:schemas-microsoft-com:xslt"
 exclude-result-prefixes="p a r xlink rels xmlns">	
 	<xsl:template name ="customAnimation">
 		<xsl:param name ="slideId"/>
 		<xsl:param name ="slideNo"/>
+		<xsl:param name="pageid"/>
+		<xsl:param name="FolderNameGUID"/>
 		<anim:par smil:dur="indefinite" smil:restart="never" presentation:node-type="timing-root">
+			<xsl:if test="document($slideId)//p:transition">
+				<anim:par>
+					<xsl:attribute name="smil:begin">
+						<xsl:value-of select="concat($pageid,'.begin')"/>
+					</xsl:attribute>
+					<!--<xsl:copy-of select="document($slideId)"/>-->
+					<anim:transitionFilter>
+						<xsl:variable name="tranSpeed">
+							<xsl:choose>
+								<xsl:when test="document($slideId)/p:sld/p:transition/@spd='slow'">
+									<xsl:value-of select="'3s'"/>
+								</xsl:when>
+								<xsl:when test="document($slideId)/p:sld/p:transition/@spd='med'">
+							<xsl:value-of select="'2s'"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="'1s'"/>
+								</xsl:otherwise>
+							</xsl:choose>							
+						</xsl:variable>
+						<xsl:attribute name="smil:dur">							
+							<xsl:value-of select="$tranSpeed"/>
+						</xsl:attribute>
+						<xsl:call-template name="SlideTransSmilType">
+							<xsl:with-param name="slidenum" select="document($slideId)/p:sld/p:transition/child::node()"/>
+						</xsl:call-template>
+					</anim:transitionFilter>
+					<xsl:if test="document($slideId)//p:transition/p:sndAc/p:stSnd">
+						<anim:audio>
+							<!--for xlink:href-->
+							<xsl:variable name ="relSlideNumber">
+								<xsl:call-template name="retString">
+									<xsl:with-param name="string2rev" select="$slideId"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:variable name="hyperlinkrid">
+								<xsl:value-of select="document($slideId)/p:sld/p:transition/p:sndAc/p:stSnd/p:snd/@r:embed"/>
+							</xsl:variable>
+							<xsl:variable name="pageRelation">
+								<xsl:value-of select="concat('ppt/slides/_rels/',$relSlideNumber,'.rels')"/>
+							</xsl:variable>
+							<xsl:variable name="soundfilename">
+								<xsl:for-each select="document($pageRelation)/rels:Relationships/rels:Relationship">
+									<xsl:if test="$hyperlinkrid=@Id">
+										<xsl:call-template name="retString">
+											<xsl:with-param name="string2rev" select="./@Target"/>
+										</xsl:call-template>
+									</xsl:if>
+								</xsl:for-each>
+							</xsl:variable>
+							<!--end-->
+							<xsl:attribute name="xlink:href">
+								<xsl:value-of select="concat('../',$FolderNameGUID,'/',$soundfilename)"/>
+							</xsl:attribute>
+							<xsl:if test="document($slideId)//p:transition/p:sndAc/p:stSnd/@loop=1">
+								<xsl:attribute name="smil:repeatCount">
+									<xsl:value-of select="'indefinite'"/>
+								</xsl:attribute>
+							</xsl:if>
+						</anim:audio>
+					</xsl:if>
+				</anim:par>
+			</xsl:if>
+
 			<anim:seq presentation:node-type="main-sequence">
 				<xsl:for-each select ="document($slideId)//p:timing/p:tnLst/p:par/p:cTn/p:childTnLst/p:seq/p:cTn/p:childTnLst/p:par">
                                     <xsl:if test="./p:cTn/p:childTnLst/p:par/p:cTn/p:childTnLst/p:par/p:cTn/@presetClass != 'mediacall'">
@@ -111,13 +178,30 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 				</xsl:attribute>
 				
 				<xsl:for-each select ="p:cTn/p:childTnLst/p:par">
+					<xsl:variable name="spId">
+						<xsl:for-each select="p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt">
+							<xsl:value-of select="@spid"/>
+						</xsl:for-each>
+					</xsl:variable>
 					<xsl:variable name ="animationId">
-						<xsl:if test ="p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg">
+						<xsl:choose>
+							<xsl:when test ="p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg">
 							<xsl:value-of select="concat('slText',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid ,p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg/@st +1 )" />
-						</xsl:if>
-						<xsl:if test ="not(p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/p:txEl/p:pRg)">
-							<xsl:value-of select="concat('sldraw',$slideNo ,'an',p:cTn/p:childTnLst/child::node()[1]/p:cBhvr/p:tgtEl/p:spTgt/@spid)" />
-						</xsl:if>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:choose>
+									<xsl:when test="/.//p:spTree/p:pic/p:nvPicPr/p:cNvPr[@id=$spId]">
+										<xsl:value-of select="concat('Picsldraw',$slideNo ,'an',$spId)" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="concat('sldraw',$slideNo ,'an',$spId)" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:otherwise>
+						</xsl:choose>
+
+
+
 					</xsl:variable>
          
 					     

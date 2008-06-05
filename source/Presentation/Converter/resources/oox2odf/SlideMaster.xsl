@@ -234,6 +234,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="FilePath" select="concat('ppt/slideMasters/',$slideMasterPath)"/>
           <xsl:with-param name="FileName" select="$slideMasterPath"/>
           <xsl:with-param name="FileType" select="$slideMasterName"/>
+          <xsl:with-param name="SMName" select="$slideMasterPath"/>
         </xsl:call-template>
         
         <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$slideMasterPath,'.rels'))//node()/@Target[contains(.,'slideLayouts')]">
@@ -249,6 +250,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:with-param name="FilePath" select="concat('ppt/slideLayouts/',$var_layoutName)"/>
             <xsl:with-param name="FileName" select="$var_layoutName"/>
             <xsl:with-param name="FileType" select="concat($slideMasterName,substring-before($var_layoutName,'.xml'))"/>
+            <xsl:with-param name="SMName" select="$slideMasterPath"/>
           </xsl:call-template>
           <xsl:call-template name="tmpgetBackImage">
             <xsl:with-param name="FilePath" select="concat('ppt/slideLayouts/',$var_layoutName)"/>
@@ -2322,6 +2324,7 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:when>
     <xsl:when test="$AttrType='strike'">
       <xsl:if test ="./a:defRPr/@strike">
+          <xsl:if test="./a:defRPr[@strike!='noStrike']">
         <xsl:attribute name ="style:text-line-through-style">
           <xsl:value-of select ="'solid'"/>
         </xsl:attribute>
@@ -2338,6 +2341,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
         </xsl:choose>
       </xsl:if>
+        </xsl:if>
     </xsl:when>
     <xsl:when test="$AttrType='Textshadow'">
       <xsl:if test ="./a:defRPr/a:effectLst/a:outerShdw">
@@ -2893,6 +2897,14 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
+                <xsl:when test="name()='p:graphicFrame'">
+                  <xsl:if test="./a:graphic/a:graphicData/p:oleObj ">
+                    <xsl:call-template name="tmpOLEObjects">
+                      <xsl:with-param name ="SlideRelationId" select ="concat('ppt/slideMasters/_rels/',$slideMasterPath,'.rels')"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                
+                </xsl:when>
                 <xsl:when test="name()='p:grpSp'">
                <xsl:variable name="var_pos" select="position()"/>
                   <xsl:variable name="TopLevelgrpCordinates">
@@ -3311,6 +3323,11 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:with-param name="lumOff">
                     <xsl:value-of select="p:bgPr/a:solidFill/a:schemeClr/a:lumOff/@val" />
                   </xsl:with-param>
+                  <xsl:with-param name ="shade">
+                    <xsl:for-each select="p:bgPr/a:solidFill/a:schemeClr/a:shade/@val">
+                      <xsl:value-of select=". div 1000"/>
+                    </xsl:for-each>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:attribute>
               <xsl:attribute name="draw:fill">
@@ -3330,6 +3347,8 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:when test="p:bgPr/a:gradFill">
           <xsl:call-template name="tmpBackGrndGradFillColor">
             <xsl:with-param name="FileType" select="concat(substring-before($slideMasterFile,'.xml'),'-Gradient')"/>
+            <xsl:with-param name="SMName" select="$slideMasterFile"/>
+            
                     </xsl:call-template>
             </xsl:when>
         <xsl:when test="p:bgRef and p:bgRef/@idx &gt; 0 and p:bgRef/@idx &lt; 1000">
@@ -3355,6 +3374,11 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:with-param>
                   <xsl:with-param name ="lumOff">
                     <xsl:value-of select="p:bgRef/a:schemeClr/a:lumOff/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name ="shade">
+                    <xsl:for-each select="p:bgRef/a:solidFill/a:schemeClr/a:shade/@val">
+                      <xsl:value-of select=". div 1000"/>
+                    </xsl:for-each>
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:attribute>
@@ -4260,11 +4284,9 @@ Copyright (c) 2007, Sonata Software Limited
                       </style:graphic-properties >
                       <xsl:if test ="p:txBody/a:bodyPr/@vert">
                         <style:paragraph-properties>
-                          <xsl:attribute name ="style:writing-mode">
-                            <xsl:call-template name ="getTextDirection">
+                          <xsl:call-template name ="getTextDirection">
                               <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                             </xsl:call-template>
-                          </xsl:attribute>
                         </style:paragraph-properties>
                       </xsl:if>
                     </style:style>
@@ -4353,10 +4375,15 @@ Copyright (c) 2007, Sonata Software Limited
                         </xsl:if>
                       </xsl:if>
                         </xsl:if>
+                      <!--Added by sanjay for master style-->
+                      <xsl:if test="p:blipFill/a:blip/a:lum">
+                        <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                          <xsl:call-template name="BrightContrast"/>
+                        </xsl:for-each>
+                      </xsl:if>
                     </style:graphic-properties >
                   </style:style>
-                 
-               </xsl:for-each>
+                </xsl:for-each>
              </xsl:when>
                <xsl:when test="name()='p:grpSp'">
               <xsl:variable name="var_pos" select="position()"/>
@@ -4420,11 +4447,9 @@ Copyright (c) 2007, Sonata Software Limited
                       </style:graphic-properties >
                       <xsl:if test ="p:txBody/a:bodyPr/@vert">
                         <style:paragraph-properties>
-                          <xsl:attribute name ="style:writing-mode">
-                            <xsl:call-template name ="getTextDirection">
+                           <xsl:call-template name ="getTextDirection">
                               <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                             </xsl:call-template>
-                          </xsl:attribute>
                         </style:paragraph-properties>
                       </xsl:if>
                     </style:style>
@@ -4437,7 +4462,6 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:when>
         <xsl:when test="name()='p:pic'">
           <xsl:variable name="pos" select="position()"/>
-            <xsl:if test="p:spPr/a:ln">
               <xsl:variable  name ="GraphicId">
                 <xsl:value-of select ="concat('SMgrp',$slideMasterName,'Picture',$var_pos,'-', $pos,'gr')"/>
               </xsl:variable>
@@ -4447,8 +4471,16 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:attribute >
                 <style:graphic-properties>
                   <!--LINE STYLE-->
+                       <xsl:if test="p:spPr/a:ln">
                   <xsl:call-template name ="LineStyle"/>
                   <xsl:call-template name ="PictureBorderColor" />
+                       </xsl:if>
+                       <!--Added by sanjay-->
+                       <xsl:if test="p:blipFill/a:blip/a:lum">
+                         <xsl:for-each select="p:blipFill/a:blip/a:lum">
+                           <xsl:call-template name="BrightContrast"/>
+                         </xsl:for-each>
+                       </xsl:if>
                   <!--Image Cropping-->
                   <xsl:call-template name="tmpImageCropping">
                     <xsl:with-param name="slideRel" select="concat('ppt/slideMasters/_rels',$slideMasterName,'.xml.rels')"/>
@@ -4457,8 +4489,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:call-template name ="TextLayout" />
                 </style:graphic-properties >
               </style:style>
-            </xsl:if>
-        </xsl:when>
+            </xsl:when>
                   <xsl:when test="name()='p:cxnSp'">
                       <xsl:variable name="pos" select="position()"/>
                     <xsl:for-each select=".">
@@ -4497,11 +4528,9 @@ Copyright (c) 2007, Sonata Software Limited
                         </style:graphic-properties >
                         <xsl:if test ="p:txBody/a:bodyPr/@vert">
                           <style:paragraph-properties>
-                            <xsl:attribute name ="style:writing-mode">
-                              <xsl:call-template name ="getTextDirection">
+                             <xsl:call-template name ="getTextDirection">
                                 <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
                               </xsl:call-template>
-                            </xsl:attribute>
                           </style:paragraph-properties>
                         </xsl:if>
                       </style:style>
@@ -4831,32 +4860,11 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:value-of select="'none'"/>
       </xsl:attribute>
     </xsl:if>
-    <!--wrap-->
-    <xsl:choose>
-      <xsl:when test="p:txBody/a:bodyPr/@wrap='none'">
-        <xsl:attribute name ="fo:wrap-option">
-          <xsl:value-of select ="'no-wrap'"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="p:txBody/a:bodyPr/@wrap='square'">
-        <xsl:attribute name ="fo:wrap-option">
-          <xsl:value-of select ="'wrap'"/>
-        </xsl:attribute>
-      </xsl:when>
-    </xsl:choose>
-    <!--resize text to shape-->
-    <xsl:choose>
-      <xsl:when test ="p:txBody/a:bodyPr/a:spAutoFit">
-        <xsl:attribute name ="draw:auto-grow-height" >
-          <xsl:value-of select ="'true'"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name ="draw:auto-grow-height" >
-          <xsl:value-of select ="'false'"/>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
+      <!-- wrap and resize text to shape-->
+      <xsl:for-each select="./p:txBody">
+        <xsl:call-template name="tmpWrapSpAutoFit"/>
+      </xsl:for-each>
+       
     <!--Line Spacing-->
     <!-- internal margin-->
     <xsl:if test ="p:txBody/a:bodyPr/@tIns">
@@ -5082,6 +5090,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
     <!-- strike style:text-line-through-style-->
     <xsl:if test ="./a:defRPr/@strike">
+      <xsl:if test ="./a:defRPr[@strike!='noStrike']">
       <xsl:attribute name ="style:text-line-through-style">
         <xsl:value-of select ="'solid'"/>
       </xsl:attribute>
@@ -5097,6 +5106,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
         </xsl:when>
       </xsl:choose>
+    </xsl:if>
     </xsl:if>
 	  <!--SuperScript and SubScript for Text added by Mathi on 1st Aug 2007-->
 	  <xsl:if test="./a:defRPr/@baseline">
@@ -8061,6 +8071,7 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:if>
     <!-- strike style:text-line-through-style-->
     <xsl:if test ="a:rPr/@strike">
+      <xsl:if test ="a:rPr[@strike!='noStrike']">
       <xsl:attribute name ="style:text-line-through-style">
         <xsl:value-of select ="'solid'"/>
       </xsl:attribute>
@@ -8077,8 +8088,10 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:when>
       </xsl:choose>
     </xsl:if>
+    </xsl:if>
     <xsl:if test ="not(a:rPr/@strike)">
       <xsl:if test ="parent::node()/parent::node()/a:lstStyle/a:lvl1pPr/a:defRPr/@strike">
+        <xsl:if test ="parent::node()/parent::node()/a:lstStyle/a:lvl1pPr/a:defRPr[@strike!='noStrike']">
         <xsl:attribute name ="style:text-line-through-style">
           <xsl:value-of select ="'solid'"/>
         </xsl:attribute>
@@ -8095,6 +8108,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
         </xsl:choose>
       </xsl:if>
+    </xsl:if>
     </xsl:if>
     <!-- Kening Property-->
     <xsl:if test ="a:rPr/@kern">
@@ -8830,6 +8844,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name="FilePath"/>
     <xsl:param name="FileName"/>
     <xsl:param name="FileType"/>
+    <xsl:param name="SMName"/>
     <xsl:for-each select="document($FilePath)//p:cSld/p:bg">
         <xsl:message terminate="no">progress:a:p</xsl:message>
             <xsl:for-each select="p:bgPr/a:gradFill">
@@ -8840,105 +8855,54 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:attribute name="draw:display-name">
                   <xsl:value-of select="concat($FileType,'-Gradient')"/>
                 </xsl:attribute>
-                <xsl:call-template name="tmpGradientFillTiletoRect"/>
+                <xsl:call-template name="tmpGradientFillTiletoRect">
+                  <xsl:with-param name="SMName" select="$SMName"/>
+                </xsl:call-template>
               </draw:gradient>
             </xsl:for-each>
           </xsl:for-each>
         </xsl:template>
+     
+
         <xsl:template name="tmpGradientFillTiletoRect">
           <xsl:param name="SMName"/>
-                <xsl:for-each select="a:gsLst/a:gs">
-                  <xsl:if test="position()=1">
+          <xsl:variable name="gradientType">
                     <xsl:choose>
-                      <xsl:when test="a:srgbClr/@val">
-                        <xsl:attribute name="draw:start-color">
-                          <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="a:schemeClr/@val">
-                        <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
-                        <xsl:attribute name="draw:start-color">
-                          <xsl:call-template name="getColorCode">
-                            <xsl:with-param name="color">
-                              <xsl:choose>
-                                <xsl:when test="$SMName!=''">
-                                  <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
-                                    <xsl:call-template name="tmpThemeClr">
-                                      <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
-                                    </xsl:call-template>
-                                  </xsl:for-each>
+              <xsl:when test="a:lin" >
+                <xsl:value-of select="'linear'"/>
                                 </xsl:when>
-                                <xsl:otherwise>
-                              <xsl:value-of select="a:schemeClr/@val" />
-                                </xsl:otherwise>
-                              </xsl:choose>
-                              <!--<xsl:value-of select="a:schemeClr/@val"/>-->
-                            </xsl:with-param>
-                            <xsl:with-param name="lumMod">
-                              <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
-                            </xsl:with-param>
-                            <xsl:with-param name="lumOff">
-                              <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
-                            </xsl:with-param>
-                            <xsl:with-param name ="shade">
-                              <xsl:for-each select="a:schemeClr/a:shade/@val">
-                                <xsl:value-of select=". div 1000"/>
-                              </xsl:for-each>
-                            </xsl:with-param>
-                          </xsl:call-template>
-                        </xsl:attribute>
+              <xsl:when test="a:path">
+                <xsl:value-of select="'path'"/>
                       </xsl:when>
                     </xsl:choose>
-                  </xsl:if>
-                  <xsl:if test="position()=last()">
-                    <xsl:choose>
-                      <xsl:when test="a:srgbClr/@val">
-                        <xsl:attribute name="draw:end-color">
-                          <xsl:value-of select="concat('#',a:srgbClr/@val)" />
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:when test="a:schemeClr/@val">
-                        <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
-                        <xsl:attribute name="draw:end-color">
-                          <xsl:call-template name="getColorCode">
-                            <xsl:with-param name="color">
-                              <!--<xsl:value-of select="a:schemeClr/@val"/>-->
-                              <xsl:choose>
-                                <xsl:when test="$SMName!=''">
-                                  <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
-                                    <xsl:call-template name="tmpThemeClr">
-                                      <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+          </xsl:variable>
+          <xsl:for-each select="a:gsLst/a:gs">
+            <xsl:call-template name="tmpGradientStop">
+              <xsl:with-param name="gradType" select="$gradientType"/>
+               <xsl:with-param name="SMName" select="$SMName"/>
                                     </xsl:call-template>
                                   </xsl:for-each>
-                                </xsl:when>
-                                <xsl:otherwise>
-                              <xsl:value-of select="a:schemeClr/@val" />
-                                </xsl:otherwise>
-                              </xsl:choose>
-                            </xsl:with-param>
-                            <xsl:with-param name="lumMod">
-                              <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
-                            </xsl:with-param>
-                            <xsl:with-param name="lumOff">
-                              <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
-                            </xsl:with-param>
-                            <xsl:with-param name ="shade">
-                              <xsl:for-each select="a:schemeClr/a:shade/@val">
-                                <xsl:value-of select=". div 1000"/>
-                              </xsl:for-each>
-                            </xsl:with-param>
-                          </xsl:call-template>
+           <xsl:for-each select="a:lin">
+                  <xsl:if test="@ang">
+                    <xsl:attribute name="draw:angle">
+                      <xsl:variable name="angleValue">
+                      <xsl:value-of select="round((((( -1 * @ang ) + 5400000 ) mod 21600000 ) div 60000) * 10)"/>
+                      </xsl:variable>
+                      <xsl:choose>
+                        <xsl:when test="$angleValue &lt; 0">
+                          <xsl:value-of select="-1 * $angleValue "/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$angleValue "/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                         </xsl:attribute>
-                      </xsl:when>
-                    </xsl:choose>
                   </xsl:if>
-                </xsl:for-each>
-                <xsl:for-each select="a:lin">
-                  <xsl:attribute name="draw:style">
+                   <xsl:attribute name="draw:style">
                     <xsl:value-of select="'linear'"/>
                   </xsl:attribute>
                 </xsl:for-each>
-                <xsl:for-each select="a:path">
+          <xsl:for-each select="./a:path">
                   <xsl:choose>
                     <xsl:when test="@path='circle'">
                       <xsl:attribute name="draw:style">
@@ -8956,20 +8920,20 @@ Copyright (c) 2007, Sonata Software Limited
                       </xsl:attribute>
                     </xsl:when>
                   </xsl:choose>
-                  <xsl:for-each select="a:fillToRect">
+                  <xsl:for-each select="./a:fillToRect">
                     <xsl:choose>
                 <xsl:when test="@l and @r and @t and @b">
                         <xsl:attribute name="draw:cx">
                     <xsl:variable name="var_cx">
                       <xsl:value-of select="number(format-number(( (@l+ @r) div 2 ) div 1000,'#')) "/>
                     </xsl:variable>
-                    <xsl:value-of select="concat(100 - $var_cx,'%') "/>
+                    <xsl:value-of select="concat($var_cx,'%') "/>
                   </xsl:attribute>
                   <xsl:attribute name="draw:cy">
                     <xsl:variable name="var_cy">
                       <xsl:value-of select="number(format-number(( (@t+ @b) div 2 ) div 1000,'#')) "/>
                     </xsl:variable>
-                    <xsl:value-of select="concat(100 - $var_cy,'%') "/>
+                    <xsl:value-of select="concat($var_cy,'%') "/>
                         </xsl:attribute>
                       </xsl:when>
                 <xsl:when test="@l and @b">
@@ -9028,4 +8992,183 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:for-each>
                 </xsl:for-each>
               </xsl:template>
+
+<xsl:template name="tmpGradientStop">
+    <xsl:param name="gradType"/>
+    <xsl:param name="SMName"/>
+    <xsl:if test="position()=1">
+      <xsl:choose>
+        <xsl:when test="a:srgbClr/@val">
+          <xsl:choose>
+            <xsl:when test="$gradType='linear'" >
+              <xsl:attribute name="draw:start-color">
+                <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$gradType='path'" >
+              <xsl:attribute name="draw:end-color">
+                <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+         
+        </xsl:when>
+        <xsl:when test="a:schemeClr/@val">
+          <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
+          <xsl:choose>
+            <xsl:when test="$gradType='linear'" >
+              <xsl:attribute name="draw:start-color">
+                <xsl:call-template name="getColorCode">
+                  <xsl:with-param name="color">
+                    <xsl:choose>
+                      <xsl:when test="$SMName!=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="a:schemeClr/@val" />
+                      </xsl:otherwise>
+                    </xsl:choose>
+                
+                  </xsl:with-param>
+                  <xsl:with-param name="lumMod">
+                    <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name="lumOff">
+                    <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name ="shade">
+                    <xsl:for-each select="a:schemeClr/a:shade/@val">
+                      <xsl:value-of select=". div 1000"/>
+                    </xsl:for-each>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$gradType='path'" >
+              <xsl:attribute name="draw:end-color">
+                <xsl:call-template name="getColorCode">
+                  <xsl:with-param name="color">
+                    <xsl:choose>
+                      <xsl:when test="$SMName!=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="a:schemeClr/@val" />
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                  <xsl:with-param name="lumMod">
+                    <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name="lumOff">
+                    <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name ="shade">
+                    <xsl:for-each select="a:schemeClr/a:shade/@val">
+                      <xsl:value-of select=". div 1000"/>
+                    </xsl:for-each>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+    <xsl:if test="position()=last()">
+      <xsl:choose>
+        <xsl:when test="a:srgbClr/@val">
+          <xsl:choose>
+            <xsl:when test="$gradType='linear'" >
+              <xsl:attribute name="draw:end-color">
+                <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$gradType='path'" >
+              <xsl:attribute name="draw:start-color">
+                <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+
+        </xsl:when>
+        <xsl:when test="a:schemeClr/@val">
+          <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
+          <xsl:choose>
+            <xsl:when test="$gradType='linear'" >
+              <xsl:attribute name="draw:end-color">
+                <xsl:call-template name="getColorCode">
+                  <xsl:with-param name="color">
+                    <xsl:choose>
+                      <xsl:when test="$SMName!=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="a:schemeClr/@val" />
+                      </xsl:otherwise>
+                    </xsl:choose>
+
+                  </xsl:with-param>
+                  <xsl:with-param name="lumMod">
+                    <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name="lumOff">
+                    <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name ="shade">
+                    <xsl:for-each select="a:schemeClr/a:shade/@val">
+                      <xsl:value-of select=". div 1000"/>
+                    </xsl:for-each>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$gradType='path'" >
+              <xsl:attribute name="draw:start-color">
+                <xsl:call-template name="getColorCode">
+                  <xsl:with-param name="color">
+                    <xsl:choose>
+                      <xsl:when test="$SMName!=''">
+                        <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
+                          <xsl:call-template name="tmpThemeClr">
+                            <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="a:schemeClr/@val" />
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                  <xsl:with-param name="lumMod">
+                    <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name="lumOff">
+                    <xsl:value-of select="a:schemeClr/a:lumOff/@val" />
+                  </xsl:with-param>
+                  <xsl:with-param name ="shade">
+                    <xsl:for-each select="a:schemeClr/a:shade/@val">
+                      <xsl:value-of select=". div 1000"/>
+                    </xsl:for-each>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
 </xsl:stylesheet>
