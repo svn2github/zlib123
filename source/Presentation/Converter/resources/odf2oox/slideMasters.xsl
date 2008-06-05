@@ -183,9 +183,19 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:for-each select="node()">
               <xsl:choose>
                 <xsl:when test="name()='draw:frame'">
-                  <xsl:variable name="var_pos" select="position()"/>
+                  <xsl:variable name="var_pos">
+                    <xsl:call-template name="getShapePosTemp">
+                      <xsl:with-param name="var_pos" select="position()"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                   <xsl:for-each select=".">
                     <xsl:choose>
+                      <xsl:when test="./draw:object or ./draw:object-ole">
+                        <xsl:call-template name="tmpOLEObjects">
+                          <xsl:with-param name ="pageNo" select ="$smId"/>
+                          <xsl:with-param name ="shapeCount" select="$var_pos" />
+                        </xsl:call-template>
+                      </xsl:when>
                       <xsl:when test="./draw:image">
                         <xsl:for-each select="./draw:image">
                           <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
@@ -396,7 +406,11 @@ Copyright (c) 2007, Sonata Software Limited
 
                 <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape'
                      or name()='draw:line' or name()='draw:connector'">
-                  <xsl:variable name="var_pos" select="position()"/>
+                  <xsl:variable name="var_pos">
+                    <xsl:call-template name="getShapePosTemp">
+                      <xsl:with-param name="var_pos" select="position()"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                   <!-- Code for shapes start-->
                   <xsl:call-template name ="shapes" >
                     <xsl:with-param name ="fileName" select ="'styles.xml'"/>
@@ -405,7 +419,11 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:call-template >
                 </xsl:when>
                 <xsl:when test="name()='draw:g'">
-                  <xsl:variable name="var_pos" select="position()"/>
+                  <xsl:variable name="var_pos">
+                    <xsl:call-template name="getShapePosTemp">
+                      <xsl:with-param name="var_pos" select="position()"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                   <xsl:call-template name="tmpGroping">
                     <xsl:with-param name="startPos" select="'1'"/>
                     <xsl:with-param name="pageNo" select="$slideMasterName"/>
@@ -6273,12 +6291,39 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- code for picture feature start-->
 
       <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]">
+        <xsl:if test=".//draw:object or .//draw:object-ole">
+          <xsl:choose>
+            <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+            <xsl:otherwise>
+              <Relationship Id="vmldrawing" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing">
+                <xsl:attribute name="Target">
+                  <xsl:value-of select="concat('../drawings/vmlDrawingSM',$ThemeId,'.vml')"/>
+                </xsl:attribute>
+              </Relationship>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:if>
         <xsl:for-each select="node()">
           <xsl:choose>
             <xsl:when test="name()='draw:frame'">
-              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:for-each select=".">
                 <xsl:choose>
+                  <xsl:when test="./draw:object or ./draw:object-ole">
+                    <xsl:choose>
+                      <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+                      <xsl:otherwise>
+                        <xsl:call-template name="tmpOLEObjectsRel">
+                          <xsl:with-param name="slideNo" select="$ThemeId"/>
+                        </xsl:call-template>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:when>
                   <xsl:when test="./draw:image">
                     <xsl:for-each select="./draw:image">
                       <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
@@ -6974,7 +7019,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='draw:custom-shape'">
-              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:for-each select=".">
                 <xsl:call-template name="tmpBitmapFillRel">
                   <xsl:with-param name ="UniqueId" select="$var_pos" />
@@ -7266,7 +7315,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='draw:rect'">
-              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:for-each select=".">
                 <xsl:choose>
                   <xsl:when test="./office:event-listeners">
@@ -7568,7 +7621,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='draw:ellipse'">
-              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:for-each select=".">
                 <xsl:variable name="shapeId">
                   <xsl:value-of select="concat('ellipse',$var_pos)"/>
@@ -7762,7 +7819,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='draw:line'">
-              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:for-each select=".">
                 <xsl:if test="./office:event-listeners">
                   <xsl:variable name="ShapePostionCount">
@@ -7863,7 +7924,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='draw:connector'">
-              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:for-each select=".">
                 <xsl:if test="./office:event-listener">
                   <xsl:variable name="ShapePostionCount">
@@ -7964,7 +8029,11 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="name()='draw:g'">
-              <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:call-template name="tmpGroupingRelation">
                 <xsl:with-param name="slideNo" select="$slideNo"/>
                 <xsl:with-param name="pos" select="$var_pos"/>

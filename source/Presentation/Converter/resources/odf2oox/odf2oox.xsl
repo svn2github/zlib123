@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -30,6 +30,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:odf="urn:odf"
+    xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -37,6 +38,9 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:page="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:v="urn:schemas-microsoft-com:vml"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
   exclude-result-prefixes="odf style text number draw page presentation">
 	<xsl:import href="docprops.xsl"/>
 	<xsl:import href ="slides.xsl"/>
@@ -148,6 +152,23 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:with-param name ="SlideMasterNo" select ="position()"/>
           <xsl:with-param name="slideMasterName" select="@style:name"/>
 				</xsl:call-template>
+
+         <xsl:if test=".//draw:object or .//draw:object-ole">
+           <xsl:choose>
+             <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+             <xsl:otherwise>
+               <pzip:entry pzip:target="{concat('ppt/drawings/vmlDrawingSM',position(),'.vml')}">
+                 <xsl:call-template name="CreateVmlDrawing">
+                   <xsl:with-param name ="pageNo" select ="position()"/>
+                 </xsl:call-template>
+               </pzip:entry>
+               <pzip:entry pzip:target="{concat('ppt/drawings/_rels/','vmlDrawingSM',position(),'.vml.rels')}">
+                 <xsl:call-template name="CreateVmlDrawingRelationship"/>
+               </pzip:entry>
+             </xsl:otherwise>
+           </xsl:choose>
+
+         </xsl:if>
 			</xsl:for-each>
       <!-- Inserted by vijayeta
        Add part handoutmaster.xml and  handoutmaster.xml.rels 
@@ -203,6 +224,24 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:with-param name ="slideNo" select ="position()"/>
 					</xsl:call-template >
 				</pzip:entry>
+        <xsl:if test=".//draw:object or .//draw:object-ole">
+          <xsl:choose>
+            <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+            <xsl:otherwise>
+              <pzip:entry pzip:target="{concat('ppt/drawings/vmlDrawing',position(),'.vml')}">
+                <xsl:call-template name="CreateVmlDrawing">
+                  <xsl:with-param name ="pageNo" select ="position()"/>
+                </xsl:call-template>
+              </pzip:entry>
+              <pzip:entry pzip:target="{concat('ppt/drawings/_rels/','vmlDrawing',position(),'.vml.rels')}">
+                <xsl:call-template name="CreateVmlDrawingRelationship"/>
+              </pzip:entry>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:if>
+
+
         <!-- added by vipul for Notes-->
         <!--Start-->
         <xsl:if test="presentation:notes/draw:page-thumbnail">
@@ -372,6 +411,14 @@ Copyright (c) 2007, Sonata Software Limited
      		 <Default Extension="pct" ContentType="image/pct"/>
      		 <Default Extension="pict" ContentType="image/pict"/>
      		 <Default Extension="wpg" ContentType="image/wpg"/>
+      <Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.oleObject"/>
+      <Default Extension="vml" ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/>
+      <Default Extension="xls" ContentType="application/vnd.ms-excel" />
+      <Default Extension="xlsx" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+      <Default Extension="ppt" ContentType="application/vnd.ms-powerpoint" />
+      <Default Extension="pptx" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation"/>
+      <Default Extension="docx" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
+      <Default Extension="doc" ContentType="application/msword"/>
         <!--NotesMaster-->
         <Override PartName="/ppt/notesMasters/notesMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml"/>
         <xsl:if test="document('styles.xml')//style:master-page/presentation:notes">
@@ -608,4 +655,198 @@ Copyright (c) 2007, Sonata Software Limited
 		</p:viewPr>
 
 	</xsl:template>
+  
+  <xsl:template name="CreateVmlDrawing">
+    <xsl:param name="pageNo"/>
+    <xml xmlns:v="urn:schemas-microsoft-com:vml"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:p="urn:schemas-microsoft-com:office:powerpoint"
+ xmlns:oa="urn:schemas-microsoft-com:office:activation">
+      <o:shapelayout v:ext="edit">
+        <o:idmap v:ext="edit" data="1"/>
+      </o:shapelayout>
+      <v:shapetype id="_x0000_t75" coordsize="21600,21600" o:spt="75"
+      o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
+        <v:stroke joinstyle="miter"/>
+        <v:formulas>
+          <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+          <v:f eqn="sum @0 1 0"/>
+          <v:f eqn="sum 0 0 @1"/>
+          <v:f eqn="prod @2 1 2"/>
+          <v:f eqn="prod @3 21600 pixelWidth"/>
+          <v:f eqn="prod @3 21600 pixelHeight"/>
+          <v:f eqn="sum @0 0 1"/>
+          <v:f eqn="prod @6 1 2"/>
+          <v:f eqn="prod @7 21600 pixelWidth"/>
+          <v:f eqn="sum @8 21600 0"/>
+          <v:f eqn="prod @7 21600 pixelHeight"/>
+          <v:f eqn="sum @10 21600 0"/>
+        </v:formulas>
+        <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+        <o:lock v:ext="edit" aspectratio="t"/>
+      </v:shapetype>
+      <xsl:for-each select="node()">
+        <xsl:choose>
+          <xsl:when test="name()='draw:frame'">
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:if test="./draw:object or ./draw:object-ole">
+              <xsl:call-template name="tmpVmlOleObjects">
+                <xsl:with-param name="pageNo" select="$pageNo"/>
+                <xsl:with-param name="var_pos" select="$var_pos"/>
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:when>
+          <xsl:when test="name()='draw:g'">
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
+                <xsl:call-template name="tmpVmlOleObjectsgrp">
+                  <xsl:with-param name="pageNo" select="$pageNo"/>
+                  <xsl:with-param name="pos" select="$var_pos"/>
+                  <xsl:with-param name="startPos" select="'1'"/>
+                </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:for-each>
+    </xml>
+  </xsl:template>
+  <xsl:template name="tmpVmlOleObjectsgrp">
+    <xsl:param name="pos"/>
+    <xsl:param name="startPos"/>
+    <xsl:param name="pageNo"/>
+    <xsl:param name="InnerGrp"/>
+    <xsl:param name="fileName"/>
+    <xsl:param name="master"/>
+    <xsl:param name="UniqueId"/>
+    <xsl:for-each select="node()">
+      <xsl:choose>
+        <xsl:when test="name()='draw:frame'">
+          <xsl:variable name="var_pos" select="position()"/>
+          <xsl:variable name="NvPrId">
+            <xsl:call-template name="getShapePosTemp">
+              <xsl:with-param name="var_pos" select="$pos + $var_pos"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:if test="./draw:object or ./draw:object-ole">
+            <xsl:call-template name="tmpVmlOleObjects">
+              <xsl:with-param name ="var_pos" select="$NvPrId" />
+              <xsl:with-param name ="grpFlag" select="'true'" />
+              <xsl:with-param name ="pageNo" select ="$pageNo"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="name()='draw:g'">
+          <xsl:variable name="var_pos" select="position()"/>
+          <xsl:variable name="NvPrId">
+            <xsl:call-template name="getShapePosTemp">
+              <xsl:with-param name="var_pos" select="$pos + $var_pos"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:call-template name="tmpVmlOleObjectsgrp">
+            <xsl:with-param name="pos" select="$NvPrId"/>
+            <xsl:with-param name ="startPos" select ="$startPos + 1"/>
+            <xsl:with-param name ="pageNo" select ="$pageNo"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+
+  </xsl:template>
+  <xsl:template name="tmpVmlOleObjects">
+    <xsl:param name="pageNo"/>
+    <xsl:param name="var_pos"/>
+
+      <xsl:variable name="width">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:width"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="height">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:height"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="left">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:x"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="top">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@svg:y"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:for-each select="./child::node()[1]">
+       
+            <v:shape  type="#_x0000_t75"
+              style="position:absolute;left:{$left}pt;top:{$top}pt;width:{$width}pt;height:{$height}pt">
+              <xsl:attribute name="id">
+                <xsl:value-of select="concat('_x0000_s', $pageNo * 1024 + $var_pos)"/>
+              </xsl:attribute>
+             
+              <v:imagedata o:title="">
+                <xsl:attribute name="o:relid">
+                  <xsl:value-of select="concat('OleImage',generate-id())"/>
+                </xsl:attribute>
+              </v:imagedata>
+            </v:shape>
+          <!--</xsl:when>
+        </xsl:choose>-->
+      </xsl:for-each>
+  
+  </xsl:template>
+  <xsl:template name="CreateVmlDrawingRelationship">
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <xsl:for-each select="node()">
+        <xsl:choose>
+        <xsl:when test="name()='draw:frame'">
+          <xsl:if test="./draw:object or ./draw:object-ole">
+            <xsl:call-template name="tmpVmlDraw"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="name()='draw:g'">
+          <xsl:variable name="pos" select="position()"/>
+          <xsl:call-template name="tmpVmldrawGrp"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+
+  </Relationships>
+</xsl:template>
+<xsl:template name="tmpVmldrawGrp">
+  <xsl:for-each select="node()">
+    <xsl:choose>
+      <xsl:when test="name()='draw:frame'">
+        <xsl:if test="./draw:object or ./draw:object-ole">
+          <xsl:call-template name="tmpVmlDraw"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test="name()='draw:g'">
+        <xsl:call-template name="tmpVmldrawGrp">
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpVmlDraw">
+    <xsl:for-each select="./child::node()[1]">
+    
+      <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" 
+                     xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <xsl:attribute name="Id">
+          <xsl:value-of select="concat('OleImage',generate-id())"/>
+        </xsl:attribute>
+        <xsl:attribute name="Target">
+          <xsl:value-of select="concat('../media/','oleObjectImage_',generate-id(),'.png')"/>
+        </xsl:attribute>
+      </Relationship>
+ 
+    </xsl:for-each>
+  </xsl:template>
 </xsl:stylesheet>

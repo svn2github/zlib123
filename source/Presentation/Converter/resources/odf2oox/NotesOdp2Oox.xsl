@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <!-- 
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -100,7 +100,11 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- warn if shapes in notes -->
             <xsl:message terminate="no">translation.odf2oox.notesTypeShapesInNotes</xsl:message>
           </xsl:if>
-          <xsl:for-each select ="draw:frame[@presentation:class[contains(.,'notes')]]">
+          <xsl:for-each select="node()">
+            <xsl:if test="name()='draw:frame'">
+            <xsl:if test=" ((not(@presentation:class) and @presentation:style-name) 
+                              or contains(@presentation:class,'notes') )">
+              <xsl:for-each select =".">
             <xsl:variable name ="masterPageName" select ="./parent::node()/@draw:master-page-name"/>
             <xsl:variable name="FrameCount" select="concat('Frame',position())"/>
               <p:sp>
@@ -149,6 +153,12 @@ Copyright (c) 2007, Sonata Software Limited
                 </p:txBody>
               </p:sp>
           </xsl:for-each >
+              </xsl:if>
+            </xsl:if>
+          </xsl:for-each>
+        
+         
+        
           <!-- Code for footer , slide number and date time control -->
           <xsl:variable name ="pageStyle">
             <xsl:value-of select ="@draw:style-name"/>
@@ -1080,6 +1090,24 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:if test ="$isNumberingEnabled='false'">
           <a:buNone/>
         </xsl:if>
+        <!--added by chhavi for bullets and numbering 1 -->
+        <xsl:if test ="$isBulleted='true'">
+          <xsl:if test ="$isNumberingEnabled='true'">
+            <xsl:call-template name ="insertBulletsNumbersForNotes" >
+              <xsl:with-param name ="listId" select ="$listId"/>
+              <xsl:with-param name ="level" select ="$level+1"/>
+              <!-- parameter added by vijayeta, dated 13-7-07-->
+              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+              <!--<xsl:with-param name ="pos" select ="$pos"/>
+              <xsl:with-param name ="grpFlag"    select ="$grpFlag"/>
+              <xsl:with-param name ="BuImgRel"   select ="$BuImgRel"/>
+              <xsl:with-param name ="shapeCount" select ="$shapeCount"/>
+              <xsl:with-param name ="FrameCount" select ="$FrameCount"/>-->
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:if>
+        <!--end here 1 -->
+
 
         <!--Code Inserted by vijayeta,For Bullets and Numbering,Set Level if present-->
         <!-- @@ Code for paragraph tabs -Start-->
@@ -1825,4 +1853,141 @@ Copyright (c) 2007, Sonata Software Limited
       </Relationship>
     </Relationships>
   </xsl:template>
+  <!--added by chhavi for bullet and numbering 2-->
+  <xsl:template name ="insertBulletsNumbersForNotes">
+    <xsl:param name ="listId"/>
+    <!--<xsl:param name ="BuImgRel"/>-->
+    <xsl:param name ="level" />
+    <!-- parameter added by vijayeta, dated 11-7-07-->
+    <xsl:param name ="masterPageName"/>
+    <!--<xsl:param name ="pos"/>
+    <xsl:param name ="shapeCount"/>
+    <xsl:param name ="FrameCount"/>
+    <xsl:param name ="grpFlag"/>-->
+    <!--<xsl:variable name ="newLevel" select ="$level+1"/>-->
+    <xsl:for-each select ="document('content.xml')//text:list-style [@style:name=$listId]">
+      <xsl:choose>
+        <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color">
+          <a:buClr>
+            <a:srgbClr>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="substring-after(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:color,'#')"/>
+              </xsl:attribute>
+            </a:srgbClr>
+          </a:buClr>
+        </xsl:when>
+        <xsl:when test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties[@style:use-window-font-color='true']">
+          <a:buClr>
+            <a:sysClr val="windowText"/>
+          </a:buClr>
+        </xsl:when>
+        <xsl:otherwise>
+          <a:buClrTx/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:if test ="./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size">
+        <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')!='100'">
+          <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')&gt; 25 ">
+            <a:buSzPct>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="format-number(substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%') * 1000,'#.##')"/>
+              </xsl:attribute>
+            </a:buSzPct>
+          </xsl:if>
+          <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')&lt; 25 ">
+            <a:buSzPct>
+              <xsl:attribute name ="val">
+                <xsl:value-of select ="'25000'"/>
+              </xsl:attribute>
+            </a:buSzPct>
+          </xsl:if>
+        </xsl:if>
+        <xsl:if test ="substring-before(./text:list-level-style-bullet[@text:level=$level]/style:text-properties/@fo:font-size,'%')='100'">
+          <a:buSzPct>
+            <xsl:attribute name ="val">
+              <xsl:value-of select ="'100000'"/>
+            </xsl:attribute>
+          </a:buSzPct>
+        </xsl:if>
+      </xsl:if>
+      <xsl:for-each select="text:list-level-style-bullet[@text:level=$level]/style:text-properties">
+        <xsl:if test="position()=1">
+          <xsl:if test="@fo:font-family">
+            <a:buFont>
+              <xsl:attribute name ="typeface">
+                <xsl:value-of select="@fo:font-family"/>
+              </xsl:attribute>
+            </a:buFont>
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
+      <!--<xsl:attribute name ="typeface">
+          <xsl:call-template name ="getBulletType">
+            <xsl:with-param name ="character" select ="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
+            <xsl:with-param name ="typeFace"/>
+          </xsl:call-template>
+        </xsl:attribute>-->
+
+      <xsl:if test ="text:list-level-style-bullet">
+        <!--<xsl:for-each select ="./child::node()[1]">-->
+        <xsl:if test ="text:list-level-style-bullet[@text:level=$level]">
+          <a:buChar>
+            <xsl:attribute name ="char">
+              <xsl:value-of select="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
+              <!--<xsl:call-template name="insertBulletChar">
+                <xsl:with-param name ="character" select ="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
+                <xsl:with-param name="character" select="./child::node()[$level]/@text:bullet-char"/>
+              </xsl:call-template>-->
+            </xsl:attribute>
+          </a:buChar>
+        </xsl:if>
+        <!--</xsl:for-each >-->
+      </xsl:if>
+      <xsl:if test="text:list-level-style-number">
+        <!--<xsl:for-each select ="./child::node()[1]">-->
+        <xsl:if test ="text:list-level-style-number[@text:level =$level]">
+          <a:buAutoNum>
+            <xsl:attribute name ="type">
+              <xsl:call-template name="getNumFormat">
+                <xsl:with-param name="format">
+                  <xsl:value-of select ="text:list-level-style-number[@text:level =$level]/@style:num-format"/>
+                  <!--<xsl:value-of select="./child::node()[$level]/@style:num-format"/>-->
+                </xsl:with-param>
+                <xsl:with-param name ="suff" select ="text:list-level-style-number[@text:level =$level]/@style:num-suffix"/>
+                <xsl:with-param name ="prefix" select ="text:list-level-style-number[@text:level =$level]/@style:num-prefix"/>
+              </xsl:call-template>
+            </xsl:attribute>
+            <xsl:if test ="text:list-level-style-number[@text:level =$level]/@text:start-value and text:list-level-style-number[@text:level =$level]/@text:start-value != 0">
+              <xsl:attribute name ="startAt">
+                <xsl:value-of select ="text:list-level-style-number[@text:level =$level]/@text:start-value"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test ="text:list-level-style-number[@text:level =$level]/@text:start-value and text:list-level-style-number[@text:level =$level]/@text:start-value = 0">
+              <xsl:attribute name ="startAt">
+                <xsl:value-of select ="1"/>
+              </xsl:attribute>
+            </xsl:if>
+          </a:buAutoNum>
+        </xsl:if>
+        <!--</xsl:for-each>-->
+      </xsl:if>
+      <!--<xsl:if test ="text:list-level-style-image[@text:level=$level] and text:list-level-style-image/@xlink:href">
+        --><!--<xsl:variable name ="rId" select ="concat('buImage',$listId,$level,$pos,$shapeCount,$FrameCount)"/>--><!--
+        <xsl:variable name ="rId" select ="concat('buImage',$grpFlag,$listId,$BuImgRel,generate-id())"/>
+        <a:buBlip>
+          <a:blip>
+            <xsl:attribute name ="r:embed">
+              <xsl:value-of select ="$rId"/>
+            </xsl:attribute>
+          </a:blip>
+        </a:buBlip>
+        <xsl:call-template name="copyPictures">
+          <xsl:with-param name ="level" select ="$level"/>
+        </xsl:call-template>
+      </xsl:if>-->
+    </xsl:for-each>
+    <!--End of condition,If Levels Present-->
+  </xsl:template>
+  <!--end here 2-->
+ 
 </xsl:stylesheet>

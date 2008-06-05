@@ -466,7 +466,9 @@ Copyright (c) 2007, Sonata Software Limited
 
         <xsl:choose>
           <xsl:when test="$grpFlag='true'">
+            <a:xfrm>
             <xsl:call-template name ="tmpGroupdrawCordinates"/>
+            </a:xfrm>
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name ="tmpdrawCordinates"/>
@@ -655,7 +657,7 @@ Copyright (c) 2007, Sonata Software Limited
       <p:nvCxnSpPr>
         <p:cNvPr>
           <xsl:attribute name ="id">
-            <xsl:value-of select ="1"/>
+				<xsl:value-of select ="$shapeCount+1"/>
           </xsl:attribute>
           <xsl:attribute name ="name">
             <xsl:value-of select ="concat($connectorType, position())" />
@@ -3500,6 +3502,52 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:with-param name ="prClassName" select ="$prClsName"/>
                   </xsl:call-template>
                 </xsl:when>
+                <xsl:when test ="name()='text:tab'">
+                  <a:r>
+                    <a:rPr lang="en-US" smtClean="0">
+                      <!--Font Size -->
+                      <xsl:variable name ="textId">
+                        <xsl:value-of select ="./parent::node()/@text:style-name"/>
+                      </xsl:variable>
+                      <xsl:if test ="not($textId ='')">
+                        <xsl:call-template name ="fontStyles">
+                          <xsl:with-param name ="Tid" select ="$textId" />
+                          <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                          <xsl:with-param name ="slideMaster" select ="$fileName"/>
+                          <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                          <xsl:with-param name ="flagPresentationClass" select ="'No'"/>
+                          <xsl:with-param name ="parentStyleName" select ="$prClsName"/>
+                        </xsl:call-template>
+                      </xsl:if>
+                      <xsl:if test ="$textId =''">
+                        <xsl:variable name ="VarSz">
+                          <xsl:call-template name ="getDefaultFontSize">
+                            <xsl:with-param name ="className" select ="$prClsName"/>
+                          </xsl:call-template >
+                        </xsl:variable>
+                        <xsl:if test ="$VarSz!=''">
+                          <xsl:attribute name ="sz">
+                            <xsl:value-of select ="substring-before($VarSz,'pt')*100"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                      </xsl:if>
+                      <xsl:if test ="$textId =''">
+                        <a:latin charset="0"  >
+                          <xsl:attribute name ="typeface">
+                            <xsl:call-template name ="getDefaultFonaName">
+                              <xsl:with-param name ="className" select ="$prClsName"/>
+                              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                            </xsl:call-template>
+                          </xsl:attribute>
+                        </a:latin >
+                      </xsl:if >
+                    </a:rPr >
+                    <a:t>
+                      <xsl:value-of select ="'&#09;'"/>
+                    </a:t>
+                  </a:r>
+                 
+                </xsl:when >
                 <xsl:when test ="not(name()='text:span')">
                   <a:r>
                     <a:rPr lang="en-US" smtClean="0">

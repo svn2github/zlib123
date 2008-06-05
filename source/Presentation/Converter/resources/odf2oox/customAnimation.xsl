@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <!-- 
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -111,7 +111,7 @@ Copyright (c) 2007, Sonata Software Limited
 								</p:cond>
 							</p:stCondLst>
 							<xsl:variable name="check_animation">
-								<xsl:call-template name="animationfifth"/>									
+								<xsl:call-template name="animationFifth"/>									
 							</xsl:variable>
 																		<xsl:choose >
 								<xsl:when test="msxsl:node-set($check_animation)/p:par">
@@ -792,9 +792,10 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="./@smil:targetElement">
 							<xsl:value-of select ="./@smil:targetElement"/>
 						</xsl:when>
-						<xsl:otherwise>
+						<!--commented by yeswanth ,20/5/2008-->
+						<!--<xsl:otherwise>
 							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>
+						</xsl:otherwise>-->
 					</xsl:choose>
 				</xsl:with-param >
 			</xsl:call-template>
@@ -809,9 +810,10 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="./@smil:targetElement">
 							<xsl:value-of select ="./@smil:targetElement"/>
 						</xsl:when>
-						<xsl:otherwise>
+						<!--commented by yeswanth ,20/5/2008-->
+						<!--<xsl:otherwise>
 							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>
+						</xsl:otherwise>-->
 					</xsl:choose>
 				</xsl:with-param>
 			</xsl:call-template>
@@ -831,9 +833,10 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="parent::node()/@smil:targetElement">
 							<xsl:value-of select ="parent::node()/@smil:targetElement"/>
 						</xsl:when>
-						<xsl:otherwise>
+						<!--commented by yeswanth ,20/5/2008-->
+						<!--<xsl:otherwise>
 							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>
+						</xsl:otherwise>-->
 					</xsl:choose>
 				</xsl:with-param >
 			</xsl:call-template>
@@ -848,9 +851,10 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:when test ="parent::node()/@smil:targetElement">
 							<xsl:value-of select ="parent::node()/@smil:targetElement"/>
 						</xsl:when>
-						<xsl:otherwise>
+						<!--commented by yeswanth ,20/5/2008-->
+						<!--<xsl:otherwise>
 							<xsl:value-of select="'id1'"/>
-						</xsl:otherwise>
+						</xsl:otherwise>-->
 					</xsl:choose>
 				</xsl:with-param>
 			</xsl:call-template>
@@ -879,9 +883,10 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test ="./@smil:targetElement">
               <xsl:value-of select ="./@smil:targetElement"/>
             </xsl:when>
-	    <xsl:otherwise>
+			<!--commented by yeswanth ,20/5/2008-->
+			<!--<xsl:otherwise>
 	      <xsl:value-of select="'id1'"/>
-	    </xsl:otherwise>
+			</xsl:otherwise>-->
           </xsl:choose>
         </xsl:with-param >
       </xsl:call-template>
@@ -1019,10 +1024,21 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select ="node()">
           <xsl:if test ="name()='draw:rect' or name()='draw:ellipse'
                   or name()='draw:custom-shape' or  name()='draw:circle'
-                  or name()='draw:g' or name()='draw:frame'">
+                  or name()='draw:g' or name()='draw:frame' or name()='draw:line'">
             <xsl:choose>
               <xsl:when test="name()='draw:frame'">
+                <xsl:variable name="var_pos">
+                  <xsl:call-template name="getShapePosTemp">
+                    <xsl:with-param name="var_pos" select="position()"/>
+                  </xsl:call-template>
+                </xsl:variable>
                 <xsl:choose>
+                  <xsl:when test="./draw:object or ./draw:object-ole">
+                    <xsl:call-template name="tmpgetNvPrID">
+                      <xsl:with-param name="spId" select="$spId"/>
+                      <xsl:with-param name="var_pos" select="$var_pos"/>
+                    </xsl:call-template>
+                  </xsl:when>
                   <xsl:when test="./draw:image">
                     <xsl:if test ="contains(./draw:image/@xlink:href,'.png') or contains(./draw:image/@xlink:href,'.emf') 
                       or contains(./draw:image/@xlink:href,'.wmf') or contains(./draw:image/@xlink:href,'.jfif') or contains(./draw:image/@xlink:href,'.jpe') 
@@ -1041,6 +1057,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:if test="not(./draw:image/@xlink:href[contains(.,'../')])">
                         <xsl:call-template name="tmpgetNvPrID">
                           <xsl:with-param name="spId" select="$spId"/>
+                          <xsl:with-param name="var_pos" select="$var_pos"/>
                         </xsl:call-template>
                       </xsl:if>
                     </xsl:if>
@@ -1050,12 +1067,14 @@ Copyright (c) 2007, Sonata Software Limited
                                   or @presentation:class[contains(.,'outline')]">
                     <xsl:call-template name="tmpgetNvPrID">
                       <xsl:with-param name="spId" select="$spId"/>
+                      <xsl:with-param name="var_pos" select="$var_pos"/>
                     </xsl:call-template>
 
                   </xsl:when>
                   <xsl:when test ="(draw:text-box) and not(@presentation:class)">
                     <xsl:call-template name="tmpgetNvPrID">
                       <xsl:with-param name="spId" select="$spId"/>
+                      <xsl:with-param name="var_pos" select="$var_pos"/>
                     </xsl:call-template>
                   </xsl:when>
                   <xsl:when test="./draw:plugin">
@@ -1063,29 +1082,65 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:choose>
               </xsl:when>
               <xsl:when test="name()='draw:custom-shape'">
+                <xsl:variable name="var_pos">
+                  <xsl:call-template name="getShapePosTemp">
+                    <xsl:with-param name="var_pos" select="position()"/>
+                  </xsl:call-template>
+                </xsl:variable>
                 <xsl:variable name ="shapeName">
                   <xsl:call-template name="tmpgetCustShapeType"/>
                 </xsl:variable>
                 <xsl:if test="$shapeName != ''">
                   <xsl:call-template name="tmpgetNvPrID">
                     <xsl:with-param name="spId" select="$spId"/>
+                    <xsl:with-param name="var_pos" select="$var_pos"/>
                   </xsl:call-template>
                 </xsl:if>
               </xsl:when>
               <xsl:when test="name()='draw:rect'">
+                <xsl:variable name="var_pos">
+                  <xsl:call-template name="getShapePosTemp">
+                    <xsl:with-param name="var_pos" select="position()"/>
+                  </xsl:call-template>
+                </xsl:variable>
                 <xsl:call-template name="tmpgetNvPrID">
                   <xsl:with-param name="spId" select="$spId"/>
+                  <xsl:with-param name="var_pos" select="$var_pos"/>
                 </xsl:call-template>
               </xsl:when>
-				<xsl:when test="name()='draw:g'">
+				<!--added by yeswanth 20/5/2008-->
+				<xsl:when test="name()='draw:line'">
+                <xsl:variable name="var_pos">
+                  <xsl:call-template name="getShapePosTemp">
+                    <xsl:with-param name="var_pos" select="position()"/>
+                  </xsl:call-template>
+                </xsl:variable>
 					<xsl:call-template name="tmpgetNvPrID">
 						<xsl:with-param name="spId" select="$spId"/>
+                  <xsl:with-param name="var_pos" select="$var_pos"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="name()='draw:g'">
+          <xsl:variable name="var_pos">
+            <xsl:call-template name="getShapePosTemp">
+              <xsl:with-param name="var_pos" select="position()"/>
+            </xsl:call-template>
+          </xsl:variable>
+					<xsl:call-template name="tmpgetNvPrID">
+						<xsl:with-param name="spId" select="$spId"/>
+            <xsl:with-param name="var_pos" select="$var_pos"/>
 					</xsl:call-template>
 				</xsl:when>
               <xsl:when test="name()='draw:ellipse' or name()='draw:circle'">
+          <xsl:variable name="var_pos">
+            <xsl:call-template name="getShapePosTemp">
+              <xsl:with-param name="var_pos" select="position()"/>
+            </xsl:call-template>
+          </xsl:variable>
                 <xsl:if test="not(@draw:kind)">
                 <xsl:call-template name="tmpgetNvPrID">
                   <xsl:with-param name="spId" select="$spId"/>
+              <xsl:with-param name="var_pos" select="$var_pos"/>
                 </xsl:call-template>
                 </xsl:if>
               </xsl:when>
@@ -1992,7 +2047,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:for-each select ="node()">
           <xsl:if test ="name()='draw:rect' or name()='draw:ellipse'
                   or name()='draw:custom-shape' 
-                  or name()='draw:g' or name()='draw:frame'">
+                  or name()='draw:g' or name()='draw:frame' or name()='draw:line'">
             <xsl:choose>
               <xsl:when test="name()='draw:frame'">
                 <xsl:choose>
@@ -2089,8 +2144,9 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:template>
   <xsl:template name="tmpgetNvPrID">
     <xsl:param name ="spId"/>
+    <xsl:param name ="var_pos"/>
     <xsl:variable name ="nvPrId">
-      <xsl:value-of select ="position()"/>
+      <xsl:value-of select ="$var_pos"/>
     </xsl:variable>
     <xsl:variable name ="drawId">
       <xsl:if test ="$spId =@draw:id">
@@ -2114,7 +2170,7 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:choose>
   </xsl:template>
 	
-	<xsl:template name="animationfifth">
+	<xsl:template name="animationFifth">
 		<xsl:for-each select="./node()">
 			<xsl:if test="name()='anim:par' or name()='anim:iterate'">
 

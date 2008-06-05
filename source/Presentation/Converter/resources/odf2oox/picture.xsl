@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <!-- 
 Copyright (c) 2007, Sonata Software Limited
 * All rights reserved.
@@ -105,14 +105,13 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:choose>
           </a:picLocks>
         </p:cNvPicPr>
-        <xsl:if test="$master='1'">
-          <p:nvPr userDrawn="1"/>
-        </xsl:if>
-        <xsl:if test="not($master)">
-          <p:nvPr>
-            <p:ph idx="{$picNo+5}" />
-          </p:nvPr>
-        </xsl:if>
+	<p:nvPr>
+          <xsl:if test="$master='1'">
+	    <xsl:attribute name="userDrawn">
+		  <xsl:value-of select="'1'"/>
+	    </xsl:attribute>
+          </xsl:if>
+	</p:nvPr>
       </p:nvPicPr>
       <p:blipFill>
         <a:blip>
@@ -126,12 +125,31 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
-          <xsl:for-each select ="document('content.xml')//office:automatic-styles/style:style[@style:name=$grStyle]/style:graphic-properties">
+          <xsl:for-each select ="document($fileName)//office:automatic-styles/style:style[@style:name=$grStyle]/style:graphic-properties">
             <xsl:if test="position()=1">
+              <xsl:if test ="@draw:opacity">
+                <xsl:choose>
+                  <xsl:when test="@draw:opacity='0%'">
+                    <a:alphaModFix  amt="0"/>
+                  </xsl:when>
+                  <xsl:when test="substring-before(@draw:opacity,'%') !='0'">
+                    <a:alphaModFix >
+                      <xsl:attribute name="amt">
+                        <xsl:value-of select="format-number(number(substring-before(@draw:opacity,'%')) * 1000,'#')" />
+                      </xsl:attribute>
+                    </a:alphaModFix>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:if>
               <xsl:if test="@draw:color-mode='greyscale'">
                 <a:grayscl />
               </xsl:if>
-            </xsl:if>
+              <!--Added by sanjay for fixing the Defect 1877163-->
+              <xsl:call-template name="LuminanceContrast">
+                <xsl:with-param name="parentGrStyle" select="parent::node()/@draw:style-name"/>
+              </xsl:call-template>
+           </xsl:if>
+          <!--End of 1877163-->
           </xsl:for-each>
         </a:blip >
         <!--Image cropping-->
@@ -184,7 +202,9 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:for-each select="./parent::node()">
         <xsl:choose>
           <xsl:when test="$grpFlag='true'">
+            <a:xfrm>
             <xsl:call-template name ="tmpGroupdrawCordinates"/>
+            </a:xfrm>
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name ="tmpdrawCordinates"/>
@@ -211,6 +231,45 @@ Copyright (c) 2007, Sonata Software Limited
       </p:spPr>
     </p:pic>
   </xsl:template>
+     <!--Template Luminance & Contrast-->
+  <xsl:template name="LuminanceContrast">
+    <xsl:param name="parentGrStyle"/>
+    <a:lum>
+      <xsl:choose>
+        <xsl:when test="@draw:luminance">
+          <xsl:attribute name="bright">
+            <xsl:value-of select="concat(substring-before(@draw:luminance,'%'),'000')"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="not(@draw:luminance) and $parentGrStyle!=''">
+          <xsl:for-each select ="document('styles.xml')//office:automatic-styles/style:style[@style:name=$parentGrStyle]/style:graphic-properties">
+      <xsl:if test="@draw:luminance">
+        <xsl:attribute name="bright">
+          <xsl:value-of select="concat(substring-before(@draw:luminance,'%'),'000')"/>
+        </xsl:attribute>
+      </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="@draw:contrast">
+          <xsl:attribute name="contrast">
+            <xsl:value-of select="concat(substring-before(@draw:contrast,'%'),'000')"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="not(@draw:contrast) and $parentGrStyle!=''">
+          <xsl:for-each select ="document('styles.xml')//office:automatic-styles/style:style[@style:name=$parentGrStyle]/style:graphic-properties">
+      <xsl:if test="@draw:contrast ">
+        <xsl:attribute name="contrast">
+          <xsl:value-of select="concat(substring-before(@draw:contrast,'%'),'000')"/>
+        </xsl:attribute>
+      </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+    </a:lum>
+  </xsl:template>
+  <!--End of  Template Luminance & Contrast-->
   <xsl:template name="InsertAudio">
     <xsl:param name ="imageNo" />
     <xsl:param name ="AudNo" />
@@ -304,8 +363,6 @@ Copyright (c) 2007, Sonata Software Limited
             </a:wavAudioFile>
               </xsl:otherwise>
             </xsl:choose>
-           
-           
           </xsl:if>
         </p:nvPr>
       </p:nvPicPr>
@@ -343,7 +400,6 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="FileName" />
     <xsl:param name ="imageName" />
     <xsl:param name ="fillType" />
-    
     <xsl:variable name ="imageSerialNo">
       <xsl:choose>
         <xsl:when test="$fillType='shape'">
@@ -370,14 +426,15 @@ Copyright (c) 2007, Sonata Software Limited
       <pzip:copy pzip:source="{$Source}"
           pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
     </xsl:for-each>
-
     <a:blip>
       <xsl:attribute name ="r:embed">
         <xsl:value-of select ="$imageSerialNo"/>
       </xsl:attribute>
-      <a:lum/>
+      <!--Added by sanjay for fixing the Defect 1877163-->
+      <xsl:call-template name="LuminanceContrast">
+        <xsl:with-param name="parentGrStyle" select="parent::node()/@draw:style-name"/>
+      </xsl:call-template>
+      <!--End of 1877163-->
     </a:blip >
-
   </xsl:template>
-
 </xsl:stylesheet>

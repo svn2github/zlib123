@@ -30,6 +30,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"   
   xmlns:odf="urn:odf"
+  xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"  
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -44,6 +45,17 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:dom="http://www.w3.org/2001/xml-events" 
+  xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" 
+  xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"	
+  xmlns:msxsl="urn:schemas-microsoft-com:xslt"  
+  
   exclude-result-prefixes="odf style text number draw page">
 
 
@@ -215,10 +227,19 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:for-each select="node()">
             <xsl:choose>
               <xsl:when test="name()='draw:frame'">
-                <xsl:variable name="var_pos" select="position()"/>
-
-                <!--<xsl:for-each select=".">-->
+                <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
                 <xsl:choose>
+                  <xsl:when test="./draw:object or ./draw:object-ole">
+                    <xsl:call-template name="tmpOLEObjects">
+                      <xsl:with-param name ="pageNo" select ="$pageNo"/>
+                      <xsl:with-param name ="shapeCount" select="$var_pos" />
+                    </xsl:call-template>
+
+                  </xsl:when>
                   <xsl:when test="./draw:image">
                     <xsl:for-each select="./draw:image">
                       <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
@@ -356,10 +377,14 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:for-each>
                   </xsl:when>
                 </xsl:choose>
-                <!--</xsl:for-each>-->
+          
               </xsl:when>
               <xsl:when test="name()='draw:g'">
-                <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                </xsl:call-template>
+              </xsl:variable>
                 <xsl:call-template name="tmpGroping">
                   <xsl:with-param name="pageNo" select="$pageNo"/>
                   <xsl:with-param name="startPos" select="'1'"/>
@@ -371,7 +396,11 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:when test="name()='draw:rect' or name()='draw:ellipse' or name()='draw:custom-shape'
               or name()='draw:line' or name()='draw:connector' or name()='draw:circle'">
                 <!-- Code for shapes start-->
-                <xsl:variable name="var_pos" select="position()"/>
+              <xsl:variable name="var_pos">
+                <xsl:call-template name="getShapePosTemp">
+                  <xsl:with-param name="var_pos" select="position()"/>
+                  </xsl:call-template>
+                </xsl:variable>
                 <!--<xsl:for-each select=".">-->
                 <xsl:call-template name ="shapes" >
                   <xsl:with-param name ="fileName" select ="'content.xml'"/>
@@ -387,9 +416,70 @@ Copyright (c) 2007, Sonata Software Limited
       <p:clrMapOvr>
         <a:masterClrMapping/>
       </p:clrMapOvr>
+	  <xsl:call-template name="slideTransition"/>
       <xsl:call-template name ="customAnimation"/>
     </p:sld>
   </xsl:template>
+  <xsl:template name="getShapePosTemp">
+    <xsl:param name="var_pos"/>
+    <xsl:variable name="Cnt">
+      <xsl:choose>
+        <xsl:when test="preceding-sibling::draw:g">
+          <xsl:for-each select="preceding-sibling::draw:g">
+            <xsl:value-of select=" concat( 
+                                    count(descendant::draw:frame)
+                                    + count(descendant::draw:g) 
+                                    + count(descendant::draw:rect) 
+                                    + count(descendant::draw:ellipse) 
+                                    + count(descendant::draw:line) 
+                                    + count(descendant::draw:connector) 
+                                    + count(descendant::draw:circle) 
+                                    + count(descendant::draw:custom-shape),':')"/>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>      
+      <xsl:when test="$Cnt!=''">
+        <xsl:call-template name="addVal">
+          <xsl:with-param name="strVal" select="$Cnt"/>
+          <xsl:with-param name="var_pos" select="$var_pos"/>
+      </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$var_pos"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="addVal">
+    <xsl:param name="strVal"/>
+    <xsl:param name="intSum" select="0"/>
+    <xsl:param name="var_pos"/>
+
+    <xsl:choose>
+      <xsl:when test="$strVal != ''">
+        <xsl:choose>
+          <xsl:when test="substring-before($strVal,':') = ''">
+            <xsl:value-of select="number($intSum) + number($strVal) + $var_pos"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="intSubTotal">
+              <xsl:value-of select="number($intSum) + number(substring-before($strVal,':'))"/>
+            </xsl:variable>
+            <xsl:call-template name="addVal">
+              <xsl:with-param name="strVal" select="substring-after($strVal,':')"/>
+              <xsl:with-param name="intSum" select="$intSubTotal"/>
+              <xsl:with-param name="var_pos" select="$var_pos"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$intSum + $var_pos"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+ 
   <xsl:template name ="processText" >
     <xsl:param name ="layoutName"/>
     <xsl:param name ="FrameCount"/>
@@ -1930,6 +2020,35 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+
+		<!--code added by yeswanth to insert relationship ID for sound files (slide transition)-->
+		<xsl:variable name="styleName">
+			<xsl:value-of select="./@draw:style-name"/>
+		</xsl:variable>
+	
+		<xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
+			<xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
+			<Relationship>
+				<xsl:variable name="soundfileName">
+					<xsl:call-template name="retString">
+							<xsl:with-param name="string2rev" select="@xlink:href"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:attribute name="Id">
+						<xsl:value-of select="concat('strId',generate-id())"/>
+				</xsl:attribute>
+				<xsl:attribute name="Type">
+					<xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio'"/>
+				</xsl:attribute>
+				<xsl:attribute name="Target">
+					<xsl:value-of select="concat('../media/',$soundfileName)"/>
+				</xsl:attribute>
+			</Relationship>
+			</xsl:for-each>
+
+		</xsl:if>		
+		<!--end of code added by yeswanth-->
+		
       <!-- added by vipul to insert relation for notes-->
       <!--start-->
       <xsl:if test="presentation:notes/draw:page-thumbnail">
@@ -1980,12 +2099,39 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
+      <xsl:if test=".//draw:object or .//draw:object-ole">
+        <xsl:choose>
+          <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+          <xsl:otherwise>
+            <Relationship Id="vmldrawing" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing">
+              <xsl:attribute name="Target">
+                <xsl:value-of select="concat('../drawings/vmlDrawing',$slideNo,'.vml')"/>
+              </xsl:attribute>
+            </Relationship>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:if>
       <xsl:for-each select ="node()">
         <xsl:choose>
           <xsl:when test="name()='draw:frame'">
-            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:for-each select=".">
               <xsl:choose>
+                <xsl:when test="./draw:object or ./draw:object-ole">
+                  <xsl:choose>
+                    <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
+                    <xsl:otherwise>
+                      <xsl:call-template name="tmpOLEObjectsRel">
+                        <xsl:with-param name="slideNo" select="$slideNo"/>
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
                 <xsl:when test="./draw:image">
                   <xsl:for-each select="./draw:image">
                     <xsl:if test ="contains(@xlink:href,'.png') or contains(@xlink:href,'.emf') or contains(@xlink:href,'.wmf') or contains(@xlink:href,'.jfif') or contains(@xlink:href,'.jpe') 
@@ -2586,7 +2732,11 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="name()='draw:custom-shape'">
-            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:for-each select=".">
 
               <xsl:call-template name="tmpBitmapFillRel">
@@ -2710,7 +2860,11 @@ Copyright (c) 2007, Sonata Software Limited
                  </xsl:for-each>
           </xsl:when>
           <xsl:when test="name()='draw:rect'">
-            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:for-each select=".">
               <xsl:choose>
                 <xsl:when test="./office:event-listeners">
@@ -2837,7 +2991,11 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="name()='draw:ellipse' or name()='draw:circle'">
-            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:for-each select=".">
               <xsl:variable name="shapeId">
                 <xsl:value-of select="concat('ellipse',$var_pos)"/>
@@ -2854,7 +3012,11 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="name()='draw:line'">
-            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:for-each select=".">
               <xsl:if test="./office:event-listeners">
                 <xsl:variable name="ShapePostionCount">
@@ -2955,7 +3117,11 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="name()='draw:connector'">
-            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:for-each select=".">
               <xsl:if test="./office:event-listener">
                 <xsl:variable name="ShapePostionCount">
@@ -3056,7 +3222,11 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="name()='draw:g'">
-            <xsl:variable name="var_pos" select="position()"/>
+            <xsl:variable name="var_pos">
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:call-template name="tmpGroupingRelation">
               <xsl:with-param name="slideNo" select="$slideNo"/>
               <xsl:with-param name="pos" select="$var_pos"/>
@@ -3697,5 +3867,504 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
+	<!--added by yeswanth.s-->
+	<!--slideTransition template-->
+	<xsl:template name="slideTransition">
+		<p:transition>
+			<xsl:if test="./@draw:style-name">
+				<xsl:variable name="styleName">
+					<xsl:value-of select="./@draw:style-name"/>
+				</xsl:variable>
+				<xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties">
+					
+						<xsl:attribute name="spd">
+							<xsl:choose>
+								<xsl:when test="./@presentation:transition-speed='slow'">
+									<xsl:value-of select="'slow'"/>
+								</xsl:when>
+								<xsl:when test="./@presentation:transition-speed='fast'">
+									<xsl:value-of select="'fast'"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="'med'"/>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+					
+					<xsl:if test="./@presentation:duration">
+						<xsl:attribute name="advTm">
+							<xsl:value-of select="'0'"/>
+						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="./@presentation:transition-type">
+						<xsl:variable name="Minutes">
+							<xsl:value-of select="number(substring-before(substring-after(./@presentation:duration,'H'),'M'))"/>
+						</xsl:variable>
+						<xsl:variable name="Seconds">
+							<xsl:value-of select="number(substring-before(substring-after(./@presentation:duration,'M'),'S'))"/>
+						</xsl:variable>
+						<xsl:choose>
+							<xsl:when test="./@presentation:transition-type='semi-automatic'">
+								<xsl:attribute name="advClick">
+									<xsl:value-of select="'0'"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="./@presentation:transition-type='automatic' and ./@presentation:duration">
+								<xsl:attribute name="advTm">
+									<xsl:value-of select="number(($Minutes*60 + $Seconds)*1000)"/>
+								</xsl:attribute>							
+							</xsl:when>
+						</xsl:choose>
+					</xsl:if>
+					<xsl:choose>
+						<!--barWipe-->
+						<xsl:when test="@smil:type='barWipe'">
+							<p:wipe>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='topToBottom' and @smil:direction='reverse'">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'u'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='leftToRight' and not(@smil:direction)">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'r'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='topToBottom' and not(@smil:direction)">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'d'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<!--do nothing , as no attribute is to be included-->
+									</xsl:otherwise>									
+								</xsl:choose>
+							</p:wipe>
+						</xsl:when>
+
+						<!--pinWheelWipe-->
+						<xsl:when test="@smil:type='pinWheelWipe'">
+							<p:wheel>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='oneBlade'">
+										<xsl:attribute name="spokes">
+											<xsl:value-of select="'1'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='twoBladeVertical'">
+										<xsl:attribute name="spokes">
+											<xsl:value-of select="'2'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='threeBlade'">
+										<xsl:attribute name="spokes">
+											<xsl:value-of select="'3'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='eightBlade'">
+										<xsl:attribute name="spokes">
+											<xsl:value-of select="'8'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:attribute name="spokes">
+											<xsl:value-of select="'4'"/>
+										</xsl:attribute>
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:wheel>
+						</xsl:when>
+
+						<!--slideWipe-->
+						<xsl:when test="@smil:type='slideWipe'">
+							<xsl:choose>
+								<xsl:when test="@smil:direction='reverse'">
+									<p:pull>
+										<xsl:choose>
+											<xsl:when test="@smil:subtype='fromTop'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'d'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromLeft'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'r'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromBottom'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'u'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromTopRight'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'ld'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromBottomRight'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'lu'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromTopLeft'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'rd'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromBottomLeft'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'ru'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise>
+												<!--do nothing , as no attribute is to be included-->
+											</xsl:otherwise>
+										</xsl:choose>
+									</p:pull>
+								</xsl:when>
+								<xsl:otherwise>
+									<p:cover>
+										<xsl:choose>
+											<xsl:when test="@smil:subtype='fromTop'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'d'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromLeft'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'r'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromBottom'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'u'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromTopRight'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'ld'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromBottomRight'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'lu'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromTopLeft'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'rd'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromBottomLeft'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'ru'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromRight'">
+												<!--do nothing , as no attribute is to be included-->
+											</xsl:when>
+										</xsl:choose>
+									</p:cover>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+
+						
+						<!--randomBarWipe-->
+						<xsl:when test="@smil:type='randomBarWipe'">
+							<p:randomBar>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='vertical'">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'vert'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<!--do nothing , as no attribute is to be included-->
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:randomBar>
+						</xsl:when>
+
+						<!--checkerBoardWipe-->
+						<xsl:when test="@smil:type='checkerBoardWipe'">
+							<p:checker>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='down'">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'vert'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<!--do nothing , as no attribute is to be included-->
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:checker>
+						</xsl:when>
+
+						<!--fourBoxWipe-->
+						<xsl:when test="@smil:type='fourBoxWipe' and @smil:subtype='cornersOut'">
+							<p:plus/>
+						</xsl:when>
+
+						<!--irisWipe-->						
+						<xsl:when test="@smil:type='irisWipe'">
+							<xsl:choose>
+								<xsl:when test="@smil:subtype='rectangle'">
+									<p:zoom>
+										<xsl:if test="@smil:direction='reverse'">
+											<xsl:attribute name="dir">
+												<xsl:value-of select="'in'"/>
+											</xsl:attribute>
+										</xsl:if>
+									</p:zoom>
+								</xsl:when>
+								<xsl:otherwise>
+									<p:diamond/>
+								</xsl:otherwise>
+							</xsl:choose>							
+						</xsl:when>
+
+						<!--ellipseWipe-->
+						<xsl:when test="@smil:type='ellipseWipe'">
+							<p:circle/>
+						</xsl:when>
+
+						<!--fanWipe-->
+						<xsl:when test="@smil:type='fanWipe'">
+							<p:wedge/>
+						</xsl:when>
+
+						<!--blindsWipe-->
+						<xsl:when test="@smil:type='blindsWipe'">
+							<p:blinds>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='vertical'">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'vert'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<!--do nothing , as no attribute is to be included-->
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:blinds>
+						</xsl:when>
+
+						<!--fade-->
+						<xsl:when test="@smil:type='fade'">
+							<p:fade>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='fadeOverColor'">
+										<xsl:attribute name="thruBlk">
+											<xsl:value-of select="'1'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<!--do nothing , as no attribute is to be included-->
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:fade>
+						</xsl:when>
+
+
+						<!--dissolve-->
+						<xsl:when test="@smil:type='dissolve'">
+							<p:dissolve/>
+						</xsl:when>
+
+						<!--random-->
+						<xsl:when test="@smil:type='random'">
+							<p:random/>
+						</xsl:when>
+
+						<!--pushWipe-->
+						<xsl:when test="@smil:type='pushWipe'">
+							<xsl:choose>
+								<xsl:when test="starts-with(@smil:subtype,'comb')">
+									<p:comb>
+										<xsl:if test="@smil:subtype='combVertical'">
+											<xsl:attribute name="dir">
+												<xsl:value-of select="'vert'"/>
+											</xsl:attribute>
+										</xsl:if>
+									</p:comb>
+								</xsl:when>
+								<xsl:otherwise>
+									<p:push>
+										<xsl:choose>
+											<xsl:when test="@smil:subtype='fromTop'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'d'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromLeft'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'r'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test="@smil:subtype='fromBottom'">
+												<xsl:attribute name="dir">
+													<xsl:value-of select="'u'"/>
+												</xsl:attribute>
+											</xsl:when>
+
+											<xsl:otherwise>
+												<!--do nothing , as no attribute is to be included-->
+											</xsl:otherwise>
+										</xsl:choose>
+									</p:push>
+								</xsl:otherwise>
+							</xsl:choose>							
+						</xsl:when>
+
+						<!--barnDoorWipe-->
+						<xsl:when test="@smil:type='barnDoorWipe'">
+							<p:split>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='horizontal' and @smil:direction='reverse'">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'in'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='vertical' and @smil:direction='reverse'">
+										<xsl:attribute name="orient">
+											<xsl:value-of select="'vert'"/>
+										</xsl:attribute>
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'in'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='vertical' and not(@smil:direction)">
+										<xsl:attribute name="orient">
+											<xsl:value-of select="'vert'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<!--do nothing , as no attribute is to be included-->
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:split>
+						</xsl:when>
+
+						<!--waterfallWipe-->
+						<xsl:when test="@smil:type='waterfallWipe'">
+							<p:strips>
+								<xsl:choose>
+									<xsl:when test="@smil:subtype='horizontalRight' and not(@smil:direction)">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'ld'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='horizontalLeft' and not(@smil:direction)">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'rd'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:when test="@smil:subtype='horizontalRight' and @smil:direction='reverse'">
+										<xsl:attribute name="dir">
+											<xsl:value-of select="'ru'"/>
+										</xsl:attribute>
+									</xsl:when>
+									<xsl:otherwise>
+										<!--do nothing , as no attribute is to be included-->
+									</xsl:otherwise>
+								</xsl:choose>
+							</p:strips>
+						</xsl:when>
+
+					</xsl:choose>
+					
+				</xsl:for-each>
+			</xsl:if>
+
+			<!--sounds-->
+			<xsl:variable name="styleName">
+				<xsl:value-of select="./@draw:style-name"/>
+			</xsl:variable>
+			<xsl:variable name="relationIdVar">
+				<xsl:value-of select="./@draw:name"/>
+			</xsl:variable>
+
+			<xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
+				<xsl:call-template name="createSoundNode">					
+					<xsl:with-param name="styleName" select="$styleName"/>
+					<xsl:with-param name="loopSound">
+						<xsl:choose>
+							<xsl:when test="./anim:par/anim:par/anim:audio/@smil:repeatCount">
+								<xsl:value-of select="'true'"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="'false'"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>
+				</xsl:call-template>				
+			</xsl:if>						
+		</p:transition>
+	</xsl:template>
+
+	<!--create sound node-->
+	<xsl:template name="createSoundNode">	
+		<xsl:param name="styleName"/>
+		<xsl:param name="loopSound"/>
+				<xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
+					<p:sndAc>
+						<p:stSnd>
+					<!--loop until next sound-->
+					<xsl:if test="$loopSound='true'">
+						<xsl:attribute name="loop">
+							<xsl:value-of select="'1'"/>
+						</xsl:attribute>
+					</xsl:if>
+							<p:snd>
+								<xsl:variable name="soundfileName">
+									<xsl:call-template name="retString">
+										<xsl:with-param name="string2rev" select="@xlink:href"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:attribute name="r:embed">
+							<xsl:value-of select="concat('strId',generate-id())"/>
+								</xsl:attribute>
+								<xsl:attribute name="name">
+									<xsl:value-of select="$soundfileName"/>
+								</xsl:attribute>
+								<xsl:attribute name="builtIn">
+									<xsl:value-of select="'1'"/>
+								</xsl:attribute>								
+								<xsl:variable name="pzipsourcename">
+									<xsl:if test="@xlink:href [ contains(.,'../')]">
+										<xsl:value-of select="@xlink:href" />
+									</xsl:if>
+									<xsl:if test="not(@xlink:href [ contains(.,'../')])">
+										<xsl:value-of select="substring-after(@xlink:href,'/')" />
+									</xsl:if>
+								</xsl:variable>
+								<pzip:import pzip:source="{$pzipsourcename}" pzip:target="{concat('ppt/media/',$soundfileName)}" />
+								<!--<pzip:import pzip:source="{substring-after(@xlink:href,'/')}" pzip:target="{concat('ppt/media/',$soundfileName)}" />-->
+								<!--<pzip:copy pzip:source="{substring-after(@xlink:href,'/')}" pzip:target="{concat('ppt/media/','glasses.wav')}"/>-->
+							</p:snd>
+						</p:stSnd>
+					</p:sndAc>
+				</xsl:for-each>
+	</xsl:template>
+
+	<!--added by yeswanth.s-->
+	<!--getting the sound-file name-->
+	<xsl:template name="retString">
+		<xsl:param name="string2rev"/>
+		<xsl:choose>
+			<xsl:when test="contains($string2rev,'/')">
+				<xsl:call-template name="retString">
+					<xsl:with-param name="string2rev" select="substring-after($string2rev,'/')"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$string2rev"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
 </xsl:stylesheet>
