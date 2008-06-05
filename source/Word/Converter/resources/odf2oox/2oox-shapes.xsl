@@ -41,7 +41,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:w10="urn:schemas-microsoft-com:office:word"
   exclude-result-prefixes="xlink draw svg fo office style text">
-  
+  <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <!--
   *************************************************************************
   SUMMARY
@@ -83,7 +83,7 @@
     <xsl:variable name="styleName" select=" @draw:style-name"/>
     <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
     <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-
+    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle" />
     <w:r>
       <w:pict>
 
@@ -110,7 +110,7 @@
             </xsl:call-template>
 
           </xsl:when>
-          <xsl:when test="draw:enhanced-geometry/@draw:type = 'round-rectangle' ">
+          <xsl:when test="draw:enhanced-geometry/@draw:enhanced-path = 'M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N' ">
 
             <xsl:call-template name="InsertRoundedRect">
               <xsl:with-param name="shapeStyle" select="$automaticStyle | $officeStyle"/>
@@ -118,6 +118,863 @@
             </xsl:call-template>
 
           </xsl:when>
+          <!--#############Code changes done by Pradeep#######################-->
+          <!-- Isosceles Triangle -->                                 
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path='M ?f0 0 L 21600 21600 0 21600 Z N'">
+            <v:shapetype id="_x0000_t5" coordsize="21600,21600" o:spt="5" adj="10800" path="m@0,l,21600r21600,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="prod #0 1 2"/>
+                <v:f eqn="sum @1 10800 0"/>
+              </v:formulas>
+              <v:path gradientshapeok="t" o:connecttype="custom" 
+                o:connectlocs="@0,0;@1,10800;0,21600;10800,21600;21600,21600;@2,10800" 
+                textboxrect="0,10800,10800,18000;5400,10800,16200,18000;10800,10800,21600,18000;0,7200,7200,21600;7200,7200,14400,21600;14400,7200,21600,21600"/>
+              <v:handles>
+                <v:h position="#0,topLeft" xrange="0,21600"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1027" type="#_x0000_t5" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <!-- Sona: Changed I/P parameter-->
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <!-- Sona: Changed I/P parameter-->
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Right Triangle -->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 21600 0 21600 0 0 Z N'">
+            <v:shapetype id="_x0000_t6" coordsize="21600,21600" o:spt="6" path="m,l,21600r21600,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="custom" o:connectlocs="0,0;0,10800;0,21600;10800,21600;21600,21600;10800,10800" textboxrect="1800,12600,12600,19800"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1035" type="#_x0000_t6">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!--Text-->
+          <!--<xsl:when test ="./child::node()[1]=draw:text-box">
+            <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202" path="m,l,21600r21600,l21600,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="rect"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1027" type="#_x0000_t202" style="position:absolute;margin-left:76.5pt;margin-top:152.25pt;width:232.5pt;height:69pt;z-index:251659264">
+              -->
+          <!--<xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>-->
+          <!--
+              -->
+          <!--insert text-box-->
+          <!--
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>-->
+
+          <!--</xsl:when>-->
+          <!-- Flowchart Process-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N'">
+            <v:shapetype id="_x0000_t109" coordsize="21600,21600" o:spt="109" path="m,l,21600r21600,l21600,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="rect"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1037" type="#_x0000_t109" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!-- insert text-box -->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Alternate Process -->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 ?f2 Y ?f0 0 L ?f1 0 X 21600 ?f2 L 21600 ?f3 Y ?f1 21600 L ?f0 21600 X 0 ?f3 Z N'">
+            <v:shapetype id="_x0000_t176" coordsize="21600,21600" o:spt="176" adj="2700" path="m@0,qx0@0l0@2qy@0,21600l@1,21600qx21600@2l21600@0qy@1,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="sum width 0 #0"/>
+                <v:f eqn="sum height 0 #0"/>
+                <v:f eqn="prod @0 2929 10000"/>
+                <v:f eqn="sum width 0 @3"/>
+                <v:f eqn="sum height 0 @3"/>
+                <v:f eqn="val width"/>
+                <v:f eqn="val height"/>
+                <v:f eqn="prod width 1 2"/>
+                <v:f eqn="prod height 1 2"/>
+              </v:formulas>
+              <v:path gradientshapeok="t" limo="10800,10800" o:connecttype="custom" o:connectlocs="@8,0;0,@9;@8,@7;@6,@9" textboxrect="@3,@3,@4,@5"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1038" type="#_x0000_t176" style="position:absolute;margin-left:77.25pt;margin-top:117.75pt;width:153pt;height:63.75pt;z-index:251659264">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!-- insert text-box -->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!--Flowchart Decision -->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 10800 L 10800 0 21600 10800 10800 21600 0 10800 Z N'">
+            <v:shapetype id="_x0000_t110" coordsize="21600,21600" o:spt="110" path="m10800,l,10800,10800,21600,21600,10800xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="rect" textboxrect="5400,5400,16200,16200"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1039" type="#_x0000_t110" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Data -->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 4230 0 L 21600 0 17370 21600 0 21600 4230 0 Z N'">
+            <v:shapetype id="_x0000_t111" coordsize="21600,21600" o:spt="111" path="m4321,l21600,,17204,21600,,21600xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="custom" o:connectlocs="12961,0;10800,0;2161,10800;8602,21600;10800,21600;19402,10800" textboxrect="4321,0,17204,21600"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1040" type="#_x0000_t111" style="position:absolute;margin-left:70.5pt;margin-top:348.75pt;width:172.5pt;height:63.75pt;z-index:251661312">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Predefined Process-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 2540 0 L 2540 21600 N M 19060 0 L 19060 21600 N'">
+            <v:shapetype id="_x0000_t112" coordsize="21600,21600" o:spt="112" path="m,l,21600r21600,l21600,xem2610,nfl2610,21600em18990,nfl18990,21600e">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect" textboxrect="2610,0,18990,21600"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1026" type="#_x0000_t112" style="position:absolute;margin-left:79.5pt;margin-top:35.25pt;width:211.5pt;height:101.25pt;z-index:251658240">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Internal Storage-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 21600 0 21600 21600 0 21600 Z N M 4230 0 L 4230 21600 N M 0 4230 L 21600 4230 N'">
+            <v:shapetype id="_x0000_t113" coordsize="21600,21600" o:spt="113" path="m,l,21600r21600,l21600,xem4236,nfl4236,21600em,4236nfl21600,4236e">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect" textboxrect="4236,4236,21600,21600"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1039" type="#_x0000_t113" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Document-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 21600 0 21600 17360 C 13050 17220 13340 20770 5620 21600 2860 21100 1850 20700 0 20120 Z N'">
+            <v:shapetype id="_x0000_t114" coordsize="21600,21600" o:spt="114" path="m,20172v945,400,1887,628,2795,913c3587,21312,4342,21370,5060,21597v2037,,2567,-227,3095,-285c8722,21197,9325,20970,9855,20800v490,-228,945,-400,1472,-740c11817,19887,12347,19660,12875,19375v567,-228,1095,-513,1700,-740c15177,18462,15782,18122,16537,17950v718,-113,1398,-398,2228,-513c19635,17437,20577,17322,21597,17322l21597,,,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:connecttype="custom" o:connectlocs="10800,0;0,10800;10800,20400;21600,10800" textboxrect="0,0,21600,17322"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1040" type="#_x0000_t114" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Multi Document-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 3600 L 1500 3600 1500 1800 3000 1800 3000 0 21600 0 21600 14409 20100 14409 20100 16209 18600 16209 18600 18009 C 11610 17893 11472 20839 4833 21528 2450 21113 1591 20781 0 20300 Z N M 1500 3600 F L 18600 3600 18600 16209 N M 3000 1800 F L 20100 1800 20100 14409 N'">
+            <v:shapetype id="_x0000_t115" coordsize="21600,21600" o:spt="115" path="m,20465v810,317,1620,452,2397,725c3077,21325,3790,21417,4405,21597v1620,,2202,-180,2657,-272c7580,21280,8002,21010,8455,20917v422,-135,810,-405,1327,-542c10205,20150,10657,19967,11080,19742v517,-182,970,-407,1425,-590c13087,19017,13605,18745,14255,18610v615,-180,1262,-318,1942,-408c16975,18202,17785,18022,18595,18022r,-1670l19192,16252r808,l20000,14467r722,-75l21597,14392,21597,,2972,r,1815l1532,1815r,1860l,3675,,20465xem1532,3675nfl18595,3675r,12677em2972,1815nfl20000,1815r,12652e">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:extrusionok="f" o:connecttype="custom" o:connectlocs="10800,0;0,10800;10800,19890;21600,10800" textboxrect="0,3675,18595,18022"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1041" type="#_x0000_t115" style="position:absolute;margin-left:66.75pt;margin-top:401.25pt;width:208.5pt;height:116.25pt;z-index:251661312">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Terminator-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 3470 21600 X 0 10800 3470 0 L 18130 0 X 21600 10800 18130 21600 Z N'">
+            <v:shapetype id="_x0000_t116" coordsize="21600,21600" o:spt="116" path="m3475,qx,10800,3475,21600l18125,21600qx21600,10800,18125,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="rect" textboxrect="1018,3163,20582,18437"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1042" type="#_x0000_t116">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Collate-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 21600 21600 0 21600 21600 0 0 0 Z N'">
+            <v:shapetype id="_x0000_t125" coordsize="21600,21600" o:spt="125" path="m21600,21600l,21600,21600,,,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="custom" o:connectlocs="10800,0;10800,10800;10800,21600" textboxrect="5400,5400,16200,16200"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1026" type="#_x0000_t125">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+
+          </xsl:when>
+          <!-- Flowchart Sort-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 10800 L 10800 0 21600 10800 10800 21600 Z N M 0 10800 L 21600 10800 N'">
+            <v:shapetype id="_x0000_t126" coordsize="21600,21600" o:spt="126" path="m10800,l,10800,10800,21600,21600,10800xem,10800nfl21600,10800e">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect" textboxrect="5400,5400,16200,16200"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1027" type="#_x0000_t126">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Extract-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 10800 0 L 21600 21600 0 21600 10800 0 Z N'">
+            <v:shapetype id="_x0000_t127" coordsize="21600,21600" o:spt="127" path="m10800,l21600,21600,,21600xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="custom" o:connectlocs="10800,0;5400,10800;10800,21600;16200,10800" textboxrect="5400,10800,16200,21600"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1028" type="#_x0000_t127" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!--Flowchart Merge-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 21600 0 10800 21600 0 0 Z N'">
+            <v:shapetype id="_x0000_t128" coordsize="21600,21600" o:spt="128" path="m,l21600,,10800,21600xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="custom" o:connectlocs="10800,0;5400,10800;10800,21600;16200,10800" textboxrect="5400,0,16200,10800"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1029" type="#_x0000_t128" style="position:absolute;margin-left:123pt;margin-top:468.8pt;width:87pt;height:96pt;z-index:251661312">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Stored Data-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 3600 21600 X 0 10800 3600 0 L 21600 0 X 18000 10800 21600 21600 Z N'">
+            <v:shapetype id="_x0000_t130" coordsize="21600,21600" o:spt="130" path="m3600,21597c2662,21202,1837,20075,1087,18440,487,16240,75,13590,,10770,75,8007,487,5412,1087,3045,1837,1465,2662,337,3600,l21597,v-937,337,-1687,1465,-2512,3045c18485,5412,18072,8007,17997,10770v75,2820,488,5470,1088,7670c19910,20075,20660,21202,21597,21597xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="custom" o:connectlocs="10800,0;0,10800;10800,21600;17997,10800" textboxrect="3600,0,17997,21600"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1030" type="#_x0000_t130" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Delay-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 10800 0 X 21600 10800 10800 21600 L 0 21600 0 0 Z N'">
+            <v:shapetype id="_x0000_t135" coordsize="21600,21600" o:spt="135" path="m10800,qx21600,10800,10800,21600l,21600,,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path gradientshapeok="t" o:connecttype="rect" textboxrect="0,3163,18437,18437"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1026" type="#_x0000_t135">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Sequential Access-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 20980 18150 L 20980 21600 10670 21600 C 4770 21540 0 16720 0 10800 0 4840 4840 0 10800 0 16740 0 21600 4840 21600 10800 21600 13520 20550 16160 18670 18170 Z N'">
+            <v:shapetype id="_x0000_t131" coordsize="21600,21600" o:spt="131" path="ar,,21600,21600,18685,18165,10677,21597l20990,21597r,-3432xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:connecttype="rect" textboxrect="3163,3163,18437,18437"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1027" type="#_x0000_t131" style="position:absolute;margin-left:140.25pt;margin-top:132pt;width:118.5pt;height:1in;z-index:251659264">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Megnetic Disk-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 3400 Y 10800 0 21600 3400 L 21600 18200 Y 10800 21600 0 18200 Z N M 0 3400 Y 10800 6800 21600 3400 N'">
+            <v:shapetype id="_x0000_t132" coordsize="21600,21600" o:spt="132" path="m10800,qx,3391l,18209qy10800,21600,21600,18209l21600,3391qy10800,xem,3391nfqy10800,6782,21600,3391e">
+              <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="custom" o:connectlocs="10800,6782;10800,0;0,10800;10800,21600;21600,10800" o:connectangles="270,270,180,90,0" textboxrect="0,6782,21600,18209"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1028" type="#_x0000_t132" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Flowchart Direct Access Storage-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 18200 0 X 21600 10800 18200 21600 L 3400 21600 X 0 10800 3400 0 Z N M 18200 0 X 14800 10800 18200 21600 N'">
+            <v:shapetype id="_x0000_t133" coordsize="21600,21600" o:spt="133" path="m21600,10800qy18019,21600l3581,21600qx,10800,3581,l18019,qx21600,10800xem18019,21600nfqx14438,10800,18019,e">
+              <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="custom" o:connectlocs="10800,0;0,10800;10800,21600;14438,10800;21600,10800" o:connectangles="270,180,90,0,0" textboxrect="3581,0,14438,21600"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1029" type="#_x0000_t133" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!--Flowchart Display -->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 3600 0 L 17800 0 X 21600 10800 17800 21600 L 3600 21600 0 10800 Z N'">
+
+            <v:shapetype id="_x0000_t134" coordsize="21600,21600" o:spt="134" path="m17955,v862,282,1877,1410,2477,3045c21035,5357,21372,7895,21597,10827v-225,2763,-562,5300,-1165,7613c19832,20132,18817,21260,17955,21597r-14388,l,10827,3567,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:path o:connecttype="rect" textboxrect="3567,0,17955,21600"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1030" type="#_x0000_t134" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Rectangular Callout-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 0 3590 ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 0 21600 3590 21600 ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 21600 21600 21600 18010 ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 21600 0 18010 0 ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 3590 0 0 0 Z N'">
+            <v:shapetype id="_x0000_t61" coordsize="21600,21600" o:spt="61" adj="1350,25920" path="m,l0@8@12@24,0@9,,21600@6,21600@15@27@7,21600,21600,21600,21600@9@18@30,21600@8,21600,0@7,0@21@33@6,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="sum 10800 0 #0"/>
+                <v:f eqn="sum 10800 0 #1"/>
+                <v:f eqn="sum #0 0 #1"/>
+                <v:f eqn="sum @0 @1 0"/>
+                <v:f eqn="sum 21600 0 #0"/>
+                <v:f eqn="sum 21600 0 #1"/>
+                <v:f eqn="if @0 3600 12600"/>
+                <v:f eqn="if @0 9000 18000"/>
+                <v:f eqn="if @1 3600 12600"/>
+                <v:f eqn="if @1 9000 18000"/>
+                <v:f eqn="if @2 0 #0"/>
+                <v:f eqn="if @3 @10 0"/>
+                <v:f eqn="if #0 0 @11"/>
+                <v:f eqn="if @2 @6 #0"/>
+                <v:f eqn="if @3 @6 @13"/>
+                <v:f eqn="if @5 @6 @14"/>
+                <v:f eqn="if @2 #0 21600"/>
+                <v:f eqn="if @3 21600 @16"/>
+                <v:f eqn="if @4 21600 @17"/>
+                <v:f eqn="if @2 #0 @6"/>
+                <v:f eqn="if @3 @19 @6"/>
+                <v:f eqn="if #1 @6 @20"/>
+                <v:f eqn="if @2 @8 #1"/>
+                <v:f eqn="if @3 @22 @8"/>
+                <v:f eqn="if #0 @8 @23"/>
+                <v:f eqn="if @2 21600 #1"/>
+                <v:f eqn="if @3 21600 @25"/>
+                <v:f eqn="if @5 21600 @26"/>
+                <v:f eqn="if @2 #1 @8"/>
+                <v:f eqn="if @3 @8 @28"/>
+                <v:f eqn="if @4 @8 @29"/>
+                <v:f eqn="if @2 #1 0"/>
+                <v:f eqn="if @3 @31 0"/>
+                <v:f eqn="if #1 0 @32"/>
+                <v:f eqn="val #0"/>
+                <v:f eqn="val #1"/>
+              </v:formulas>
+              <v:path o:connecttype="custom" o:connectlocs="10800,0;0,10800;10800,21600;21600,10800;@34,@35"/>
+              <v:handles>
+                <v:h position="#0,#1"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1033" type="#_x0000_t61">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Round Rectangular Callout-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 3590 0 X 0 3590 L ?f2 ?f3 0 8970 0 12630 ?f4 ?f5 0 18010 Y 3590 21600 L ?f6 ?f7 8970 21600 12630 21600 ?f8 ?f9 18010 21600 X 21600 18010 L ?f10 ?f11 21600 12630 21600 8970 ?f12 ?f13 21600 3590 Y 18010 0 L ?f14 ?f15 12630 0 8970 0 ?f16 ?f17 Z N'">
+            <v:shapetype id="_x0000_t62" coordsize="21600,21600" o:spt="62" adj="1350,25920" path="m3600,qx,3600l0@8@12@24,0@9,,18000qy3600,21600l@6,21600@15@27@7,21600,18000,21600qx21600,18000l21600@9@18@30,21600@8,21600,3600qy18000,l@7,0@21@33@6,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="sum 10800 0 #0"/>
+                <v:f eqn="sum 10800 0 #1"/>
+                <v:f eqn="sum #0 0 #1"/>
+                <v:f eqn="sum @0 @1 0"/>
+                <v:f eqn="sum 21600 0 #0"/>
+                <v:f eqn="sum 21600 0 #1"/>
+                <v:f eqn="if @0 3600 12600"/>
+                <v:f eqn="if @0 9000 18000"/>
+                <v:f eqn="if @1 3600 12600"/>
+                <v:f eqn="if @1 9000 18000"/>
+                <v:f eqn="if @2 0 #0"/>
+                <v:f eqn="if @3 @10 0"/>
+                <v:f eqn="if #0 0 @11"/>
+                <v:f eqn="if @2 @6 #0"/>
+                <v:f eqn="if @3 @6 @13"/>
+                <v:f eqn="if @5 @6 @14"/>
+                <v:f eqn="if @2 #0 21600"/>
+                <v:f eqn="if @3 21600 @16"/>
+                <v:f eqn="if @4 21600 @17"/>
+                <v:f eqn="if @2 #0 @6"/>
+                <v:f eqn="if @3 @19 @6"/>
+                <v:f eqn="if #1 @6 @20"/>
+                <v:f eqn="if @2 @8 #1"/>
+                <v:f eqn="if @3 @22 @8"/>
+                <v:f eqn="if #0 @8 @23"/>
+                <v:f eqn="if @2 21600 #1"/>
+                <v:f eqn="if @3 21600 @25"/>
+                <v:f eqn="if @5 21600 @26"/>
+                <v:f eqn="if @2 #1 @8"/>
+                <v:f eqn="if @3 @8 @28"/>
+                <v:f eqn="if @4 @8 @29"/>
+                <v:f eqn="if @2 #1 0"/>
+                <v:f eqn="if @3 @31 0"/>
+                <v:f eqn="if #1 0 @32"/>
+                <v:f eqn="val #0"/>
+                <v:f eqn="val #1"/>
+              </v:formulas>
+              <v:path o:connecttype="custom" o:connectlocs="10800,0;0,10800;10800,21600;21600,10800;@34,@35" textboxrect="791,791,20809,20809"/>
+              <v:handles>
+                <v:h position="#0,#1"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1034" type="#_x0000_t62">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Oval Callout-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='W 0 0 21600 21600 ?f22 ?f23 ?f18 ?f19 L ?f14 ?f15 Z N'">
+            <v:shapetype id="_x0000_t63" coordsize="21600,21600" o:spt="63" adj="1350,25920" path="wr,,21600,21600@15@16@17@18l@21@22xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="val #1"/>
+                <v:f eqn="sum 10800 0 #0"/>
+                <v:f eqn="sum 10800 0 #1"/>
+                <v:f eqn="atan2 @2 @3"/>
+                <v:f eqn="sumangle @4 11 0"/>
+                <v:f eqn="sumangle @4 0 11"/>
+                <v:f eqn="cos 10800 @4"/>
+                <v:f eqn="sin 10800 @4"/>
+                <v:f eqn="cos 10800 @5"/>
+                <v:f eqn="sin 10800 @5"/>
+                <v:f eqn="cos 10800 @6"/>
+                <v:f eqn="sin 10800 @6"/>
+                <v:f eqn="sum 10800 0 @7"/>
+                <v:f eqn="sum 10800 0 @8"/>
+                <v:f eqn="sum 10800 0 @9"/>
+                <v:f eqn="sum 10800 0 @10"/>
+                <v:f eqn="sum 10800 0 @11"/>
+                <v:f eqn="sum 10800 0 @12"/>
+                <v:f eqn="mod @2 @3 0"/>
+                <v:f eqn="sum @19 0 10800"/>
+                <v:f eqn="if @20 #0 @13"/>
+                <v:f eqn="if @20 #1 @14"/>
+              </v:formulas>
+              <v:path o:connecttype="custom" o:connectlocs="10800,0;3163,3163;0,10800;3163,18437;10800,21600;18437,18437;21600,10800;18437,3163;@21,@22" textboxrect="3163,3163,18437,18437"/>
+              <v:handles>
+                <v:h position="#0,#1"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1035" type="#_x0000_t63">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!--Right Arrow-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 ?f0 L ?f1 ?f0 ?f1 0 21600 10800 ?f1 21600 ?f1 ?f2 0 ?f2 Z N'">
+            <v:shapetype id="_x0000_t13" coordsize="21600,21600" o:spt="13" adj="16200,5400" path="m@0,l@0@1,0@1,0@2@0@2@0,21600,21600,10800xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="val #1"/>
+                <v:f eqn="sum height 0 #1"/>
+                <v:f eqn="sum 10800 0 #1"/>
+                <v:f eqn="sum width 0 #0"/>
+                <v:f eqn="prod @4 @3 10800"/>
+                <v:f eqn="sum width 0 @5"/>
+              </v:formulas>
+              <v:path o:connecttype="custom" o:connectlocs="@0,0;0,10800;@0,21600;21600,10800" o:connectangles="270,180,90,0" textboxrect="0,@1,@6,@2"/>
+              <v:handles>
+                <v:h position="#0,#1" xrange="0,21600" yrange="0,10800"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1032" type="#_x0000_t13" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Left Arrow-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 21600 ?f0 L ?f1 ?f0 ?f1 0 0 10800 ?f1 21600 ?f1 ?f2 21600 ?f2 Z N'">
+            <v:shapetype id="_x0000_t66" coordsize="21600,21600" o:spt="66" adj="5400,5400" path="m@0,l@0@1,21600@1,21600@2@0@2@0,21600,,10800xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="val #1"/>
+                <v:f eqn="sum 21600 0 #1"/>
+                <v:f eqn="prod #0 #1 10800"/>
+                <v:f eqn="sum #0 0 @3"/>
+              </v:formulas>
+              <v:path o:connecttype="custom" o:connectlocs="@0,0;0,10800;@0,21600;21600,10800" o:connectangles="270,180,90,0" textboxrect="@4,@1,21600,@2"/>
+              <v:handles>
+                <v:h position="#0,#1" xrange="0,21600" yrange="0,10800"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1033" type="#_x0000_t66">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Up Arrow -->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M ?f0 21600 L ?f0 ?f1 0 ?f1 10800 0 21600 ?f1 ?f2 ?f1 ?f2 21600 Z N'">
+            <v:shapetype id="_x0000_t68" coordsize="21600,21600" o:spt="68" adj="5400,5400" path="m0@0l@1@0@1,21600@2,21600@2@0,21600@0,10800,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="val #1"/>
+                <v:f eqn="sum 21600 0 #1"/>
+                <v:f eqn="prod #0 #1 10800"/>
+                <v:f eqn="sum #0 0 @3"/>
+              </v:formulas>
+              <v:path o:connecttype="custom" o:connectlocs="10800,0;0,@0;10800,21600;21600,@0" o:connectangles="270,180,90,0" textboxrect="@1,@4,@2,21600"/>
+              <v:handles>
+                <v:h position="#1,#0" xrange="0,10800" yrange="0,21600"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1034" type="#_x0000_t68">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Down Arrow-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M ?f0 0 L ?f0 ?f1 0 ?f1 10800 21600 21600 ?f1 ?f2 ?f1 ?f2 0 Z N'">
+            <v:shapetype id="_x0000_t67" coordsize="21600,21600" o:spt="67" adj="16200,5400" path="m0@0l@1@0@1,0@2,0@2@0,21600@0,10800,21600xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="val #1"/>
+                <v:f eqn="sum height 0 #1"/>
+                <v:f eqn="sum 10800 0 #1"/>
+                <v:f eqn="sum width 0 #0"/>
+                <v:f eqn="prod @4 @3 10800"/>
+                <v:f eqn="sum width 0 @5"/>
+              </v:formulas>
+              <v:path o:connecttype="custom" o:connectlocs="10800,0;0,@0;10800,21600;21600,@0" o:connectangles="270,180,90,0" textboxrect="@1,0,@2,@6"/>
+              <v:handles>
+                <v:h position="#1,#0" xrange="0,10800" yrange="0,21600"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1035" type="#_x0000_t67" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+
+
+          </xsl:when>
+          <!-- Trapezoid-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 0 L 21600 0 ?f0 21600 ?f1 21600 Z N'">
+            <v:shapetype id="_x0000_t8" coordsize="21600,21600" o:spt="8" adj="5400" path="m,l@0,21600@1,21600,21600,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="sum width 0 #0"/>
+                <v:f eqn="prod #0 1 2"/>
+                <v:f eqn="sum width 0 @2"/>
+                <v:f eqn="mid #0 width"/>
+                <v:f eqn="mid @1 0"/>
+                <v:f eqn="prod height width #0"/>
+                <v:f eqn="prod @6 1 2"/>
+                <v:f eqn="sum height 0 @7"/>
+                <v:f eqn="prod width 1 2"/>
+                <v:f eqn="sum #0 0 @9"/>
+                <v:f eqn="if @10 @8 0"/>
+                <v:f eqn="if @10 @7 height"/>
+              </v:formulas>
+              <v:path gradientshapeok="t" o:connecttype="custom" o:connectlocs="@3,10800;10800,21600;@2,10800;10800,0" textboxrect="1800,1800,19800,19800;4500,4500,17100,17100;7200,7200,14400,14400"/>
+              <v:handles>
+                <v:h position="#0,bottomRight" xrange="0,10800"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1037" type="#_x0000_t8" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+
+            <!-- Can-->
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 44 0 C 20 0 0 ?f2 0 ?f0 L 0 ?f3 C 0 ?f4 20 21600 44 21600 68 21600 88 ?f4 88 ?f3 L 88 ?f0 C 88 ?f2 68 0 44 0 Z N M 44 0 C 20 0 0 ?f2 0 ?f0 0 ?f5 20 ?f6 44 ?f6 68 ?f6 88 ?f5 88 ?f0 88 ?f2 68 0 44 0 Z N'">
+            <v:shapetype id="_x0000_t22" coordsize="21600,21600" o:spt="22" adj="5400" path="m10800,qx0@1l0@2qy10800,21600,21600@2l21600@1qy10800,xem0@1qy10800@0,21600@1nfe">
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="prod #0 1 2"/>
+                <v:f eqn="sum height 0 @1"/>
+              </v:formulas>
+              <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="custom" o:connectlocs="10800,@0;10800,0;0,10800;10800,21600;21600,10800" o:connectangles="270,270,180,90,0" textboxrect="0,@0,21600,@2"/>
+              <v:handles>
+                <v:h position="center,#0" yrange="0,10800"/>
+              </v:handles>
+              <o:complex v:ext="view"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1038" type="#_x0000_t22" >
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Cube-->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M 0 ?f12 L 0 ?f1 ?f2 0 ?f11 0 ?f11 ?f3 ?f4 ?f12 Z N M 0 ?f1 L ?f2 0 ?f11 0 ?f4 ?f1 Z N M ?f4 ?f12 L ?f4 ?f1 ?f11 0 ?f11 ?f3 Z N'">
+            <v:shapetype id="_x0000_t16" coordsize="21600,21600" o:spt="16" adj="5400" path="m@0,l0@0,,21600@1,21600,21600@2,21600,xem0@0nfl@1@0,21600,em@1@0nfl@1,21600e">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="sum width 0 #0"/>
+                <v:f eqn="sum height 0 #0"/>
+                <v:f eqn="mid height #0"/>
+                <v:f eqn="prod @1 1 2"/>
+                <v:f eqn="prod @2 1 2"/>
+                <v:f eqn="mid width #0"/>
+              </v:formulas>
+              <v:path o:extrusionok="f" gradientshapeok="t" limo="10800,10800" o:connecttype="custom" o:connectlocs="@6,0;@4,@0;0,@3;@4,21600;@1,@3;21600,@5" o:connectangles="270,270,180,90,0,0" textboxrect="0,@0,@1,21600"/>
+              <v:handles>
+                <v:h position="topLeft,#0" switch="" yrange="0,21600"/>
+              </v:handles>
+              <o:complex v:ext="view"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1039" type="#_x0000_t16" style="position:absolute;margin-left:2in;margin-top:276.75pt;width:81pt;height:79.5pt;z-index:251660288">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Octagon -->
+          <xsl:when test ="draw:enhanced-geometry/@draw:enhanced-path ='M ?f0 0 L ?f2 0 21600 ?f1 21600 ?f3 ?f2 21600 ?f0 21600 0 ?f3 0 ?f1 Z N'">
+            <v:shapetype id="_x0000_t10" coordsize="21600,21600" o:spt="10" adj="6326" path="m@0,l0@0,0@2@0,21600@1,21600,21600@2,21600@0@1,xe">
+              <v:stroke joinstyle="miter"/>
+              <v:formulas>
+                <v:f eqn="val #0"/>
+                <v:f eqn="sum width 0 #0"/>
+                <v:f eqn="sum height 0 #0"/>
+                <v:f eqn="prod @0 2929 10000"/>
+                <v:f eqn="sum width 0 @3"/>
+                <v:f eqn="sum height 0 @3"/>
+                <v:f eqn="val width"/>
+                <v:f eqn="val height"/>
+                <v:f eqn="prod width 1 2"/>
+                <v:f eqn="prod height 1 2"/>
+              </v:formulas>
+              <v:path gradientshapeok="t" limo="10800,10800" o:connecttype="custom" o:connectlocs="@8,0;0,@9;@8,@7;@6,@9" textboxrect="0,0,21600,21600;2700,2700,18900,18900;5400,5400,16200,16200"/>
+              <v:handles>
+                <v:h position="#0,topLeft" switch="" xrange="0,10800"/>
+              </v:handles>
+            </v:shapetype>
+            <v:shape id="_x0000_s1040" type="#_x0000_t10" style="position:absolute;margin-left:134.25pt;margin-top:420.75pt;width:99pt;height:100.5pt;z-index:251661312">
+              <xsl:call-template name="ConvertShapeProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shape" select="."/>
+              </xsl:call-template>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <xsl:when test ="draw:enhanced-geometry/@draw:type =''">
+
+
+          </xsl:when>
+          <!--#############Code changes done by Pradeep#######################-->
+          <!-- TODO - other shapes -->
+          <xsl:otherwise/>
         </xsl:choose>
         
       </w:pict>
