@@ -182,4 +182,10 @@
   <data name="translation.odf2oox.imageFromOtherApplication" xml:space="preserve">
     <value>Data or Images copied and pasted from other applications will be lost and not converted.</value>
   </data>
+  <data name="translation.odf2oox.BarLineCombinationChart" xml:space="preserve">
+    <value>Combination chart of type 'Lines and Columns' is not compatible in oox, hence data corresponding to line is replaced by column in the chart.</value>
+  </data>
+  <data name="translation.odf2oox.baseDate" xml:space="preserve">
+    <value>Date less than 1/1/1900 is rounded to base date 1/1/1900</value>
+  </data>
 </root>

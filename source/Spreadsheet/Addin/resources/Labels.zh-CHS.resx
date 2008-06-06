@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="translation.odf2oox.BarLineCombinationChart" xml:space="preserve">
+    <value>Combination chart of type 'Lines and Columns' is not compatible in oox, hence data corresponding to line is replaced by column in the chartCHS.</value>
+  </data>
+  <data name="translation.odf2oox.baseDate" xml:space="preserve">
+    <value>日期不少于00年1月1日是四舍五入至基准日期1900年1月1日</value>
+  </data>
   <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
     <value>Excel 不支持数据验证中的单元格范围条件。</value>
   </data>

@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="translation.odf2oox.BarLineCombinationChart" xml:space="preserve">
+    <value>Combination chart of type 'Lines and Columns' is not compatible in oox, hence data corresponding to line is replaced by column in the chart-FR.</value>
+  </data>
+  <data name="translation.odf2oox.baseDate" xml:space="preserve">
+    <value>Date de moins de 1/1/1900 est arrondi à la date de référence 1/1/1900</value>
+  </data>
   <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
     <value>Excel ne prend pas en charge les critères de plage de cellules lors de la validation des données.</value>
   </data>
