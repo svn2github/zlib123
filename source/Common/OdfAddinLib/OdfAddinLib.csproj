@@ -58,10 +58,6 @@
     <Compile Include="OdfAddinLib.cs">
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="ConfigForm.cs-CZ.resx">
-      <DependentUpon>ConfigForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="ConfigForm.de-DE.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -110,11 +106,7 @@
       <DependentUpon>ConverterForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
- <EmbeddedResource Include="ConverterForm.cs-CZ.resx">
-      <DependentUpon>ConverterForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ConverterForm.zh-CHS.resx">
+   <EmbeddedResource Include="ConverterForm.zh-CHS.resx">
       <DependentUpon>ConverterForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
