@@ -1798,10 +1798,12 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:when test="$chartType = 'chart:ring'"/>
         <xsl:otherwise>
           <xsl:for-each select="key('series','')[position() = $number]">
-            <xsl:call-template name="InsertSpPr">
-              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              <xsl:with-param name="defaultFill" select="'solid'"/>
-            </xsl:call-template>
+            <xsl:if test="$chartType = 'chart:line' and key('style', @chart:style-name)/style:graphic-properties/@svg:stroke-color">
+                <xsl:call-template name="InsertSpPr">
+                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                  <xsl:with-param name="defaultFill" select="'solid'"/>
+                </xsl:call-template>
+            </xsl:if>
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
