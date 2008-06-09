@@ -427,34 +427,34 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
     </xsl:variable>
     
     <xsl:variable name="ConditionalCellCol">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+      <!--xsl:for-each select="key('Part', concat('xl/',$Id))">
           <xsl:call-template name="ConditionalCellCol">        
           </xsl:call-template>
-       </xsl:for-each>
+       </xsl:for-each-->
     </xsl:variable>
     
     <xsl:variable name="ConditionalCellAll">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))">
+      <!--xsl:for-each select="key('Part', concat('xl/',$Id))">
         <xsl:call-template name="ConditionalCellAll">          
         </xsl:call-template>
-      </xsl:for-each>
+      </xsl:for-each-->
     </xsl:variable>
     
     <xsl:variable name="ConditionalCellSingle">
-      <xsl:call-template name="ConditionalCellSingle">
+      <!--xsl:call-template name="ConditionalCellSingle">
         <xsl:with-param name="sqref">
           <xsl:value-of select="$ConditionalCellAll"/>
         </xsl:with-param>
-      </xsl:call-template>
+      </xsl:call-template-->
     </xsl:variable>
     
     
     <xsl:variable name="ConditionalCellMultiple">
-      <xsl:call-template name="ConditionalCellMultiple">
+      <!--xsl:call-template name="ConditionalCellMultiple">
         <xsl:with-param name="sqref">
           <xsl:value-of select="$ConditionalCellAll"/>
         </xsl:with-param>
-      </xsl:call-template>
+      </xsl:call-template-->
     </xsl:variable>
     
 
