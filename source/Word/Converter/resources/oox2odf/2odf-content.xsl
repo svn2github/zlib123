@@ -253,7 +253,8 @@
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
       <!-- add text-properties to empty paragraphs. -->
-      <xsl:if test="parent::w:p[count(child::node()) = 1]/w:pPr/w:rPr">
+      <!--clam, dialogika: bugfix 1752761-->
+      <xsl:if test="parent::w:p[count(child::node()) = 1]/w:pPr/w:rPr or w:rPr/w:vanish">
         <style:text-properties>
           <xsl:call-template name="InsertTextProperties"/>
         </style:text-properties>
