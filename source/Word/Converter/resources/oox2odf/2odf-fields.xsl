@@ -64,6 +64,34 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="right-trim">
+    <xsl:param name="s" />
+    <xsl:choose>
+      <xsl:when test="substring($s, 1, 1) = ''">
+        <xsl:value-of select="$s"/>
+      </xsl:when>
+      <xsl:when test="normalize-space(substring($s, string-length($s))) = ''">
+        <xsl:call-template name="right-trim">
+          <xsl:with-param name="s" select="substring($s, 1, string-length($s) - 1)" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$s" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="trim">
+    <xsl:param name="s" />
+    <xsl:call-template name="right-trim">
+      <xsl:with-param name="s">
+        <xsl:call-template name="left-trim">
+          <xsl:with-param name="s" select="$s" />
+        </xsl:call-template>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
   <!-- process a field code -->
   <xsl:template match="w:instrText">
     <xsl:param name="parentRunNode"/>
@@ -1042,14 +1070,20 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:attribute name="text:ref-name">
+            <!--clam, dialogika: trim inserted because of bug 1839938-->
             <xsl:choose>
-              <xsl:when test="contains($fieldCode, ' \')">
-                <xsl:value-of select="substring-before(substring-after($fieldCode, 'REF '), ' \')"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="substring-after($fieldCode, 'REF ')"/>
-              </xsl:otherwise>
-            </xsl:choose>
+                <xsl:when test="contains($fieldCode, ' \')">
+                  <xsl:call-template name="trim">
+                    <xsl:with-param name="s" select="substring-before(substring-after($fieldCode, 'REF '), ' \')" />
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="trim">
+                    <xsl:with-param name="s" select="substring-after($fieldCode, 'REF ')" />
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
