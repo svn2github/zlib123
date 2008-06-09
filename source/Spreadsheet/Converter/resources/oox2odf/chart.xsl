@@ -391,11 +391,11 @@
       <!-- TO DO chart:style-name -->
       <chart:series chart:style-name="{concat('series',position())}">
         <xsl:if
-          test="(key('plotArea', ancestor::c:chartSpace/@oox:part)/c:scatterChart or key('plotArea', ancestor::c:chartSpace/@oox:part)/c:bubbleChart) and position() = 1">
+          test="(key('plotArea', @oox:part)/c:scatterChart or key('plotArea', @oox:part)/c:bubbleChart) and position() = 1">
           <chart:domain/>
         </xsl:if>
         <!-- for stock chart type 3 and type 4 -->
-        <xsl:if test="key('plotArea', ancestor::c:chartSpace/@oox:part)/c:stockChart and key('plotArea', ancestor::c:chartSpace/@oox:part)/c:barChart">
+        <xsl:if test="key('plotArea', @oox:part)/c:stockChart and key('plotArea', @oox:part)/c:barChart">
           <xsl:attribute name="chart:attached-axis">
 
             <xsl:variable name="axisYId">
@@ -404,7 +404,7 @@
               </xsl:for-each>
             </xsl:variable>
 
-            <xsl:for-each select="key('plotArea', ancestor::c:chartSpace/@oox:part)/child::node()[contains(name(),'Ax')][2]">
+            <xsl:for-each select="key('plotArea', @oox:part)/child::node()[contains(name(),'Ax')][2]">
               <xsl:choose>
                 <xsl:when test="c:axId/@val = $axisYId">
                   <xsl:text>primary-y</xsl:text>
@@ -435,11 +435,11 @@
           <xsl:attribute name="chart:repeated">
             <xsl:choose>
               <!-- for scatter chart -->
-              <xsl:when test="key('xNumPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount">
-                <xsl:value-of select="key('xNumPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
+              <xsl:when test="key('xNumPoints', @oox:part)/descendant::c:ptCount">
+                <xsl:value-of select="key('xNumPoints', @oox:part)/descendant::c:ptCount/@val"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="key('numPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
+                <xsl:value-of select="key('numPoints', @oox:part)/descendant::c:ptCount/@val"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
@@ -580,7 +580,7 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of
-              select="concat('Series',key('numPoints', ancestor::c:chartSpace/@oox:part)/descendant::c:ptCount/@val + 1 - $count)"
+              select="concat('Series',key('numPoints', @oox:part)/descendant::c:ptCount/@val + 1 - $count)"
             />
           </xsl:otherwise>
         </xsl:choose>
@@ -835,7 +835,7 @@
 
   <xsl:template name="InsertXAxis">
     <!-- @Description: Outputs chart X Axis -->
-    <!-- @Context: inside input chart file -->
+    <!-- @Context: axis element (c:catAx, c:dateAx, c:AxPos) -->
     <xsl:param name="type"/>
 
     <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="axis-x">
@@ -1434,7 +1434,7 @@
           chart:data-label-symbol="false">
 
           <!-- insert markers for Stock Chart if necessary -->
-          <xsl:if test="descendant::node()/c:marker and key('plotArea', c:chartSpace/@oox:part)/c:stockChart">
+          <xsl:if test="descendant::node()/c:marker and key('plotArea', @oox:part)/c:stockChart">
             <xsl:attribute name="chart:symbol-type">
               <xsl:text>automatic</xsl:text>
             </xsl:attribute>
@@ -1442,44 +1442,44 @@
           
           <!-- japanese candle-stick can be true for stockChart or lineChart -->
           <xsl:if
-            test="key('plotArea', c:chartSpace/@oox:part)/c:stockChart/c:upDownBars or key('plotArea', c:chartSpace/@oox:part)/c:lineChart/c:upDownBars">
+            test="key('plotArea', @oox:part)/c:stockChart/c:upDownBars or key('plotArea', @oox:part)/c:lineChart/c:upDownBars">
             <xsl:attribute name="chart:japanese-candle-stick">
               <xsl:text>true</xsl:text>
             </xsl:attribute>
           </xsl:if>
           
-          <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:stockChart and key('plotArea', c:chartSpace/@oox:part)/c:barChart">
+          <xsl:if test="key('plotArea', @oox:part)/c:stockChart and key('plotArea', @oox:part)/c:barChart">
             <xsl:attribute name="chart:stock-with-volume">
               <xsl:text>true</xsl:text>
             </xsl:attribute>
           </xsl:if>
             
           <!-- insert markers for Stock Chart if necessary -->
-          <xsl:if test="descendant::node()/c:marker and key('plotArea', c:chartSpace/@oox:part)/c:stockChart">
+          <xsl:if test="descendant::node()/c:marker and key('plotArea', @oox:part)/c:stockChart">
             <xsl:attribute name="chart:symbol-type">
               <xsl:text>automatic</xsl:text>
             </xsl:attribute>
           </xsl:if>
           <!-- japanese candle-stick can be true only for stockChart or lineChart -->
           <xsl:if
-            test="key('plotArea', c:chartSpace/@oox:part)/c:stockChart/c:upDownBars or key('plotArea', c:chartSpace/@oox:part)/c:lineChart/c:upDownBars">
+            test="key('plotArea', @oox:part)/c:stockChart/c:upDownBars or key('plotArea', @oox:part)/c:lineChart/c:upDownBars">
             <xsl:attribute name="chart:japanese-candle-stick">
               <xsl:text>true</xsl:text>
             </xsl:attribute>
           </xsl:if>
           <!-- data grouping-->
           <xsl:choose>
-            <xsl:when test="key('grouping', c:chartSpace/@oox:part)[1]/@val = 'stacked' ">
+            <xsl:when test="key('grouping', @oox:part)[1]/@val = 'stacked' ">
               <xsl:attribute name="chart:stacked">
                 <xsl:text>true</xsl:text>
               </xsl:attribute>
             </xsl:when>
-            <xsl:when test="key('grouping', c:chartSpace/@oox:part)[1]/@val = 'percentStacked' ">
+            <xsl:when test="key('grouping', @oox:part)[1]/@val = 'percentStacked' ">
               <xsl:attribute name="chart:percentage">
                 <xsl:text>true</xsl:text>
               </xsl:attribute>
             </xsl:when>
-            <xsl:when test="key('grouping', c:chartSpace/@oox:part)[1]/@val = 'standard' ">
+            <xsl:when test="key('grouping', @oox:part)[1]/@val = 'standard' ">
               <xsl:attribute name="chart:deep">
                 <xsl:text>true</xsl:text>
               </xsl:attribute>
@@ -1673,7 +1673,9 @@
   </xsl:template>
 
   <xsl:template name="InsertSeriesProperties">
-
+    <!-- @Description: Inserts series style properties -->
+    <!-- @Context: Input chart file root -->
+    
     <xsl:variable name="reverse">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
@@ -1693,7 +1695,7 @@
       <xsl:variable name="seriesNumber">
         <xsl:choose>
           <xsl:when test="$reverse = 'true' ">
-            <xsl:value-of select="count(key('dataSeries', ancestor::c:chartSpace/@oox:part)) - position() + 1"/>
+            <xsl:value-of select="count(key('dataSeries', @oox:part)) - position() + 1"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="position()"/>
@@ -1713,7 +1715,7 @@
 
           <!-- radar chart symbols -->
           <xsl:if
-            test="key('plotArea', ancestor::c:chartSpace/@oox:part)/c:radarChart/c:radarStyle/@val = 'marker' and not(c:marker/c:symbol/@val = 'none')">
+            test="key('plotArea', @oox:part)/c:radarChart/c:radarStyle/@val = 'marker' and not(c:marker/c:symbol/@val = 'none')">
             <xsl:attribute name="chart:symbol-type">
               <xsl:text>automatic</xsl:text>
             </xsl:attribute>
@@ -1806,13 +1808,13 @@
 
           <!-- default stroke for scatter and bubble chart -->
           <xsl:if
-            test="key('plotArea', ancestor::c:chartSpace/@oox:part)/c:bubbleChart or key('plotArea', ancestor::c:chartSpace/@oox:part)/c:barChart or key('plotArea', ancestor::c:chartSpace/@oox:part)/c:bar3DChart">
+            test="key('plotArea', @oox:part)/c:bubbleChart or key('plotArea', @oox:part)/c:barChart or key('plotArea', @oox:part)/c:bar3DChart">
             <xsl:attribute name="draw:stroke">
               <xsl:text>none</xsl:text>
             </xsl:attribute>
           </xsl:if>
 
-          <xsl:if test="key('plotArea', ancestor::c:chartSpace/@oox:part)/c:scatterChart and not(c:smooth)">
+          <xsl:if test="key('plotArea', @oox:part)/c:scatterChart and not(c:smooth)">
             <xsl:attribute name="draw:stroke">
               <xsl:text>solid</xsl:text>
             </xsl:attribute>
@@ -1820,9 +1822,37 @@
 
           <!-- default line width for line chart -->
           <xsl:if
-            test="key('plotArea', ancestor::c:chartSpace/@oox:part)/c:lineChart or c:smooth or key('plotArea', ancestor::c:chartSpace/@oox:part)/c:radarChart">
+            test="key('plotArea', @oox:part)/c:lineChart or c:smooth or key('plotArea', @oox:part)/c:radarChart">
             <xsl:attribute name="svg:stroke-width">
               <xsl:text>0.079cm</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+            <!-- default line color -->
+          <xsl:if test="not(c:spPr/a:ln/a:noFill)">
+              <xsl:variable name="defaultColor">
+                <xsl:call-template name="InsertDefaultChartSeriesColor">
+                  <xsl:with-param name="number">
+                    <xsl:value-of select="$seriesNumber"/>
+                  </xsl:with-param>                  
+                </xsl:call-template>
+              </xsl:variable>              
+              <xsl:attribute name="svg:stroke-color">
+              <xsl:value-of select="$defaultColor"/>  
+              </xsl:attribute>
+            </xsl:if>
+          
+          <!-- default fill color  -->
+          <xsl:if test="not(c:spPr/a:noFill or c:spPr/a:gradFill or c:spPr/a:blipFill)">
+            <xsl:variable name="defaultColor">
+              <xsl:call-template name="InsertDefaultChartSeriesColor">
+                <xsl:with-param name="number">
+                  <xsl:value-of select="$seriesNumber"/>
+                </xsl:with-param>                  
+              </xsl:call-template>
+            </xsl:variable>              
+            <xsl:attribute name="draw:fill-color">
+              <xsl:value-of select="$defaultColor"/>  
             </xsl:attribute>
           </xsl:if>
 
@@ -2194,7 +2224,33 @@
     </xsl:choose>
   </xsl:template>
   
-
-  
+  <xsl:template name="InsertDefaultChartSeriesColor">
+    <xsl:param name="number"/>
+    
+    <xsl:variable name="colorNum">
+      <xsl:value-of select="$number mod 6"/>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="$colorNum = 1">
+        <xsl:text>#345b89</xsl:text>
+      </xsl:when>
+      <xsl:when test="$colorNum = 2">
+        <xsl:text>#8b3533</xsl:text>
+      </xsl:when>
+      <xsl:when test="$colorNum = 3">
+        <xsl:text>#6f873c</xsl:text>
+      </xsl:when>
+      <xsl:when test="$colorNum = 4">
+        <xsl:text>#5a4474</xsl:text>
+      </xsl:when>
+      <xsl:when test="$colorNum = 5">
+        <xsl:text>#2e7c90</xsl:text>
+      </xsl:when>
+      <xsl:when test="$colorNum = 0">
+        <xsl:text>#b56a2c</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
 </xsl:stylesheet>
