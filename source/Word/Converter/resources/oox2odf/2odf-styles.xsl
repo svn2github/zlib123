@@ -1604,9 +1604,11 @@
       </xsl:when>
       <xsl:otherwise>
         <!--clam, dialogika: bugfix 1911697-->
-        <style:header>
-          <text:p></text:p>
-        </style:header>
+        <xsl:if test="w:headerReference">
+          <style:header>
+            <text:p></text:p>
+          </style:header>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
 
@@ -5033,7 +5035,7 @@
       </xsl:attribute>
 
       <!-- write border padding attribute -->
-      <xsl:if test="$side/@w:space">
+      <xsl:if test="$side/@w:space and $side/@w:space != '0' ">
         <xsl:attribute name="{concat('fo:padding-',$sideName)}">
           <xsl:call-template name="ConvertPoints">
             <xsl:with-param name="length">
