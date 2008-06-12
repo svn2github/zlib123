@@ -118,9 +118,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                     {
                                         xtw.WriteAttributeString(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI, xtr.Value);
                                     }
-                                }                                                                
+                                } 
+                                                               
+                                xtr.MoveToElement();
 
-                               
                             }
                             PrevRowNumber = RowNumber;
                         }
