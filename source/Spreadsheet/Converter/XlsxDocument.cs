@@ -500,34 +500,20 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                  if (String.Compare(xtr.LocalName, "sqref") == 0)
                                  {
 
-                                     string Cell = ConditionalCellNumber(xtr.Value);
+                                     string Cell = ConditionalCellNumber(xtr.Value, idConditional);
 
                                      
                                      if (String.Compare(Cell, "false") != 0)
                                      {                                         
                                          sqrefExist = 1;
-                                         ConditionalCellSheet = ConditionalCellSheet + " " + ConditionalCellNumber(xtr.Value);
+                                         ConditionalCellSheet = ConditionalCellSheet + " " + ConditionalCellNumber(xtr.Value, idConditional);
                                      }
                                  }
                                  string value = xtr.Value;
                              }
+                             idConditional++;
                          } 
                              xtr.MoveToElement();
-                         }
-
-                         if (String.Compare(xtr.LocalName, "cfRule") == 0)
-                         {
-
-                                    if (sqrefExist == 1)
-                                     {
-                                         ConditionalCellSheet = ConditionalCellSheet + " " + idConditional.ToString() + "=";
-                                         sqrefExist = 0;
-                                         idConditional++;
-                                         
-                                     }
-                                     string value = xtr.Value;
-                               
-                          
                          }
 
                          break;
@@ -554,7 +540,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
              return ConditionalCellSheet;
         }
 
-        private string ConditionalCellNumber(string sqref)
+        private string ConditionalCellNumber(string sqref, int idConditional)
         {
             string result = "";
             int RowStart = 0;
@@ -579,7 +565,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         if (ColEnd > 256) ColEnd = 256;
                         if (RowEnd > 65536) RowEnd = 65536;
 
-                        result = result + ColStart + "|" + RowStart + "-" + ColEnd + "|" + RowEnd;
+                        result = result + ColStart + "|" + RowStart + "-" + ColEnd + "|" + RowEnd + " " + idConditional.ToString() + "= ";
 
 
                     }
@@ -595,7 +581,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     RowStart = GetRowId(value);
 
                     if (ColStart <= 256 && RowStart <= 65536)
-                        result = result + GetColId(value) + "|" + GetRowId(value);
+                        result = result + GetColId(value) + "|" + GetRowId(value) + " " + idConditional.ToString() + "= ";
                     else
                         result = "false";
                 }       
