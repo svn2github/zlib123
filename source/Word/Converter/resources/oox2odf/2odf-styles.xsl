@@ -1041,17 +1041,13 @@
                 test="self::w:autoSpaceDN or self::w:autoSpaceDE and not(key('default-styles', 'paragraph')[last()]/w:rPr[w:autoSpaceDN or w:autoSpaceDE])">
                 <xsl:call-template name="InsertParagraphAutoSpace"/>
               </xsl:when>
-              <!--clam, dialogika: bugfix 1911687-->
               <xsl:otherwise>
-                <xsl:apply-templates select="." mode="pPrChildren"/>
-              </xsl:otherwise>
-              <!--<xsl:otherwise>
-                --><!-- insert attributes using match --><!--
+                 <!--insert attributes using match--> 
                 <xsl:if
                   test="not(key('default-styles', 'paragraph')[last()]/w:pPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="pPrChildren"/>
                 </xsl:if>
-              </xsl:otherwise>-->
+              </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
         </style:paragraph-properties>
