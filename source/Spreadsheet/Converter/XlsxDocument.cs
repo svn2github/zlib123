@@ -518,12 +518,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                          if (String.Compare(xtr.LocalName, "cfRule") == 0)
                          {
 
-                             if (xtr.HasAttributes)
-                             {
-                                 while (xtr.MoveToNextAttribute())
-                                 {
-
-                                     if (String.Compare(xtr.LocalName, "dxfId") == 0 && sqrefExist == 1)
+                                    if (sqrefExist == 1)
                                      {
                                          ConditionalCellSheet = ConditionalCellSheet + " " + idConditional.ToString() + "=";
                                          sqrefExist = 0;
@@ -531,9 +526,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                          
                                      }
                                      string value = xtr.Value;
-                                 }
-                             }
-                             xtr.MoveToElement();
+                               
+                          
                          }
 
                          break;
