@@ -37,6 +37,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" 
+  xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   exclude-result-prefixes="w r xlink office draw text style">
 
   <xsl:template name="InsertPartRelationships">
@@ -63,6 +64,9 @@
       <Relationship Id="rId7"
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments"
         Target="comments.xml"/>
+      <Relationship Id="CompatibilitySettings"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/customXml"
+        Target="../customXml/CompatibilitySettings.xml" />
 
       <!-- Headers/Footers relationships -->
       <xsl:call-template name="InsertHeaderFooterRelationships"/>
@@ -88,6 +92,27 @@
         </xsl:call-template>
       </xsl:for-each>
     </Relationships>
+  </xsl:template>
+
+  <xsl:template name="InsertCompatibilitySettings">
+    <xsl:variable name="configuration-settings"
+     select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']"/>
+    <CompatibilitySettings>
+      <xsl:for-each select="$configuration-settings/config:config-item">
+        <CompatibilitySetting>
+          <xsl:attribute name="NAME">
+            <xsl:value-of select="@config:name"></xsl:value-of>
+          </xsl:attribute>
+          <xsl:attribute name="TYPE">
+            <xsl:value-of select="@config:type"></xsl:value-of>
+          </xsl:attribute>
+          <xsl:attribute name="VALUE">
+            <xsl:value-of select="."></xsl:value-of>
+          </xsl:attribute>
+        </CompatibilitySetting>
+      </xsl:for-each>
+  </CompatibilitySettings>
+    
   </xsl:template>
 
 
