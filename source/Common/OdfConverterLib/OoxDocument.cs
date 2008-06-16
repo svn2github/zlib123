@@ -326,7 +326,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             while (subfolder.StartsWith("../"))
             {
-                basePath = basePath.Substring(0, basePath.LastIndexOf('/'));
+                if (basePath.Contains("/"))
+                {
+                    basePath = basePath.Substring(0, basePath.LastIndexOf('/'));
+                }
+                else
+                {
+                    basePath = "";
+                }
+                
                 subfolder = subfolder.Substring(subfolder.IndexOf('/') + 1);
             }
 
