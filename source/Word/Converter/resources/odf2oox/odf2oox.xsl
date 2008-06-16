@@ -161,6 +161,11 @@
         <xsl:call-template name="InsertPartRelationships"/>
       </pzip:entry>
 
+      <!-- compatibility settings -->
+      <pzip:entry pzip:target="customXml/CompatibilitySettings.xml">
+        <xsl:call-template name="InsertCompatibilitySettings"/>
+      </pzip:entry>
+
       <!-- content types -->
       <pzip:entry pzip:target="[Content_Types].xml">
         <xsl:call-template name="contentTypes"/>
