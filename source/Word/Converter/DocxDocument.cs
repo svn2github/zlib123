@@ -228,6 +228,7 @@ namespace CleverAge.OdfConverter.Word
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments");
                 namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme");
+                namespaces.Add("http://schemas.openxmlformats.org/officeDocument/2006/relationships/customXml");
                 namespaces.Add("http://schemas.openxmlformats.org/package/2006/content-types");
 
                 return namespaces;
