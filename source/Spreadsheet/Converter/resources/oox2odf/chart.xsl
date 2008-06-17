@@ -1479,7 +1479,7 @@
                 <xsl:text>true</xsl:text>
               </xsl:attribute>
             </xsl:when>
-            <xsl:when test="key('grouping', @oox:part)[1]/@val = 'standard' ">
+            <xsl:when test="key('grouping', @oox:part)[1]/@val = 'standard' and key('plotArea', @oox:part)/c:bar3DChart">
               <xsl:attribute name="chart:deep">
                 <xsl:text>true</xsl:text>
               </xsl:attribute>
