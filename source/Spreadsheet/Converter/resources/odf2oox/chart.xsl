@@ -318,6 +318,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <!--/c:manualLayout>
         </c:layout-->
 
+        <!-- change context to chart:chart and insert chart type -->
         <xsl:for-each select="parent::node()">
           <xsl:call-template name="InsertChartType">
             <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
@@ -1787,8 +1788,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </xsl:when>
 
         <!-- without line between points in series in stockChart4 -->
-        <xsl:when
-          test="$chartType = 'chart:stock'  and $numSeries = 4 and key('series','')/@chart:class">
+        <xsl:when test="$chartType = 'chart:stock' ">
           <c:spPr>
             <a:ln w="28575">
               <a:noFill/>
@@ -2072,14 +2072,29 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                 </c:marker>
               </xsl:for-each>
             </xsl:when>
-            <!-- default "none" marker type for series in stockCharts -->
+            <!-- default marker type for series in stockCharts -->
             <xsl:when test="$chartType = 'chart:stock' ">
-              <xsl:if test="not(key('style',$styleName)/style:chart-properties/@chart:symbol-type = 'automatic') and 
-                not(key('style',$styleName)/style:chart-properties/@chart:symbol-type = 'named-symbol' )">
-                <c:marker>
-                  <c:symbol val="none"/>
-                </c:marker>
-              </xsl:if>
+              <xsl:choose>
+                <!-- close price marker for stock chart 1 -->
+                <xsl:when test="$numSeries = 3 and $count = 2">
+                  <c:marker>
+                    <c:symbol val="dot"/>
+                    <c:size val="3"/>
+                  </c:marker>
+                </xsl:when>
+                <!-- close price marker for stock chart 3 -->
+                <xsl:when test="$numSeries = 4 and $count = 3 and chart:series/@chart:class = 'chart:bar' ">
+                  <c:marker>
+                    <c:symbol val="dot"/>
+                    <c:size val="3"/>
+                  </c:marker>
+                </xsl:when>
+                <xsl:otherwise>
+                  <c:marker>
+                    <c:symbol val="none"/>
+                  </c:marker>
+                </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
