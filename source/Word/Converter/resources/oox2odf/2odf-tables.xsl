@@ -32,8 +32,10 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:oox="urn:oox"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   exclude-result-prefixes="w table oox">
 
   <!-- 
@@ -42,7 +44,10 @@
   *************************************************************************
   -->
   
-  <xsl:template match="w:tbl">
+  <!--
+  Summary: Handles the conversion of inline tables.
+  -->
+  <xsl:template match="w:tbl[not(w:tblPr/w:tblpPr)]">
     <table:table>
       <xsl:attribute name="table:style-name">
         <xsl:value-of select="generate-id(self::w:tbl)"/>
@@ -53,7 +58,41 @@
     </table:table>
   </xsl:template>
 
+  <!--
+  Summary: Handles the conversion of positioned tables.
+  -->
+  <xsl:template match="w:tbl[w:tblPr/w:tblpPr]">
+    <text:p text:style-name="http://www.dialogika.de/stylename/hiddenParagraph">
+      <draw:frame>
+        <xsl:attribute name="draw:style-name">
+          <xsl:value-of select="generate-id(w:tblPr/w:tblpPr)"/>
+        </xsl:attribute>
+        <xsl:attribute name="draw:name">
+          <xsl:value-of select="concat('Frame', generate-id(w:tblPr/w:tblpPr))"/>
+        </xsl:attribute>
+        <xsl:call-template name="InsertTableFramePosition">
+          <xsl:with-param name="tblPr" select="w:tblPr" />
+        </xsl:call-template>
+        <xsl:call-template name="InsertTableFrameWidth">
+          <xsl:with-param name="tblPr" select="w:tblPr" />
+        </xsl:call-template>
+        <draw:text-box>
+          <table:table>
+            <xsl:attribute name="table:style-name">
+              <xsl:value-of select="generate-id(self::w:tbl)"/>
+            </xsl:attribute>
+            <!--TODO: @table:style-name -->
+            <xsl:apply-templates select="w:tblGrid"/>
+            <xsl:apply-templates select="w:tr"/>
+          </table:table>
+        </draw:text-box>
+      </draw:frame>
+    </text:p>
+  </xsl:template>
+
   <xsl:template match="w:tblPr" mode="automaticstyles">
+    <xsl:apply-templates select="w:tblpPr" mode="automaticstyles" />
+    
     <style:style style:name="{generate-id(parent::w:tbl)}" style:family="table">
       <xsl:if test="w:tblStyle">
         <xsl:attribute name="style:parent-style-name">
@@ -66,6 +105,42 @@
           <xsl:with-param name="Default">StyleTableProperties</xsl:with-param>
         </xsl:call-template>
       </style:table-properties>
+    </style:style>
+  </xsl:template>
+
+  <!-- 
+  Converts the properties of a positioned table
+  The tblpPr proerties are converted to a style of a draw:frame
+  -->
+  <xsl:template match="w:tblpPr" mode="automaticstyles">
+    <style:style style:name="{generate-id(.)}" style:family="graphic" style:parent-style-name="Frame">
+      <style:graphic-properties>
+        <xsl:attribute name="style:wrap">
+          <xsl:text>dynamic</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="style:number-wrapped-paragraphs">
+          <xsl:text>no-limit</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:background-color">
+          <xsl:text>#ffffff</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="style:background-transparency">
+          <xsl:text>100%</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="draw:wrap-influence-on-position">
+          <xsl:text>once-successive</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:padding">
+          <xsl:text>0cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:border">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
+
+        <xsl:call-template name="InsertTableFramePositionForStyle">
+          <xsl:with-param name="tblpPr" select="." />
+        </xsl:call-template>
+      </style:graphic-properties>
     </style:style>
   </xsl:template>
 
@@ -208,6 +283,153 @@
   *************************************************************************
   -->
 
+  <!--
+  Summary:  Converts the width of a positioned Word table to draw:frame properties
+  Author:   makz (DIaLOGIKa)
+  Params:   tblPr: The properties of the Word table
+  -->
+  <xsl:template name="InsertTableFrameWidth">
+    <xsl:param name="tblPr" />
+
+    <xsl:choose>
+      <xsl:when test="$tblPr/w:tblW/@w:type='pct'">
+        <!-- relative width -->
+        
+        <!--
+          <xsl:variable name="sectPr" select="following::w:sectPr[1]" />
+          <xsl:variable name="pgWidth" select="$sectPr/w:pgSz/@w:w" />
+          <xsl:variable name="pgMarLeft" select="$sectPr/w:pgMar/@w:left" />
+          <xsl:variable name="pgMarRight" select="$sectPr/w:pgMar/@w:right" />
+        -->
+        <xsl:variable name="pct" select="$tblPr/w:tblW/@w:w div 5000" />
+
+        <xsl:attribute name="style:rel-width">
+          <xsl:value-of select="concat(100 * $pct, '%')"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- absolute width -->
+        
+        <xsl:attribute name="svg:width">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length" select="$tblPr/w:tblPr/@w:w" />
+            <xsl:with-param name="unit" select="'cm'" />
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+  
+  
+  <!--
+  Summary:  Converts the positioning properties of a Word table to draw:frame properties
+  Author:   makz (DIaLOGIKa)
+  Params:   tblPr: The properties of the Word table
+  -->
+  <xsl:template name="InsertTableFramePosition">
+    <xsl:param name="tblPr" />
+
+    <xsl:attribute name="text:anchor-type">
+      <xsl:text>page</xsl:text>
+    </xsl:attribute>
+
+    <xsl:attribute name="text:anchor-page-number">
+      <xsl:text>1</xsl:text>
+    </xsl:attribute>
+
+    <xsl:attribute name="svg:x">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpX" />
+        <xsl:with-param name="unit" select="'cm'" />
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:attribute name="svg:y">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpY" />
+        <xsl:with-param name="unit" select="'cm'" />
+      </xsl:call-template>
+    </xsl:attribute>
+    
+  </xsl:template>
+
+  <!--
+  Summary:  Converts the positioning properties of a Word table to the style of a draw:frame
+  Author:   makz (DIaLOGIKa)
+  Params:   tblpPr: The positioning properties of the Word table
+  -->
+  <xsl:template name="InsertTableFramePositionForStyle">
+    <xsl:param name="tblpPr" />
+
+    <!-- vertical position -->
+    <xsl:variable name="vertPos">
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:vertAnchor='page'">
+          <xsl:text>from-top</xsl:text>
+        </xsl:when>
+        <!-- insert other cases here -->
+        <xsl:otherwise>
+          <xsl:text>from-top</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- vertical relation -->
+    <xsl:variable name="vertRel">
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:vertAnchor='page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <!-- insert other cases here -->
+        <xsl:otherwise>
+          <xsl:text>page</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- horizontal position -->
+    <xsl:variable name="horzPos">
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:horzAnchor='margin'">
+          <xsl:text>from-left</xsl:text>
+        </xsl:when>
+        <!-- insert other cases here -->
+        <xsl:otherwise>
+          <xsl:text>from-left</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- horizontal relation -->
+    <xsl:variable name="horzRel">
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:horzAnchor='margin'">
+          <xsl:text>page-content</xsl:text>
+        </xsl:when>
+        <!-- insert other cases here -->
+        <xsl:otherwise>
+          <xsl:text>page-content</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:attribute name="style:vertical-pos">
+      <xsl:value-of select="$vertPos"/>
+    </xsl:attribute>
+    <xsl:attribute name="style:vertical-rel">
+      <xsl:value-of select="$vertRel"/>
+    </xsl:attribute>
+    <xsl:attribute name="style:horizontal-pos">
+      <xsl:value-of select="$horzPos"/>
+    </xsl:attribute>
+    <xsl:attribute name="style:horizontal-rel">
+      <xsl:value-of select="$horzRel"/>
+    </xsl:attribute>
+    
+  </xsl:template>
+                
+                
   <!--
   Summary:  Inserts a certain amount of empty cells into a row
   Author:   makz (DIaLOGIKa)
@@ -514,6 +736,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
   
   <!--
   Summary:  Insert cells properties: vertical align, margins, borders  

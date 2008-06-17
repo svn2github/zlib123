@@ -993,6 +993,13 @@
         <xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="InsertDefaultPageLayout"/>
         </xsl:if>
+
+        <!--
+        makz: paragraph style for additional paragraph that should not be visible
+        -->
+        <style:style style:name="http://www.dialogika.de/stylename/hiddenParagraph" style:family="paragraph" style:parent-style-name="Standard">
+          <style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
+        </style:style>
       </office:automatic-styles>
       <!-- master styles -->
       <office:master-styles>
