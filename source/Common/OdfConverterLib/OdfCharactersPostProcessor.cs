@@ -200,7 +200,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         this.nextWriter.WriteEndElement();
                         text = text.Substring(1);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                     }
                 }
