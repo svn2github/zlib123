@@ -1039,7 +1039,13 @@
           
           <xsl:if test="$type='TOC'">
             <text:index-entry-chapter/>
-            <!--<text:index-entry-span><xsl:text> </xsl:text></text:index-entry-span>-->
+            <!--math, dialogika: Bugfix #1947993 and #1828338 BEGIN-->
+            <!--Only put space here (between number and text) if either no style with current level = outlineLvl is found or style with outlineLvl has a numbering-->
+            <xsl:variable name="StylesWithCurrentOutlineLevel" select="document('word/styles.xml')/w:styles/w:style[w:pPr/w:outlineLvl/@w:val = $level]" />
+            <xsl:if test="not($StylesWithCurrentOutlineLevel[1]) or $StylesWithCurrentOutlineLevel/w:pPr/w:numPr/w:numId">
+              <text:index-entry-span><xsl:text> </xsl:text></text:index-entry-span>
+            </xsl:if>
+            <!--math, dialogika: Bugfix #1947993 and #1828338 END-->
           </xsl:if>
           <text:index-entry-text/>
           <xsl:apply-templates select="(descendant::w:r/w:tab)[number(last())]" mode="entry"/>
