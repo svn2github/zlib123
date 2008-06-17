@@ -438,14 +438,16 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:choose>
+        <!--math, dialogika: Bugfix 1828347 BEGIN-->
+        <!--<xsl:choose>
           <xsl:when test="number(substring-after($stylesWithLevels,';'))=number($level)">
             <xsl:value-of select="number(substring(substring-before($stylesWithLevels,';'),string-length(substring-before($stylesWithLevels,';'))))"/>
           </xsl:when>
-          <xsl:otherwise>
+          <xsl:otherwise>-->
             <xsl:value-of select="$level"/>
-          </xsl:otherwise>
-        </xsl:choose>
+          <!--</xsl:otherwise>
+        </xsl:choose>-->
+        <!--math, dialogika: Bugfix 1828347 END-->
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1037,6 +1039,7 @@
           
           <xsl:if test="$type='TOC'">
             <text:index-entry-chapter/>
+            <!--<text:index-entry-span><xsl:text> </xsl:text></text:index-entry-span>-->
           </xsl:if>
           <text:index-entry-text/>
           <xsl:apply-templates select="(descendant::w:r/w:tab)[number(last())]" mode="entry"/>
