@@ -120,7 +120,7 @@
       <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
       <xsl:variable name="frameStyle" select="$automaticStyle | $officeStyle"/>
       
-      <xsl:call-template name="FrameToShapePropertie">
+      <xsl:call-template name="FrameToShapeProperties">
         <xsl:with-param name="frameStyle" select="$frameStyle"/>
         <xsl:with-param name="frame" select="."/>
       </xsl:call-template>
