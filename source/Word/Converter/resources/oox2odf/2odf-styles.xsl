@@ -3589,23 +3589,32 @@
           <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left" />
         </xsl:when>
 
-        <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
-          <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
-        </xsl:when>
-
-        <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
-          <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
-        </xsl:when>
-
+        <!-- makz: bugfix 1947862 :
+      
+        First check if there is a basedOn style.
+        If there is no basedOn style, use the default style.
+        
+        -->
         <xsl:when test="key('StyleId',$StyleId)/w:basedOn/@w:val">
+          <!-- use the basedOn style -->
           <xsl:call-template name="getStyleLeftInd">
             <xsl:with-param name="StyleId">
               <xsl:value-of select="key('StyleId',$StyleId)/w:basedOn/@w:val" />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-
-        <xsl:otherwise>0</xsl:otherwise>
+        <xsl:otherwise>
+          <xsl:choose>
+            <!-- use the default style -->
+            <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
+              <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
+            </xsl:when>
+            <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
+              <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:template>
     <!--math, dialogika bugfix #1751701 indentation problem END-->
@@ -3653,23 +3662,32 @@
         <xsl:value-of select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:right" />
       </xsl:when>
 
-      <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right">
-        <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right" />
-      </xsl:when>
-
-      <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
-        <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
-      </xsl:when>
+      <!-- makz: bugfix 1947862 :
+      
+      First check if there is a basedOn style.
+      If there is no basedOn style, use the default style.
+      -->
 
       <xsl:when test="key('StyleId',$StyleId)/w:basedOn/@w:val">
+        <!-- use the basedOn style -->
         <xsl:call-template name="getStyleRightInd">
           <xsl:with-param name="StyleId">
             <xsl:value-of select="key('StyleId',$StyleId)/w:basedOn/@w:val" />
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-
-      <xsl:otherwise>0</xsl:otherwise>
+      <xsl:otherwise>
+        <!-- use the default style -->
+        <xsl:choose>
+          <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right">
+            <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right" />
+          </xsl:when>
+          <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
+            <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
