@@ -443,7 +443,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                             }
 
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             text = strDefaultValue;
                         }
@@ -511,7 +511,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         text = String.Concat("rect(", t2.ToString(), "cm ", r2.ToString(), "cm ", b2.ToString(), "cm ", l2.ToString(), "cm)");
 
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         text = strDefault;
                     }
@@ -522,7 +522,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 text = strDefaultValue;
             }
