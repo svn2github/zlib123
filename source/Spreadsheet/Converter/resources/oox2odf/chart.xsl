@@ -456,7 +456,7 @@
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
           <xsl:when
-            test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' )  or c:areaChart/c:grouping/@val = 'standard' ">
+            test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -470,7 +470,7 @@
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
           <xsl:when
-            test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart">
+            test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart or c:doughnutChart">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
