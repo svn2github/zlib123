@@ -1720,6 +1720,12 @@
               <xsl:text>automatic</xsl:text>
             </xsl:attribute>
           </xsl:if>
+          
+          <xsl:if test="c:explosion">
+            <xsl:attribute name="chart:pie-offset">
+              <xsl:value-of select="c:explosion/@val"/>
+            </xsl:attribute>
+          </xsl:if>
 
           <!-- label -->
           <xsl:for-each select="c:dLbls">

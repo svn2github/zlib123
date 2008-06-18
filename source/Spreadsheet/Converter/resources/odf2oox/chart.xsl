@@ -1698,6 +1698,14 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <c:ser>
       <c:idx val="{$primarySeries + $count}"/>
       <c:order val="{$primarySeries + $count}"/>
+      
+      <xsl:if test="key('style', $styleName)/style:chart-properties/@chart:pie-offset">
+        <c:explosion>
+          <xsl:attribute name="val">
+            <xsl:value-of select="key('style', $styleName)/style:chart-properties/@chart:pie-offset"/>
+          </xsl:attribute>
+        </c:explosion>
+      </xsl:if>
 
       <!-- series name -->
       <xsl:choose>
