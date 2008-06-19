@@ -784,6 +784,7 @@
         </xsl:choose>
       </xsl:attribute>
 
+      
       <xsl:attribute name="w:w">
         <xsl:value-of select="$cellWidth" />
       </xsl:attribute>
@@ -834,7 +835,9 @@
               <xsl:value-of select="substring-before($relWidthString, '*')" />
             </xsl:when>
             <xsl:when test="$isRelTable='false' and $widthString">
-              <xsl:value-of select="substring-before($widthString, 'cm')" />
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="$widthString" />
+              </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -862,9 +865,7 @@
             <xsl:value-of select="($cellWidth * 5000) div 10000"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="concat($cellWidth, 'cm')" />
-            </xsl:call-template>
+            <xsl:value-of select="$cellWidth"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
