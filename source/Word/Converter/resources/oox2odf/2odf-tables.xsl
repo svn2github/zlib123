@@ -593,19 +593,8 @@
     </xsl:choose>
 
     <xsl:call-template name="InsertTableIndent">
-      <xsl:with-param name="wTblPr" select="." />
+      <xsl:with-param name="tblPr" select="." />
     </xsl:call-template>
-    
-    <xsl:if test="w:tblInd">
-      <xsl:attribute name="fo:margin-left">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:tblInd/@w:w"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
 
     <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and 
       not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
@@ -704,37 +693,33 @@
   <!--
   Summary:  Inserts the indent of a table.
   Author:   makz (DIaLOGIKa)
-  Params:   wTblPr: The w:tblPr node of the table
+  Params:   table: The w:tbl node
   -->
   <xsl:template name="InsertTableIndent">
-    <xsl:param name="wTblPr" />
+    <xsl:param name="tblPr" />
 
-    <xsl:choose>
-      <xsl:when test="$wTblPr/w:tblInd">
-        <!-- use direct formatting -->
-        <xsl:attribute name="fo:margin-left">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$wTblPr/w:tblInd/@w:w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="$wTblPr/w:tblStyle">
-        <!-- use style -->
-        <xsl:variable name="styleId" select="$wTblPr/w:tblStyle/@w:val" />
-        <xsl:call-template name="InsertTableIndent">
-          <xsl:with-param name="wTblPr" select="key('StyleId', $styleId)/w:tblPr" />
-        </xsl:call-template> 
-      </xsl:when>
-      <xsl:otherwise>
-        <!-- 0cm margin (default of Word) -->
-        <xsl:attribute name="fo:margin-left">
-          <xsl:text>0cm</xsl:text>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:variable name="tableIndent">
+      <xsl:call-template name="GetTableIndent">
+        <xsl:with-param name="tblPr" select="$tblPr"/>
+        <xsl:with-param name="styleName" select="$tblPr/w:tblStyle/@w:val" />
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="cellMargin">
+      <xsl:call-template name="GetLeftCellMargin">
+        <xsl:with-param name="tblPr" select="$tblPr"/>
+        <xsl:with-param name="styleName" select="$tblPr/w:tblStyle/@w:val" />
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:attribute name="fo:margin-left">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$tableIndent - $cellMargin"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+    </xsl:attribute>
   </xsl:template>
   
   
@@ -1479,6 +1464,82 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$width"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <!--
+  Summary:  Returns the left margin of the first cell as dxa value
+  Author:   makz (DIaLOGIKa)
+  Params:   tblPr: The w:tblPr node of the table
+            styleName: The name of the style thta should be used
+  -->
+  <xsl:template name="GetLeftCellMargin">
+    <xsl:param name="tblPr" />
+    <xsl:param name="styleName" />
+    
+    <xsl:choose>
+      <xsl:when test="$tblPr/w:tblCellMar/w:left and $tblPr/w:tblCellMar/w:left/@w:type='dxa'">
+        <!-- Direct Formatting -->
+        <xsl:value-of select="$tblPr/w:tblCellMar/w:left/@w:w"/>
+      </xsl:when>
+      <xsl:when test="$styleName != ''">
+        <!-- The table has a style, try to find in style -->
+        <xsl:variable name="style" select="key('StyleId', $styleName)" />
+        <xsl:call-template name="GetLeftCellMargin">
+          <xsl:with-param name="margins" select="$style/w:tblPr"/>
+          <xsl:with-param name="styleName" select="$style/w:basedOn/@w:val" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="key('StyleId', 'TableNormal')">
+        <!-- Use the TableNormal Style -->
+        <xsl:variable name="style" select="key('StyleId', 'TableNormal')" />
+        <xsl:call-template name="GetLeftCellMargin">
+          <xsl:with-param name="tblPr" select="$style/w:tblPr"/>
+          <xsl:with-param name="styleName" select="$style/w:basedOn/@w:val" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>0</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <!--
+  Summary:  Returns the left padding of the first cell in dxa
+  Author:   makz (DIaLOGIKa)
+  Params:   tblPr: The w:tblPr node of the table
+            styleName: The name of the style thta should be used
+  -->
+  <xsl:template name="GetTableIndent">
+    <xsl:param name="tblPr" />
+    <xsl:param name="styleName" />
+
+    <xsl:choose>
+      <xsl:when test="$tblPr/w:tblInd and $tblPr/w:tblInd/@w:type='dxa'">
+        <!--  iThere is direct formatting -->
+        <xsl:value-of select="$tblPr/w:tblInd/@w:w"/>
+      </xsl:when>
+      <xsl:when test="$styleName != ''">
+        <!-- the table has a style, try to find in style -->
+        <xsl:variable name="style" select="key('StyleId', $styleName)" />
+        <xsl:call-template name="GetTableIndent">
+          <xsl:with-param name="tblPr" select="$style/w:tblPr"/>
+          <xsl:with-param name="styleName" select="$style/w:basedOn/@w:val" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="key('StyleId', 'TableNormal')">
+        <!-- Use the TableNormal Style -->
+        <xsl:variable name="style" select="key('StyleId', 'TableNormal')" />
+        <xsl:call-template name="GetTableIndent">
+          <xsl:with-param name="tblPr" select="$style/w:tblPr"/>
+          <xsl:with-param name="styleName" select="$style/w:basedOn/@w:val" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>0</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

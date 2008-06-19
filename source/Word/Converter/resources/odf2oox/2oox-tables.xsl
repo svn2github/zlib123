@@ -463,11 +463,6 @@
       </xsl:choose>
     </xsl:variable>
 
-    <!-- 
-    CleverAge:  get left padding from cells (ignore subcells padding) 
-    makz: I have no idea why we should add the cell padding to the table margin.
-          This behavior cause sthe bug 1947883, so I commented it out.
-         
     <xsl:variable name="padding">
       <xsl:choose>
         <xsl:when
@@ -491,11 +486,10 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    -->
 
     <w:tblInd w:type="{$type}">
       <xsl:attribute name="w:w">
-        <xsl:value-of select="$marginLeft"/>
+        <xsl:value-of select="$marginLeft + $padding"/>
       </xsl:attribute>
     </w:tblInd>
   </xsl:template>
