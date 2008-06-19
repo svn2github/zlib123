@@ -41,7 +41,7 @@
     <Compile Include="Matrix.cs" />
     <Compile Include="NotAnOoxDocumentException.cs" />
     <Compile Include="OdfCharactersPostProcessor.cs" />
-    <Compile Include="OdfEventArgs.cs" />      
+    <Compile Include="OdfEventArgs.cs" />
     <Compile Include="OoxCharactersPostProcessor.cs" />
     <Compile Include="OoxShape.cs" />
     <Compile Include="OoxTransform.cs" />
@@ -75,6 +75,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\dummy.dtd" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\utils.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>

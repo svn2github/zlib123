@@ -102,18 +102,23 @@
 
   <xsl:template name="InsertOlePreviewName">
     <xsl:param name="thisId" />
+    <xsl:param name="relFile" />
 
     <!-- get the hosting document (headerX.xml, document.xml) -->
-    <xsl:variable name="hostingDoc" select="ancestor::oox:part/@oox:name" />
-    <xsl:variable name="relFile" select="concat('word/_rels/', concat(substring-after($hostingDoc, '/'), '.rels'))" />
-      
-    <xsl:variable name="olePreview" select="key('Part', $hostingDoc)//v:shape/v:imagedata[@r:id=$thisId]" />
+    <xsl:variable name="hostingDoc">
+      <xsl:call-template name="substring-after-last">
+        <xsl:with-param name ="string" select="substring-before($relFile, '.rels')" />
+        <xsl:with-param name="occurrence" select="'/'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="olePreview" select="key('Part', concat('word/',$hostingDoc))//v:shape/v:imagedata[@r:id=$thisId]" />
     <xsl:variable name="oleId" select="$olePreview/../../o:OLEObject/@r:id" />
     <xsl:variable name="allRels" select="key('Part', $relFile)/rels:Relationships/rels:Relationship" />
     <xsl:variable name="previewRelTarget" select="$allRels[@Id=$oleId]/@Target" />
-    
+
     <xsl:value-of select="substring-before(substring-after($previewRelTarget, '/'), '.')" />
   </xsl:template>
+ 
   
   <!--
   Summary: inserts the object itself

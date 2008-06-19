@@ -37,6 +37,7 @@
 
   <xsl:import href="measures.xsl"/>
   <xsl:import href="common-meta.xsl"/>
+  <xsl:import href="utils.xsl"/>
   <xsl:import href="2odf-common.xsl"/>
   <xsl:import href="2odf-content.xsl"/>
   <xsl:import href="2odf-pictures.xsl"/>
@@ -147,6 +148,7 @@
     </pzip:archive>
   </xsl:template>
 
+  
   <!--
   Summary: Inserts the manifest entry for a single reference
   Author: Clever Age
@@ -159,7 +161,7 @@
       <xsl:variable name="thisId" select="@Id" />
       <xsl:variable name="suffix" select="translate(substring-after(@Target,'.'), 
                     'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
-      
+
       <!-- write the media type -->
       <xsl:choose>
         <!-- GIF -->
@@ -189,7 +191,13 @@
         <!-- EMF -->
         <xsl:when test="$suffix='emf'">
           <xsl:attribute name="manifest:media-type">
-            <xsl:text>image/png</xsl:text>
+            <xsl:text>application/x-openoffice-wmf;windows_formatname="Image EMF"</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- WMF -->
+        <xsl:when test="$suffix='wmf'">
+          <xsl:attribute name="manifest:media-type">
+            <xsl:text>application/x-openoffice-wmf;windows_formatname="Image WMF"</xsl:text>
           </xsl:attribute>
         </xsl:when>
         <!-- Binaries OLE -->
@@ -211,10 +219,13 @@
         <!-- the ref is ole picture -->
         <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//v:shape/v:imagedata[./@r:id=$thisId]">
           <xsl:attribute name="manifest:full-path">
+
             <xsl:text>ObjectReplacements/</xsl:text>
             <xsl:call-template name="InsertOlePreviewName">
               <xsl:with-param name="thisId" select="$thisId" />
+              <xsl:with-param name="relFile" select="ancestor::oox:part/@oox:name" />
             </xsl:call-template>
+
           </xsl:attribute>
         </xsl:when>
         <!-- the ref is a normal picture -->

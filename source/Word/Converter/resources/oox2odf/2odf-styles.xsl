@@ -40,6 +40,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
+  xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="w r draw number wp xlink v oox">
 
   <xsl:import href="2odf-footnotes.xsl"/>
