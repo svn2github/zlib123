@@ -140,11 +140,28 @@
         </xsl:choose>
       </xsl:if>
     </xsl:for-each>
+        
     <xsl:for-each select="a:lin">
+      <xsl:if test="@ang">
+        <xsl:attribute name="draw:angle">
+          <xsl:variable name="angleValue">
+            <xsl:value-of select="round((((( -1 * @ang ) + 5400000 ) mod 21600000 ) div 60000) * 10)"/>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="$angleValue &lt; 0">
+              <xsl:value-of select="-1 * $angleValue "/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$angleValue "/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:attribute name="draw:style">
         <xsl:value-of select="'linear'"/>
       </xsl:attribute>
     </xsl:for-each>
+        
     <xsl:for-each select="a:path">
       <xsl:choose>
         <xsl:when test="@path='circle'">

@@ -104,7 +104,31 @@
                         <xsl:call-template name="tmpTileToRect"/>
                     </xsl:when>
                     <xsl:when test="@draw:style='linear'">
-                        <a:lin ang="0" scaled="1"/>
+                        <a:lin  scaled="1">
+                            <xsl:if test="@draw:angle!=''">
+                                <xsl:attribute name="ang">
+                                    <xsl:choose>
+                                        <xsl:when test="@draw:angle">
+                                            <xsl:variable name="angleValue">
+                                                <xsl:value-of select="round(((( ( -1 * @draw:angle) + 900 ) mod 3600)  div 10) * 60000)"/>
+                                            </xsl:variable>
+                                            <xsl:choose>
+                                                <xsl:when test="$angleValue &lt; 0">
+                                                    <xsl:value-of select="-1 * $angleValue "/>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="$angleValue "/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                            
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="'0'"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:attribute>
+                            </xsl:if>
+                        </a:lin>
                         <a:tileRect/>
                     </xsl:when>
                     <xsl:when test="@draw:style='rectangular' or @draw:style='square'">
