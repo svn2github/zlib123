@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-
 extern "C" {
 
 	// This function displays an error message
@@ -138,6 +137,43 @@ extern "C" {
 		UINT nRet = MsiGetProperty(hInstall, _T("TARGETDIR"), sBuf, &dwBufSize);
 		if (nRet == ERROR_SUCCESS) {
 			ShellExecute(NULL, _T("Open"), _T("Readme.htm"), NULL, sBuf, SW_SHOW);
+		} else {
+			DisplayError(nRet, _T("MsiGetProperty"));
+		}
+		return ERROR_SUCCESS;
+	}
+
+	UINT __stdcall NgenAssemblies(MSIHANDLE hInstall) {
+		TCHAR sTargetDir[MAX_PATH];
+		DWORD dwBufSize = sizeof(sTargetDir) / sizeof(sTargetDir[0]);
+		UINT nRet = MsiGetProperty(hInstall, _T("TARGETDIR"), sTargetDir, &dwBufSize);
+		if (nRet == ERROR_SUCCESS) {
+			WIN32_FIND_DATA wfd;
+			HANDLE hFind;
+			
+			TCHAR sNgen[MAX_PATH] = _T("");
+			TCHAR sAssemblyFilePath[MAX_PATH] = _T("");
+			
+			wcscpy_s(sAssemblyFilePath, sizeof(sAssemblyFilePath) / sizeof(TCHAR), sTargetDir);
+			wcscat_s(sAssemblyFilePath, sizeof(sAssemblyFilePath) / sizeof(TCHAR), _T("*.dll"));
+
+			SHGetSpecialFolderPath(0, sNgen, CSIDL_WINDOWS, false);
+			wcscat_s(sNgen, sizeof(sNgen) / sizeof(TCHAR), _T("\\Microsoft.NET\\Framework\\v2.0.50727\\ngen.exe")); 
+
+			if ((hFind = FindFirstFile(sAssemblyFilePath, &wfd )) != INVALID_HANDLE_VALUE)
+			{
+				do
+				{
+					TCHAR sCmdLine[2*MAX_PATH + 200];
+					wcscpy_s(sCmdLine, sizeof(sCmdLine) / sizeof(TCHAR), _T("install "));
+					wcscat_s(sCmdLine, sizeof(sCmdLine) / sizeof(TCHAR), wfd.cFileName);
+					//wcscat_s(sCmdLine, sizeof(sCmdLine) / sizeof(TCHAR), _T(" /queue"));
+
+					ShellExecute(NULL, _T("Open"), sNgen, sCmdLine, sTargetDir, SW_HIDE);
+				} while (FindNextFile(hFind, &wfd));
+				FindClose (hFind);
+			}
+
 		} else {
 			DisplayError(nRet, _T("MsiGetProperty"));
 		}
