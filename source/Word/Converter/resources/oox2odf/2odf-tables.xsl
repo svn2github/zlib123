@@ -253,7 +253,21 @@
               </xsl:choose>
             </xsl:attribute>
           </xsl:if>
-          <xsl:apply-templates/>
+
+          <!--
+          makz: If the last paragraph in a table cell is behind a inner table and it is empty (no run), 
+          it is the default w:p that must exist in every cell.
+          Word does not display this paragraph. So we cannot not convert it because Open Office will display it.
+          
+          See bug 1839896 for reference.
+          -->
+          <xsl:variable name="childCount" select="count(*)" />
+          <xsl:for-each select="./*">
+            <xsl:if test="not(position() = $childCount and preceding-sibling::w:tbl and not(w:r))">
+              <xsl:apply-templates select="."/>
+            </xsl:if>
+          </xsl:for-each>
+
         </table:table-cell>
       </xsl:otherwise>
     </xsl:choose>
@@ -1488,7 +1502,7 @@
         <!-- The table has a style, try to find in style -->
         <xsl:variable name="style" select="key('StyleId', $styleName)" />
         <xsl:call-template name="GetLeftCellMargin">
-          <xsl:with-param name="margins" select="$style/w:tblPr"/>
+          <xsl:with-param name="tblPr" select="$style/w:tblPr"/>
           <xsl:with-param name="styleName" select="$style/w:basedOn/@w:val" />
         </xsl:call-template>
       </xsl:when>
