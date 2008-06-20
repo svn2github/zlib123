@@ -198,14 +198,25 @@
   <xsl:template name="InsertFrameSize">
     <xsl:param name="framePr" />
 
-    <xsl:attribute name="svg:width">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:value-of select="$framePr/@w:w"/>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:attribute>
+    <xsl:choose>
+      <xsl:when test="$framePr/@w:w">
+        <!-- If a size is specifed, use the width attribute -->
+        <xsl:attribute name="svg:width">
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="$framePr/@w:w"/>
+            </xsl:with-param>
+            <xsl:with-param name="destUnit" select="'cm'"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- If no width is specified, the frame is autosized, so use the min-width attribute -->
+        <xsl:attribute name="fo:min-width">
+          <xsl:text>0cm</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <xsl:attribute name="svg:height">
       <xsl:call-template name="ConvertMeasure">
