@@ -1708,37 +1708,39 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       </xsl:if>
 
       <xsl:for-each select="key('series','')[position() = $number]">
-        <c:trendline>
-          <xsl:for-each select="chart:regression-curve[1]">
-            <xsl:call-template name="InsertSpPr">
-              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-              <xsl:with-param name="defaultFill" select="'solid'"/>
-            </xsl:call-template>
-          </xsl:for-each>
-          <xsl:for-each select="key('style', @chart:style-name)">
-            <c:trendlineType>
-              <xsl:attribute name="val">
-                <xsl:choose>
-                  <xsl:when test="style:chart-properties/@chart:regression-type = 'linear' ">
-                    <xsl:text>linear</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="style:chart-properties/@chart:regression-type = 'logarithmic' ">
-                    <xsl:text>log</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="style:chart-properties/@chart:regression-type = 'exponential' ">
-                    <xsl:text>exp</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="style:chart-properties/@chart:regression-type = 'power' ">
-                    <xsl:text>power</xsl:text>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:text>linear</xsl:text>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-            </c:trendlineType>
-          </xsl:for-each>
-        </c:trendline>
+        <xsl:if test="chart:regression-curve">
+          <c:trendline>
+            <xsl:for-each select="chart:regression-curve[1]">
+              <xsl:call-template name="InsertSpPr">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="defaultFill" select="'solid'"/>
+              </xsl:call-template>
+            </xsl:for-each>
+            <xsl:for-each select="key('style', @chart:style-name)">
+              <c:trendlineType>
+                <xsl:attribute name="val">
+                  <xsl:choose>
+                    <xsl:when test="style:chart-properties/@chart:regression-type = 'linear' ">
+                      <xsl:text>linear</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="style:chart-properties/@chart:regression-type = 'logarithmic' ">
+                      <xsl:text>log</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="style:chart-properties/@chart:regression-type = 'exponential' ">
+                      <xsl:text>exp</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="style:chart-properties/@chart:regression-type = 'power' ">
+                      <xsl:text>power</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>linear</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </c:trendlineType>
+            </xsl:for-each>
+          </c:trendline>
+        </xsl:if>
       </xsl:for-each>
 
       <!-- series name -->
