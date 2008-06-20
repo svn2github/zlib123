@@ -352,7 +352,7 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
           <xsl:value-of select="$number"/>
         </xsl:with-param>
         <xsl:with-param name="name">
-					<xsl:value-of select="translate(@name,'!$#():,.+','')"/>
+					<xsl:value-of select="translate(@name,'!$-#():,.+','')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1827,7 +1827,7 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
 
       <!-- when this row is not first one and there were pictures rows after previous non-empty row-->
       <xsl:when
-        test="preceding-sibling::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding-sibling::e:row[1]/@r and $GetMinRowWithElement &lt; @r - 1">
+        test="preceding-sibling::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding-sibling::e:row[1]/@r and $GetMinRowWithElement &lt; @r ">
 
         <xsl:call-template name="InsertElementsBetwenTwoRows">
           <xsl:with-param name="sheet">
