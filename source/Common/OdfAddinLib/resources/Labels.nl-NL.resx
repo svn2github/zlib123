@@ -207,7 +207,7 @@
   <data name="OdfFileOptionsDescription" xml:space="preserve">
     <value>Activeren / deactiveren FidelityMessage dialoogvenster</value>
   </data>
-  <data name="OdfFileOptionsLabel" xml:space="preserve">
+  <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF Opties</value>
   </data>
 </root>

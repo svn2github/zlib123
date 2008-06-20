@@ -33,6 +33,8 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.Runtime.InteropServices;
+using OdfConverter.OdfConverterLib;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -58,7 +60,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             for (int i = this.managers.Count - 1; i >= 0; i--)
             {
-                System.Resources.ResourceManager manager = (System.Resources.ResourceManager) this.managers[i];
+                System.Resources.ResourceManager manager = (System.Resources.ResourceManager)this.managers[i];
                 if (manager != null)
                 {
                     string value = manager.GetString(key);
@@ -71,11 +73,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return null;
         }
     }
-  
+
     /// <summary>
     /// Base class MS Office add-in implementations.
     /// </summary>
-    public class OdfAddinLib
+    //[ComVisible(true)]
+    public class OdfAddinLib : IOdfConverter
     {
         private AbstractConverter converter;
         private ChainResourceManager resourceManager;
@@ -102,11 +105,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
 
-       /// <summary>
-       /// Retrieve the label associated to the specified key
-       /// </summary>
-       /// <param name="key"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Retrieve the label associated to the specified key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public string GetString(string key)
         {
             return this.resourceManager.GetString(key);
@@ -134,14 +137,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             if (form.HasLostElements)
                             {
                                 ArrayList elements = form.LostElements;
-                                ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
-                                configMan.LoadConfig();
-                                if (configMan.IsErrorIgnored == false)
-                                {
-                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
-                                infoBox.ShowDialog();
+                                //ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
+                                //configMan.LoadConfig();
+                                //if (configMan.IsErrorIgnored == false)
+                                //{
+                                    InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
+                                    infoBox.ShowDialog();
+                                //}
                             }
-                        }
                         }
                         else
                         {
@@ -178,7 +181,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 catch (Exception e)
                 {
-                    if (e.InnerException != null && e.InnerException is System.Xml.XmlException) 
+                    if (e.InnerException != null && e.InnerException is System.Xml.XmlException)
                     {
                         // An xsl exception may embed an xml exception. In this case we have a non well formed xml document.
                         ArrayList messages = new ArrayList();
@@ -237,13 +240,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         if (form.HasLostElements)
                         {
                             ArrayList elements = form.LostElements;
-                            ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
-                            configMan.LoadConfig();
-                            if (configMan.IsErrorIgnored == false)
-                            {
+                            //ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
+                            //configMan.LoadConfig();
+                            //if (configMan.IsErrorIgnored == false)
+                            //{
                             InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
                             infoBox.ShowDialog();
-                        }
+                            //}
                         }
 
                         if (form.Exception != null)
@@ -257,7 +260,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 }
-                catch (OdfZipUtils.ZipException e) 
+                catch (OdfZipUtils.ZipException e)
                 {
                     InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "PossiblyEncryptedDocument", this.resourceManager);
                     infoBox.ShowDialog();
@@ -366,12 +369,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return output;
         }
 
-      /// <summary>
-      /// Create a random temporary folder 
-      /// </summary>
-      /// <param name="fileName">The name of the file</param>
-      /// <param name="targetExtension">The target extension</param>
-      /// <returns></returns>
+        /// <summary>
+        /// Create a random temporary folder 
+        /// </summary>
+        /// <param name="fileName">The name of the file</param>
+        /// <param name="targetExtension">The target extension</param>
+        /// <returns></returns>
         public string GetTempPath(string fileName, string targetExtension)
         {
             string folderName = null;
@@ -380,11 +383,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 folderName = Path.GetRandomFileName();
                 path = Path.Combine(Path.GetTempPath(), folderName);
-            } 
+            }
             while (Directory.Exists(path));
 
             Directory.CreateDirectory(path);
-            return Path.Combine(path, Path.GetFileNameWithoutExtension(fileName)+targetExtension);
+            return Path.Combine(path, Path.GetFileNameWithoutExtension(fileName) + targetExtension);
         }
 
         public void DeleteTempPath(string tempPath)

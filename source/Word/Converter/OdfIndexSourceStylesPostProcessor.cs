@@ -32,7 +32,7 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using System.Collections.Generic;
 
-namespace CleverAge.OdfConverter.Word
+namespace OdfConverter.Wordprocessing
 {
     /// <summary>
     /// Postprocessor to insert Index Source Styles.
@@ -107,7 +107,7 @@ namespace CleverAge.OdfConverter.Word
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return;
                 }

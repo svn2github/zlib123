@@ -31,7 +31,7 @@ using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 
-namespace CleverAge.OdfConverter.Word
+namespace OdfConverter.Wordprocessing
 {
 	/// <summary>
 	/// Postprocessor to remove paragraphs which were processed in Index

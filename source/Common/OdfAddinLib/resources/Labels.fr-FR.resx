@@ -208,7 +208,7 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="OdfFileOptionsDescription" xml:space="preserve">
     <value>Activer / Désactiver FidelityMessage boîte de dialogue</value>
   </data>
-  <data name="OdfFileOptionsLabel" xml:space="preserve">
+  <data name="OdfOptionsLabel" xml:space="preserve">
     <value>Options ODF</value>
   </data>
   </root>

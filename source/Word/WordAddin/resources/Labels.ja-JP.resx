@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="translation.odf2oox.paddingShortened" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.odf2oox.borderShortened" xml:space="preserve">
+    <value>??????</value>
+  </data>
+  <data name="translation.odf2oox.textBgColor" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.dateFormat" xml:space="preserve">
+    <value>?????</value>
+  </data>
+  <data name="translation.odf2oox.chapterField" xml:space="preserve">
+    <value>??????????? (???????)</value>
+  </data>
+  <data name="translation.odf2oox.descriptionField" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.printedByField" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.pageVariableField" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.ddeConnection" xml:space="preserve">
+    <value>DDE ??</value>
+  </data>
+  <data name="translation.odf2oox.formulaField" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.internetProperties" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.odf2oox.documentCreationDate" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.documentModificationDate" xml:space="preserve">
+    <value>????????????</value>
+  </data>
+  <data name="translation.odf2oox.nestedFrames" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.positionInsideTextbox" xml:space="preserve">
+    <value>???? ???????????????</value>
+  </data>
+  <data name="translation.odf2oox.annotationsInsideTextbox" xml:space="preserve">
+    <value>???? ??????????</value>
+  </data>
+  <data name="translation.odf2oox.annotationsInsideHeaderFooter" xml:space="preserve">
+    <value>?????????????????</value>
+  </data>
+  <data name="translation.odf2oox.hyperlinkName" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve">
+    <value>????????????</value>
+  </data>
+  <data name="translation.odf2oox.hiddenSection" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve">
+    <value>????????????</value>
+  </data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve">
+    <value>%1 ?????</value>
+  </data>
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve">
+    <value>?? %1 ????</value>
+  </data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve">
+    <value>?? %1 ????????????</value>
+  </data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve">
+    <value>?? %1 ???????????</value>
+  </data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve">
+    <value>?? %1 ???</value>
+  </data>
+  <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve">
+    <value>??????????????????</value>
+  </data>
+  <data name="translation.odf2oox.dropcapSize" xml:space="preserve">
+    <value>???? ????????</value>
+  </data>
+  <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.noteInList" xml:space="preserve">
+    <value>?????</value>
+  </data>
+  <data name="translation.odf2oox.footnoteContinuationSeparator" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorWidth" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorLength" xml:space="preserve">
+    <value>?????????</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorColor" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.odf2oox.footnoteSeparatorStyle" xml:space="preserve">
+    <value>???????????</value>
+  </data>
+  <data name="translation.odf2oox.footnoteMaximumHeight" xml:space="preserve">
+    <value>?????????</value>
+  </data>
+  <data name="translation.odf2oox.svmImage" xml:space="preserve">
+    <value>SVM ????</value>
+  </data>
+  <data name="translation.odf2oox.embeddedPluginFile" xml:space="preserve">
+    <value>???????????????</value>
+  </data>
+  <data name="translation.odf2oox.applet" xml:space="preserve">
+    <value>?????</value>
+  </data>
+  <data name="translation.odf2oox.floatingFrame" xml:space="preserve">
+    <value>??????</value>
+  </data>
+  <data name="translation.odf2oox.croppedImage" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.scaledImage" xml:space="preserve">
+    <value>???????/??</value>
+  </data>
+  <data name="translation.odf2oox.valignInsideTextbox" xml:space="preserve">
+    <value>???? ?????????????</value>
+  </data>
+  <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
+    <value>?????/???????</value>
+  </data>
+  <data name="translation.odf2oox.textOrientationInsideTextbox" xml:space="preserve">
+    <value>???? ????????????</value>
+  </data>
+  <data name="translation.odf2oox.alphabeticalIndexColumnNumber" xml:space="preserve">
+    <value>???????????????</value>
+  </data>
+  <data name="translation.odf2oox.listBulletAlignment" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.distanceNumberingText" xml:space="preserve">
+    <value>???????????</value>
+  </data>
+  <data name="translation.odf2oox.spacingTopPageAndTable" xml:space="preserve">
+    <value>???/???????</value>
+  </data>
+  <data name="translation.odf2oox.pageLayout" xml:space="preserve">
+    <value>??? ???????????</value>
+  </data>
+  <data name="translation.odf2oox.alignmentLastLine" xml:space="preserve">
+    <value>??????</value>
+  </data>
+  <data name="translation.odf2oox.paragraphBgImage" xml:space="preserve">
+    <value>?????????</value>
+  </data>
+  <data name="translation.odf2oox.automaticPageBreak" xml:space="preserve">
+    <value>??????</value>
+  </data>
+  <data name="translation.odf2oox.numberWidowsOrphans" xml:space="preserve">
+    <value>?????</value>
+  </data>
+  <data name="translation.odf2oox.blinkingText" xml:space="preserve">
+    <value>?????</value>
+  </data>
+  <data name="translation.odf2oox.rotatedText" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.odf2oox.fontWeight" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.capitalizedText" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.lowercaseText" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.textScale600pct" xml:space="preserve">
+    <value>600% ?????????????????</value>
+  </data>
+  <data name="translation.odf2oox.leaderText" xml:space="preserve">
+    <value>??????</value>
+  </data>
+  <data name="translation.odf2oox.pageBgColor" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.paperTray" xml:space="preserve">
+    <value>?????</value>
+  </data>
+  <data name="translation.odf2oox.lineNumbering" xml:space="preserve">
+    <value>???</value>
+  </data>
+  <data name="translation.odf2oox.headerDistance" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.footerDistance " xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.paragraphPageShadow" xml:space="preserve">
+    <value>??/???????????</value>
+  </data>
+  <data name="translation.odf2oox.subtableBordersPadding" xml:space="preserve">
+    <value>???????????</value>
+  </data>
+  <data name="translation.odf2oox.consecutiveTables" xml:space="preserve">
+    <value>?????</value>
+  </data>
+  <data name="translation.odf2oox.tableHeaderRepeated" xml:space="preserve">
+    <value>???????????</value>
+  </data>
+  <data name="translation.odf2oox.tableHeaderRows" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.tableTogetherWithParagraph" xml:space="preserve">
+    <value>???????????????</value>
+  </data>
+  <data name="translation.odf2oox.unsplitableTable" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.odf2oox.tableBgImage" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.odf2oox.tableShadow" xml:space="preserve">
+    <value>?????????</value>
+  </data>
+  <data name="translation.odf2oox.tableManualAlignment" xml:space="preserve">
+    <value>??????</value>
+  </data>
+  <data name="translation.odf2oox.tableWith64Columns" xml:space="preserve">
+    <value>????? 64 ?????</value>
+  </data>
+  <data name="translation.odf2oox.rowBgImage" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.odf2oox.protectedCell" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.odf2oox.cellBgImage" xml:space="preserve">
+    <value>?????????</value>
+  </data>
+  <data name="translation.odf2oox.cellShadow" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.odf2oox.cellContentNotPrinted" xml:space="preserve">
+    <value>????????????????</value>
+  </data>
+  <data name="translation.odf2oox.cellContentRepeated" xml:space="preserve">
+    <value>????????????????</value>
+  </data>
+  <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve">
+    <value>??? 3-D ??</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve">
+    <value>??????</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve">
+    <value>?????????</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve">
+    <value>???????????</value>
+  </data>
+  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve">
+    <value>???????</value>
+  </data>
+  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve">
+    <value>???? ?????????</value>
+  </data>
+  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve">
+    <value>?????????????</value>
+  </data>
+  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve">
+    <value>??????????</value>
+  </data>
+  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve">
+    <value>????????????</value>
+  </data>
+  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve">
+    <value>??????????????????</value>
+  </data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve">
+    <value>????????</value>
+  </data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve">
+    <value>?????????</value>
+  </data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve">
+    <value>???? ????? [?????] ?????</value>
+  </data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
+    <value>????????????????</value>
+  </data>
+  <data name="translation.odf2oox.oleOdfObject" xml:space="preserve">
+    <value>???? ODF ??????</value>
+  </data>
+  <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
+    <value>埋め込み OpenXML オブジェクト</value>
+  </data>
+  <data name="translation.oox2odf.oleNetworkPath" xml:space="preserve">
+    <value>ネットワーク フォルダのOLE オブジェクトにリンクする</value>
+  </data>
+  <data name="translation.oox2odf.lists.indentation.directFormatting" xml:space="preserve">
+    <value>リストに書式を直接適用したために生じたインデント</value>
+  </data>
+  <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
+    <value>親スタイルから継承した番号付け</value>
+  </data>
+</root>

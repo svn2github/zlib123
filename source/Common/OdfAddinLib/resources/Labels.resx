@@ -166,19 +166,19 @@
     <value>This document doesn't seem to be a valid OASIS OpenDocument file.</value>
   </data>
   <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Office 2007 File converters are not installed : the ODF convertion cannot work without.</value>
+    <value>Office 2007 File converters are not installed: ODF conversion cannot work without.</value>
   </data>
   <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
     <value>Conversion failed, please try to save the document in Word 2007 format first.</value>
   </data>
   <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>Please save your document before exporting to ODF</value>
+    <value>Please save your document before exporting to ODF.</value>
   </data>
   <data name="OdfConverterTitle" xml:space="preserve">
     <value>ODF Converter</value>
   </data>
   <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>Unable to create target file : check that the path is correct and that the file is not in use by another application.</value>
+    <value>Unable to create target file: check that the path is correct and that the file is not in use by another application.</value>
   </data>
   <data name="UnableToCreateOutputLabel" xml:space="preserve">
     <value>Unable to create target file</value>
@@ -207,7 +207,7 @@
   <data name="OdfFileOptionsDescription" xml:space="preserve">
     <value>Enable/Disable FidelityMessage Dialog Box</value>
   </data>
-  <data name="OdfFileOptionsLabel" xml:space="preserve">
+  <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF Options</value>
   </data>
 </root>

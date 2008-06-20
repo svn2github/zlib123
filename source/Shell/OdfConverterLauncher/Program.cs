@@ -89,7 +89,7 @@ namespace OdfConverterLauncher
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
                 .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "Language", null) as string;
-            
+
             if (languageVal != null)
             {
                 int.TryParse(languageVal, out culture);
@@ -231,8 +231,8 @@ namespace OdfConverterLauncher
             }
             object[] args = new object[] { document };
             _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
-            
-           
+
+
         }
 
         public void getLanguage()
@@ -273,7 +273,7 @@ namespace OdfConverterLauncher
         [STAThread]
         static void Main(string[] args)
         {
-            if (args.Length == 1) 
+            if (args.Length == 1)
             {
                 string input = args[0];
                 if (input.ToUpper().EndsWith(".ODP"))
@@ -310,8 +310,8 @@ namespace OdfConverterLauncher
                 {
                     OdfAddinLib lib = new CleverAge.OdfConverter.Spreadsheet.Addin();
                     Excel objExcel = null;
-                   
-                   
+
+
                     try
                     {
                         bool showUserInterface = true;
@@ -321,8 +321,8 @@ namespace OdfConverterLauncher
                         lib.OdfToOox(input, output, showUserInterface);
                         if (File.Exists((string)output))
                         {
-                                objExcel.Visible = true;
-                                objExcel.Open(output);
+                            objExcel.Visible = true;
+                            objExcel.Open(output);
                         }
                         else
                         {
@@ -339,34 +339,34 @@ namespace OdfConverterLauncher
                 }
                 if (input.ToUpper().EndsWith(".ODT"))
                 {
-                OdfAddinLib lib = new CleverAge.OdfConverter.Word.Addin();
-                Word word = null;
-                try
-                {
-                    bool showUserInterface = true;   
-                    string output = lib.GetTempFileName(input, ".docx");
-                    word = new Word();
-                    word.getLanguage();
-                    lib.OdfToOox(input, output, showUserInterface);
-                    if (File.Exists((string)output))
+                    OdfAddinLib lib = new OdfAddinLib(new OdfConverter.Wordprocessing.Converter());
+                    Word word = null;
+                    try
                     {
-                        word.Visible = true;
-                        word.Open(output);
+                        bool showUserInterface = true;
+                        string output = lib.GetTempFileName(input, ".docx");
+                        word = new Word();
+                        word.getLanguage();
+                        lib.OdfToOox(input, output, showUserInterface);
+                        if (File.Exists((string)output))
+                        {
+                            word.Visible = true;
+                            word.Open(output);
+                        }
+                        else
+                        {
+                            word.Quit();
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        word.Quit();
+                        System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
+                        Assembly.GetAssembly(lib.GetType()));
+                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", rm);
+                        infoBox.ShowDialog();
                     }
-                }
-                catch (Exception e)
-                {
-                    System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels", 
-                    Assembly.GetAssembly(lib.GetType()));
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")",  rm);
-                    infoBox.ShowDialog();
                 }
             }
-        }
         }
     }
 }

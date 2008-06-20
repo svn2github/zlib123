@@ -6,7 +6,7 @@ using System.Xml;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.Diagnostics;
 
-namespace CleverAge.OdfConverter.Word
+namespace OdfConverter.Wordprocessing
 {
     class DocxDocument : OoxDocument
     {

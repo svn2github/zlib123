@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("OdfWordConverterLib")]
+[assembly: AssemblyTitle("OdfWordprocessingConverterLib")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Clever Age")]
-[assembly: AssemblyProduct("OdfWordConverterLib")]
+[assembly: AssemblyProduct("OdfWordprocessingConverterLib")]
 [assembly: AssemblyCopyright("Copyright © Clever Age 2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -33,3 +33,7 @@ using System.Runtime.InteropServices;
 // en utilisant '*', comme indiqué ci-dessous :
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+[assembly: DependencyAttribute("WordprocessingConverter2Oox", LoadHint.Always)]
+[assembly: DependencyAttribute("WordprocessingConverter2Odf", LoadHint.Always)]
+

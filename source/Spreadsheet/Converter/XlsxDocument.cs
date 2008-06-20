@@ -30,6 +30,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             bool isCell = false;
             List<RelationShip> rels = new List<RelationShip>();
 
+            int idSheet = 0;
+            int idRow = 1;
             int idFont = 0;
             int idFill = 0;
             int idBorder = 0;
@@ -241,6 +243,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         switch (xtr.LocalName)
                         {
                             // reset id counters
+                            case "sheets": idSheet = 0; break;
+                            case "sheetData": idRow = 1; break;
                             case "fonts": idFont = 0; break;
                             case "fills": idFill = 0; break;
                             case "borders": idBorder = 0; break;
@@ -254,6 +258,14 @@ namespace CleverAge.OdfConverter.Spreadsheet
                             case "sst": idSi = 0; break;
 
                             // add id values
+                            case "sheet":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idSheet++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+
+                            case "row":
+                                xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idRow++).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                                break; 
+
                             case "font":
                                 xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, (idFont++).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                 break;

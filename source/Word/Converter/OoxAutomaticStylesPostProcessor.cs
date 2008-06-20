@@ -32,7 +32,7 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using System.IO;
 
-namespace CleverAge.OdfConverter.Word
+namespace OdfConverter.Wordprocessing
 {
         
     /// <summary>

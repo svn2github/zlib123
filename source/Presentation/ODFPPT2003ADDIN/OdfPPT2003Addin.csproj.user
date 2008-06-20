@@ -9,4 +9,9 @@
     <StartProgram>C:\Program Files\Microsoft Office\OFFICE11\POWERPNT.EXE</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing %28signed%29|AnyCPU' ">
+    <StartProgram>C:\Program Files\Microsoft Office\OFFICE11\POWERPNT.EXE</StartProgram>
+    <StartWorkingDirectory>C:\Program Files\Microsoft Visual Studio 8\Common7\IDE\</StartWorkingDirectory>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
 </Project>

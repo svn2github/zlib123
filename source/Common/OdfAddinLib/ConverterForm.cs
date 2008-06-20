@@ -68,18 +68,23 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.manager = manager;
             this.isDirect = isDirect;
             lostElements = new ArrayList();
-            ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
-            configMan.LoadConfig();
-            if (configMan.IsErrorIgnored == true)
-            {
-                chkbxIgnoreError.Checked = true;
-            }
-
+            //ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
+            //configMan.LoadConfig();
+            //if (configMan.IsErrorIgnored == true)
+            //{
+            //    chkbxIgnoreError.Checked = true;
+            //}
+            
             //this code is for displaying the label in progress bar               
             //Code change 1 of 2
             this.lblMessage.Text = manager.GetString("ProgressBarLoadLabel");
-            this.lblMessage.Visible  = true;                      
-            
+            this.lblMessage.Visible  = true;
+
+            if (this.Parent == null)
+            {
+                // started in stand-alone mode (e.g. via context menu)
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
         }
 
         public class CancelledException : Exception
@@ -226,7 +231,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
         private void ConverterForm_Activated(object sender, EventArgs e) {
-            // Launch convertion
+            // Launch conversion
             if (!converting) {
                 converting = true;
                 Application.DoEvents();

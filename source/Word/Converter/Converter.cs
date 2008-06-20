@@ -10,7 +10,7 @@ using CleverAge.OdfConverter.OdfConverterLib;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.IO;
 
-namespace CleverAge.OdfConverter.Word
+namespace OdfConverter.Wordprocessing
 {
     public class Converter : AbstractConverter
     {
@@ -21,6 +21,29 @@ namespace CleverAge.OdfConverter.Word
         public Converter()
             : base(Assembly.GetExecutingAssembly())
         { }
+
+        protected override Type LoadPrecompiledXslt()
+        {
+            Type stylesheet = null;
+            try
+            {
+                if (this.DirectTransform)
+                {
+                    stylesheet = Assembly.Load("WordprocessingConverter2Oox")
+                                            .GetType("WordprocessingConverter2Oox");
+                }
+                else
+                {
+                    stylesheet = Assembly.Load("WordprocessingConverter2Odf")
+                                            .GetType("WordprocessingConverter2Odf");
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return stylesheet;
+        }
       
         protected override string [] DirectPostProcessorsChain
         {
@@ -28,11 +51,11 @@ namespace CleverAge.OdfConverter.Word
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
                 return new string []  {
-                   "CleverAge.OdfConverter.Word.OoxChangeTrackingPostProcessor,"+fullname,
+                   "OdfConverter.Wordprocessing.OoxChangeTrackingPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.OdfConverterLib.OoxSpacesPostProcessor",
-        	       "CleverAge.OdfConverter.Word.OoxSectionsPostProcessor,"+fullname, 
-        	       "CleverAge.OdfConverter.Word.OoxAutomaticStylesPostProcessor,"+fullname,
-        	       "CleverAge.OdfConverter.Word.OoxParagraphsPostProcessor,"+fullname,
+        	       "OdfConverter.Wordprocessing.OoxSectionsPostProcessor,"+fullname, 
+        	       "OdfConverter.Wordprocessing.OoxAutomaticStylesPostProcessor,"+fullname,
+        	       "OdfConverter.Wordprocessing.OoxParagraphsPostProcessor,"+fullname,
         	       "CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor"
                 };
             }
@@ -44,10 +67,10 @@ namespace CleverAge.OdfConverter.Word
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
                 return new string []  {
-                    "CleverAge.OdfConverter.Word.OdfParagraphPostProcessor,"+fullname,
-			        "CleverAge.OdfConverter.Word.OdfCheckIfIndexPostProcessor,"+fullname,
+                    "OdfConverter.Wordprocessing.OdfParagraphPostProcessor,"+fullname,
+			        "OdfConverter.Wordprocessing.OdfCheckIfIndexPostProcessor,"+fullname,
         	        "CleverAge.OdfConverter.OdfConverterLib.OdfCharactersPostProcessor",
-                    "CleverAge.OdfConverter.Word.OdfIndexSourceStylesPostProcessor,"+fullname
+                    "OdfConverter.Wordprocessing.OdfIndexSourceStylesPostProcessor,"+fullname
                 };
             }
         }

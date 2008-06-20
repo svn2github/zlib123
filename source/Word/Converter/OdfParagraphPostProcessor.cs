@@ -32,7 +32,7 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using System.Text;
 
-namespace CleverAge.OdfConverter.Word
+namespace OdfConverter.Wordprocessing
 {
 	/// <summary>
 	/// Postprocessor to handle paragraphs with too many characters.

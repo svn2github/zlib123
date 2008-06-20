@@ -266,7 +266,7 @@
             try
             {
                 // if item already exists, use it (should never happen)
-                optionButton = (CommandBarButton)controls[this.addinLib.GetString("OdfFileOptionsLabel")];
+                optionButton = (CommandBarButton)controls[this.addinLib.GetString("OdfOptionsLabel")];
             }
             catch (Exception)
             {
@@ -274,8 +274,8 @@
                 optionButton = (CommandBarButton)controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 5, true);
             }
             // set item's label
-            optionButton.Caption = this.addinLib.GetString("OdfFileOptionsLabel");
-            optionButton.Tag = this.addinLib.GetString("OdfFileOptionsLabel");
+            optionButton.Caption = this.addinLib.GetString("OdfOptionsLabel");
+            optionButton.Tag = this.addinLib.GetString("OdfOptionsLabel");
             // set action
             optionButton.OnAction = "!<OdfExcel2003Addin.Connect>";
             optionButton.Visible = true;
@@ -339,7 +339,7 @@
             button.Delete(Type.Missing);
             button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfExportLabel"), Type.Missing);
             button.Delete(Type.Missing);
-            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfFileOptionsLabel"), Type.Missing);
+            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfOptionsLabel"), Type.Missing);
             button.Delete(Type.Missing);
         }
 

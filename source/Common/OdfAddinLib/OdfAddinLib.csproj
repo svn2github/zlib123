@@ -27,6 +27,19 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing %28signed%29|AnyCPU' ">
+    <OutputPath>bin\Release to Manufacturing %28signed%29\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleAssemblies>C:\Program Files\Microsoft Visual Studio 8\Team Tools\Static Analysis Tools\FxCop\\rules</CodeAnalysisRuleAssemblies>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\OdfConverter.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
@@ -36,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractOdfAddin.cs" />
     <Compile Include="ConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -49,14 +63,18 @@
     <Compile Include="ConverterForm.Designer.cs">
       <DependentUpon>ConverterForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="IOdfConverter.cs" />
     <Compile Include="InfoBox.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InfoBox.Designer.cs">
       <DependentUpon>InfoBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="LateBindingObject.cs" />
+    <Compile Include="ManagedAggregator.cs" />
     <Compile Include="OdfAddinLib.cs">
     </Compile>
+    <Compile Include="Office.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ConfigForm.de-DE.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
@@ -106,7 +124,7 @@
       <DependentUpon>ConverterForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-   <EmbeddedResource Include="ConverterForm.zh-CHS.resx">
+    <EmbeddedResource Include="ConverterForm.zh-CHS.resx">
       <DependentUpon>ConverterForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -174,6 +192,9 @@
       <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
       <Name>OdfZipUtils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\customUI.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

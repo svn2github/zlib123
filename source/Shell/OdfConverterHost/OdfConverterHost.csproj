@@ -29,6 +29,17 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing %28signed%29|AnyCPU' ">
+    <OutputPath>bin\Release to Manufacturing %28signed%29\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleAssemblies>C:\Program Files\Microsoft Visual Studio 8\Team Tools\Static Analysis Tools\FxCop\\rules</CodeAnalysisRuleAssemblies>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -86,10 +97,6 @@
     <ProjectReference Include="..\..\Common\OdfZipUtils\OdfZipUtils.csproj">
       <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
       <Name>OdfZipUtils</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Word\Add-In\Addin.csproj">
-      <Project>{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}</Project>
-      <Name>Addin %28Word\Addin%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Word\Converter\Converter.csproj">
       <Project>{F9071930-348E-4A30-A0F6-A1A3DF3A587B}</Project>

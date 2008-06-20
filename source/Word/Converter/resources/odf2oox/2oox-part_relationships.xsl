@@ -255,7 +255,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- copy placeholder picture -->
-        <pzip:copy pzip:source="#CER#WordConverter.dll#CleverAge.OdfConverter.Word.resources.OLEplaceholder.png#"
+        <pzip:copy pzip:source="#CER#WordConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#"
                    pzip:target="word/media/{$olePictureId}.png"/>
         <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
           <xsl:attribute name="Id">

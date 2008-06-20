@@ -1,0 +1,39 @@
+// OdfWordAddinShim.idl 
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(F6D1F10C-3429-45D3-8700-CB6C62229AD4),
+	version(1.0),
+	helpstring("OdfWordAddinShim 1.0 Type Library")
+]
+library OdfWordAddinShimLib
+{
+	importlib("stdole2.tlb");
+
+	[
+		uuid(f474d30d-3450-423e-ae62-bd3307544e86),
+		helpstring("ConnectProxy Class")
+	]
+	coclass ConnectProxy
+	{
+		[default] interface IUnknown;
+	};
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

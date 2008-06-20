@@ -207,7 +207,7 @@
   <data name="OdfFileOptionsDescription" xml:space="preserve">
     <value>有効化/無効化]ダイアログボックスでfidelitymessage</value>
   </data>
-  <data name="OdfFileOptionsLabel" xml:space="preserve">
+  <data name="OdfOptionsLabel" xml:space="preserve">
     <value>odfオプション</value>
   </data>
 </root>

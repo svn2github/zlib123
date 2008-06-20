@@ -27,6 +27,19 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing %28signed%29|AnyCPU' ">
+    <OutputPath>bin\Release to Manufacturing %28signed%29\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleAssemblies>C:\Program Files\Microsoft Visual Studio 8\Team Tools\Static Analysis Tools\FxCop\\rules</CodeAnalysisRuleAssemblies>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\OdfConverter.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -120,4 +133,9 @@
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\xsltc.exe" /settings:document+,dtd-,script- /nologo /platform:x86 /class:$(TargetName)2Odf /out:$(TargetName)2Odf.dll $(ProjectDir)resources\oox2odf\oox2odf.xsl
+"C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\xsltc.exe" /settings:document+,dtd-,script- /nologo /platform:x86 /class:$(TargetName)2Oox /out:$(TargetName)2Oox.dll $(ProjectDir)resources\odf2oox\odf2oox.xsl
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

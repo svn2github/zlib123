@@ -33,11 +33,12 @@ using System.Reflection;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
-using CleverAge.OdfConverter.Word;
 using Sonata.OdfConverter.Presentation;
 using CleverAge.OdfConverter.Spreadsheet;
+using Wordprocessing = OdfConverter.Wordprocessing;
 
 
 namespace CleverAge.OdfConverter.CommandLineTool
@@ -389,7 +390,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     break;
                 default:
                     throw new ArgumentException("unsupported batch type");
-                    break;
             }
             string [] files = Directory.GetFiles(this.input, "*."+ext, option);
             int nbFiles = files.Length;
@@ -1063,7 +1063,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 case Direction.OdtToDocx:
                     if (wordInstance == null)
                     {
-                        wordInstance = new CleverAge.OdfConverter.Word.Converter();
+                        wordInstance = new Wordprocessing.Converter();
                     }
                     return wordInstance;
                 case Direction.PptxToOdp:

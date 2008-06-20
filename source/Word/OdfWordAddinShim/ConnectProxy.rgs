@@ -1,0 +1,49 @@
+HKCR
+{
+	OdfWordAddin.Connect = s 'Connect Class'
+	{
+		CLSID = s '{f474d30d-3450-423e-ae62-bd3307544e86}'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove '{f474d30d-3450-423e-ae62-bd3307544e86}' = s 'OdfWordAddin.Connect'
+		{
+			ProgID = s 'OdfWordAddin.Connect'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			
+		}
+	}
+}
+
+HKLM
+{
+	NoRemove Software
+	{
+		NoRemove Microsoft
+		{
+			NoRemove Office
+			{
+				NoRemove Word
+				{
+					NoRemove Addins
+					{
+						ForceRemove OdfWordAddin.Connect
+						{
+							val 'Description' = s 'Version 2.0'
+							val 'FriendlyName' = s 'ODF Addin for Word'
+							val 'LoadBehavior' = d 3
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
