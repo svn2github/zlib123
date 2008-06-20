@@ -1707,6 +1707,40 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </c:explosion>
       </xsl:if>
 
+      <xsl:for-each select="key('series','')[position() = $number]">
+        <c:trendline>
+          <xsl:for-each select="chart:regression-curve[1]">
+            <xsl:call-template name="InsertSpPr">
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              <xsl:with-param name="defaultFill" select="'solid'"/>
+            </xsl:call-template>
+          </xsl:for-each>
+          <xsl:for-each select="key('style', @chart:style-name)">
+            <c:trendlineType>
+              <xsl:attribute name="val">
+                <xsl:choose>
+                  <xsl:when test="style:chart-properties/@chart:regression-type = 'linear' ">
+                    <xsl:text>linear</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="style:chart-properties/@chart:regression-type = 'logarithmic' ">
+                    <xsl:text>log</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="style:chart-properties/@chart:regression-type = 'exponential' ">
+                    <xsl:text>exp</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="style:chart-properties/@chart:regression-type = 'power' ">
+                    <xsl:text>power</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>linear</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </c:trendlineType>
+          </xsl:for-each>
+        </c:trendline>
+      </xsl:for-each>
+
       <!-- series name -->
       <xsl:choose>
         <!-- pie chart series name is also a chart title and it can be occur only if chart title is displayed -->
@@ -1831,7 +1865,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </xsl:when>
 
         <xsl:when test="$reverseCategories = 'true' ">
-          <xsl:for-each select="key('series','')[position() = $number]/child::node()[last()]">
+          <xsl:for-each select="key('series','')[position() = $number]/chart:data-point[last()]">
             <xsl:call-template name="InsertDataPointsShapeProperties">
               <xsl:with-param name="parentStyleName" select="$styleName"/>
               <xsl:with-param name="reverse" select=" 'true' "/>
@@ -1843,7 +1877,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </xsl:when>
 
         <xsl:otherwise>
-          <xsl:for-each select="key('series','')[position() = $number]/child::node()[1]">
+          <xsl:for-each select="key('series','')[position() = $number]/chart:data-point[1]">
             <xsl:call-template name="InsertDataPointsShapeProperties">
               <xsl:with-param name="parentStyleName" select="$styleName"/>
               <xsl:with-param name="ChartDirectory">
@@ -2430,82 +2464,83 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:param name="styleName"/>
     <xsl:param name="parentStyleName"/>
     <xsl:param name="ChartDirectory"/>
- 
-<xsl:choose>
- 
-  <xsl:when test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill='gradient'">
-    <xsl:for-each select="key('style',$styleName)/style:graphic-properties">
-    <xsl:call-template name="tmpGradientFill">
-      <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-      <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
-      <xsl:with-param name="ChartDirectory">
-          <xsl:value-of select="$ChartDirectory"/>
-      </xsl:with-param>
-    </xsl:call-template>
-    </xsl:for-each>
-  </xsl:when>
-  <xsl:otherwise>
-    
-    <!-- series shape property -->
-    <c:spPr>
 
-      <!-- fill color -->
-      <xsl:if
-        test="key('style',$styleName)/style:graphic-properties/@draw:fill-color or key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
-        <a:solidFill>
-          <a:srgbClr val="9999FF">
-            <xsl:attribute name="val">
-              <xsl:choose>
-                <xsl:when test="key('style',$styleName)/style:graphic-properties/@draw:fill-color">
-                  <xsl:value-of
-                    select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
-                  />
-                </xsl:when>
-                <xsl:when
-                  test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
-                  <xsl:value-of
-                    select="substring(key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color,2)"
-                  />
-                </xsl:when>
-              </xsl:choose>
-            </xsl:attribute>
-          </a:srgbClr>
-        </a:solidFill>
-      </xsl:if>
+    <xsl:choose>
 
-      <!-- line color -->
-      <xsl:if test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none')">
-        <a:ln w="3175">
-          <a:solidFill>
-            <a:srgbClr val="000000">
-              <xsl:if
-                test="(key('style',$styleName)/style:graphic-properties/@svg:stroke-color or key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color)">
+      <xsl:when test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill='gradient'">
+        <xsl:for-each select="key('style',$styleName)/style:graphic-properties">
+          <xsl:call-template name="tmpGradientFill">
+            <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+            <xsl:with-param name="opacity" select="substring-before(@draw:opacity,'%')"/>
+            <xsl:with-param name="ChartDirectory">
+              <xsl:value-of select="$ChartDirectory"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+
+        <!-- series shape property -->
+        <c:spPr>
+
+          <!-- fill color -->
+          <xsl:if
+            test="key('style',$styleName)/style:graphic-properties/@draw:fill-color or key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
+            <a:solidFill>
+              <a:srgbClr val="9999FF">
                 <xsl:attribute name="val">
                   <xsl:choose>
                     <xsl:when
-                      test="key('style',$styleName)/style:graphic-properties/@svg:stroke-color">
+                      test="key('style',$styleName)/style:graphic-properties/@draw:fill-color">
                       <xsl:value-of
-                        select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
+                        select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
                       />
                     </xsl:when>
                     <xsl:when
-                      test="key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color">
+                      test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
                       <xsl:value-of
-                        select="substring(key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color,2)"
+                        select="substring(key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color,2)"
                       />
                     </xsl:when>
                   </xsl:choose>
                 </xsl:attribute>
-              </xsl:if>
-            </a:srgbClr>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-        </a:ln>
-      </xsl:if>
-    </c:spPr>
-    
-  </xsl:otherwise>
-</xsl:choose>
+              </a:srgbClr>
+            </a:solidFill>
+          </xsl:if>
+
+          <!-- line color -->
+          <xsl:if test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none')">
+            <a:ln w="3175">
+              <a:solidFill>
+                <a:srgbClr val="000000">
+                  <xsl:if
+                    test="(key('style',$styleName)/style:graphic-properties/@svg:stroke-color or key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color)">
+                    <xsl:attribute name="val">
+                      <xsl:choose>
+                        <xsl:when
+                          test="key('style',$styleName)/style:graphic-properties/@svg:stroke-color">
+                          <xsl:value-of
+                            select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
+                          />
+                        </xsl:when>
+                        <xsl:when
+                          test="key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color">
+                          <xsl:value-of
+                            select="substring(key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color,2)"
+                          />
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:attribute>
+                  </xsl:if>
+                </a:srgbClr>
+              </a:solidFill>
+              <a:prstDash val="solid"/>
+            </a:ln>
+          </xsl:if>
+        </c:spPr>
+
+      </xsl:otherwise>
+    </xsl:choose>
 
   </xsl:template>
 
@@ -2537,7 +2572,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
           <xsl:with-param name="styleName" select="@chart:style-name"/>
           <xsl:with-param name="ChartDirectory">
-              <xsl:value-of select="$ChartDirectory"/>
+            <xsl:value-of select="$ChartDirectory"/>
           </xsl:with-param>
         </xsl:call-template>
       </c:dPt>
@@ -2547,8 +2582,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:choose>
       <!-- previous if categories are aligned in reverse order -->
       <xsl:when test="$reverse = 'true' ">
-        <xsl:if test="preceding-sibling::node()[1]">
-          <xsl:for-each select="preceding-sibling::node()[1]">
+        <xsl:if test="preceding-sibling::chart:data-point[1]">
+          <xsl:for-each select="preceding-sibling::chart:data-point[1]">
             <xsl:call-template name="InsertDataPointsShapeProperties">
               <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
               <xsl:with-param name="reverse" select="$reverse"/>
@@ -2562,8 +2597,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       </xsl:when>
       <!-- folowing data point -->
       <xsl:otherwise>
-        <xsl:if test="following-sibling::node()[1]">
-          <xsl:for-each select="following-sibling::node()[1]">
+        <xsl:if test="following-sibling::chart:data-point[1]">
+          <xsl:for-each select="following-sibling::chart:data-point[1]">
             <xsl:call-template name="InsertDataPointsShapeProperties">
               <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
               <xsl:with-param name="count" select="$count + $points"/>
@@ -2605,7 +2640,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               <xsl:value-of select="count(key('series','')) - 1"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="count(key('series','')[@chart:attached-axis = 'secondary-y' ])"/>
+              <xsl:value-of select="count(key('series','')[@chart:attached-axis = 'secondary-y' ])"
+              />
             </xsl:otherwise>
           </xsl:choose>
           <!--End of RefNo-2-->
@@ -2623,7 +2659,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!--<xsl:value-of select="count(key('series','')[not(@chart:attached-axis = 'secondary-y' )])"/>-->
           <xsl:choose>
             <xsl:when
-                  test="@chart:class = 'chart:bar' and key('series','')[@chart:class = 'chart:line' ]">
+              test="@chart:class = 'chart:bar' and key('series','')[@chart:class = 'chart:line' ]">
               <xsl:value-of select="count(key('series',''))"/>
             </xsl:when>
             <xsl:otherwise>
@@ -2832,7 +2868,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:if test="$count &lt; $numSeries">
       <xsl:choose>
         <!-- if there is secondary axis ommit its series -->
-        <xsl:when test = "(key('chart','')/@chart:class = 'chart:stock') and (count(key('series','')) = 4) and ($count = 3) and (key('series','')[position() = $number and @chart:attached-axis])" >
+        <xsl:when
+          test="(key('chart','')/@chart:class = 'chart:stock') and (count(key('series','')) = 4) and ($count = 3) and (key('series','')[position() = $number and @chart:attached-axis])">
           <xsl:call-template name="Series">
             <xsl:with-param name="numSeries" select="$numSeries"/>
             <!--<xsl:with-param name="primarySeries" select="$primarySeries"/>-->
@@ -2845,7 +2882,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             <xsl:with-param name="chartType" select="$chartType"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="key('series','')[position() = $number and @chart:attached-axis = 'secondary-y']">
+        <xsl:when
+          test="key('series','')[position() = $number and @chart:attached-axis = 'secondary-y']">
           <xsl:call-template name="Series">
             <xsl:with-param name="numSeries" select="$numSeries"/>
             <!--<xsl:with-param name="primarySeries" select="$primarySeries"/>-->
@@ -3184,7 +3222,5 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     </xsl:choose>
 
   </xsl:template>
-  
-
 
 </xsl:stylesheet>

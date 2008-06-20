@@ -42,8 +42,7 @@
   xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  xmlns:oox="urn:oox"
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:oox="urn:oox"
   exclude-result-prefixes="e r c a xdr oox">
   
   <!-- @Filename: chart.xsl -->
@@ -430,6 +429,10 @@
             <chart:error-indicator chart:style-name="{concat('error',generate-id(.))}"/>
           </xsl:if>
         </xsl:for-each>
+
+        <xsl:if test="c:trendline">
+          <chart:regression-curve chart:style-name="{concat('trend',position())}"/>
+        </xsl:if>
 
         <chart:data-point>
           <xsl:attribute name="chart:repeated">
@@ -1430,7 +1433,7 @@
           chart:lines-used="0" chart:connect-bars="false" chart:series-source="columns"
           chart:mean-value="false" chart:error-margin="0" chart:error-lower-limit="0"
           chart:error-upper-limit="0" chart:error-category="none" chart:error-percentage="0"
-          chart:regression-type="none" chart:data-label-number="none" chart:data-label-text="false"
+          chart:data-label-number="none" chart:data-label-text="false"
           chart:data-label-symbol="false">
 
           <!-- insert markers for Stock Chart if necessary -->
@@ -1531,6 +1534,29 @@
             c:scatterChart/c:ser/c:smooth/@val = 1">
             <xsl:attribute name="chart:interpolation">
               <xsl:text>cubic-spline</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+          <!-- trend line -->
+          <xsl:if test="count(key('dataSeries',@oox:part)/c:trendline) = 1 and count(key('dataSeries',@oox:part)) = 1">
+            <xsl:attribute name="chart:regression-type">
+              <xsl:choose>
+                <xsl:when test="c:ser/c:trendline/c:trendlineType/@val = 'linear' ">
+                  <xsl:text>linear</xsl:text>
+                </xsl:when>
+                <xsl:when test="c:ser/c:trendline/c:trendlineType/@val = 'log' ">
+                  <xsl:text>logarithmic</xsl:text>
+                </xsl:when>
+                <xsl:when test="c:ser/c:trendline/c:trendlineType/@val = 'exp' ">
+                  <xsl:text>exponential</xsl:text>
+                </xsl:when>
+                <xsl:when test="c:ser/c:trendline/c:trendlineType/@val = 'power' ">
+                  <xsl:text>power</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>linear</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:if>
 
@@ -1808,6 +1834,29 @@
 
           </xsl:for-each>
 
+          <!-- trend line -->
+          <xsl:if test="c:trendline">
+            <xsl:attribute name="chart:regression-type">
+              <xsl:choose>
+                <xsl:when test="c:trendline/c:trendlineType/@val = 'linear' ">
+                  <xsl:text>linear</xsl:text>
+                </xsl:when>
+                <xsl:when test="c:trendline/c:trendlineType/@val = 'log' ">
+                  <xsl:text>logarithmic</xsl:text>
+                </xsl:when>
+                <xsl:when test="c:trendline/c:trendlineType/@val = 'exp' ">
+                  <xsl:text>exponential</xsl:text>
+                </xsl:when>
+                <xsl:when test="c:trendline/c:trendlineType/@val = 'power' ">
+                  <xsl:text>power</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>linear</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+
         </style:chart-properties>
 
         <style:graphic-properties>
@@ -1905,6 +1954,39 @@
           </xsl:for-each>
         </style:text-properties>
       </style:style>
+
+      <xsl:if test="c:trendline">
+        <style:style style:name="{concat('trend',$seriesNumber)}" style:family="chart">
+          <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
+            svg:stroke-color="#004586" svg:stroke-opacity="100%" draw:stroke-linejoin="none">
+            <xsl:for-each select="c:trendline/c:spPr">
+
+              <!-- Insert fill -->
+              <xsl:choose>
+                <xsl:when test="a:gradFill">
+                  <xsl:attribute name="draw:fill">
+                    <xsl:text>gradient</xsl:text>
+                  </xsl:attribute>
+                  <xsl:for-each select="a:gradFill">
+                    <xsl:attribute name="draw:fill-gradient-name">
+                      <xsl:value-of select="generate-id()"/>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="a:blipFill">
+                  <xsl:call-template name="InsertBitmapFill"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="InsertFill"/>
+                </xsl:otherwise>
+              </xsl:choose>
+
+              <xsl:call-template name="InsertLineColor"/>
+              <xsl:call-template name="InsertLineStyle"/>
+            </xsl:for-each>
+          </style:graphic-properties>
+        </style:style>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
 
