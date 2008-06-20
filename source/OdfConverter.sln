@@ -434,8 +434,8 @@ Global
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Any CPU.Build.0 = Release|Any CPU
-		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release|Any CPU
+		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -481,8 +481,8 @@ Global
 		{E7055581-7C0C-429F-8134-99D3413C5756}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
 		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Any CPU.Build.0 = Release|Any CPU
-		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release|Any CPU
+		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{E7055581-7C0C-429F-8134-99D3413C5756}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{E7055581-7C0C-429F-8134-99D3413C5756}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -496,8 +496,8 @@ Global
 		{792B426E-9ED5-414C-9853-98137AE0CC50}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
 		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Any CPU.Build.0 = Release|Any CPU
-		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release|Any CPU
+		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{792B426E-9ED5-414C-9853-98137AE0CC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -510,7 +510,8 @@ Global
 		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
-		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{44851BA9-366B-4DAB-BB05-9E4CF24601AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -522,7 +523,8 @@ Global
 		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
-		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{9065A728-701B-4B99-91FB-2A36E8E2C3C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -534,7 +536,8 @@ Global
 		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
-		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{1BA6DE1B-711A-4AD8-A35F-38928992E5F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -547,8 +550,8 @@ Global
 		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
 		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Any CPU.Build.0 = Release|Any CPU
-		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release|Any CPU
+		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{0EACD55D-3D67-4E42-9714-8142EAF8246A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -561,7 +564,8 @@ Global
 		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
-		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{9A212D52-99FD-4366-A465-6C1A79B5720E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -573,7 +577,8 @@ Global
 		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
-		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{AE45A9DA-E571-491B-9695-A5690797E8A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -584,7 +589,8 @@ Global
 		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release|Any CPU
-		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{505B4BD9-AB8F-456C-9523-096C86D96CD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -626,7 +632,8 @@ Global
 		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Debug|Win32.ActiveCfg = Debug
 		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)
 		{2660C5F8-A5A2-40C8-88E2-63A643E0FF29}.Release|Any CPU.ActiveCfg = Release
@@ -636,7 +643,8 @@ Global
 		{C81228E1-3600-466C-A717-6FB1DAA09499}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{C81228E1-3600-466C-A717-6FB1DAA09499}.Debug|Win32.ActiveCfg = Debug
 		{C81228E1-3600-466C-A717-6FB1DAA09499}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{C81228E1-3600-466C-A717-6FB1DAA09499}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{C81228E1-3600-466C-A717-6FB1DAA09499}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{C81228E1-3600-466C-A717-6FB1DAA09499}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{C81228E1-3600-466C-A717-6FB1DAA09499}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{C81228E1-3600-466C-A717-6FB1DAA09499}.Release|Any CPU.ActiveCfg = Release
 		{C81228E1-3600-466C-A717-6FB1DAA09499}.Release|Mixed Platforms.ActiveCfg = Release
@@ -645,7 +653,8 @@ Global
 		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Debug|Win32.ActiveCfg = Debug
 		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Release|Any CPU.ActiveCfg = Release
 		{67AA1C17-01C4-4E9D-BF5F-184C218E81B7}.Release|Mixed Platforms.ActiveCfg = Release
@@ -654,7 +663,8 @@ Global
 		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Debug|Win32.ActiveCfg = Debug
 		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Release|Any CPU.ActiveCfg = Release
 		{F88B7810-F0EC-4381-911A-F0ED5795BF0E}.Release|Mixed Platforms.ActiveCfg = Release
@@ -663,7 +673,8 @@ Global
 		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Debug|Win32.ActiveCfg = Debug
 		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Release|Any CPU.ActiveCfg = Release
 		{7D625731-77C9-49C9-ACFD-9DD18ACF117F}.Release|Mixed Platforms.ActiveCfg = Release
@@ -672,7 +683,8 @@ Global
 		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Debug|Win32.ActiveCfg = Debug
 		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Release|Any CPU.ActiveCfg = Release
 		{AA53AB6D-50A8-403A-AEA7-647D7FD789F2}.Release|Mixed Platforms.ActiveCfg = Release
@@ -681,7 +693,8 @@ Global
 		{0444CAAD-474F-44E5-AA67-665F84108333}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{0444CAAD-474F-44E5-AA67-665F84108333}.Debug|Win32.ActiveCfg = Debug
 		{0444CAAD-474F-44E5-AA67-665F84108333}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{0444CAAD-474F-44E5-AA67-665F84108333}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{0444CAAD-474F-44E5-AA67-665F84108333}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{0444CAAD-474F-44E5-AA67-665F84108333}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{0444CAAD-474F-44E5-AA67-665F84108333}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{0444CAAD-474F-44E5-AA67-665F84108333}.Release|Any CPU.ActiveCfg = Release
 		{0444CAAD-474F-44E5-AA67-665F84108333}.Release|Mixed Platforms.ActiveCfg = Release
@@ -690,7 +703,8 @@ Global
 		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Debug|Win32.ActiveCfg = Debug
 		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)
 		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)
 		{91958993-D2D5-48CA-BEB8-01886C4B51DD}.Release|Any CPU.ActiveCfg = Release
@@ -702,7 +716,8 @@ Global
 		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Debug|Win32.ActiveCfg = Debug
 		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release
 		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Release|Any CPU.ActiveCfg = Release
 		{D1D95A42-F55D-4FDA-9770-3F2CAAF3A7EC}.Release|Any CPU.Build.0 = Release
@@ -712,7 +727,8 @@ Global
 		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Debug|Win32.ActiveCfg = Debug
 		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release
 		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Release|Any CPU.ActiveCfg = Release
 		{9A2B5D8F-0E2C-47F5-B3EB-CF090A685960}.Release|Any CPU.Build.0 = Release
@@ -722,7 +738,8 @@ Global
 		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Debug|Win32.ActiveCfg = Debug
 		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release
 		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Release|Any CPU.ActiveCfg = Release
 		{5E11CC78-E2EE-4FE3-9CEF-21F9DD83B10F}.Release|Any CPU.Build.0 = Release
@@ -732,7 +749,8 @@ Global
 		{91E62340-D974-49C9-B505-73424988360D}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{91E62340-D974-49C9-B505-73424988360D}.Debug|Win32.ActiveCfg = Debug
 		{91E62340-D974-49C9-B505-73424988360D}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{91E62340-D974-49C9-B505-73424988360D}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{91E62340-D974-49C9-B505-73424988360D}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{91E62340-D974-49C9-B505-73424988360D}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{91E62340-D974-49C9-B505-73424988360D}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release
 		{91E62340-D974-49C9-B505-73424988360D}.Release|Any CPU.ActiveCfg = Release
 		{91E62340-D974-49C9-B505-73424988360D}.Release|Any CPU.Build.0 = Release
@@ -742,7 +760,8 @@ Global
 		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Debug|Win32.ActiveCfg = Debug
 		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release
 		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Release|Any CPU.ActiveCfg = Release
 		{408DF5F6-E4E1-44B4-AFE5-8BFECF18C228}.Release|Any CPU.Build.0 = Release
@@ -752,7 +771,8 @@ Global
 		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Debug|Win32.ActiveCfg = Debug
 		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Release to Manufacturing (signed)|Any CPU.ActiveCfg = Release
-		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release
+		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)
+		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)
 		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release
 		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Release|Any CPU.ActiveCfg = Release
 		{6CAF98BF-2929-451F-B0B8-560C8D5E24D0}.Release|Any CPU.Build.0 = Release
