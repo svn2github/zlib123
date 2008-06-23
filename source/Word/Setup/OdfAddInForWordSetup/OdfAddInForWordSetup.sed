@@ -35,7 +35,7 @@ FILE1="OdfAddInForWordSetup.msi"
 FILE2="extensibilityMSM.msi"
 FILE3="lockbackRegKey.msi"
 FILE4="office2003-kb907417sfxcab-ENU.exe"
-FILE5="SetupPrepare.bat"
+FILE5="..\Scripts\SetupPrepare.bat"
 [SourceFiles]
 SourceFiles0=
 SourceFiles1=KB908002\

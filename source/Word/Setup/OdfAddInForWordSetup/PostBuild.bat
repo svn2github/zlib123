@@ -1,12 +1,24 @@
-%1AddCustomActions.vbs %2 ..\..\..\..\..\lib\OdfInstallHelper.dll
-cscript.exe %1CorrectConditions.vbs %2 %1Conditions.xml
-cscript.exe %1patchForVista.vbs %2
+:: called with the following parameters:
+::     %1 - path to project folder
+::     %2 - BuiltOutputPath, e.g. .\Release\OdfAddInForWordSetup.msi
+::     %3 - Configuration, e.g. "Release", "Release to Manufacturing (signed)"
+
+:: add custom install actions
+ECHO "Adding custom actions"
+ECHO %1..\Scripts\AddCustomActions.vbs %2 ..\..\..\..\..\lib\OdfInstallHelper.dll
+cscript.exe %1..\Scripts\AddCustomActions.vbs %2 ..\..\..\..\..\lib\OdfInstallHelper.dll
+
+
+cscript.exe %1..\Scripts\CorrectConditions.vbs %2 %1..\Scripts\Conditions.xml
+cscript.exe %1..\Scripts\patchForVista.vbs %2
 
 ::Bug #1789989  enable back button on wizard page 4
 ::removed bugfix 20080606/divo
-::cscript.exe %1AddProperty.vbs %2
-%1MakeSetupExe.bat %1%3
+::cscript.exe %1..\Scripts\AddProperty.vbs %2
 
-::ECHO.%1AddCustomActions.vbs %2 ..\..\..\..\..\lib\OdfInstallHelper.dll>"postBuild.log"
-::ECHO.%1MakeSetupExe.bat %1%3>>"postBuild.log"
+::build self-extracting installer
+%1..\Scripts\MakeSetupExe.bat %1%3 ..\OdfAddInForWordSetup.sed
+
+
+
 
