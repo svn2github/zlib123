@@ -3963,6 +3963,17 @@
       <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
     </xsl:if-->
 
+    <xsl:if test="ancestor::w:tc and ancestor::w:tbl/w:tblPr/w:tblStyle">
+      <xsl:if test="$StyleId = ''">
+        <xsl:variable name="TableStyleName" select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"></xsl:variable>
+        <xsl:variable name="Spacing" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$TableStyleName]/w:pPr/w:spacing"></xsl:variable>
+        <xsl:if test="$Spacing/@w:after='0'">
+          <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+        </xsl:if>
+      </xsl:if>
+    </xsl:if>
+    
+
     <!-- insert attributes using template -->
     <xsl:call-template name="InsertParagraphBreakBefore"/>
     <xsl:call-template name="InsertParagraphAutoSpace"/>
