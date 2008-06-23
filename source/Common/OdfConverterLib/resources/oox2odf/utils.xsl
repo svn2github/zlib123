@@ -19,5 +19,24 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name="substring-count">
+    <xsl:param name="string" />
+    <xsl:param name="occurrence" />
+    <xsl:param name="count" select="0" />
+
+    <xsl:choose>
+      <xsl:when test="contains($string, $occurrence)">
+        <xsl:call-template name="substring-count">
+          <xsl:with-param name="string" select="substring-after($string, $occurrence)" />
+          <xsl:with-param name="occurrence" select="$occurrence"/>
+          <xsl:with-param name="count" select="$count +1" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$count"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   
 </xsl:stylesheet>

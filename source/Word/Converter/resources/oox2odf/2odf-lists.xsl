@@ -262,10 +262,24 @@
             </xsl:with-param>
           </xsl:call-template>
           <xsl:choose>
-            <!--dialogika, clam: bugfix #1831298-->
-            <xsl:when test="starts-with(w:lvlText/@w:val,concat('%',$lvl,'%',$lvl))">
+            <!--
+              dialogika, clam: bugfix #1831298
+              <xsl:when test="starts-with(w:lvlText/@w:val,concat('%',$lvl,'%',$lvl))">
+              
+              dialogika, makz: 
+              changed that it works dynamically
+              -->
+            <xsl:when test="starts-with(w:lvlText/@w:val, concat('%',$lvl))">
+              <xsl:variable name="cnt">
+                <xsl:call-template name="substring-count">
+                  <xsl:with-param name="string" select="w:lvlText/@w:val" />
+                  <xsl:with-param name="occurrence" select="concat('%',$lvl)" />
+                </xsl:call-template>
+              </xsl:variable>
               <xsl:attribute name="style:num-letter-sync">true</xsl:attribute>
-              <xsl:attribute name="text:start-value">27</xsl:attribute>
+              <xsl:attribute name="text:start-value">
+                <xsl:value-of select="1 + (($cnt - 1)*26)"/>
+              </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
               <xsl:if test="w:start and w:start/@w:val > 1">
@@ -308,6 +322,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
 
   <!-- numbering format -->
 
@@ -375,7 +390,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
 
   <!--math, dialogika: changed for correct indentation calculation BEGIN -->  
 
