@@ -59,14 +59,7 @@ namespace OdfConverterLauncher
             }
         }
 
-        public void Quit()
-        {
-            object[] args = new object[] { Missing.Value,
-                                            Missing.Value,
-                                            Missing.Value };
-            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
-        }
-
+       
         public void Open(string document)
         {
             if (_documents == null)
@@ -136,14 +129,7 @@ namespace OdfConverterLauncher
                 _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
             }
         }
-
-        public void Quit()
-        {
-            object[] args = new object[] { Missing.Value,
-                                            Missing.Value,
-                                            Missing.Value };
-            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
-        }
+       
 
         public void Open(string document)
         {
@@ -213,15 +199,7 @@ namespace OdfConverterLauncher
                 _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
             }
         }
-
-        public void Quit()
-        {
-            object[] args = new object[] { Missing.Value,
-                                            Missing.Value,
-                                            Missing.Value };
-            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
-        }
-
+      
         public void Open(string document)
         {
             if (_documents == null)
@@ -292,11 +270,7 @@ namespace OdfConverterLauncher
                             ppt.Visible = true;
                             ppt.Open(output);
 
-                        }
-                        else
-                        {
-                            ppt.Quit();
-                        }
+                        }                        
                     }
                     catch (Exception e)
                     {
@@ -323,11 +297,7 @@ namespace OdfConverterLauncher
                         {
                             objExcel.Visible = true;
                             objExcel.Open(output);
-                        }
-                        else
-                        {
-                            objExcel.Quit();
-                        }
+                        }                        
                     }
                     catch (Exception e)
                     {
@@ -352,11 +322,7 @@ namespace OdfConverterLauncher
                         {
                             word.Visible = true;
                             word.Open(output);
-                        }
-                        else
-                        {
-                            word.Quit();
-                        }
+                        }                        
                     }
                     catch (Exception e)
                     {
