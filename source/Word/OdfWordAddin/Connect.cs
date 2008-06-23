@@ -202,7 +202,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                         LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
                         
                         // update document fields
-                        doc.Invoke("Fields").Invoke("Update");
+                        //doc.Invoke("Fields").Invoke("Update");
 
                         // and activate it
                         doc.Invoke("Activate");
