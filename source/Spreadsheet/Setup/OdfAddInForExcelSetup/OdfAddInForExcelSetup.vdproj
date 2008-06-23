@@ -1348,26 +1348,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7B1331554AA643548133C01E6D5CEA9F"
-            {
-            "SourcePath" = "8:..\\..\\..\\Common\\conf\\config.xml"
-            "TargetName" = "8:config.xml"
-            "Tag" = "8:"
-            "Folder" = "8:_C7C71FC0EA3E41659913C837B389F64E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_84EA9EC0615E9BC799827E25C3F5A9AF"
             {
             "AssemblyRegister" = "3:1"
@@ -1785,17 +1765,7 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_C7C71FC0EA3E41659913C837B389F64E"
-                    {
-                    "Name" = "8:conf"
-                    "AlwaysCreate" = "11:FALSE"
-                    "Condition" = "8:"
-                    "Transitive" = "11:FALSE"
-                    "Property" = "8:_11AD798D680240A8B65E94B3A3CD96EB"
-                        "Folders"
-                        {
-                        }
-                    }
+                    
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_541F9CA8F08D4B30BD8D78DFCCC6BD04"
@@ -1931,6 +1901,14 @@
                                         }
                                         "Values"
                                         {
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_2F022E8C7A9B4F248856D55422FDD689"
+                                            {
+                                            "Name" = "8:fidelityValue"
+                                            "Condition" = "8:ALLUSERS=1"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:false"
+                                            }
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_9AF811BA1B1145C483C4E361BF1278BF"
                                             {
                                             "Name" = "8:language"
@@ -2008,7 +1986,7 @@
                                                                     "Condition" = "8:WORDVERSION=11 AND ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4235)"
+                                                                    "Value" = "8:Version 2.0 (Build 4235)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_758B652404D54834BAE80A18A0BFB8BC"
                                                                     {
@@ -2046,7 +2024,7 @@
                                                                     "Condition" = "8:WORDVERSION=10 AND ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4235)"
+                                                                    "Value" = "8:Version 2.0 (Build 4235)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_FCBCC8549B99411F9FE5B8CA1DCFBFA3"
                                                                     {
@@ -2084,7 +2062,7 @@
                                                                     "Condition" = "8:WORDVERSION=12 AND ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4235)"
+                                                                    "Value" = "8:Version 2.0 (Build 4235)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_FC5C3894669A4754BEB12F9B9319A660"
                                                                     {
@@ -2198,7 +2176,7 @@
                                                                     "Condition" = "8:WORDVERSION=10 AND ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4235)"
+                                                                    "Value" = "8:Version 2.0 (Build 4235)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_9874E26F09EC47F4973DB3C27F822FDD"
                                                                     {
@@ -2228,7 +2206,7 @@
                                                                     "Condition" = "8:WORDVERSION=11 AND ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4235)"
+                                                                    "Value" = "8:Version 2.0 (Build 4235)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_AE7F6193038E4910A325A9F4CD7DE698"
                                                                     {
@@ -2282,7 +2260,7 @@
                                                                     "Condition" = "8:WORDVERSION=12 AND ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4235)"
+                                                                    "Value" = "8:Version 2.0 (Build 4235)"
                                                                     }
                                                                 }
                                                             }
@@ -2327,6 +2305,14 @@
                                         }
                                         "Values"
                                         {
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_23635816D398424F932579D9E8AB21B9"
+                                            {
+                                            "Name" = "8:fidelityValue"
+                                            "Condition" = "8:ALLUSERS<>1"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:false"
+                                            }
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_607DFAA23DD44B0C9D734681E2E432BA"
                                             {
                                             "Name" = "8:language"

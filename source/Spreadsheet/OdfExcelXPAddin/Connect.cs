@@ -481,6 +481,16 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                             object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
                             File.Copy((string)initialName, (string)newName);
 
+                            //converting readonly files 
+                            FileInfo lFi;
+
+                            lFi = new FileInfo((string)newName);
+
+                            if (lFi.IsReadOnly)
+                            {
+                                lFi.IsReadOnly = false;
+                            }
+
                             // open the duplicated file
                             object addToRecentFiles = false;
                             object readOnly = false;

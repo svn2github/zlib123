@@ -27,12 +27,12 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="onLoad">
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui">
   <ribbon>
     <officeMenu>
       <menu id="OdfMenu" getLabel="GetLabel" insertAfterMso="FileSaveAsMenu" itemSize="large" getImage="GetImage">
-        <button id="OdfImport" imageMso="FileOpen" getLabel="GetLabel" onAction="ImportODF" getEnabled="getEnabled" getDescription="GetDescription" />
-        <button id="OdfExport" imageMso="FileSave" getLabel="GetLabel" onAction="ExportODF" getEnabled="getEnabled" getDescription="GetDescription" />
+        <button id="OdfImport" imageMso="FileOpen" getLabel="GetLabel" onAction="ImportODF" getDescription="GetDescription" />
+        <button id="OdfExport" imageMso="FileSave" getLabel="GetLabel" onAction="ExportODF" getDescription="GetDescription" enabled="true" />
         <button id="OdfFileOptions" imageMso="ApplicationOptionsDialog" getLabel="GetLabel" onAction="ODFOptions" getDescription="GetDescription"/>
       </menu>
     </officeMenu>

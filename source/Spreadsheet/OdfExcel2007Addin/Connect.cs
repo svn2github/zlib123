@@ -101,8 +101,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
             this.applicationObject = (MSExcel.Application)application;
-            RegisterBarsEventHandler();
-
+            
             // set culture to match current application culture or user's choice
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
@@ -197,9 +196,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
             fd.Title = this.addinLib.GetString(IMPORT_LABEL);
             // display the dialog
             fd.Show();
-
-            // For unknown (yet ;-) ) reason, we have to restore some event handlers...
-            bool restoreHandlers = (fd.SelectedItems.Count > 0);
+            
             try {
                 // process the chosen documents	
                 for (int i = 1; i <= fd.SelectedItems.Count; ++i) {
@@ -242,10 +239,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                         return;
                     }
                 }
-            } finally {
-                if (restoreHandlers) {
-                    RegisterBarsEventHandler();
-                }
+            } finally {                
             }
         }
 
@@ -257,8 +251,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         {
             // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
             System.Globalization.CultureInfo ci;
-            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
-            bool restoreHandlers = false;
+            ci = System.Threading.Thread.CurrentThread.CurrentCulture;           
             try
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -288,7 +281,6 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                     // process the chosen workbooks
                     if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                     {
-                        restoreHandlers = true;
                         // retrieve file name
                         string odfFile = sfd.FileName;
                         if (!odfFile.EndsWith(ext))
@@ -306,6 +298,16 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                             // duplicate the file
                             object wbCopyName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
                             File.Copy((string) initialName, (string) wbCopyName);
+
+                            //converting readonly files 
+                            FileInfo lFi;
+
+                            lFi = new FileInfo((string)wbCopyName);
+
+                            if (lFi.IsReadOnly)
+                            {
+                                lFi.IsReadOnly = false;
+                            }
 
                             // open the duplicated file
                             object addToRecentFiles = false;
@@ -347,10 +349,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
             }
             finally
             {
-                System.Threading.Thread.CurrentThread.CurrentCulture = ci;
-                if (restoreHandlers) {
-                    RegisterBarsEventHandler();
-                }
+                System.Threading.Thread.CurrentThread.CurrentCulture = ci;                
             }
         }
 
@@ -438,35 +437,6 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         }
 
         #endregion
-
-        IRibbonUI m_Ribbon;
-        bool m_bEnabled;
-
-        public void onLoad(IRibbonUI ribbon)
-        {
-            m_Ribbon = ribbon;
-        }
-        public bool getEnabled(IRibbonControl control)
-        {
-            return m_bEnabled;
-        }
-        void bars_OnUpdate()
-        {
-            bool newValue = applicationObject.CommandBars.GetEnabledMso("FileOpen");
-            //ODS("bars_OnUpdate : " + newValue);
-            if (m_bEnabled != newValue)
-            {
-                m_bEnabled = newValue;
-                m_Ribbon.InvalidateControl("OdfImport");
-                m_Ribbon.InvalidateControl("OdfExport");
-            }
-
-        }
-
-        void RegisterBarsEventHandler() {
-            CommandBars bars = applicationObject.CommandBars;
-            bars.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(bars_OnUpdate);
-            m_bEnabled = bars.GetEnabledMso("FileOpen");
-        }
+        
     }
 }
