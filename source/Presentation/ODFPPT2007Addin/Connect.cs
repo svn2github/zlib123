@@ -282,6 +282,16 @@ namespace OdfPPT2007Addin
                         object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
                         File.Copy((string)initialName, (string)newName);
 
+                        //Bug#1958717(Desc:readonly files are not converted)
+                        FileInfo lFi;
+
+                        lFi = new FileInfo((string)newName);
+
+                        if (lFi.IsReadOnly)
+                        {
+                            lFi.IsReadOnly = false;
+                        }
+
                         PPT.Presentation newPres = this.applicationObject.Presentations.Open((string)newName, MsoTriState.msoFalse, MsoTriState.msoFalse, MsoTriState.msoFalse);
 
                         // generate openxml file from the duplicated file (under a temporary file)

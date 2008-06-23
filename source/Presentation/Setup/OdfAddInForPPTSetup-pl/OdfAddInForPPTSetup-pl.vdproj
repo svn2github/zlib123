@@ -1593,26 +1593,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D454DE8C1CE54EE0BE3BA6877F7BC187"
-            {
-            "SourcePath" = "8:..\\..\\..\\Common\\conf\\config.xml"
-            "TargetName" = "8:config.xml"
-            "Tag" = "8:"
-            "Folder" = "8:_EF2E7523139D4651BAE22155E2F81C11"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DA44D690B01A4CA28645BA292B9449B8"
             {
             "SourcePath" = "8:..\\..\\..\\..\\lib\\zlibwapi.dll"
@@ -1751,17 +1731,7 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_EF2E7523139D4651BAE22155E2F81C11"
-                    {
-                    "Name" = "8:conf"
-                    "AlwaysCreate" = "11:FALSE"
-                    "Condition" = "8:"
-                    "Transitive" = "11:FALSE"
-                    "Property" = "8:_D91B05B1B97546A7A8BDD2C2C35F7A08"
-                        "Folders"
-                        {
-                        }
-                    }
+                    
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_B38DC705F9A1468D8B1FEB3A6047AFD9"
@@ -1946,7 +1916,7 @@
                                                                     "Condition" = "8:WORDVERSION=11 AND ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4239)"
+                                                                    "Value" = "8:Version 2.0 (Build 4239)"
                                                                     }
                                                                 }
                                                             }
@@ -1968,7 +1938,7 @@
                                                                     "Condition" = "8:WORDVERSION=12 AND ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4239)"
+                                                                    "Value" = "8:Version 2.0 (Build 4239)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_69C2FBD54F5D4F918108EFB16E24091B"
                                                                     {
@@ -2014,7 +1984,7 @@
                                                                     "Condition" = "8:WORDVERSION=10 AND ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4239)"
+                                                                    "Value" = "8:Version 2.0 (Build 4239)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_B8C30E4900574157A5988B59CD4998CE"
                                                                     {
@@ -2075,6 +2045,14 @@
                                             "ValueTypes" = "3:1"
                                             "Value" = "8:[ADDINLANGUAGE]"
                                             }
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_92DF9A1FC73842E994CBBF5EF17F9E81"
+                                            {
+                                            "Name" = "8:fidelityValue"
+                                            "Condition" = "8:ALLUSERS=1"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:false"
+                                            }
                                         }
                                     }
                                 }
@@ -2123,6 +2101,14 @@
                                         }
                                         "Values"
                                         {
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_71334512A9DE499DB15538055C3DA88A"
+                                            {
+                                            "Name" = "8:fidelityValue"
+                                            "Condition" = "8:ALLUSERS<>1"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:false"
+                                            }
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C0453014FD6C4320B0FF6D43CFBC4945"
                                             {
                                             "Name" = "8:language"
@@ -2208,7 +2194,7 @@
                                                                     "Condition" = "8:WORDVERSION=12 AND ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4239)"
+                                                                    "Value" = "8:Version 2.0 (Build 4239)"
                                                                     }
                                                                 }
                                                             }
@@ -2246,7 +2232,7 @@
                                                                     "Condition" = "8:WORDVERSION=10 AND ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4239)"
+                                                                    "Value" = "8:Version 2.0 (Build 4239)"
                                                                     }
                                                                 }
                                                             }
@@ -2284,7 +2270,7 @@
                                                                     "Condition" = "8:WORDVERSION=11 AND ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 1.0 (Build 4239)"
+                                                                    "Value" = "8:Version 2.0 (Build 4239)"
                                                                     }
                                                                 }
                                                             }
@@ -2431,7 +2417,7 @@
                                 {
                                     "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_9CD63EDEBA774CE3999945DB11063DF7"
                                     {
-                                    "Name" = "8:Open with Microsoft PowerPoint"
+                                    "Name" = "8:Otwrz w Microsoft PowerPoint"
                                     "Condition" = "8:"
                                     "AlwaysCreate" = "11:FALSE"
                                     "DeleteAtUninstall" = "11:FALSE"
