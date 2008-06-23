@@ -185,7 +185,7 @@
         <xsl:when test="$suffix='wmf' or $suffix='emf'">
         -->
         <xsl:when test="$suffix='xxx'">
-          <pzip:copy pzip:source="#CER#WordConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#"
+          <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#"
                      pzip:target="{concat('ObjectReplacements/', $newFileName)}" />
         </xsl:when>
 
