@@ -136,7 +136,7 @@
     <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 	<data name="cancelButton.Location" type="System.Drawing.Point, System.Drawing">
-		<value>109, 110</value>
+		<value>111, 83</value>
 	</data>
 	<data name="cancelButton.Size" type="System.Drawing.Size, System.Drawing">
 		<value>75, 23</value>
@@ -158,16 +158,7 @@
   </data>
   <data name="cancelButton.Text" xml:space="preserve">
     <value>Annuler</value>
-  </data>
-  <data name="chkbxIgnoreError.Text" xml:space="preserve">
-    <value>Ne pas m'avertir des erreurs de nouveau</value>
-  </data>
-	<data name="chkbxIgnoreError.Location" type="System.Drawing.Point, System.Drawing">
-		<value>9, 75</value>
-	</data>
-	<data name="chkbxIgnoreError.Size" type="System.Drawing.Size, System.Drawing">
-		<value>182, 17</value>
-	</data>
+  </data> 
 	<data name="lblMessage.Location" type="System.Drawing.Point, System.Drawing">
 		<value>12, 45</value>
 	</data>

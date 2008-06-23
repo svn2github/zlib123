@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -36,6 +36,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Resources;
 using System.Collections;
+using Microsoft.Win32;
 
 using System.Runtime.InteropServices;
 namespace CleverAge.OdfConverter.OdfConverterLib
@@ -91,7 +92,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     Text = newTitle;
                 }
                 // Store the offsets of buttons and groupbox
-                Size proposedSize = new Size(label.Width, 2000); // No vertical constraint
+                Size proposedSize = new Size(label.Width, 3000); // No vertical constraint
                 Size newSize = label.GetPreferredSize(proposedSize);
                 int newHeight = newSize.Height;
                 int offset = newHeight - label.Height;
@@ -99,8 +100,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 // Redim/move windows and controls
                 label.Height = newHeight;
                 smallSize.Height += offset;
-                OK.Top += offset;
-                Details.Top += offset;
+                chkbxIsErrorIgnored.Top = label.Height ;
+                OK.Top = chkbxIsErrorIgnored.Height+ chkbxIsErrorIgnored.Top ;
+                Details.Top = chkbxIsErrorIgnored.Height + chkbxIsErrorIgnored.Top;
 
                 // Test if everything fits
                 int offsetRight = 0;
@@ -122,7 +124,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     smallSize.Height += offsetBottom;
                 }
 
-                grpDetails.Top += offset + offsetBottom;
+                grpDetails.Top = Details.Top + Details.Height + 10;
 
                 // Now compute the size needed for details text box and form with details are shown
                 int marginBottom = ClientSize.Height - grpDetails.Bottom;
@@ -142,7 +144,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     grpDetails.Height += offset2;
                 }
                 largeSize = smallSize;
-                largeSize.Height = grpDetails.Bottom + marginBottom + offset;
+                largeSize.Height = grpDetails.Top + grpDetails.Height+ 10;
                 // At loadtime : no details
                 this.showDetails = false;
                 this.ClientSize = smallSize;
@@ -171,8 +173,47 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-
-
-
+        private void chkbxIsErrorIgnored_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkbxIsErrorIgnored.Checked)
+            {
+                if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "POWERPNT")
+                {
+                    string languageVal = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", null) as string;
+                    if (languageVal == null)
+                    {
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "true");
+                    }
+                    else
+                    {
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "true");
+                    }
+                }
+                if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
+                {
+                    string languageVal = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", null) as string;
+                    if (languageVal == null)
+                    {
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "true");
+                    }
+                    else
+                    {
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "true");
+                    }
+                }
+                if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
+                {
+                    string languageVal = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", null) as string;
+                    if (languageVal == null)
+                    {
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "true");
+                    }
+                    else
+                    {
+                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "true");
+                    }
+                }
+    }
+}
     }
 }

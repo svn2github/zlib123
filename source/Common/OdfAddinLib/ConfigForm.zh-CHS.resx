@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>关于转换过程中的错误，请不要提示我</value>
+    <value>不要再提醒我的富达讯息</value>
   </data>
   <data name="btnOK.Text" xml:space="preserve">
     <value>确定</value>
@@ -137,6 +137,6 @@
     <value>187, 19</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>ODF格式的翻译配置</value>
+    <value>ODF 转换器</value>
   </data>
 </root>

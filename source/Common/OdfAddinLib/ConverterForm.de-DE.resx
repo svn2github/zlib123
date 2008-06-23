@@ -130,7 +130,7 @@
     <value>cancelButton</value>
   </data>
 	<data name="cancelButton.Location" type="System.Drawing.Point, System.Drawing">
-		<value>109, 110</value>
+		<value>111, 83</value>
 	</data>
 	<data name="cancelButton.Size" type="System.Drawing.Size, System.Drawing">
 		<value>75, 23</value>
@@ -158,20 +158,11 @@
   </data>
   <data name="cancelButton.Text" xml:space="preserve">
     <value>Abbrechen</value>
-  </data>
-  <data name="chkbxIgnoreError.Text" xml:space="preserve">
-    <value>Nicht warnen mich der Fehler erneut</value>
-  </data>
+  </data>  
 	<data name="lblMessage.Location" type="System.Drawing.Point, System.Drawing">
 		<value>12, 45</value>
 	</data>
 	<data name="lblMessage.Size" type="System.Drawing.Size, System.Drawing">
 		<value>0, 13</value>
-	</data>
-	<data name="chkbxIgnoreError.Location" type="System.Drawing.Point, System.Drawing">
-		<value>9, 75</value>
-	</data>
-	<data name="chkbxIgnoreError.Size" type="System.Drawing.Size, System.Drawing">
-		<value>182, 17</value>
 	</data>
 </root>

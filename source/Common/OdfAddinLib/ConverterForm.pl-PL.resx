@@ -141,7 +141,7 @@
     <value>1</value>
   </data>
   <data name="cancelButton.Location" type="System.Drawing.Point, System.Drawing">
- 	<value>109, 110</value>
+ 	<value>111, 83</value>
   </data>
   <data name="cancelButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -188,28 +188,7 @@
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
     <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="chkbxIgnoreError.Text" xml:space="preserve">
-    <value>Nie ostrzegaj mnie z błędów ponownie</value>
-  </data>
-  <data name="chkbxIgnoreError.Location" type="System.Drawing.Point, System.Drawing">
-	<value>9, 75</value>
-  </data>
-  <data name="chkbxIgnoreError.Size" type="System.Drawing.Size, System.Drawing">
- 	<value>182, 17</value>
-  </data>
-  <data name="&gt;&gt;chkbxIgnoreError.Name" xml:space="preserve">
-    <value>chkbxIgnoreError</value>
-  </data>
-  <data name="&gt;&gt;chkbxIgnoreError.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;chkbxIgnoreError.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;chkbxIgnoreError.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
+  </data> 
   <data name="&gt;&gt;lblMessage.Name" xml:space="preserve">
     <value>lblMessage</value>
   </data>

@@ -55,8 +55,7 @@
     </Compile>
     <Compile Include="ConfigForm.designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ConfigManager.cs" />
+    </Compile>    
     <Compile Include="ConverterForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -119,21 +119,17 @@
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="chkbxIsErrorIgnored.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 43</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="chkbxIsErrorIgnored.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 3, 2, 3</value>
-  </data>
+     <value>5, 19</value>
+  </data>  
   <data name="chkbxIsErrorIgnored.Size" type="System.Drawing.Size, System.Drawing">
-    <value>224, 46</value>
+    <value>256, 25</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="chkbxIsErrorIgnored.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>Don't warn me of the errors during translation</value>
+    <value>Don't warn me of the fidelity messages</value>
   </data>
   <data name="&gt;&gt;chkbxIsErrorIgnored.Name" xml:space="preserve">
     <value>chkbxIsErrorIgnored</value>
@@ -148,13 +144,10 @@
     <value>0</value>
   </data>
   <data name="btnOK.Location" type="System.Drawing.Point, System.Drawing">
-    <value>36, 159</value>
-  </data>
-  <data name="btnOK.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 3, 2, 3</value>
+    <value>55, 87</value>
   </data>
   <data name="btnOK.Size" type="System.Drawing.Size, System.Drawing">
-    <value>82, 32</value>
+    <value>75, 23</value>
   </data>
   <data name="btnOK.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -175,13 +168,10 @@
     <value>2</value>
   </data>
   <data name="btnCancel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>148, 159</value>
-  </data>
-  <data name="btnCancel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 3, 2, 3</value>
+    <value>153, 87</value>
   </data>
   <data name="btnCancel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>82, 32</value>
+    <value>75, 23</value>
   </data>
   <data name="btnCancel.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -202,8 +192,9 @@
     <value>1</value>
   </data>
   <data name="grpbxConfig.Location" type="System.Drawing.Point, System.Drawing">
-    <value>9, 10</value>
+    <value>7, 10</value>
   </data>
+<assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="grpbxConfig.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 3, 2, 3</value>
   </data>
@@ -211,7 +202,7 @@
     <value>2, 3, 2, 3</value>
   </data>
   <data name="grpbxConfig.Size" type="System.Drawing.Size, System.Drawing">
-    <value>248, 134</value>
+    <value>266, 60</value>
   </data>
   <data name="grpbxConfig.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -238,13 +229,13 @@
     <value>6, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>266, 201</value>
+    <value>278, 122</value>
   </data>
   <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 3, 2, 3</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>ODF Translator Configuration</value>
+    <value>Odf Converter</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>ConfigForm</value>

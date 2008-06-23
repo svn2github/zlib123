@@ -68,13 +68,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.manager = manager;
             this.isDirect = isDirect;
             lostElements = new ArrayList();
-            //ConfigManager configMan = new ConfigManager(System.IO.Path.GetDirectoryName(typeof(ConverterForm).Assembly.Location) + @"\conf\config.xml");
-            //configMan.LoadConfig();
-            //if (configMan.IsErrorIgnored == true)
-            //{
-            //    chkbxIgnoreError.Checked = true;
-            //}
-            
             //this code is for displaying the label in progress bar               
             //Code change 1 of 2
             this.lblMessage.Text = manager.GetString("ProgressBarLoadLabel");

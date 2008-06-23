@@ -59,8 +59,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConverterForm));
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
-            this.lblMessage = new System.Windows.Forms.Label();
-            this.chkbxIgnoreError = new System.Windows.Forms.CheckBox();
+            this.lblMessage = new System.Windows.Forms.Label();            
             this.SuspendLayout();
             // 
             // progressBar1
@@ -81,21 +80,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             // 
             resources.ApplyResources(this.lblMessage, "lblMessage");
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.UseWaitCursor = true;
-            // 
-            // chkbxIgnoreError
-            // 
-            resources.ApplyResources(this.chkbxIgnoreError, "chkbxIgnoreError");
-            this.chkbxIgnoreError.Name = "chkbxIgnoreError";
-            this.chkbxIgnoreError.UseVisualStyleBackColor = true;
-            this.chkbxIgnoreError.UseWaitCursor = true;            
+            this.lblMessage.UseWaitCursor = true;                  
             // 
             // ConverterForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ControlBox = false;
-            this.Controls.Add(this.chkbxIgnoreError);
+            this.ControlBox = false;            
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.progressBar1);
@@ -117,7 +108,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Label lblMessage;
-        private System.Windows.Forms.CheckBox chkbxIgnoreError;
-
+       
     }
 }

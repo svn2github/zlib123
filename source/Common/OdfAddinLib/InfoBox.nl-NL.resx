@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -129,11 +129,11 @@
   </data>
   <data name="OK.Text" xml:space="preserve">
     <value>OK</value>
-  </data>
-  <data name="grpDetails.Text" xml:space="preserve">
-    <value>Details</value>
-  </data>
+  </data> 
   <data name="$this.Text" xml:space="preserve">
-    <value>Odf-conversieprogramma</value>
+    <value>ODF Converter</value>
+  </data>
+  <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
+    <value>Niet waarschuwen me van de trouw-berichten</value>
   </data>
 </root>

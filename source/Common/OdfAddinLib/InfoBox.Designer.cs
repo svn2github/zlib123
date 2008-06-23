@@ -34,6 +34,7 @@
             this.Details = new System.Windows.Forms.Button();
             this.grpDetails = new System.Windows.Forms.GroupBox();
             this.txtDetails = new System.Windows.Forms.TextBox();
+            this.chkbxIsErrorIgnored = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.grpDetails.SuspendLayout();
             this.SuspendLayout();
@@ -78,11 +79,19 @@
             resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
             // 
+            // chkbxIsErrorIgnored
+            // 
+            resources.ApplyResources(this.chkbxIsErrorIgnored, "chkbxIsErrorIgnored");
+            this.chkbxIsErrorIgnored.Name = "chkbxIsErrorIgnored";
+            this.chkbxIsErrorIgnored.UseVisualStyleBackColor = true;
+            this.chkbxIsErrorIgnored.CheckedChanged += new System.EventHandler(this.chkbxIsErrorIgnored_CheckedChanged);
+            // 
             // InfoBox
             // 
             this.AcceptButton = this.OK;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkbxIsErrorIgnored);
             this.Controls.Add(this.grpDetails);
             this.Controls.Add(this.OK);
             this.Controls.Add(this.Details);
@@ -108,5 +117,6 @@
         private System.Windows.Forms.GroupBox grpDetails;
         private System.Windows.Forms.TextBox txtDetails;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox chkbxIsErrorIgnored;
     }
 }
