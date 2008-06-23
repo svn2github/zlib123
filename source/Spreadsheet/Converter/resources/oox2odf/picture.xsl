@@ -394,7 +394,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
           <xsl:when test="$min = ''">
             <xsl:call-template name="GetMinRowWithPicture">
               <xsl:with-param name="min">
-                <xsl:if test="$AfterRow &lt;= substring-before($PictureRow, ';')">
+                <xsl:if test="$AfterRow &lt; substring-before($PictureRow, ';')">
                   <xsl:value-of select="substring-before($PictureRow, ';')"/>
                 </xsl:if>
               </xsl:with-param>
@@ -407,7 +407,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
             </xsl:call-template>
           </xsl:when>
           <xsl:when
-            test="$min &gt; substring-before($PictureRow, ';') and $AfterRow &lt;= substring-before($PictureRow, ';')">
+            test="$min &gt; substring-before($PictureRow, ';') and $AfterRow &lt; substring-before($PictureRow, ';')">
             <xsl:call-template name="GetMinRowWithPicture">
               <xsl:with-param name="min">
                 <xsl:value-of select="substring-before($PictureRow, ';')"/>

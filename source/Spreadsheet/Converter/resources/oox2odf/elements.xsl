@@ -298,7 +298,7 @@
           <xsl:value-of select="$ElementsColl"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$prevColl + 1"/>
+          <xsl:value-of select="$prevColl"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -567,7 +567,7 @@
           <xsl:value-of select="$AllElementsRow"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$prevRow + 1"/>
+          <xsl:value-of select="$prevRow"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -775,7 +775,7 @@
           <xsl:value-of select="$ElementsColl"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$prevColl + 1"/>
+          <xsl:value-of select="$prevColl"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>

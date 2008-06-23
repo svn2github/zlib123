@@ -1531,7 +1531,7 @@
           <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$colNum + 1"/>
+          <xsl:value-of select="$colNum"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
