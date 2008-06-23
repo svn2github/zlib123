@@ -140,9 +140,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(ProjectDir)..\..\Common\OdfConverterLib\resources\odf2oox\*.xsl $(ProjectDir)resources\odf2oox\
+    <PostBuildEvent>copy "$(ProjectDir)..\..\Common\OdfConverterLib\resources\odf2oox\*.xsl" "$(ProjectDir)resources\odf2oox\"
 
-copy $(ProjectDir)..\..\Common\OdfConverterLib\resources\oox2odf\*.xsl $(ProjectDir)resources\oox2odf\
+copy "$(ProjectDir)..\..\Common\OdfConverterLib\resources\oox2odf\*.xsl" "$(ProjectDir)resources\oox2odf\"
 
 "C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\xsltc.exe" /settings:document+,dtd-,script- /nologo /platform:x86 /class:$(TargetName)2Odf /out:$(ProjectDir)bin\$(TargetName)2Odf.dll $(ProjectDir)resources\oox2odf\oox2odf.xsl
 "C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\xsltc.exe" /settings:document+,dtd-,script- /nologo /platform:x86 /class:$(TargetName)2Oox /out:$(ProjectDir)bin\$(TargetName)2Oox.dll $(ProjectDir)resources\odf2oox\odf2oox.xsl
