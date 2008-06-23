@@ -374,11 +374,6 @@
                     "Name" = "8:.NET Framework 2.0"
                     "ProductCode" = "8:Microsoft.Net.Framework.2.0"
                     }
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Office.o2003pia"
-                    {
-                    "Name" = "8:Microsoft Office 2003 Primary Interop Assemblies"
-                    "ProductCode" = "8:Microsoft.Office.o2003pia"
-                    }
                     "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.OtkLoader.2.0"
                     {
                     "Name" = "8:Shared Add-in Support Update for Microsoft .NET Framework 2.0 (KB908002)"
@@ -990,7 +985,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ODF Add-in for Microsoft Word"
         "ProductCode" = "8:{76C89F84-D489-49B9-ACC5-230EB5352EB9}"
-        "PackageCode" = "8:{DF8B47B3-4541-43A2-A828-ACD144CF0B6C}"
+        "PackageCode" = "8:{099605B2-2845-4066-9F57-45694B3D574A}"
         "UpgradeCode" = "8:{429EF697-737F-49D5-A58E-8C8C81FCD580}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -1012,7 +1007,7 @@
         "UseSystemSearchPath" = "11:TRUE"
         "TargetPlatform" = "3:0"
         "PreBuildEvent" = "8:"
-        "PostBuildEvent" = "8:\"$(ProjectDir)\"PostBuild.bat \"$(ProjectDir)\" \"$(BuiltOuputPath)\" \"$(Configuration)\""
+        "PostBuildEvent" = "8:\"$(ProjectDir)\"..\\Scripts\\PostBuild.bat \"$(ProjectDir)\" \"$(BuiltOuputPath)\" \"$(Configuration)\""
         "RunPostBuildEvent" = "3:0"
         }
         "Registry"
@@ -1157,8 +1152,8 @@
                                             {
                                             "Name" = "8:language"
                                             "Condition" = "8:ALLUSERS=1"
-                                            "Transitive" = "11:TRUE"
-                                            "ValueTypes" = "3:2"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
                                             "Value" = "8:[ADDINLANGUAGE]"
                                             }
                                         }
@@ -1514,7 +1509,7 @@
                     "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_95F6D68C97684BA4B5E23F69A383104B"
                     {
                     "Name" = "8:OdfWordAddin.Connect"
-                    "Condition" = "8:WORDVERSION=9"
+                    "Condition" = "8:"
                     "AlwaysCreate" = "11:FALSE"
                     "DeleteAtUninstall" = "11:TRUE"
                     "Transitive" = "11:FALSE"
@@ -1523,7 +1518,7 @@
                             "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_86336B5A26C448A688DBF84146F24091"
                             {
                             "Name" = "8:CLSID"
-                            "Condition" = "8:WORDVERSION=9"
+                            "Condition" = "8:"
                             "AlwaysCreate" = "11:FALSE"
                             "DeleteAtUninstall" = "11:FALSE"
                             "Transitive" = "11:FALSE"
