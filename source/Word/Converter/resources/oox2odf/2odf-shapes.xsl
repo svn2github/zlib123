@@ -146,7 +146,7 @@
           <xsl:call-template name="InsertShapeHeight"/>
           <xsl:call-template name="InsertshapeAbsolutePos"/>
           <xsl:call-template name="InsertShapeZindex"/>
-          <xsl:apply-templates select="v:textbox" mode="XXX">
+          <xsl:apply-templates select="v:textbox">
             <xsl:with-param name ="shapetype" select ="'isosceles-triangle'"/>
           </xsl:apply-templates >
           <!--</xsl:for-each>-->
@@ -1002,7 +1002,7 @@
   Summary: Template writes rectangles/lines.
   Author: Clever Age
   -->
-  <xsl:template match="v:rect | v:line|v:shapetype|v:oval|v:roundrect">
+  <xsl:template match="v:rect | v:line|v:shape|v:oval|v:roundrect">
     <!-- version 1.1-->
     <xsl:choose>
       <xsl:when test="v:imagedata">
@@ -1160,73 +1160,24 @@
             </draw:line>
           </xsl:when>
           <xsl:otherwise>
-            <!--<xsl:variable name="OldshapeType">
-              <xsl:value-of select="substring-after(self::v:shape/@type,'#')"/>
-            </xsl:variable>
+          
             <xsl:variable name ="shapeTypeId">
-              <xsl:choose>
-                <xsl:when  test ="parent::node()/v:shapetype/@id" >
-                <xsl:value-of select ="parent::node()/v:shapetype/@id"/>
-              </xsl:when>
-                <xsl:when  test ="not(parent::node()/v:shapetype/@id)">                  
-                  <xsl:value-of select="./parent::node()/parent::node()/preceding-sibling::w:r/w:pict/v:shapetype[@id=$OldshapeType]/@id"/>
-                </xsl:when>
-              </xsl:choose>
+              <xsl:value-of select ="substring-after(@type,'#')"/>          
             </xsl:variable>
             <xsl:variable name ="pathId">
-              <xsl:choose>
-                <xsl:when  test ="parent::node()/v:shapetype/@id" >
-                  <xsl:value-of select ="parent::node()/v:shapetype/@path"/>
-                </xsl:when>
-                <xsl:when  test ="not(parent::node()/v:shapetype/@id)">                  
-                  <xsl:value-of select="./parent::node()/parent::node()/preceding-sibling::w:r/w:pict/v:shapetype[@id=$OldshapeType]/@path"/>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:variable>-->
-            <!--<xsl:variable name="OldshapeType">
-              <xsl:value-of select="concat('#',./@id)"/>
-            </xsl:variable>-->
-            <xsl:variable name ="shapeTypeId">
-              <xsl:value-of select ="parent::node()/v:shapetype/@id"/>
-              <!--<xsl:choose>                
-                <xsl:when  test ="parent::node()/v:shape/@type" >
-                  <xsl:value-of select ="parent::node()/v:shapetype/@id"/>
-                </xsl:when>
-                <xsl:when  test ="not(parent::node()/v:shape/@type)">
-                  <xsl:value-of select="substring-after(./parent::node()/parent::node()/following-sibling::w:r[1]/w:pict/v:shape[@type=$OldshapeType]/@type,'#')"/>
-                </xsl:when>
-              </xsl:choose>-->
+              <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+                <xsl:if test ="position()=1">
+                  <xsl:value-of select ="@path"/>
+                </xsl:if>
+              </xsl:for-each>
             </xsl:variable>
-            <xsl:variable name ="pathId">
-              <!--<xsl:choose>
-                <xsl:when  test ="parent::node()/v:shape/@type" >-->
-              <xsl:value-of select ="parent::node()/v:shapetype/@path"/>
-              <!--</xsl:when>
-                <xsl:when  test ="not(parent::node()/v:shape/@id)">
-                  <xsl:value-of select="./parent::node()/parent::node()/following-sibling::w:r[1]/w:pict/v:shape[@type=$OldshapeType]/@path"/>
-                </xsl:when>
-              </xsl:choose>-->
-            </xsl:variable>
-            <!--<xsl:choose>-->
-            <xsl:if  test ="parent::node()/v:shape">
-              <xsl:for-each select ="parent::node()/v:shape">
+           
                 <xsl:call-template name="GetShape">
                   <xsl:with-param name ="currentShape" select="." />
                   <xsl:with-param name="shapeTypeId" select="$shapeTypeId"></xsl:with-param>
                   <xsl:with-param name="pathId" select="$pathId"></xsl:with-param>
                 </xsl:call-template>
-              </xsl:for-each>
-            </xsl:if>
-            <xsl:if test="./parent::node()/parent::node()/following-sibling::w:r/w:pict/v:shape and ./parent::node()/parent::node()/following-sibling::w:r/w:pict/v:shape/@type=concat('#',$shapeTypeId)">
-              <xsl:for-each select ="./parent::node()/parent::node()/following-sibling::w:r/w:pict/v:shape">
-                <xsl:call-template name="GetShape">
-                  <xsl:with-param name ="currentShape" select="." />
-                  <xsl:with-param name="shapeTypeId" select="$shapeTypeId"></xsl:with-param>
-                  <xsl:with-param name="pathId" select="$pathId"></xsl:with-param>
-                </xsl:call-template>
-              </xsl:for-each>
-            </xsl:if>
-            <!--</xsl:choose>-->
+                      
 
             <xsl:choose>
               <!--Rectangle -->
