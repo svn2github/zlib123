@@ -1877,7 +1877,7 @@
 
           <!-- default line width for line chart -->
           <xsl:if
-            test="key('plotArea', @oox:part)/c:lineChart or c:smooth or key('plotArea', @oox:part)/c:radarChart">
+            test="key('plotArea', @oox:part)/c:lineChart or key('plotArea', @oox:part)/c:scatterChart or c:smooth or key('plotArea', @oox:part)/c:radarChart">
             <xsl:attribute name="svg:stroke-width">
               <xsl:text>0.079cm</xsl:text>
             </xsl:attribute>
