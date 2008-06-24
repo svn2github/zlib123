@@ -49,6 +49,7 @@ sub main()
     AjouterAction installer, database, "OdfInstallHelper", "", "DetectPreviousConverters", 301
     AjouterAction installer, database, "OdfInstallHelper", "", "GetWordVersion", 302
     AjouterAction installer, database, "OdfInstallHelper", "", "LaunchReadme", 1400
+    AjouterAction installer, database, "OdfInstallHelper", "", "NgenAssemblies", 1401
 
     'WScript.Echo "Custom actions installed"
 end sub
