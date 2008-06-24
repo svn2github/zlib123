@@ -394,4 +394,10 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+  <PropertyGroup>
+    <PostBuildEvent>echo Copy pre-compiled transformations
+copy "$(ProjectDir)..\..\Word\Converter\bin\*.dll" "$(TargetDir)"
+copy "$(ProjectDir)..\..\Spreadsheet\Converter\bin\*.dll" "$(TargetDir)"
+copy "$(ProjectDir)..\..\Presentation\Converter\bin\*.dll" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
