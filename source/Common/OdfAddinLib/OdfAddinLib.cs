@@ -325,12 +325,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 }
-                catch (OdfZipUtils.ZipException e)
+                catch (OdfZipUtils.ZipException)
                 {
                     InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "PossiblyEncryptedDocument", this.resourceManager);
                     infoBox.ShowDialog();
                 }
-                catch (System.IO.IOException e)
+                catch (System.IO.IOException)
                 {
                     // this is meant to catch "file already accessed by another process", though there's no .NET fine-grain exception for this.
                     // bug #1676586  Concurrent file access crashes the addin
