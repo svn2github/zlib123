@@ -53,7 +53,7 @@
           </xsl:variable>
 
           <xsl:choose>
-            <xsl:when test="$CompatibilitySettingsFile">
+            <xsl:when test="not($CompatibilitySettingsFile = '')">
               <xsl:for-each select="key('Part', $CompatibilitySettingsFile)/CompatibilitySettings/CompatibilitySetting">
                 <config:config-item>
                   <xsl:attribute name="config:name">
@@ -88,6 +88,9 @@
               <!--clam, dialogika: bugfix 1948059-->
               <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
               <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
+              
+              <!--clam, dialogika-->
+              <config:config-item config:name="AddExternalLeading" config:type="boolean">true</config:config-item>
 
               <!--math, dialogika: Added for correct indentation calculation BEGIN -->
 
