@@ -190,6 +190,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
                 try
                 {
+#if (!DEBUG)
                     Type t = typeof(XslCompiledTransform);
                     MethodInfo mi = t.GetMethod("Load", new Type[] { typeof(Type) });
                     Type compiledStylesheet = this.LoadPrecompiledXslt();
@@ -203,8 +204,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     }
                     else
                     {
+#endif
                         xslt.Load(xslDoc, this.XsltProcSettings, this.ResourceResolver);
+#if (!DEBUG)
                     }
+#endif
                 }
                 catch (Exception ex)
                 {
