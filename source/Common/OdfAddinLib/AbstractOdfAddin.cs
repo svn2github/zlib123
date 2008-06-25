@@ -343,7 +343,13 @@ namespace OdfConverter.OdfConverterLib
         /// <param name="control">An IRibbonControl instance</param>
         public virtual void ImportOdf12(IRibbonControl control)
         {
-            importOdf();
+            try
+            {
+                importOdf();
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>
@@ -365,7 +371,13 @@ namespace OdfConverter.OdfConverterLib
         /// <param name="control">An IRibbonControl instance</param>
         public virtual void ExportOdf12(IRibbonControl control)
         {
-            exportOdf();
+            try
+            {
+                exportOdf();
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>
