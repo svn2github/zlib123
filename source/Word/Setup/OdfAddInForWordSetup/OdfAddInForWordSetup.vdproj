@@ -232,18 +232,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7B3CC0269822428B909A689016594980"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6B326CBDE79D48E0BC52492A167E4A9B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_F164BAE3134487FC56D08690F54B1333"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -293,6 +281,18 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_C919C4CC6D18B977C1509D1827BFAE26"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7B3CC0269822428B909A689016594980"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6B326CBDE79D48E0BC52492A167E4A9B"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -984,8 +984,8 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ODF Add-in for Microsoft Word"
-        "ProductCode" = "8:{76C89F84-D489-49B9-ACC5-230EB5352EB9}"
-        "PackageCode" = "8:{099605B2-2845-4066-9F57-45694B3D574A}"
+        "ProductCode" = "8:{C798FFFD-48E2-425B-AF2C-61686BB982AF}"
+        "PackageCode" = "8:{63768B71-0632-4F28-8AB3-1EA1FA9EDA41}"
         "UpgradeCode" = "8:{429EF697-737F-49D5-A58E-8C8C81FCD580}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

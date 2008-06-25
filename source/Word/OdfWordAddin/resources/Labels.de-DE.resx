@@ -456,4 +456,7 @@
   <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
     <value>Fortsetzung der von übergeordneten Formatvorlagen vererbten Nummerierung</value>
   </data>
+  <data name="translation.oox2odf.fields.styleref" xml:space="preserve">
+    <value>STYLEREF Feld</value>
+  </data>
 </root>

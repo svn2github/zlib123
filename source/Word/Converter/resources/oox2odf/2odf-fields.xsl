@@ -377,7 +377,7 @@
 
   <!--chapter name or chapter number-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'STYLEREF')]" mode="fields">
-    <text:chapter>
+    <!--text:chapter>
       <xsl:choose>
         <xsl:when test="self::node()[contains(@w:instr,'\n')]">
           <xsl:attribute name="text:display">number</xsl:attribute>
@@ -396,7 +396,9 @@
         </xsl:attribute>
       </xsl:if>
       <xsl:apply-templates select="w:r/child::node()"/>
-    </text:chapter>
+    </text:chapter-->
+    <xsl:message terminate="no">translation.oox2odf.fields.styleref</xsl:message>
+    <xsl:apply-templates select="w:r/child::node()"/>
   </xsl:template>
 
   <!--document subject SUBJECT, DOCPROPERTY Subject-->

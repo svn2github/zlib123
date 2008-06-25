@@ -447,4 +447,7 @@
   <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
     <value>親スタイルから継承した番号付け</value>
   </data>
+  <data name="translation.oox2odf.fields.styleref" xml:space="preserve">
+    <value>Field of type STYLEREF</value>
+  </data>
 </root>

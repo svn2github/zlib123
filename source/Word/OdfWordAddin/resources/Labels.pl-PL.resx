@@ -447,4 +447,7 @@
   <data name="translation.oox2odf.lists.numbering" xml:space="preserve">
     <value>Numeracja dziedziczona od stylów nadrzędnych</value>
   </data>
+  <data name="translation.oox2odf.fields.styleref" xml:space="preserve">
+    <value>Field of type STYLEREF</value>
+  </data>
 </root>

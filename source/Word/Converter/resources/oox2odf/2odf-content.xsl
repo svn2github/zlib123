@@ -308,26 +308,42 @@
   </xsl:template>
 
   <!--  get outline level from styles hierarchy for headings -->
-  <xsl:template name="GetStyleOutlineLevel">
-    <xsl:param name="outline"/>
-    <xsl:for-each select="key('Part', 'word/styles.xml')">
+  <xsl:template name="GetOutlineLevelByStyleId">
+    <xsl:param name="styleId"/>
+    <xsl:variable name="basedOn">
+      <xsl:value-of select="key('StyleId', $styleId)[1]/w:basedOn/@w:val"/>
+    </xsl:variable>
+    <!--  Search outlineLvl in style based on style -->
+    <xsl:choose>
+      <xsl:when test="key('StyleId', $styleId)[1]/w:pPr/w:outlineLvl/@w:val">
+        <xsl:value-of select="key('StyleId', $styleId)[1]/w:pPr/w:outlineLvl/@w:val"/>
+      </xsl:when>
+      <xsl:when test="key('StyleId', $styleId)[1]/w:basedOn/@w:val">
+        <xsl:call-template name="GetOutlineLevelByStyleId">
+          <xsl:with-param name="styleId">
+            <xsl:value-of select="key('StyleId', $styleId)[1]/w:basedOn/@w:val"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+    <!--xsl:for-each select="key('Part', 'word/styles.xml')">
       <xsl:variable name="basedOn">
         <xsl:value-of select="key('StyleId', $outline)[1]/w:basedOn/@w:val"/>
-      </xsl:variable>
+      </xsl:variable-->
       <!--  Search outlineLvl in style based on style -->
-      <xsl:choose>
+      <!--xsl:choose>
         <xsl:when test="key('StyleId', $basedOn)[1]/w:pPr/w:outlineLvl/@w:val">
           <xsl:value-of select="key('StyleId', $basedOn)[1]/w:pPr/w:outlineLvl/@w:val"/>
         </xsl:when>
         <xsl:when test="key('StyleId', $outline)[1]/w:basedOn/@w:val">
-          <xsl:call-template name="GetStyleOutlineLevel">
-            <xsl:with-param name="outline">
+          <xsl:call-template name="GetOutlineLevelByStyleId">
+            <xsl:with-param name="styleId">
               <xsl:value-of select="key('StyleId', $outline)[1]/w:basedOn/@w:val"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
       </xsl:choose>
-    </xsl:for-each>
+    </xsl:for-each-->
   </xsl:template>
 
   <!-- Get outlineLvl if the paragraf is heading -->
@@ -362,8 +378,8 @@
                 select="key('StyleId', $linkedStyleOutline)[1]/w:pPr/w:outlineLvl/@w:val"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:call-template name="GetStyleOutlineLevel">
-                <xsl:with-param name="outline">
+              <xsl:call-template name="GetOutlineLevelByStyleId">
+                <xsl:with-param name="styleId">
                   <xsl:value-of select="key('StyleId', $outline)[1]/w:link/@w:val"/>
                 </xsl:with-param>
               </xsl:call-template>
@@ -389,8 +405,8 @@
               <xsl:value-of select="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:call-template name="GetStyleOutlineLevel">
-                <xsl:with-param name="outline">
+              <xsl:call-template name="GetOutlineLevelByStyleId">
+                <xsl:with-param name="styleId">
                   <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
                 </xsl:with-param>
               </xsl:call-template>
@@ -411,8 +427,8 @@
                 select="key('StyleId', $linkedStyleOutline)[1]/w:pPr/w:outlineLvl/@w:val"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:call-template name="GetStyleOutlineLevel">
-                <xsl:with-param name="outline">
+              <xsl:call-template name="GetOutlineLevelByStyleId">
+                <xsl:with-param name="styleId">
                   <xsl:value-of select="key('StyleId', $outline)[1]/w:link/@w:val"/>
                 </xsl:with-param>
               </xsl:call-template>
@@ -1075,7 +1091,7 @@
     <xsl:call-template name="InsertDropCapText"/>
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
-      <xsl:when test="not(contains(., '  '))">
+      <xsl:when test="not(contains(., '  ') or substring(., 1, 1) = ' ')">
         <xsl:choose>
           <xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink' and ../w:rPr/w:color">
             <text:span text:style-name="{generate-id(..)}">
@@ -1127,6 +1143,7 @@
       <xsl:when test="not(contains($string,' '))">
         <xsl:value-of select="$string"/>
       </xsl:when>
+      
       <!-- convert white spaces  -->
       <xsl:otherwise>
         <xsl:variable name="before">
@@ -1139,42 +1156,36 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="$before != '' ">
-          <xsl:value-of select="concat($before,' ')"/>
-        </xsl:if>
-        <!--add remaining whitespaces as text:s if there are any-->
-        <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
-          <xsl:choose>
-            <xsl:when test="($length - string-length(concat($before, $after))) = 1">
-              <text:s/>
-            </xsl:when>
-            <xsl:otherwise>
-              <text:s>
-                <xsl:attribute name="text:c">
-                  <xsl:choose>
-                    <xsl:when test="$before = ''">
-                      <xsl:value-of select="$length - string-length($after)"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="$length - string-length(concat($before,' ', $after))"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
-              </text:s>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:if>
+        <xsl:variable name="numberOfSpaces" select="$length - string-length($before) - string-length($after)" />
+        <xsl:value-of select="$before"/>
+        <xsl:choose>
+          <xsl:when test="$numberOfSpaces = 1 and ($before = '' or $after = '')">
+            <!-- single whitespace at the beginning or end of the string -->
+            <text:s />
+          </xsl:when>
+          <xsl:when test="$numberOfSpaces = 1">
+            <!-- single whitespace in the middle of the string -->
+            <xsl:text> </xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- several consecutive whitespace characters -->
+            <text:s>
+              <xsl:attribute name="text:c">
+                <xsl:value-of select="$numberOfSpaces"/>
+              </xsl:attribute>
+            </text:s>
+          </xsl:otherwise>
+        </xsl:choose>
+        
         <!--repeat it for substring which has whitespaces-->
-        <xsl:if test="contains($string,' ') and $length &gt; 0">
-          <xsl:call-template name="InsertWhiteSpaces">
-            <xsl:with-param name="string">
-              <xsl:value-of select="$after"/>
-            </xsl:with-param>
-            <xsl:with-param name="length">
-              <xsl:value-of select="string-length($after)"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
+        <xsl:call-template name="InsertWhiteSpaces">
+          <xsl:with-param name="string">
+            <xsl:value-of select="$after"/>
+          </xsl:with-param>
+          <xsl:with-param name="length">
+            <xsl:value-of select="string-length($after)"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

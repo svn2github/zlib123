@@ -453,4 +453,7 @@
   <data name="translation.oox2odf.oleOoxObject" xml:space="preserve">
     <value>Embedded OpenXML object</value>
   </data>
+  <data name="translation.oox2odf.fields.styleref" xml:space="preserve">
+    <value>Field of type STYLEREF</value>
+  </data>
 </root>
