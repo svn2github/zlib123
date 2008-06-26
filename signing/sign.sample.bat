@@ -22,7 +22,9 @@ IF NOT EXIST "%SIGNTOOL%" goto :error
 "%SIGNTOOL%" sign /d "%PROJECT_NAME%" /du "%PROJECT_URL%" %TIMESTAMP_SERVER% /f "%CERT_FILE%" /p "%CERT_PASSWORD%" /v "%~f1"
 @echo off
 
-exit /b 0
+goto :eof
 
 :error
 echo ERROR: signtool.exe not found (Please configure the path correctly in file %~f0).
+
+:eof

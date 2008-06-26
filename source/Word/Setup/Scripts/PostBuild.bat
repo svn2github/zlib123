@@ -16,8 +16,13 @@ cscript.exe %1..\Scripts\patchForVista.vbs %2
 ::removed bugfix 20080606/divo
 ::cscript.exe %1..\Scripts\AddProperty.vbs %2
 
-::build self-extracting installer
-%1..\Scripts\MakeSetupExe.bat %1%3 ..\OdfAddInForWordSetup.sed
+::sign the MSI file
+if %3 == "Release to Manufacturing (signed)" CALL %1..\..\..\..\signing\sign.bat %2
 
+::build self-extracting installer
+CALL %1..\Scripts\MakeSetupExe.bat %1%3 ..\OdfAddInForWordSetup.sed
+
+::sign the self-extracting installer
+if %3 == "Release to Manufacturing (signed)" CALL %1..\..\..\..\signing\sign.bat *.exe
 
 

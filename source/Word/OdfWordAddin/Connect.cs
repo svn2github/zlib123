@@ -206,6 +206,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
 
                         // and activate it
                         doc.Invoke("Activate");
+                        doc.Invoke("Windows").Invoke("Item", 1).Invoke("Activate");
                     }
                 }
                 catch (Exception ex)

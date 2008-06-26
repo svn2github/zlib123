@@ -307,7 +307,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing post-build tasks"
-				CommandLine="&quot;$(FrameworkSDKDir)bin\signtool.exe&quot; sign /d &quot;OpenXML/ODF Translator for Office&quot; /du &quot;http://odf-converter.sourceforge.net&quot; /t &quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot; /f %CERTFILE% /p %CERTPASS% /v &quot;$(TargetPath)&quot;"
+				CommandLine="&#x0D;&#x0A;echo $(SolutionDir)..\signing\sign.bat &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)..\signing\sign.bat &quot;$(TargetPath)&quot;&#x0D;&#x0A;&#x0D;&#x0A;::&quot;$(FrameworkSDKDir)bin\signtool.exe&quot; sign /d &quot;OpenXML/ODF Translator for Office&quot; /du &quot;http://odf-converter.sourceforge.net&quot; /t &quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot; /f %CERTFILE% /p %CERTPASS% /v &quot;$(TargetPath)&quot;"
 			/>
 		</Configuration>
 	</Configurations>
