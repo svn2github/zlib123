@@ -1055,8 +1055,19 @@
   <xsl:template name="InsertCrossReference">
     <xsl:param name="fieldCode"/>
     <xsl:param name="displayValue" />
+
+    <!--clam, dialogika: bugfix 2000762-->
+    <xsl:variable name="ReferenceFormat">
+      <xsl:choose>
+        <xsl:when test="contains($fieldCode, ' \w')">chapter</xsl:when>
+        <xsl:otherwise>text</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     
-    <text:bookmark-ref text:reference-format="text">
+    <text:bookmark-ref>
+      <xsl:attribute name="text:reference-format">
+        <xsl:value-of select="$ReferenceFormat"/>
+      </xsl:attribute>
       <xsl:choose>
         <xsl:when test="contains($fieldCode, 'PAGEREF')">
           <xsl:attribute name="text:ref-name">
@@ -1092,13 +1103,46 @@
 
       <xsl:choose>
         <xsl:when test="name()='w:instrText'">
-          <xsl:apply-templates select="../following-sibling::w:r/w:t"/>
+          <!--clam, dialogika: bugfix 2000762-->
+          <!--<xsl:apply-templates select="../following-sibling::w:r/w:t"/>-->
+          <xsl:call-template name="InsertInstrTextFieldText">
+            <xsl:with-param name="currentRun" select="../following-sibling::w:r[1]"></xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <!--clam, dialogika: bugfix 2000762-->
+        <xsl:when test="name() = 'w:fldSimple'">
+          <xsl:apply-templates select="w:r/w:t"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="following-sibling::w:r/w:t"/>
         </xsl:otherwise>
       </xsl:choose>
     </text:bookmark-ref>
+  </xsl:template>
+
+  <!--clam, dialogika: bugfix 2000762-->
+  <xsl:template name="InsertInstrTextFieldText">
+    <xsl:param name="currentRun"/>
+    <xsl:choose>
+      <xsl:when test="$currentRun/w:fldChar[@w:fldCharType = 'end']">
+        <!--stop it-->
+      </xsl:when>
+      <xsl:when test="$currentRun/w:t">
+        <xsl:apply-templates select="$currentRun/w:t"/>
+        <xsl:if test="$currentRun/following-sibling::w:r">
+          <xsl:call-template name="InsertInstrTextFieldText">
+              <xsl:with-param name="currentRun" select="$currentRun/following-sibling::w:r[1]"></xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="$currentRun/following-sibling::w:r">
+          <xsl:call-template name="InsertInstrTextFieldText">
+            <xsl:with-param name="currentRun" select="$currentRun/following-sibling::w:r[1]"></xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertFieldCharFieldContent">
