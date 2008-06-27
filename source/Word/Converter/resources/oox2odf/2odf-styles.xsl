@@ -5905,28 +5905,31 @@
 
     <xsl:variable name="bStop">
 
-      <xsl:if test="count($documentParagraphWAfter)>0 and $StyleParagraphId!=''">
-        <!-- We have values for margin-->
-        <xsl:value-of select="1"/>
-      </xsl:if>
+      <xsl:choose>
+      
+        <xsl:when test="count($documentParagraphWAfter)>0 and $StyleParagraphId!=''">
+          <!-- We have values for margin-->
+          <xsl:value-of select="1"/>
+        </xsl:when>
 
-      <xsl:if
-        test="count($documentParagraphWAfter)=0 and count($parentStyleId)>0 and $StyleParagraphId!=''">
-        <!-- we dont have values for margin but we have a parent-->
-        <xsl:value-of select="0"/>
-      </xsl:if>
+        <xsl:when
+          test="count($documentParagraphWAfter)=0 and count($parentStyleId)>0 and $StyleParagraphId!=''">
+          <!-- we dont have values for margin but we have a parent-->
+          <xsl:value-of select="0"/>
+          </xsl:when>
 
-      <xsl:if
-        test="count($documentParagraphWAfter)=0 and count($parentStyleId)=0 and $StyleParagraphId!=''">
-        <!-- We are at the top of the tree without any values -->
-        <xsl:value-of select="2"/>
-      </xsl:if>
+        <xsl:when
+          test="count($documentParagraphWAfter)=0 and count($parentStyleId)=0 and $StyleParagraphId!=''">
+          <!-- We are at the top of the tree without any values -->
+          <xsl:value-of select="2"/>
+        </xsl:when>
 
-      <xsl:if test="$StyleParagraphId=''">
-        <!-- No styleId is defined, we must apply the the <w:pPrDefault> if exists -->
-        <xsl:value-of select="3"/>
-      </xsl:if>
+        <xsl:when test="$StyleParagraphId=''">
+          <!-- No styleId is defined, we must apply the the <w:pPrDefault> if exists -->
+          <xsl:value-of select="3"/>
+        </xsl:when>
 
+      </xsl:choose>
 
     </xsl:variable>
 
@@ -5953,6 +5956,11 @@
         <!-- No styleId is defined, we must apply the the <w:pPrDefault> -->
         <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
       </xsl:when>
+
+      <!--clam, dialogika: bugfix 1998725-->
+      <xsl:otherwise>
+        <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
+      </xsl:otherwise>
 
 
     </xsl:choose>
