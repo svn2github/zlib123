@@ -5881,14 +5881,19 @@
         </xsl:call-template>
       </xsl:when>
 
-      <xsl:when test="$bStop='2'">
+      <!--<xsl:when test="$bStop='2'">
         <xsl:call-template name="getMarginTopFromWpPrDefault"/>
       </xsl:when>
 
       <xsl:when test="$bStop='3'">
-        <!-- No styleId is defined, we must apply the the <w:pPrDefault> -->
+        --><!-- No styleId is defined, we must apply the the <w:pPrDefault> --><!--
         <xsl:call-template name="getMarginTopFromWpPrDefault"/>
-      </xsl:when>
+      </xsl:when>-->
+
+      <!--clam, dialogika: bugfix 1998725-->
+      <xsl:otherwise>
+        <xsl:call-template name="getMarginTopFromWpPrDefault"/>
+      </xsl:otherwise>
 
     </xsl:choose>
   </xsl:template>
@@ -5948,14 +5953,14 @@
         </xsl:call-template>
       </xsl:when>
 
-      <xsl:when test="$bStop='2'">
+      <!--<xsl:when test="$bStop='2'">
         <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
       </xsl:when>
 
       <xsl:when test="$bStop='3'">
-        <!-- No styleId is defined, we must apply the the <w:pPrDefault> -->
+        --><!-- No styleId is defined, we must apply the the <w:pPrDefault> --><!--
         <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
-      </xsl:when>
+      </xsl:when>-->
 
       <!--clam, dialogika: bugfix 1998725-->
       <xsl:otherwise>
