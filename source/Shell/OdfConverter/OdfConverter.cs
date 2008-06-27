@@ -565,7 +565,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipException e)
             {
-                this.report.AddLog(input, "Conversion failed - Input file is not a valid file for conversion", Report.ERROR_LEVEL);
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid file for conversion or might be password protected", Report.ERROR_LEVEL);
                 this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
                 return false;
             }

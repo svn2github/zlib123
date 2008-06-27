@@ -176,7 +176,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                                 {
                                     InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
                                     infoBox.ShowDialog();
-                            }
+                                }
                             }
                         }
                         else
