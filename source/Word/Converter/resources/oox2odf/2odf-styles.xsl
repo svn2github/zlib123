@@ -2669,6 +2669,49 @@
             <xsl:call-template name="getMarginBottomFromWpPrDefault"/>
           </xsl:variable>
 
+          <!--clam, dialogika: default line height added as bugfix for 1998724-->
+          <xsl:variable name="DefaultLineHeight">
+            <xsl:call-template name="getLineHeightFromWpPrDefault"/>
+          </xsl:variable>
+
+          <xsl:variable name="DefaultLineRule">
+            <xsl:call-template name="getLineRuleFromWpPrDefault"/>
+          </xsl:variable>
+
+          <xsl:if test="not($DefaultLineHeight = '0')">
+
+              <xsl:choose>
+                <xsl:when test="$DefaultLineRule='atLeast'">
+                  <xsl:attribute name="style:line-height-at-least">
+                    <xsl:call-template name="ConvertTwips">
+                      <xsl:with-param name="length">
+                        <xsl:value-of select="$DefaultLineHeight"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="unit">cm</xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$DefaultLineRule='exact'">
+                  <xsl:attribute name="fo:line-height">
+                    <xsl:call-template name="ConvertTwips">
+                      <xsl:with-param name="length">
+                        <xsl:value-of select="$DefaultLineHeight"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="unit">cm</xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- value of lineRule is 'auto' -->
+                  <xsl:attribute name="fo:line-height">
+                    <!-- convert 240th of line to percent -->
+                    <xsl:value-of select="concat($DefaultLineHeight div 240 * 100,'%')"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>            
+
+          </xsl:if>          
+
           <xsl:call-template name="setFoMarginTop">
             <xsl:with-param name="setParagraphWBefore" select="$DefaultBefore"/>
           </xsl:call-template>
@@ -5797,6 +5840,69 @@
 
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name="getLineHeightFromWpPrDefault">
+
+    <xsl:variable name="documentLineHeightNormal"
+      select="key('StyleId', 'Normal')/w:pPr/w:spacing/@w:line"/>
+    <xsl:variable name="documentLineHeightDefault"
+      select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line"/>
+
+    <xsl:choose>
+      <xsl:when
+        test="count($documentLineHeightNormal)=0 and count($documentLineHeightDefault)=0">
+        <xsl:value-of select="'0'"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentLineHeightNormal)=0 and count($documentLineHeightDefault)>0">
+        <xsl:value-of select="$documentLineHeightDefault"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentLineHeightNormal)>0 and count($documentLineHeightDefault)=0">
+        <xsl:value-of select="$documentLineHeightNormal"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentLineHeightNormal)>0 and count($documentLineHeightDefault)>0">
+        <xsl:value-of select="$documentLineHeightNormal"/>
+      </xsl:when>
+
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="getLineRuleFromWpPrDefault">
+
+    <xsl:variable name="documentLineRuleNormal"
+      select="key('StyleId', 'Normal')/w:pPr/w:spacing/@w:lineRule"/>
+    <xsl:variable name="documentLineRuleDefault"
+      select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:lineRule"/>
+
+    <xsl:choose>
+      <xsl:when
+        test="count($documentLineRuleNormal)=0 and count($documentLineRuleDefault)=0">
+        <xsl:value-of select="'0'"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentLineRuleNormal)=0 and count($documentLineRuleDefault)>0">
+        <xsl:value-of select="$documentLineRuleDefault"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentLineRuleNormal)>0 and count($documentLineRuleDefault)=0">
+        <xsl:value-of select="$documentLineRuleNormal"/>
+      </xsl:when>
+
+      <xsl:when
+        test="count($documentLineRuleNormal)>0 and count($documentLineRuleDefault)>0">
+        <xsl:value-of select="$documentLineRuleNormal"/>
+      </xsl:when>
+
+    </xsl:choose>
+  </xsl:template>
+  
 
   <!-- Write the attribute for fo:margin-top-->
   <xsl:template name="setFoMarginTop">
