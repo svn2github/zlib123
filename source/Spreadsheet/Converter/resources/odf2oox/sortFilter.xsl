@@ -475,10 +475,18 @@
           select="substring-before(substring-after(substring-after(@table:target-range-address,':'),'.'),$row2)"
         />
       </xsl:variable>
-
+	 <!-- 
+	 Code Changed by: Vijayeta 
+     Bug number:1803593, performance 
+	 Date:19th Jun '08 
+	 Desc: In the following variable, according to the commented 'When' condition, if the attribute '@table:contains-header' is absent the condition is executed.
+	       hence and additional condition to check if it is present in the first place
+     InputFile: Uni_Chart_Privatization.xlsx(roundtrip)
+	 -->
       <xsl:variable name="startRow">
         <xsl:choose>
-          <xsl:when test="@table:contains-header = 'false' ">
+			<!--<xsl:when test="@table:contains-header = 'false'">-->
+			<xsl:when test="@table:contains-header = 'false' or not(@table:contains-header) ">
             <xsl:value-of select="$row1"/>
           </xsl:when>
 
@@ -565,10 +573,18 @@
           select="substring-before(substring-after(substring-after(@table:target-range-address,':'),'.'),$row2)"
         />
       </xsl:variable>
-
+	 <!-- 
+	 Code Changed by: Vijayeta 
+     Bug number:1803593, performance 
+	 Date:19th Jun '08 
+	 Desc: In the following variable, according to the commented 'When' condition, if the attribute '@table:contains-header' is absent the condition is executed.
+	       hence and additional condition to check if it is present in the first place.
+     InputFile: Uni_Chart_Privatization.xlsx(roundtrip)
+	 -->
       <xsl:variable name="startCol">
         <xsl:choose>
-          <xsl:when test="@table:contains-header = 'false' ">
+			<!--<xsl:when test="@table:contains-header = 'false'">-->
+			<xsl:when test="@table:contains-header = 'false' or not(@table:contains-header) ">
             <xsl:value-of select="$col1"/>
           </xsl:when>
           <!-- make range one row shorter-->

@@ -32,6 +32,7 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content missing and 1832335 New line inserted in note content after roundtrip conversions                                              
 RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in grouped columns lost
+RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet not printed after conversion(issue with the sheet names)
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -292,7 +293,7 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
                 <xsl:value-of select="$number"/>
               </xsl:with-param>
               <xsl:with-param name="name">
-                <xsl:value-of select="translate(@name,'!-$#:(),.+','')"/>
+                <xsl:value-of select="translate(@name,'!-$#():,.+','')"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
@@ -341,6 +342,9 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
       </xsl:call-template>
     </xsl:variable>
 
+	  <!--Start of RefNo-3-->
+    <xsl:variable name="strSheetName" select="@name"/>    
+    <!--End of RefNo-3-->
 	  <!-- Defect :1803593, file '03706191.CONFIDENTIAL.xlsx 
 		   Changes by: Vijayeta
 		   Desc:â€?-â€? is removed from the list of symbols to get the value of â€?checkedNameâ€™.,line 342 
@@ -352,7 +356,8 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
           <xsl:value-of select="$number"/>
         </xsl:with-param>
         <xsl:with-param name="name">
-					<xsl:value-of select="translate(@name,'!$-#():,.+','')"/>
+          <!--RefNo-3-->
+					<xsl:value-of select="translate(@name,'!-$#():,.+','')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -591,14 +596,22 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
             <xsl:value-of select ="substring-before(./self::node(),'!')"/>
           </xsl:variable>          
 			<!--<xsl:if test="($sheetNamePrntRnge = concat($apostrof, $checkedName,$apostrof) or $sheetNamePrntRnge = $checkedName) and (@name = '_xlnm.Print_Area' or @name='_xlnm._FilterDatabase' or contains(@name,'Excel_BuiltIn__FilterDatabase'))">-->
-			<xsl:if test="($sheetNamePrntRnge = concat($apostrof, $checkedName,$apostrof) or $sheetNamePrntRnge = $checkedName) and (@name = '_xlnm.Print_Area')">
+          <!--RefNo-3:Replaced $checkedName with $strSheetName(contains the original sheet name.)-->
+          <!--<xsl:if test="($sheetNamePrntRnge = concat($apostrof, $checkedName,$apostrof) or $sheetNamePrntRnge = $checkedName) and (@name = '_xlnm.Print_Area')">-->
+          <xsl:if test="($sheetNamePrntRnge = concat($apostrof, $strSheetName,$apostrof) or $sheetNamePrntRnge = $strSheetName) and (@name = '_xlnm.Print_Area')">
             <!-- one print range with apostrophes -->
-            <xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">
+            <xsl:choose>
+              <!--RefNo-3:Replaced $checkedName with $strSheetName(contains the original sheet name.)-->
+              <!--<xsl:when test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">-->
+              <xsl:when test="not(contains(./self::node(),concat(',', $apostrof, $strSheetName)))">     
+                <!--<xsl:if test="not(contains(./self::node(),concat(',', $apostrof, $checkedName)))">-->
 				<xsl:variable name ="prntRnge">
 					<xsl:call-template name="recursive">
 					  <xsl:with-param name="oldString" select="':'"/>
 					  <xsl:with-param name="newString" select="concat(':', $apostrof, $checkedName, $apostrof, '.')"/>
-					  <xsl:with-param name="wholeText" select="translate(./self::node(), '!', '.')"/>
+                     <!--RefNo-3--> 
+                     <!--<xsl:with-param name="wholeText" select="translate(./self::node(), '!', '.')"/>-->
+                      <xsl:with-param name="wholeText" select="concat($apostrof, $checkedName, $apostrof,'.',substring-after(./self::node(), '!'))"/>                                            
 					</xsl:call-template>
 				  </xsl:variable>
 				<xsl:variable name ="PartOne">
@@ -732,19 +745,43 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
 				<xsl:attribute name="table:print-ranges">
 					<xsl:value-of select ="$newPrntRnge"/>
 				</xsl:attribute>
-            </xsl:if>
+                <!--</xsl:if>-->
+              </xsl:when>
             <!-- multiple print ranges with apostrophes -->            
-            <xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">
+              <!--RefNo-3:Replaced $checkedName with $strSheetName(contains the original sheet name.)-->
+              <xsl:when test="contains(./self::node(),concat(',', $apostrof, $strSheetName))">
+                <!--<xsl:if test="contains(./self::node(),concat(',', $apostrof, $checkedName))">-->
               <xsl:variable name ="GetPrintRange">
                 <xsl:value-of select="./self::node()"/>
               </xsl:variable>
               <xsl:variable name ="newRange">
+                  <!--Start of RefNo-3: Replace the sheet name with special charecters with checked name.-->
+                  <xsl:choose>
+                    <xsl:when test="$strSheetName != $checkedName">
+                      <xsl:if test="not(contains($strSheetName, '!') or contains($strSheetName, ','))">
+                        <xsl:variable name="strReplaceSheetName">
+                          <xsl:call-template name="tmpReplaceSheetName">
+                            <xsl:with-param name="GetPrintRange" select="$GetPrintRange"/>
+                            <xsl:with-param name="checkedName" select="concat($apostrof,$checkedName,$apostrof,'.')"/>
+                            <xsl:with-param name="strBuildPrtRng" select="''"/>
+                          </xsl:call-template>                        
+                        </xsl:variable>
+                        <xsl:value-of select ="translate($strReplaceSheetName,'$','')"/>
+                      </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
                 <xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <!--<xsl:value-of select ="translate(translate(translate($GetPrintRange,'!','.'),'$',''),',',' ')"/>-->
+                  <!--End fo RefNo-3-->
               </xsl:variable>
               <xsl:attribute name="table:print-ranges">
                 <xsl:value-of select ="$newRange"/>
               </xsl:attribute>
-            </xsl:if>
+                <!--</xsl:if>-->
+              </xsl:when>
+            </xsl:choose>
             <!-- End of fix for Bug 1803593, for the file U S Extreme Temperature, on round trip-->
           </xsl:if>
         </xsl:if>
@@ -870,6 +907,44 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
     </xsl:if>
 
   </xsl:template>
+
+  <!--Start of RefNo-3: Template to replace old sheet name with the new one.-->
+  <xsl:template name="tmpReplaceSheetName">
+    <xsl:param name="GetPrintRange"/>
+    <xsl:param name="checkedName"/>
+    <xsl:param name="strBuildPrtRng"/>
+
+    <xsl:choose>
+      <xsl:when test="$GetPrintRange != ''">
+        <xsl:choose>
+          <xsl:when test="contains($GetPrintRange,',')">
+            <xsl:variable name="strPrntRange" select="substring-before($GetPrintRange,',')"/>            
+            <xsl:call-template name="tmpReplaceSheetName">
+              <xsl:with-param name="GetPrintRange" select="substring-after($GetPrintRange,',')"/>
+              <xsl:with-param name="checkedName" select="$checkedName"/>
+              <xsl:with-param name="strBuildPrtRng">
+                <xsl:choose>
+                  <xsl:when test="$strBuildPrtRng = ''">
+                    <xsl:value-of select="concat($checkedName, substring-after($strPrntRange,'!'))"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="concat($strBuildPrtRng,' ',$checkedName, substring-after($strPrntRange,'!'))"/>                    
+                  </xsl:otherwise>                    
+                </xsl:choose>                        
+              </xsl:with-param> 
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($strBuildPrtRng,' ',$checkedName, substring-after($GetPrintRange,'!'))"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$strBuildPrtRng"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!--End of RefNo-3-->
 
   <xsl:template match="e:definedName" mode="PrintArea">
     <xsl:param name="name"/>
@@ -2753,20 +2828,31 @@ RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
     <xsl:param name="name"/>
     <xsl:param name="sheetNumber"/>
 
+    <!--Start of RefNo-3: code to chk for the invalid charecters-->
+    <xsl:variable name="invalidChars">
+      <xsl:text>&apos;!-$#():,.+</xsl:text>
+    </xsl:variable>
+
+    <xsl:variable name="strTrnName" select="translate($name,$invalidChars,'')"/>
+    <!--End of RefNo-3: code to chk for the invalid charecters-->
+    
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
-      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $name][2]">
+      <!--RefNo-3:Replaced $name with $strTrnName-->
+      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $strTrnName][2]">
         <xsl:variable name="nameConflictsBefore">
           <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
+          <!--RefNo-3:Replaced $name with $strTrnName-->
           <xsl:value-of
-            select="count(parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $name and position() &lt; $sheetNumber])"
+            select="count(parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $strTrnName and position() &lt; $sheetNumber])"
           />
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
         <xsl:value-of select="concat(translate(@name,'!$-()#:,.+',''),'_',$nameConflictsBefore + 1)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$name"/>
+        <!--RefNo-3:Replaced $name with $strTrnName-->
+        <xsl:value-of select="$strTrnName"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

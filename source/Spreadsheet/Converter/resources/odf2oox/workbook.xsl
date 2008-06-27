@@ -197,6 +197,46 @@
         <xsl:call-template name="InsertDefineConnection"/>
       </xsl:for-each>
       <!--definedName name="praca" localSheetId="0">Sheet1!$C$11:$D$11</definedName-->
+			
+			<!--Defect Id     : 1768233
+			* Code Changed by : Sateesh
+			* Date            : 17th Jun '08
+			* Bug Description :Filters dropdown list conversion not proper-office XP/2003-->
+
+			<xsl:for-each
+			  select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:database-ranges/table:database-range ">
+				<definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">
+					<xsl:variable name="rangeAddress">
+						<xsl:value-of select="@table:target-range-address"/>
+					</xsl:variable>
+					<xsl:variable name="partOne">
+						<xsl:value-of select="substring-before(substring-before(@table:target-range-address,':'),'.')"/>	
+					</xsl:variable>
+					<xsl:variable name="partTwo">
+						<xsl:value-of select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+					</xsl:variable>
+					<xsl:variable name="partThree">
+						<xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+					</xsl:variable>
+					
+					<xsl:variable name="firstColValue">
+						<xsl:value-of select="translate($partTwo,'1234567890','')"/>
+					</xsl:variable>
+					<xsl:variable name="firstRowValue">
+						<xsl:value-of select="translate($partTwo,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
+					</xsl:variable>
+
+					<xsl:variable name="secondColValue">
+						<xsl:value-of select="translate($partThree,'1234567890','')"/>
+					</xsl:variable>
+					<xsl:variable name="secondRowValue">
+						<xsl:value-of select="translate($partThree,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','')"/>
+					</xsl:variable>
+					
+					<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>
+				</definedName>
+			</xsl:for-each>
+			<!--End-->
     </definedNames>
 
     <xsl:for-each select="table:data-pilot-tables">
