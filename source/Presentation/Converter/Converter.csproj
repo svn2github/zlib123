@@ -149,7 +149,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>if not $(ConfigurationName) == Debug (
+    <PostBuildEvent>if not "$(ConfigurationName)" == "Debug" (
 echo Pre-compiling XSLT
 copy "$(ProjectDir)..\..\Common\OdfConverterLib\resources\odf2oox\*.xsl" "$(ProjectDir)resources\odf2oox\"
 
