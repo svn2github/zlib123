@@ -9,7 +9,7 @@ SUBDIRS= \
 	source/Word/Converter \
 	source/Presentation/Converter \
 	source/Spreadsheet/Converter \
-	source/Shell/OdfConverterTest
+	source/Shell/OdfConverter
 DISTFILES= \
 	build/common.mk \
 	source/AdditionalTools/zlib123/zconf.h \
