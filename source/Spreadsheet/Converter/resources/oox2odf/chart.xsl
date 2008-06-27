@@ -382,105 +382,315 @@
     </pzip:entry>
   </xsl:template>
 
-  <xsl:template name="InsertDataSeries">
-    <!-- @Description: Outputs chart data series  -->
+  <xsl:template name="InsertSeries">
+    <!-- @Description: Outputs chart series in normal order  -->
     <!-- @Context: inside input chart file -->
 
+    <xsl:param name="reverseCategories"/>
+    <!-- (bool) if categories have to be reversed during conversion -->
+
     <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)">
-      <!-- TO DO chart:style-name -->
-      <chart:series chart:style-name="{concat('series',position())}">
-        <xsl:if
-          test="(key('plotArea', @oox:part)/c:scatterChart or key('plotArea', @oox:part)/c:bubbleChart) and position() = 1">
-          <chart:domain/>
-        </xsl:if>
-        <!-- for stock chart type 3 and type 4 -->
-        <xsl:if test="key('plotArea', @oox:part)/c:stockChart and key('plotArea', @oox:part)/c:barChart">
-          <xsl:attribute name="chart:attached-axis">
-
-            <xsl:variable name="axisYId">
-              <xsl:for-each select="parent::node()">
-                <xsl:value-of select="c:axId[2]/@val"/>
-              </xsl:for-each>
-            </xsl:variable>
-
-            <xsl:for-each select="key('plotArea', @oox:part)/child::node()[contains(name(),'Ax')][2]">
-              <xsl:choose>
-                <xsl:when test="c:axId/@val = $axisYId">
-                  <xsl:text>primary-y</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>secondary-y</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-
-            <!-- first series belong to primary y -->
-          </xsl:attribute>
-          <xsl:if test="position()=1">
-            <xsl:attribute name="chart:class">
-              <xsl:text>chart:bar</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
-
-        <!-- error indicator -->
-        <xsl:for-each select="c:errBars">
-          <xsl:if test="c:errValType/@val != 'stdErr' and c:errValType/@val != 'stdDev' ">
-            <chart:error-indicator chart:style-name="{concat('error',generate-id(.))}"/>
-          </xsl:if>
-        </xsl:for-each>
-
-        <xsl:if test="c:trendline">
-          <chart:regression-curve chart:style-name="{concat('trend',position())}"/>
-        </xsl:if>
-
-        <chart:data-point>
-          <xsl:attribute name="chart:repeated">
-            <xsl:choose>
-              <!-- for scatter chart -->
-              <xsl:when test="key('xNumPoints', @oox:part)/descendant::c:ptCount">
-                <xsl:value-of select="key('xNumPoints', @oox:part)/descendant::c:ptCount/@val"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="key('numPoints', @oox:part)/descendant::c:ptCount/@val"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </chart:data-point>
-      </chart:series>
+      <xsl:call-template name="InsertSeriesData">
+        <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+      </xsl:call-template>
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template name="InsertChartTable">
+  <xsl:template name="InsertSeriesReversed">
+    <!-- @Description: Outputs chart series in reverse order  -->
+    <!-- @Context: c:ser -->
+
+    <xsl:param name="reverseCategories"/>
+    <!-- (bool) if categories have to be reversed during conversion -->
+
+    <xsl:call-template name="InsertSeriesData">
+      <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+    </xsl:call-template>
+
+    <xsl:for-each select="preceding-sibling::c:ser[1]">
+      <xsl:call-template name="InsertSeriesReversed">
+        <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+      </xsl:call-template>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertSeriesData">
+    <!-- @Description: Outputs chart series data -->
+    <!-- @Context: c:ser -->
+
+    <xsl:param name="reverseCategories"/>
+    <!-- (bool) if categories have to be reversed during conversion -->
+
+    <!-- calculate this series number -->
+    <xsl:variable name="seriesNumber">
+      <xsl:value-of select="c:idx/@val"/>
+    </xsl:variable>
+
+    <chart:series chart:style-name="{concat('series',$seriesNumber)}">
+      <xsl:if
+        test="(key('plotArea', @oox:part)/c:scatterChart or key('plotArea', @oox:part)/c:bubbleChart) and position() = 1">
+        <chart:domain/>
+      </xsl:if>
+      <!-- for stock chart type 3 and type 4 -->
+      <xsl:if test="key('plotArea', @oox:part)/c:stockChart and key('plotArea', @oox:part)/c:barChart">
+        <xsl:attribute name="chart:attached-axis">
+
+          <xsl:variable name="axisYId">
+            <xsl:for-each select="parent::node()">
+              <xsl:value-of select="c:axId[2]/@val"/>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:for-each select="key('plotArea', @oox:part)/child::node()[contains(name(),'Ax')][2]">
+            <xsl:choose>
+              <xsl:when test="c:axId/@val = $axisYId">
+                <xsl:text>primary-y</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>secondary-y</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+
+          <!-- first series belong to primary y -->
+        </xsl:attribute>
+        <xsl:if test="position()=1">
+          <xsl:attribute name="chart:class">
+            <xsl:text>chart:bar</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:if>
+
+      <!-- error indicator -->
+      <xsl:for-each select="c:errBars">
+        <xsl:if test="c:errValType/@val != 'stdErr' and c:errValType/@val != 'stdDev' ">
+          <chart:error-indicator chart:style-name="{concat('error',generate-id(.))}"/>
+        </xsl:if>
+      </xsl:for-each>
+
+      <xsl:if test="c:trendline">
+        <chart:regression-curve chart:style-name="{concat('trend',position())}"/>
+      </xsl:if>
+
+      <!-- insert data points -->
+      <xsl:variable name="numPoints">
+        <xsl:choose>
+          <!-- for scatter chart -->
+          <xsl:when test="key('xNumPoints', @oox:part)/descendant::c:ptCount">
+            <xsl:value-of select="key('xNumPoints', @oox:part)/descendant::c:ptCount/@val"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="key('numPoints', @oox:part)/descendant::c:ptCount/@val"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:choose>
+        <!-- insert data points to maintain properties -->
+        <xsl:when
+          test="key('plotArea',@oox:part)/c:pieChart or key('plotArea',@oox:part)/c:pie3DChart ">
+          <xsl:if test="$seriesNumber = 0">
+            <xsl:call-template name="InsertPieDataPoints">
+              <xsl:with-param name="numPoints" select="$numPoints - 1"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:when>
+        <!-- when all data points have default properties -->
+        <xsl:when test="not(c:dPt) and not(c:dLbls)">
+          <chart:data-point>
+            <xsl:attribute name="chart:repeated">
+              <xsl:value-of select="$numPoints"/>
+            </xsl:attribute>
+          </chart:data-point>
+        </xsl:when>
+        <xsl:otherwise>
+
+          <xsl:choose>
+            <xsl:when test="$reverseCategories = 'true' ">
+              <!-- insert data points in reverse order -->
+              <xsl:for-each select="c:dPt[last()]">
+              <xsl:call-template name="InsertDataPointsReverse">
+                <xsl:with-param name="seriesNum">
+                  <xsl:value-of select="$seriesNumber"/>
+                </xsl:with-param>
+                <xsl:with-param name="numPoints">
+                  <xsl:value-of select="$numPoints"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- insert data points in normal order -->
+              <xsl:for-each select="c:dPt[1]">
+                <xsl:call-template name="InsertDataPoints">
+                  <xsl:with-param name="seriesNum">
+                    <xsl:value-of select="$seriesNumber"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numPoints">
+                    <xsl:value-of select="$numPoints"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:otherwise>
+      </xsl:choose>
+
+    </chart:series>
+  </xsl:template>
+
+  <xsl:template name="InsertPieDataPoints">
+    <!-- @Description: Inserts data points properties for pie charts  -->
+    <!-- @Context: c:ser -->
+
+    <xsl:param name="numPoints"/>
+    <!-- (int) total number of points in chart reduced by 1-->
+    <xsl:param name="current" select="$numPoints"/>
+    <!-- (int) number of currently processed point (zero-based) -->
+
+    <chart:data-point chart:style-name="{concat('data0-',$current)}"/>
+
+    <xsl:if test="$current != 0">
+      <xsl:call-template name="InsertPieDataPoints">
+        <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="current" select="$current -1"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertDataPoints">
+    <!-- @Description: Inserts data points for series  in normal order -->
+    <!-- @Context: c:dPt -->
+
+    <xsl:param name="seriesNum"/>
+    <!-- (int) sequential number of currently processed series -->
+    <xsl:param name="numPoints"/>
+    <!-- (int) number of all data points in series -->
+    <xsl:param name="prev" select="-1"/>
+    <!-- (int) previous data point number (zero based) -->
+
+    <!-- insert default data points before -->
+    <xsl:if test="c:idx/@val - $prev &gt; 1  ">
+      <chart:data-point>
+        <xsl:if test="c:idx/@val - ($prev) &gt; 2">
+          <xsl:attribute name="chart:repeated">
+            <xsl:value-of select="c:idx/@val - ($prev) - 1"/>
+          </xsl:attribute>
+        </xsl:if>
+      </chart:data-point>
+    </xsl:if>
+
+    <chart:data-point>
+      <!-- 
+              style-name format: dataS-D 
+              S - series number
+              D - data point number
+              i.e. data2-3
+      -->
+      <xsl:attribute name="chart:style-name">
+        <xsl:value-of select="concat('data',$seriesNum,'-',c:idx/@val)"/>
+      </xsl:attribute>
+    </chart:data-point>
+
+    <xsl:choose>
+      <!-- insert next data point -->
+      <xsl:when test="following-sibling::c:dPt[1]">
+        <xsl:for-each select="following-sibling::c:dPt[1]">
+          <xsl:call-template name="InsertDataPoints">
+            <xsl:with-param name="seriesNum" select="$seriesNum"/>
+            <xsl:with-param name="numPoints" select="$numPoints"/>
+            <xsl:with-param name="prev" select="c:idx/@val"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- insert default data points to the end of series -->
+      <xsl:otherwise>
+        <xsl:if test="c:idx/@val != $numPoints - 1">
+          <chart:data-point>
+            <xsl:if test="$numPoints - 1 - c:idx/@val &gt; 1">
+              <xsl:attribute name="chart:repeated">
+                <xsl:value-of select="$numPoints - 1 - c:idx/@val - 1"/>
+              </xsl:attribute>
+            </xsl:if>
+          </chart:data-point>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+  
+  <xsl:template name="InsertDataPointsReverse">
+    <!-- @Description: Inserts data points for series in reverse order -->
+    <!-- @Context: c:dPt -->
+
+    <xsl:param name="seriesNum"/>
+    <!-- (int) sequential number of currently processed series -->
+    <xsl:param name="numPoints"/>
+    <!-- (int) number of all data points in series -->
+    <xsl:param name="prev" select="$numPoints"/>
+    <!-- (int) previous data point number (zero based) -->
+
+    <!-- insert default data points before -->
+    <xsl:if test="$prev - c:idx/@val &gt; 1  ">
+      <chart:data-point>
+        <xsl:if test="$prev - c:idx/@val &gt; 2">
+          <xsl:attribute name="chart:repeated">
+            <xsl:value-of select="$prev - c:idx/@val - 1"/>
+          </xsl:attribute>
+        </xsl:if>
+      </chart:data-point>
+    </xsl:if>
+
+    <chart:data-point>
+      <!-- 
+        style-name format: dataS-D 
+        S - series number
+        D - data point number
+        i.e. data2-3
+      -->
+      <xsl:attribute name="chart:style-name">
+        <xsl:value-of select="concat('data',$seriesNum,'-',c:idx/@val)"/>
+      </xsl:attribute>
+    </chart:data-point>
+
+    <xsl:choose>
+      <!-- insert next data point -->
+      <xsl:when test="preceding-sibling::c:dPt[1]">
+        <xsl:for-each select="preceding-sibling::c:dPt[1]">
+          <xsl:call-template name="InsertDataPointsReverse">
+            <xsl:with-param name="seriesNum" select="$seriesNum"/>
+            <xsl:with-param name="numPoints" select="$numPoints"/>
+            <xsl:with-param name="prev" select="c:idx/@val"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- insert default data points to the start of series -->
+      <xsl:otherwise>
+        <xsl:if test="c:idx/@val != 0">
+          <chart:data-point>
+            <xsl:if test="c:idx/@val &gt; 1">
+              <xsl:attribute name="chart:repeated">
+                <xsl:value-of select="c:idx/@val"/>
+              </xsl:attribute>
+            </xsl:if>
+          </chart:data-point>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+   <xsl:template name="InsertChartTable">
     <!-- @Description: Outputs chart data table containing visualized values  -->
     <!-- @Context: inside input chart file -->
 
     <xsl:variable name="reverseSeries">
-      <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
-        <xsl:choose>
-          <xsl:when
-            test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' or c:doughnutChart ">
-            <xsl:text>true</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
+      <xsl:call-template name="CheckIfSeriesReversed"/>
     </xsl:variable>
 
     <xsl:variable name="reverseCategories">
-      <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
-        <xsl:choose>
-          <xsl:when
-            test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart or c:doughnutChart">
-            <xsl:text>true</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
+      <xsl:call-template name="CheckIfCategoriesReversed"/>
     </xsl:variable>
 
     <table:table table:name="local-table">
@@ -1101,8 +1311,31 @@
           </xsl:otherwise>
         </xsl:choose>
 
+        <!-- check if series are reversed -->
+        <xsl:variable name="reverseSeries">
+          <xsl:call-template name="CheckIfSeriesReversed"/>
+        </xsl:variable>
 
-        <xsl:call-template name="InsertDataSeries"/>
+        <!-- check if data points are to be inserted in reverse order -->
+        <xsl:variable name="reverseCategories">
+          <xsl:call-template name="CheckIfCategoriesReversed"/>
+        </xsl:variable>
+
+
+        <xsl:choose>
+          <xsl:when test="$reverseSeries = 'false' ">
+            <xsl:call-template name="InsertSeries">
+              <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)[last()]">
+              <xsl:call-template name="InsertSeriesReversed">
+                <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
 
         <chart:wall chart:style-name="wall"/>
         <chart:floor chart:style-name="floor"/>
@@ -1126,9 +1359,9 @@
                 <xsl:text>gradient</xsl:text>
               </xsl:attribute>
               <xsl:for-each select="a:gradFill">
-              <xsl:attribute name="draw:fill-gradient-name">
-                <xsl:value-of select="generate-id()"/>
-              </xsl:attribute>
+                <xsl:attribute name="draw:fill-gradient-name">
+                  <xsl:value-of select="generate-id()"/>
+                </xsl:attribute>
               </xsl:for-each>
             </xsl:when>
             <xsl:when test="a:blipFill">
@@ -1158,7 +1391,7 @@
               <xsl:when test="a:gradFill">
                 <xsl:attribute name="draw:fill">
                   <xsl:text>gradient</xsl:text>
-                </xsl:attribute>                
+                </xsl:attribute>
                 <xsl:for-each select="a:gradFill">
                   <xsl:attribute name="draw:fill-gradient-name">
                     <xsl:value-of select="generate-id()"/>
@@ -1701,32 +1934,22 @@
   <xsl:template name="InsertSeriesProperties">
     <!-- @Description: Inserts series style properties -->
     <!-- @Context: Input chart file root -->
-    
-    <xsl:variable name="reverse">
-      <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
-        <xsl:choose>
-          <xsl:when
-            test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' ">
-            <xsl:text>true</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
+
+    <!-- check if data points are to be inserted in reverse order -->
+    <xsl:variable name="reverseCategories">
+      <xsl:call-template name="CheckIfCategoriesReversed"/>
+    </xsl:variable>
+
+    <!-- check if series are reversed -->
+    <xsl:variable name="reverseSeries">
+      <xsl:call-template name="CheckIfSeriesReversed"/>
     </xsl:variable>
 
     <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)">
 
+      <!-- calculate this series number -->
       <xsl:variable name="seriesNumber">
-        <xsl:choose>
-          <xsl:when test="$reverse = 'true' ">
-            <xsl:value-of select="count(key('dataSeries', @oox:part)) - position() + 1"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="position()"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="c:idx/@val"/>
       </xsl:variable>
 
       <style:style style:name="{concat('series',$seriesNumber)}" style:family="chart">
@@ -1863,7 +2086,8 @@
 
           <!-- default stroke for scatter and bubble chart -->
           <xsl:if
-            test="key('plotArea', @oox:part)/c:bubbleChart or key('plotArea', @oox:part)/c:barChart or key('plotArea', @oox:part)/c:bar3DChart">
+            test="key('plotArea', @oox:part)/c:bubbleChart or key('plotArea', @oox:part)/c:barChart or key('plotArea', @oox:part)/c:bar3DChart or 
+            key('plotArea', @oox:part)/c:pie3DChart or key('plotArea', @oox:part)/c:pieChart">
             <xsl:attribute name="draw:stroke">
               <xsl:text>none</xsl:text>
             </xsl:attribute>
@@ -1883,19 +2107,19 @@
             </xsl:attribute>
           </xsl:if>
 
-            <!-- default line color -->
-          <xsl:if test="not(c:spPr/a:ln/a:noFill)">
-              <xsl:variable name="defaultColor">
-                <xsl:call-template name="InsertDefaultChartSeriesColor">
-                  <xsl:with-param name="number">
-                    <xsl:value-of select="$seriesNumber"/>
-                  </xsl:with-param>                  
-                </xsl:call-template>
-              </xsl:variable>              
-              <xsl:attribute name="svg:stroke-color">
-              <xsl:value-of select="$defaultColor"/>  
-              </xsl:attribute>
-            </xsl:if>
+          <!-- default line chart line color -->
+          <xsl:if test="key('plotArea', @oox:part)/c:lineChart and not(c:spPr/a:ln/a:noFill)">
+            <xsl:variable name="defaultColor">
+              <xsl:call-template name="InsertDefaultChartSeriesColor">
+                <xsl:with-param name="number">
+                  <xsl:value-of select="$seriesNumber"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:attribute name="svg:stroke-color">
+              <xsl:value-of select="$defaultColor"/>
+            </xsl:attribute>
+          </xsl:if>
           
           <!-- default fill color  -->
           <xsl:if test="not(c:spPr/a:noFill or c:spPr/a:gradFill or c:spPr/a:blipFill)">
@@ -1903,11 +2127,11 @@
               <xsl:call-template name="InsertDefaultChartSeriesColor">
                 <xsl:with-param name="number">
                   <xsl:value-of select="$seriesNumber"/>
-                </xsl:with-param>                  
+                </xsl:with-param>
               </xsl:call-template>
-            </xsl:variable>              
+            </xsl:variable>
             <xsl:attribute name="draw:fill-color">
-              <xsl:value-of select="$defaultColor"/>  
+              <xsl:value-of select="$defaultColor"/>
             </xsl:attribute>
           </xsl:if>
 
@@ -1987,7 +2211,216 @@
           </style:graphic-properties>
         </style:style>
       </xsl:if>
+
+      <!-- insert this series data points styles -->
+      <xsl:choose>
+        <xsl:when
+          test="key('plotArea',@oox:part)/c:pieChart or key('plotArea',@oox:part)/c:pie3DChart">
+          <xsl:if test="position() = 1">
+            <xsl:variable name="numPoints">
+              <xsl:value-of select="descendant::c:ptCount/@val"/>
+            </xsl:variable>
+            <xsl:call-template name="InsertPieDataPointsProperties">
+              <xsl:with-param name="numPoints" select="$numPoints - 1"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:for-each select="c:dPt[1]">
+            <xsl:call-template name="InsertDataPointsProperties">
+              <xsl:with-param name="seriesNum">
+                <xsl:value-of select="$seriesNumber"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertPieDataPointsProperties">
+    <!-- @Description: Inserts data points properties for pie charts  -->
+    <!-- @Context: c:ser -->
+
+    <xsl:param name="numPoints"/>
+    <!-- (int) total number of points in chart reduced by 1-->
+    <xsl:param name="current" select="0"/>
+    <!-- (int) number of currently processed point (zero-based) -->
+
+    <xsl:choose>
+      <xsl:when test="c:dPt/c:idx/@val = $numPoints - $current">
+        <xsl:for-each select="c:dPt[c:idx/@val = $numPoints - $current]">
+          <xsl:call-template name="InsertDataPointsProperties">
+            <xsl:with-param name="seriesNum" select="0"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <style:style style:name="{concat('data0-',$numPoints - $current)}" style:family="chart">
+
+          <!-- label -->
+          <xsl:if test="c:dLbls">
+            <style:chart-properties>
+              <xsl:for-each select="c:dLbls">
+                <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
+                  <!-- value -->
+                  <xsl:if test="c:showVal/@val = 1 ">
+                    <xsl:attribute name="chart:data-label-number">
+                      <xsl:text>value</xsl:text>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <!-- name -->
+                  <xsl:if test="c:showCatName/@val = 1 ">
+                    <xsl:attribute name="chart:data-label-text">
+                      <xsl:text>true</xsl:text>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <!-- legend icon -->
+                  <xsl:if test="c:showLegendKey/@val = 1 ">
+                    <xsl:attribute name="chart:data-label-symbol">
+                      <xsl:text>true</xsl:text>
+                    </xsl:attribute>
+                  </xsl:if>
+                </xsl:if>
+              </xsl:for-each>
+            </style:chart-properties>
+          </xsl:if>
+
+          <style:graphic-properties draw:fill="solid">
+            <xsl:attribute name="draw:fill-color">
+              <xsl:call-template name="InsertDefaultChartSeriesColor">
+                <xsl:with-param name="number" select="$numPoints - $current"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </style:graphic-properties>
+        </style:style>
+      </xsl:otherwise>
+    </xsl:choose>
+
+    <xsl:if test="$current != $numPoints">
+      <xsl:call-template name="InsertPieDataPointsProperties">
+        <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="current" select="$current +1"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertDataPointsProperties">
+    <!-- @Description: Inserts data points properties  -->
+    <!-- @Context: c:dPt -->
+
+    <xsl:param name="seriesNum"/>
+    <!-- (int) sequential number of currently processed series -->
+
+    <style:style style:name="{concat('data',$seriesNum,'-',c:idx/@val)}" style:family="chart">
+
+      <xsl:variable name="pointNum">
+        <xsl:value-of select="c:idx/@val"/>
+      </xsl:variable>
+
+      <!-- does this data point has label -->
+      <xsl:variable name="hasLabel">
+        <xsl:for-each select="parent::node()">
+          <xsl:choose>
+            <xsl:when test="c:dLbls/c:dLbl/c:idx[@val = $pointNum]">
+              <xsl:text>text</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <!-- label -->
+      <xsl:if test="$hasLabel = 'true' ">
+        <style:chart-properties>
+          <xsl:for-each select="parent::node()">
+            <xsl:if test="c:dLbls">
+              <xsl:for-each select="c:dLbls">
+                <!--xsl:if test="not(c:dLbls/c:delete/@val = 1)"-->
+                <!-- value -->
+                <xsl:if test="c:showVal/@val = 1 ">
+                  <xsl:attribute name="chart:data-label-number">
+                    <xsl:text>value</xsl:text>
+                  </xsl:attribute>
+                </xsl:if>
+                <!-- name -->
+                <xsl:if test="c:showCatName/@val = 1 ">
+                  <xsl:attribute name="chart:data-label-text">
+                    <xsl:text>true</xsl:text>
+                  </xsl:attribute>
+                </xsl:if>
+                <!-- legend icon -->
+                <xsl:if test="c:showLegendKey/@val = 1 ">
+                  <xsl:attribute name="chart:data-label-symbol">
+                    <xsl:text>true</xsl:text>
+                  </xsl:attribute>
+                </xsl:if>
+                <!--/xsl:if-->
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:for-each>
+        </style:chart-properties>
+      </xsl:if>
+
+      <style:graphic-properties>
+
+        <!-- default fill color  -->
+        <xsl:if
+          test="key('plotArea', parent::node()/@oox:part)/c:pieChart or key('plotArea', parent::node()/@oox:part)/c:pie3DChart">
+          <xsl:if test="not(c:spPr/a:noFill or c:spPr/a:gradFill or c:spPr/a:blipFill)">
+            <xsl:variable name="defaultColor">
+              <xsl:call-template name="InsertDefaultChartSeriesColor">
+                <xsl:with-param name="number">
+                  <xsl:value-of select="c:idx/@val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:attribute name="draw:fill-color">
+              <xsl:value-of select="$defaultColor"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if>
+
+        <xsl:for-each select="c:spPr">
+          <!-- Insert fill -->
+          <xsl:choose>
+            <xsl:when test="a:gradFill">
+              <xsl:attribute name="draw:fill">
+                <xsl:text>gradient</xsl:text>
+              </xsl:attribute>
+              <xsl:for-each select="a:gradFill">
+                <xsl:attribute name="draw:fill-gradient-name">
+                  <xsl:value-of select="generate-id()"/>
+                </xsl:attribute>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="a:blipFill">
+              <xsl:call-template name="InsertBitmapFill"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="InsertFill"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
+          <xsl:call-template name="InsertLineColor"/>
+          <xsl:call-template name="InsertLineStyle"/>
+        </xsl:for-each>
+
+      </style:graphic-properties>
+    </style:style>
+
+    <!-- insert style for next data point -->
+    <xsl:if test="following-sibling::c:dPt[1]">
+      <xsl:for-each select="following-sibling::c:dPt[1]">
+        <xsl:call-template name="InsertDataPointsProperties">
+          <xsl:with-param name="seriesNum" select="$seriesNum"/>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="InsertErrorProperties">
@@ -2092,16 +2525,16 @@
     <xsl:for-each select="key('spPr', c:chartSpace/@oox:part)/a:gradFill">
       
       
-        <draw:gradient>
-          <xsl:attribute name="draw:name">
-           <xsl:value-of select="generate-id()"/>
-          </xsl:attribute>
-          <xsl:attribute name="draw:display-name">
-              <xsl:value-of select="generate-id()"/>
-          </xsl:attribute>
-          <xsl:call-template name="tmpGradientFillTiletoRect"/>
-        </draw:gradient>
-      </xsl:for-each>
+      <draw:gradient>
+        <xsl:attribute name="draw:name">
+          <xsl:value-of select="generate-id()"/>
+        </xsl:attribute>
+        <xsl:attribute name="draw:display-name">
+          <xsl:value-of select="generate-id()"/>
+        </xsl:attribute>
+        <xsl:call-template name="tmpGradientFillTiletoRect"/>
+      </draw:gradient>
+    </xsl:for-each>
       
 
 
@@ -2320,25 +2753,59 @@
     </xsl:variable>
     
     <xsl:choose>
-      <xsl:when test="$colorNum = 1">
+      <xsl:when test="$colorNum = 0">
         <xsl:text>#345b89</xsl:text>
       </xsl:when>
-      <xsl:when test="$colorNum = 2">
+      <xsl:when test="$colorNum = 1">
         <xsl:text>#8b3533</xsl:text>
       </xsl:when>
-      <xsl:when test="$colorNum = 3">
+      <xsl:when test="$colorNum = 2">
         <xsl:text>#6f873c</xsl:text>
       </xsl:when>
-      <xsl:when test="$colorNum = 4">
+      <xsl:when test="$colorNum = 3">
         <xsl:text>#5a4474</xsl:text>
       </xsl:when>
-      <xsl:when test="$colorNum = 5">
+      <xsl:when test="$colorNum = 4">
         <xsl:text>#2e7c90</xsl:text>
       </xsl:when>
-      <xsl:when test="$colorNum = 0">
+      <xsl:when test="$colorNum = 5">
         <xsl:text>#b56a2c</xsl:text>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="CheckIfSeriesReversed">
+    <!-- @Description: Checks if data series should be reversed  -->
+    <!-- @Context: inside input chart file -->
+
+    <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
+      <xsl:choose>
+        <xsl:when
+          test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' or c:doughnutChart">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="CheckIfCategoriesReversed">
+    <!-- @Description: Checks if data categories should be reversed  -->
+    <!-- @Context: inside input chart file -->
+
+    <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
+      <xsl:choose>
+        <xsl:when
+          test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart or c:ofPieChart">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
