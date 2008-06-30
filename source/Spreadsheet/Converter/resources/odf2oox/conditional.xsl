@@ -230,8 +230,10 @@
     <!-- there was a case where condition was "cell-content()=#NAME?G$45" and it caused a crash (but there can be #NAME condition as text occurence) -->
 
 <xsl:choose>
-  <xsl:when test="key('style',$styleName)/style:map[@style:condition != '' and not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot)))]">
+  <!-- Formulas are not implemented. We rejected conditional with formulas. -->
+  <xsl:when test="key('style',$styleName)/style:map[@style:condition != '' and not(contains(@style:condition,'#NAME') and not(contains(@style:condition,$quot))) and not(contains(@style:condition, 'is-true-formula'))]">
     <conditionalFormatting>
+ 
       <xsl:variable name="ColChar">
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
