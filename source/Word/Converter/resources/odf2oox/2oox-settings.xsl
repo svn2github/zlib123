@@ -46,6 +46,10 @@
   
   <xsl:template name="InsertSettings">
     <w:settings>
+
+      <!--clam, dialogika: bugfix 1945545-->
+      <w:stylePaneFormatFilter w:val="1021" />
+
       <!-- view layout -->
       <xsl:variable name="view-settings"
         select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:view-settings']"/>
