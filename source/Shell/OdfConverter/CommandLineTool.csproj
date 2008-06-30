@@ -395,9 +395,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo Copy pre-compiled transformations
+    <PostBuildEvent>if exist "C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\xsltc.exe" (
+echo Copy pre-compiled transformations
 copy "$(ProjectDir)..\..\Word\Converter\bin\*.dll" "$(TargetDir)"
 copy "$(ProjectDir)..\..\Spreadsheet\Converter\bin\*.dll" "$(TargetDir)"
-copy "$(ProjectDir)..\..\Presentation\Converter\bin\*.dll" "$(TargetDir)"</PostBuildEvent>
+copy "$(ProjectDir)..\..\Presentation\Converter\bin\*.dll" "$(TargetDir)"
+)</PostBuildEvent>
   </PropertyGroup>
 </Project>
