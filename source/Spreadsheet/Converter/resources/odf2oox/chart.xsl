@@ -117,6 +117,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                 <!-- chart area properties -->
                 <xsl:call-template name="InsertSpPr">
                   <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                  <xsl:with-param name="defaultFill" select="'solid'"/>
                 </xsl:call-template>
               </xsl:for-each>
 
@@ -383,7 +384,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!--End of RefNo-2-->
         </xsl:choose>
 
-        <xsl:if test="not(key('chart','')/@chart:class = 'chart:circle')">
+        <xsl:if
+          test="not(key('chart','')/@chart:class = 'chart:circle' or key('chart','')/@chart:class = 'chart:ring' )">
 
           <!-- primary X axis -->
           <xsl:for-each select="chart:axis[@chart:name = 'primary-x' ]">
@@ -438,7 +440,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!-- 'chart:stock' condition is temporary till this chart type is properly conversed -->
           <!--Start of RefNo-2:uncommented the code and Added condition to chk wheather any series is attached to seconday-y-axis.-->
           <xsl:if test="chart:axis[contains(@chart:name,'secondary')]">
-            <xsl:if test="key('series','')[@chart:attached-axis = 'secondary-y'] and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])">
+            <xsl:if
+              test="key('series','')[@chart:attached-axis = 'secondary-y'] and not(key('series','')[@chart:attached-axis = 'secondary-y' and @chart:class])">
               <!--secondary Y axis-->
               <xsl:choose>
                 <xsl:when test="$chartType = 'chart:stock' and count(key('series','')) &lt; 4">
@@ -475,7 +478,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                       </c:valAx>
                     </xsl:otherwise>
                   </xsl:choose>
-                  <!--secondary X axis (there can't be one in Calc?)--> 
+                  <!--secondary X axis (there can't be one in Calc?)-->
                   <!--default axes-->
                   <xsl:choose>
                     <!--scater chart has value axis-X-->
@@ -516,9 +519,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!--End of RefNo-2-->
         </xsl:if>
 
-        <!-- for the Radar Chart -->
+        <!-- for the Radar Chart  in OOo < 2.3 -->
         <xsl:if
-          test="key('chart','')/@chart:class='chart:radar' and not(key('chart','')/chart:plot-area/chart:axis/chart:categories)">
+          test="key('chart','')/@chart:class='chart:radar' and not(key('chart','')/chart:plot-area/chart:axis/chart:categories) and not(key('chart','')/chart:plot-area/chart:axis[@chart:dimension = 'x' ])">
           <xsl:for-each select="chart:axis[@chart:dimension = 'y' ]">
             <c:catAx>
               <xsl:call-template name="InsertAxisX">
@@ -540,6 +543,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:for-each select="chart:wall">
           <xsl:call-template name="InsertSpPr">
             <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+            <xsl:with-param name="defaultFill" select="'solid'"/>
           </xsl:call-template>
         </xsl:for-each>
 
@@ -630,11 +634,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!-- bar or column chart -->
           <xsl:choose>
             <xsl:when
-              test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'false' ">
-              <c:barDir val="col"/>
+              test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'true' ">
+              <c:barDir val="bar"/>
             </xsl:when>
             <xsl:otherwise>
-              <c:barDir val="bar"/>
+              <c:barDir val="col"/>
             </xsl:otherwise>
           </xsl:choose>
 
@@ -676,11 +680,11 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!-- bar or column chart -->
           <xsl:choose>
             <xsl:when
-              test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'false' ">
-              <c:barDir val="col"/>
+              test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'true' ">
+              <c:barDir val="bar"/>
             </xsl:when>
             <xsl:otherwise>
-              <c:barDir val="bar"/>
+              <c:barDir val="col"/>
             </xsl:otherwise>
           </xsl:choose>
 
@@ -926,6 +930,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       />
     </xsl:variable>
 
+    <xsl:variable name="chartType">
+      <xsl:value-of select="@chart:class"/>
+    </xsl:variable>
+
     <xsl:variable name="numSeries">
       <!-- (number) number of series inside chart -->
       <!--Start of RefNo-1
@@ -933,13 +941,19 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       -->
       <xsl:choose>
         <xsl:when
-              test="@chart:class = 'chart:bar' and key('series','')[@chart:class = 'chart:line' ]">
+          test="@chart:class = 'chart:bar' and key('series','')[@chart:class = 'chart:line' ]">
           <xsl:value-of select="count(key('series',''))"/>
           <xsl:message terminate="no">translation.odf2oox.BarLineCombinationChart</xsl:message>
         </xsl:when>
+        <!-- ring chart series in OO 2.4 have in chart:class attribute 'chart:circle' value -->
+        <xsl:when test="$chartType = 'chart:ring' ">
+          <xsl:value-of
+            select="count(key('series','')[not(@chart:class != 'chart:ring' and @chart:class != 'chart:circle' )])"
+          />
+        </xsl:when>
         <xsl:otherwise>
           <!-- (number) number of series inside chart -->
-          <xsl:value-of select="count(key('series','')[not(@chart:class)])"/>
+          <xsl:value-of select="count(key('series','')[not(@chart:class != $chartType)])"/>
         </xsl:otherwise>
       </xsl:choose>
       <!--End of RefNo-1-->
@@ -979,7 +993,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <!-- reverse categories for: (pie charts) or (ring charts) or (2D bar charts stacked or percentage) -->
           <xsl:when
             test="(key('chart','')/@chart:class = 'chart:circle' ) or (key('chart','')/@chart:class = 'chart:ring' ) or 
-            (@chart:vertical = 'true' and @chart:three-dimensional = 'false' )">
+            (@chart:vertical = 'true' and not(@chart:three-dimensional = 'true') )">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -994,8 +1008,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:choose>
           <!-- reverse series for: (2D normal bar chart) or (2D normal area chart) or (ring:chart) -->
           <xsl:when
-            test="(@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and @chart:three-dimensional = 'false' ) or 
-            (key('chart','')/@chart:class = 'chart:area' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and @chart:three-dimensional = 'false' ) or
+            test="(@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and not(@chart:three-dimensional = 'true' ) ) or 
+            (key('chart','')/@chart:class = 'chart:area' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and not(@chart:three-dimensional = 'true') ) or
             (key('chart','')/@chart:class = 'chart:ring')">
             <xsl:text>true</xsl:text>
           </xsl:when>
@@ -1004,10 +1018,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
-    </xsl:variable>
-
-    <xsl:variable name="chartType">
-      <xsl:value-of select="@chart:class"/>
     </xsl:variable>
 
     <xsl:for-each select="key('rows','')">
@@ -1698,11 +1708,12 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <c:ser>
       <c:idx val="{$primarySeries + $count}"/>
       <c:order val="{$primarySeries + $count}"/>
-      
+
       <xsl:if test="key('style', $styleName)/style:chart-properties/@chart:pie-offset">
         <c:explosion>
           <xsl:attribute name="val">
-            <xsl:value-of select="key('style', $styleName)/style:chart-properties/@chart:pie-offset"/>
+            <xsl:value-of select="key('style', $styleName)/style:chart-properties/@chart:pie-offset"
+            />
           </xsl:attribute>
         </c:explosion>
       </xsl:if>
@@ -1797,11 +1808,16 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:when test="$chartType = 'chart:scatter' ">
           <c:spPr>
 
-            <!-- draw line-->
+            <!-- draw line -->
             <xsl:for-each select="key('chart','')/chart:plot-area">
-              <xsl:for-each select="key('style',@chart:style-name)/style:chart-properties">
+              <xsl:for-each select="key('style',@chart:style-name)">
                 <xsl:choose>
-                  <xsl:when test="@chart:lines = 'false' ">
+                  <xsl:when test="style:chart-properties/@chart:lines = 'false' ">
+                    <a:ln w="28575">
+                      <a:noFill/>
+                    </a:ln>
+                  </xsl:when>
+                  <xsl:when test="key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none' ">
                     <a:ln w="28575">
                       <a:noFill/>
                     </a:ln>
@@ -1842,12 +1858,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:when test="$chartType = 'chart:ring'"/>
         <xsl:otherwise>
           <xsl:for-each select="key('series','')[position() = $number]">
-            <xsl:if test="$chartType = 'chart:line' and key('style', @chart:style-name)/style:graphic-properties/@svg:stroke-color">
-                <xsl:call-template name="InsertSpPr">
-                  <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-                  <xsl:with-param name="defaultFill" select="'solid'"/>
-                </xsl:call-template>
-            </xsl:if>
+              <xsl:call-template name="InsertSpPr">
+                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+                <xsl:with-param name="defaultFill" select="'solid'"/>
+              </xsl:call-template>
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
@@ -2127,7 +2141,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                   </c:marker>
                 </xsl:when>
                 <!-- close price marker for stock chart 3 -->
-                <xsl:when test="$numSeries = 4 and $count = 3 and chart:series/@chart:class = 'chart:bar' ">
+                <xsl:when
+                  test="$numSeries = 4 and $count = 3 and chart:series/@chart:class = 'chart:bar' ">
                   <c:marker>
                     <c:symbol val="dot"/>
                     <c:size val="3"/>
@@ -2138,7 +2153,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     <c:symbol val="none"/>
                   </c:marker>
                 </xsl:otherwise>
-                </xsl:choose>
+              </xsl:choose>
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
@@ -2428,38 +2443,39 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
   <xsl:template name="InsertSpPr">
     <xsl:param name="chartDirectory"/>
     <xsl:param name="defaultFill"/>
- 
+
     <c:spPr>
 
-    <xsl:choose>
-      
-      <xsl:when test="key('style',@chart:style-name)/style:graphic-properties/@draw:fill='gradient'">
-        <xsl:for-each select="key('style',@chart:style-name)/style:graphic-properties">
-          <xsl:call-template name="tmpGradientFill">
-            <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-            <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
-            <xsl:with-param name="ChartDirectory">
-              <xsl:value-of select="$chartDirectory"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:otherwise>
- 
-    <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
-      
-        <xsl:call-template name="InsertDrawingFill">
-          <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-          <xsl:with-param name="default" select="$defaultFill"/>
-        </xsl:call-template>
+      <xsl:choose>
 
-        <xsl:call-template name="InsertDrawingBorder"/>
+        <xsl:when
+          test="key('style',@chart:style-name)/style:graphic-properties/@draw:fill='gradient'">
+          <xsl:for-each select="key('style',@chart:style-name)/style:graphic-properties">
+            <xsl:call-template name="tmpGradientFill">
+              <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
+              <xsl:with-param name="opacity" select="substring-before(@draw:opacity,'%')"/>
+              <xsl:with-param name="ChartDirectory">
+                <xsl:value-of select="$chartDirectory"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
 
-    </xsl:for-each>
-      </xsl:otherwise>
+          <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
+
+            <xsl:call-template name="InsertDrawingFill">
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              <xsl:with-param name="default" select="$defaultFill"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="InsertDrawingBorder"/>
+
+          </xsl:for-each>
+        </xsl:otherwise>
       </xsl:choose>
     </c:spPr>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertShapeProperties">
