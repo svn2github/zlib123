@@ -1158,6 +1158,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
           </a:srgbClr>
         </a:solidFill>
       </xsl:when>
+      <xsl:when test="@draw:fill = 'none' ">
+        <a:noFill/>
+      </xsl:when>
       <xsl:when test="$default = 'solid' "/>
       <xsl:otherwise>
         <a:noFill/>

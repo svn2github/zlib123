@@ -1226,9 +1226,6 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
           <xsl:value-of select="'none'"/>
         </xsl:attribute>
 
-        <xsl:attribute name="draw:fill-color">
-          <xsl:value-of select="'#ffffff'"/>
-        </xsl:attribute>
       </xsl:when>
 
       <!-- Solid fill-->
