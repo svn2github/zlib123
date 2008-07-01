@@ -58,7 +58,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
             XmlReader SearchConditionalReader; 
             
             RelationShip rel = new RelationShip();
-
+           
+            if (!(partName.Contains(".vml")))
+            {
           while (xtr.Read())
             {
                 switch (xtr.NodeType)
@@ -372,6 +374,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     default:
                         Debug.Assert(false);
                         break;
+                    }
                 }
             }
 
