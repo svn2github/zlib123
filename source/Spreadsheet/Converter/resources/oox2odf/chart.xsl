@@ -508,7 +508,6 @@
           <xsl:choose>
             <xsl:when test="$reverseCategories = 'true' ">
               <!-- insert data points in reverse order -->
-              <xsl:for-each select="c:dPt[last()]">
               <xsl:call-template name="InsertDataPointsReverse">
                 <xsl:with-param name="seriesNum">
                   <xsl:value-of select="$seriesNumber"/>
@@ -517,20 +516,17 @@
                   <xsl:value-of select="$numPoints"/>
                 </xsl:with-param>
               </xsl:call-template>
-              </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
               <!-- insert data points in normal order -->
-              <xsl:for-each select="c:dPt[1]">
-                <xsl:call-template name="InsertDataPoints">
-                  <xsl:with-param name="seriesNum">
-                    <xsl:value-of select="$seriesNumber"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="numPoints">
-                    <xsl:value-of select="$numPoints"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:for-each>
+              <xsl:call-template name="InsertDataPoints">
+                <xsl:with-param name="seriesNum">
+                  <xsl:value-of select="$seriesNumber"/>
+                </xsl:with-param>
+                <xsl:with-param name="numPoints">
+                  <xsl:value-of select="$numPoints"/>
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
 
@@ -561,127 +557,185 @@
 
   <xsl:template name="InsertDataPoints">
     <!-- @Description: Inserts data points for series  in normal order -->
-    <!-- @Context: c:dPt -->
+    <!-- @Context: c:ser-->
 
     <xsl:param name="seriesNum"/>
     <!-- (int) sequential number of currently processed series -->
     <xsl:param name="numPoints"/>
     <!-- (int) number of all data points in series -->
+    <xsl:param name="current" select="0"/>
+    <!-- (int) current data point number (zero based) -->
     <xsl:param name="prev" select="-1"/>
-    <!-- (int) previous data point number (zero based) -->
+    <!-- (int) previous non-default data point number (zero based) -->
 
-    <!-- insert default data points before -->
-    <xsl:if test="c:idx/@val - $prev &gt; 1  ">
-      <chart:data-point>
-        <xsl:if test="c:idx/@val - ($prev) &gt; 2">
-          <xsl:attribute name="chart:repeated">
-            <xsl:value-of select="c:idx/@val - ($prev) - 1"/>
-          </xsl:attribute>
-        </xsl:if>
-      </chart:data-point>
-    </xsl:if>
+    <!-- does this data point has label -->
+    <xsl:variable name="hasLabel">
+      <xsl:choose>
+        <xsl:when test="c:dLbls/c:dLbl/c:idx[@val = $current]">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
-    <chart:data-point>
-      <!-- 
-              style-name format: dataS-D 
-              S - series number
-              D - data point number
-              i.e. data2-3
-      -->
-      <xsl:attribute name="chart:style-name">
-        <xsl:value-of select="concat('data',$seriesNum,'-',c:idx/@val)"/>
-      </xsl:attribute>
-    </chart:data-point>
-
+    <!-- process this data point -->
     <xsl:choose>
-      <!-- insert next data point -->
-      <xsl:when test="following-sibling::c:dPt[1]">
-        <xsl:for-each select="following-sibling::c:dPt[1]">
+      <!-- if data point is not default -->
+      <xsl:when test="c:dPt[c:idx/@val = $current] or $hasLabel = 'true' ">
+        <!-- insert default data points before -->
+        <xsl:if test="$current - $prev &gt; 1  ">
+          <chart:data-point>
+            <xsl:if test="$current - $prev &gt; 2">
+              <xsl:attribute name="chart:repeated">
+                <xsl:value-of select="$current - $prev - 1"/>
+              </xsl:attribute>
+            </xsl:if>
+          </chart:data-point>
+        </xsl:if>
+
+        <!-- insert current data point -->
+        <chart:data-point>
+          <!-- 
+            style-name format: dataS-D 
+            S - series number
+            D - data point number
+            i.e. data2-3
+          -->
+          <xsl:attribute name="chart:style-name">
+            <xsl:value-of select="concat('data',$seriesNum,'-',$current)"/>
+          </xsl:attribute>
+        </chart:data-point>
+
+        <!-- next data point -->
+        <xsl:if test="$current != $numPoints - 1">
           <xsl:call-template name="InsertDataPoints">
             <xsl:with-param name="seriesNum" select="$seriesNum"/>
             <xsl:with-param name="numPoints" select="$numPoints"/>
-            <xsl:with-param name="prev" select="c:idx/@val"/>
+            <xsl:with-param name="prev" select="$current"/>
+            <xsl:with-param name="current" select="$current + 1"/>
           </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <!-- insert default data points to the end of series -->
-      <xsl:otherwise>
-        <xsl:if test="c:idx/@val != $numPoints - 1">
-          <chart:data-point>
-            <xsl:if test="$numPoints - 1 - c:idx/@val &gt; 1">
-              <xsl:attribute name="chart:repeated">
-                <xsl:value-of select="$numPoints - 1 - c:idx/@val - 1"/>
-              </xsl:attribute>
-            </xsl:if>
-          </chart:data-point>
         </xsl:if>
+      </xsl:when>
+
+      <!-- if data point is default process next data point or output default data-points if the last one -->
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$current = $numPoints - 1">
+            <chart:data-point>
+              <xsl:if test="$current - $prev &gt; 1">
+                <xsl:attribute name="chart:repeated">
+                  <xsl:value-of select="$current - $prev "/>
+                </xsl:attribute>
+              </xsl:if>
+            </chart:data-point>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertDataPoints">
+              <xsl:with-param name="seriesNum" select="$seriesNum"/>
+              <xsl:with-param name="numPoints" select="$numPoints"/>
+              <xsl:with-param name="prev" select="$prev"/>
+              <xsl:with-param name="current" select="$current + 1"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
 
   </xsl:template>
-  
+
   <xsl:template name="InsertDataPointsReverse">
     <!-- @Description: Inserts data points for series in reverse order -->
-    <!-- @Context: c:dPt -->
+    <!-- @Context: c:ser -->
 
     <xsl:param name="seriesNum"/>
     <!-- (int) sequential number of currently processed series -->
     <xsl:param name="numPoints"/>
     <!-- (int) number of all data points in series -->
+    <xsl:param name="current" select="$numPoints - 1"/>
+    <!-- (int) current data point number (zero based) -->
     <xsl:param name="prev" select="$numPoints"/>
-    <!-- (int) previous data point number (zero based) -->
+    <!-- (int) previous non-default data point number (zero based) -->
 
-    <!-- insert default data points before -->
-    <xsl:if test="$prev - c:idx/@val &gt; 1  ">
-      <chart:data-point>
-        <xsl:if test="$prev - c:idx/@val &gt; 2">
-          <xsl:attribute name="chart:repeated">
-            <xsl:value-of select="$prev - c:idx/@val - 1"/>
-          </xsl:attribute>
-        </xsl:if>
-      </chart:data-point>
-    </xsl:if>
+    <!-- does this data point has label -->
+    <xsl:variable name="hasLabel">
+      <xsl:choose>
+        <xsl:when test="c:dLbls/c:dLbl/c:idx[@val = $current]">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
-    <chart:data-point>
-      <!-- 
-        style-name format: dataS-D 
-        S - series number
-        D - data point number
-        i.e. data2-3
-      -->
-      <xsl:attribute name="chart:style-name">
-        <xsl:value-of select="concat('data',$seriesNum,'-',c:idx/@val)"/>
-      </xsl:attribute>
-    </chart:data-point>
-
+    <!-- process this data point -->
     <xsl:choose>
-      <!-- insert next data point -->
-      <xsl:when test="preceding-sibling::c:dPt[1]">
-        <xsl:for-each select="preceding-sibling::c:dPt[1]">
-          <xsl:call-template name="InsertDataPointsReverse">
-            <xsl:with-param name="seriesNum" select="$seriesNum"/>
-            <xsl:with-param name="numPoints" select="$numPoints"/>
-            <xsl:with-param name="prev" select="c:idx/@val"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <!-- insert default data points to the start of series -->
-      <xsl:otherwise>
-        <xsl:if test="c:idx/@val != 0">
+      <!-- if data point is not default -->
+      <xsl:when test="c:dPt[c:idx/@val = $current] or $hasLabel = 'true' ">
+        <!-- insert default data points before -->
+        <xsl:if test="$prev - $current &gt; 1  ">
           <chart:data-point>
-            <xsl:if test="c:idx/@val &gt; 1">
+            <xsl:if test="$prev - $current &gt; 2">
               <xsl:attribute name="chart:repeated">
-                <xsl:value-of select="c:idx/@val"/>
+                <xsl:value-of select="$prev - $current - 1"/>
               </xsl:attribute>
             </xsl:if>
           </chart:data-point>
         </xsl:if>
+
+        <!-- insert current data point -->
+        <chart:data-point>
+          <!-- 
+            style-name format: dataS-D 
+            S - series number
+            D - data point number
+            i.e. data2-3
+          -->
+          <xsl:attribute name="chart:style-name">
+            <xsl:value-of select="concat('data',$seriesNum,'-',$current)"/>
+          </xsl:attribute>
+        </chart:data-point>
+
+        <!-- next data point -->
+        <xsl:if test="$current != 0">
+          <xsl:call-template name="InsertDataPointsReverse">
+            <xsl:with-param name="seriesNum" select="$seriesNum"/>
+            <xsl:with-param name="numPoints" select="$numPoints"/>
+            <xsl:with-param name="prev" select="$current"/>
+            <xsl:with-param name="current" select="$current - 1"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:when>
+
+      <!-- if data point is default process next data point -->
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$current = 0">
+            <chart:data-point>
+              <xsl:if test="$prev &gt; 1">
+                <xsl:attribute name="chart:repeated">
+                  <xsl:value-of select="$prev"/>
+                </xsl:attribute>
+              </xsl:if>
+            </chart:data-point>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertDataPointsReverse">
+              <xsl:with-param name="seriesNum" select="$seriesNum"/>
+              <xsl:with-param name="numPoints" select="$numPoints"/>
+              <xsl:with-param name="current" select="$current - 1"/>
+              <xsl:with-param name="prev" select="$prev"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
 
   </xsl:template>
 
-   <xsl:template name="InsertChartTable">
+  <xsl:template name="InsertChartTable">
     <!-- @Description: Outputs chart data table containing visualized values  -->
     <!-- @Context: inside input chart file -->
 
@@ -793,7 +847,7 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of
-              select="concat('Series',key('numPoints', @oox:part)/descendant::c:ptCount/@val + 1 - $count)"
+              select="concat('Series',key('numPoints', @oox:part)/descendant::c:ptCount/@val - $count)"
             />
           </xsl:otherwise>
         </xsl:choose>
@@ -1945,6 +1999,21 @@
       <xsl:call-template name="CheckIfSeriesReversed"/>
     </xsl:variable>
 
+    <!-- insert data points -->
+    <xsl:variable name="numPoints">
+      <xsl:choose>
+        <!-- for scatter chart -->
+        <xsl:when test="key('xNumPoints', c:chartSpace/@oox:part)/descendant::c:ptCount">
+          <xsl:value-of
+            select="key('xNumPoints', c:chartSpace/@oox:part)/descendant::c:ptCount/@val"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="key('numPoints', c:chartSpace/@oox:part)/descendant::c:ptCount/@val"
+          />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)">
 
       <!-- calculate this series number -->
@@ -1978,13 +2047,25 @@
 
           <!-- label -->
           <xsl:for-each select="c:dLbls">
-            <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
-              <!-- value -->
-              <xsl:if test="c:showVal/@val = 1 ">
-                <xsl:attribute name="chart:data-label-number">
-                  <xsl:text>value</xsl:text>
-                </xsl:attribute>
-              </xsl:if>
+            <xsl:if test="not(c:delete/@val = 1 or c:dLbl/c:delete/@val = 1)">
+              <!-- value and/or percentage -->
+              <xsl:choose>
+                <xsl:when test="c:showVal/@val = 1 and c:showPercent/@val=1 ">
+                  <xsl:attribute name="chart:data-label-number">
+                    <xsl:text>value-and-percentage</xsl:text>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:showVal/@val = 1 ">
+                  <xsl:attribute name="chart:data-label-number">
+                    <xsl:text>value</xsl:text>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:showPercent/@val=1 ">
+                  <xsl:attribute name="chart:data-label-number">
+                    <xsl:text>percentage</xsl:text>
+                  </xsl:attribute>
+                </xsl:when>
+              </xsl:choose>
               <!-- name -->
               <xsl:if test="c:showCatName/@val = 1 ">
                 <xsl:attribute name="chart:data-label-text">
@@ -2217,23 +2298,21 @@
         <xsl:when
           test="key('plotArea',@oox:part)/c:pieChart or key('plotArea',@oox:part)/c:pie3DChart">
           <xsl:if test="position() = 1">
-            <xsl:variable name="numPoints">
-              <xsl:value-of select="descendant::c:ptCount/@val"/>
-            </xsl:variable>
             <xsl:call-template name="InsertPieDataPointsProperties">
               <xsl:with-param name="numPoints" select="$numPoints - 1"/>
             </xsl:call-template>
           </xsl:if>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:for-each select="c:dPt[1]">
-            <xsl:call-template name="InsertDataPointsProperties">
-              <xsl:with-param name="seriesNum">
-                <xsl:value-of select="$seriesNumber"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:otherwise>
+        <xsl:when test="c:dPt or c:dLbls">
+          <xsl:call-template name="InsertDataPointsProperties">
+            <xsl:with-param name="seriesNum">
+              <xsl:value-of select="$seriesNumber"/>
+            </xsl:with-param>
+            <xsl:with-param name="numPoints">
+              <xsl:value-of select="$numPoints - 1"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
       </xsl:choose>
 
     </xsl:for-each>
@@ -2249,43 +2328,38 @@
     <!-- (int) number of currently processed point (zero-based) -->
 
     <xsl:choose>
-      <xsl:when test="c:dPt/c:idx/@val = $numPoints - $current">
-        <xsl:for-each select="c:dPt[c:idx/@val = $numPoints - $current]">
-          <xsl:call-template name="InsertDataPointsProperties">
-            <xsl:with-param name="seriesNum" select="0"/>
-          </xsl:call-template>
-        </xsl:for-each>
+      <xsl:when test="c:dPt[c:idx/@val = $numPoints - $current]">
+        <xsl:call-template name="InsertDataPointsPropertiesStyle">
+          <xsl:with-param name="seriesNum" select="0"/>
+          <xsl:with-param name="current" select="$numPoints - $current"/>
+          <xsl:with-param name="point" select="$numPoints - $current"/>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <style:style style:name="{concat('data0-',$numPoints - $current)}" style:family="chart">
-
+          
           <!-- label -->
-          <xsl:if test="c:dLbls">
-            <style:chart-properties>
-              <xsl:for-each select="c:dLbls">
-                <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
-                  <!-- value -->
-                  <xsl:if test="c:showVal/@val = 1 ">
-                    <xsl:attribute name="chart:data-label-number">
-                      <xsl:text>value</xsl:text>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <!-- name -->
-                  <xsl:if test="c:showCatName/@val = 1 ">
-                    <xsl:attribute name="chart:data-label-text">
-                      <xsl:text>true</xsl:text>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <!-- legend icon -->
-                  <xsl:if test="c:showLegendKey/@val = 1 ">
-                    <xsl:attribute name="chart:data-label-symbol">
-                      <xsl:text>true</xsl:text>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:if>
-              </xsl:for-each>
-            </style:chart-properties>
-          </xsl:if>
+          <xsl:for-each select="c:dLbls">
+            <!-- if label wasn't deleted from data point -->
+            <xsl:if test="not(c:dLbl[c:idx/@val = $numPoints - $current]/c:delete/@val=1)">
+              <xsl:choose>
+                <!-- take data point label type -->
+                <xsl:when test="c:dLbl[c:idx/@val = $numPoints - $current]">
+                  <xsl:for-each select="c:dLbl[c:idx/@val = $numPoints - $current]">
+                    <style:chart-properties>
+                      <xsl:call-template name="InsertDataPointLabelAttributes"/>
+                    </style:chart-properties>
+                  </xsl:for-each>
+                </xsl:when>
+                <!-- take series label type -->
+                <xsl:otherwise>
+                  <style:chart-properties>
+                    <xsl:call-template name="InsertDataPointLabelAttributes"/>
+                  </style:chart-properties>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
+          </xsl:for-each>
 
           <style:graphic-properties draw:fill="solid">
             <xsl:attribute name="draw:fill-color">
@@ -2308,69 +2382,106 @@
 
   <xsl:template name="InsertDataPointsProperties">
     <!-- @Description: Inserts data points properties  -->
-    <!-- @Context: c:dPt -->
+    <!-- @Context: c:ser -->
 
     <xsl:param name="seriesNum"/>
     <!-- (int) sequential number of currently processed series -->
+    <xsl:param name="numPoints"/>
+    <!-- (int) number of all data points in series -->
+    <xsl:param name="current" select="0"/>
+    <!-- (int) current data point number (zero based) -->
+    <xsl:param name="prev" select="-1"/>
+    <!-- (int) previous non-default data point number (zero based) -->
 
-    <style:style style:name="{concat('data',$seriesNum,'-',c:idx/@val)}" style:family="chart">
+    <!-- does this data point has label -->
+    <xsl:variable name="hasLabel">
+      <xsl:choose>
+        <xsl:when test="c:dLbls/c:dLbl/c:idx[@val = $current]">
+          <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
-      <xsl:variable name="pointNum">
-        <xsl:value-of select="c:idx/@val"/>
-      </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="c:dPt[c:idx/@val = $current] or $hasLabel = 'true' ">
 
-      <!-- does this data point has label -->
-      <xsl:variable name="hasLabel">
-        <xsl:for-each select="parent::node()">
-          <xsl:choose>
-            <xsl:when test="c:dLbls/c:dLbl/c:idx[@val = $pointNum]">
-              <xsl:text>text</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>false</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:variable>
+        <xsl:call-template name="InsertDataPointsPropertiesStyle">
+          <xsl:with-param name="seriesNum" select="$seriesNum"/>
+          <xsl:with-param name="current" select="$current"/>
+          <xsl:with-param name="prev" select="$prev"/>
+        </xsl:call-template>
+
+        <!-- next data point style -->
+        <xsl:if test="$current != $numPoints">
+          <xsl:call-template name="InsertDataPointsProperties">
+            <xsl:with-param name="seriesNum" select="$seriesNum"/>
+            <xsl:with-param name="numPoints" select="$numPoints"/>
+            <xsl:with-param name="prev" select="$current"/>
+            <xsl:with-param name="current" select="$current + 1"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:when>
+
+      <!-- if data point is default process next data point style -->
+      <xsl:otherwise>
+        <xsl:if test="$current != $numPoints">
+          <xsl:call-template name="InsertDataPointsProperties">
+            <xsl:with-param name="seriesNum" select="$seriesNum"/>
+            <xsl:with-param name="numPoints" select="$numPoints"/>
+            <xsl:with-param name="prev" select="$prev"/>
+            <xsl:with-param name="current" select="$current + 1"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertDataPointsPropertiesStyle">
+    <!-- @Description: Inserts data points properties style  -->
+    <!-- @Context: c:ser -->
+
+    <xsl:param name="seriesNum"/>
+    <!-- (int) sequential number of currently processed series -->
+    <xsl:param name="current"/>
+    <!-- (int) current data point number (zero based) -->
+    <xsl:param name="point" select="$current"/>
+
+    <style:style style:name="{concat('data',$seriesNum,'-',$point)}" style:family="chart">
 
       <!-- label -->
-      <xsl:if test="$hasLabel = 'true' ">
-        <style:chart-properties>
-          <xsl:for-each select="parent::node()">
-            <xsl:if test="c:dLbls">
-              <xsl:for-each select="c:dLbls">
-                <!--xsl:if test="not(c:dLbls/c:delete/@val = 1)"-->
-                <!-- value -->
-                <xsl:if test="c:showVal/@val = 1 ">
-                  <xsl:attribute name="chart:data-label-number">
-                    <xsl:text>value</xsl:text>
-                  </xsl:attribute>
-                </xsl:if>
-                <!-- name -->
-                <xsl:if test="c:showCatName/@val = 1 ">
-                  <xsl:attribute name="chart:data-label-text">
-                    <xsl:text>true</xsl:text>
-                  </xsl:attribute>
-                </xsl:if>
-                <!-- legend icon -->
-                <xsl:if test="c:showLegendKey/@val = 1 ">
-                  <xsl:attribute name="chart:data-label-symbol">
-                    <xsl:text>true</xsl:text>
-                  </xsl:attribute>
-                </xsl:if>
-                <!--/xsl:if-->
+      <xsl:for-each select="c:dLbls">
+        <!-- if label wasn't deleted from data point -->
+        <xsl:if test="not(c:dLbl[c:idx/@val =$current]/c:delete/@val=1)">
+          <xsl:choose>
+            <!-- take data point label type -->
+            <xsl:when test="c:dLbl[c:idx/@val =$current]">
+              <xsl:for-each select="c:dLbl[c:idx/@val =$current]">
+                <style:chart-properties>
+                  <xsl:call-template name="InsertDataPointLabelAttributes"/>
+                </style:chart-properties>
               </xsl:for-each>
-            </xsl:if>
-          </xsl:for-each>
-        </style:chart-properties>
-      </xsl:if>
+            </xsl:when>
+            <!-- take series label type -->
+            <xsl:otherwise>
+              <style:chart-properties>
+                <xsl:call-template name="InsertDataPointLabelAttributes"/>
+              </style:chart-properties>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:for-each>
 
       <style:graphic-properties>
 
         <!-- default fill color  -->
         <xsl:if
-          test="key('plotArea', parent::node()/@oox:part)/c:pieChart or key('plotArea', parent::node()/@oox:part)/c:pie3DChart">
-          <xsl:if test="not(c:spPr/a:noFill or c:spPr/a:gradFill or c:spPr/a:blipFill)">
+          test="key('plotArea', @oox:part)/c:pieChart or key('plotArea', @oox:part)/c:pie3DChart">
+          <xsl:if
+            test="not(c:dPt[c:idx/@val = $current]/c:spPr/a:noFill or c:dPt[c:idx/@val = $current]/c:spPr/a:gradFill or c:dPt[c:idx/@val = $current]/c:spPr/a:blipFill)">
             <xsl:variable name="defaultColor">
               <xsl:call-template name="InsertDefaultChartSeriesColor">
                 <xsl:with-param name="number">
@@ -2384,7 +2495,7 @@
           </xsl:if>
         </xsl:if>
 
-        <xsl:for-each select="c:spPr">
+        <xsl:for-each select="c:dPt[c:idx/@val = $current]/c:spPr">
           <!-- Insert fill -->
           <xsl:choose>
             <xsl:when test="a:gradFill">
@@ -2411,16 +2522,6 @@
 
       </style:graphic-properties>
     </style:style>
-
-    <!-- insert style for next data point -->
-    <xsl:if test="following-sibling::c:dPt[1]">
-      <xsl:for-each select="following-sibling::c:dPt[1]">
-        <xsl:call-template name="InsertDataPointsProperties">
-          <xsl:with-param name="seriesNum" select="$seriesNum"/>
-        </xsl:call-template>
-      </xsl:for-each>
-    </xsl:if>
-
   </xsl:template>
 
   <xsl:template name="InsertErrorProperties">
@@ -2522,9 +2623,8 @@
         </xsl:attribute>
       </draw:fill-image>
     </xsl:for-each>
+
     <xsl:for-each select="key('spPr', c:chartSpace/@oox:part)/a:gradFill">
-      
-      
       <draw:gradient>
         <xsl:attribute name="draw:name">
           <xsl:value-of select="generate-id()"/>
@@ -2535,8 +2635,6 @@
         <xsl:call-template name="tmpGradientFillTiletoRect"/>
       </draw:gradient>
     </xsl:for-each>
-      
-
 
   </xsl:template>
 
@@ -2806,6 +2904,39 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertDataPointLabelAttributes">
+    <!-- value and/or percentage -->
+    <xsl:choose>
+      <xsl:when test="c:showVal/@val = 1 and c:showPercent/@val=1 ">
+        <xsl:attribute name="chart:data-label-number">
+          <xsl:text>value-and-percentage</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="c:showVal/@val = 1">
+        <xsl:attribute name="chart:data-label-number">
+          <xsl:text>value</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="c:showPercent/@val=1">
+        <xsl:attribute name="chart:data-label-number">
+          <xsl:text>percentage</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+    <!-- name -->
+    <xsl:if test="c:showCatName/@val = 1 ">
+      <xsl:attribute name="chart:data-label-text">
+        <xsl:text>true</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+    <!-- legend icon -->
+    <xsl:if test="c:showLegendKey/@val = 1 ">
+      <xsl:attribute name="chart:data-label-symbol">
+        <xsl:text>true</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>
