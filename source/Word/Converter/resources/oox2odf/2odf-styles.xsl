@@ -959,23 +959,29 @@
         <xsl:apply-templates select="key('Part', 'word/styles.xml')/w:styles"/>
         
         <!--clam: special hyperlink style for toc (bug #1806204)-->
-        <style:style style:name="X3AS7TOCHyperlink" style:display-name="X3AS7TOCHyperlink" style:family="text" style:parent-style-name="DefaultParagraphFont">
-          <style:text-properties fo:color="#000000" style:text-underline-style="none" />
-        </style:style>
+        <xsl:if test="not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='X3AS7TOCHyperlink'])">
+          <style:style style:name="X3AS7TOCHyperlink" style:display-name="X3AS7TOCHyperlink" style:family="text" style:parent-style-name="DefaultParagraphFont">
+            <style:text-properties fo:color="#000000" style:text-underline-style="none" />
+          </style:style>
+        </xsl:if>
 
         <!--clam: special style for tabs in footer (bug #1803097)-->
-        <style:style style:name="X3AS7TABSTYLE" style:family="paragraph" style:parent-style-name="Footer" xmlns:pchar="urn:cleverage:xmlns:post-processings:characters" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns="http://schemas.openxmlformats.org/package/2006/relationships" xmlns:v="urn:schemas-microsoft-com:vml">
-          <style:paragraph-properties>
-            <style:tab-stops>
-              <style:tab-stop style:type="right" style:position="25cm" />
-            </style:tab-stops>
-          </style:paragraph-properties>
-        </style:style>
+        <xsl:if test="not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='X3AS7TABSTYLE'])">
+          <style:style style:name="X3AS7TABSTYLE" style:family="paragraph" style:parent-style-name="Footer" xmlns:pchar="urn:cleverage:xmlns:post-processings:characters" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns="http://schemas.openxmlformats.org/package/2006/relationships" xmlns:v="urn:schemas-microsoft-com:vml">
+            <style:paragraph-properties>
+              <style:tab-stops>
+                <style:tab-stop style:type="right" style:position="25cm" />
+              </style:tab-stops>
+            </style:paragraph-properties>
+          </style:style>
+        </xsl:if>
 
         <!--clam: special style for bullets with symbol font (bug #1806059)-->
-        <style:style style:family="text" style:name="BulletSymbol">
-          <style:text-properties style:font-name="Symbol" />
-        </style:style>
+        <xsl:if test="not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='BulletSymbol'])">
+          <style:style style:family="text" style:name="BulletSymbol">
+            <style:text-properties style:font-name="Symbol" />
+          </style:style>
+        </xsl:if>
 
         <xsl:call-template name="InsertNotesConfiguration"/>
         <xsl:if
