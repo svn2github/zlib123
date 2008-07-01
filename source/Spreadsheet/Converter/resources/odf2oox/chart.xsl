@@ -1858,10 +1858,10 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         <xsl:when test="$chartType = 'chart:ring'"/>
         <xsl:otherwise>
           <xsl:for-each select="key('series','')[position() = $number]">
-              <xsl:call-template name="InsertSpPr">
-                <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
-                <xsl:with-param name="defaultFill" select="'solid'"/>
-              </xsl:call-template>
+            <xsl:call-template name="InsertSpPr">
+              <xsl:with-param name="chartDirectory" select="$chartDirectory"/>
+              <xsl:with-param name="defaultFill" select="'solid'"/>
+            </xsl:call-template>
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
@@ -1922,10 +1922,14 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
             <xsl:for-each select="style:chart-properties">
               <xsl:choose>
                 <xsl:when
-                  test="@chart:data-label-number = 'value' or @chart:data-label-text = 'true' ">
+                  test="@chart:data-label-number = 'value' or @chart:data-label-text = 'true' or @chart:data-label-number = 'value-and-percentage' ">
                   <!-- value -->
-                  <xsl:if test="@chart:data-label-number = 'value' ">
+                  <xsl:if test="@chart:data-label-number = 'value' or @chart:data-label-number = 'value-and-percentage' ">
                     <c:showVal val="1"/>
+                  </xsl:if>
+                  <!-- percent -->
+                  <xsl:if test="@chart:data-label-number = 'percentage' or @chart:data-label-number = 'value-and-percentage' ">
+                    <c:showPercent val="1"/>
                   </xsl:if>
                   <!-- name -->
                   <xsl:if test="@chart:data-label-text = 'true' ">
