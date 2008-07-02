@@ -441,7 +441,16 @@
             </xsl:call-template>
           </xsl:variable>
           <!--<xsl:value-of select="substring-before($TextIndent, 'cm') - substring-before($MinLabelWidth, 'cm')" />-->
-          <xsl:value-of select="$myTextIndent - $myMinLabelWidth"/>
+          <!--math, dialogika: Bugfix #2001515: if @text:is-list-header = 'true' list option min-label-width is ignored BEGIN-->          
+          <xsl:choose>
+            <xsl:when test ="@text:is-list-header = 'true'">
+              <xsl:value-of select="$myTextIndent"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$myTextIndent - $myMinLabelWidth"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <!--math, dialogika: Bugfix #2001515: if @text:is-list-header = 'true' list option min-label-width is ignored END-->
         </xsl:variable>
 
         <xsl:choose>
