@@ -1240,7 +1240,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
             </xsl:when>
             <xsl:otherwise>
               <!-- change referencing node to style:text-properties and count-->
-              <xsl:for-each select="style:text-properties">
+              <xsl:for-each select="style:text-properties[1]">
                 <xsl:variable name="fontNum">
                   <xsl:number
                     count="style:text-properties[parent::node()/@style:family='table-cell']"
