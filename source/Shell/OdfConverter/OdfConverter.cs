@@ -447,11 +447,14 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 varResult = "Word";
             }
 
-            this.report.AddComment("Results: " + nbConverted + " file(s) over " + nbFiles + " were converted, among them:");
-            this.report.AddComment("   " + nbValidatedAndOpened + " were validated and successfully opened in " + varResult);
-            this.report.AddComment("   " + nbValidatedAndNotOpened + " were validated but could not be opened in  " + varResult);
-            this.report.AddComment("   " + nbNotValidatedAndOpened + " were not validated but were successfully opened  " + varResult);
-            this.report.AddComment("   " + nbNotValidatedAndNotOpened + " were not validated and could not be opened in " + varResult);
+            this.report.AddComment("Results: " + nbConverted + " file(s) over " + nbFiles + " were converted successfully.");
+
+            // opening and validating options have been removed
+            //this.report.AddComment("Results: " + nbConverted + " file(s) over " + nbFiles + " were converted, among them:");
+            //this.report.AddComment("   " + nbValidatedAndOpened + " were validated and successfully opened in " + varResult);
+            //this.report.AddComment("   " + nbValidatedAndNotOpened + " were validated but could not be opened in " + varResult);
+            //this.report.AddComment("   " + nbNotValidatedAndOpened + " were not validated but were successfully opened  " + varResult);
+            //this.report.AddComment("   " + nbNotValidatedAndNotOpened + " were not validated and could not be opened in " + varResult);
         }
 
         private void ProceedBatchOox()
@@ -687,7 +690,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private static void usage()
         {
-            Console.WriteLine("Usage: OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level] ");
+            Console.WriteLine("Usage: OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX] [/XSLT Path] [/NOPACKAGING] [/SKIP Name] [/REPORT Filename] [/LEVEL Level] ");
             //Console.WriteLine("Usage: OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level] ");
             Console.WriteLine("  Where options are:");
             Console.WriteLine("     /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)");
@@ -703,7 +706,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             //Console.WriteLine("     /OPEN              Try to open the converted files (works only for ODF->OOX, Microsoft Word required)");
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
             Console.WriteLine("     /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)");
-            Console.WriteLine("     /SKIP name         Skip a post-processing (provide the post-processor's name)");
+            Console.WriteLine("     /SKIP Name         Skip a post-processing (provide the post-processor's name)");
             Console.WriteLine("     /REPORT Filename   Name of the report file that must be generated (existing files will be replaced)");
             Console.WriteLine("     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR");
           	Console.WriteLine("     /ODT2DOCX          Force conversion to DOCX regardless of input file extension");
