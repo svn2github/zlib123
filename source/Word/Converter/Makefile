@@ -2,7 +2,7 @@ top_srcdir=../../..
 
 include $(top_srcdir)/build/common.mk
 
-ID_SUFFIX=CleverAge.OdfConverter.Word.resources
+ID_SUFFIX=OdfConverter.Wordprocessing.resources
 
 OOX2ODF_RES= \
     $(wildcard resources/oox2odf/*.xsl) \
