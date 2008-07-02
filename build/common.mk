@@ -1,6 +1,6 @@
 all: do-all
 
-OS:=$(shell uname -o)
+OS:=$(shell uname -o 2> /dev/null)
 
 # uname doesn't have a -o option on all platforms
 ifndef OS
