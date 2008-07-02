@@ -55,8 +55,9 @@
         </xsl:attribute>
       </xsl:if>
       
+      <xsl:if test="(@fo:border-left != '' and @fo:border-left != 'none') or (@fo:border != '' and @fo:border != 'none' )">
+        
         <left>
-          <xsl:if test="(@fo:border-left != '' and @fo:border-left != 'none') or (@fo:border != '' and @fo:border != 'none' )">
             <xsl:attribute name="style">
               <xsl:call-template name="GetBorderStyle">
                 <xsl:with-param name="style">
@@ -83,12 +84,13 @@
                     </xsl:choose>                              
                   </xsl:with-param>
                 </xsl:call-template>
-          </xsl:if> 
       </left>
-
+        
+      </xsl:if> 
       
+      <xsl:if test="(@fo:border-right != '' and @fo:border-right != 'none') or (@fo:border != '' and @fo:border != 'none' )">
+        
       <right>
-        <xsl:if test="(@fo:border-right != '' and @fo:border-right != 'none') or (@fo:border != '' and @fo:border != 'none' )">
           <xsl:attribute name="style">
             <xsl:call-template name="GetBorderStyle">
               <xsl:with-param name="style">
@@ -115,12 +117,14 @@
               </xsl:choose>                    
             </xsl:with-param>
           </xsl:call-template>
-        </xsl:if>
       </right>
+        
+      </xsl:if>
 
-      
+
+      <xsl:if test="(@fo:border-top != '' and @fo:border-top != 'none') or (@fo:border != '' and @fo:border != 'none' )" >
+        
       <top>
-        <xsl:if test="(@fo:border-top != '' and @fo:border-top != 'none') or (@fo:border != '' and @fo:border != 'none' )" >
         <xsl:attribute name="style">
           <xsl:call-template name="GetBorderStyle">
             <xsl:with-param name="style">
@@ -147,12 +151,14 @@
               </xsl:choose>                         
             </xsl:with-param>
           </xsl:call-template>
-        </xsl:if>
       </top>
-
+        
+      </xsl:if>
       
+      
+      <xsl:if test="(@fo:border-bottom != '' and @fo:border-bottom != 'none') or (@fo:border != '' and @fo:border != 'none' )">
+        
       <bottom>
-        <xsl:if test="(@fo:border-bottom != '' and @fo:border-bottom != 'none') or (@fo:border != '' and @fo:border != 'none' )">
           <xsl:attribute name="style">
             <xsl:call-template name="GetBorderStyle">
               <xsl:with-param name="style">
@@ -179,12 +185,14 @@
               </xsl:choose>                                  
             </xsl:with-param>
           </xsl:call-template>
-        </xsl:if>
       </bottom>
+        
+      </xsl:if>
 
-      <diagonal>
+     
         <xsl:choose>
           <xsl:when test="@style:diagonal-bl-tr != '' and @style:diagonal-bl-tr != 'none'">
+            <diagonal>
             <xsl:attribute name="style">
               <xsl:call-template name="GetBorderStyle">
                 <xsl:with-param name="style">
@@ -211,8 +219,10 @@
                 </xsl:choose>
               </xsl:with-param>
             </xsl:call-template>    
+              </diagonal>
           </xsl:when>
           <xsl:when test="@style:diagonal-tl-br != '' and @style:diagonal-tl-br != 'none'">
+            <diagonal>
             <xsl:attribute name="style">
               <xsl:call-template name="GetBorderStyle">
                 <xsl:with-param name="style">
@@ -239,9 +249,10 @@
                 </xsl:choose>
               </xsl:with-param>
             </xsl:call-template>
+            </diagonal>
           </xsl:when>
         </xsl:choose>
-      </diagonal>
+     
       
       </border>
     
