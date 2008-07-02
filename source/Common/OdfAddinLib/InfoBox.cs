@@ -72,6 +72,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 bld.Append("\r\n");
             }
             txtDetails.Text = bld.ToString();
+
+            if (this.Parent == null)
+            {
+                // started in stand-alone mode (e.g. via context menu)
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
         }
 
         public InfoBox(string label, string details, ResourceManager manager)
