@@ -897,7 +897,7 @@
 
 
   <!--math: Added for bugfix #1934315 START-->
-  <xsl:template name ="CheckDefaultTOCStyle">
+  <!--xsl:template name ="CheckDefaultTOCStyle">
     <xsl:param name="Name" />
     <xsl:param name="Counter" select="1"/>
     <xsl:choose>
@@ -912,6 +912,22 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template-->
+  <xsl:template name ="CheckDefaultTOCStyle">
+    <xsl:param name="name" />
+    <xsl:choose>
+      <xsl:when test="$name = 'TOCHeading' 
+                or $name = 'TOC1'
+                or $name = 'TOC2'
+                or $name = 'TOC3'
+                or $name = 'TOC4'
+                or $name = 'TOC5'
+                or $name = 'TOC6'
+                or $name = 'TOC7'
+                or $name = 'TOC8'
+                or $name = 'TOC9'">true</xsl:when>
+      <xsl:otherwise>false</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   <!--math: Added for bugfix #1934315 END-->
