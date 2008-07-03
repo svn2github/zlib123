@@ -1,0 +1,9 @@
+; OdfExcelAddinShim.def : Declares the module parameters.
+
+LIBRARY      "OdfExcelAddinShim.DLL"
+
+EXPORTS
+	DllCanUnloadNow		PRIVATE
+	DllGetClassObject	PRIVATE
+	DllRegisterServer	PRIVATE
+	DllUnregisterServer	PRIVATE

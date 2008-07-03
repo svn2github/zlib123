@@ -1,0 +1,39 @@
+// OdfExcelAddinShim.idl 
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(F4EBEE3E-BB1C-4E32-8947-FAB55E619373),
+	version(1.0),
+	helpstring("OdfExcelAddinShim 1.0 Type Library")
+]
+library OdfExcelAddinShimLib
+{
+	importlib("stdole2.tlb");
+
+	[
+		uuid(e00c9ebb-f140-4e6f-8c7b-eed19ae33aea),
+		helpstring("ConnectProxy Class")
+	]
+	coclass ConnectProxy
+	{
+		[default] interface IUnknown;
+	};
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

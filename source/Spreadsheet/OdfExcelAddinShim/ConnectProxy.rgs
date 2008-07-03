@@ -1,0 +1,49 @@
+HKCR
+{
+	OdfExcelAddin.Connect = s 'Connect Class'
+	{
+		CLSID = s '{e00c9ebb-f140-4e6f-8c7b-eed19ae33aea}'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove '{e00c9ebb-f140-4e6f-8c7b-eed19ae33aea}' = s 'OdfExcelAddin.Connect'
+		{
+			ProgID = s 'OdfExcelAddin.Connect'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			
+		}
+	}
+}
+
+HKLM
+{
+	NoRemove Software
+	{
+		NoRemove Microsoft
+		{
+			NoRemove Office
+			{
+				NoRemove Excel
+				{
+					NoRemove Addins
+					{
+						ForceRemove OdfExcelAddin.Connect
+						{
+							val 'Description' = s 'Version 2.0'
+							val 'FriendlyName' = s 'ODF Addin for Excel'
+							val 'LoadBehavior' = d 3
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+

@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="translation.odf2oox.BarLineCombinationChart" xml:space="preserve">
+    <value>Combination chart of type 'Lines and Columns' is not compatible in oox, hence data corresponding to line is replaced by column in the chart-FR.</value>
+  </data>
+  <data name="translation.odf2oox.baseDate" xml:space="preserve">
+    <value>Date de moins de 1/1/1900 est arrondi à la date de référence 1/1/1900</value>
+  </data>
+  <data name="translation.odf2oox.DataValidCellRange" xml:space="preserve">
+    <value>Excel ne prend pas en charge les critères de plage de cellules lors de la validation des données.</value>
+  </data>
+  <data name="translation.odf2oox.DataValidErrorMacro" xml:space="preserve">
+    <value>Excel ne prend pas en charge les alertes de macros d’erreur lors de la validation des données.</value>
+  </data>
+  <data name="translation.odf2oox.draggedImagePath" xml:space="preserve">
+    <value>Les images que l’utilisateur fait glisser pour les déplacer vers un fichier ODS empruntent un chemin relatif et par conséquent, seront perdues lors de la conversion vers XLSX.</value>
+  </data>
+  <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
+    <value>Excel ne prend en charge que 256 caractères dans les chaînes d’en tête/de pied de page (avec mise en forme). Tout caractère au-delà de la limite de 256 caractères sera perdu.</value>
+  </data>
+  <data name="translation.odf2oox.hyperlinkTextbox" xml:space="preserve">
+    <value>Si un lien hypertexte est appliqué à des mots individuels dans une zone de texte dans ODS, il sera également appliqué à toute la zone de texte une fois la conversion vers XLSX effectuée.</value>
+  </data>
+  <data name="translation.odf2oox.imageFromOtherApplication" xml:space="preserve">
+    <value>Les données et les images copiées et collées à partir d’autres applications seront perdues et ne seront pas converties.</value>
+  </data>
+  <data name="translation.odf2oox.LineChartSmoothingBSpline" xml:space="preserve">
+    <value>Excel ne prend pas en charge les couleurs de bordure pour les scénarios.</value>
+  </data>
+  <data name="translation.odf2oox.QuarterDateFormat" xml:space="preserve">
+    <value>Excel ne prend pas en charge le format de date trimestriel. Le format de date sera remplacé par le format annuel.</value>
+  </data>
+  <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
+    <value>Certains filtres de données ont du être supprimés car ils ne sont pas pris en charge par Excel.</value>
+  </data>
+  <data name="translation.odf2oox.ScenarioNumber" xml:space="preserve">
+    <value>Trop de cellules de scénario. Excel ne prend en charge que 32 cellules de scénario.</value>
+  </data>
+  <data name="translation.odf2oox.SheetNameLength" xml:space="preserve">
+    <value>Les noms de feuilles Excel ne peuvent pas contenir plus de 31 caractères. Les caractères non valides *\/[]:";? et les caractères au-delà de la limite de 31 caractères seront perdus.</value>
+  </data>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Seules les colonnes I à IV sont prises en charge par la Calculatrice Open Office. Toute colonne au-delà de la colonne IV sera définitivement perdue.</value>
+  </data>
+  <data name="translation.oox2odf.DataConsolidation" xml:space="preserve">
+    <value>Impossible de convertir les données consolidées.</value>
+  </data>
+  <data name="translation.oox2odf.ManualColBreakeInsideHeader" xml:space="preserve">
+    <value>Plus d’un saut de colonne manuel doit être inséré dans les colonnes d’en-tête. Seul l’un deux sera visible.</value>
+  </data>
+  <data name="translation.oox2odf.OLEObject" xml:space="preserve">
+    <value>La Calculatrice Open Office ne prend en charge que les objets OLEObject implémentés en tant que liens vers des fichiers.</value>
+  </data>
+  <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>Certains filtres de données ont du être supprimés car ils ne sont pas pris en charge par la Calculatrice.</value>
+  </data>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>La Calculatrice Open Office ne prend en charge que 65536 lignes. Toute ligne au-delà de la limite de 65536 lignes sera définitivement perdue.</value>
+  </data>
+  <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
+    <value>La Calculatrice Open Office ne prend en charge que 256 feuilles. Toute feuille au-delà de la limite de 256 feuilles sera définitivement perdue.</value>
+  </data>
+</root>

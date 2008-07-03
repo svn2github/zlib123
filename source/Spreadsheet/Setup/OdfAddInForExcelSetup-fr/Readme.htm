@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<title>Compl&eacute;ment OpenXML/ODF Translator pour Microsoft Excel</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body style="font-family: 'Arial';font-size: 10pt;">
+
+
+<h1><a name="top">Compl&eacute;ment OpenXML/ODF Translator pour Microsoft Excel</a></h1>        
+
+<p>Merci d'avoir t&eacute;l&eacute;charg&eacute; le compl&eacute;ment OpenXML/ODF pour Excel. Ce compl&eacute;ment vous permet d'ouvrir, dans Microsoft Excel, des documents bas&eacute;s sur les sp&eacute;cifications ODF et de d&eacute;montrer l'interfonctionnement entre Office Open XML et ODF.  Ce projet d'interfonctionnement est h&eacute;berg&eacute; sur le site <a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. Pour plus de d&eacute;tails et pour des informations sur les futures mises &agrave; jour concernant le projet, veuillez consulter notre feuille de route (RoadMap).</p>
+
+<p>Financ&eacute; par <a href="http://www.microsoft.com/">Microsoft</a>, le projet de traduction OpenXML/ODF Translator a &eacute;t&eacute; d&eacute;velopp&eacute; par <a href="http://www.clever-age.com/">Clever Age</a> et <a href="http://www.sonata-software.com/">Sonata Software Limited</a> (pour plus d'informations, veuillez visiter le <a href="http://odf-converter.sourceforge.net/">site Web</a> relatif au projet).</p>
+        
+<h2><hr>Table des mati&egrave;res</h2>
+	<ul>
+    	<li><a href="#hRequirements">Configuration logicielle requise</a></li>
+		<li><a href="#hInstall">Installation du compl&eacute;ment</a></li>
+		<li><a href="#hTroobleshooting">Guide de d&eacute;pannage</a></li>
+		<li><a href="#hFeatures">Fonctionnalit&eacute;s/options non prises en charge</a></li>
+	</ul>
+        
+<h2><hr><a name="hRequirements"> Configuration logicielle requise</a></h2>
+
+	<p>Avant d'installer le compl&eacute;ment, v&eacute;rifiez que vous disposez de l'un des &eacute;l&eacute;ments suivants...</p>
+	
+	 <ul>
+		<li>Microsoft Excel XP</li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Module de compatibilit&eacute; Office</a></li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET Framework 2.0 SP1</a></li>
+	</ul>      
+        
+	<p><strong>ou</strong></p>        
+	<ul>
+		<li>Microsoft Excel 2003</li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466">Module de compatibilit&eacute; Office</a></li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET Framework 2.0* SP1</a></li>
+	</ul>
+
+	<p><strong>ou</strong></p>
+	<ul>
+		<li>Microsoft Excel 2007 (avec l'option Prise en charge de la programmabilit&eacute; .NET activ&eacute;e)</li>
+		<li><a href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET Framework 2.0* SP1</a></li>
+	</ul>
+	
+	<p><strong>(*) Remarque&nbsp;:</strong> Si vous avez install&eacute; Microsoft Excel avant .NET Framework, vous devez mettre &agrave; jour votre installation de Excel comme suit&nbsp;:</p>
+
+	<ol>
+		<li>Ouvrez <i>Ajout/Suppression de programmes</i> dans le Panneau de configuration.</li>
+		<li>Recherchez l'entr&eacute;e Microsoft Excel et choisissez <i>Modifier</i>.</li>
+		<li>Au cours du processus d'installation, choisissez <i>Ajouter ou supprimer des composants</i> puis ajoutez <i>Prise en charge de la programmabilit&eacute; .NET</i> dans la section <i>Microsoft Office Excel</i>. </li>
+	</ol>
+
+	<p><a href="#top" class="back">Haut de page</a></p>
+        
+<h2><hr><a name="hInstall">Installation du compl&eacute;ment</a></h2>
+
+	<p>Effectuez un double clic sur le fichier <strong>&laquo;&nbsp;OdfAddInForExcelSetup-en.exe&nbsp;&raquo;</strong></p>
+	<p> Si l'installation r&eacute;ussit, vous pouvez ouvrir un fichier .ODS (ODS est l'extension de fichier standard des documents ODF) dans Microsoft Excel (voir le menu <i>Fichier&gt;ODF...</i>). En outre, lorsque vous effectuez un clic droit sur un fichier .ODS dans l'Explorateur, vous devez pouvoir ouvrir le document dans Microsoft Excel (menu <i>Ouvrir dans Excel</i>). </p>
+	<p>
+            <strong>Remarque importante&nbsp;:</strong> Les fichiers ODS ouverts par le compl&eacute;ment sont import&eacute;s dans Microsoft Excel en tant que fichiers XLSX en lecture seule. Par cons&eacute;quent, si vous avez apport&eacute; des modifications &agrave; un fichier et que vous l'avez enregistr&eacute; en tant que fichier .ODS, vous devez d'abord l'enregistrer sous un nouveau nom (<i>Fichier&gt;Enregistrer sous</i>), puis utiliser la commande <i>Fichier&gt;ODF…-Enregistrer sous ODF…</i>.</p>
+
+	<p><a href="#top" class="back">Haut de page</a></p>
+        
+<h2><hr><a name="hTroobleshooting">D&eacute;pannage</a></h2>
+
+	<p> Si l'entr&eacute;e ODF n'appara&icirc;t pas dans le menu <i>Fichier</i> de Microsoft Excel, il est possible qu'il manque des fonctionnalit&eacute;s dans Excel(voir la section <a href="#hRequirements">Configuration logicielle requise</a>) ou qu'une panne se soit produite lors de l'installation des assemblys PIA (Primary Interop Assemblies) de Excel.</p>
+	<p>Veuillez consulter notre <a href="http://downloads.sourceforge.net/odf-converter/Add-In_installation_checklist_V1.1.xlsx?use_mirror=osdn">Guide de d&eacute;pannage</a> pour plus d'informations.</p>
+	
+	<p><a href="#top" class="back">Haut de page</a></p>
+        
+<h2><hr><a name="hFeatures">Fonctionnalit&eacute;s/options non prises en charge</a></h2>
+
+	<p>La liste compl&egrave;te des fonctionnalit&eacute;s non prises en charge est publi&eacute;e sur notre <a href="http://odf-converter.sourceforge.net/features.html">site Web</a>.
+        </p>
+
+	<p><a href="#top" class="back">Haut de page</a></p>
+
+</body>
+</html>
