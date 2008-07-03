@@ -1108,6 +1108,10 @@
           <xsl:call-template name="GetLineStroke">
             <xsl:with-param name="shapeStyle" select="$automaticStyle|$officeStyle"/>
           </xsl:call-template>
+          <!--Sona Added Shape Wrap-->
+          <xsl:call-template name="FrameToShapeWrap">
+            <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
+          </xsl:call-template>
         </v:shape>
       </w:pict>
     </w:r>
@@ -1148,6 +1152,10 @@
               <xsl:call-template name="GetLineStroke">
                 <xsl:with-param name="shapeStyle" select="$automaticStyle|$officeStyle"/>
               </xsl:call-template>
+              <!--Sona Added Shape Wrap-->
+              <xsl:call-template name="FrameToShapeWrap">
+                <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
             </v:shape>
           </xsl:when>
           <xsl:otherwise>
@@ -1177,6 +1185,10 @@
               <!-- Sona Added Dashed Lines-->
               <xsl:call-template name="GetLineStroke">
                 <xsl:with-param name="shapeStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
+              <!--Sona Added Shape Wrap-->
+              <xsl:call-template name="FrameToShapeWrap">
+                <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
               </xsl:call-template>
             </v:shape>
           </xsl:otherwise>
@@ -1298,6 +1310,11 @@
       <xsl:call-template name="GetLineStroke">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>      
+   
+      <!--Sona Added Shape Wrap-->
+      <xsl:call-template name="FrameToShapeWrap">
+        <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+      </xsl:call-template>
    
     </xsl:if>
   </xsl:template>
@@ -1908,7 +1925,7 @@
           </xsl:variable>
           <xsl:call-template name ="setArrowSize">
             <xsl:with-param name ="size" select ="substring-before($shapeStyle/style:graphic-properties/@draw:marker-start-width,$Unit)" />
-            <xsl:with-param name ="arrType" select ="start"></xsl:with-param>
+            <xsl:with-param name ="arrType" select ="'start'"></xsl:with-param>
           </xsl:call-template >
         </xsl:if>
       </xsl:if>
@@ -1943,7 +1960,7 @@
           </xsl:variable>
           <xsl:call-template name ="setArrowSize">
             <xsl:with-param name ="size" select ="substring-before($shapeStyle/style:graphic-properties/@draw:marker-end-width,$Unit)" />
-            <xsl:with-param name ="arrType" select ="end"></xsl:with-param>
+            <xsl:with-param name ="arrType" select ="'end'"></xsl:with-param>
           </xsl:call-template >
         </xsl:if>
       </xsl:if>
@@ -1954,7 +1971,7 @@
     <xsl:param name ="arrType"></xsl:param>
     
       <xsl:choose>
-        <xsl:when test="start">
+        <xsl:when test="$arrType='start'">
           <xsl:choose>
             <xsl:when test ="($size &lt;= $sm-sm)">
               <xsl:attribute name ="startarrowwidth">
