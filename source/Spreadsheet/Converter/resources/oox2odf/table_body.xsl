@@ -295,6 +295,16 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
+          
+            <xsl:if test="@oox:ConditionalRepeat  = 'continue'">
+              <xsl:attribute name="table:number-rows-repeated">
+                <xsl:variable name="rowNum">
+                  <xsl:value-of select="@r"/>
+                </xsl:variable>
+                <xsl:value-of select="65536 - $rowNum + 1"/>
+              </xsl:attribute>
+            </xsl:if>
+          
 
           <!-- if row is fidden and fiter is not being removed -->
           <xsl:if

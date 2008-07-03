@@ -111,7 +111,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                     }                                
                                 }
 
-                                InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, RowNumber, PrevRowNumber, CheckIfBigConditional);
+                                InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, RowNumber, PrevRowNumber, CheckIfBigConditional, false);
                                 xtr.MoveToElement();
 
                                 xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
@@ -330,9 +330,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                         if (xtr.IsEmptyElement)
                         {
-                            if (string.Compare(xtr.LocalName.ToString(), "ConditionalCell") != 0 && string.Compare(xtr.LocalName.ToString(), "sheetData") == 0)
+                            if (ConditionalCell != "" && string.Compare(xtr.LocalName.ToString(), "sheetData") == 0)
                             {
-                                InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, 65537, 0, CheckIfBigConditional);                                
+                                InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, 65537, 0, CheckIfBigConditional, false);                                
                             }
 
                             xtw.WriteEndElement();
@@ -342,7 +342,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         if (string.Compare(xtr.LocalName.ToString(), "sheetData") == 0 && (ConditionalCell != ""))
                         {
                           
-                            InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, 65537, PrevRowNumber, CheckIfBigConditional);
+                            InsertEmptyRowsWithConditional(ConditionalCellRowList, ConditionalCell, xtw, 65537, PrevRowNumber, CheckIfBigConditional, true);
                             
                         }
                         if (string.Compare(xtr.LocalName.ToString(), "row") == 0 && (ConditionalCell != ""))
@@ -637,7 +637,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             return result;
         }
 
-        private void InsertEmptyRowsWithConditional(List<int> intListRow, String ConditionalCell, XmlTextWriter xtw, int RowNumber, int PrevRowNumber, Boolean CheckIfBigConditional)
+        private void InsertEmptyRowsWithConditional(List<int> intListRow, String ConditionalCell, XmlTextWriter xtw, int RowNumber, int PrevRowNumber, Boolean CheckIfBigConditional, Boolean InsertRowWithConditionalAfterLastRow)
         {
 
             if (CheckIfBigConditional)
@@ -650,30 +650,63 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     xtw.WriteStartAttribute(null, "r", null);
                     xtw.WriteString(count.ToString());
                     xtw.WriteEndAttribute();
+                    
+                    if (InsertRowWithConditionalAfterLastRow)
+                    {
+
+                        xtw.WriteStartAttribute(null, "oox:ConditionalRepeat", null);
+                        xtw.WriteString("continue");
+                        xtw.WriteEndAttribute();
+
+                        
+                    }
 
                     InsertCellInRow(count, ConditionalCell, xtw, 0, 256);
 
-                    xtw.WriteEndElement();                        
+                    xtw.WriteEndElement();
+                    if (InsertRowWithConditionalAfterLastRow)
+                    {
+                        break;
+                    }   
 
                 }
             }
             else
             {
-              
-                for (int count = 0; count < intListRow.Count; count++)
+
+                for (int count = (intListRow.IndexOf(intListRow.Find(delegate(int it)
+                                 {
+                                     return it > PrevRowNumber;
+                                 })));
+
+                            count < intListRow.Count; count++)
                 {
 
                     if (PrevRowNumber < intListRow[count] && intListRow[count] < RowNumber)
                     {                        
                         xtw.WriteStartElement(null, "row", SPREADSHEET_ML_NS);
-
                         xtw.WriteStartAttribute(null, "r", null);
                         xtw.WriteString(intListRow[count].ToString());
                         xtw.WriteEndAttribute();
+                       
+                        if (InsertRowWithConditionalAfterLastRow && (intListRow.Count + PrevRowNumber - 65536) >= 0)
+                        {
+                           
+                            xtw.WriteStartAttribute(null, "oox:ConditionalRepeat", null);
+                            xtw.WriteString("continue");
+                            xtw.WriteEndAttribute();
+
+                            
+                        }
+
 
                         InsertCellInRow(intListRow[count], ConditionalCell, xtw, 0, 256);
 
                         xtw.WriteEndElement();
+                        if (InsertRowWithConditionalAfterLastRow && (intListRow.Count + PrevRowNumber - 65536) >= 0)
+                        {
+                            break;
+                        }
 
                     }
                     else if (RowNumber < intListRow[count])
