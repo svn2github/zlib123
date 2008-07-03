@@ -204,7 +204,7 @@
   <data name="OdfPPTFileType" xml:space="preserve">
     <value>OpenDocument Präsentation Dateien</value>
   </data>
-  <data name="OdfFileOptionsDescription" xml:space="preserve">
+  <data name="OdfOptionsDescription" xml:space="preserve">
     <value>Aktivieren / deaktivieren FidelityMessage Dialogfeld</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">

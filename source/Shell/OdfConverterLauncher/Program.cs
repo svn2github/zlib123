@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -256,7 +256,7 @@ namespace OdfConverterLauncher
                 string input = args[0];
                 if (input.ToUpper().EndsWith(".ODP"))
                 {
-                    OdfAddinLib lib = new Sonata.OdfConverter.Presentation.Addin();
+                    OdfAddinLib lib = new OdfAddinLib(new Sonata.OdfConverter.Presentation.Converter());
                     Presentation ppt = null;
                     try
                     {
@@ -282,7 +282,7 @@ namespace OdfConverterLauncher
                 }
                 if (input.ToUpper().EndsWith(".ODS"))
                 {
-                    OdfAddinLib lib = new CleverAge.OdfConverter.Spreadsheet.Addin();
+                    OdfAddinLib lib = new OdfAddinLib(new CleverAge.OdfConverter.Spreadsheet.Converter());
                     Excel objExcel = null;
 
 

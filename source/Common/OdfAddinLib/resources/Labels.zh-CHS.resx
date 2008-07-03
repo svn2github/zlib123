@@ -204,7 +204,7 @@
   <data name="OdfPPTFileType" xml:space="preserve">
     <value>OpenDocument的演示文件</value>
   </data>
-  <data name="OdfFileOptionsDescription" xml:space="preserve">
+  <data name="OdfOptionsDescription" xml:space="preserve">
     <value>启用/禁用fidelitymessage对话框</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">

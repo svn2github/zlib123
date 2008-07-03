@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (c) 2008, DIaLOGIKa
  * All rights reserved.
  *
@@ -13,7 +13,7 @@
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY DIaLOGIKa ``AS IS´´ AND ANY
+ * THIS SOFTWARE IS PROVIDED BY DIaLOGIKa ``AS IS AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
  * DISCLAIMED. IN NO EVENT SHALL DIaLOGIKa BE LIABLE FOR ANY
@@ -108,6 +108,122 @@ namespace OdfConverter
             wdWordDocument = 0,
             wdOriginalDocumentFormat = 1,
             wdPromptUser = 2,
+        }
+
+        public enum XlSaveAsAccessMode
+        {
+            xlNoChange = 1,
+            xlShared = 2,
+            xlExclusive = 3,
+        }
+
+        public enum XlFileFormat
+        {
+            xlCurrentPlatformText = -4158,
+            xlWorkbookNormal = -4143,
+            xlSYLK = 2,
+            xlWKS = 4,
+            xlWK1 = 5,
+            xlCSV = 6,
+            xlDBF2 = 7,
+            xlDBF3 = 8,
+            xlDIF = 9,
+            xlDBF4 = 11,
+            xlWJ2WD1 = 14,
+            xlWK3 = 15,
+            xlExcel2 = 16,
+            xlTemplate = 17,
+            xlTemplate8 = 17,
+            xlAddIn8 = 18,
+            xlAddIn = 18,
+            xlTextMac = 19,
+            xlTextWindows = 20,
+            xlTextMSDOS = 21,
+            xlCSVMac = 22,
+            xlCSVWindows = 23,
+            xlCSVMSDOS = 24,
+            xlIntlMacro = 25,
+            xlIntlAddIn = 26,
+            xlExcel2FarEast = 27,
+            xlWorks2FarEast = 28,
+            xlExcel3 = 29,
+            xlWK1FMT = 30,
+            xlWK1ALL = 31,
+            xlWK3FM3 = 32,
+            xlExcel4 = 33,
+            xlWQ1 = 34,
+            xlExcel4Workbook = 35,
+            xlTextPrinter = 36,
+            xlWK4 = 38,
+            xlExcel7 = 39,
+            xlExcel5 = 39,
+            xlWJ3 = 40,
+            xlWJ3FJ3 = 41,
+            xlUnicodeText = 42,
+            xlExcel9795 = 43,
+            xlHtml = 44,
+            xlWebArchive = 45,
+            xlXMLSpreadsheet = 46,
+            xlExcel12 = 50,
+            xlOpenXMLWorkbook = 51,
+            xlWorkbookDefault = 51,
+            xlOpenXMLWorkbookMacroEnabled = 52,
+            xlOpenXMLTemplateMacroEnabled = 53,
+            xlOpenXMLTemplate = 54,
+            xlOpenXMLAddIn = 55,
+            xlExcel8 = 56,
+        }
+
+       
+        public enum PpSaveAsFileType
+        {
+            ppSaveAsPresentation = 1,
+            [TypeLibVar(64)]
+            ppSaveAsPowerPoint7 = 2,
+            [TypeLibVar(64)]
+            ppSaveAsPowerPoint4 = 3,
+            [TypeLibVar(64)]
+            ppSaveAsPowerPoint3 = 4,
+            ppSaveAsTemplate = 5,
+            ppSaveAsRTF = 6,
+            ppSaveAsShow = 7,
+            ppSaveAsAddIn = 8,
+            [TypeLibVar(64)]
+            ppSaveAsPowerPoint4FarEast = 10,
+            ppSaveAsDefault = 11,
+            ppSaveAsHTML = 12,
+            ppSaveAsHTMLv3 = 13,
+            ppSaveAsHTMLDual = 14,
+            ppSaveAsMetaFile = 15,
+            ppSaveAsGIF = 16,
+            ppSaveAsJPG = 17,
+            ppSaveAsPNG = 18,
+            ppSaveAsBMP = 19,
+            ppSaveAsWebArchive = 20,
+            ppSaveAsTIF = 21,
+            [TypeLibVar(64)]
+            ppSaveAsPresForReview = 22,
+            ppSaveAsEMF = 23,
+            ppSaveAsOpenXMLPresentation = 24,
+            ppSaveAsOpenXMLPresentationMacroEnabled = 25,
+            ppSaveAsOpenXMLTemplate = 26,
+            ppSaveAsOpenXMLTemplateMacroEnabled = 27,
+            ppSaveAsOpenXMLShow = 28,
+            ppSaveAsOpenXMLShowMacroEnabled = 29,
+            ppSaveAsOpenXMLAddin = 30,
+            ppSaveAsOpenXMLTheme = 31,
+            ppSaveAsPDF = 32,
+            ppSaveAsXPS = 33,
+            ppSaveAsXMLPresentation = 34,
+        }
+
+        public enum MsoTriState
+        {
+            msoTriStateToggle = -3,
+            msoTriStateMixed = -2,
+            msoTrue = -1,
+            msoFalse = 0,
+            msoCTrue = 1,
         }
         #endregion
 

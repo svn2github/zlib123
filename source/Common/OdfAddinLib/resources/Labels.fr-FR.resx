@@ -205,7 +205,7 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="OdfPPTFileType" xml:space="preserve">
     <value>Présentation des fichiers OpenDocument</value>
   </data>
-  <data name="OdfFileOptionsDescription" xml:space="preserve">
+  <data name="OdfOptionsDescription" xml:space="preserve">
     <value>Activer / Désactiver FidelityMessage boîte de dialogue</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">

@@ -87,13 +87,21 @@
       <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
       <Name>OdfZipUtils</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Presentation\Addin\Addin.csproj">
-      <Project>{0EACD55D-3D67-4E42-9714-8142EAF8246A}</Project>
-      <Name>Addin %28Presentation\Addin%29</Name>
+    <ProjectReference Include="..\..\Presentation\Converter\Converter.csproj">
+      <Project>{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}</Project>
+      <Name>Converter %28Presentation\Converter%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Spreadsheet\Addin\Addin.csproj">
-      <Project>{792B426E-9ED5-414C-9853-98137AE0CC50}</Project>
-      <Name>Addin %28Spreadsheet\Addin%29</Name>
+    <ProjectReference Include="..\..\Presentation\OdfPowerPointAddin\OdfPowerPointAddin.csproj">
+      <Project>{686B68A3-A89A-458F-8281-E5F00068C0AB}</Project>
+      <Name>OdfPowerPointAddin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Spreadsheet\Converter\Converter.csproj">
+      <Project>{E7055581-7C0C-429F-8134-99D3413C5756}</Project>
+      <Name>Converter %28Spreadsheet\Converter%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Spreadsheet\OdfExcelAddin\OdfExcelAddin.csproj">
+      <Project>{294AC077-14E0-4630-B689-B440F3887550}</Project>
+      <Name>OdfExcelAddin</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Word\Converter\Converter.csproj">
       <Project>{F9071930-348E-4A30-A0F6-A1A3DF3A587B}</Project>
