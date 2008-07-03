@@ -337,7 +337,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
             Node elt = (Node)elements.Peek();
-            Debug.WriteLine("[WriteStartAttribute] prefix=" + prefix + " localName" + localName + " ns=" + ns + " element=" + elt.Name);
+            Debug.WriteLine("[WriteStartAttribute] prefix=" + prefix + " localName=" + localName + " ns=" + ns + " element=" + elt.Name);
 
             if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
             {
