@@ -170,10 +170,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             else if (isInMaxLength)
             {
                     this.isAtribute = false;
-                    if (this.totalStringLength < MAX_CELL_TEXT_LENGTH)
-                    {
-                        this.nextWriter.WriteEndAttribute();
-                    }
+                    this.nextWriter.WriteEndAttribute();
             }
             else
             {
