@@ -2,93 +2,265 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{8BC2F418-26E0-454F-94D1-D32EB2212FCB}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shell", "Shell", "{19F7D0D1-4317-4F6F-8297-60984AD99BFE}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Word", "Word", "{D0B15A59-98A0-4839-B321-A48E69101DF7}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{8BCA40CA-460E-42AE-A44D-0642957B3749}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Spreadsheet", "Spreadsheet", "{921169EE-9A48-4083-9CAB-B7947DBB4AD1}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfConverterLib", "Common\OdfConverterLib\OdfConverterLib.csproj", "{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfZipUtils", "Common\OdfZipUtils\OdfZipUtils.csproj", "{E51CB999-A720-4165-9DF2-A3E49547A40B}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{05D4C0EB-A6B0-4551-AFB0-EAD538D2C3A4}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfConverterLauncher", "Shell\OdfConverterLauncher\OdfConverterLauncher.csproj", "{2FFDBC2D-0F7E-485E-9548-47CDBD7FE3C6}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{0926B47F-86B3-4AAB-9F1C-A558A58E939B} = {0926B47F-86B3-4AAB-9F1C-A558A58E939B}
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup", "Word\Setup\OdfAddInForWordSetup\OdfAddInForWordSetup.vdproj", "{780B03C7-B819-4E62-AD38-E62EB71EA051}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-de", "Word\Setup\OdfAddInForWordSetup-de\OdfAddInForWordSetup-de.vdproj", "{E295B7D0-C466-4121-9F32-DAD06067D7B4}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-fr", "Word\Setup\OdfAddInForWordSetup-fr\OdfAddInForWordSetup-fr.vdproj", "{0A04F05F-EB4D-433C-B81B-51C784C14D31}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-nl", "Word\Setup\OdfAddInForWordSetup-nl\OdfAddInForWordSetup-nl.vdproj", "{D06B7BC0-638A-4043-8941-76BA12B4E813}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-pl", "Word\Setup\OdfAddInForWordSetup-pl\OdfAddInForWordSetup-pl.vdproj", "{C9577E7C-5012-4886-9210-7F81DAFCC177}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Presentation\Converter\Converter.csproj", "{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Word\Converter\Converter.csproj", "{F9071930-348E-4A30-A0F6-A1A3DF3A587B}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfAddinLib", "Common\OdfAddinLib\OdfAddinLib.csproj", "{599773FF-1E86-4AC2-8B24-34BBAC707370}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Spreadsheet\Converter\Converter.csproj", "{E7055581-7C0C-429F-8134-99D3413C5756}"
+        ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-chs", "Word\Setup\OdfAddInForWordSetup-chs\OdfAddInForWordSetup-chs.vdproj", "{8E9DFA0D-5D87-4244-9A73-D5200D14F0D9}"
+        ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{D3E4B38D-18B2-476A-A614-D3560176E3AF}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{751AFC6B-AFDB-4D9B-ACBC-A07E3A62474B}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OdfWordAddinShim", "Word\OdfWordAddinShim\OdfWordAddinShim.vcproj", "{0926B47F-86B3-4AAB-9F1C-A558A58E939B}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfWordAddin", "Word\OdfWordAddin\OdfWordAddin.csproj", "{2329EA27-8A83-4AFB-89CE-CBE1E72F4A10}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineTool", "Shell\OdfConverter\CommandLineTool.csproj", "{289C4B72-B929-4E3D-808F-F622E275AC70}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-ja", "Word\Setup\OdfAddInForWordSetup-ja\OdfAddInForWordSetup-ja.vdproj", "{FE137308-33BD-4113-9951-E6DCF1023F34}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfPowerPointAddin", "Presentation\OdfPowerPointAddin\OdfPowerPointAddin.csproj", "{686B68A3-A89A-458F-8281-E5F00068C0AB}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OdfPowerPointAddinShim", "Presentation\OdfPowerPointAddinShim\OdfPowerPointAddinShim.vcproj", "{FED3CFB2-ED96-4027-86DE-F490CD65CD3D}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfExcelAddin", "Spreadsheet\OdfExcelAddin\OdfExcelAddin.csproj", "{294AC077-14E0-4630-B689-B440F3887550}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OdfExcelAddinShim", "Spreadsheet\OdfExcelAddinShim\OdfExcelAddinShim.vcproj", "{6293D7DA-2382-43D2-892C-48C3D45ADF71}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-pl", "Spreadsheet\Setup\OdfAddInForExcelSetup-pl\OdfAddInForExcelSetup-pl.vdproj", "{8749ADFC-2CD9-4928-8514-79FDBF668D0F}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-nl", "Spreadsheet\Setup\OdfAddInForExcelSetup-nl\OdfAddInForExcelSetup-nl.vdproj", "{CAE1BF68-DC61-4C40-979A-4BF5C32BF887}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-ja", "Spreadsheet\Setup\OdfAddInForExcelSetup-ja\OdfAddInForExcelSetup-ja.vdproj", "{A22A5BE9-0F2A-449A-8E17-C04AAA17A2F9}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-fr", "Spreadsheet\Setup\OdfAddInForExcelSetup-fr\OdfAddInForExcelSetup-fr.vdproj", "{24AE33BD-A643-4C40-989A-D6552D684396}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-de", "Spreadsheet\Setup\OdfAddInForExcelSetup-de\OdfAddInForExcelSetup-de.vdproj", "{7EBA039B-D49F-433D-BA4F-930E9938C1ED}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup", "Spreadsheet\Setup\OdfAddInForExcelSetup\OdfAddInForExcelSetup.vdproj", "{E4DF865D-1012-41B1-BB2A-ED20A93CA81F}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-chs", "Spreadsheet\Setup\OdfAddInForExcelSetup-chs\OdfAddInForExcelSetup-chs.vdproj", "{7F602C97-B32D-44F1-ACA2-50ABC659F611}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup", "Presentation\Setup\OdfAddInForPPTSetup\OdfAddInForPPTSetup.vdproj", "{E285D4D8-D7D4-4C9B-AD19-C71209C3B972}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-chs", "Presentation\Setup\OdfAddInForPPTSetup-chs\OdfAddInForPPTSetup-chs.vdproj", "{70F3F1F0-D3BE-4766-84BA-B4B7AF7864D3}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-de", "Presentation\Setup\OdfAddInForPPTSetup-de\OdfAddInForPPTSetup-de.vdproj", "{2EE5D721-DDEE-4AEA-87E3-D5B12FD6DF0E}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-fr", "Presentation\Setup\OdfAddInForPPTSetup-fr\OdfAddInForPPTSetup-fr.vdproj", "{0466433B-BFD1-4E75-8074-167B0397DF96}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-ja", "Presentation\Setup\OdfAddInForPPTSetup-ja\OdfAddInForPPTSetup-ja.vdproj", "{78AEF59F-EA4E-4F07-B559-4511C7A742A2}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-nl", "Presentation\Setup\OdfAddInForPPTSetup-nl\OdfAddInForPPTSetup-nl.vdproj", "{ED7D7117-8E82-403B-B8B7-6482F69912F2}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-pl", "Presentation\Setup\OdfAddInForPPTSetup-pl\OdfAddInForPPTSetup-pl.vdproj", "{D10B9115-86D6-40D0-B57A-933E75763EA2}"
+ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
