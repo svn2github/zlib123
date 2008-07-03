@@ -139,6 +139,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             else if (this.changeCellName)
             {
                 this.changeCellName = false;
+                this.nextWriter.WriteEndAttribute();
             }
             else
             {
