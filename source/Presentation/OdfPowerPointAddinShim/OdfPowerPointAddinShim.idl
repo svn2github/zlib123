@@ -1,0 +1,39 @@
+// OdfPowerPointAddinShim.idl 
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(032D6324-73DC-4555-91FE-989D7D6D99D2),
+	version(1.0),
+	helpstring("OdfPowerPointAddinShim 1.0 Type Library")
+]
+library OdfPowerPointAddinShimLib
+{
+	importlib("stdole2.tlb");
+
+	[
+		uuid(7f459b4c-65f0-4d44-bb27-66c5fd3ca151),
+		helpstring("ConnectProxy Class")
+	]
+	coclass ConnectProxy
+	{
+		[default] interface IUnknown;
+	};
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

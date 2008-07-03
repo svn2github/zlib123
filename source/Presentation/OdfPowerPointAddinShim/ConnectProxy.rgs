@@ -1,0 +1,49 @@
+HKCR
+{
+	OdfPowerPointAddin.Connect = s 'Connect Class'
+	{
+		CLSID = s '{7f459b4c-65f0-4d44-bb27-66c5fd3ca151}'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove '{7f459b4c-65f0-4d44-bb27-66c5fd3ca151}' = s 'OdfPowerPointAddin.Connect'
+		{
+			ProgID = s 'OdfPowerPointAddin.Connect'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			
+		}
+	}
+}
+
+HKLM
+{
+	NoRemove Software
+	{
+		NoRemove Microsoft
+		{
+			NoRemove Office
+			{
+				NoRemove PowerPoint
+				{
+					NoRemove Addins
+					{
+						ForceRemove OdfPowerPointAddin.Connect
+						{
+							val 'Description' = s 'Version 2.0'
+							val 'FriendlyName' = s 'ODF Addin for PowerPoint'
+							val 'LoadBehavior' = d 3
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+

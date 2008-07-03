@@ -1,0 +1,239 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypeLines" xml:space="preserve">
+    <value>Alle lijneigenschappen in opmaak zijn gemapt naar dia.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
+    <value>Vorm 'gebogen pijl' kan niet worden behouden en is geconverteerd naar 'hoekpijl'.</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
+    <value>Aangepast opsommingsteken vervangen door eenvoudig opsommingsteken in masterdia.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
+    <value>Vorm 'akkoord' kan niet worden behouden en is geconverteerd naar 'ellips'.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
+    <value>Vorm 'rechthoek met één geknipte hoek' kon niet worden behouden en is geconverteerd naar '(omgekeerd) stroomschema'</value>
+  </data>
+  <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
+    <value>Alleen de eerste kleur van de achtergrond is geconverteerd in de opmaak.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsKiosk" xml:space="preserve">
+    <value>Presentatietype 'Kiosk' niet compatibel, vervangen door standaardtype 'Volledig scherm'.</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeCustomBullet" xml:space="preserve">
+    <value>Aangepaste aandachtspunt vervangen door eenvoudige aandachtspunt.</value>
+  </data>
+  <data name="translation.oox2odf.pictureTypeProperties" xml:space="preserve">
+    <value>Afbeeldingseigenschap niet geconverteerd.</value>
+  </data>
+  <data name="translation.oox2odf.bulletTypeCustomBullet" xml:space="preserve">
+    <value>Aangepaste aandachtspunt vervangen door eenvoudige aandachtspunt.</value>
+  </data>
+  <data name="translation.odf2oox.notesTypeShapesInNotes" xml:space="preserve">
+    <value>Vormen in opmerkingen kunnen niet worden behouden.</value>
+  </data>
+  <data name="translation.oox2odf.notesMasterSingleToMultiple" xml:space="preserve">
+    <value>Enkele master voor notities geconverteerd naar meerdere masters voor notities op elke dia.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsSlideStartEnd" xml:space="preserve">
+    <value>Startvorm tijdens diavoorstelling kan niet worden behouden.</value>
+  </data>
+  <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
+    <value>Alleen de eerste kleur van de gelijdelijke grafische vulling is geconverteerd in de dia.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
+    <value>Penkleur tijdens diavoorstelling kan niet worden behouden.</value>
+  </data>
+  <data name="translation.odf2oox.notesMasterMultipleToSingle" xml:space="preserve">
+    <value>Master meerdere aantekeningen vervangen door master enkele aantekeningen voor elke dia.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypeNavigator" xml:space="preserve">
+    <value>'Schermnavigator' tijdens diavoorstelling kan niet worden behouden.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeInnerShadow" xml:space="preserve">
+    <value>Binnenste schaduw voor vorm kan niet worden behouden.</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeLevel10" xml:space="preserve">
+    <value>10e niveau geconverteerd naar 9e (laatste) niveaulevel.</value>
+  </data>
+  <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
+    <value>Alleen de eerste kleur van de gelijdelijke vulling van de achtergrond is geconverteerd in de dia.</value>
+  </data>
+  <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
+    <value>Miniaturen in handout-pagina die dia's weergeven waarvan de grootte niet kan worden aangepast. 
+Er zijn slechts zes slide-handouts beschikbaar.
+Oriëntatie handoutpagina niet gemapt.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypePauseGreaterThanZero" xml:space="preserve">
+    <value>Vertraging bij presentatie van dia's in lussen tijdens diavoorstelling kan niet worden behouden.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
+    <value>Gesherpe gebogen pijl (links, rechts, omhoog, omlaag) kan niet worden behouden en is geconverteerd naar cirkelvormige pijl</value>
+  </data>
+  <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
+    <value>Alleen de eerste kleur van de gelijdelijke grafische vulling is geconverteerd in de opmaak.</value>
+  </data>
+  <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
+    <value>Alleen de eerste kleur van de gelijdelijke vulling van de achtergrond is geconverteerd in de diamaster.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTransitionOnClick" xml:space="preserve">
+    <value>Overgang bij klikken tijdens diavoorstelling kan niet worden bewaard.</value>
+  </data>
+  <data name="translation.oox2odf.groupingTypeExtensionChange" xml:space="preserve">
+    <value>Verlies van groepering vanwege wijziging extensie-eigenschap van object.</value>
+  </data>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypePicture" xml:space="preserve">
+    <value>Alle afbeelingseigenschappen in opmaak zijn gemapt naar dia.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypeMouseAsPen" xml:space="preserve">
+    <value>Muiscursos weergeven als pen tijdens diavoorstelling kan niet worden behouden.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeArrowHeadTailSize" xml:space="preserve">
+    <value>Kop- en staartgrotte van pijlen bij benadering berekend omdat de mapping niet beschikbaar is.</value>
+  </data>
+  <data name="translation.odf2oox.audioVideoTypeImage" xml:space="preserve">
+    <value>Snapshot voor geluid/video in dia vervangen door miniatuur van snapshot laatste dia.</value>
+  </data>
+  <data name="translation.oox2odf.handOutMasterTypeOrientation" xml:space="preserve">
+    <value>Oriëntatie handout-pagina kan niet worden behouden.</value>
+  </data>
+  <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
+    <value>Grootte niet aangepast van vorm Onder en boven uitgelijnde tekst met terugloop.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
+    <value>Vorm 'u-pijl' kan niet worden behouden en is geconverteerd naar 'cirkelvormige pijl'.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
+    <value>'Presenatie bovenliggend' tijdens diavoorstelling kan niet worden behouden.</value>
+  </data>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypeShapes" xml:space="preserve">
+    <value>Vormeigenschappen in opmaak gemapt naar dia.</value>
+  </data>
+  <data name="translation.oox2odf.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
+    <value>Aangepast opsommingsteken vervangen door eenvoudig opsommingsteken in masterdia.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
+    <value>Diavoorstelling met commentaar tijdens diavoorstelling kan niet worden behouden.</value>
+  </data>
+  <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
+    <value>Koppelingen naar toepassingen werken alleen als de toepassingen zich bevinden in standaardmappen, bijv. WINDOWS, of in dezelfde map als de presentatie.</value>
+  </data>
+</root>

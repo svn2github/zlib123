@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<conditions>
+  <file name= "OFFICE.DLL" version="7.0">NEVER</file>
+  <file name= "OFFICE.DLL" version="11.0.5530">NEVER</file>
+  <file name= "OFFICE.DLL" version="12.0">NEVER</file>
+  <file name= "MICROSOFT.OFFICE.INTEROP.WORD.DLL" version="10.0">NEVER</file>
+  <file name= "MICROSOFT.OFFICE.INTEROP.WORD.DLL" version="11.0">NEVER</file>
+  <file name= "MICROSOFT.OFFICE.INTEROP.WORD.DLL" version="12.0">NEVER</file>
+  <file name= "MICROSOFT.VBE.INTEROP.DLL" version="10.0">NEVER</file>
+  <file name= "MICROSOFT.VBE.INTEROP.DLL" version="11.0.5530.0">NEVER</file>
+  <file name= "MICROSOFT.VBE.INTEROP.DLL" version="12.0">NEVER</file>
+</conditions>

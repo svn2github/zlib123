@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypeLines" xml:space="preserve">
+    <value>Propriétés de toutes les lignes de la disposition mappées sur la diapositive.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeBentArrow" xml:space="preserve">
+    <value>La forme « Flèche courbée » ne peut être conservée et a été convertie en forme « Flèche de coin ».</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
+    <value>Puce personnalisée remplacée par une puce simple dans la matrice de diapositives.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeChord" xml:space="preserve">
+    <value>La forme de type « Corde » ne peut être conservée et a été convertie en forme « Ellipse ».</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeSnipSingleCornerRectangle" xml:space="preserve">
+    <value>La forme « Rectangle à un coin coupé » ne peut être conservée et a été convertie en forme « Organigramme (Carte retournée) ».</value>
+  </data>
+  <data name="translation.oox2odf.slideLayoutTypeBackgroundGradient" xml:space="preserve">
+    <value>Seule la première couleur du Remplissage du gradient de l’arrière-plan a été convertie pendant la disposition.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsKiosk" xml:space="preserve">
+    <value>Type de présentation « Kiosque » incompatible, remplacé par le type par défaut, « Plein écran ».</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeCustomBullet" xml:space="preserve">
+    <value>Puce personnalisée remplacée par une puce simple dans la diapositive.</value>
+  </data>
+  <data name="translation.oox2odf.pictureTypeProperties" xml:space="preserve">
+    <value>Propriété d’image non convertie.</value>
+  </data>
+  <data name="translation.oox2odf.bulletTypeCustomBullet" xml:space="preserve">
+    <value>Puce personnalisée remplacée par une puce simple dans la diapositive.</value>
+  </data>
+  <data name="translation.odf2oox.notesTypeShapesInNotes" xml:space="preserve">
+    <value>Impossible de conserver les formes des notes.</value>
+  </data>
+  <data name="translation.oox2odf.notesMasterSingleToMultiple" xml:space="preserve">
+    <value>Matrice de notes unique remplacée par plusieurs matrices de notes pour chaque diapositive.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsSlideStartEnd" xml:space="preserve">
+    <value>Impossible de conserver l’option « Commencer par » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.oox2odf.slideTypeGraphicGradient" xml:space="preserve">
+    <value>Seule la première couleur du Remplissage du gradient du graphique a été convertie dans la diapositive.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsPenColor" xml:space="preserve">
+    <value>Impossible de conserver la « Couleur du stylo » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.odf2oox.notesMasterMultipleToSingle" xml:space="preserve">
+    <value>Matrices de notes multiples remplacées par une seule matrice de notes pour chaque diapositive.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypeNavigator" xml:space="preserve">
+    <value>Impossible de conserver l’option « Afficher le navigateur » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeInnerShadow" xml:space="preserve">
+    <value>Impossible de conserver l’ombre intérieure de la forme.</value>
+  </data>
+  <data name="translation.odf2oox.bulletTypeLevel10" xml:space="preserve">
+    <value>10ème niveau converti en 9ème (dernier) niveau.</value>
+  </data>
+  <data name="translation.oox2odf.slideTypeBackgroundGradient" xml:space="preserve">
+    <value> Seule la première couleur du Remplissage du gradient de l’arrière-plan a été convertie dans la diapositive.</value>
+  </data>
+  <data name="translation.odf2oox.handOutMasterTypeThumbNail" xml:space="preserve">
+    <value>Impossible de redimensionner les miniatures de page de document, représentant des diapositives. 
+Seuls six documents de diapositives sont disponibles.
+Orientation de page de document non mappée.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypePauseGreaterThanZero" xml:space="preserve">
+    <value>Impossible de conserver l’option « Retard dans la présentation des diapositives dans la boucle » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeCurvedLeftRightUpDownArrow" xml:space="preserve">
+    <value>La forme Flèche arrondie (Gauche, Droite, Haut, Bas) ne peut être conservée et a été convertie en forme Flèche circulaire</value>
+  </data>
+  <data name="translation.oox2odf.slideLayoutTypeGraphicGradient" xml:space="preserve">
+    <value>Seule la première couleur du Remplissage du gradient du graphique a été convertie pendant la disposition.</value>
+  </data>
+  <data name="translation.oox2odf.slideMasterTypeBackgroundGradient" xml:space="preserve">
+    <value>Seule la première couleur du Remplissage du gradient de l’arrière-plan a été convertie dans la matrice de diapositives.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTransitionOnClick" xml:space="preserve">
+    <value>Impossible de conserver la « Transition par clic » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.oox2odf.groupingTypeExtensionChange" xml:space="preserve">
+    <value>Perte de regroupement à cause de la modification de la propriété d’extension de l’objet.</value>
+  </data>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypePicture" xml:space="preserve">
+    <value>Propriétés de toutes les images de la disposition mappées sur la diapositive.</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypeMouseAsPen" xml:space="preserve">
+    <value>Impossible de conserver l’option « Afficher la souris sous forme de stylo » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeArrowHeadTailSize" xml:space="preserve">
+    <value>Taille de pointe et de queue des flèches calculée approximativement car le mappage n'est pas disponible.</value>
+  </data>
+  <data name="translation.odf2oox.audioVideoTypeImage" xml:space="preserve">
+    <value>Capture d’écran de l’image audio/vidéo dans la diapositive remplacée par une miniature de la capture d’écran de la dernière diapositive.</value>
+  </data>
+  <data name="translation.oox2odf.handOutMasterTypeOrientation" xml:space="preserve">
+    <value>Impossible de conserver l’orientation de page du document.</value>
+  </data>
+  <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve">
+    <value>Forme Texte justifié en haut et en bas avec retour à la ligne non redimensionnée.</value>
+  </data>
+  <data name="translation.oox2odf.shapesTypeUTurnArrow" xml:space="preserve">
+    <value>La forme « Flèche demi-tour » ne peut être conservée et a été convertie en forme « Flèche circulaire ».</value>
+  </data>
+  <data name="translation.odf2oox.slideShowSettingsTypePresentationOnTop" xml:space="preserve">
+    <value>Impossible de conserver l’option « Mettre la présentation au dessus » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.oox2odf.layoutsToSlideMappingTypeShapes" xml:space="preserve">
+    <value>Propriétés des formes de la disposition mappées sur la diapositive.</value>
+  </data>
+  <data name="translation.oox2odf.bulletTypeSlideMasterCustomBullet" xml:space="preserve">
+    <value>Puce personnalisée remplacée par une puce simple dans la matrice de diapositives.</value>
+  </data>
+  <data name="translation.oox2odf.slideShowSettingsNarration" xml:space="preserve">
+    <value>Impossible de conserver l’option « Diaporama avec narration » utilisée pendant le diaporama.</value>
+  </data>
+  <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
+    <value>Les liens vers des applications ne fonctionnent que pour les applications résidant dans des dossiers standard, comme WINDOWS, ou dans  
+le même dossier que la présentation.</value>
+  </data>
+</root>
