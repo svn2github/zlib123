@@ -674,12 +674,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             else
             {
 
-                for (int count = (intListRow.IndexOf(intListRow.Find(delegate(int it)
-                                 {
-                                     return it > PrevRowNumber;
-                                 })));
-
-                            count < intListRow.Count; count++)
+                for (int count = 0; count < intListRow.Count; count++)
                 {
 
                     if (PrevRowNumber < intListRow[count] && intListRow[count] < RowNumber)
