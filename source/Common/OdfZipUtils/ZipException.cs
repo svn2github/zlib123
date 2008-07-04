@@ -90,4 +90,18 @@ namespace CleverAge.OdfConverter.OdfZipUtils {
         }
 
     }
+    //DefectId : 1907127 
+    //Fixed by : Shabeer
+    //Description - new Exception class declaration to catch exception, 
+    //              if the excel file is password protected
+    [Serializable]
+    public class ExcelPasswordProtectedException : Exception
+    {
+        /// <summary>Constructs an exception with a descriptive message.</summary>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        public ExcelPasswordProtectedException(String message)
+            : base(message)
+        {
+        }
+    }
 }

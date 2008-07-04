@@ -29,6 +29,7 @@
 using System;
 using System.IO;
 
+
 namespace CleverAge.OdfConverter.OdfZipUtils
 {
     class ZlibZipReader : ZipReader, IDisposable
@@ -43,11 +44,33 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             {
                 throw new FileNotFoundException("File does not exist:" + path);
             }
+
+            //DefectId    : 1907127 
+            //Fixedby     : Shabeer
+            //Description : Reads the temperory file to check if it's text contains "Content_Types", 
+            //               to decide if it is password protected
+            StreamReader re = File.OpenText(path);
+            string input = null;
+            string input1 = null;
+            while ((input = re.ReadLine()) != null)
+            {
+                input1 = input1 + input;
+            }
+            re.Close();
+
+            if (!(input1.Contains("Content_Types")) && !(input1.Contains("sheet1.xml")) && !(input1.Contains("workbook.xml.rels")) && !(input1.Contains("app.xml")))
+            {
+                //shaby - throw ExcelPasswordProtectedException since the file is password protected
+                throw new ExcelPasswordProtectedException("Could be a password protected file");
+            }
+            else
+            {
             this.handle = ZipLib.unzOpen(resolvedPath);
             if (handle == IntPtr.Zero)
             {
                 throw new ZipException("Unable to open ZIP file:" + path);
             }
+        }
         }
 
         ~ZlibZipReader() {
