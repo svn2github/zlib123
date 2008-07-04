@@ -66,19 +66,4 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
         }
     }
-
-    //Defetct Id: 1907127
-    //Fixed By :shabeer
-    // Desc     : - new Exception class declaration to catch exception, 
-    //            if the ODF file is password protected
-    [Serializable]
-    public class PasswordProtectedException : Exception
-    {
-        /// <summary>Constructs an exception with a descriptive message.</summary>
-        /// <param name="message">The error message that explains the reason for the exception.</param>
-        public PasswordProtectedException(String message)
-            : base(message)
-        {
-        }
-    }
 }
