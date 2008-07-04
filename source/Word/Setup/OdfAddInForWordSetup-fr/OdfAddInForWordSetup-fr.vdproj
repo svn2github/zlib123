@@ -899,14 +899,7 @@
                                         }
                                         "Values"
                                         {
-                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_1DFD3E531FBF43FEB22A8793C91199E0"
-                                            {
-                                            "Name" = "8:fidelityValue"
-                                            "Condition" = "8:ALLUSERS=1"
-                                            "Transitive" = "11:FALSE"
-                                            "ValueTypes" = "3:1"
-                                            "Value" = "8:false"
-                                            }
+                                            
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_5A0DE41CE5254CC6B22A7A737EA6F934"
                                             {
                                             "Name" = "8:language"
@@ -1060,7 +1053,7 @@
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_253AC6D37B72458ABE10999B49531446"
                                             {
                                             "Name" = "8:fidelityValue"
-                                            "Condition" = "8:ALLUSERS<>1"
+                                            "Condition" = "8:"
                                             "Transitive" = "11:FALSE"
                                             "ValueTypes" = "3:1"
                                             "Value" = "8:false"

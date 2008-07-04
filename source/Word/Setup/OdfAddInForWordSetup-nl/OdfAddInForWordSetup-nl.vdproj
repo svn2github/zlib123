@@ -907,14 +907,7 @@
                                             "ValueTypes" = "3:1"
                                             "Value" = "8:[ADDINLANGUAGE]"
                                             }
-                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_BE1FC78C470A4069BB784282791D0608"
-                                            {
-                                            "Name" = "8:fidelityValue"
-                                            "Condition" = "8:ALLUSERS=1"
-                                            "Transitive" = "11:FALSE"
-                                            "ValueTypes" = "3:1"
-                                            "Value" = "8:false"
-                                            }
+                                            
                                         }
                                     }
                                 }
@@ -1060,7 +1053,7 @@
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8B57BB2B90C24FB7A43B48120137FC9F"
                                             {
                                             "Name" = "8:fidelityValue"
-                                            "Condition" = "8:ALLUSERS<>1"
+                                            "Condition" = "8:"
                                             "Transitive" = "11:FALSE"
                                             "ValueTypes" = "3:1"
                                             "Value" = "8:false"
