@@ -144,34 +144,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                                     fidelityMsgValue = Microsoft.Win32.Registry
                                     .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", null) as string;
 
-                                    if (fidelityMsgValue == null)
-                                    {
-                                        fidelityMsgValue = Microsoft.Win32.Registry
-                                        .GetValue(@"HKEY_LOCAL_MACHINE\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", null) as string;
-                                    }
                                 }
                                 else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
                                 {
                                     fidelityMsgValue = Microsoft.Win32.Registry
                                     .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", null) as string;
 
-                                    if (fidelityMsgValue == null)
-                                    {
-                                        fidelityMsgValue = Microsoft.Win32.Registry
-                                        .GetValue(@"HKEY_LOCAL_MACHINE\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", null) as string;
-                                    }
-                                }
+                                  }
                                 else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
                                 {
                                     fidelityMsgValue = Microsoft.Win32.Registry
                                    .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", null) as string;
                                 
-                                    if (fidelityMsgValue == null)
-                                    {
-                                        fidelityMsgValue = Microsoft.Win32.Registry
-                                        .GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Clever Age\Odf Add-in for Word", "fidelityValue", null) as string;
-                                    }
-                                }
+                                 }
                                 if (fidelityMsgValue == "false")
                                 {
                                     InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
@@ -279,34 +264,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             {
                                 fidelityMsgValue = Microsoft.Win32.Registry
                                 .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", null) as string;
-
-                                if (fidelityMsgValue == null)
-                                {
-                                    fidelityMsgValue = Microsoft.Win32.Registry
-                                    .GetValue(@"HKEY_LOCAL_MACHINE\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", null) as string;
-                                }
-                            }
+                             }
                             else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
                             {
                                 fidelityMsgValue = Microsoft.Win32.Registry
                                 .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", null) as string;
-
-                                if (fidelityMsgValue == null)
-                                {
-                                    fidelityMsgValue = Microsoft.Win32.Registry
-                                    .GetValue(@"HKEY_LOCAL_MACHINE\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", null) as string;
-                                }
                             }
                             else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
                             {
                                 fidelityMsgValue = Microsoft.Win32.Registry
                                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", null) as string;
-
-                                if (fidelityMsgValue == null)
-                                {
-                                    fidelityMsgValue = Microsoft.Win32.Registry
-                                    .GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Clever Age\Odf Add-in for Word", "fidelityValue", null) as string;
-                                }
                             }
                             if (fidelityMsgValue == "false")
                             {

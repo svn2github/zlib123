@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -159,6 +159,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.nextWriter.WriteString(EvalRotationExpression(text));
 
             }
+            else if (text.Contains("TableCord"))
+            {
+
+                this.nextWriter.WriteString(EvalTableCord(text));
+
+            }
             else if (text.Contains("Group-Transform"))
             {
 
@@ -211,6 +217,39 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         /*
          * General methods */
+        private string EvalTableCord(string text)
+        {
+            string[] arrPart = text.Split('@');
+            string[] arrVal = arrPart[0].Split(':');
+            string[] arrVal1 = arrPart[1].Split(':');
+            double dblTempCell = 0.0;
+            double dblXY = 0.0;
+            double dblRetXY = 0.0;
+            double dblSUBXY = 0.0;
+            dblXY = Double.Parse(arrVal1[1], System.Globalization.CultureInfo.InvariantCulture);
+           
+            if (arrVal1[0] == "1")
+            {
+               
+               dblRetXY =dblXY;
+            }
+           
+            else
+            {
+                for (int intCount = 1; intCount < arrVal.Length - 2; intCount++)
+                {
+                    dblTempCell = Double.Parse(arrVal[intCount], System.Globalization.CultureInfo.InvariantCulture);
+                    dblSUBXY += dblTempCell;
+
+                }
+                dblRetXY = dblXY + dblSUBXY;
+               
+
+            }
+
+            string str = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.#####}", dblRetXY / 360000);
+            return str + "cm";
+        }
         private string EvalgetCurrentSysDate(string text)
         {
             string str = "";
@@ -1327,8 +1366,31 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 else
                 {
                     Element element = (Element)this.store.Peek();
+                    //added by Sonata
+                    if (text.Contains(":::currentDate:::"))
+                    {
+                        string strDate = "";
+                        string[] strVal = text.Split('@');
+                        if (strVal[1] == "datetime1")
+                        {
+                              strDate = DateTime.Now.ToString("dd/MM/yyyy");
 
+                        }
+                        else if(strVal[1] == "datetime2")
+                        {
+                             strDate = DateTime.Now.ToLongDateString();
+                        }
+                        else
+                        {
+                        strDate = DateTime.Now.ToShortDateString();
+                        }
+                        element.AddChild(strDate);
+                    }
+                    //added by Sonata
+                    else
+                    {
                     element.AddChild(text);
+                }
                 }
 
             }

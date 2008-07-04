@@ -57,12 +57,11 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 input1 = input1 + input;
             }
             re.Close();
-
-            if (!(input1.Contains("Content_Types")) && !(input1.Contains("sheet1.xml")) && !(input1.Contains("workbook.xml.rels")) && !(input1.Contains("app.xml")))
+            if (!(input1.Contains(".xml") || input1.Contains("Content_Types")))
             {
-                //shaby - throw ExcelPasswordProtectedException since the file is password protected
-                throw new ExcelPasswordProtectedException("Could be a password protected file");
+               throw new ExcelPasswordProtectedException("Could be a password protected file");
             }
+           
             else
             {
             this.handle = ZipLib.unzOpen(resolvedPath);

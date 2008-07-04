@@ -185,41 +185,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "POWERPNT")
                 {
-                    string languageVal = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", null) as string;
-                    if (languageVal == null)
-                    {
-                        Microsoft.Win32.Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "true");
-                    }
-                    else
-                    {
-                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "true");
-                    }
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "true");
                 }
                 if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
                 {
-                    string languageVal = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", null) as string;
-                    if (languageVal == null)
-                    {
-                        Microsoft.Win32.Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "true");
-                    }
-                    else
-                    {
-                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "true");
-                    }
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "true");
                 }
                 if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
                 {
-                    string languageVal = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", null) as string;
-                    if (languageVal == null)
-                    {
-                        Microsoft.Win32.Registry.SetValue(@"HKEY_LOCAL_MACHINE\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "true");
-                    }
-                    else
-                    {
-                        Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "true");
-                    }
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "true");
                 }
-    }
-}
-    }
+            }
+        }
+     }
 }

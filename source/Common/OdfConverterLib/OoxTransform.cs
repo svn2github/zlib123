@@ -245,7 +245,7 @@ namespace OdfConverter.Transforms {
                 double x2, y2;
                 Transform(_x + _cx, _y + _cy, out x2, out y2);
                 return string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0:F3}cm@{1:F3}cm@{2:F3}cm@{3:F3}cm",
-                    x1, y1, x2, y2);
+                    x2, y2, x1, y1);
 
             }
         }
