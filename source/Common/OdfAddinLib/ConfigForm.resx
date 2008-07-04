@@ -129,7 +129,7 @@
     <value>1</value>
   </data>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>Don't warn me of the fidelity messages</value>
+    <value>Show fidelity loss information </value>
   </data>
   <data name="&gt;&gt;chkbxIsErrorIgnored.Name" xml:space="preserve">
     <value>chkbxIsErrorIgnored</value>

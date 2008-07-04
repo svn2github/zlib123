@@ -134,6 +134,6 @@
     <value>ODF Converter</value>
   </data>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>Niet waarschuwen me van de trouw-berichten</value>
+    <value>Niet weergeven dit bericht weer </value>
   </data>
 </root>

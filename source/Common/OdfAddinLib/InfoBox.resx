@@ -301,7 +301,7 @@
     <value>5</value>
   </data>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>Don't warn me of the fidelity messages</value>
+    <value>Do not show this message again</value>
   </data>
   <data name="chkbxIsErrorIgnored.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
     <value>TopLeft</value>

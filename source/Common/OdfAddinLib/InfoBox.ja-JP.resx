@@ -307,6 +307,6 @@
     <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>私は、フィデリティはありません警告メッセージ</value>
+    <value>このメッセージを表示しない </value>
   </data>
 </root>

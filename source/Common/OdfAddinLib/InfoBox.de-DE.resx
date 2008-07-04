@@ -128,6 +128,6 @@
     <value>CenterParent</value>
   </data>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>Nicht warnen, mich an die Treue Nachrichten</value>
+    <value>Diese Meldung nicht mehr anzeigen wieder </value>
   </data>
 </root>
