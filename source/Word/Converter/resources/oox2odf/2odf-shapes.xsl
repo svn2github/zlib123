@@ -1325,7 +1325,8 @@
                     <xsl:value-of select="parent::node()/v:rect/@id"/>
               </xsl:attribute>
               <!--TODO-->
-                  <xsl:for-each select ="parent::node()/v:rect">
+                  <!-- Sona Resolved Defect #1989834-->
+                  <!--<xsl:for-each select ="parent::node()/v:rect">-->
               <xsl:attribute name="draw:name">
                 <xsl:text>Frame1</xsl:text>
               </xsl:attribute>
@@ -1339,7 +1340,7 @@
                       <xsl:with-param name ="shapetype" select ="'Rectangle'"/>
                     </xsl:apply-templates >
               <!--<xsl:call-template name="InsertParagraphToFrame"/>-->
-                  </xsl:for-each>
+                  <!--</xsl:for-each>-->
             </draw:rect>
               </xsl:when>
               <!-- Oval -->
@@ -1348,7 +1349,7 @@
                   <xsl:attribute name="draw:style-name">
                     <xsl:value-of select="parent::node()/v:oval/@id"/>
                   </xsl:attribute>
-                  <xsl:for-each select ="parent::node()/v:oval">
+                  <!--<xsl:for-each select ="parent::node()/v:oval">-->
                     <xsl:call-template name="InsertAnchorType"/>
                     <xsl:call-template name="InsertShapeWidth"/>
                     <xsl:call-template name="InsertShapeHeight"/>
@@ -1357,7 +1358,7 @@
                     <xsl:apply-templates select="v:textbox" >
                       <xsl:with-param name ="shapetype" select ="'Oval'"/>
                     </xsl:apply-templates >
-                  </xsl:for-each>
+                  <!--</xsl:for-each>-->
                   <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3200 3200 18400 18400" draw:type="ellipse"/>
                 </draw:custom-shape>
               </xsl:when>
@@ -1367,7 +1368,7 @@
                   <xsl:attribute name="draw:style-name">
                     <xsl:value-of select="parent::node()/v:roundrect/@id"/>
                   </xsl:attribute>
-                  <xsl:for-each select ="parent::node()/v:roundrect">
+                  <!--<xsl:for-each select ="parent::node()/v:roundrect">-->
                     <xsl:call-template name="InsertAnchorType"/>
                     <xsl:call-template name="InsertShapeWidth"/>
                     <xsl:call-template name="InsertShapeHeight"/>
@@ -1376,7 +1377,7 @@
                     <xsl:apply-templates select="v:textbox" >
                       <xsl:with-param name ="shapetype" select ="'Rounded Rectangle'"/>
                     </xsl:apply-templates >
-                  </xsl:for-each>
+                  <!--</xsl:for-each>-->
                   <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
                     <draw:equation draw:name="f0" draw:formula="45"/>
                     <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
