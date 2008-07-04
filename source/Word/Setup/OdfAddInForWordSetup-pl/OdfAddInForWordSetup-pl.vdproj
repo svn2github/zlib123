@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1AD025D57CDFBE06344D7F6F5C3EA4FA"
+        "OwnerKey" = "8:_7C769FE39E2E40CB96396345017C619D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_26EB9B0196D14E45BE7146A716BE8327"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -41,6 +47,12 @@
         {
         "MsmKey" = "8:_53F9D963296B9BD6F658E2676E1A2AF6"
         "OwnerKey" = "8:_7C769FE39E2E40CB96396345017C619D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_53F9D963296B9BD6F658E2676E1A2AF6"
+        "OwnerKey" = "8:_7B37DCA91EA64667859C284192E499EC"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -70,7 +82,19 @@
         "Entry"
         {
         "MsmKey" = "8:_6FC5DCFEB24C879AAD97EDA811C11663"
+        "OwnerKey" = "8:_7B37DCA91EA64667859C284192E499EC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6FC5DCFEB24C879AAD97EDA811C11663"
         "OwnerKey" = "8:_53F9D963296B9BD6F658E2676E1A2AF6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6FC5DCFEB24C879AAD97EDA811C11663"
+        "OwnerKey" = "8:_1AD025D57CDFBE06344D7F6F5C3EA4FA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -82,6 +106,12 @@
         "Entry"
         {
         "MsmKey" = "8:_6FC5DCFEB24C879AAD97EDA811C11663"
+        "OwnerKey" = "8:_7C769FE39E2E40CB96396345017C619D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7B37DCA91EA64667859C284192E499EC"
         "OwnerKey" = "8:_7C769FE39E2E40CB96396345017C619D"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -117,8 +147,26 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A12A9360FD3F44E4E3534E74F12A70E9"
+        "OwnerKey" = "8:_7B37DCA91EA64667859C284192E499EC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A12A9360FD3F44E4E3534E74F12A70E9"
+        "OwnerKey" = "8:_1AD025D57CDFBE06344D7F6F5C3EA4FA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A7FB860D3FAA89DF5E89A4061DD5042C"
         "OwnerKey" = "8:_7C769FE39E2E40CB96396345017C619D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A7FB860D3FAA89DF5E89A4061DD5042C"
+        "OwnerKey" = "8:_1AD025D57CDFBE06344D7F6F5C3EA4FA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -190,12 +238,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D3B7429127FA4D56B2A654803AE44D45"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_FD68AFDF8ED64C03AF6FA11C2E9EB353"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -208,13 +250,31 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D3B7429127FA4D56B2A654803AE44D45"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_9F798BF8EE1A323C92DF9500F9599C94"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_7B37DCA91EA64667859C284192E499EC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_53F9D963296B9BD6F658E2676E1A2AF6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_1AD025D57CDFBE06344D7F6F5C3EA4FA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -438,6 +498,37 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1AD025D57CDFBE06344D7F6F5C3EA4FA"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:OdfPowerPointAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a641c4710f1207f8, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_1AD025D57CDFBE06344D7F6F5C3EA4FA"
+                    {
+                    "Name" = "8:OdfPowerPointAddin.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:OdfPowerPointAddin.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_26EB9B0196D14E45BE7146A716BE8327"
             {
             "SourcePath" = "8:..\\..\\..\\..\\lib\\OdfInstallHelper.dll"
@@ -523,6 +614,37 @@
                     }
                 }
             "SourcePath" = "8:OdfConverterLib.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7B37DCA91EA64667859C284192E499EC"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:OdfExcelAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a641c4710f1207f8, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_7B37DCA91EA64667859C284192E499EC"
+                    {
+                    "Name" = "8:OdfExcelAddin.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:OdfExcelAddin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"
@@ -993,7 +1115,6 @@
                                         }
                                         "Values"
                                         {
-                                            
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_5A0DE41CE5254CC6B22A7A737EA6F934"
                                             {
                                             "Name" = "8:language"
@@ -1151,14 +1272,6 @@
                                             "Transitive" = "11:FALSE"
                                             "ValueTypes" = "3:2"
                                             "Value" = "8:[ADDINLANGUAGE]"
-                                            }
-                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_EB45DB5F3A394164B7E75D2C6762B8E8"
-                                            {
-                                            "Name" = "8:fidelityValue"
-                                            "Condition" = "8:"
-                                            "Transitive" = "11:FALSE"
-                                            "ValueTypes" = "3:1"
-                                            "Value" = "8:false"
                                             }
                                         }
                                     }
