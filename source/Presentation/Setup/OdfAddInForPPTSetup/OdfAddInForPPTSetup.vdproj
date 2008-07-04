@@ -1095,7 +1095,7 @@
                                                                     "Condition" = "8:ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 2.0 (Build 4490)"
+                                                                    "Value" = "8:Version 2.0 (Build 4649)"
                                                                     }
                                                                 }
                                                             }
@@ -1140,14 +1140,6 @@
                                         }
                                         "Values"
                                         {
-                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_1EF5CDA6B399495E8684ED4C374BA981"
-                                            {
-                                            "Name" = "8:fidelityValue"
-                                            "Condition" = "8:ALLUSERS=1"
-                                            "Transitive" = "11:FALSE"
-                                            "ValueTypes" = "3:1"
-                                            "Value" = "8:false"
-                                            }
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8D78570DFC834C709533957FDC30A7EF"
                                             {
                                             "Name" = "8:language"
@@ -1215,7 +1207,7 @@
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_DE67437AD87F4F5DA01010B4558A3C35"
                                             {
                                             "Name" = "8:fidelityValue"
-                                            "Condition" = "8:ALLUSERS<>1"
+                                            "Condition" = "8:"
                                             "Transitive" = "11:FALSE"
                                             "ValueTypes" = "3:1"
                                             "Value" = "8:false"
@@ -1289,7 +1281,7 @@
                                                                     "Condition" = "8:ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 2.0 (Build 4490)"
+                                                                    "Value" = "8:Version 2.0 (Build 4649)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_99733AD7B3CC4F7BB47D7E8F6DD9C9F4"
                                                                     {
