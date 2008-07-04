@@ -82,6 +82,13 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 doc = new XmlDocument();
                 XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
                 doc.Load(reader);
+
+                XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
+                if (nodes.Count > 0)
+                {
+                    throw new EncryptedDocumentException(fileName + " is an encrypted document");
+                }
+
                 /*Code Changed By:Vijayeta 
 				    Defect ID      :1740412
 					Date           :20th Dec '07
@@ -95,17 +102,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 throw new NotAnOdfDocumentException(e.Message);
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-
-            XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
-            if (nodes.Count > 0)
-            {
-                throw new EncryptedDocumentException(fileName + " is an encrypted document");
-            }
+            
 
             // Check the document mime-type.
             XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
