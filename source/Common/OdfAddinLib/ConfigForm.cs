@@ -60,7 +60,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "POWERPNT")
                 {
                         string languageVal = Microsoft.Win32.Registry
-                                            .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", null) as string;
+                                            .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "false") as string;
 
                         if (languageVal == "true")
                         {
@@ -78,7 +78,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
                 {
                         string languageVal = Microsoft.Win32.Registry
-                                            .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", null) as string;
+                                            .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "false") as string;
                    
                         if (languageVal == "true")
                         {
@@ -96,7 +96,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
                 {
                         string languageVal = Microsoft.Win32.Registry
-                                        .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", null) as string;
+                                        .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "false") as string;
                    
                         if (languageVal == "true")
                         {
