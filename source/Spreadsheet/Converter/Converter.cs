@@ -93,19 +93,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
             catch (XmlException e)
             {
-                //Defect id: 1907127
-                // Fixed  By:Shabeer
-                // Desc:     below given error is usually thrown when an ODF file is password protected
-                if (e.Message.Contains("Invalid character in the given encoding"))
-                {
-                    throw new PasswordProtectedException(e.Message);
-                }
-                else
-                {
                 throw new NotAnOdfDocumentException(e.Message);
-            }
-                //end
-                
             }
             catch (Exception e)
             {
