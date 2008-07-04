@@ -50,6 +50,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   exclude-result-prefixes="svg table r text style number fo draw">
 
   <xsl:import href="measures.xsl"/>
+	<xsl:key name="text" match="number:text-style" use="@style:name"/>
   <xsl:key name="number" match="number:number-style" use="@style:name"/>
   <xsl:key name="percentage" match="number:percentage-style" use="@style:name"/>
   <xsl:key name="currency" match="number:currency-style" use="@style:name"/>
@@ -184,6 +185,16 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
         <xsl:with-param name="numId">1</xsl:with-param>
         <xsl:with-param name="styleName"/>
       </xsl:apply-templates>
+		<!--Defect Id: 1959472
+                    Fixed By : Vijayeta Tilak
+                    Date     : 4th Jul '08
+                    Desc     : user defined format #####Bf handeled-->
+		<xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:automatic-styles/number:text-style[1]"
+        mode="numFormat">
+			<xsl:with-param name="numId">1</xsl:with-param>
+			<xsl:with-param name="styleName"/>
+		</xsl:apply-templates>		
 
       <!-- apply number styles from styles.xml -->
       <xsl:apply-templates

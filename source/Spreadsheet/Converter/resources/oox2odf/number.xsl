@@ -1706,16 +1706,24 @@
 
     <!-- @Descripition: inserts fixed date format -->
     <!-- @Context: None -->
-
+	  <!-- Defect Id: 1959472
+	       By       : Vijayeta
+		   Date     :4th Jul '08
+		   Desc     :Date format 14 is mon/dd/yyyy and not of type yyyy-mon-dd-->
     <xsl:param name="ID"/>
     <!-- (int) number format ID -->
     <xsl:choose>
       <xsl:when test="$ID = 14">
-        <number:year number:style="long"/>
+		  <number:month/>
+		  <number:text>/</number:text>
+		  <number:day/>
+		  <number:text>/</number:text>
+		  <number:year number:style="long"/>
+		  <!--<number:year number:style="long"/>
         <number:text>-</number:text>
         <number:month/>
         <number:text>-</number:text>
-        <number:day number:style="long"/>
+        <number:day number:style="long"/>-->
       </xsl:when>
       <xsl:when test="$ID = 15">
         <number:day/>

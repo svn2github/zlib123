@@ -32,6 +32,7 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
 RefNo-2 19-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pane
+RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected error occurred after round trip conversion(auto filter)	
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -301,7 +302,8 @@ RefNo-2 19-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pan
         </xsl:with-param>
       </xsl:call-template>
 
-      <!-- insert filter -->
+      <!--RefNo-3 insert filter: Commented and added the code after sort -->
+	  <!--
       <xsl:choose>
         <xsl:when test="$ignoreFilter = '' ">
           <xsl:call-template name="MatchFilter">
@@ -311,7 +313,7 @@ RefNo-2 19-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pan
         <xsl:otherwise>
           <xsl:message terminate="no">translation.odf2oox.RemovedFilter</xsl:message>
         </xsl:otherwise>
-      </xsl:choose>
+      </xsl:choose>-->
 
 
 
@@ -982,7 +984,28 @@ RefNo-2 19-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pan
       </xsl:apply-templates>
 
     </sheetData>
-
+	  <!--Start of RefNo-3 : Added code to insert sort after auto filter.-->
+	  <!-- check if filter can be conversed -->
+	  <xsl:variable name="ignoreFilterNew">
+		  <xsl:call-template name="MatchFilter">
+			  <xsl:with-param name="tableName" select="@table:name"/>
+			  <xsl:with-param name="ignoreFilter">
+				  <xsl:text>check</xsl:text>
+			  </xsl:with-param>
+		  </xsl:call-template>
+	  </xsl:variable>
+	  <!-- insert filter -->
+	 <xsl:choose>
+		 <xsl:when test="$ignoreFilterNew = '' ">
+			 <xsl:call-template name="MatchFilter">
+				 <xsl:with-param name="tableName" select="@table:name"/>
+			  </xsl:call-template>
+		  </xsl:when>
+		  <xsl:otherwise>
+			  <xsl:message terminate="no">translation.odf2oox.RemovedFilter</xsl:message>
+		  </xsl:otherwise>
+	  </xsl:choose>
+	  <!--End of RefNo-3-->
     <!-- insert sort -->
     <xsl:call-template name="InsertSort">
       <xsl:with-param name="tableName" select="@table:name"/>
