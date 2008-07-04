@@ -347,35 +347,63 @@
         </xsl:variable>
         
         <xsl:variable name="startRangeAddressRow">
-          <xsl:call-template name="GetRowNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of select="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':')"/>
-            </xsl:with-param>
-          </xsl:call-template>          
+          <xsl:choose>
+            <xsl:when test="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':') != ''">
+              <xsl:call-template name="GetRowNum">            
+                <xsl:with-param name="cell">              
+                  <xsl:value-of select="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':')"/>
+                </xsl:with-param>
+              </xsl:call-template>            
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
         
         <xsl:variable name="endRangeAddressRow">
-          <xsl:call-template name="GetRowNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of select="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.')"/>
-            </xsl:with-param>
-          </xsl:call-template> 
+          <xsl:choose>
+            <xsl:when test="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.') != ''">
+              <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of select="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.')"/>
+                </xsl:with-param>
+              </xsl:call-template>     
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>          
         </xsl:variable>
         
-        <xsl:variable name="startRangeAddressCol">
-          <xsl:call-template name="GetColNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of select="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':')"/>
-            </xsl:with-param>
-          </xsl:call-template>          
+        <xsl:variable name="startRangeAddressCol">          
+          <xsl:choose>
+            <xsl:when test="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':') != ''">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of select="substring-before(substring-after(key('pivot','')/@table:target-range-address, '.'), ':')"/>
+                </xsl:with-param>
+              </xsl:call-template>      
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
         
         <xsl:variable name="endRangeAddressCol">
-          <xsl:call-template name="GetColNum">
-            <xsl:with-param name="cell">
-              <xsl:value-of select="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.')"/>
-            </xsl:with-param>
-          </xsl:call-template> 
+          <xsl:choose>
+            <xsl:when test="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.') != ''">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of select="substring-after(substring-after(key('pivot','')/@table:target-range-address, '.'), '.')"/>
+                </xsl:with-param>
+              </xsl:call-template>       
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>          
         </xsl:variable>
         
 	     <!--
