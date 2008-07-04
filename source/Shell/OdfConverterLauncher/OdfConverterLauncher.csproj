@@ -107,10 +107,6 @@
       <Project>{F9071930-348E-4A30-A0F6-A1A3DF3A587B}</Project>
       <Name>Converter %28Word\Converter%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Word\OdfWordAddin\OdfWordAddin.csproj">
-      <Project>{2329EA27-8A83-4AFB-89CE-CBE1E72F4A10}</Project>
-      <Name>OdfWordAddin</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
