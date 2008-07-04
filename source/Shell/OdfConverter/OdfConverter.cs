@@ -560,27 +560,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                 return false;
             }
-            //Defect id: 1907127
-            // Fixed By : shabeer
-            // Desc:      - catch Password Protected Exceptions for ODF, if password protected
-            //           (if odf file is password protected, the exception will be 
-            //           converted to PasswordProtectedException in Converter.cs)
-            catch (PasswordProtectedException e)
-            {
-                this.report.AddLog(input, "Conversion failed - Input ODF file could be password protected", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
-                return false;
-            }
-            //catch Password Protected Exceptions for Excel, if password protected 
-            //      (if Excel file is password protected,  
-            //       ExcelPasswordProtectedException will be thrown from ZlibZipReader.cs)
-            catch (ExcelPasswordProtectedException e)
-            {
-                this.report.AddLog(input, "Conversion failed - Input EXCEL file could be password protected", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
-                return false;
-            }
-            
             catch (NotAnOoxDocumentException e)
             {
                 this.report.AddLog(input, "Conversion failed - Input file is not a valid Office OpenXML file", Report.ERROR_LEVEL);
@@ -589,9 +568,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipException e)
             {
-                //error message modified by shabeer
-                this.report.AddLog(input, "Conversion failed - Input file is not a valid file for conversion", Report.ERROR_LEVEL);
-                
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid file for conversion or might be password protected", Report.ERROR_LEVEL);
                 this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
                 return false;
             }
