@@ -470,6 +470,19 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:for-each  select ="document($fileName)//office:automatic-styles/style:style[@style:name =$Tid ]">
       <xsl:if test="position()=1">
 			<xsl:message terminate="no">progress:text:p</xsl:message>
+
+        <xsl:choose>
+          <xsl:when test="style:text-properties/@style:language-asian and style:text-properties/@style:country-asian">
+            <xsl:attribute name ="lang">
+              <xsl:value-of select="concat(style:text-properties/@style:language-asian,'-',style:text-properties/@style:country-asian)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name ="lang">
+              <xsl:value-of select="'en-US'"/>
+            </xsl:attribute>
+        </xsl:otherwise>
+        </xsl:choose>
 			<!-- Added by lohith :substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0  because sz(font size) shouldnt be zero - 16filesbug-->
 			<xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
 				<xsl:attribute name ="sz">
@@ -847,7 +860,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:variable>
 					<xsl:if test ="$indetValue!=''">
 						<xsl:attribute name="indent">
-							<xsl:value-of select="$indetValue"/>
+                <xsl:value-of select="concat('-',$indetValue)"/>
 						</xsl:attribute>
 					</xsl:if>
 				</xsl:if>
@@ -1363,7 +1376,7 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name="tmpGradientFill">
     <xsl:param name="gradStyleName"/>
     <xsl:param name="opacity"/>
-    <a:gradFill flip="none" rotWithShape="1">
+    <a:gradFill flip="none" rotWithShape="0">
 
                 <xsl:for-each select="document('styles.xml')//draw:gradient[@draw:name= $gradStyleName]">
         <a:gsLst>
@@ -2310,9 +2323,17 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:value-of select ="'&#09;'"/>
 				</xsl:when >
 				<xsl:when test ="name()='text:s'">
-					<xsl:call-template name ="insertSpace">
+          <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
+                  <xsl:if test="@text:c">
+                    <xsl:attribute name="pxs:c">
+                      <xsl:value-of select="@text:c"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </pxs:s>
+					<!--<xsl:call-template name ="insertSpace" >
 						<xsl:with-param name ="spaceVal" select ="@text:c"/>
-					</xsl:call-template>
+					</xsl:call-template>-->
+          
 				</xsl:when >
 				<xsl:when test =".='' and child::node()">
 					<xsl:value-of select ="' '"/>
@@ -2657,7 +2678,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:if test ="not(./text:line-break)">
           <xsl:if test ="child::node()">
             <a:r>
-              <a:rPr lang="en-US" smtClean="0">
+              <a:rPr smtClean="0">
                 <!--Font Size -->
                 <xsl:variable name ="textId">
                   <xsl:value-of select ="@text:style-name"/>
@@ -2684,14 +2705,14 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
           <!-- Bug 1744106 fixed by vijayeta, date 16th Aug '07, add a new templaet to set font size and family in endPara-->
           <xsl:if test ="not(child::node())">
-            <a:endParaRPr lang="en-US" dirty="0" smtClean="0" >
+            <a:endParaRPr dirty="0" smtClean="0" >
               <xsl:if test ="not(@text:style-name ='')">
                 <xsl:call-template name ="getFontSizeFamilyFromContentEndPara">
                   <xsl:with-param name ="Tid" select ="@text:style-name"/>
                 </xsl:call-template>
               </xsl:if >
               <xsl:if test ="@text:style-name =''">
-                <a:endParaRPr lang="en-US" dirty="0" smtClean="0"/>
+                <a:endParaRPr dirty="0" smtClean="0"/>
               </xsl:if>
             </a:endParaRPr>
           </xsl:if>
@@ -2712,7 +2733,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
       <xsl:if test ="name()='text:tab'">
         <a:r>
-          <a:rPr lang="en-US" smtClean="0">
+          <a:rPr smtClean="0">
             <!--Font Size -->
             <xsl:variable name ="textId">
               <xsl:value-of select ="@text:style-name"/>
@@ -2738,7 +2759,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if >
       <xsl:if test ="not(name()='text:span' or name()='text:line-break' or name()='text:tab') ">
         <a:r>
-          <a:rPr lang="en-US" smtClean="0">
+          <a:rPr smtClean="0">
             <!--Font Size -->
             <xsl:variable name ="textId">
               <xsl:value-of select ="./parent::node()/@text:style-name"/>
@@ -2768,7 +2789,7 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name ="processBR">
     <xsl:param name ="T" />
     <a:br>
-      <a:rPr lang="en-US" smtClean="0">
+      <a:rPr smtClean="0">
         <!--Font Size -->
         <xsl:if test ="not($T ='')">
           <xsl:call-template name ="fontStyles">
@@ -2930,6 +2951,18 @@ Copyright (c) 2007, Sonata Software Limited
 
     <xsl:for-each  select ="document('styles.xml')//style:style[@style:name =$TextStyleID ]">
       <xsl:if test="position()=1">
+        <xsl:choose>
+          <xsl:when test="style:text-properties/@style:language-asian and style:text-properties/@style:country-asian">
+            <xsl:attribute name ="lang">
+              <xsl:value-of select="concat(style:text-properties/@style:language-asian,'-',style:text-properties/@style:country-asian)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name ="lang">
+              <xsl:value-of select="'en-US'"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
       <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
         <xsl:attribute name ="sz">
           <xsl:call-template name ="convertToPoints">
@@ -3816,6 +3849,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
+      <xsl:if test="@xlink:href !=''">
       <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
                                     xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <xsl:attribute name="Id">
@@ -3862,8 +3896,17 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of select="'External'"/>
             </xsl:attribute>
           </xsl:when>
+          <xsl:when test="starts-with(@xlink:href,'../')">
+            <xsl:attribute name="Target">
+             <xsl:value-of select ="concat('hyperlink-path:',@xlink:href)"/>
+            </xsl:attribute>
+            <xsl:attribute name="TargetMode">
+              <xsl:value-of select="'External'"/>
+            </xsl:attribute>
+          </xsl:when>
         </xsl:choose>
       </Relationship>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
   <xsl:template name="tmpBulletImageRel">
@@ -5733,6 +5776,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
       <xsl:otherwise>
         <xsl:for-each select="./child::node()[1]">
+          <xsl:if test="@xlink:href !=''">
           <p:graphicFrame>
             <p:nvGraphicFramePr>
               <p:cNvPr>
@@ -5760,10 +5804,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:attribute name="spid">
                                     <xsl:value-of select="concat('_x0000_s', $pageNo * 1024 + $shapeCount)"/>
                                   </xsl:attribute>
-                  <!--<xsl:attribute name="spid">
-                    <xsl:value-of select="concat('_x0000_s',$shapeCount+1)"/>
-                  </xsl:attribute>-->
-                  <xsl:attribute name="name">
+                    <xsl:attribute name="name">
                     <xsl:value-of select="'Package'"/>
                   </xsl:attribute>
                   <xsl:attribute name="r:id">
@@ -5800,9 +5841,9 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:when test="starts-with(@xlink:href,'./')">
                       <p:embed/>
                     </xsl:when>
-                    <xsl:when test="starts-with(@xlink:href,'/') or starts-with(@xlink:href,'//')
+                      <xsl:when test="starts-with(@xlink:href,'/') or starts-with(@xlink:href,'../') or starts-with(@xlink:href,'//')
                                             or starts-with(@xlink:href,'file:///')">
-                      <p:link updateAutomatic="1" />
+                      <p:link/>
                     </xsl:when>
                   </xsl:choose>
                 </p:oleObj>
@@ -5851,7 +5892,9 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:when>
             </xsl:choose>
           </xsl:if>
+          </xsl:if>
         </xsl:for-each>
+        
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

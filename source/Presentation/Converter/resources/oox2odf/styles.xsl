@@ -69,8 +69,7 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:variable>
 	<xsl:variable name ="distance">
 		<xsl:value-of select ="'0.211'"/>
-	</xsl:variable>
-	
+	</xsl:variable>	
 	<xsl:template name="styles">
     <xsl:message terminate="no">progress:a:p</xsl:message>
 		<office:document-styles>
@@ -130,7 +129,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:call-template name ="InsertDefaultStyles" />
         <xsl:call-template name="SlideMaster"/>
 				<xsl:call-template name="InsertShapeStyles"/>
-				<xsl:call-template name ="InsertLayoutStyle"/>
+        <xsl:call-template name="tmpInsertLayoutType"/>
         <xsl:for-each select="document('ppt/presentation.xml')//p:sldMasterIdLst/p:sldMasterId">
           <xsl:message terminate="no">progress:a:p</xsl:message>
           <xsl:variable name="sldMasterIdRelation">
@@ -274,33 +273,18 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:variable name ="SlideId">
 				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
 			</xsl:variable>
-			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:cxnSp/p:spPr/a:ln">
-				
-				<!--Dash types-->
-				<xsl:if test ="a:prstDash/@val">
-				<xsl:call-template name ="getDashType">
-					<xsl:with-param name ="val" select ="a:prstDash/@val" />
-					<xsl:with-param name ="cap" select ="@cap" />
-				</xsl:call-template>
-				</xsl:if>
-				
-				<!-- Head End-->
-				<xsl:if test ="a:headEnd">
-					<xsl:call-template name ="getArrowType">
-						<xsl:with-param name ="type" select ="a:headEnd/@type" />
-					</xsl:call-template>
-				</xsl:if>
+						
+			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree//p:sp/p:spPr/a:ln">
+        <xsl:call-template name="tmpArrowProp"/>
+			</xsl:for-each>
 
-				<!-- Tail End-->
-				<xsl:if test ="a:tailEnd">
-					<xsl:call-template name ="getArrowType">
-						<xsl:with-param name ="type" select ="a:tailEnd/@type" />
-					</xsl:call-template>
-				</xsl:if>
+      <xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree//p:cxnSp/p:spPr/a:ln ">
+        <xsl:call-template name="tmpArrowProp"/>
+      </xsl:for-each>
 			</xsl:for-each >
-
-			
-			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp/p:spPr/a:ln">
+		
+	</xsl:template>
+  <xsl:template name="tmpArrowProp">
 				<!--Dash types-->
 				<xsl:if test ="a:prstDash/@val">
 					<xsl:call-template name ="getDashType">
@@ -308,7 +292,6 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:with-param name ="cap" select ="@cap" />
 					</xsl:call-template>
 				</xsl:if>
-
 				<!-- Head End-->
 				<xsl:if test ="a:headEnd">
 					<xsl:call-template name ="getArrowType">
@@ -322,13 +305,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:with-param name ="type" select ="a:tailEnd/@type" />
 					</xsl:call-template>
 				</xsl:if>
-			</xsl:for-each>
-
-			 
-		</xsl:for-each >
-		
-	</xsl:template>
-
+			</xsl:template>
   <!-- Notes Size-->
   <xsl:template name="NotesMasterSlideSize">
     <xsl:for-each select ="document('ppt/presentation.xml')//p:presentation/p:notesSz">
@@ -1067,32 +1044,172 @@ Copyright (c) 2007, Sonata Software Limited
 			</text:p>
 		</draw:text-box>
 	</xsl:template>
-	<xsl:template name ="InsertLayoutStyle">
-		<!--@@title and subtitle layout  -->
-		<style:presentation-page-layout style:name="AL1T0">
+  <xsl:template name ="tmpInsertLayoutType">
+    <xsl:variable name="SlideLayoutType">
+      <xsl:for-each select="document('ppt/presentation.xml')//p:sldMasterIdLst/p:sldMasterId">
+        <xsl:message terminate="no">progress:a:p</xsl:message>
+        <xsl:variable name="sldMasterIdRelation">
+          <xsl:value-of select="@r:id"></xsl:value-of>
+        </xsl:variable>
+        <xsl:for-each select="document('ppt/_rels/presentation.xml.rels')//node()[@Id=$sldMasterIdRelation]">
+          <xsl:variable name="slideMasterPath">
+            <xsl:value-of select="substring-after(@Target,'/')"/>
+          </xsl:variable>
+          <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$slideMasterPath,'.rels'))//node()/@Target[contains(.,'slideLayouts')]">
+            <xsl:variable name="slideLayoutName">
+              <xsl:value-of select="substring-after(.,'..')"/>
+            </xsl:variable>
+            <xsl:for-each select ="document(concat('ppt',$slideLayoutName))/p:sldLayout/@type">
+              <xsl:value-of select="concat(.,'@')"/>
+            </xsl:for-each>
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:variable>
+    <!--Style defination for GetLayOutName template-->
+    <!--@@Title and chart-->
+    <xsl:if test="contains($SlideLayoutType,'chart@')">
+      <style:presentation-page-layout style:name="AL6T2">
 			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
-			<presentation:placeholder presentation:object="subtitle" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm" />
+        <presentation:placeholder presentation:object="chart" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, clipart on left, text on right-->
+    <xsl:if test="contains($SlideLayoutType,'clipArtAndTx@')">
+      <style:presentation-page-layout style:name="AL8T9">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="graphic" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title and four objects-->
+    <xsl:if test="contains($SlideLayoutType,'fourObj@')">
+      <style:presentation-page-layout style:name="AL19T18">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="12.748cm" svg:width="11.67cm" svg:height="-0.601cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="14.311cm" svg:y="12.748cm" svg:width="-0.585cm" svg:height="-0.601cm"/>
 		</style:presentation-page-layout>
-		<!-- @@Title and sub content layout -->
+    </xsl:if>
+    <!--@@Title and Object only-->
+    <xsl:if test="contains($SlideLayoutType,'obj@') or contains($SlideLayoutType,'tx@')">
 		<style:presentation-page-layout style:name="AL2T1">
 			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
-			<presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm" />
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, object on left, text on right-->
+    <xsl:if test="contains($SlideLayoutType,'objAndTx@')">
+      <style:presentation-page-layout style:name="AL14T13">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, object on top, text on bottom-->
+    <xsl:if test="contains($SlideLayoutType,'objOverTx@')">
+      <style:presentation-page-layout style:name="AL15T14">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="12.748cm" svg:width="23.912cm" svg:height="-0.601cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title and table-->
+    <xsl:if test="contains($SlideLayoutType,'tbl@')">
+      <style:presentation-page-layout style:name="AL7T8">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="table" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm"/>
 		</style:presentation-page-layout>
-		<!-- @@Title and two content layout -->
+    </xsl:if>
+     <!--@@Title only layout--> 
+    <xsl:if test="contains($SlideLayoutType,'titleOnly@')">
+      <style:presentation-page-layout style:name="AL4T19">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, text on left, text on right-->
+    <xsl:if test="contains($SlideLayoutType,'twoColTx@') or contains($SlideLayoutType,'twoObj@') or contains($SlideLayoutType,'twoTxTwoObj@')">
 		<style:presentation-page-layout style:name="AL3T3">
 			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
 			<presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm" />
 			<presentation:placeholder presentation:object="outline" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm" />
 		</style:presentation-page-layout>
-		<!-- @@Title only layout -->
-		<style:presentation-page-layout style:name="AL1T19">
+    </xsl:if>
+    <!--@@Title, two objects on left, text on right-->
+    <xsl:if test="contains($SlideLayoutType,'twoObjAndTx@')">
+      <style:presentation-page-layout style:name="AL16T15">
 			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="12.748cm" svg:width="11.67cm" svg:height="-0.601cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm"/>
 		</style:presentation-page-layout>
-		<!-- @@Title and object-->
-		<style:presentation-page-layout style:name="AL5T11">
+    </xsl:if>
+    <!--@@Title, two objects on top, text on bottom-->
+    <xsl:if test="contains($SlideLayoutType,'twoObjOverTx@')">
+      <style:presentation-page-layout style:name="AL17T16">
 			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
-			<presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm" />
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="12.748cm" svg:width="23.912cm" svg:height="-0.601cm"/>
 		</style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, text on left, clip art on right-->
+    <xsl:if test="contains($SlideLayoutType,'txAndClipArt@')">
+      <style:presentation-page-layout style:name="AL10T6">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+        <presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm" />
+        <presentation:placeholder presentation:object="graphic" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, text on left, object on right-->
+    <xsl:if test="contains($SlideLayoutType,'txAndObj@')">
+      <style:presentation-page-layout style:name="AL12T10">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+        <presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, Text &  Objects-->
+    <xsl:if test="contains($SlideLayoutType,'txAndTwoObj@')">
+      <style:presentation-page-layout style:name="AL13T12">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+        <presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="14.311cm" svg:y="12.748cm" svg:width="-0.585cm" svg:height="-0.601cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title, text on top, object on bottom-->
+    <xsl:if test="contains($SlideLayoutType,'txOverObj@')">
+      <style:presentation-page-layout style:name="AL18T17">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="6.311cm"/>
+        <presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="12.748cm" svg:width="23.912cm" svg:height="-0.601cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title & SubTitle-->
+    <xsl:if test="contains($SlideLayoutType,'title@') or contains($SlideLayoutType,'secHead@')">
+      <style:presentation-page-layout style:name="AL1T0">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="subtitle" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title,Text& Chart-->
+    <xsl:if test="contains($SlideLayoutType,'vertTx@') or contains($SlideLayoutType,'txAndChart@')">
+      <style:presentation-page-layout style:name="AL9T4">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm"/>
+        <presentation:placeholder presentation:object="chart" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
+    <!--@@Title,Chart & Text-->
+    <xsl:if test="contains($SlideLayoutType,'chartAndTx@')">
+      <style:presentation-page-layout style:name="AL11T7">
+        <presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm"/>
+        <presentation:placeholder presentation:object="chart" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm"/>
+        <presentation:placeholder presentation:object="outline" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm"/>
+      </style:presentation-page-layout>
+    </xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
 

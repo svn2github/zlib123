@@ -274,10 +274,22 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:if>-->
       </xsl:if>
       <xsl:if test="not($audio)">
+        <xsl:variable name="varHyperLinksForPic">
+          <!-- Added by lohith.ar - Start - Mouse click hyperlinks -->
+          <office:event-listeners>
+            <xsl:for-each select ="p:nvPicPr/p:cNvPr">
+              <xsl:call-template name="tmpHyperLinkForShapesPic">
+                <xsl:with-param name="SlideRelationId" select="$slideRel"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </office:event-listeners>
+          <!-- End - Mouse click hyperlinks-->
+        </xsl:variable>
         <draw:image  xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
           <xsl:attribute name ="xlink:href"  >
             <xsl:value-of select ="concat('Pictures/',$targetFile)"/>
           </xsl:attribute>
+          <xsl:copy-of select="$varHyperLinksForPic" />
           <text:p />
         </draw:image>
       </xsl:if>

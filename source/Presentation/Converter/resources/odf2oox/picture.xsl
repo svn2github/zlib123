@@ -78,7 +78,6 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:value-of select ="concat('sl',$imageNo,'Image' ,$picNo)"/>
          </xsl:otherwise>
        </xsl:choose>
-
     </xsl:variable>
     <pzip:copy pzip:source="{@xlink:href}"
 				   pzip:target="{concat('ppt/media/',substring-after(@xlink:href,'/'))}"/>
@@ -93,7 +92,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:value-of  select ="substring-after(@xlink:href,'/')"/>
             </xsl:if >
           </xsl:attribute>
-        </p:cNvPr >
+             </p:cNvPr >
         <p:cNvPicPr>
           <a:picLocks noChangeAspect="1">
             <xsl:choose>

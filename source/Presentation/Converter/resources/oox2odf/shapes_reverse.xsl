@@ -76,22 +76,6 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:variable name="lg-lg">
 		<xsl:value-of select ="'0.4'" />
 	</xsl:variable>
-
-  <xsl:template name ="drawShapes">
-    <xsl:param name ="SlideID" />
-    <xsl:param name ="SlideRelationId" />
-    <xsl:param name ="grID" />
-    <xsl:param name ="prID" />
-
-    <xsl:call-template name ="shapes">
-      <!-- Extra parameter "slideId" added by lohith,requierd for template AddTextHyperlinks -->
-      <xsl:with-param name="slideId" select ="$SlideID"/>
-      <xsl:with-param name="GraphicId" select ="concat($SlideID,$grID,position())"/>
-      <xsl:with-param name ="ParaId" select ="concat($SlideID,$prID,position())" />
-      <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
-    </xsl:call-template>
-  </xsl:template>
-
   <!-- Template for Shapes in reverse conversion -->
   <xsl:template  name="shapes">
     <xsl:param name="GraphicId" />
@@ -107,228 +91,9 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Added by lohith.ar - Start - Mouse click hyperlinks -->
       <office:event-listeners>
         <xsl:for-each select ="p:nvSpPr/p:cNvPr">
-            <xsl:choose>
-            <!-- Start => Go to previous slide-->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=previousslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'previous-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to previous slide-->
-            <!-- Start => Go to Next slide -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=nextslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'next-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to Next slide-->
-            <!-- Start => Go to First slide -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=firstslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'first-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to First slide -->
-            <!-- Start => Go to Last slide -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=lastslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'last-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to Last slide -->
-            <!-- Start => EndShow -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=endshow')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'stop'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => End show -->
-            <!-- Start => Go to Page or Object && Go to Other document && Run program  -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'ppaction://hlinksldjump') or contains(.,'ppaction://hlinkfile') or contains(.,'ppaction://program') ]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:variable name="RelationId">
-                  <xsl:value-of select="a:hlinkClick/@r:id"/>
-                </xsl:variable>
-                <xsl:variable name="SlideVal">
-                  <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Target"/>
-                </xsl:variable>
-                <!-- Condn Go to Other page/slide-->
-                <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://hlinksldjump')]">
-                  <xsl:attribute name ="presentation:action">
-                    <xsl:value-of select ="'show'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:value-of select ="concat('#page',substring-before(substring-after($SlideVal,'slide'),'.xml'))"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <!-- Condn Go to Other document-->
-                <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://hlinkfile')]">
-                  <xsl:attribute name ="presentation:action">
-                    <xsl:value-of select ="'show'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) > 0">
-                      <xsl:value-of select ="concat('/',translate(substring-after($SlideVal,'file:///'),'\','/'))"/>
-                    </xsl:if>
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) = 0 ">
-                      <xsl:value-of select ="concat('../',$SlideVal)"/>
-                    </xsl:if>
-                  </xsl:attribute>
-                </xsl:if>
-                <!-- Condn Go to Run program-->
-                <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://program') ]">
-                  <xsl:attribute name ="presentation:action">
-                    <xsl:value-of select ="'execute'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) > 0">
-                      <xsl:value-of select ="concat('/',translate(substring-after($SlideVal,'file:///'),'\','/'))"/>
-                    </xsl:if>
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) = 0">
-                      <xsl:value-of select ="concat('../',$SlideVal)"/>
-                    </xsl:if>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:attribute name ="xlink:type">
-                  <xsl:value-of select ="'simple'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="xlink:show">
-                  <xsl:value-of select ="'new'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="xlink:actuate">
-                  <xsl:value-of select ="'onRequest'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to Page or Object && Go to Other document && Run program -->
-            <!-- Start => Play sound  -->
-            <xsl:when test="a:hlinkClick/a:snd">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'sound'"/>
-                </xsl:attribute>
-                <presentation:sound>
-                  <xsl:variable name="varMediaFileRelId">
-                    <xsl:value-of select="a:hlinkClick/a:snd/@r:embed"/>
-                  </xsl:variable>
-                  <xsl:variable name="varMediaFileTargetPath">
-                    <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$varMediaFileRelId]/@Target"/>
-                  </xsl:variable>
-                  <xsl:variable name="varPptMediaFileTargetPath">
-                    <xsl:value-of select="concat('ppt/',substring-after($varMediaFileTargetPath,'/'))"/>
-                  </xsl:variable>
-                  <!--<xsl:variable name="varDocumentModifiedTime">
-                    <xsl:value-of select="document('docProps/core.xml')/cp:coreProperties/dcterms:modified"/>
-                  </xsl:variable>-->
-                  <!--<xsl:variable name="varDestMediaFileTargetPath">
-                    <xsl:value-of select="concat(translate($varDocumentModifiedTime,':','-'),'|',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>-->
-                  <!--<xsl:variable name="varMediaFilePathForOdp">
-                    <xsl:value-of select="concat('../_MediaFilesForOdp_',translate($varDocumentModifiedTime,':','-'),'/',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>-->
-          
-                  <xsl:variable name="FolderNameGUID">
-                    <xsl:call-template name="GenerateGUIDForFolderName">
-                      <xsl:with-param name="RootNode" select="." />
+          <xsl:call-template name="tmpHyperLinkForShapesPic">
+            <xsl:with-param name="SlideRelationId" select="$SlideRelationId"/>
                     </xsl:call-template>
-                  </xsl:variable>
-                  <xsl:variable name="varDestMediaFileTargetPath">
-                    <xsl:value-of select="concat($FolderNameGUID,'|',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>
-                  <xsl:variable name="varMediaFilePathForOdp">
-                    <xsl:value-of select="concat('../',$FolderNameGUID,'/',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:value-of select ="$varMediaFilePathForOdp"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:type">
-                    <xsl:value-of select ="'simple'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:show">
-                    <xsl:value-of select ="'new'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:actuate">
-                    <xsl:value-of select ="'onRequest'"/>
-                  </xsl:attribute>
-                  <pzip:extract pzip:source="{$varPptMediaFileTargetPath}" pzip:target="{$varDestMediaFileTargetPath}" />
-                </presentation:sound>
-              </presentation:event-listener>
-            </xsl:when>
-              <xsl:otherwise>
-                <xsl:if test="a:hlinkClick/@r:id">
-                <presentation:event-listener script:event-name="dom:click" presentation:action="show"
-                                      xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
-                  <xsl:variable name="RelationId">
-                    <xsl:value-of select="a:hlinkClick/@r:id"/>
-                  </xsl:variable>
-                  <xsl:variable name="Target">
-                    <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Target"/>
-                  </xsl:variable>
-                  <xsl:variable name="type">
-                    <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Type"/>
-                  </xsl:variable>
-                  <xsl:choose>
-                    <xsl:when test="contains($Target,'mailto:') or contains($Target,'http:') or contains($Target,'https:')">
-                      <xsl:attribute name="xlink:href">
-                        <xsl:value-of select="$Target"/>
-                      </xsl:attribute>
-                    </xsl:when>
-                    <xsl:when test="contains($Target,'slide')">
-                      <xsl:attribute name="xlink:href">
-                        <xsl:value-of select="concat('#Slide ',substring-before(substring-after($Target,'slide'),'.xml'))"/>
-                      </xsl:attribute>
-                    </xsl:when>
-                    <xsl:when test="contains($Target,'file:///')">
-                      <xsl:attribute name="xlink:href">
-                        <xsl:value-of select="concat('/',translate(substring-after($Target,'file:///'),'\','/'))"/>
-                      </xsl:attribute>
-                    </xsl:when>
-                    <xsl:when test="contains($type,'hyperlink') and not(contains($Target,'http:')) and not(contains($Target,'https:'))">
-                      <!-- warn if hyperlink Path  -->
-                      <xsl:message terminate="no">translation.oox2odf.hyperlinkTypeRelativePath</xsl:message>
-                      <xsl:attribute name="xlink:href">
-                        <!--Link Absolute Path-->
-                        <xsl:value-of select ="concat('hyperlink-path:',$Target)"/>
-                        <!--End-->
-                      </xsl:attribute>
-                    </xsl:when>
-                  </xsl:choose>
-                </presentation:event-listener>
-                </xsl:if>
-              </xsl:otherwise>
-            <!-- End => Play sound  -->
-          </xsl:choose>
         </xsl:for-each>
       </office:event-listeners>
       <!-- End - Mouse click hyperlinks-->
@@ -337,188 +102,10 @@ Copyright (c) 2007, Sonata Software Limited
       <!-- Added by lohith.ar - Start - Mouse click hyperlinks -->
       <office:event-listeners>
         <xsl:for-each select ="p:nvCxnSpPr/p:cNvPr">
-          <xsl:choose>
-            <!-- Start => Go to previous slide-->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=previousslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'previous-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to previous slide-->
-            <!-- Start => Go to Next slide -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=nextslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'next-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to Next slide-->
-            <!-- Start => Go to First slide -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=firstslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'first-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to First slide -->
-            <!-- Start => Go to Last slide -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=lastslide')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'last-page'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to Last slide -->
-            <!-- Start => EndShow -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'jump=endshow')]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'stop'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => End show -->
-            <!-- Start => Go to Page or Object && Go to Other document && Run program  -->
-            <xsl:when test="a:hlinkClick/@action[contains(.,'ppaction://hlinksldjump') or contains(.,'ppaction://hlinkfile') or contains(.,'ppaction://program') ]">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:variable name="RelationId">
-                  <xsl:value-of select="a:hlinkClick/@r:id"/>
-                </xsl:variable>
-                <xsl:variable name="SlideVal">
-                  <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Target"/>
-                </xsl:variable>
-                <!-- Condn Go to Other page/slide-->
-                <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://hlinksldjump')]">
-                  <xsl:attribute name ="presentation:action">
-                    <xsl:value-of select ="'show'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:value-of select ="concat('#page',substring-before(substring-after($SlideVal,'slide'),'.xml'))"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <!-- Condn Go to Other document-->
-                <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://hlinkfile')]">
-                  <xsl:attribute name ="presentation:action">
-                    <xsl:value-of select ="'show'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) > 0">
-                      <xsl:value-of select ="concat('/',translate(substring-after($SlideVal,'file:///'),'\','/'))"/>
-                    </xsl:if>
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) = 0 ">
-                      <xsl:value-of select ="concat('../',$SlideVal)"/>
-                    </xsl:if>
-                  </xsl:attribute>
-                </xsl:if>
-                <!-- Condn Go to Run program-->
-                <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://program') ]">
-                  <xsl:attribute name ="presentation:action">
-                    <xsl:value-of select ="'execute'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) > 0">
-                      <xsl:value-of select ="concat('/',translate(substring-after($SlideVal,'file:///'),'\','/'))"/>
-                    </xsl:if>
-                    <xsl:if test="string-length(substring-after($SlideVal,'file:///')) = 0">
-                      <xsl:value-of select ="concat('../',$SlideVal)"/>
-                    </xsl:if>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:attribute name ="xlink:type">
-                  <xsl:value-of select ="'simple'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="xlink:show">
-                  <xsl:value-of select ="'new'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="xlink:actuate">
-                  <xsl:value-of select ="'onRequest'"/>
-                </xsl:attribute>
-              </presentation:event-listener>
-            </xsl:when>
-            <!-- End => Go to Page or Object && Go to Other document && Run program -->
-            <!-- Start => Play sound  -->
-            <xsl:when test="a:hlinkClick/a:snd">
-              <presentation:event-listener>
-                <xsl:attribute name ="script:event-name">
-                  <xsl:value-of select ="'dom:click'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="presentation:action">
-                  <xsl:value-of select ="'sound'"/>
-                </xsl:attribute>
-                <presentation:sound>
-                  <xsl:variable name="varMediaFileRelId">
-                    <xsl:value-of select="a:hlinkClick/a:snd/@r:embed"/>
-                  </xsl:variable>
-                  <xsl:variable name="varMediaFileTargetPath">
-                    <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$varMediaFileRelId]/@Target"/>
-                  </xsl:variable>
-                  <xsl:variable name="varPptMediaFileTargetPath">
-                    <xsl:value-of select="concat('ppt/',substring-after($varMediaFileTargetPath,'/'))"/>
-                  </xsl:variable>
-                  <!--<xsl:variable name="varDocumentModifiedTime">
-                    <xsl:value-of select="document('docProps/core.xml')/cp:coreProperties/dcterms:modified"/>
-                  </xsl:variable>-->
-                  <!--<xsl:variable name="varDestMediaFileTargetPath">
-                    <xsl:value-of select="concat(translate($varDocumentModifiedTime,':','-'),'|',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>
-                  <xsl:variable name="varMediaFilePathForOdp">
-                    <xsl:value-of select="concat('../_MediaFilesForOdp_',translate($varDocumentModifiedTime,':','-'),'/',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>-->
-
-                  <xsl:variable name="FolderNameGUID">
-                    <xsl:call-template name="GenerateGUIDForFolderName">
-                      <xsl:with-param name="RootNode" select="." />
+          <xsl:call-template name="tmpHyperLinkForShapesPic">
+            <xsl:with-param name="SlideRelationId" select="$SlideRelationId"/>
                     </xsl:call-template>
-                  </xsl:variable>
-                  <xsl:variable name="varDestMediaFileTargetPath">
-                    <xsl:value-of select="concat($FolderNameGUID,'|',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>
-                  <xsl:variable name="varMediaFilePathForOdp">
-                    <xsl:value-of select="concat('../',$FolderNameGUID,'/',$varMediaFileRelId,'.wav')"/>
-                  </xsl:variable>
-                  <xsl:attribute name ="xlink:href">
-                    <xsl:value-of select ="$varMediaFilePathForOdp"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:type">
-                    <xsl:value-of select ="'simple'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:show">
-                    <xsl:value-of select ="'new'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="xlink:actuate">
-                    <xsl:value-of select ="'onRequest'"/>
-                  </xsl:attribute>
-                  <pzip:extract pzip:source="{$varPptMediaFileTargetPath}" pzip:target="{$varDestMediaFileTargetPath}" />
-                </presentation:sound>
-              </presentation:event-listener>
-            </xsl:when>
-
-            <!-- End => Play sound  -->
-          </xsl:choose>
-        </xsl:for-each>
+                         </xsl:for-each>
       </office:event-listeners>
       <!-- End - Mouse click hyperlinks-->
     </xsl:variable>
@@ -4110,6 +3697,231 @@ Copyright (c) 2007, Sonata Software Limited
 
     </xsl:choose>
   </xsl:template>
+  <xsl:template name="tmpHyperLinkForShapesPic">
+    <xsl:param name="SlideRelationId"/>
+    <xsl:choose>
+      <!-- Start => Go to previous slide-->
+      <xsl:when test="a:hlinkClick/@action[contains(.,'jump=previousslide')]">
+        <presentation:event-listener>
+          <xsl:attribute name ="script:event-name">
+            <xsl:value-of select ="'dom:click'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="presentation:action">
+            <xsl:value-of select ="'previous-page'"/>
+          </xsl:attribute>
+        </presentation:event-listener>
+      </xsl:when>
+      <!-- End => Go to previous slide-->
+      <!-- Start => Go to Next slide -->
+      <xsl:when test="a:hlinkClick/@action[contains(.,'jump=nextslide')]">
+        <presentation:event-listener>
+          <xsl:attribute name ="script:event-name">
+            <xsl:value-of select ="'dom:click'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="presentation:action">
+            <xsl:value-of select ="'next-page'"/>
+          </xsl:attribute>
+        </presentation:event-listener>
+      </xsl:when>
+      <!-- End => Go to Next slide-->
+      <!-- Start => Go to First slide -->
+      <xsl:when test="a:hlinkClick/@action[contains(.,'jump=firstslide')]">
+        <presentation:event-listener>
+          <xsl:attribute name ="script:event-name">
+            <xsl:value-of select ="'dom:click'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="presentation:action">
+            <xsl:value-of select ="'first-page'"/>
+          </xsl:attribute>
+        </presentation:event-listener>
+      </xsl:when>
+      <!-- End => Go to First slide -->
+      <!-- Start => Go to Last slide -->
+      <xsl:when test="a:hlinkClick/@action[contains(.,'jump=lastslide')]">
+        <presentation:event-listener>
+          <xsl:attribute name ="script:event-name">
+            <xsl:value-of select ="'dom:click'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="presentation:action">
+            <xsl:value-of select ="'last-page'"/>
+          </xsl:attribute>
+        </presentation:event-listener>
+      </xsl:when>
+      <!-- End => Go to Last slide -->
+      <!-- Start => EndShow -->
+      <xsl:when test="a:hlinkClick/@action[contains(.,'jump=endshow')]">
+        <presentation:event-listener>
+          <xsl:attribute name ="script:event-name">
+            <xsl:value-of select ="'dom:click'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="presentation:action">
+            <xsl:value-of select ="'stop'"/>
+          </xsl:attribute>
+        </presentation:event-listener>
+      </xsl:when>
+      <!-- End => End show -->
+      <!-- Start => Go to Page or Object && Go to Other document && Run program  -->
+      <xsl:when test="a:hlinkClick/@action[contains(.,'ppaction://hlinksldjump') or contains(.,'ppaction://hlinkfile') or contains(.,'ppaction://program') ]">
+        <presentation:event-listener>
+          <xsl:attribute name ="script:event-name">
+            <xsl:value-of select ="'dom:click'"/>
+          </xsl:attribute>
+          <xsl:variable name="RelationId">
+            <xsl:value-of select="a:hlinkClick/@r:id"/>
+          </xsl:variable>
+          <xsl:variable name="SlideVal">
+            <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Target"/>
+          </xsl:variable>
+          <!-- Condn Go to Other page/slide-->
+          <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://hlinksldjump')]">
+            <xsl:attribute name ="presentation:action">
+              <xsl:value-of select ="'show'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="xlink:href">
+              <xsl:value-of select ="concat('#page',substring-before(substring-after($SlideVal,'slide'),'.xml'))"/>
+            </xsl:attribute>
+          </xsl:if>
+          <!-- Condn Go to Other document-->
+          <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://hlinkfile')]">
+            <xsl:attribute name ="presentation:action">
+              <xsl:value-of select ="'show'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="xlink:href">
+              <xsl:if test="string-length(substring-after($SlideVal,'file:///')) > 0">
+                <xsl:value-of select ="concat('/',translate(substring-after($SlideVal,'file:///'),'\','/'))"/>
+              </xsl:if>
+              <xsl:if test="string-length(substring-after($SlideVal,'file:///')) = 0 ">
+                <xsl:value-of select ="concat('../',$SlideVal)"/>
+              </xsl:if>
+            </xsl:attribute>
+          </xsl:if>
+          <!-- Condn Go to Run program-->
+          <xsl:if test="a:hlinkClick/@action[contains(.,'ppaction://program') ]">
+            <xsl:attribute name ="presentation:action">
+              <xsl:value-of select ="'execute'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="xlink:href">
+              <xsl:if test="string-length(substring-after($SlideVal,'file:///')) > 0">
+                <xsl:value-of select ="concat('/',translate(substring-after($SlideVal,'file:///'),'\','/'))"/>
+              </xsl:if>
+              <xsl:if test="string-length(substring-after($SlideVal,'file:///')) = 0">
+                <xsl:value-of select ="concat('../',$SlideVal)"/>
+              </xsl:if>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:attribute name ="xlink:type">
+            <xsl:value-of select ="'simple'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="xlink:show">
+            <xsl:value-of select ="'new'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="xlink:actuate">
+            <xsl:value-of select ="'onRequest'"/>
+          </xsl:attribute>
+        </presentation:event-listener>
+      </xsl:when>
+      <!-- End => Go to Page or Object && Go to Other document && Run program -->
+      <!-- Start => Play sound  -->
+      <xsl:when test="a:hlinkClick/a:snd">
+        <presentation:event-listener>
+          <xsl:attribute name ="script:event-name">
+            <xsl:value-of select ="'dom:click'"/>
+          </xsl:attribute>
+          <xsl:attribute name ="presentation:action">
+            <xsl:value-of select ="'sound'"/>
+          </xsl:attribute>
+          <presentation:sound>
+            <xsl:variable name="varMediaFileRelId">
+              <xsl:value-of select="a:hlinkClick/a:snd/@r:embed"/>
+            </xsl:variable>
+            <xsl:variable name="varMediaFileTargetPath">
+              <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$varMediaFileRelId]/@Target"/>
+            </xsl:variable>
+            <xsl:variable name="varPptMediaFileTargetPath">
+              <xsl:value-of select="concat('ppt/',substring-after($varMediaFileTargetPath,'/'))"/>
+            </xsl:variable>
+            <!--<xsl:variable name="varDocumentModifiedTime">
+                    <xsl:value-of select="document('docProps/core.xml')/cp:coreProperties/dcterms:modified"/>
+                  </xsl:variable>-->
+            <!--<xsl:variable name="varDestMediaFileTargetPath">
+                    <xsl:value-of select="concat(translate($varDocumentModifiedTime,':','-'),'|',$varMediaFileRelId,'.wav')"/>
+                  </xsl:variable>-->
+            <!--<xsl:variable name="varMediaFilePathForOdp">
+                    <xsl:value-of select="concat('../_MediaFilesForOdp_',translate($varDocumentModifiedTime,':','-'),'/',$varMediaFileRelId,'.wav')"/>
+                  </xsl:variable>-->
+
+            <xsl:variable name="FolderNameGUID">
+              <xsl:call-template name="GenerateGUIDForFolderName">
+                <xsl:with-param name="RootNode" select="." />
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="varDestMediaFileTargetPath">
+              <xsl:value-of select="concat($FolderNameGUID,'|',$varMediaFileRelId,'.wav')"/>
+            </xsl:variable>
+            <xsl:variable name="varMediaFilePathForOdp">
+              <xsl:value-of select="concat('../',$FolderNameGUID,'/',$varMediaFileRelId,'.wav')"/>
+            </xsl:variable>
+            <xsl:attribute name ="xlink:href">
+              <xsl:value-of select ="$varMediaFilePathForOdp"/>
+            </xsl:attribute>
+            <xsl:attribute name ="xlink:type">
+              <xsl:value-of select ="'simple'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="xlink:show">
+              <xsl:value-of select ="'new'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="xlink:actuate">
+              <xsl:value-of select ="'onRequest'"/>
+            </xsl:attribute>
+            <pzip:extract pzip:source="{$varPptMediaFileTargetPath}" pzip:target="{$varDestMediaFileTargetPath}" />
+          </presentation:sound>
+        </presentation:event-listener>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="a:hlinkClick/@r:id">
+          <presentation:event-listener script:event-name="dom:click" presentation:action="show"
+                                xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+            <xsl:variable name="RelationId">
+              <xsl:value-of select="a:hlinkClick/@r:id"/>
+            </xsl:variable>
+            <xsl:variable name="Target">
+              <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Target"/>
+            </xsl:variable>
+            <xsl:variable name="type">
+              <xsl:value-of select="document($SlideRelationId)/rels:Relationships/rels:Relationship[@Id=$RelationId]/@Type"/>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="contains($Target,'mailto:') or contains($Target,'http:') or contains($Target,'https:')">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of select="$Target"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="contains($Target,'slide')">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of select="concat('#Slide ',substring-before(substring-after($Target,'slide'),'.xml'))"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="contains($Target,'file:///')">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of select="concat('/',translate(substring-after($Target,'file:///'),'\','/'))"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:when test="contains($type,'hyperlink') and not(contains($Target,'http:')) and not(contains($Target,'https:'))">
+                <!-- warn if hyperlink Path  -->
+                <xsl:message terminate="no">translation.oox2odf.hyperlinkTypeRelativePath</xsl:message>
+                <xsl:attribute name="xlink:href">
+                  <!--Link Absolute Path-->
+                  <xsl:value-of select ="concat('hyperlink-path:',$Target)"/>
+                  <!--End-->
+                </xsl:attribute>
+              </xsl:when>
+            </xsl:choose>
+          </presentation:event-listener>
+        </xsl:if>
+      </xsl:otherwise>
+      <!-- End => Play sound  -->
+    </xsl:choose>
+  </xsl:template>
   <!-- Draw Shape reading values from pptx p:spPr-->
   <xsl:template name ="CreateShape">
     <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
@@ -4120,6 +3932,9 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="grpBln" />
     <xsl:param name ="flagTextBox" />
     <xsl:param name ="grpCordinates"/>
+    <xsl:param name ="blnTable"/>
+    <xsl:param name ="rowPosition"/>
+    
     <!-- Addition of a parameter,by Vijayets ,for bullets and numbering in shapes-->
     <xsl:param name="SlideRelationId"/>
 
@@ -4135,6 +3950,13 @@ Copyright (c) 2007, Sonata Software Limited
 	  </xsl:attribute>
     <!-- For the Grouping of Shapes Bug Fixing -->
     <xsl:choose>
+      <xsl:when test="$blnTable='true'">
+        <xsl:call-template name="tmpTableCordinates">
+          <xsl:with-param name="rowPosition" select ="$rowPosition" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
       <xsl:when test="$grpBln ='true'">
         <xsl:call-template name="tmpGropingWriteCordinates">
           <xsl:with-param name ="grpCordinates" select ="$grpCordinates" />
@@ -4144,8 +3966,10 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name="tmpWriteCordinates"/>
       </xsl:otherwise>
       </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:choose>
-      <xsl:when test ="$flagTextBox='true'">
+      <xsl:when test ="$flagTextBox='true' or $blnTable='true'">
         <draw:text-box>
           <xsl:call-template name ="AddShapeText">
             <xsl:with-param name ="prID" select ="$prID" />
@@ -4154,6 +3978,7 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Addition of a parameter,by vijayeta,for bullets and numbering in shapes-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <xsl:with-param name="TypeId" select ="$TypeId" />
+            <xsl:with-param name="blnTable" select="$blnTable"/>
           </xsl:call-template>
         </draw:text-box>
       </xsl:when>
@@ -4166,6 +3991,121 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
           <xsl:with-param name="TypeId" select ="$TypeId" />
         </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name ="tmpTableCordinates">
+    <xsl:param name ="rowPosition"/>
+    <xsl:variable name="x">
+      <xsl:value-of select="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/p:xfrm/a:off/@x"/>
+    </xsl:variable>
+    <xsl:variable name="y">
+      <xsl:value-of select="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/p:xfrm/a:off/@y"/>
+    </xsl:variable>
+    <xsl:variable name="cx">
+      <xsl:value-of select="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/p:xfrm/a:ext/@cx"/>
+    </xsl:variable>
+    <xsl:variable name="cy">
+      <xsl:value-of select="./parent::node()/parent::node()/parent::node()/parent::node()/parent::node()/p:xfrm/a:ext/@cy"/>
+    </xsl:variable>
+    <xsl:variable name="colPosition">
+      <xsl:value-of select="position()"/>
+    </xsl:variable>
+    <xsl:variable name="colSpan">
+      <xsl:value-of select="@gridSpan"/>
+    </xsl:variable>
+    <xsl:variable name="rowSpan">
+      <xsl:value-of select="@rowSpan"/>
+    </xsl:variable>
+
+    <xsl:variable name="Height">
+      <xsl:choose>
+        <xsl:when test="$rowSpan !=''">
+          <xsl:variable name="SVGHeight">
+            <xsl:for-each select="./parent::node()/parent::node()/a:tr[position() &gt;= $rowPosition  or position() = $rowPosition + $rowSpan -1]">
+              <xsl:value-of select="concat(@h,':')"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:call-template name="tmpCellspan">
+            <xsl:with-param name="strVal" select="$SVGHeight"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="./parent::node()/@h"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="Width">
+      <xsl:choose>
+        <xsl:when test="$colSpan !=''">
+          <xsl:variable name="SVGWidth">
+          <xsl:for-each select="./parent::node()/parent::node()/a:tblGrid/a:gridCol[position() &gt;= $colPosition  or position() = $colPosition + $colSpan -1]">
+            <xsl:value-of select="concat(@w,':')"/>
+          </xsl:for-each>
+          </xsl:variable>
+          <xsl:call-template name="tmpCellspan">
+            <xsl:with-param name="strVal" select="$SVGWidth"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:for-each select="./parent::node()/parent::node()/a:tblGrid/a:gridCol[position()=$colPosition]">
+            <xsl:value-of select="@w"/>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="SVGX">
+      <xsl:for-each select="./parent::node()/parent::node()/a:tblGrid/a:gridCol[position() &lt;=$colPosition] ">
+        <xsl:value-of select="concat(@w,':')"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="SVGY">
+      <xsl:for-each select="./parent::node()/parent::node()/a:tr[position() &lt;=$rowPosition] ">
+        <xsl:value-of select="concat(@h,':')"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:attribute name ="svg:x">
+      <xsl:value-of select="concat('TableCord-X:', $SVGX,'@',$colPosition,':',$x) "/>
+    </xsl:attribute>
+    <xsl:attribute name ="svg:y">
+      <xsl:value-of select="concat('TableCord-Y:', $SVGY,'@',$rowPosition,':',$y) "/>
+    </xsl:attribute>
+   
+    <xsl:attribute name ="svg:width">
+      <xsl:call-template name="ConvertEmu">
+        <xsl:with-param name="length" select="$Width"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name ="svg:height">
+      <xsl:call-template name="ConvertEmu">
+        <xsl:with-param name="length" select="$Height"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+  </xsl:template>
+  <xsl:template name="tmpCellspan">
+    <xsl:param name="strVal"/>
+    <xsl:param name="intSum" select="0"/>
+    <xsl:choose>
+      <xsl:when test="$strVal != ''">
+        <xsl:choose>
+          <xsl:when test="substring-before($strVal,':') = ''">
+            <xsl:value-of select="number($intSum) + number($strVal) + $var_pos"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="intSubTotal">
+              <xsl:value-of select="number($intSum) + number(substring-before($strVal,':'))"/>
+            </xsl:variable>
+            <xsl:call-template name="tmpCellspan">
+              <xsl:with-param name="strVal" select="substring-after($strVal,':')"/>
+              <xsl:with-param name="intSum" select="$intSubTotal"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$intSum"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -4246,57 +4186,113 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:otherwise>
 
     </xsl:choose>
- 
-	  <xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn)">
-
-		  <xsl:variable name="pNvprId">
-			  <xsl:value-of select="p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id" />
+    <xsl:variable name="startShapepresetGm">
+      <xsl:call-template name="tmpgetpresetgm">
+        <xsl:with-param name="nvprId" select="p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="endShapepresetGm">
+      <xsl:call-template name="tmpgetpresetgm">
+        <xsl:with-param name="nvprId" select="p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@id"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="maxstartSpgluePointCount">
+      <xsl:choose>
+        <xsl:when test="$startShapepresetGm='ellipse' or $startShapepresetGm='octagon' or $startShapepresetGm='noSmoking'">
+          <xsl:value-of select="'8'"/>
+        </xsl:when>
+        <xsl:when test="$startShapepresetGm='pentagon' or $startShapepresetGm='hexagon'
+                         or $startShapepresetGm='cube' or $startShapepresetGm='parallelogram'">
+          <xsl:value-of select="'6'"/>
+        </xsl:when>
+        <xsl:when test="$startShapepresetGm='triangle' or $startShapepresetGm='rtTriangle' or $startShapepresetGm='can'">
+          <xsl:value-of select="'5'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'4'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="maxendSpgluePointCount">
+      <xsl:choose>
+        <xsl:when test="$endShapepresetGm='ellipse' or $endShapepresetGm='octagon' or $endShapepresetGm='noSmoking'">
+          <xsl:value-of select="'8'"/>
+        </xsl:when>
+        <xsl:when test="$endShapepresetGm='pentagon' or $endShapepresetGm='hexagon'
+                         or $endShapepresetGm='cube' or $endShapepresetGm='parallelogram'">
+          <xsl:value-of select="'6'"/>
+        </xsl:when>
+        <xsl:when test="$endShapepresetGm='triangle' or $endShapepresetGm='rtTriangle' or $endShapepresetGm='can'">
+          <xsl:value-of select="'5'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'4'"/>
+        </xsl:otherwise>
+      </xsl:choose>
 		  </xsl:variable>
-		  <xsl:attribute name ="draw:start-shape">
-			  <xsl:value-of select ="concat('sldraw',$sldId,'an', $pNvprId)"/>
-		  </xsl:attribute>
-		  <xsl:variable name="stGluePoint">
+		   <xsl:variable name="stGluePoint">
 			  <xsl:value-of select="p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@idx"/>
 		  </xsl:variable>
+    <xsl:variable name="endGluePoint">
+      <xsl:value-of select="p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@idx"/>
+    </xsl:variable>
+	  <xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn)">
+		  <xsl:attribute name ="draw:start-shape">
+			  <xsl:value-of select ="concat('sldraw',$sldId,'an', p:nvCxnSpPr/p:cNvCxnSpPr/a:stCxn/@id)"/>
+		  </xsl:attribute>
 		  <xsl:attribute name ="draw:start-glue-point">
 			  	  <xsl:choose>
+          <xsl:when test="$maxstartSpgluePointCount &gt;4 ">
+            <xsl:choose>
+              <xsl:when test="$stGluePoint = 0">
+                <xsl:value-of select="'0'"/>
+              </xsl:when>
+              <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &gt;= 4">
+                <xsl:value-of select="number($maxstartSpgluePointCount) - ( ( number($maxstartSpgluePointCount) - number($stGluePoint) - 4))"/>
+              </xsl:when>
+              <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &lt; 4">
+                <xsl:value-of select="number($maxstartSpgluePointCount) + ( 4 -  ( number($maxstartSpgluePointCount) - number($stGluePoint)))"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'0'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
 					  <xsl:when test="$stGluePoint = 0">
 						  <xsl:value-of select="'0'"/>
 					  </xsl:when>
-					  <xsl:when test="$stGluePoint = 1">
-						  <xsl:value-of select="'3'"/>
+              <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &gt; 0">
+                <xsl:value-of select="number($maxstartSpgluePointCount) - number($stGluePoint)"/>
 					  </xsl:when>
-					  <xsl:when test="$stGluePoint = 2">
-						  <xsl:value-of select="'2'"/>
+              <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &lt; 0">
+                <xsl:value-of select="number($maxstartSpgluePointCount) - number($stGluePoint)"/>
 					  </xsl:when>
-					  <xsl:when test="$stGluePoint = 3">
-						  <xsl:value-of select="'1'"/>
+              <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) = 0">
+                <xsl:value-of select="number($stGluePoint)"/>
 					  </xsl:when>
 					  <xsl:otherwise>
 						  <xsl:value-of select="'0'"/>
 					  </xsl:otherwise>
 				  </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
 		  </xsl:attribute>
 		  </xsl:if>
 		<xsl:if test="(p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn)">
-		  <xsl:variable name="endGluePoint">
-			  <xsl:value-of select="p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@idx"/>
-		  </xsl:variable>
-		  <xsl:attribute name ="draw:end-glue-point">
+			  <xsl:attribute name ="draw:end-glue-point">
 			  <xsl:choose>
-				  <xsl:when test="parent::node()/p:sp/p:spPr/a:prstGeom/@prst = 'snip1Rect'">
+          <xsl:when test="$maxendSpgluePointCount &gt;4 ">
 					  <xsl:choose>
 						  <xsl:when test="$endGluePoint = 0">
-							  <xsl:value-of select="'1'"/>
+                <xsl:value-of select="'0'"/>
 						  </xsl:when>
-						  <xsl:when test="$endGluePoint = 1">
-							  <xsl:value-of select="'3'"/>
+              <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) &gt;= 4">
+                <xsl:value-of select="number($maxendSpgluePointCount) - ( ( number($maxendSpgluePointCount) - number($endGluePoint) - 4))"/>
 						  </xsl:when>
-						  <xsl:when test="$endGluePoint = 2">
-							  <xsl:value-of select="'2'"/>
-						  </xsl:when>
-						  <xsl:when test="$endGluePoint = 3">
-							  <xsl:value-of select="'0'"/>
+              <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) &lt; 4">
+                <xsl:value-of select="number($maxendSpgluePointCount) + ( 4 -  ( number($maxendSpgluePointCount) - number($endGluePoint)))"/>
 						  </xsl:when>
 						  <xsl:otherwise>
 							  <xsl:value-of select="'0'"/>
@@ -4308,14 +4304,14 @@ Copyright (c) 2007, Sonata Software Limited
 						  <xsl:when test="$endGluePoint = 0">
 							  <xsl:value-of select="'0'"/>
 						  </xsl:when>
-						  <xsl:when test="$endGluePoint = 1">
-							  <xsl:value-of select="'3'"/>
+              <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) &gt; 0">
+                <xsl:value-of select="number($maxendSpgluePointCount) - number($endGluePoint)"/>
 						  </xsl:when>
-						  <xsl:when test="$endGluePoint = 2">
-							  <xsl:value-of select="'2'"/>
+              <xsl:when test="number($maxendSpgluePointCount) - number($stGluePoint) &lt; 0">
+                <xsl:value-of select="number($maxendSpgluePointCount) - number($endGluePoint)"/>
 						  </xsl:when>
-						  <xsl:when test="$endGluePoint = 3">
-							  <xsl:value-of select="'1'"/>
+              <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) = 0">
+                <xsl:value-of select="number($endGluePoint)"/>
 						  </xsl:when>
 						  <xsl:otherwise>
 							  <xsl:value-of select="'0'"/>
@@ -4323,23 +4319,61 @@ Copyright (c) 2007, Sonata Software Limited
 					  </xsl:choose>
 				  </xsl:otherwise>
 			  </xsl:choose>
+
 		  </xsl:attribute>
 		  <xsl:attribute name ="draw:end-shape">
 			  <xsl:value-of select ="concat('sldraw',$sldId,'an', p:nvCxnSpPr/p:cNvCxnSpPr/a:endCxn/@id)"/>
 		  </xsl:attribute>
 	  </xsl:if>
-	  
+  </xsl:template>
+  <xsl:template name="tmpgetpresetgm">
+    <xsl:param name="nvprId"/>
+    <xsl:for-each select="parent::node()/p:sp/p:nvSpPr/p:cNvPr[@id=$nvprId] | parent::node()/p:grpSp/p:sp/p:nvSpPr/p:cNvPr[@id=$nvprId]">
+      <xsl:value-of select="parent::node()/parent::node()/p:spPr/a:prstGeom/@prst"/>
+    </xsl:for-each>
   </xsl:template>
   <!-- Add text to the shape -->
+
   <xsl:template name ="AddShapeText">
+    <xsl:param name ="blnTable"/>
     <!-- Extra parameter "sldId" added by lohith,requierd for template AddTextHyperlinks -->
     <xsl:param name ="sldID" />
     <xsl:param name ="prID" />
     <xsl:param name="SlideRelationId"/>
     <xsl:param name="TypeId"/>
     <xsl:variable name ="SlideNumber" select ="substring-before(substring-after($SlideRelationId,'ppt/slides/_rels/'),'.xml.rels')"/>
-    <!--concat($SlideNumber,'textboxshape_List',position()-->
+    <xsl:choose>
+      <xsl:when test="$blnTable='true'">
+        <xsl:for-each select ="a:txBody">
+          <xsl:call-template name="tmpInsertShapeText">
+            <xsl:with-param name="sldID" select="$sldID"/>
+            <xsl:with-param name="prID" select="$prID"/>
+            <xsl:with-param name="SlideRelationId" select="$SlideRelationId"/>
+            <xsl:with-param name="TypeId" select="concat('SLTable',$TypeId)"/>
+            <xsl:with-param name="SlideNumber" select="$SlideNumber"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
     <xsl:for-each select ="p:txBody">
+          <xsl:call-template name="tmpInsertShapeText">
+            <xsl:with-param name="sldID" select="$sldID"/>
+            <xsl:with-param name="prID" select="$prID"/>
+            <xsl:with-param name="SlideRelationId" select="$SlideRelationId"/>
+            <xsl:with-param name="TypeId" select="$TypeId"/>
+            <xsl:with-param name="SlideNumber" select="$SlideNumber"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+  <xsl:template name="tmpInsertShapeText">
+    <xsl:param name ="sldID" />
+    <xsl:param name ="prID" />
+    <xsl:param name="SlideRelationId"/>
+    <xsl:param name="TypeId"/>
+    <xsl:param name="SlideNumber"/>
       <xsl:variable name ="textNumber" select ="./parent::node()/p:nvSpPr/p:cNvPr/@id"/>
       <!--code inserted by Vijayeta,InsertStyle For Bullets and Numbering-->
       <xsl:variable name ="listStyleName">
@@ -4380,7 +4414,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
                     <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
                     <xsl:choose >
-                      <xsl:when test ="a:rPr[@cap='all']">
+                      <xsl:when test ="a:rPr[@cap!='none']">
                         <xsl:choose >
                           <xsl:when test =".=''">
                             <text:s/>
@@ -4398,25 +4432,7 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:otherwise>
                         </xsl:choose>
                       </xsl:when>
-                      <xsl:when test ="a:rPr[@cap='small']">
-                        <xsl:choose >
-                          <xsl:when test =".=''">
-                            <text:s/>
-                          </xsl:when>
-                          <xsl:when test ="not(contains(.,'  '))">
-                            <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
-                          </xsl:when>
-                          <xsl:when test =".= ' '">
-                            <text:s/>
-                          </xsl:when>
-                          <xsl:otherwise >
-                            <xsl:call-template name ="InsertWhiteSpaces">
-                              <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                            </xsl:call-template>
-                          </xsl:otherwise>
-                        </xsl:choose >
-                      </xsl:when>
-                      <xsl:otherwise >
+                        <xsl:otherwise >
                         <xsl:choose >
                           <xsl:when test =".=''">
                             <text:s/>
@@ -4453,30 +4469,24 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:if test ="name()='a:br'">
                 <text:line-break/>
               </xsl:if>
-              <xsl:if test="name()='a:fld'">
+              <xsl:if test="name()='a:fld' and @type='slidenum'">
               <!--Added by Sanjay for fix 1956100-->
-                 <xsl:if test="@type='slidenum'">
-                  <text:span>
+                            <text:span>
                     <xsl:attribute name="text:style-name">
                       <xsl:value-of select="concat($TypeId,generate-id())"/>
                     </xsl:attribute>
                       <text:page-number/>
                   </text:span>
                   </xsl:if>
-              </xsl:if>
-              <!--<xsl:if test="name()='a:fld' and (@type='datetime' or @type='datetime1')">
-                    --><!--<xsl:variable name="pos" select="position()"/>
-                    <xsl:variable name="curSysDate">
-                      <xsl:value-of select="concat(':::','current:::')" />
-                    </xsl:variable>--><!--
+              <xsl:if test="name()='a:fld' and contains(@type,'datetime')">
+                    <xsl:variable name="pos" select="position()"/>
                   <text:span>
                     <xsl:attribute name="text:style-name">
                       <xsl:value-of select="concat($TypeId,generate-id())"/>
                     </xsl:attribute>
-                       <xsl:value-of select="'vipul'" />
-                       <xsl:value-of select="concat(':::','current:::')" />
+                       <xsl:value-of select="concat(':::','currentDate:::@',@type)" />
                   </text:span>
-                  </xsl:if>-->
+                  </xsl:if>
               <!--End of 1956100-->
               <!-- Added by lohith.ar for fix 1731885-->
               <xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
@@ -4492,8 +4502,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:if >
       </xsl:for-each>
       <!--If no bullets are present or default bullets-->
-    </xsl:for-each>
-  </xsl:template>
+   </xsl:template>
   <xsl:template name ="InsertStylesForGraphicProperties"  >
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
       <!-- Added by vipul-->
@@ -4584,9 +4593,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:call-template name ="TextLayout" />
 
 		  <!-- SHADOW IMPLEMENTATION -->
-		  <xsl:if test="p:spPr/a:effectLst/a:outerShdw ">
-			<xsl:call-template name ="ShapesShadow"/>
-		  </xsl:if>
+          <xsl:call-template name="tmpShapeShadow"/>
           <xsl:if test="p:spPr/a:effectLst/a:innerShdw ">
             <!-- warn if inner Shadow -->
             <xsl:message terminate="no">translation.oox2odf.shapesTypeInnerShadow</xsl:message>
@@ -4654,135 +4661,14 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <!-- Solid fill-->
       <xsl:when test ="p:spPr/a:solidFill">
-        <xsl:if test ="p:spPr/a:solidFill/a:srgbClr/@val">
-        <xsl:attribute name ="draw:fill">
-          <xsl:value-of select="'solid'" />
-        </xsl:attribute>
-          <xsl:attribute name ="draw:fill-color">
-            <xsl:value-of select="concat('#',p:spPr/a:solidFill/a:srgbClr/@val)"/>
-          </xsl:attribute>
-          <!-- Transparency percentage-->
-          <xsl:if test="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val">
-            <xsl:variable name ="alpha">
-              <xsl:value-of select ="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val"/>
-            </xsl:variable>
-            <xsl:if test="($alpha != '') or ($alpha != 0)">
-              <xsl:attribute name ="draw:opacity">
-                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
-              </xsl:attribute>
-            </xsl:if>
-          </xsl:if>
-        </xsl:if>
-        <!--Theme color-->
-        <xsl:if test ="p:spPr/a:solidFill/a:schemeClr/@val">
-          <xsl:variable name="var_schemeClr" select="p:spPr/a:solidFill/a:schemeClr/@val"/>
-          <xsl:attribute name ="draw:fill">
-            <xsl:value-of select="'solid'" />
-          </xsl:attribute>
-          <xsl:attribute name ="draw:fill-color">
-            <xsl:call-template name ="getColorCode">
-              <xsl:with-param name ="color">
-                <xsl:choose>
-                  <xsl:when test="$SMName!=''">
-                    <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
-                      <xsl:call-template name="tmpThemeClr">
-                        <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
+        <xsl:for-each select="p:spPr/a:solidFill">
+          <xsl:call-template name="tmpShapeSolidFillColor">
+            <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="$var_schemeClr"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:with-param>
-              <xsl:with-param name ="lumMod">
-                <xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-              </xsl:with-param>
-              <xsl:with-param name ="lumOff">
-                <xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-              </xsl:with-param>
-              <xsl:with-param name ="shade">
-                <xsl:for-each select="p:spPr/a:solidFill/a:schemeClr/a:shade/@val">
-                  <xsl:value-of select=". div 1000"/>
-                </xsl:for-each>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-          <!-- Transparency percentage-->
-          <xsl:if test="p:spPr/a:solidFill/a:schemeClr/a:alpha/@val">
-            <xsl:variable name ="alpha">
-              <xsl:value-of select ="p:spPr/a:solidFill/a:schemeClr/a:alpha/@val"/>
-            </xsl:variable>
-            <xsl:if test="($alpha != '') or ($alpha != 0)">
-              <xsl:attribute name ="draw:opacity">
-                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
-              </xsl:attribute>
-            </xsl:if>
-          </xsl:if>
-        </xsl:if>
-      </xsl:when>
-      <xsl:when test="p:spPr/a:blipFill and p:spPr/a:blipFill/a:blip/@r:embed ">
-        <xsl:attribute name="draw:fill-color">
-          <xsl:value-of select="'#FFFFFF'"/>
-        </xsl:attribute>
-        <xsl:attribute name="draw:fill">
-          <xsl:value-of select="'bitmap'"/>
-        </xsl:attribute>
-        <xsl:choose>
-          <xsl:when test="p:spPr/a:blipFill/a:stretch/a:fillRect">
-            <xsl:attribute name="style:repeat">
-              <xsl:value-of select="'stretch'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="p:spPr/a:blipFill/a:tile">
-            <xsl:for-each select="./p:spPr/a:blipFill/a:tile">
-              <xsl:if test="@sx">
-                <xsl:attribute name="draw:fill-image-ref-point-x">
-                  <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test="@sy">
-                <xsl:attribute name="draw:fill-image-ref-point-y">
-                  <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test="@algn">
-                <xsl:attribute name="draw:fill-image-ref-point">
-                  <xsl:choose>
-                    <xsl:when test="@algn='tl'">
-                      <xsl:value-of select ="'top-left'"/>
-                    </xsl:when>
-                    <xsl:when test="@algn='t'">
-                      <xsl:value-of select ="'top'"/>
-                    </xsl:when>
-                    <xsl:when test="@algn='tr'">
-                      <xsl:value-of select ="'top-right'"/>
-                    </xsl:when>
-                    <xsl:when test="@algn='r'">
-                      <xsl:value-of select ="'right'"/>
-                    </xsl:when>
-                    <xsl:when test="@algn='bl'">
-                      <xsl:value-of select ="'bottom-left'"/>
-                    </xsl:when>
-                    <xsl:when test="@algn='br'">
-                      <xsl:value-of select ="'bottom-right'"/>
-                    </xsl:when>
-                    <xsl:when test="@algn='b'">
-                      <xsl:value-of select ="'bottom'"/>
-                    </xsl:when>
-                    <xsl:when test="@algn='ctr'">
-                      <xsl:value-of select ="'center'"/>
-                    </xsl:when>
-                  </xsl:choose>
-                </xsl:attribute>
-              </xsl:if>
-              <!--<xsl:attribute name="draw:tile-repeat-offset">
-                      <xsl:value-of select ="'100% horizontal'"/>
-                    </xsl:attribute>-->
-            </xsl:for-each>
-          </xsl:when>
-        </xsl:choose>
-        <xsl:choose>
+                      <xsl:when test="p:spPr/a:blipFill and p:spPr/a:blipFill/a:blip/@r:embed ">
+              <xsl:choose>
           <xsl:when test="$flagGroup='True'">
             <xsl:attribute name="draw:fill-image-name">
               <xsl:value-of select="concat($FileType,'-grpshapeImg',$var_pos)"/>
@@ -4794,22 +4680,9 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
-<!-- Image Transperancy -->
-        <xsl:if test="p:spPr/a:blipFill/a:blip/a:alphaModFix/@amt">
-          <xsl:variable name ="alpha">
-            <xsl:value-of select ="p:spPr/a:blipFill/a:blip/a:alphaModFix/@amt"/>
-          </xsl:variable>
-          <xsl:if test="($alpha != '') or ($alpha != 0)">
-            <xsl:attribute name ="draw:opacity">
-              <xsl:value-of select="concat(($alpha div 1000), '%')"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="$alpha = '0'">
-            <xsl:attribute name ="draw:opacity">
-              <xsl:value-of select="'0%'"/>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
+        <xsl:for-each select="p:spPr">
+          <xsl:call-template name="tmpPictureFillProp"/>
+        </xsl:for-each>
       </xsl:when>
       <!--added by vipul for gradient fill-->
       <xsl:when test="p:spPr/a:gradFill">
@@ -4821,71 +4694,9 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:call-template>
         </xsl:when>
       <xsl:when test ="p:style/a:fillRef">
-        <!--Fill refernce-->
-        <xsl:choose>
-          <xsl:when test ="p:style/a:fillRef/@idx = 0">
-            <xsl:attribute name ="draw:fill">
-              <xsl:value-of select="'none'" />
-            </xsl:attribute>
-            
-          </xsl:when>
-          <xsl:when test ="p:style/a:fillRef/@idx > 0">
-            <xsl:attribute name ="draw:fill">
-              <xsl:value-of select="'solid'" />
-            </xsl:attribute>
-
-          </xsl:when>
-        </xsl:choose>
-          <!-- Standard color-->
-          <xsl:if test ="p:style/a:fillRef/a:srgbClr/@val">
-            <xsl:attribute name ="draw:fill-color">
-              <xsl:value-of select="concat('#',p:style/a:fillRef/a:srgbClr/@val)"/>
-            </xsl:attribute>
-            <!-- Shade percentage-->
-            <!--<xsl:if test="p:style/a:fillRef/a:srgbClr/a:shade/@val">
-						<xsl:variable name ="shade">
-							<xsl:value-of select ="a:solidFill/a:srgbClr/a:shade/@val"/>
-						</xsl:variable>
-						<xsl:if test="($shade != '') or ($shade != 0)">
-							<xsl:attribute name ="draw:shadow-opacity">
-								<xsl:value-of select="concat(($shade div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>
-					</xsl:if>-->
-          </xsl:if>
-
-          <!--Theme color-->
-          <xsl:if test ="p:style/a:fillRef/a:schemeClr/@val">
-            <xsl:attribute name ="draw:fill-color">
-              <xsl:call-template name ="getColorCode">
-                <xsl:with-param name ="color">
-                  <xsl:value-of select="p:style/a:fillRef/a:schemeClr/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name ="lumMod">
-                  <xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumMod/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name ="lumOff">
-                  <xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumOff/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name ="shade">
-                  <xsl:for-each select="p:style/a:fillRef/a:schemeClr/a:shade/@val">
-                    <xsl:value-of select=". div 1000"/>
-                  </xsl:for-each>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-            <!-- Shade percentage-->
-            <!--<xsl:if test="a:solidFill/a:schemeClr/a:shade/@val">
-						<xsl:variable name ="shade">
-							<xsl:value-of select ="a:solidFill/a:schemeClr/a:shade/@val"/>
-						</xsl:variable>
-						<xsl:if test="($shade != '') or ($shade != 0)">
-							<xsl:attribute name ="draw:shadow-opacity">
-								<xsl:value-of select="concat(($shade div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>
-					</xsl:if>-->
-          </xsl:if>
+        <xsl:for-each select="p:style/a:fillRef">
+          <xsl:call-template name="tmpShapeSolidFillColor"/>
+        </xsl:for-each>
         </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name ="draw:fill">
@@ -4957,6 +4768,7 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select=". div 1000"/>
                 </xsl:for-each>
               </xsl:with-param>
+              <xsl:with-param name ="SMName" select="$SMName"/>
             </xsl:call-template>
           </xsl:attribute>
           <!-- Transparency percentage-->
@@ -5005,6 +4817,7 @@ Copyright (c) 2007, Sonata Software Limited
                       <xsl:value-of select=". div 1000"/>
                     </xsl:for-each>
                   </xsl:with-param>
+                  <xsl:with-param name ="SMName" select="$SMName"/>
                 </xsl:call-template>
               </xsl:attribute>
                  </xsl:if>
@@ -5279,200 +5092,30 @@ Copyright (c) 2007, Sonata Software Limited
 	
   <!-- Get text layout for shapes -->
   <xsl:template name ="TextLayout">
-    <xsl:for-each select="p:txBody">
-      <xsl:if test="contains(a:bodyPr/@vert,'vert')">
-        <xsl:choose>
-          <xsl:when test="(a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='b' and not(a:bodyPr/@anchorCtr))">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'left'"/>
-            </xsl:attribute>
+    <xsl:for-each select="p:txBody/a:bodyPr">
+      <xsl:choose>
+        <xsl:when test="contains(@vert,'vert')">
+        <xsl:call-template name="tmpShapeVerticalAlign"/>
+        </xsl:when>
+        <xsl:when test="@vert='horz' or not(@vert) ">
+        <xsl:if test ="@anchor">
             <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'top'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="(a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='t' and not(a:bodyPr/@anchorCtr))">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'right'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'top'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="(a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='ctr' and not(a:bodyPr/@anchorCtr))">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'center'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'top'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'right'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'middle'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'center'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'middle'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'left'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'middle'"/>
-            </xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:if>
-                <xsl:if test="a:bodyPr/@vert='horz'">
-        <xsl:choose>
-          <xsl:when test="(a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='t' and not(a:bodyPr/@anchorCtr))">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'justify'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'top'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="(a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='ctr' and not(a:bodyPr/@anchorCtr))  ">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'justify'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'middle'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='t' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'center'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'top'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="(a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='0') or (a:bodyPr/@anchor='b' and not(a:bodyPr/@anchorCtr))">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'justify'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'bottom'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='ctr' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'center'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'middle'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="a:bodyPr/@anchor='b' and a:bodyPr/@anchorCtr='1'">
-            <xsl:attribute name ="draw:textarea-horizontal-align">
-              <xsl:value-of select="'center'"/>
-            </xsl:attribute>
-            <xsl:attribute name ="draw:textarea-vertical-align">
-              <xsl:value-of select="'bottom'"/>
-            </xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:if>
-
-      <xsl:if test ="a:bodyPr/@lIns">
-        <xsl:attribute name ="fo:padding-left">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="a:bodyPr/@lIns"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+            <xsl:call-template name="tmpVerticalAlign"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test ="not(a:bodyPr/@lIns)">
-        <xsl:attribute name ="fo:padding-left">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="'91440'"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+        <xsl:if test ="@anchorCtr" >
+          <xsl:attribute name ="draw:textarea-horizontal-align">
+            <xsl:call-template name="tmpHorizontalAlign"/>
         </xsl:attribute>
       </xsl:if>
-
-      <xsl:if test ="a:bodyPr/@tIns">
-        <xsl:attribute name ="fo:padding-top">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="a:bodyPr/@tIns"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test ="not(a:bodyPr/@tIns)">
-        <xsl:attribute name ="fo:padding-top">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="'45720'"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-
-      <xsl:if test ="a:bodyPr/@rIns">
-        <xsl:attribute name ="fo:padding-right">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="a:bodyPr/@rIns"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test ="not(a:bodyPr/@rIns)">
-        <xsl:attribute name ="fo:padding-right">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="'91440'"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-
-      <xsl:if test ="a:bodyPr/@bIns">
-        <xsl:attribute name ="fo:padding-bottom">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="a:bodyPr/@bIns"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test ="not(a:bodyPr/@bIns)">
-        <xsl:attribute name ="fo:padding-bottom">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="'45720'"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:call-template name="tmpWrapSpAutoFit">
-        <xsl:with-param name="flagshape" select="'true'"/>
-      </xsl:call-template>
-
+        </xsl:when>
+      </xsl:choose>
+     
+      <xsl:call-template name="tmpInternalMargin"/>
+      <xsl:call-template name="tmpWrapSpAutoFit"/>
       </xsl:for-each>
   </xsl:template>
-  <!-- Get text padding-->
-  <xsl:template name ="getPadding">
-    <xsl:param name ="length" />
-    <xsl:choose>
-      <xsl:when test ="($length != '')">
-        <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="$length"/>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test ="(a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
-        <xsl:value-of select ="'0cm'"/>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
+ 
   <!--Text direction-->
   <xsl:template name ="getTextDirection">
     <xsl:param name ="vert" />
@@ -5506,12 +5149,12 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:template name ="ShapesShadow">
 		<xsl:variable name ="distVal" >
 			<xsl:choose>
-				<xsl:when test="(p:spPr/a:effectLst/a:outerShdw/@dist != '') or (p:spPr/a:effectLst/a:outerShdw/@dist != 0)">
-					<xsl:value-of select ="p:spPr/a:effectLst/a:outerShdw/@dist"/>
+        <xsl:when test="(@dist != '') or (@dist != 0)">
+          <xsl:value-of select ="@dist"/>
 				</xsl:when>
 				<!-- get center selection value -->
-				<xsl:when test="(p:spPr/a:effectLst/a:outerShdw/@sx != '') or (p:spPr/a:effectLst/a:outerShdw/@sx != 0)">
-					<xsl:value-of select ="p:spPr/a:effectLst/a:outerShdw/@sx"/>
+        <xsl:when test="(@sx != '') or (@sx != 0)">
+          <xsl:value-of select ="@sx"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select ="'0'"/>
@@ -5521,61 +5164,46 @@ Copyright (c) 2007, Sonata Software Limited
 
 	    <xsl:variable name ="dirVal" >
 		    <xsl:choose>
-				<xsl:when test="(p:spPr/a:effectLst/a:outerShdw/@dir != '') or (p:spPr/a:effectLst/a:outerShdw/@dir != 0)">
-					<xsl:value-of select ="p:spPr/a:effectLst/a:outerShdw/@dir"/>
+        <xsl:when test="(@dir != '') or (@dir != 0)">
+          <xsl:value-of select ="@dir"/>
 				</xsl:when>
 				<!-- get center selection value -->
-				<xsl:when test="(p:spPr/a:effectLst/a:outerShdw/@sy != '') or (p:spPr/a:effectLst/a:outerShdw/@sy != 0)">
-					<xsl:value-of select ="p:spPr/a:effectLst/a:outerShdw/@sy"/>
+        <xsl:when test="(@sy != '') or (@sy != 0)">
+          <xsl:value-of select ="@sy"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select ="'0'"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-
 		<xsl:attribute name ="draw:shadow">
 			<xsl:value-of select="'visible'"/>
 		</xsl:attribute>
-
-		<xsl:choose>
-			<xsl:when test="((p:spPr/a:effectLst/a:outerShdw/@sy != '') or (p:spPr/a:effectLst/a:outerShdw/@sx != ''))">
-				<xsl:attribute name ="draw:shadow-offset-x">
-					<xsl:value-of select ="'0cm'"/>
-				</xsl:attribute>
-				<xsl:attribute name ="draw:shadow-offset-y">
-					<xsl:value-of select ="'0cm'"/>
-				</xsl:attribute>
-			</xsl:when>
-			<xsl:otherwise>
 				<xsl:attribute name ="draw:shadow-offset-x">
 					<xsl:value-of select ="concat('shadow-offset-y:',$distVal, ':', $dirVal)"/>
 				</xsl:attribute>
 				<xsl:attribute name ="draw:shadow-offset-y">
 					<xsl:value-of select ="concat('shadow-offset-x:',$distVal, ':', $dirVal)"/>
 				</xsl:attribute>
-			</xsl:otherwise>
-		</xsl:choose>
-
-		<!-- Theme Color -->
-		<xsl:if test ="p:spPr/a:effectLst/a:outerShdw/a:schemeClr/@val">
+			<!-- Theme Color -->
+    <xsl:if test ="a:schemeClr/@val">
 			<xsl:attribute name ="draw:shadow-color">
 				<xsl:call-template name ="getColorCode">
 					<xsl:with-param name ="color">
-						<xsl:value-of select="p:spPr/a:effectLst/a:outerShdw/a:schemeClr/@val"/>
+            <xsl:value-of select="a:schemeClr/@val"/>
 					</xsl:with-param>
 					<xsl:with-param name ="lumMod">
-						<xsl:value-of select="p:spPr/a:effectLst/a:outerShdw/a:schemeClr/a:lumMod/@val"/>
+            <xsl:value-of select="a:schemeClr/a:lumMod/@val"/>
 					</xsl:with-param>
 					<xsl:with-param name ="lumOff">
-						<xsl:value-of select="p:spPr/a:effectLst/a:outerShdw/a:schemeClr/a:lumOff/@val"/>
+            <xsl:value-of select="a:schemeClr/a:lumOff/@val"/>
 					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:attribute>
 			<!-- Transparency percentage-->
-			<xsl:if test="p:spPr/a:effectLst/a:outerShdw/a:schemeClr/a:alpha/@val">
+      <xsl:if test="a:schemeClr/a:alpha/@val">
 				<xsl:variable name ="alpha">
-					<xsl:value-of select ="p:spPr/a:effectLst/a:outerShdw/a:schemeClr/a:alpha/@val"/>
+          <xsl:value-of select ="a:schemeClr/a:alpha/@val"/>
 				</xsl:variable>
 				<xsl:if test="($alpha != '') or ($alpha != 0)">
 					<xsl:attribute name ="draw:shadow-opacity">
@@ -5585,14 +5213,14 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:if>
 		</xsl:if>
 
-		<xsl:if test ="p:spPr/a:effectLst/a:outerShdw/a:srgbClr/@val">
+    <xsl:if test ="a:srgbClr/@val">
 			<xsl:attribute name ="draw:shadow-color">
-				<xsl:value-of select="concat('#',p:spPr/a:effectLst/a:outerShdw/a:srgbClr/@val)"/>
+        <xsl:value-of select="concat('#',a:srgbClr/@val)"/>
 			</xsl:attribute>
 			<!-- Transparency percentage-->
-			<xsl:if test="p:spPr/a:effectLst/a:outerShdw/a:srgbClr/a:alpha/@val">
+      <xsl:if test="a:srgbClr/a:alpha/@val">
 				<xsl:variable name ="alpha">
-					<xsl:value-of select ="p:spPr/a:effectLst/a:outerShdw/a:srgbClr/a:alpha/@val"/>
+          <xsl:value-of select ="a:srgbClr/a:alpha/@val"/>
 				</xsl:variable>
 				<xsl:if test="($alpha != '') or ($alpha != 0)">
 					<xsl:attribute name ="draw:shadow-opacity">
@@ -5601,15 +5229,14 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:if>
 			</xsl:if>
 		</xsl:if>
-
-		<xsl:if test ="p:spPr/a:effectLst/a:outerShdw/a:prstClr/@val">
+    <xsl:if test ="a:prstClr/@val">
 			<xsl:attribute name ="draw:shadow-color">
 				<xsl:value-of select="'#000000'"/>
 			</xsl:attribute>
 			<!-- Transparency percentage-->
-			<xsl:if test="p:spPr/a:effectLst/a:outerShdw/a:prstClr/a:alpha/@val">
+      <xsl:if test="a:prstClr/a:alpha/@val">
 				<xsl:variable name ="alpha">
-					<xsl:value-of select ="p:spPr/a:effectLst/a:outerShdw/a:prstClr/a:alpha/@val"/>
+          <xsl:value-of select ="a:prstClr/a:alpha/@val"/>
 				</xsl:variable>
 				<xsl:if test="($alpha != '') or ($alpha != 0)">
 					<xsl:attribute name ="draw:shadow-opacity">

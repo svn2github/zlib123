@@ -177,10 +177,12 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                       <xsl:value-of select ="concat($NotesNumber,'-Text-',generate-id())"/>
                     </xsl:attribute>
                     <style:text-properties>
+                      <xsl:for-each select ="a:rPr">
                       <xsl:call-template name="tmpSlideTextProperty">
                         <xsl:with-param name="fontscale" select="$var_fontScale"/>
                         <xsl:with-param name="DefFont" select="$DefFont"/>
                       </xsl:call-template>
+                      </xsl:for-each>
                     </style:text-properties>
                   </style:style>
                 </xsl:if>
@@ -431,7 +433,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                               <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
                               <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
                               <xsl:choose >
-                                <xsl:when test ="a:rPr[@cap='all']">
+                                <xsl:when test ="a:rPr[@cap!='none']">
                                   <xsl:choose >
                                     <xsl:when test =".=''">
                                       <text:s/>
@@ -449,25 +451,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                                     </xsl:otherwise>
                                   </xsl:choose>
                                 </xsl:when>
-                                <xsl:when test ="a:rPr[@cap='small']">
-                                  <xsl:choose >
-                                    <xsl:when test =".=''">
-                                      <text:s/>
-                                    </xsl:when>
-                                    <xsl:when test ="not(contains(.,'  '))">
-                                      <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
-                                    </xsl:when>
-                                    <xsl:when test =".= ' '">
-                                      <text:s/>
-                                    </xsl:when>
-                                    <xsl:otherwise >
-                                      <xsl:call-template name ="InsertWhiteSpaces">
-                                        <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                                      </xsl:call-template>
-                                    </xsl:otherwise>
-                                  </xsl:choose >
-                                </xsl:when>
-                                <xsl:otherwise >
+                                  <xsl:otherwise >
                                   <xsl:choose >
                                     <xsl:when test =".=''">
                                       <text:s/>
@@ -709,7 +693,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                 <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
                 <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
                 <xsl:choose >
-                  <xsl:when test ="a:rPr[@cap='all']">
+                  <xsl:when test ="a:rPr[@cap!='none']">
                     <xsl:choose >
                       <xsl:when test =".=''">
                         <text:s/>
@@ -727,25 +711,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                       </xsl:otherwise>
                     </xsl:choose>
                   </xsl:when>
-                  <xsl:when test ="a:rPr[@cap='small']">
-                    <xsl:choose >
-                      <xsl:when test =".=''">
-                        <text:s/>
-                      </xsl:when>
-                      <xsl:when test ="not(contains(.,'  '))">
-                        <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
-                      </xsl:when>
-                      <xsl:when test =".= ' '">
-                        <text:s/>
-                      </xsl:when>
-                      <xsl:otherwise >
-                        <xsl:call-template name ="InsertWhiteSpaces">
-                          <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                        </xsl:call-template>
-                      </xsl:otherwise>
-                    </xsl:choose >
-                  </xsl:when>
-                  <xsl:otherwise >
+                    <xsl:otherwise >
                     <xsl:choose >
                       <xsl:when test =".=''">
                         <text:s/>

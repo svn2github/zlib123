@@ -126,7 +126,9 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:variable name ="SlideMaster">
 					<xsl:value-of select ="concat('slideMaster',position())"/>
 				</xsl:variable>
-       
+        <xsl:variable name="CountSlide">
+          <xsl:value-of select ="count(document('content.xml')/office:document-content/office:body/office:presentation/draw:page)"/>
+        </xsl:variable>
 				<pzip:entry pzip:target="{concat('ppt/theme/theme',position(),'.xml')}">
 					<xsl:call-template name="theme"/>
 				</pzip:entry>
@@ -135,6 +137,7 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:call-template name="slideMasters">
 						<xsl:with-param name="slideMasterName" select="@style:name"/>
 						<xsl:with-param name ="smId" select ="position()"/>
+            <xsl:with-param name ="vmlPageNo" select ="$CountSlide + position()"/>
 					</xsl:call-template>
 				</pzip:entry>
 				<pzip:entry pzip:target="{concat('ppt/slideMasters/_rels/',$SlideMaster,'.xml.rels')}">
@@ -143,6 +146,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:with-param name ="ThemeId" select ="position()"/>
 						<xsl:with-param name ="slideMasterName" select ="@style:name"/>
 						<xsl:with-param name ="slideNo" select ="@style:name"/>
+               <xsl:with-param name ="vmlPageNo" select ="$CountSlide + position()"/>
 					</xsl:call-template >
 				</pzip:entry>
 				<xsl:call-template name ="CreateLaouts">
@@ -157,12 +161,13 @@ Copyright (c) 2007, Sonata Software Limited
            <xsl:choose>
              <xsl:when test="document(concat(substring-after(./child::node()[1]/@xlink:href,'./'),'/content.xml'))/child::node()"/>
              <xsl:otherwise>
-               <pzip:entry pzip:target="{concat('ppt/drawings/vmlDrawingSM',position(),'.vml')}">
+             
+               <pzip:entry pzip:target="{concat('ppt/drawings/vmlDrawing',$CountSlide + position(),'.vml')}">
                  <xsl:call-template name="CreateVmlDrawing">
-                   <xsl:with-param name ="pageNo" select ="position()"/>
+                   <xsl:with-param name ="pageNo" select ="$CountSlide + position()"/>
                  </xsl:call-template>
                </pzip:entry>
-               <pzip:entry pzip:target="{concat('ppt/drawings/_rels/','vmlDrawingSM',position(),'.vml.rels')}">
+               <pzip:entry pzip:target="{concat('ppt/drawings/_rels/','vmlDrawing',$CountSlide + position(),'.vml.rels')}">
                  <xsl:call-template name="CreateVmlDrawingRelationship"/>
                </pzip:entry>
              </xsl:otherwise>
@@ -663,7 +668,7 @@ Copyright (c) 2007, Sonata Software Limited
  xmlns:p="urn:schemas-microsoft-com:office:powerpoint"
  xmlns:oa="urn:schemas-microsoft-com:office:activation">
       <o:shapelayout v:ext="edit">
-        <o:idmap v:ext="edit" data="1"/>
+        <o:idmap v:ext="edit" data="{$pageNo}"/>
       </o:shapelayout>
       <v:shapetype id="_x0000_t75" coordsize="21600,21600" o:spt="75"
       o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">

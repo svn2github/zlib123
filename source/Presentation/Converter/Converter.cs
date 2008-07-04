@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Copyright (c) 2007, Sonata Software Limited
  * All rights reserved.
  * 
@@ -92,7 +92,7 @@ namespace Sonata.OdfConverter.Presentation
         protected override void CheckOdfFile(string fileName)
         {
             // Test for encryption
-            XmlDocument doc;
+            XmlDocument docContent, docStyle,doc;
             try
             {
                 XmlReaderSettings settings = new XmlReaderSettings();
@@ -101,6 +101,21 @@ namespace Sonata.OdfConverter.Presentation
                 doc = new XmlDocument();
                 XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
                 doc.Load(reader);
+                docStyle = new XmlDocument();
+                XmlReader readerStyle = XmlReader.Create("styles.xml", settings);
+                docStyle.Load(readerStyle);
+
+                docContent = new XmlDocument();
+                XmlReader readerContent = XmlReader.Create("content.xml", settings);
+                docContent.Load(readerContent);
+         
+                 string svgNameSpace = docContent.DocumentElement.Attributes["xmlns:svg"].Value.ToString();
+                 if (svgNameSpace == "http://www.w3.org/2000/svg")
+                 {
+                     throw new NotAnOdfDocumentException("Could not convert " + fileName
+                                                    + ". Invalid OASIS OpenDocument file");
+                 }
+               
             }
             catch (Exception e)
             {
@@ -125,26 +140,7 @@ namespace Sonata.OdfConverter.Presentation
                                                     + ". Invalid OASIS OpenDocument file");
             }
 
-            // To check content.xml and styles.xml are valid xml document or not
-            //1840172
-            try
-            {
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.XmlResolver = new ZipResolver(fileName);
-                settings.ProhibitDtd = false;
-                doc = new XmlDocument();                
-                XmlReader readerStyle = XmlReader.Create("styles.xml", settings);
-                doc.Load(readerStyle);
-                XmlReader readerContent = XmlReader.Create("content.xml", settings);
-                doc.Load(readerContent);               
-            }
-            catch (Exception e)
-            {
-                throw new NotAnOdfDocumentException(e.Message);
-            }
-            // To check content.xml and styles.xml are valid xml document or not
-            //1840172
-        }
+             }
 
         protected override void CheckOoxFile(string fileName)
         {

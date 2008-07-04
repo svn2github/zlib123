@@ -102,8 +102,15 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
           <xsl:for-each select="node()">
             <xsl:if test="name()='draw:frame'">
-            <xsl:if test=" ((not(@presentation:class) and @presentation:style-name) 
-                              or contains(@presentation:class,'notes') )">
+              <xsl:if test="not(@presentation:class) and @presentation:style-name">
+                <xsl:call-template name ="CreateShape">
+                  <xsl:with-param name ="fileName" select ="'content.xml'"/>
+                  <xsl:with-param name ="shapeName" select="'TextBox '" />
+                  <xsl:with-param name ="shapeCount" select="position()" />
+                  <xsl:with-param name ="grpFlag" select="'true'" />
+                </xsl:call-template>
+              </xsl:if>
+            <xsl:if test="(contains(@presentation:class,'notes') )">
               <xsl:for-each select =".">
             <xsl:variable name ="masterPageName" select ="./parent::node()/@draw:master-page-name"/>
             <xsl:variable name="FrameCount" select="concat('Frame',position())"/>
@@ -156,10 +163,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:if>
             </xsl:if>
           </xsl:for-each>
-        
-         
-        
-          <!-- Code for footer , slide number and date time control -->
+           <!-- Code for footer , slide number and date time control -->
           <xsl:variable name ="pageStyle">
             <xsl:value-of select ="@draw:style-name"/>
           </xsl:variable>

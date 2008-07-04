@@ -99,7 +99,9 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:variable>
 					<xsl:variable name ="drawId">
 						<xsl:if test ="$spId =@draw:id">
-							<xsl:value-of select ="position()"/>
+              <xsl:call-template name="getShapePosTemp">
+                <xsl:with-param name="var_pos" select="position()"/>
+              </xsl:call-template>
 						</xsl:if >
 					</xsl:variable >
 					<xsl:variable name ="paraId">
@@ -498,7 +500,7 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:call-template>
       </p:spPr>
       <p:style>
-        <a:lnRef idx="1">
+        <a:lnRef idx="0">
           <a:schemeClr val="dk1" />
         </a:lnRef>
         <a:fillRef idx="0">
@@ -624,7 +626,44 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+  <xsl:template name="tmpShapeType">
+    <xsl:param name="nvprId"/>
+    <xsl:choose>
+      <xsl:when test="parent::node()/draw:custom-shape[@draw:id=$nvprId][position()=1] | parent::node()/draw:g/draw:custom-shape[@draw:id=$nvprId][position()=1]">
+        <xsl:for-each select="parent::node()/draw:custom-shape[@draw:id=$nvprId][position()=1] | parent::node()/draw:g/draw:custom-shape[@draw:id=$nvprId][position()=1]">
+        <xsl:choose>
+          <xsl:when test="draw:enhanced-geometry[@draw:enhanced-path='M ?f0 0 L 21600 21600 0 21600 Z N' or @draw:type='isosceles-triangle']">
+            <xsl:value-of select="'triangle'"/>
+        </xsl:when>
+          <xsl:when test="draw:enhanced-geometry[@draw:enhanced-path='M 0 0 L 21600 21600 0 21600 0 0 Z N' or @draw:type='rtTriangle']">
+            <xsl:value-of select="'triangle'"/>
+          </xsl:when>
+          <xsl:when test="draw:enhanced-geometry[@draw:enhanced-path='M ?f0 0 L 21600 0 ?f1 21600 0 21600 Z N' or @draw:type='parallelogram']">
+            <xsl:value-of select="'parallelogram'"/>
+          </xsl:when>
+          <xsl:when test="draw:enhanced-geometry[@draw:enhanced-path='M 0 1216152 L 228600 0 L 685800 0 L 914400 1216152 Z N' or @draw:type='mso-spt100']">
+            <xsl:value-of select="'trapezoid'"/>
+          </xsl:when>
+          <xsl:when test="draw:enhanced-geometry[@draw:enhanced-path='M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N' or @draw:type='diamond']">
+            <xsl:value-of select="'diamond'"/>
+          </xsl:when>
+          <xsl:when test="draw:enhanced-geometry[@draw:enhanced-path='M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N' or @draw:type='pentagon']">
+            <xsl:value-of select="'pentagon'"/>
+          </xsl:when>
+          <xsl:when test="draw:enhanced-geometry[@draw:enhanced-path='M ?f0 0 L ?f1 0 21600 10800 ?f1 21600 ?f0 21600 0 10800 Z N' or @draw:type='hexagon']">
+            <xsl:value-of select="'hexagon'"/>
+          </xsl:when>
+          <xsl:when test="draw:enhanced-geometry[@draw:type='ellipse']">
+            <xsl:value-of select="'ellipse'"/>
+          </xsl:when>
+        </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="'rect'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
    <!-- Draw line-->
   <xsl:template name ="drawLine">
     <xsl:param name ="fileName" />
@@ -801,6 +840,57 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:if>
         </p:cNvPr>
 		  <p:cNvCxnSpPr>
+
+        <xsl:variable name="startShapepresetGm">
+          <xsl:call-template name="tmpShapeType">
+            <xsl:with-param name="nvprId" select="@draw:start-shape"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="endShapepresetGm">
+          <xsl:call-template name="tmpShapeType">
+            <xsl:with-param name="nvprId" select="@draw:end-shape"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="maxstartSpgluePointCount">
+          <xsl:choose>
+            <xsl:when test="$startShapepresetGm='ellipse' or $startShapepresetGm='octagon' or $startShapepresetGm='noSmoking'">
+              <xsl:value-of select="'8'"/>
+            </xsl:when>
+            <xsl:when test="$startShapepresetGm='pentagon' or $startShapepresetGm='hexagon'
+                         or $startShapepresetGm='cube' or $startShapepresetGm='parallelogram'">
+              <xsl:value-of select="'6'"/>
+            </xsl:when>
+            <xsl:when test="$startShapepresetGm='triangle' or $startShapepresetGm='rtTriangle' or $startShapepresetGm='can'">
+              <xsl:value-of select="'5'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'4'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="maxendSpgluePointCount">
+          <xsl:choose>
+            <xsl:when test="$endShapepresetGm='ellipse' or $endShapepresetGm='octagon' or $endShapepresetGm='noSmoking'">
+              <xsl:value-of select="'8'"/>
+            </xsl:when>
+            <xsl:when test="$endShapepresetGm='pentagon' or $endShapepresetGm='hexagon'
+                         or $endShapepresetGm='cube' or $endShapepresetGm='parallelogram'">
+              <xsl:value-of select="'6'"/>
+            </xsl:when>
+            <xsl:when test="$endShapepresetGm='triangle' or $endShapepresetGm='rtTriangle' or $endShapepresetGm='can'">
+              <xsl:value-of select="'5'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'4'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="stGluePoint">
+          <xsl:value-of select="@draw:start-glue-point"/>
+        </xsl:variable>
+        <xsl:variable name="endGluePoint">
+          <xsl:value-of select="@draw:end-glue-point"/>
+        </xsl:variable>
 			  <xsl:if test="@draw:start-glue-point">
 				  <xsl:variable name="startShape">
 					  <xsl:call-template name ="shapeGetnvPrId">
@@ -809,91 +899,208 @@ Copyright (c) 2007, Sonata Software Limited
 						  </xsl:with-param>
 					  </xsl:call-template>
 				  </xsl:variable>
-
-				  <xsl:variable name="stGluePoint">
-					  <xsl:value-of select="@draw:start-glue-point"/>
-				  </xsl:variable>
           <xsl:if test="$startShape !=''">
             <a:stCxn>
-
               <xsl:attribute name="id">
 						  <xsl:value-of  select="$startShape" />
 					  </xsl:attribute>
          
 					  <xsl:attribute name="idx">
 						  <xsl:choose>
-							  <xsl:when test="$stGluePoint = 0  or $stGluePoint = 4">
+                  <xsl:when test="$maxstartSpgluePointCount &gt;4 ">
+                    <xsl:choose>
+                      <xsl:when test="$stGluePoint = 0">
 								  <xsl:value-of select="'0'"/>
 							  </xsl:when>
-							  <xsl:when test="$stGluePoint = 1  or $stGluePoint = 5">
-								  <xsl:value-of select="'3'"/>
+                      <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &gt;= 4">
+                        <xsl:variable name="glueptval">
+                          <xsl:value-of select="number($maxstartSpgluePointCount) + ( ( number($maxstartSpgluePointCount) - number($stGluePoint) + 4))"/>
+                        </xsl:variable>
+                        <xsl:choose>
+                          <xsl:when test="$glueptval &lt; 0">
+                            <xsl:value-of select="$glueptval * -1"/>
 							  </xsl:when>
-							  <xsl:when test="($stGluePoint = 2)  or ($stGluePoint = 6)">
-								  <xsl:value-of select="'2'"/>
+                          <xsl:when test="contains($glueptval,'NaN')">
+                            <xsl:value-of select="'0'"/>
 							  </xsl:when>
-							  <xsl:when test="($stGluePoint = 3) or ($stGluePoint = 7)">
-								  <xsl:value-of select="'1'"/>
+                          <xsl:otherwise>
+                            <xsl:value-of select="$glueptval"/>
+                        </xsl:otherwise>
+                        </xsl:choose>
 							  </xsl:when>
-							  <xsl:when test="$stGluePoint = 8">
-								  <xsl:value-of select="'4'"/>
+                      <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &lt; 4">
+                        <xsl:variable name="glueptval">
+                          <xsl:value-of select="number($maxstartSpgluePointCount) - ( 4 +  ( number($maxstartSpgluePointCount) - number($stGluePoint)))"/>
+                        </xsl:variable>
+                        <xsl:choose>
+                          <xsl:when test="$glueptval &lt; 0">
+                            <xsl:value-of select="$glueptval * -1"/>
 							  </xsl:when>
-							  <xsl:when test="$stGluePoint = 9">
-								  <xsl:value-of select="'5'"/>
+                          <xsl:when test="contains($glueptval,'NaN')">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="$glueptval"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
 							  </xsl:when>
 							  <xsl:otherwise>
 								  <xsl:value-of select="'0'"/>
 							  </xsl:otherwise>
-							  
-							  
+                    </xsl:choose>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:choose>
+                      <xsl:when test="$stGluePoint = 0">
+                        <xsl:value-of select="'0'"/>
+                      </xsl:when>
+                      <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &gt; 0">
+                        <xsl:variable name="glueptval">
+                          <xsl:value-of select="number($maxstartSpgluePointCount) - number($stGluePoint)"/>
+                        </xsl:variable>
+                        <xsl:choose>
+                          <xsl:when test="$glueptval &lt; 0">
+                            <xsl:value-of select="$glueptval * -1"/>
+                          </xsl:when>
+                          <xsl:when test="contains($glueptval,'NaN')">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="$glueptval"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:when>
+                      <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) &lt; 0">
+                        <xsl:variable name="glueptval">
+                          <xsl:value-of select="number($maxstartSpgluePointCount) - number($stGluePoint)"/>
+                        </xsl:variable>
+                        <xsl:choose>
+                          <xsl:when test="$glueptval &lt; 0">
+                            <xsl:value-of select="$glueptval * -1"/>
+                          </xsl:when>
+                          <xsl:when test="contains($glueptval,'NaN')">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="$glueptval"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:when>
+                      <xsl:when test="number($maxstartSpgluePointCount) - number($stGluePoint) = 0">
+                        <xsl:value-of select="number($stGluePoint)"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="'0'"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:otherwise>
 						  </xsl:choose>
 					  </xsl:attribute>
 				  </a:stCxn>
 			  </xsl:if>
         </xsl:if>
-       
-			  <xsl:if test="@draw:end-glue-point">
-         
-             <xsl:variable name="endShape">
+       			  <xsl:if test="@draw:end-glue-point">
+                      <xsl:variable name="endShape">
 						  <xsl:call-template name ="shapeGetnvPrId">
 							  <xsl:with-param name ="spId">
 								  <xsl:value-of select="@draw:end-shape"/>
 							  </xsl:with-param>
 						  </xsl:call-template>
 					  </xsl:variable>
-
-				  <xsl:variable name="endGluePoint">
-					  <xsl:value-of select="@draw:end-glue-point"/>
-				  </xsl:variable>
           <xsl:if test="$endShape !=''">
 				  <a:endCxn>
-					  
-					  <xsl:attribute name="id">
+			  <xsl:attribute name="id">
 						  <xsl:value-of  select="$endShape" />
 					  </xsl:attribute>
 					  <xsl:attribute name="idx">
 						  <xsl:choose>
-							  <xsl:when test="$endGluePoint = 0 or $endGluePoint = 4">
+                <xsl:when test="$maxendSpgluePointCount &gt;4 ">
+                  <xsl:choose>
+                    <xsl:when test="$endGluePoint = 0">
 								  <xsl:value-of select="'0'"/>
 							  </xsl:when>
-							  <xsl:when test="$endGluePoint = 1  or $endGluePoint = 5">
-								  <xsl:value-of select="'3'"/>
+                    <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) &gt;= 4">
+                      <xsl:variable name="glueptval">
+                        <xsl:value-of select="number($maxendSpgluePointCount) + ( ( number($maxendSpgluePointCount) - number($endGluePoint) + 4))"/>
+                      </xsl:variable>
+                      <xsl:choose>
+                        <xsl:when test="$glueptval &lt; 0">
+                          <xsl:value-of select="$glueptval * -1"/>
+                        </xsl:when>
+                        <xsl:when test="contains($glueptval,'NaN')">
+                          <xsl:value-of select="'0'"/>
 							  </xsl:when>
-							  <xsl:when test="$endGluePoint = 2  or $endGluePoint = 6">
-								  <xsl:value-of select="'2'"/>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$glueptval"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 							  </xsl:when>
-							  <xsl:when test="$endGluePoint = 3  or $endGluePoint = 7">
-								  <xsl:value-of select="'1'"/>
+                    <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) &lt; 4">
+                      <xsl:variable name="glueptval">
+                        <xsl:value-of select="number($maxendSpgluePointCount) - ( 4 +  ( number($maxendSpgluePointCount) - number($endGluePoint)))"/>
+                      </xsl:variable>
+                      <xsl:choose>
+                        <xsl:when test="$glueptval &lt; 0">
+                          <xsl:value-of select="$glueptval * -1"/>
 							  </xsl:when>
-							  <xsl:when test="$endGluePoint =8">
-								  <xsl:value-of select="'4'"/>
+                        <xsl:when test="contains($glueptval,'NaN')">
+                          <xsl:value-of select="'0'"/>
 							  </xsl:when>
-							  <xsl:when test="$endGluePoint =9">
-								  <xsl:value-of select="'5'"/>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$glueptval"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
 							  </xsl:when>
 							  <xsl:otherwise>
 								  <xsl:value-of select="'0'"/>
 							  </xsl:otherwise>
-
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="$endGluePoint = 0">
+                      <xsl:value-of select="'0'"/>
+                    </xsl:when>
+                    <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) &gt; 0">
+                      <xsl:variable name="glueptval">
+                        <xsl:value-of select="number($maxendSpgluePointCount) - number($endGluePoint)"/>
+                      </xsl:variable>
+                      <xsl:choose>
+                        <xsl:when test="$glueptval &lt; 0">
+                          <xsl:value-of select="$glueptval * -1"/>
+                        </xsl:when>
+                        <xsl:when test="contains($glueptval,'NaN')">
+                          <xsl:value-of select="'0'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$glueptval"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:when test="number($maxendSpgluePointCount) - number($stGluePoint) &lt; 0">
+                      <xsl:variable name="glueptval">
+                        <xsl:value-of select="number($maxendSpgluePointCount) - number($endGluePoint)"/>
+                      </xsl:variable>
+                      <xsl:choose>
+                        <xsl:when test="$glueptval &lt; 0">
+                          <xsl:value-of select="$glueptval * -1"/>
+                        </xsl:when>
+                        <xsl:when test="contains($glueptval,'NaN')">
+                          <xsl:value-of select="'0'"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$glueptval"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:when test="number($maxendSpgluePointCount) - number($endGluePoint) = 0">
+                      <xsl:value-of select="number($endGluePoint)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="'0'"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
 						  </xsl:choose>
 					  </xsl:attribute>
 				  </a:endCxn>
@@ -3076,16 +3283,14 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
-
-
         <!-- Text wrapping in shape-->
-        <!--<xsl:choose>
+        <xsl:choose>
 					<xsl:when test ="@fo:wrap-option='no-wrap'">
 						<xsl:attribute name ="wrap">
 							<xsl:value-of select ="'square'"/>
 						</xsl:attribute>
 					</xsl:when>
-					<xsl:when test ="(@fo:wrap-option='wrap')">
+					<xsl:when test ="@fo:wrap-option='wrap'">
 						<xsl:attribute name ="wrap">
 							<xsl:value-of select ="'none'"/>
 						</xsl:attribute>
@@ -3100,66 +3305,48 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:value-of select ="'none'"/>
 						</xsl:attribute>
 					</xsl:when>
-					<xsl:when test ="(@draw:auto-grow-height = 'true') or (@draw:auto-grow-width = 'true')">
+      						<xsl:otherwise>
 						<xsl:attribute name ="wrap">
-							<xsl:value-of select ="'square'"/>
-						</xsl:attribute>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:attribute name ="wrap">
-							<xsl:value-of select ="'none'"/>
+              <xsl:value-of select ="'square'"/>
 						</xsl:attribute>
 					</xsl:otherwise>  
 				</xsl:choose>
-
-				-->
-        <!-- AutoFit - Resize to accommodate the text in shape.-->
-        <!--
-				<xsl:if test ="(@draw:auto-grow-height = 'true') or (@draw:auto-grow-width = 'true') or ($default-autogrow-height = 'true') or ($default-autogrow-width = 'true')">
+        <xsl:choose>
+          <xsl:when test ="@draw:auto-grow-height = 'true' or @draw:auto-grow-width = 'true'">
 					<a:spAutoFit/>
-				</xsl:if>-->
-
+          </xsl:when>
+          <xsl:when test ="$default-autogrow-height = 'true' or $default-autogrow-width = 'true'">
+            <a:spAutoFit/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:for-each>
+    </a:bodyPr>
+    </xsl:template>
+  <xsl:template name="tmpWrap">
         <xsl:choose>
           <xsl:when test ="@fo:wrap-option='no-wrap'">
             <xsl:attribute name ="wrap">
               <xsl:value-of select ="'square'"/>
             </xsl:attribute>
           </xsl:when>
-          <xsl:when test ="$default-wrap-option='no-wrap'">
-            <xsl:attribute name ="wrap">
-              <xsl:value-of select ="'square'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test ="(@fo:wrap-option='wrap') or ( ($default-wrap-option='wrap') and ($customShape = 'true') )  or
-                            ((@draw:auto-grow-height = 'false') and (@draw:auto-grow-width = 'false'))">
+      <xsl:when test ="@fo:wrap-option='wrap'">
             <xsl:attribute name ="wrap">
               <xsl:value-of select ="'none'"/>
             </xsl:attribute>
           </xsl:when>
-          <!--Bug fix for text Wrap in textbox by Mathi on 12thSep 2007-->
-          <xsl:when test="(not(@fo:wrap-option='no-wrap') and ((@draw:auto-grow-height = 'true') and (@draw:auto-grow-width = 'true')))">
+               <xsl:otherwise>
             <xsl:attribute name ="wrap">
-              <xsl:value-of select ="'none'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <!--end of code-->
-          <xsl:otherwise>
-            <xsl:attribute name ="wrap">
-              <xsl:value-of select ="'square'"/>
+          <xsl:value-of select ="'square'"/>
             </xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
-
-        <!-- AutoFit - Resize to accommodate the text in shape.-->
-        <xsl:if test ="(@draw:auto-grow-height = 'true') or (@draw:auto-grow-width = 'true') or ($default-autogrow-height = 'true') or ($default-autogrow-width = 'true') or not(@draw:auto-grow-height)">
+      <xsl:if test ="@draw:auto-grow-height = 'true' or @draw:auto-grow-width = 'true'">
           <a:spAutoFit/>
         </xsl:if>
-      </xsl:for-each>
-    </a:bodyPr>
-
+  
   </xsl:template>
   <!-- Get arrow type-->
-  <xsl:template name ="getArrowType">
+    <xsl:template name ="getArrowType">
     <xsl:param name ="ArrowType" />
 
     <xsl:if test ="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$ArrowType]">
@@ -3805,7 +3992,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:value-of select ="@fo:wrap-option"/>
           </xsl:if>
           <xsl:if test ="not(@fo:wrap-option)">
-            <xsl:value-of select ="'wrap'"/>
+            <xsl:value-of select ="'square'"/>
           </xsl:if>
         </xsl:when>
         <xsl:when test ="$attributeName = 'auto-grow-height'">
