@@ -43,7 +43,7 @@
   <xsl:key name="list-style" match="text:list-style" use="@style:name"/>
   <xsl:key name="list-content" match="text:list" use="@text:style-name"/>
   <xsl:key name="bullets" match="text:list-level-style-image" use="''"/>
-  <xsl:key name="outlined-styles" match="style:style[@style:default-outline-level]" use="''"/>
+  <xsl:key name="outlined-styles" match="style:style[@style:default-outline-level]" use="@style:default-outline-level"/>
   <xsl:key name="list-styles" match="office:styles/style:style[@style:list-style-name]"
     use="@style:name"/>
 
@@ -819,20 +819,14 @@
     <xsl:param name="level"/>
     <xsl:for-each select="document('content.xml')">
       <xsl:choose>
-        <xsl:when
-          test="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:name">
-          <xsl:value-of
-            select="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:name"
-          />
+        <xsl:when test="key('outlined-styles', $level+1)/@style:name">
+          <xsl:value-of select="key('outlined-styles', $level+1)/@style:name" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
-              <xsl:when
-                test="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:name">
-                <xsl:value-of
-                  select="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:name"
-                />
+              <xsl:when test="key('outlined-styles', $level+1)/@style:name">
+                <xsl:value-of select="key('outlined-styles', $level+1)/@style:name" />
               </xsl:when>
               <xsl:otherwise>none</xsl:otherwise>
             </xsl:choose>
@@ -847,20 +841,14 @@
     <xsl:param name="level"/>
     <xsl:for-each select="document('content.xml')">
       <xsl:choose>
-        <xsl:when
-          test="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:list-style-name">
-          <xsl:value-of
-            select="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:list-style-name"
-          />
+        <xsl:when test="key('outlined-styles', $level+1)/@style:list-style-name">
+          <xsl:value-of select="key('outlined-styles', $level+1)/@style:list-style-name" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
-              <xsl:when
-                test="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:list-style-name">
-                <xsl:value-of
-                  select="key('outlined-styles','')[@style:default-outline-level = $level+1]/@style:list-style-name"
-                />
+              <xsl:when test="key('outlined-styles', $level+1)/@style:list-style-name">
+                <xsl:value-of select="key('outlined-styles', $level+1)/@style:list-style-name" />
               </xsl:when>
               <xsl:otherwise>none</xsl:otherwise>
             </xsl:choose>

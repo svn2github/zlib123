@@ -149,7 +149,8 @@
   </xsl:template>
 
   <xsl:template name="InsertTOCBookmark">
-    <xsl:param name="tableOfContentsNum" select="count(key('toc',''))"/>
+    <xsl:param name="tableOfContentsNum" select="$tocCount"/>
+	  <!--xsl:param name="tableOfContentsNum" select="count(key('toc',''))"/-->
     <xsl:param name="bookmarkType"/>
     <xsl:param name="styleName" select="@text:style-name"/>
 

@@ -45,6 +45,7 @@
 
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
+  <xsl:key name="ParagraphsByStyleId" match="/oox:package/oox:part[@oox:name = 'word/document.xml']/w:document/w:body/w:p/w:pPr/w:tabs/w:tab" use="../../w:pStyle/@w:val" />
   <xsl:key name="default-styles"
     match="w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on']" use="@w:type"/>
 
@@ -4947,9 +4948,7 @@
     <xsl:param name="MarginLeft"/>
     <xsl:param name="parentStyleId"/>
     <xsl:variable name="parentParentStyleId">
-      <xsl:value-of
-        select="key('StyleId', $parentStyleId)/w:basedOn/@w:val"
-      />
+      <xsl:value-of select="key('StyleId', $parentStyleId)/w:basedOn/@w:val" />
     </xsl:variable>
     <!-- divo: seems this won't work for parent's parent's parent styles etc -->
     <xsl:if
@@ -4961,38 +4960,31 @@
             <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
           </xsl:call-template>
         </xsl:for-each>
-        <xsl:for-each select="key('Part', 'word/styles.xml')">
-          <xsl:for-each select="key('StyleId', $parentStyleId)/w:pPr">
-            <xsl:if test="w:tabs">
-              <xsl:for-each select="w:tabs/w:tab">
-                <xsl:if
-                  test="not(key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos)">
-                  <xsl:variable name="pos">
-                    <xsl:value-of select="./@w:pos"/>
-                  </xsl:variable>
-                  <!--clam, dialogika: bugfix 1839626-->
-                  <xsl:if test="not($me/w:tab[@w:pos=$pos][@w:val='clear'])">
-                    <xsl:call-template name="InsertTabs">
-                    <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
-                  </xsl:call-template>
-                  </xsl:if>
-                </xsl:if>
-              </xsl:for-each>
-            </xsl:if>
-          </xsl:for-each>
-          <xsl:for-each select="key('StyleId', $parentParentStyleId)/w:pPr">
-            <xsl:if test="w:tabs">
-              <xsl:for-each select="w:tabs/w:tab">
-                <xsl:if
-                  test="not(key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos) and not(key('StyleId',$parentStyleId)/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
-                  <xsl:call-template name="InsertTabs">
-                    <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
-                  </xsl:call-template>
-                </xsl:if>
-              </xsl:for-each>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:for-each>
+        
+		<xsl:for-each select="key('StyleId', $parentStyleId)/w:pPr/w:tabs/w:tab">
+			<xsl:if
+			  test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos)">
+			  <xsl:variable name="pos">
+				<xsl:value-of select="./@w:pos"/>
+			  </xsl:variable>
+			  <!--clam, dialogika: bugfix 1839626-->
+			  <xsl:if test="not($me/w:tab[@w:pos=$pos][@w:val='clear'])">
+				<xsl:call-template name="InsertTabs">
+					<xsl:with-param name="MarginLeft" select="$MarginLeft"/>
+				</xsl:call-template>
+			  </xsl:if>
+			</xsl:if>
+		</xsl:for-each>
+		  
+		<xsl:for-each select="key('StyleId', $parentParentStyleId)/w:pPr/w:tabs/w:tab">
+			<xsl:if
+			  test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos) 
+					and not(key('StyleId',$parentStyleId)/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
+			  <xsl:call-template name="InsertTabs">
+				<xsl:with-param name="MarginLeft" select="$MarginLeft"/>
+			  </xsl:call-template>
+			</xsl:if>
+		</xsl:for-each>
       </style:tab-stops>
     </xsl:if>
   </xsl:template>
