@@ -190,7 +190,7 @@
     <value>Die Konvertierung wurde vom Benutzer abgebrochen.</value>
   </data>
   <data name="PossiblyEncryptedDocument" xml:space="preserve">
-    <value>Das ZIP-Archiv konnte nicht geöffnet werden. Bitte überprüfen Sie, dass die Datei nicht passwortgeschützt ist.</value>
+    <value>Das Dokument konnte nicht geöffnet werden. Bitte überprüfen Sie, dass die Datei nicht passwortgeschützt ist.</value>
   </data>
  <data name="ProgressBarExitLabel" xml:space="preserve">
     <value>Bitte warten Sie, bis die Übersetzung beendet ist.</value>
