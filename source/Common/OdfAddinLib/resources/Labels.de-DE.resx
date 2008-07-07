@@ -205,9 +205,9 @@
     <value>OpenDocument Präsentation Dateien</value>
   </data>
   <data name="OdfOptionsDescription" xml:space="preserve">
-    <value>Aktivieren / deaktivieren FidelityMessage Dialogfeld</value>
+    <value>Einstellungen für das ODF Add-in vornehmen.</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
-    <value>ODF-Optionen</value>
+    <value>ODF Add-in Optionen</value>
   </data>
 </root>
