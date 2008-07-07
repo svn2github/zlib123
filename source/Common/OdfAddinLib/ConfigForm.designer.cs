@@ -27,7 +27,7 @@
  * 
  */
 
-namespace CleverAge.OdfConverter.OdfConverterLib
+namespace OdfConverter.OdfConverterLib
 {
     partial class ConfigForm
     {
@@ -62,7 +62,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.grpbxConfig = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.grpbxConfig.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // chkbxIsErrorIgnored
@@ -87,24 +89,33 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             // 
             // grpbxConfig
             // 
-            this.grpbxConfig.Controls.Add(this.chkbxIsErrorIgnored);
             resources.ApplyResources(this.grpbxConfig, "grpbxConfig");
+            this.tableLayoutPanel1.SetColumnSpan(this.grpbxConfig, 2);
+            this.grpbxConfig.Controls.Add(this.chkbxIsErrorIgnored);
+            this.grpbxConfig.MinimumSize = new System.Drawing.Size(350, 0);
             this.grpbxConfig.Name = "grpbxConfig";
             this.grpbxConfig.TabStop = false;
+            // 
+            // tableLayoutPanel1
+            // 
+            resources.ApplyResources(this.tableLayoutPanel1, "tableLayoutPanel1");
+            this.tableLayoutPanel1.Controls.Add(this.grpbxConfig, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.btnCancel, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.btnOK, 0, 1);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             // 
             // ConfigForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.grpbxConfig);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnOK);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "ConfigForm";
-            this.Load += new System.EventHandler(this.ConfigForm_Load);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ConfigForm_FormClosed);
             this.grpbxConfig.ResumeLayout(false);
+            this.grpbxConfig.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -115,5 +126,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.GroupBox grpbxConfig;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     }
 }

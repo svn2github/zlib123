@@ -1,4 +1,4 @@
-﻿namespace CleverAge.OdfConverter.OdfConverterLib
+﻿namespace OdfConverter.OdfConverterLib
 {
     partial class InfoBox
     {

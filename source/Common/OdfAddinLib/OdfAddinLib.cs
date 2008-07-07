@@ -81,15 +81,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     public class OdfAddinLib : IOdfConverter
     {
         private AbstractConverter converter;
+        private AbstractOdfAddin addin;
         private ChainResourceManager resourceManager;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="converter">An implementation of AbstractConverter</param>
-        public OdfAddinLib(AbstractConverter converter)
+        public OdfAddinLib(AbstractOdfAddin addin, AbstractConverter converter)
         {
             this.converter = converter;
+            this.addin = addin;
             this.resourceManager = new ChainResourceManager();
             // Add a default resource managers (for common labels)
             this.resourceManager.Add(new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
@@ -136,30 +138,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         {
                             if (form.HasLostElements)
                             {
-                                ArrayList elements = form.LostElements;
-                                string fidelityMsgValue = string.Empty;
+                                string fidelityValue = Microsoft.Win32.Registry.GetValue(this.addin.RegistryKeyUser, ConfigForm.FidelityValue, "false") as string;
 
-                                if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "POWERPNT")
+                                if (fidelityValue.Equals("false", StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    fidelityMsgValue = Microsoft.Win32.Registry
-                                    .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "false") as string;
-
-                                }
-                                else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
-                                {
-                                    fidelityMsgValue = Microsoft.Win32.Registry
-                                    .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "false") as string;
-
-                                  }
-                                else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
-                                {
-                                    fidelityMsgValue = Microsoft.Win32.Registry
-                                   .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "false") as string;
-                                
-                                 }
-                                if (fidelityMsgValue == "false")
-                                {
-                                    InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
+                                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, true, "FeedbackLabel", form.LostElements);
                                     infoBox.ShowDialog();
                                 }
                             }
@@ -179,22 +162,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 catch (EncryptedDocumentException)
                 {
-                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "EncryptedDocumentLabel", "EncryptedDocumentDetail");
                     infoBox.ShowDialog();
                 }
                 catch (NotAnOdfDocumentException)
                 {
-                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail");
                     infoBox.ShowDialog();
                 }
                 catch (OdfZipUtils.ZipCreationException)
                 {
-                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "UnableToCreateOutputDetail", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "UnableToCreateOutputLabel", "UnableToCreateOutputDetail");
                     infoBox.ShowDialog();
                 }
                 catch (OdfZipUtils.ZipException)
                 {
-                    InfoBox infoBox = new InfoBox("CorruptedInputFileLabel", "CorruptedInputFileDetail", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "CorruptedInputFileLabel", "CorruptedInputFileDetail");
                     infoBox.ShowDialog();
                 }
                 catch (Exception e)
@@ -202,17 +185,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     if (e.InnerException != null && e.InnerException is System.Xml.XmlException)
                     {
                         // An xsl exception may embed an xml exception. In this case we have a non well formed xml document.
-                        ArrayList messages = new ArrayList();
+                        List<string> messages = new List<string>();
                         messages.Add("CorruptedInputFileDetail");
                         messages.Add("");
                         messages.Add(e.Message);
                         messages.Add("InnerException: " + e.InnerException.Message);
-                        InfoBox infoBox = new InfoBox("CorruptedInputFileLabel", messages, this.resourceManager);
+                        InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "CorruptedInputFileLabel", (string[])messages.ToArray());
                         infoBox.ShowDialog();
                     }
                     else
                     {
-                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
+                        InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
                         infoBox.ShowDialog();
                     }
                     if (File.Exists(outputFile))
@@ -257,29 +240,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                         if (form.HasLostElements)
                         {
-                            ArrayList elements = form.LostElements;                           
-                           string fidelityMsgValue = string.Empty;
+                            string fidelityMsgValue = Microsoft.Win32.Registry.GetValue(this.addin.RegistryKeyUser, ConfigForm.FidelityValue, "false") as string;
 
-                            if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "POWERPNT")
-                            {
-                                fidelityMsgValue = Microsoft.Win32.Registry
-                                .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "false") as string;
-                             }
-                            else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
-                            {
-                                fidelityMsgValue = Microsoft.Win32.Registry
-                                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "false") as string;
-                            }
-                            else if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
-                            {
-                                fidelityMsgValue = Microsoft.Win32.Registry
-                               .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "false") as string;
-                            }
                             if (fidelityMsgValue == "false")
                             {
-                            InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
-                            infoBox.ShowDialog();                            
-                        }
+                                InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, true, "FeedbackLabel", form.LostElements);
+                                infoBox.ShowDialog();
+                            }
                         }
                         if (form.Exception != null)
                         {
@@ -289,12 +256,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 catch (OdfZipUtils.ZipCreationException zipEx)
                 {
-                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail");
                     infoBox.ShowDialog();
                 }
                 catch (OdfZipUtils.ZipException)
                 {
-                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "PossiblyEncryptedDocument", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "UnableToCreateOutputLabel", "PossiblyEncryptedDocument");
                     infoBox.ShowDialog();
                 }
                 catch (System.IO.IOException)
@@ -302,13 +269,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     // this is meant to catch "file already accessed by another process", though there's no .NET fine-grain exception for this.
                     // bug #1676586  Concurrent file access crashes the addin
                     // bug #1807447  avoid display of unlocalized .NET exception message text and display localized string
-                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "UnableToCreateOutputDetail", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "UnableToCreateOutputLabel", "UnableToCreateOutputDetail");
                     //InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", e.Message, this.resourceManager);
                     infoBox.ShowDialog();
                 }
                 catch (Exception e)
                 {
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
+                    InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, false, "OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
                     infoBox.ShowDialog();
 
                     if (File.Exists(outputFile))
@@ -335,31 +302,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-
-        /// <summary>
-        /// Returns the logo of the application.
-        /// </summary>
-        /// <returns>The logo of the application.</returns>
-        public stdole.IPictureDisp GetLogo()
-        {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            Stream stream = null;
-            foreach (string name in asm.GetManifestResourceNames())
-            {
-                if (name.EndsWith("OdfLogo.png"))
-                {
-                    stream = asm.GetManifestResourceStream(name);
-                    break;
-                }
-            }
-            if (stream == null)
-            {
-                return null;
-            }
-            System.Drawing.Bitmap image = new System.Drawing.Bitmap(stream);
-            return OdfAddinLib.ConvertImage.Convert(image);
-        }
-
+        
         /// <summary>
         /// Build a temporary file.
         /// </summary>
@@ -428,22 +371,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (Directory.Exists(directory))
             {
                 Directory.Delete(directory, true);
-            }
-        }
-
-
-        sealed private class ConvertImage : System.Windows.Forms.AxHost
-        {
-            private ConvertImage()
-                : base(null)
-            {
-            }
-            public static stdole.IPictureDisp Convert
-                (System.Drawing.Image image)
-            {
-                return (stdole.IPictureDisp)System.
-                    Windows.Forms.AxHost
-                    .GetIPictureDispFromPicture(image);
             }
         }
     }

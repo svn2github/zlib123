@@ -57,7 +57,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private Exception exception;
         private bool cancel;
         private bool converting;
-        private ArrayList lostElements;
+        private List<string> lostElements;
 
         public ConverterForm(AbstractConverter converter, string inputFile, string outputFile, ResourceManager manager, bool isDirect)
         {
@@ -67,7 +67,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.outputFile = outputFile;
             this.manager = manager;
             this.isDirect = isDirect;
-            lostElements = new ArrayList();
+            lostElements = new List<string>();
             //this code is for displaying the label in progress bar               
             //Code change 1 of 2
             this.lblMessage.Text = manager.GetString("ProgressBarLoadLabel");
@@ -106,11 +106,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        public ArrayList LostElements
+        public string[] LostElements
         {
             get
             {
-                return lostElements;
+                return (string[])lostElements.ToArray();
             }
         }
 

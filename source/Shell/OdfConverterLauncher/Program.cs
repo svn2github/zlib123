@@ -32,10 +32,17 @@ using CleverAge.OdfConverter.OdfConverterLib;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
+using OdfConverter.OdfConverterLib;
 
 namespace OdfConverterLauncher
 {
-    class Word
+    interface IOfficeApplication
+    {
+        bool Visible { set; }
+        void Open(string document);
+    }
+
+    class Word : IOfficeApplication
     {
         Type _type;
         object _instance;
@@ -59,7 +66,7 @@ namespace OdfConverterLauncher
             }
         }
 
-       
+
         public void Open(string document)
         {
             if (_documents == null)
@@ -105,7 +112,7 @@ namespace OdfConverterLauncher
                 new System.Globalization.CultureInfo(culture);
         }
     }
-    class Presentation
+    class Presentation : IOfficeApplication
     {
         Type _type;
         object _instance;
@@ -129,7 +136,7 @@ namespace OdfConverterLauncher
                 _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
             }
         }
-       
+
 
         public void Open(string document)
         {
@@ -176,7 +183,8 @@ namespace OdfConverterLauncher
                 new System.Globalization.CultureInfo(culture);
         }
     }
-    class Excel
+
+    class Excel : IOfficeApplication
     {
         Type _type;
         object _instance;
@@ -199,7 +207,7 @@ namespace OdfConverterLauncher
                 _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
             }
         }
-      
+
         public void Open(string document)
         {
             if (_documents == null)
@@ -251,86 +259,54 @@ namespace OdfConverterLauncher
         [STAThread]
         static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
+
             if (args.Length == 1)
             {
+                AbstractOdfAddin addin = null;
+                IOfficeApplication app = null;
+                string output = "";
+
+                bool showUserInterface = true;
+
                 string input = args[0];
-                if (input.ToUpper().EndsWith(".ODP"))
-                {
-                    OdfAddinLib lib = new OdfAddinLib(new Sonata.OdfConverter.Presentation.Converter());
-                    Presentation ppt = null;
-                    try
-                    {
-                        bool showUserInterface = true;
-                        string output = lib.GetTempFileName(input, ".pptx");
-                        ppt = new Presentation();
-                        ppt.getLanguage();
-                        lib.OdfToOox(input, output, showUserInterface);
-                        if (File.Exists((string)output))
-                        {
-                            ppt.Visible = true;
-                            ppt.Open(output);
 
-                        }                        
-                    }
-                    catch (Exception e)
+                try
+                {
+                    if (input.ToUpper().EndsWith(".ODP"))
                     {
-                        System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
-                        Assembly.GetAssembly(lib.GetType()));
-                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", rm);
-                        infoBox.ShowDialog();
+                        addin = new OdfConverter.Presentation.OdfPowerPointAddin.Connect();
+                        app = new Presentation();
+                        output = addin.AddinLib.GetTempFileName(input, ".pptx");
+                    }
+                    else if (input.ToUpper().EndsWith(".ODS"))
+                    {
+                        addin = new OdfConverter.Spreadsheet.OdfExcelAddin.Connect();
+                        app = new Excel();
+                        output = addin.AddinLib.GetTempFileName(input, ".xlsx");
+                    }
+                    else if (input.ToUpper().EndsWith(".ODT"))
+                    {
+                        addin = new OdfConverter.Wordprocessing.OdfWordAddin.Connect();
+                        app = new Word();
+                        output = addin.AddinLib.GetTempFileName(input, ".docx");
+                    }
+
+
+                    addin.SetUICulture();
+                    addin.AddinLib.OdfToOox(input, output, showUserInterface);
+                    if (File.Exists((string)output))
+                    {
+                        app.Visible = true;
+                        app.Open(output);
                     }
                 }
-                if (input.ToUpper().EndsWith(".ODS"))
+                catch (Exception e)
                 {
-                    OdfAddinLib lib = new OdfAddinLib(new CleverAge.OdfConverter.Spreadsheet.Converter());
-                    Excel objExcel = null;
-
-
-                    try
-                    {
-                        bool showUserInterface = true;
-                        string output = lib.GetTempFileName(input, ".xlsx");
-                        objExcel = new Excel();
-                        objExcel.getLanguage();
-                        lib.OdfToOox(input, output, showUserInterface);
-                        if (File.Exists((string)output))
-                        {
-                            objExcel.Visible = true;
-                            objExcel.Open(output);
-                        }                        
-                    }
-                    catch (Exception e)
-                    {
-                        System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
-                        Assembly.GetAssembly(lib.GetType()));
-                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", rm);
-                        infoBox.ShowDialog();
-                    }
-                }
-                if (input.ToUpper().EndsWith(".ODT"))
-                {
-                    OdfAddinLib lib = new OdfAddinLib(new OdfConverter.Wordprocessing.Converter());
-                    Word word = null;
-                    try
-                    {
-                        bool showUserInterface = true;
-                        string output = lib.GetTempFileName(input, ".docx");
-                        word = new Word();
-                        word.getLanguage();
-                        lib.OdfToOox(input, output, showUserInterface);
-                        if (File.Exists((string)output))
-                        {
-                            word.Visible = true;
-                            word.Open(output);
-                        }                        
-                    }
-                    catch (Exception e)
-                    {
-                        System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
-                        Assembly.GetAssembly(lib.GetType()));
-                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", rm);
-                        infoBox.ShowDialog();
-                    }
+                    System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
+                    Assembly.GetAssembly(addin.AddinLib.GetType()));
+                    InfoBox infoBox = new InfoBox(addin, rm, false, "OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
+                    infoBox.ShowDialog();
                 }
             }
         }

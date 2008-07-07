@@ -107,13 +107,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfAddinLib", "Common\OdfAd
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Spreadsheet\Converter\Converter.csproj", "{E7055581-7C0C-429F-8134-99D3413C5756}"
-        ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-chs", "Word\Setup\OdfAddInForWordSetup-chs\OdfAddInForWordSetup-chs.vdproj", "{8E9DFA0D-5D87-4244-9A73-D5200D14F0D9}"
-        ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
@@ -125,139 +125,139 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{D3E4B38D
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{751AFC6B-AFDB-4D9B-ACBC-A07E3A62474B}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OdfWordAddinShim", "Word\OdfWordAddinShim\OdfWordAddinShim.vcproj", "{0926B47F-86B3-4AAB-9F1C-A558A58E939B}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfWordAddin", "Word\OdfWordAddin\OdfWordAddin.csproj", "{2329EA27-8A83-4AFB-89CE-CBE1E72F4A10}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineTool", "Shell\OdfConverter\CommandLineTool.csproj", "{289C4B72-B929-4E3D-808F-F622E275AC70}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-ja", "Word\Setup\OdfAddInForWordSetup-ja\OdfAddInForWordSetup-ja.vdproj", "{FE137308-33BD-4113-9951-E6DCF1023F34}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfPowerPointAddin", "Presentation\OdfPowerPointAddin\OdfPowerPointAddin.csproj", "{686B68A3-A89A-458F-8281-E5F00068C0AB}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OdfPowerPointAddinShim", "Presentation\OdfPowerPointAddinShim\OdfPowerPointAddinShim.vcproj", "{FED3CFB2-ED96-4027-86DE-F490CD65CD3D}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfExcelAddin", "Spreadsheet\OdfExcelAddin\OdfExcelAddin.csproj", "{294AC077-14E0-4630-B689-B440F3887550}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OdfExcelAddinShim", "Spreadsheet\OdfExcelAddinShim\OdfExcelAddinShim.vcproj", "{6293D7DA-2382-43D2-892C-48C3D45ADF71}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-pl", "Spreadsheet\Setup\OdfAddInForExcelSetup-pl\OdfAddInForExcelSetup-pl.vdproj", "{8749ADFC-2CD9-4928-8514-79FDBF668D0F}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-nl", "Spreadsheet\Setup\OdfAddInForExcelSetup-nl\OdfAddInForExcelSetup-nl.vdproj", "{CAE1BF68-DC61-4C40-979A-4BF5C32BF887}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-ja", "Spreadsheet\Setup\OdfAddInForExcelSetup-ja\OdfAddInForExcelSetup-ja.vdproj", "{A22A5BE9-0F2A-449A-8E17-C04AAA17A2F9}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-fr", "Spreadsheet\Setup\OdfAddInForExcelSetup-fr\OdfAddInForExcelSetup-fr.vdproj", "{24AE33BD-A643-4C40-989A-D6552D684396}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-de", "Spreadsheet\Setup\OdfAddInForExcelSetup-de\OdfAddInForExcelSetup-de.vdproj", "{7EBA039B-D49F-433D-BA4F-930E9938C1ED}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup", "Spreadsheet\Setup\OdfAddInForExcelSetup\OdfAddInForExcelSetup.vdproj", "{E4DF865D-1012-41B1-BB2A-ED20A93CA81F}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForExcelSetup-chs", "Spreadsheet\Setup\OdfAddInForExcelSetup-chs\OdfAddInForExcelSetup-chs.vdproj", "{7F602C97-B32D-44F1-ACA2-50ABC659F611}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup", "Presentation\Setup\OdfAddInForPPTSetup\OdfAddInForPPTSetup.vdproj", "{E285D4D8-D7D4-4C9B-AD19-C71209C3B972}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-chs", "Presentation\Setup\OdfAddInForPPTSetup-chs\OdfAddInForPPTSetup-chs.vdproj", "{70F3F1F0-D3BE-4766-84BA-B4B7AF7864D3}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-de", "Presentation\Setup\OdfAddInForPPTSetup-de\OdfAddInForPPTSetup-de.vdproj", "{2EE5D721-DDEE-4AEA-87E3-D5B12FD6DF0E}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-fr", "Presentation\Setup\OdfAddInForPPTSetup-fr\OdfAddInForPPTSetup-fr.vdproj", "{0466433B-BFD1-4E75-8074-167B0397DF96}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-ja", "Presentation\Setup\OdfAddInForPPTSetup-ja\OdfAddInForPPTSetup-ja.vdproj", "{78AEF59F-EA4E-4F07-B559-4511C7A742A2}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-nl", "Presentation\Setup\OdfAddInForPPTSetup-nl\OdfAddInForPPTSetup-nl.vdproj", "{ED7D7117-8E82-403B-B8B7-6482F69912F2}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForPPTSetup-pl", "Presentation\Setup\OdfAddInForPPTSetup-pl\OdfAddInForPPTSetup-pl.vdproj", "{D10B9115-86D6-40D0-B57A-933E75763EA2}"
-ProjectSection(WebsiteProperties) = preProject
+	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
@@ -537,6 +537,7 @@ Global
 		{289C4B72-B929-4E3D-808F-F622E275AC70}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{289C4B72-B929-4E3D-808F-F622E275AC70}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{289C4B72-B929-4E3D-808F-F622E275AC70}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{289C4B72-B929-4E3D-808F-F622E275AC70}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{289C4B72-B929-4E3D-808F-F622E275AC70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{289C4B72-B929-4E3D-808F-F622E275AC70}.Release|Any CPU.Build.0 = Release|Any CPU
 		{289C4B72-B929-4E3D-808F-F622E275AC70}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
@@ -571,6 +572,7 @@ Global
 		{686B68A3-A89A-458F-8281-E5F00068C0AB}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{686B68A3-A89A-458F-8281-E5F00068C0AB}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{686B68A3-A89A-458F-8281-E5F00068C0AB}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{686B68A3-A89A-458F-8281-E5F00068C0AB}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{686B68A3-A89A-458F-8281-E5F00068C0AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{686B68A3-A89A-458F-8281-E5F00068C0AB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{686B68A3-A89A-458F-8281-E5F00068C0AB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
@@ -600,6 +602,7 @@ Global
 		{294AC077-14E0-4630-B689-B440F3887550}.Release to Manufacturing (signed)|Mixed Platforms.ActiveCfg = Release to Manufacturing (signed)|Any CPU
 		{294AC077-14E0-4630-B689-B440F3887550}.Release to Manufacturing (signed)|Mixed Platforms.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{294AC077-14E0-4630-B689-B440F3887550}.Release to Manufacturing (signed)|Win32.ActiveCfg = Release to Manufacturing (signed)|Any CPU
+		{294AC077-14E0-4630-B689-B440F3887550}.Release to Manufacturing (signed)|Win32.Build.0 = Release to Manufacturing (signed)|Any CPU
 		{294AC077-14E0-4630-B689-B440F3887550}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{294AC077-14E0-4630-B689-B440F3887550}.Release|Any CPU.Build.0 = Release|Any CPU
 		{294AC077-14E0-4630-B689-B440F3887550}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU

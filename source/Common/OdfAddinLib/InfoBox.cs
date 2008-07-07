@@ -39,30 +39,42 @@ using System.Collections;
 using Microsoft.Win32;
 
 using System.Runtime.InteropServices;
-namespace CleverAge.OdfConverter.OdfConverterLib
+
+namespace OdfConverter.OdfConverterLib
 {
     public partial class InfoBox : Form
     {
-        private ResourceManager manager;
+        private AbstractOdfAddin _addin;
+        private ResourceManager _manager;
         /// <summary>
         /// Are details shown
         /// </summary>
-        private bool showDetails;
+        private bool _showDetails;
+
+        /// <summary>
+        /// A flag indicating whether a "Do not show this message again" checkbox is shown in the dialog
+        /// </summary>
+        private bool _showDisableCheckbox = false;
+        
         /// <summary>
         /// Client size of dialog box in "no details" mode
         /// </summary>
-        private Size smallSize = new Size(387, 65);
+        private Size _smallSize = new Size(387, 65);
         /// <summary>
         /// Client size of dialog box in "show details" mode
         /// </summary>
-        private Size largeSize;
+        private Size _largeSize;
 
 
 
-        public InfoBox(string label, ArrayList details, ResourceManager manager)
+        public InfoBox(AbstractOdfAddin addin, ResourceManager manager, bool showDisableCheckbox, string label, params string[] details)
         {
             InitializeComponent();
-            this.manager = manager;
+
+            this._addin = addin;
+            this._manager = manager;
+            this._showDisableCheckbox = showDisableCheckbox;
+
             this.label.Text = manager.GetString(label);
             StringBuilder bld = new StringBuilder();
             foreach (string detail in details)
@@ -80,22 +92,28 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        public InfoBox(string label, string details, ResourceManager manager)
-        {
-            InitializeComponent();
-            this.manager = manager;
-            this.label.Text = manager.GetString(label);
-            string text = manager.GetString(details);
-            txtDetails.Text = (string.IsNullOrEmpty(text) ? details : text);
-        }
+        //public InfoBox(string label, string details, ResourceManager manager, bool showDisableCheckbox)
+        //{
+        //    InitializeComponent();
+        //    this.manager = manager;
+        //    this.label.Text = manager.GetString(label);
+        //    string text = manager.GetString(details);
+        //    txtDetails.Text = (string.IsNullOrEmpty(text) ? details : text);
+
+        //    if (this.Parent == null)
+        //    {
+        //        // started in stand-alone mode (e.g. via context menu)
+        //        this.StartPosition = FormStartPosition.CenterScreen;
+        //    }
+        //}
 
         private void InfoBox_Load(object sender, EventArgs e)
         {
             try {
                 // Change the title
-                string newTitle = manager.GetString("OdfConverterTitle");
+                string newTitle = _manager.GetString("OdfConverterTitle");
                 if (!string.IsNullOrEmpty(newTitle)) {
-                    Text = newTitle;
+                    this.Text = newTitle;
                 }
                 // Store the offsets of buttons and groupbox
                 Size proposedSize = new Size(label.Width, 3000); // No vertical constraint
@@ -105,10 +123,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 // Redim/move windows and controls
                 label.Height = newHeight;
-                smallSize.Height += offset;
-                chkbxIsErrorIgnored.Top = label.Height ;
-                OK.Top = chkbxIsErrorIgnored.Height+ chkbxIsErrorIgnored.Top ;
-                Details.Top = chkbxIsErrorIgnored.Height + chkbxIsErrorIgnored.Top;
+                _smallSize.Height += offset;
+
+                chkbxIsErrorIgnored.Visible = _showDisableCheckbox;
+
+                if (_showDisableCheckbox)
+                {
+                    chkbxIsErrorIgnored.Top = label.Height + label.Top;
+                    OK.Top = chkbxIsErrorIgnored.Height + chkbxIsErrorIgnored.Top;
+                    Details.Top = chkbxIsErrorIgnored.Height + chkbxIsErrorIgnored.Top;
+                }
+                else
+                {
+                    OK.Top = label.Height + label.Top;
+                    Details.Top = label.Height + label.Top; 
+                }
 
                 // Test if everything fits
                 int offsetRight = 0;
@@ -119,15 +148,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     Details.Left += offsetRight;
                     grpDetails.Width += offsetRight;
                 }
-                if (Details.Right + leftMargin > smallSize.Width) {
-                    offsetRight += Details.Right + leftMargin - smallSize.Width;
+                if (Details.Right + leftMargin > _smallSize.Width) {
+                    offsetRight += Details.Right + leftMargin - _smallSize.Width;
                     this.Width += offsetRight;
-                    smallSize.Width += offsetRight;
+                    _smallSize.Width += offsetRight;
                 }
-                if (Details.Bottom + leftMargin > smallSize.Height) {
-                    offsetBottom = Details.Bottom + leftMargin - smallSize.Height;
+                if (Details.Bottom + leftMargin > _smallSize.Height) {
+                    offsetBottom = Details.Bottom + leftMargin - _smallSize.Height;
                     this.Height += offsetBottom;
-                    smallSize.Height += offsetBottom;
+                    _smallSize.Height += offsetBottom;
                 }
 
                 grpDetails.Top = Details.Top + Details.Height + 10;
@@ -149,13 +178,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     txtDetails.ScrollBars = ScrollBars.None;
                     grpDetails.Height += offset2;
                 }
-                largeSize = smallSize;
-                largeSize.Height = grpDetails.Top + grpDetails.Height+ 10;
+                _largeSize = _smallSize;
+                _largeSize.Height = grpDetails.Top + grpDetails.Height+ 10;
                 // At loadtime : no details
-                this.showDetails = false;
-                this.ClientSize = smallSize;
-                txtDetails.Visible = showDetails;
-                grpDetails.Visible = showDetails;
+                this._showDetails = false;
+                this.ClientSize = _smallSize;
+                txtDetails.Visible = _showDetails;
+                grpDetails.Visible = _showDetails;
             } catch {
                 // No message no crash
             }
@@ -163,18 +192,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void Details_Click(object sender, EventArgs e)
         {
-            showDetails = !showDetails;
+            _showDetails = !_showDetails;
 
-            txtDetails.Visible = showDetails;
-            grpDetails.Visible = showDetails;
-            if (showDetails)
+            txtDetails.Visible = _showDetails;
+            grpDetails.Visible = _showDetails;
+            if (_showDetails)
             {
-                this.ClientSize = largeSize;
+                this.ClientSize = _largeSize;
                 Details.Text = Details.Text.Replace("> > >", "< < <");
             }
             else
             {
-                this.ClientSize = smallSize;
+                this.ClientSize = _smallSize;
                 Details.Text = Details.Text.Replace("< < <", "> > >");
             }
         }
@@ -183,18 +212,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             if (chkbxIsErrorIgnored.Checked)
             {
-                if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "POWERPNT")
-                {
-                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "fidelityValue", "true");
-                }
-                if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "EXCEL")
-                {
-                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "fidelityValue", "true");
-                }
-                if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "WINWORD")
-                {
-                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "fidelityValue", "true");
-                }
+                Microsoft.Win32.Registry.SetValue(this._addin.RegistryKeyUser, ConfigForm.FidelityValue, "true");
+            }
+            else
+            {
+                Microsoft.Win32.Registry.SetValue(this._addin.RegistryKeyUser, ConfigForm.FidelityValue, "false");
             }
         }
      }

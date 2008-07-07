@@ -33,6 +33,7 @@ using CleverAge.OdfConverter.OdfConverterLib;
 using System.IO;
 using System.Globalization;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace OdfConverter.OdfConverterLib
 {
@@ -139,6 +140,33 @@ namespace OdfConverter.OdfConverterLib
             return fileNames;
         }
 
+        public virtual void SetUICulture()
+        {
+            // set culture to match current application culture or user's choice
+            int culture = 0;
+            string languageVal = Microsoft.Win32.Registry.GetValue(this.RegistryKeyUser, "Language", null) as string;
+
+            if (languageVal == null)
+            {
+                languageVal = Microsoft.Win32.Registry.GetValue(this.RegistryKeyLocalMachine, "Language", null) as string;
+            }
+
+            if (languageVal != null)
+            {
+                int.TryParse(languageVal, out culture);
+            }
+            if (culture == 0 && _application != null)
+            {
+                culture = _application.Invoke("LanguageSettings")
+                    .Invoke("LanguageID", MsoAppLanguageID.msoLanguageIDUI).ToInt32();
+            }
+
+            if (culture != 0)
+            {
+                System.Threading.Thread.CurrentThread.CurrentUICulture =
+                    new System.Globalization.CultureInfo(culture);
+            }
+        }
         
         /// <summary>
         ///      Implements the OnConnection method of the IDTExtensibility2 interface.
@@ -166,26 +194,9 @@ namespace OdfConverter.OdfConverterLib
                 out version);
             _officeVersion = (OfficeVersion)version;
 
-            // set culture to match current application culture or user's choice
-            int culture = 0;
-            string languageVal = Microsoft.Win32.Registry.GetValue(this.RegistryKeyUser, "Language", null) as string;
+            Application.EnableVisualStyles();
 
-            if (languageVal == null)
-            {
-                languageVal = Microsoft.Win32.Registry.GetValue(this.RegistryKeyLocalMachine, "Language", null) as string;
-            }
-
-            if (languageVal != null)
-            {
-                int.TryParse(languageVal, out culture);
-            }
-            if (culture == 0)
-            {
-                culture = _application.Invoke("LanguageSettings")
-                    .Invoke("LanguageID", MsoAppLanguageID.msoLanguageIDUI).ToInt32();
-            }
-            System.Threading.Thread.CurrentThread.CurrentUICulture =
-                new System.Globalization.CultureInfo(culture);
+            this.SetUICulture();
 
             this.DialogBoxTitle = _addinLib.GetString("OdfConverterTitle");
 
@@ -412,7 +423,8 @@ namespace OdfConverter.OdfConverterLib
 
         protected virtual void odfOptions()
         {
-            using (ConfigForm cfgForm = new ConfigForm())
+            using (ConfigForm cfgForm = 
+                new ConfigForm(this, new System.Resources.ResourceManager("OdfAddinLib.resources.Labels", Assembly.GetExecutingAssembly())))
             {
                 cfgForm.ShowDialog();
             }
@@ -439,7 +451,22 @@ namespace OdfConverter.OdfConverterLib
         /// <returns>IPictureDisp object</returns>
         public virtual stdole.IPictureDisp GetImage(Office.IRibbonControl control)
         {
-            return this._addinLib.GetLogo();
+            Assembly asm = Assembly.GetExecutingAssembly();
+            Stream stream = null;
+            foreach (string name in asm.GetManifestResourceNames())
+            {
+                if (name.EndsWith("OdfLogo.png"))
+                {
+                    stream = asm.GetManifestResourceStream(name);
+                    break;
+                }
+            }
+            if (stream == null)
+            {
+                return null;
+            }
+            System.Drawing.Bitmap image = new System.Drawing.Bitmap(stream);
+            return ConvertImage.Convert(image);
         }
 
         /// <summary>
@@ -476,14 +503,22 @@ namespace OdfConverter.OdfConverterLib
         }
         #endregion
 
-        protected abstract string RegistryKeyUser
+        public abstract string RegistryKeyUser
         {
             get;
         }
 
-        protected abstract string RegistryKeyLocalMachine
+        public abstract string RegistryKeyLocalMachine
         {
             get;
+        }
+
+        public OdfAddinLib AddinLib
+        {
+            get
+            {
+                return _addinLib;
+            }
         }
 
         protected abstract string ImportOdfFileFilter
@@ -518,5 +553,20 @@ namespace OdfConverter.OdfConverterLib
         }
 
         protected abstract void InitializeAddin();
+
+        sealed private class ConvertImage : System.Windows.Forms.AxHost
+        {
+            private ConvertImage()
+                : base(null)
+            {
+            }
+            public static stdole.IPictureDisp Convert
+                (System.Drawing.Image image)
+            {
+                return (stdole.IPictureDisp)System.
+                    Windows.Forms.AxHost
+                    .GetIPictureDispFromPicture(image);
+            }
+        }
     }
 }

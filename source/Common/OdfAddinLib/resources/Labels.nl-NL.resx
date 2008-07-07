@@ -133,7 +133,7 @@
     <value>ODF...</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>"Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."</value>
+    <value>Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen.</value>
   </data>
   <data name="AllFileType" xml:space="preserve">
     <value>Alle bestanden</value>
@@ -142,13 +142,13 @@
     <value>OpenDocument-tekstbestanden</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
-    <value>"Sorry, deze functie is nog niet geïmplementeerd"</value>
+    <value>Sorry, deze functie is nog niet geïmplementeerd</value>
   </data>
   <data name="ConversionFormTitle" xml:space="preserve">
     <value>Bezig met converteren van %1...</value>
   </data>
   <data name="FeedbackLabel" xml:space="preserve">
-    <value>"Sommige elementen kunnen tijdens de transformatie verloren zijn gegaan. Om een lijst met eventueel verloren elementen te bekijken, klik op "Details"."</value>
+    <value>Sommige elementen kunnen tijdens de transformatie verloren zijn gegaan. Om een lijst met eventueel verloren elementen te bekijken, klik op "Details".</value>
   </data>
   <data name="EncryptedDocumentDetail" xml:space="preserve">
     <value>Deze functie is door de huidige versie van de invoegtoepassing niet geïmplementeerd.</value>
@@ -160,7 +160,7 @@
     <value>Het ziparchief kon niet worden geopend. Controleer of uw document niet versleuteld is.</value>
   </data>
   <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>"Als het volgens u een geldig ODF-document is, vul dan een bugrapport in op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."</value>
+    <value>Als het volgens u een geldig ODF-document is, vul dan een bugrapport in op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen.</value>
   </data>
   <data name="NotAnOdfDocumentLabel" xml:space="preserve">
     <value>Dit document is schijnbaar geen geldig OASIS OpenDocument-bestand.</value>
@@ -187,7 +187,7 @@
     <value>De conversion is geannuleerd door de gebruiker</value>
   </data>
   <data name="CorruptedInputFileDetail" xml:space="preserve">
-    <value>"Als het volgens u een geldig ODF-document is, vul dan een bugrapport in op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen."</value>
+    <value>Als het volgens u een geldig ODF-document is, vul dan een bugrapport in op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen.</value>
   </data>
   <data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>Dit document is schijnbaar een corrupt OASIS OpenDocument-bestand.</value>

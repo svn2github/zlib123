@@ -70,7 +70,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         /// </summary>
         public Connect()
         {
-            this._addinLib = new OdfAddinLib(new CleverAge.OdfConverter.Spreadsheet.Converter());
+            this._addinLib = new OdfAddinLib(this, new CleverAge.OdfConverter.Spreadsheet.Converter());
             this._addinLib.OverrideResourceManager = new System.Resources.ResourceManager("OdfExcelAddin.resources.Labels", Assembly.GetExecutingAssembly());
         }
 
@@ -312,12 +312,12 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
             get { return EXPORT_ODF_FILE_FILTER; }
         }
 
-        protected override string RegistryKeyUser
+        public override string RegistryKeyUser
         {
             get { return HKCU_KEY; }
         }
 
-        protected override string RegistryKeyLocalMachine
+        public override string RegistryKeyLocalMachine
         {
             get { return HKLM_KEY; }
         }

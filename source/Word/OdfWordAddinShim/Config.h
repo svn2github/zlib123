@@ -6,7 +6,7 @@
 
 // These strings are specific to the managed assembly that this shim will load.
 static LPCWSTR szAddInAssemblyName = 
-	L"OdfWordAddin, PublicKeyToken=a641c4710f1207f8";
+	L"OdfWordAddin, PublicKeyToken=91d379aab3a2c227";
 static LPCWSTR szConnectClassName = 
 	L"OdfConverter.Wordprocessing.OdfWordAddin.Connect";
 static LPCWSTR szAssemblyConfigName =
@@ -15,4 +15,4 @@ static LPCWSTR szAssemblyConfigName =
 
 // This is the assembly that contains the ManagedAggregator
 static LPCWSTR szOdfAddinLibAssemblyName = 
-	L"OdfAddinLib, PublicKeyToken=a641c4710f1207f8";
+	L"OdfAddinLib, PublicKeyToken=91d379aab3a2c227";

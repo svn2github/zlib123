@@ -51,8 +51,8 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         protected const string IMPORT_ODF_FILE_FILTER = "*.odt";
         protected const string EXPORT_ODF_FILE_FILTER = " (*.odt)|*.odt|";
 
-        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OdfConverter\ODF Add-in for Word";
-        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OdfConverter\ODF Add-in for Word";
+        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\Clever Age\ODF Add-in for Word";
+        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\Clever Age\ODF Add-in for Word";
         
         /// <summary>
         /// Class name for Word12 documents
@@ -70,7 +70,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         /// </summary>
         public Connect()
         {
-            this._addinLib = new OdfAddinLib(new OdfConverter.Wordprocessing.Converter());
+            this._addinLib = new OdfAddinLib(this, new OdfConverter.Wordprocessing.Converter());
             this._addinLib.OverrideResourceManager = new System.Resources.ResourceManager("OdfWordAddin.resources.Labels", Assembly.GetExecutingAssembly());
         }
 
@@ -369,12 +369,12 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
             get { return EXPORT_ODF_FILE_FILTER; }
         }
 
-        protected override string RegistryKeyUser
+        public override string RegistryKeyUser
         {
             get { return HKCU_KEY; }
         }
 
-        protected override string RegistryKeyLocalMachine
+        public override string RegistryKeyLocalMachine
         {
             get { return HKLM_KEY; }
         }
