@@ -2826,7 +2826,10 @@
         <xsl:attribute name="chart:interval-major">
           <xsl:value-of select="c:majorUnit/@val"/>
         </xsl:attribute>
-        <xsl:if test="c:minorUnit">
+        <xsl:variable name="val">
+          <xsl:value-of select="c:majorUnit/@val div c:minorUnit/@val"/>
+        </xsl:variable>
+        <xsl:if test="c:minorUnit and $val != 'NaN'">
           <xsl:attribute name="chart:interval-minor-divisor">
             <xsl:value-of select="c:majorUnit/@val div c:minorUnit/@val"/>
           </xsl:attribute>
