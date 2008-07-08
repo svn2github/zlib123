@@ -974,7 +974,7 @@
         "Subject" = "8:"
         "ARPCONTACT" = "8:Clever Age"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Build: 4674"
+        "ARPCOMMENTS" = "8:Build: 4677"
         "ARPURLINFOABOUT" = "8:http://odf-converter.sourceforge.net/"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
@@ -1098,7 +1098,7 @@
                                                                     "Condition" = "8:ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 2.0 (Build 4674)"
+                                                                    "Value" = "8:Version 2.0 (Build 4677)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A28A1DACAD5D492CAF0A72382282AD39"
                                                                     {
@@ -1240,7 +1240,7 @@
                                                                     "Condition" = "8:ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 2.0 (Build 4674)"
+                                                                    "Value" = "8:Version 2.0 (Build 4677)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_D0B9AE2584A84EDB8DA1570B1012D5DF"
                                                                     {

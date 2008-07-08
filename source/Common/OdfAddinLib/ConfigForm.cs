@@ -71,13 +71,15 @@ namespace OdfConverter.OdfConverterLib
                     this.Text = newTitle;
                 }
 
+                MessageBox.Show(this._addin.RegistryKeyUser + " " + ConfigForm.FidelityValue);
+
                 string fidelityValue = Microsoft.Win32.Registry.GetValue(this._addin.RegistryKeyUser, ConfigForm.FidelityValue, "false") as string;
                 
                 chkbxIsErrorIgnored.Checked = fidelityValue.Equals("false", StringComparison.InvariantCultureIgnoreCase);
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show(e.ToString());
             }
         }
 

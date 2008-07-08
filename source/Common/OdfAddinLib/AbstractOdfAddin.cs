@@ -410,7 +410,13 @@ namespace OdfConverter.OdfConverterLib
         /// <param name="control">An IRibbonControl instance</param>
         public virtual void OdfOptions12(IRibbonControl control)
         {
-            odfOptions();
+            try
+            {
+                odfOptions();
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>
