@@ -576,15 +576,17 @@
       <!-- Condition: Cell content is not equal to -->
       <xsl:when test="contains(@style:condition, '!=')">
         <formula>
-          <xsl:if
-            test="substring-after(@style:condition, '!=') ='&quot;'
-            or substring-after(@style:condition, '!=') ='['
-            or number(substring-after(@style:condition, '!='))">
-            <xsl:call-template name="TranslateFormula">
-              <xsl:with-param name="formula" select="substring-after(@style:condition,'!=')"/>
-              <xsl:with-param name="tableName" select="$tableName"/>
-            </xsl:call-template>
-          </xsl:if>
+          <xsl:choose>
+            <xsl:when
+              test="substring-after(@style:condition, '!=') ='&quot;'
+              or substring-after(@style:condition, '!=') ='['
+              or number(substring-after(@style:condition, '!=')) or contains(substring-after(@style:condition, '!='), '&quot;')">
+              <xsl:call-template name="TranslateFormula">
+                <xsl:with-param name="formula" select="substring-after(@style:condition,'!=')"/>
+                <xsl:with-param name="tableName" select="$tableName"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
         </formula>
       </xsl:when>
 
