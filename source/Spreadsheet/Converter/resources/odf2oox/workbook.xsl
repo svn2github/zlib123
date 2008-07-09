@@ -401,7 +401,7 @@
 
   <xsl:template name="InsertPrintRanges">
     <xsl:for-each select="table:table">
-      <xsl:if test="@table:print-ranges">
+      <xsl:if test="@table:print-ranges and key('style',@table:style-name)/style:table-properties/@table:display != 'false'">
         <definedName name="_xlnm.Print_Area">
           <xsl:attribute name="localSheetId">
             <xsl:value-of select="position() - 1"/>
