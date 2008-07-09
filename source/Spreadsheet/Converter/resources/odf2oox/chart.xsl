@@ -2487,20 +2487,6 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
     <xsl:param name="parentStyleName"/>
     <xsl:param name="ChartDirectory"/>
 
-    <xsl:choose>
-
-      <xsl:when test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill='gradient'">
-        <xsl:for-each select="key('style',$styleName)/style:graphic-properties">
-          <xsl:call-template name="tmpGradientFill">
-            <xsl:with-param name="gradStyleName" select="@draw:fill-gradient-name"/>
-            <xsl:with-param name="opacity" select="substring-before(@draw:opacity,'%')"/>
-            <xsl:with-param name="ChartDirectory">
-              <xsl:value-of select="$ChartDirectory"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:otherwise>
 
         <!-- series shape property -->
         <c:spPr>
@@ -2561,9 +2547,7 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           </xsl:if>
         </c:spPr>
 
-      </xsl:otherwise>
-    </xsl:choose>
-
+   
   </xsl:template>
 
   <xsl:template name="InsertDataPointsShapeProperties">
