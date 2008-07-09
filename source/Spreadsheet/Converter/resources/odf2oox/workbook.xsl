@@ -72,17 +72,23 @@
         <!-- Insert firstSheet attribute when first sheet is hidden -->
         <xsl:if
           test="key('style',office:spreadsheet/table:table[position()=1]/@table:style-name)/style:table-properties/@table:display = 'false'">
-          <xsl:attribute name="firstSheet">
+        
             <xsl:variable name="TableStyleName">
               <xsl:value-of
                 select="office:spreadsheet/table:table[key('style',@table:style-name)/style:table-properties/@table:display != 'false']/@table:style-name"
               />
             </xsl:variable>
+            <xsl:variable name="TableCount">
             <xsl:for-each
               select="office:spreadsheet/table:table[@table:style-name=$TableStyleName][position()=1]">
               <xsl:value-of select="count(preceding-sibling::table:table)"/>
             </xsl:for-each>
-          </xsl:attribute>
+            </xsl:variable>
+            <xsl:if test="$TableCount != ''">
+              <xsl:attribute name="firstSheet">
+                    <xsl:value-of select="$TableCount"/>
+              </xsl:attribute>
+            </xsl:if>
         </xsl:if>
 
         <!-- Insert activeTab (Active sheet after open the file) -->
