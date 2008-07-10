@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OdfPowerPointAddin")]
 [assembly: AssemblyDescription("ODF Add-in for Microsoft PowerPoint")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Sonata")]
+[assembly: AssemblyCompany("Sonata Software Limited")]
 [assembly: AssemblyProduct("ODF Add-in for Microsoft PowerPoint")]
-[assembly: AssemblyCopyright("Copyright © DIaLOGIKa 2008")]
+[assembly: AssemblyCopyright("Copyright © Sonata Software Limited 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
