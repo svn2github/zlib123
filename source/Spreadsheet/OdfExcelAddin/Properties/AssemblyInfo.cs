@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OdfPowerPointAddin")]
-[assembly: AssemblyDescription("ODF Add-in for Microsoft Word")]
+[assembly: AssemblyTitle("OdfExcelAddin")]
+[assembly: AssemblyDescription("ODF Add-in for Microsoft Excel")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("DIaLOGIKa")]
-[assembly: AssemblyProduct("ODF Add-in for Microsoft Word")]
-[assembly: AssemblyCopyright("Copyright © DIaLOGIKa 2008")]
+[assembly: AssemblyCompany("Clever Age")]
+[assembly: AssemblyProduct("ODF Add-in for Microsoft Excel")]
+[assembly: AssemblyCopyright("Copyright © Sonata Software Limited 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
