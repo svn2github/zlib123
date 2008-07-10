@@ -307,7 +307,7 @@
     <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="chkbxIsErrorIgnored.Text" xml:space="preserve">
-    <value>不要再次显示此讯息 </value>
+    <value>不要再显示这条讯息</value>
   </data>
 </root>
 

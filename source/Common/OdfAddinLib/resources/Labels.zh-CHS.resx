@@ -208,6 +208,6 @@
     <value>启用/禁用fidelitymessage对话框</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
-    <value>ODF格式的选项</value>
+    <value>ODF选项</value>
   </data>
 </root>
