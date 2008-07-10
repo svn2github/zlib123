@@ -140,6 +140,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             {
                                 string fidelityValue = Microsoft.Win32.Registry.GetValue(this.addin.RegistryKeyUser, ConfigForm.FidelityValue, "false") as string;
 
+                                if (fidelityValue == null)
+                                {
+                                    fidelityValue = "false";
+                                }
+
                                 if (fidelityValue.Equals("false", StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, true, "FeedbackLabel", form.LostElements);
@@ -242,7 +247,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         {
                             string fidelityMsgValue = Microsoft.Win32.Registry.GetValue(this.addin.RegistryKeyUser, ConfigForm.FidelityValue, "false") as string;
 
-                            if (fidelityMsgValue == "false")
+                            if (fidelityMsgValue == null || fidelityMsgValue == "false")
                             {
                                 InfoBox infoBox = new InfoBox(this.addin, this.resourceManager, true, "FeedbackLabel", form.LostElements);
                                 infoBox.ShowDialog();
