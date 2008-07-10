@@ -79,7 +79,7 @@ namespace OdfConverterLauncher
             Type aType = aDoc.GetType();
             object fields = aType.InvokeMember("Fields", BindingFlags.GetProperty, null, aDoc, null);
             Type fieldsType = fields.GetType();
-            fieldsType.InvokeMember("Update", BindingFlags.InvokeMethod, null, fields, null);
+            //fieldsType.InvokeMember("Update", BindingFlags.InvokeMethod, null, fields, null);
         }
 
         public void getLanguage()
