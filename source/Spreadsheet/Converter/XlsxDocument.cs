@@ -900,7 +900,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 if (value.Contains("-"))
                 {
-                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value) + value.Length);
+                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value + " ") + value.Length);
                     Style = ConditionalCellStyle.Substring(0, ConditionalCellStyle.IndexOf('='));
 
                     string CellStart = value.Substring(0, value.IndexOf('-'));
@@ -921,7 +921,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 else if (value.Contains("|"))
                 {
 
-                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value) + value.Length);
+                    ConditionalCellStyle = ConditionalCell.Substring(ConditionalCell.IndexOf(value + " ") + value.Length);
                     Style = ConditionalCellStyle.Substring(0, ConditionalCellStyle.IndexOf('='));
 
                     int CollNr = System.Int32.Parse(value.Substring(0, value.IndexOf('|')));

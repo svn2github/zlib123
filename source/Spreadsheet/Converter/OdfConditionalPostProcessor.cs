@@ -118,7 +118,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
             else if (ElementName.Equals("sqref"))
             {
-                this.nextWriter.WriteString(stringSqref[text].ToString());              
+                
+                this.nextWriter.WriteString(ConditionalModification(stringSqref[text].ToString()));              
                 ElementName = "";
             }
             else
@@ -164,5 +165,130 @@ namespace CleverAge.OdfConverter.Spreadsheet
             }
             
         }
+
+
+        protected int GetRowId(string value)
+        {
+            int result = 0;
+
+            foreach (char c in value)
+            {
+                if (c >= '0' && c <= '9')
+                {
+                    result = (10 * result) + (c - '0');
+                }
+            }
+
+            return result;
+        }
+
+        protected int GetColId(string value)
+        {
+            int result = 0;
+
+            foreach (char c in value)
+            {
+                if (c >= 'A' && c <= 'Z')
+                {
+                    result = (26 * result) + (c - 'A' + 1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        protected string ConditionalModification(string value)
+        {
+            string result = "";
+            string prevCell = "";
+            int prevRowNum = -1;
+            int prevColNum = -1;
+            int repeat = 0;
+
+            int thisRowNum = -1;
+            int thisColNum = -1;
+
+
+            //result = value;
+            foreach (string single in value.Split())
+            {
+                if (single.Contains(":"))
+                {
+                    if (result != "")
+                    {
+                        if (repeat > 0)
+                        {
+                            result = result + ":" + prevCell + " " + single;
+                            prevCell = "";
+                            prevRowNum = -1;
+                            prevColNum = -1;
+                            repeat = 0;
+                        }
+                        else
+                        {
+                            result = result + " " + single;
+                        }
+
+                    }
+                    else
+                    {
+                        result = single;
+                    }
+                }
+                else
+                {
+                    if (result != "")
+                    {
+                        thisRowNum = GetRowId(single);
+                        thisColNum = GetColId(single);
+                        if (prevCell != "")
+                        {
+                            if (thisColNum == prevColNum && thisRowNum == (prevRowNum + 1))
+                            {
+                                prevCell = single;
+                                prevRowNum = thisRowNum;
+                                prevColNum = thisColNum;
+                                repeat = repeat + 1;
+                            }
+                            else if (repeat > 0)
+                            {
+                                result = result + ":" + prevCell + " " + single;
+                                prevCell = single;
+                                prevRowNum = thisRowNum;
+                                prevColNum = thisColNum;
+								repeat = 0;
+                            }
+                            else
+                            {
+                                result = result + " " + single;
+                                prevCell = single;
+                                prevRowNum = thisRowNum;
+                                prevColNum = thisColNum;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        result = single;
+                        prevCell = single;
+                        prevRowNum = thisRowNum;
+                        prevColNum = thisColNum;
+                    }
+                }
+            }
+
+            if (repeat > 0 && prevCell != "")
+            {
+                result = result + ":" + prevCell;
+            }
+            
+
+            return result;
+        }
+
     }
 }
