@@ -848,6 +848,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
 						this.replace = true;
 						break;
                     default:
+                        if (string.IsNullOrEmpty(this.input))
+                        {
+                            this.input = args[i];
+                        }
                         break;
                 }
             }
