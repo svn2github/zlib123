@@ -82,6 +82,11 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
 
+    <xsl:variable name="ConditionalCellStyle">
+      <xsl:for-each select="document('content.xml')/office:document-content/office:automatic-styles/style:style[style:map]">
+        <xsl:value-of select="concat(@style:name, '|')"/>
+      </xsl:for-each>
+    </xsl:variable>
 
     <xsl:if test="not(table:scenario)">
       <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
@@ -111,6 +116,9 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           </xsl:with-param>
           <xsl:with-param name="CheckIfConditional">
             <xsl:value-of select="$CheckIfConditional"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
           </xsl:with-param>
         </xsl:call-template>
       </pzip:entry>
@@ -166,9 +174,10 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
+    <xsl:param name="ConditionalCellStyle"/>
 
     <worksheet>
-
+      
       <xsl:variable name="MergeCell">
         <xsl:call-template name="WriteMergeCell"/>
       </xsl:variable>
@@ -326,9 +335,10 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           <xsl:value-of select="$MergeCellStyle"/>
         </xsl:with-param>
       </xsl:call-template>
+      
 
-      <xsl:if
-        test="ancestor::office:document-content/office:automatic-styles/style:style/style:map/@style:condition != ''">
+      <xsl:if test="$ConditionalCellStyle != ''">
+   
         <xsl:apply-templates select="descendant::table:table-row[1]" mode="conditional">
           <xsl:with-param name="rowNumber">
             <xsl:text>1</xsl:text>
@@ -340,6 +350,16 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
           <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
+      
+        <xsl:call-template name="InsertConditionalCellElement">
+          <xsl:with-param name="tableName">
+            <xsl:value-of select="@table:name"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
       </xsl:if>
 
       <!-- Insert Data Validation -->

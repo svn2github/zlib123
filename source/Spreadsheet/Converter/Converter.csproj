@@ -116,6 +116,7 @@
     <EmbeddedResource Include="resources\oox2odf\pivot_tables.xsl" />
     <EmbeddedResource Include="resources\oox2odf\Gradient.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
+    <Compile Include="OdfConditionalPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />
     <Compile Include="OoxMaximumCellTextPostProcessor.cs" />
     <Compile Include="OoxPhysicalPathPostProcessor.cs" />

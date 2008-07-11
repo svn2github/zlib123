@@ -47,6 +47,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
                 return new string[]  {
+                   "CleverAge.OdfConverter.Spreadsheet.OdfConditionalPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.Spreadsheet.OoxCommentsPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.Spreadsheet.OoxDrawingsPostProcessor,"+fullname,
                    "CleverAge.OdfConverter.Spreadsheet.OoxHeaderFooterPostProcessor,"+fullname,
