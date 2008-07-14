@@ -72,6 +72,13 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         {
             this._addinLib = new OdfAddinLib(this, new CleverAge.OdfConverter.Spreadsheet.Converter());
             this._addinLib.OverrideResourceManager = new System.Resources.ResourceManager("OdfExcelAddin.resources.Labels", Assembly.GetExecutingAssembly());
+            // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
+            if (!CultureInfo.CurrentCulture.Equals(CultureInfo.CurrentUICulture))
+            {
+                System.Globalization.CultureInfo ci;
+                ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+                System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            }
         }
 
                 
@@ -196,10 +203,17 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                     // conversion may have been cancelled and file deleted.
                     if (File.Exists((string)fileName))
                     {
+                        // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
+                        System.Globalization.CultureInfo ci;
+                        ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+                        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
                         LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
                         
                         // and activate it
                         doc.Invoke("Activate");
+
+                        System.Threading.Thread.CurrentThread.CurrentCulture = ci;
                     }
                 }
                 catch (Exception ex)
@@ -216,7 +230,11 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         /// </summary>
         protected override void exportOdf()
         {
-
+            System.Globalization.CultureInfo ci;
+            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            try
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             LateBindingObject doc = _application.Invoke("ActiveWorkbook");
 
             // the second test deals with blank documents 
@@ -299,6 +317,11 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                         this._addinLib.DeleteTempPath((string)tempDocxName);
                     }
                 }
+            }
+        }
+            finally
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = ci;
             }
         }
 

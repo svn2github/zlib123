@@ -176,7 +176,11 @@
                     <xsl:when test="contains(@table:condition, 'is-time')">
                         <xsl:text>time</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains(@table:condition, 'is-in-list(&quot;')">
+					<!--Conditon(or condition) added by Sateesh, fix for the bug 1768233
+					Bug Description:ODS Filters dropdown list worngly converted-office XP/2003
+					File Name:Criminal.EN.ods
+					Date:14th July '08-->
+                    <xsl:when test="contains(@table:condition, 'is-in-list(&quot;') or contains(@table:condition, 'cell-content-is-in-list')">
                         <xsl:text>list</xsl:text>
                     </xsl:when>
                     <xsl:when test="contains(@table:condition, 'cell-content-text-length')">
@@ -462,6 +466,49 @@
                     </xsl:call-template>
                 </formula2>
             </xsl:when>
+			<!-- Condition: Cell content is in list -->
+			<!-- Code added by Sateesh, fix for the bug 1768233
+				 Bug Description:ODS Filters dropdown list worngly converted-office XP/2003
+				 File Name:Criminal.EN.ods
+				 Date:14th July '08-->
+			<xsl:when test="contains(@table:condition, 'cell-content-is-in-list')">
+				<xsl:variable name="listValue">
+					<xsl:value-of select="substring-before(substring-after(@table:condition,'cell-content-is-in-list(['),'])')"/>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="contains($listValue,'.') and contains($listValue,':')">
+						<formula1>
+							<xsl:value-of select="concat(substring-after(substring-before($listValue,':'),'.'),':',substring-after(substring-after($listValue,':'),'.'))"/>
+						</formula1>
+						<formula2>
+							<xsl:text>0</xsl:text>
+						</formula2>
+					</xsl:when>
+					<xsl:when test="contains(@table:condition,';')">
+						<formula1>
+							<xsl:variable name="value">
+								<xsl:value-of select="translate(translate(substring-before(substring-after(@table:condition,'cell-content-is-in-list('),')'),'&quot;',' '),';',',')"/>
+							</xsl:variable>
+							<xsl:value-of select="concat('&quot;',$value,'&quot;')"/>
+						</formula1>
+						<formula2>
+							<xsl:text>0</xsl:text>
+						</formula2>
+					</xsl:when>
+					<xsl:otherwise>
+						<formula1>
+							<xsl:variable name="value">
+								<xsl:value-of select="translate(translate(substring-before(substring-after(@table:condition,'cell-content-is-in-list('),')'),'&quot;',' '),';',',')"/>
+							</xsl:variable>
+							<xsl:value-of select="concat('&quot;',$value,'&quot;')"/>
+						</formula1>
+						<formula2>
+							<xsl:text>0</xsl:text>
+						</formula2>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<!--End-->
 
         </xsl:choose>
     </xsl:template>

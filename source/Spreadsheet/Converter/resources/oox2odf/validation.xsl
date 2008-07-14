@@ -460,6 +460,9 @@
                 <xsl:with-param name="sheet">
                     <xsl:value-of select="$number"/>
                 </xsl:with-param>
+				<xsl:with-param name="sheetName">
+					<xsl:value-of select="$sheetName"/>
+				</xsl:with-param>
             </xsl:apply-templates>
         </xsl:for-each>
 
@@ -474,20 +477,28 @@
 
     <xsl:template match="e:dataValidations" mode="Validation">
         <xsl:param name="sheet"/>
+		<xsl:param name="sheetName"/>
         <xsl:call-template name="InsertValidationProperties">
             <xsl:with-param name="sheet">
                 <xsl:value-of select="$sheet"/>
             </xsl:with-param>
+			<xsl:with-param name="sheetName">
+				<xsl:value-of select="$sheetName"/>
+			</xsl:with-param>
         </xsl:call-template>
     </xsl:template>
 
     <xsl:template name="InsertValidationProperties">
         <xsl:param name="sheet"/>
+		<xsl:param name="sheetName"/>
         <table:content-validations>
             <xsl:call-template name="InsertValidation">
                 <xsl:with-param name="sheet">
                     <xsl:value-of select="$sheet"/>
                 </xsl:with-param>
+				<xsl:with-param name="sheetName">
+					<xsl:value-of select="$sheetName"/>
+				</xsl:with-param>
             </xsl:call-template>
         </table:content-validations>
     </xsl:template>
@@ -495,6 +506,7 @@
     <!-- Insert Data Validation -->
     <xsl:template name="InsertValidation">
         <xsl:param name="sheet"/>
+		<xsl:param name="sheetName"/>
 
         <xsl:for-each select="e:dataValidation">
             <xsl:sort select="@priority"/>
@@ -634,16 +646,47 @@
                 </xsl:attribute>
 
                 <xsl:if test="contains(@type, 'list')">
-
                     <xsl:choose>
                         <xsl:when test="contains(@type, 'list')">
                             <xsl:attribute name="table:condition">
                                 <xsl:variable name="ListValue">
                                     <xsl:value-of select="e:formula1"/>
                                 </xsl:variable>
-                                <xsl:value-of
-                                    select="concat('oooc:cell-content-is-in-list(&quot;',$ListValue,'&quot;)')"
-                                />
+						<xsl:choose>
+							<!--Code added by Sateesh, fix for the bug 1768233
+							Bug Description:ODS Filters dropdown list worngly converted-office XP/2003
+							File Name:Criminal.EN.ods
+							Date:14th July '08-->
+							<xsl:when test="contains($ListValue,':')">
+								<xsl:value-of select="concat('oooc:cell-content-is-in-list([',$sheetName,'.',substring-before($ListValue,':'),':',$sheetName,'.',substring-after($ListValue,':'),'])')"/>
+							</xsl:when>
+							<xsl:when test="contains($ListValue,',')">
+							  <xsl:choose>
+								<xsl:when test="contains($ListValue,',') and contains($ListValue,' ')">
+									<xsl:variable name="value">
+										<xsl:value-of select="translate($ListValue,'&quot;','')"/>
+									</xsl:variable>
+									<xsl:value-of select="concat('oooc:cell-content-is-in-list(',translate(translate(translate($value,'&quot;',' '),',',';'),' ','&quot;'),')')"/>
+								</xsl:when>
+								<xsl:when test="contains($ListValue,',')">
+									<xsl:variable name ="valResult">
+										<xsl:call-template name="recursive">
+											<xsl:with-param name="oldString" select="','"/>
+											<xsl:with-param name="newString" select="concat('&quot;',';','&quot;')"/>
+											<xsl:with-param name="wholeText" select="$ListValue"/>
+										</xsl:call-template>
+									</xsl:variable>
+									<xsl:value-of select="concat('oooc:cell-content-is-in-list(',$valResult,')')"/>
+								</xsl:when>
+							  </xsl:choose>
+							</xsl:when>
+							<xsl:when test="not(contains($ListValue,',') and contains($ListValue,':'))">
+								<xsl:value-of select="concat('oooc:cell-content-is-in-list(',$ListValue,')')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="concat('oooc:cell-content-is-in-list(&quot;',$ListValue,'&quot;)')"/>
+						    </xsl:otherwise>
+					    </xsl:choose>
                             </xsl:attribute>
                         </xsl:when>
                     </xsl:choose>
@@ -669,6 +712,12 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
+					
+		    <!--Code Added By Sateesh-->
+		    <xsl:attribute name="table:base-cell-address">
+			<xsl:value-of select="concat($sheetName,'.',@sqref)"/>
+		    </xsl:attribute>
+		    <!--End-->
                 </xsl:if>
 
                 <!-- Criteria Allow Blank Cells -->
@@ -681,6 +730,8 @@
                     </xsl:choose>
                 </xsl:attribute>
 
+
+	    <xsl:if test="@promptTitle != '' and @prompt !=''">
                 <table:help-message>
                     <!-- Input Help - Show input help when cell is selected -->
                     <xsl:attribute name="table:display">
@@ -699,6 +750,7 @@
                         <xsl:value-of select="@prompt"/>
                     </text:p>
                 </table:help-message>
+	    </xsl:if>
 
                 <table:error-message>
                     <!-- Error Alert - Show error alert when cell is selected -->
