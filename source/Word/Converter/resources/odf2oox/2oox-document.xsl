@@ -51,8 +51,7 @@
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <xsl:key name="hyperlinks" match="text:a" use="''"/>
   <xsl:key name="headers" match="text:h" use="''"/>
-  <xsl:key name="restarting-lists"
-    match="text:list[text:list-item/@text:start-value and @text:style-name]" use="''"/>
+  <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value and @text:style-name]" use="''"/>
 
 
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
@@ -1208,7 +1207,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="myStyle" select="key('automatic-styles', $styleName)"></xsl:variable>
+    <xsl:variable name="myStyle" select="key('automatic-styles', $styleName)" />
     
     <xsl:choose>
 

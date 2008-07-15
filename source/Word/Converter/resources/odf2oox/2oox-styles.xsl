@@ -174,10 +174,16 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      <xsl:if test="$prefixedStyleName = 'X3AS7TOCHyperlink' or $prefixedStyleName = 'X3AS7TABSTYLE' or $prefixedStyleName = 'BulletSymbol' or $prefixedStyleName = 'http://www.dialogika.de/stylename/hiddenParagraph'">
-        <w:semiHidden />
-      </xsl:if>          
-
+		<xsl:choose>
+			<xsl:when test="$prefixedStyleName = 'X3AS7TOCHyperlink' or $prefixedStyleName = 'X3AS7TABSTYLE' or $prefixedStyleName = 'BulletSymbol' or $prefixedStyleName = 'http://www.dialogika.de/stylename/hiddenParagraph'">
+				<w:semiHidden />
+			</xsl:when>
+			<xsl:when test="starts-with($prefixedStyleName, 'ID0')">
+				<!-- on roundtrip hide styles which were generated during DOCX -> ODT conversion -->
+				<w:hidden />
+			</xsl:when>
+		</xsl:choose>
+		
       <!-- Parent style name -->
       <xsl:choose>
         <xsl:when test="@style:parent-style-name = 'Addressee' ">
