@@ -183,7 +183,7 @@
   <xsl:template name="DrawingMLToZindex" >
     <xsl:param name="wpAnchor" />
 
-    <xsl:variable name="index" select="$wpAnchor/@relativeHeight" />
+    <xsl:variable name="index" select="number($wpAnchor/@relativeHeight)" />
     
     <!--
     makz:
