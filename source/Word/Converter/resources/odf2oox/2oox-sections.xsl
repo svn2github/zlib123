@@ -275,8 +275,9 @@
       -->
       <xsl:if
         test="($next-page-break='true' or $next-master-page != '' or $next-new-section = 'true' or $next-end-section = 'true' ) 
-        and not(ancestor::text:note-body or ancestor::table:table)">
+        and not(ancestor::text:note-body or ancestor::table:table or ancestor::*[substring(name(), 1, 5) = 'draw:'])">
         <!--dialogika, clam: section breaks have their own paragraphs now (bug #1615686)-->
+		<!-- 20080711/divo: Fix for #2014947: Don't add section breaks inside shapes, i.e. when there is an ancestor in the draw namespace -->
         <w:p>
           <w:pPr>
             <w:sectPr>
