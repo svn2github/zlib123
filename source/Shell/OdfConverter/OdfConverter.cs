@@ -398,7 +398,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             int nbValidatedAndNotOpened = 0;
             int nbNotValidatedAndOpened = 0;
             int nbNotValidatedAndNotOpened = 0;
-            this.report.AddComment("Processing " + nbFiles + " " + ext.ToUpper() + "  file(s)");
+            this.report.AddComment("Processing " + nbFiles + " " + ext.ToUpper() + " file(s)");
             foreach (string input in files)
             {
                 string output = this.GenerateOutputName(this.output, input, targetExt, this.replace);
