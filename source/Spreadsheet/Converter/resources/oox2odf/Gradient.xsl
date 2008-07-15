@@ -536,17 +536,44 @@
     <xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:variable name ="NewRed">
       <xsl:call-template name ="DecToHex">
-        <xsl:with-param name ="number" select ="$Red"/>
+        <xsl:with-param name ="number">
+          <xsl:choose>
+            <xsl:when test="$Red != 'NaN'">
+              <xsl:value-of select="$Red"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>        
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name ="NewGreen">
       <xsl:call-template name ="DecToHex">
-        <xsl:with-param name ="number" select ="$Green"/>
+        <xsl:with-param name ="number">
+          <xsl:choose>
+            <xsl:when test="$Green != 'NaN'">
+              <xsl:value-of select="$Green"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name ="NewBlue">
       <xsl:call-template name ="DecToHex">
-        <xsl:with-param name ="number" select ="$Blue"/>
+        <xsl:with-param name ="number">
+          <xsl:choose>
+            <xsl:when test="$Blue != 'NaN'">
+              <xsl:value-of select="$Blue"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
