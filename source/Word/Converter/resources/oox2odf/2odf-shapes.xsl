@@ -1145,6 +1145,10 @@
 	<xsl:template match="v:rect | v:line|v:shape|v:oval|v:roundrect">
 		<!-- version 1.1-->
 		<xsl:choose>
+      <xsl:when test =".//w:drawing">
+        <!--If picture inside any shape is present ignore the shape for converion
+        since it is causing the crash in ODT and also this feature is not compatible in ODT.-->
+      </xsl:when>
 			<xsl:when test="v:imagedata">
 				<xsl:variable name="document">
 					<xsl:call-template name="GetDocumentName">
@@ -1773,7 +1777,7 @@
 		</xsl:call-template>
 		<!--####prad-->
 		<xsl:choose>
-			<xsl:when test ="contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')">
+      <xsl:when test ="contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') or contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:true')">
 				<xsl:attribute name ="draw:auto-grow-height">
 					<xsl:value-of select ="'true'"/>
 				</xsl:attribute>
@@ -2133,7 +2137,8 @@
 				<xsl:otherwise>
 					<xsl:call-template name="GetShapeProperty">
 						<xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
-						<xsl:with-param name="shape" select="."/>
+            <!-- Sona Defect #1990565-->
+            <xsl:with-param name="shape" select="$shape"/>
 					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -2147,7 +2152,8 @@
 				<xsl:otherwise>
 					<xsl:call-template name="GetShapeProperty">
 						<xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
-						<xsl:with-param name="shape" select="."/>
+            <!-- Sona Defect #1990565-->
+            <xsl:with-param name="shape" select="$shape"/>
 					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -2166,7 +2172,7 @@
 				<xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and not(w10:wrap/@type)">
 					<xsl:text>false</xsl:text>
 				</xsl:when>
-				<xsl:when test="$verticalRelative='page' and $horizontalRelative='page'">
+        <xsl:when test="$verticalRelative='page' or $horizontalRelative='page'">
 					<xsl:text>false</xsl:text>
 				</xsl:when>
 				<xsl:otherwise>
@@ -2252,12 +2258,14 @@
 				<xsl:with-param name="shape" select="$shape"/>
 			</xsl:call-template>
 		</xsl:variable>
-		<xsl:call-template name="InsertVerticalPos">
-			<xsl:with-param name="vAlign" select="$verticalPos"/>
+    <!-- Sona changed parameter for defect #1844731-->
+    <xsl:call-template name="InsertGraphicPosV">
+      <xsl:with-param name="align" select="$verticalPos" />
+      <xsl:with-param name="relativeFrom" select="$verticalRelative"/>      
 		</xsl:call-template>
-		<xsl:call-template name="InsertVerticalRel">
-			<xsl:with-param name="vRel" select="$verticalRelative"/>
-			<xsl:with-param name="vPos" select="$verticalPos" />
+    <xsl:call-template name="InsertGraphicPosRelativeV">
+      <xsl:with-param name="relativeFrom" select="$verticalRelative"/>
+      <xsl:with-param name="align" select="$verticalPos" />
 		</xsl:call-template>
 	</xsl:template>
 
@@ -3021,6 +3029,17 @@
 				</xsl:attribute>
 			</xsl:when>
 		</xsl:choose>
+    <!--Sona Wrap and resize-->    
+      <xsl:attribute name ="fo:wrap-option">
+        <xsl:choose>
+          <xsl:when test ="$wrapStyle='none' and $wrapStyle='none'">
+            <xsl:value-of select="'wrap'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'no-wrap'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>    
 	</xsl:template>
 
 	<!--
@@ -3164,12 +3183,28 @@
 		</xsl:variable>
 		<xsl:variable name="HorizontalWidth">
 			<xsl:choose>
-				<xsl:when test="$relH='page'">
-					<xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w)"/>
-				</xsl:when>
+				
 				<xsl:when test="$relH='margin'">
 					<xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w) - number(ancestor::node()/w:sectPr/w:pgMar/@w:left) - number(ancestor::node()/w:sectPr/w:pgMar/@w:right)"/>
 				</xsl:when>
+        <xsl:when test="$relH='right-margin-area' or $relH='inner-margin-area'">
+          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w) - number(ancestor::node()/w:sectPr/w:pgMar/@w:right)"/>
+        </xsl:when>
+
+        <xsl:otherwise>
+          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="VerticalHeight">
+      <xsl:choose>
+        <xsl:when test="$relV='bottom-margin-area' or $relV='inner-margin-area'">
+          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:h) - number(ancestor::node()/w:sectPr/w:pgMar/@w:bottom)"/>
+        </xsl:when>
+
+        <xsl:otherwise>
+          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:h)"/>
+        </xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 
@@ -3189,113 +3224,303 @@
     -->
 		<xsl:if test="name($shape/..)!='v:group'">
 
-			<xsl:if test="$position='absolute'">
+      <xsl:if test="not(contains($shape/@style,'mso-left-percent'))">
 				<xsl:variable name="x">
 					<xsl:choose>
 						<xsl:when test="$LeftPercent &gt; 0">
 							<xsl:value-of select="$HorizontalWidth * $LeftPercent  div 1000"/>
 						</xsl:when>
+            <!-- Sona: Fixed Defect #1990593-->
 						<xsl:when test="$shape[name()='v:rect' or name()='v:line']">
+              <xsl:choose>
+                <xsl:when test ="contains($shape/@style,'margin-left')">
+                  <xsl:variable name ="margLeft">
 							<xsl:call-template name="GetShapeProperty">
 								<xsl:with-param name="shape" select="$shape"/>
-								<xsl:with-param name="propertyName" select="'left'"/>
+                      <xsl:with-param name="propertyName" select="'margin-left'"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name ="marginLeft">
+                    <xsl:choose>
+                      <xsl:when test ="$margLeft != 0">
+                        <xsl:call-template name ="ConvertMeasure">
+                          <xsl:with-param name ="length" select="$margLeft"></xsl:with-param>
+                          <xsl:with-param name ="destUnit" select="'cm'"></xsl:with-param>
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:call-template name="GetShapeProperty">
-								<xsl:with-param name="shape" select="$shape"/>
-								<xsl:with-param name="propertyName" select="'margin-left'"/>
-							</xsl:call-template>
+                        <xsl:value-of select="'0cm'"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-				<xsl:variable name="y">
+				
 					<xsl:choose>
-						<xsl:when test="$shape[name()='v:rect' or name()='v:line']">
-							<xsl:call-template name="GetShapeProperty">
-								<xsl:with-param name="shape" select="$shape"/>
-								<xsl:with-param name="propertyName" select="'top'"/>
+                    <xsl:when test ="$relH='right-margin-area' or $relH='inner-margin-area'">
+                      <xsl:variable name ="horWidth">
+                        <xsl:call-template name ="ConvertTwips">
+                          <xsl:with-param name="length" select ="$HorizontalWidth"></xsl:with-param>
+                          <xsl:with-param name ="unit" select="'cm'"></xsl:with-param>
 							</xsl:call-template>
+                      </xsl:variable>
+                      <xsl:value-of select="concat((substring-before($horWidth,'cm')+substring-before($marginLeft,'cm')),'cm')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$marginLeft"></xsl:value-of>
+                    </xsl:otherwise>
+                  </xsl:choose>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:call-template name="GetShapeProperty">
 								<xsl:with-param name="shape" select="$shape"/>
-								<xsl:with-param name="propertyName" select="'margin-top'"/>
+                    <xsl:with-param name="propertyName" select="'left'"/>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name ="margLeft">
+                <xsl:call-template name="GetShapeProperty">
+                  <xsl:with-param name="shape" select="$shape"/>
+                  <xsl:with-param name="propertyName" select="'margin-left'"/>
+                </xsl:call-template>
 				</xsl:variable>
-
-				<!--
-        Modify the vertical position if the shape is 
-        in the footer/header and anchored to the page or margin.
-        -->
-
-				<xsl:variable name="posX">
+              <xsl:variable name ="marginLeft">
+                <xsl:choose>
+                  <xsl:when test ="$margLeft != 0">
 					<xsl:call-template name="ConvertMeasure">
-						<xsl:with-param name="length" select="$x"/>
-						<xsl:with-param name="destUnit" select="'cm'"/>
+                      <xsl:with-param name ="length" select="$margLeft"></xsl:with-param>
+                      <xsl:with-param name ="destUnit" select="'cm'"></xsl:with-param>
 					</xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="'0cm'"/>
+                  </xsl:otherwise>
+                </xsl:choose>
 				</xsl:variable>
 
-				<xsl:variable name="posY">
+			
 					<xsl:choose>
-						<!-- shape is in footer ... -->
-						<xsl:when test="ancestor::*[w:ftr]">
-							<xsl:variable name="pgH">
+                <xsl:when test ="$relH='right-margin-area' or $relH='inner-margin-area'">
+                  <xsl:variable name ="horWidth">
 								<xsl:call-template name="ConvertTwips">
-									<xsl:with-param name="length" select="$myFooterSectPr/w:pgSz/@w:h"/>
-									<xsl:with-param name="unit" select="'pt'"/>
+                      <xsl:with-param name="length" select ="$HorizontalWidth"></xsl:with-param>
+                      <xsl:with-param name ="unit" select="'cm'"></xsl:with-param>
 								</xsl:call-template>
 							</xsl:variable>
-							<xsl:variable name="marT">
-								<xsl:call-template name="ConvertTwips">
-									<xsl:with-param name="length" select="$myFooterSectPr/w:pgMar/@w:top"/>
-									<xsl:with-param name="unit" select="'pt'"/>
+                  <xsl:value-of select="concat((substring-before($horWidth,'cm')+substring-before($marginLeft,'cm')),'cm')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$marginLeft"></xsl:value-of>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+							</xsl:variable>
+        <xsl:variable name="posX">
+          <xsl:value-of select="$x"/>
+        </xsl:variable>
+        <xsl:attribute name="svg:x">
+          <xsl:value-of select="$posX"/>
+        </xsl:attribute>
+      </xsl:if>
+
+      <xsl:if test="not(contains($shape/@style,'mso-top-percent'))">
+        <xsl:variable name="y">
+          <xsl:choose>
+            <!-- Sona: Fixed Defect #1990593-->
+            <xsl:when test="$shape[name()='v:rect' or name()='v:line']">
+              <xsl:choose>
+                <xsl:when test ="contains($shape/@style,'margin-top')">
+                  <xsl:variable name ="margTop">
+                    <xsl:call-template name="GetShapeProperty">
+                      <xsl:with-param name="shape" select="$shape"/>
+                      <xsl:with-param name="propertyName" select="'margin-top'"/>
 								</xsl:call-template>
 							</xsl:variable>
-							<xsl:variable name="marB">
-								<xsl:call-template name="ConvertTwips">
-									<xsl:with-param name="length" select="$myFooterSectPr/w:pgMar/@w:top"/>
-									<xsl:with-param name="unit" select="'pt'"/>
-								</xsl:call-template>
-							</xsl:variable>
+                  <xsl:variable name ="marginTop">
 							<xsl:choose>
-								<!-- ... and relative to margin -->
-								<xsl:when test="$relV='margin'">
+                      <xsl:when test ="$margTop != 0">
 									<xsl:call-template name="ConvertMeasure">
-										<xsl:with-param name="length" select="concat(substring-before($pgH, 'pt') - 
-                                substring-before($marT, 'pt') -
-                                substring-before($marB, 'pt') -
-                                substring-before($y, 'pt'), 'pt')"/>
-										<xsl:with-param name="destUnit" select="'cm'"/>
+                          <xsl:with-param name ="length" select="$margTop"></xsl:with-param>
+                          <xsl:with-param name ="destUnit" select="'cm'"></xsl:with-param>
 									</xsl:call-template>
 								</xsl:when>
-								<!-- ... and relative to page -->
-								<xsl:when test="$relV='page'">
-									<xsl:call-template name="ConvertMeasure">
-										<xsl:with-param name="length" select="concat(substring-before($pgH, 'pt') - 
-                                substring-before($y, 'pt'), 'pt')"/>
-										<xsl:with-param name="destUnit" select="'cm'"/>
+                      <xsl:otherwise>
+                        <xsl:value-of select="'0cm'"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:choose>
+                    <xsl:when test ="$relV='bottom-margin-area' or $relV='inner-margin-area'">
+                      <xsl:variable name ="vertHeight">
+                        <xsl:call-template name ="ConvertTwips">
+                          <xsl:with-param name="length" select ="$VerticalHeight"></xsl:with-param>
+                          <xsl:with-param name ="unit" select="'cm'"></xsl:with-param>
 									</xsl:call-template>
+                      </xsl:variable>
+                      <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
 								</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$marginTop"></xsl:value-of>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="GetShapeProperty">
+                    <xsl:with-param name="shape" select="$shape"/>
+                    <xsl:with-param name="propertyName" select="'top'"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
 							</xsl:choose>
 						</xsl:when>
 						<!-- shape is in document -->
 						<xsl:otherwise>
+              <xsl:variable name ="margTop">
+                <xsl:call-template name="GetShapeProperty">
+                  <xsl:with-param name="shape" select="$shape"/>
+                  <xsl:with-param name="propertyName" select="'margin-top'"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name ="marginTop">
+                <xsl:choose>
+                  <xsl:when test ="$margTop != 0">
 							<xsl:call-template name="ConvertMeasure">
-								<xsl:with-param name="length" select="$y"/>
-								<xsl:with-param name="destUnit" select="'cm'"/>
+                      <xsl:with-param name ="length" select="$margTop"></xsl:with-param>
+                      <xsl:with-param name ="destUnit" select="'cm'"></xsl:with-param>
 							</xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="'0cm'"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-
+              <xsl:choose>
+                <xsl:when test ="$relV='bottom-margin-area' or $relV='inner-margin-area'">
+                  <xsl:variable name ="vertHeight">
+                    <xsl:call-template name ="ConvertTwips">
+                      <xsl:with-param name="length" select ="$VerticalHeight"></xsl:with-param>
+                      <xsl:with-param name ="unit" select="'cm'"></xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$marginTop"></xsl:value-of>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="posY">
+          <xsl:value-of select="$y"/>
+        </xsl:variable>
 				<xsl:attribute name="svg:y">
 					<xsl:value-of select="$posY"/>
 				</xsl:attribute>
+      </xsl:if>
+
+      <!--<xsl:if test="contains($shape/@style,'mso-left-percent')">-->
+      <xsl:variable name="marTop">
+        <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:top"/>
+      </xsl:variable>
+      <xsl:variable name="marBottom">
+        <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:bottom"/>
+      </xsl:variable>
+      <xsl:variable name="relativeHeight">
+        <xsl:call-template name="GetShapeProperty">
+          <xsl:with-param name="shape" select="$shape"/>
+          <xsl:with-param name="propertyName" select="'mso-top-percent'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="contains($shape/@style,'mso-top-percent')">
+        <xsl:variable name ="verRelPos">
+          <xsl:choose >
+            <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:margin')">
+              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440 * ($relativeHeight div 1000)"/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:top-margin-area')">
+              <xsl:value-of select ="$marTop div 1440 * ($relativeHeight div 1000) "/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:bottom-margin-area')">
+              <!--<xsl:value-of select ="$marBottom div 1440 "/>-->
+              <!--<xsl:value-of select ="(//w:pgSz/@w:h div 1440) -(($marBottom div 1440) * ($relativeHeight div 1000))"/>-->
+              <xsl:value-of select ="((ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440)-($marBottom div 1440)) +($marBottom div 1440 * $relativeHeight div 1000)"/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:inner-margin-area')">
+              <xsl:value-of select ="$marTop div 1440 * ($relativeHeight div 1000) "/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:outer-margin-area')">
+              <xsl:value-of select ="$marBottom div 1440 * ($relativeHeight div 1000)"/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:page')">
+              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440 * ($relativeHeight div 1000)"/>
+            </xsl:when>
+            <!--<xsl:otherwise >
+            <xsl:value-of select ="//w:pgSz/@w:h div 1440"/>
+          </xsl:otherwise>-->
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:attribute name="svg:y">
+          <xsl:value-of select ="concat((format-number($verRelPos*2.54,'#.##')),'cm')"/>
+        </xsl:attribute>
+      </xsl:if>
+
+
+      <xsl:variable name="marLeft">
+        <xsl:choose>
+          <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:left">
+            <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:left"/>
+          </xsl:when>
+          <!--<xsl:otherwise>
+          <xsl:value-of select="//w:pgMar/@w:header"/>
+        </xsl:otherwise>-->
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="marRight">
+        <xsl:choose>
+          <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:right">
+            <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:right"/>
+          </xsl:when>
+          <!--<xsl:otherwise>
+          <xsl:value-of select="//w:pgMar/@w:footer"/>
+        </xsl:otherwise>-->
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="relativeWidth">
+        <xsl:call-template name="GetShapeProperty">
+          <xsl:with-param name="shape" select="$shape"/>
+          <xsl:with-param name="propertyName" select="'mso-left-percent'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="contains($shape/@style,'mso-left-percent')">
+        <xsl:variable name ="horRelPos">
+          <xsl:choose >
+            <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:margin')">
+              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440 * ($relativeWidth div 1000)"/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:left-margin-area')">
+              <xsl:value-of select ="$marLeft div 1440 * ($relativeWidth div 1000)"/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:right-margin')">
+              <!--<xsl:value-of select ="((//w:pgSz/@w:w div 1440)-($marRight div 1440))) -(($marRight div 1440) * ($relativeWidth div 1000))"/>-->
+              <xsl:value-of select ="((ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440)-($marRight div 1440)) +($marRight div 1440 * $relativeWidth div 1000)"/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:inner-margin-area')">
+              <xsl:value-of select ="$marLeft div 1440 * ($relativeWidth div 1000) "/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:outer-margin-area')">
+              <xsl:value-of select ="$marRight div 1440 * ($relativeWidth div 1000)"/>
+            </xsl:when>
+            <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:page')">
+              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440 * ($relativeWidth div 1000)"/>
+            </xsl:when>
+            <!--<xsl:otherwise >
+            <xsl:value-of select ="//w:pgSz/@w:w div 1440"/>
+          </xsl:otherwise>-->
+          </xsl:choose>
+        </xsl:variable>
 				<xsl:attribute name="svg:x">
-					<xsl:value-of select="$posX"/>
+          <xsl:value-of select ="concat((format-number($horRelPos * 2.54,'#.##')),'cm')"/>
 				</xsl:attribute>
 			</xsl:if>
 		</xsl:if>
@@ -3366,9 +3591,9 @@
 						  -->
 						<xsl:text>paragraph</xsl:text>
 					</xsl:when>
-
+          <!-- Sona changed parameter for defect #1844731-->
 					<xsl:when test="(w10:wrap/@anchorx='page' and w10:wrap/@anchory='page') or ($shape/@w:hAnchor='page' and $shape/@w:vAnchor='page')">
-						<xsl:text>page</xsl:text>
+            <xsl:text>char</xsl:text>
 					</xsl:when>
 
 					<xsl:otherwise>
@@ -3522,6 +3747,39 @@
 				<xsl:with-param name="propertyName" select="'mso-height-relative'"/>
 			</xsl:call-template>
 		</xsl:variable>
+    <!-- Chhavi: Implementation of Relative Height-->
+    <xsl:variable name="marTop">
+      <xsl:value-of select="ancestor::node()/w:sectPr//w:pgMar/@w:top"/>
+    </xsl:variable>
+    <xsl:variable name="marBottom">
+      <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:bottom"/>
+    </xsl:variable>
+    <xsl:variable name ="VarHeight">
+      <xsl:choose >
+        <xsl:when test ="contains($shape/@style,'mso-height-relative:margin')">
+          <xsl:value-of select ="(ancestor::node()/w:sectPr/w:pgSz/@w:h  - ($marBottom + $marTop)) div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-height-relative:top-margin-area')">
+          <xsl:value-of select ="$marTop div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-height-relative:bottom-margin-area')">
+          <xsl:value-of select ="$marBottom div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-height-relative:inner-margin-area')">
+          <xsl:value-of select ="$marTop div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-height-relative:outer-margin-area')">
+          <xsl:value-of select ="$marBottom div 1440 "/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:attribute name="svg:height">
+      <xsl:value-of select ="concat((($VarHeight * $relativeHeight ) div 1000)* 2.54,'cm')"/>
+    </xsl:attribute>
+
 
 		<xsl:if test="$relativeTo != ''">
 			<xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
@@ -3710,6 +3968,53 @@
 			</xsl:call-template>
 		</xsl:variable>
 
+    <!-- Chhavi: Implementation of Relative width-->
+    <xsl:variable name="marLeft">
+      <xsl:choose>
+        <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:left">
+          <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:left"/>
+        </xsl:when>
+        <!--<xsl:otherwise>
+          <xsl:value-of select="//w:pgMar/@w:header"/>
+        </xsl:otherwise>-->
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="marRight">
+      <xsl:choose>
+        <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:right">
+          <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:right"/>
+        </xsl:when>
+        <!--<xsl:otherwise>
+          <xsl:value-of select="//w:pgMar/@w:footer"/>
+        </xsl:otherwise>-->
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name ="VarWidth">
+      <xsl:choose >
+        <xsl:when test ="contains($shape/@style,'mso-width-relative:margin')">
+          <xsl:value-of select ="(ancestor::node()/w:sectPr/w:pgSz/@w:w  - ($marLeft + $marRight)) div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-width-relative:left-margin-area')">
+          <xsl:value-of select ="$marLeft div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-width-relative:right-margin-area')">
+          <xsl:value-of select ="$marRight div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-width-relative:inner-margin-area')">
+          <xsl:value-of select ="$marLeft div 1440 "/>
+        </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-width-relative:outer-margin-area')">
+          <xsl:value-of select ="$marRight div 1440 "/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:attribute name="svg:width">
+      <xsl:value-of select ="concat((($VarWidth * $relativeWidth ) div 1000) * 2.54,'cm')"/>
+    </xsl:attribute>
+    
 		<xsl:if test="$relativeTo != ''">
 			<xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
 		</xsl:if>
