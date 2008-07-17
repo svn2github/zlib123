@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -751,7 +751,8 @@
         <xsl:text>A6CAF0</xsl:text>
       </xsl:when>
       <xsl:when test="$index=45">
-        <xsl:text>CC9CCC</xsl:text>
+        <!--<xsl:text>CC9CCC</xsl:text>-->
+	<xsl:text>ff99cc</xsl:text>
       </xsl:when>
       <xsl:when test="$index=46">
         <xsl:text>CC99FF</xsl:text>

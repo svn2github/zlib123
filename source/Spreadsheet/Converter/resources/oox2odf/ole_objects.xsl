@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -25,6 +25,13 @@
   * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 15-Jul-2008 Sandeep S     1874669  Changes done to fix External Links are not retaining.                                               
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -118,8 +125,10 @@
 
     <xsl:if test="$XlinkOLEObject != ''">
       <draw:frame>
+        <!--RefNo-1-->
+        <!--select="key('Part', 'xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:shape' and contains(@id,$ShapeId)] "/>-->
         <xsl:apply-templates
-          select="key('Part', 'xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:shape' and contains(@id,$ShapeId)] "/>
+          select ="document('xl/drawings/vmlDrawing1.vml')//node()[name() = 'v:shape' and contains(@id,$ShapeId)]"/> 
         <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="$XlinkOLEObject"/>

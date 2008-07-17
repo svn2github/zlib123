@@ -1138,9 +1138,22 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
 
     <xsl:message terminate="no">progress:table:table-cell</xsl:message>
     <!--RefNo-1-->
+    <!--Start of RefNo-4: 16-Jul-2008-->
+    <xsl:variable name="columnCellStyle">
+      <xsl:call-template name="GetColumnCellStyle">
+        <xsl:with-param name="colNum">
+          <xsl:value-of select="$colNumber"/>
+        </xsl:with-param>
+        <xsl:with-param name="TableColumnTagNum">
+          <xsl:value-of select="$TableColumnTagNum"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!--End of RefNo-4-->
+    <!--RefNo-4:added columnCellStyle condition-->
     <!--RefNo-6: or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'-->
+    <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name or $columnCellStyle != '') or (256 = ($colNumber + @table:number-columns-repeated)))) or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'">
     
-    <xsl:if test="not(not(following-sibling::table:table-cell) and not(child::text:p) and (not(attribute::table:style-name) or (256 = ($colNumber + @table:number-columns-repeated)))) or following-sibling::table:covered-table-cell or name()='table:covered-table-cell'">
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
