@@ -26,10 +26,8 @@
     <office:document-meta>
       <office:meta>
         <!-- generator -->
-        <meta:generator>
-          OpenXML/ODF Translator <xsl:if test="$app-version">
-            <xsl:value-of
-                            select="$app-version"/>
+        <meta:generator><xsl:text>OpenXML/ODF Translator </xsl:text><xsl:if test="$app-version">
+            <xsl:value-of select="$app-version"/>
           </xsl:if>
         </meta:generator>
         <!-- title -->
