@@ -274,7 +274,7 @@
         <xsl:param name="dxfIdStyle"/>
 
         <xsl:choose>
-            <xsl:when test="$StartRowNum &lt;= $EndRowNum">
+            <xsl:when test="$StartRowNum &lt;= $EndRowNum and $StartRowNum &lt; 600 ">
                 <xsl:call-template name="RepeatRowValidation">
                     <xsl:with-param name="ValidationCell">
                         <xsl:choose>

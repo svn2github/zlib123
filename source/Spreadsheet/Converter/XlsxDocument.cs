@@ -136,7 +136,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
                             isCell = xtr.LocalName.Equals("c") && xtr.NamespaceURI.Equals(SPREADSHEET_ML_NS);
 
-                            if (xtr.HasAttributes && isCell && ConditionalCell != "")
+                            if (xtr.HasAttributes && isCell && ConditionalCell != "" && ConditionalCellRowList.Contains(RowNumber))
                             {
                                 while (xtr.MoveToNextAttribute())
                                 {
@@ -187,15 +187,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
                                                 + GetRowId(value).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
                                             xtw.WriteAttributeString(NS_PREFIX, "p", PACKAGE_NS, coord);
-                                            if (ConditionalCell != "")
+                                            if (ConditionalCell != "" && ConditionalCellRowList.Contains(GetRowId(value)))
                                             {
                                                 ConditionalStyle = CheckIfConditional(GetRowId(value), GetColId(value), ConditionalCell);
-                                                if (ConditionalStyle != -1)
-                                                {                                                    
-                                                    xtw.WriteAttributeString(NS_PREFIX, "ConditionalStyle", PACKAGE_NS, ConditionalStyle.ToString());
-                                                }
+                                                 if (ConditionalStyle != -1)
+                                                 {                                                    
+                                                     xtw.WriteAttributeString(NS_PREFIX, "ConditionalStyle", PACKAGE_NS, ConditionalStyle.ToString());
+                                                 } 
                                                 
-                                            }
+                                            } 
                                             //xtw.WriteAttributeString(NS_PREFIX, "c", PACKAGE_NS, GetColId(value).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                             //xtw.WriteAttributeString(NS_PREFIX, "r", PACKAGE_NS, GetRowId(value).ToString(System.Globalization.CultureInfo.InvariantCulture));
                                         }
