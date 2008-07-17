@@ -728,27 +728,33 @@
         <xsl:when test="$relativeFrom ='text'">
           <xsl:text>paragraph</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
-          <xsl:text>page-start-margin</xsl:text>
+        <xsl:when test="$relativeFrom = 'left-margin-area' or $relativeFrom = 'outside-margin-area'">
+          <!--<xsl:text>page-start-margin</xsl:text>-->
+          <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'rightMargin' or $relativeFrom = 'insideMargin'">
-          <xsl:text>page-end-margin</xsl:text>
+        <xsl:when test="$relativeFrom = 'right-margin-area' or $relativeFrom = 'inside-margin-area'">
+          <!--<xsl:text>page-end-margin</xsl:text>-->
+          <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'character' or $relativeFrom = 'char'">
           <xsl:text>char</xsl:text>
         </xsl:when>
         <!-- COMMENT : following values not defined in OOX spec, but used by Word 2007 -->
         <xsl:when test="$relativeFrom = 'left-margin-area' ">
-          <xsl:text>page-start-margin</xsl:text>
+          <!--<xsl:text>page-start-margin</xsl:text>-->
+          <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'right-margin-area' ">
-          <xsl:text>page-end-margin</xsl:text>
+          <!--<xsl:text>page-end-margin</xsl:text>-->
+          <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'inner-margin-area'">
-          <xsl:text>paragraph-end-margin</xsl:text>
+          <!--<xsl:text>paragraph-end-margin</xsl:text>-->
+          <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'outer-margin-area'">
-          <xsl:text>paragraph-start-margin</xsl:text>
+          <!--<xsl:text>paragraph-start-margin</xsl:text>-->
+          <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom=''">
           <!-- 
@@ -788,8 +794,8 @@
         <xsl:when test="$align and $align != ''">
           <xsl:choose>
             <!--special rules-->
-            <xsl:when  test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
-              <xsl:text>top</xsl:text>
+            <xsl:when  test="$relativeFrom = 'top-margin-area' or $relativeFrom = 'bottom-margin-area' or $relativeFrom = 'inner-margin-area' or $relativeFrom = 'outer-margin-area'">
+              <xsl:text>from-top</xsl:text>
             </xsl:when>
             <xsl:when test=" $relativeFrom = 'line'  and $align= 'bottom' ">
               <xsl:text>top</xsl:text>
@@ -825,7 +831,7 @@
               <xsl:text>from-top</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>top</xsl:text>
+              <xsl:text>from-top</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
@@ -845,16 +851,16 @@
         <xsl:when test="$relativeFrom ='page'">
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'topMargin'">
+        <xsl:when test="$relativeFrom = 'top-margin-area'">
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'bottomMargin'">
+        <xsl:when test="$relativeFrom = 'bottom-margin-area'">
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'insideMargin'">
+        <xsl:when test="$relativeFrom = 'inner-margin-area'">
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'outsideMargin'">
+        <xsl:when test="$relativeFrom = 'outer-margin-area'">
           <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'line'">
