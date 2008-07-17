@@ -65,7 +65,7 @@
 	<xsl:key name="InstrText" match="w:instrText" use="''"/>
 	<xsl:key name="bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
 	<xsl:key name="bookmarksByName" match="w:bookmarkStart" use="@w:name"/>
-	<xsl:key name="pPr" match="w:pPr" use="''"/>
+	<xsl:key name="numPr" match="w:pPr/w:numPr" use="''"/>
 	<!--xsl:key name="sectPr" match="w:sectPr" use="''"/-->
 
 	<xsl:key name="p" match="w:p" use="@oox:id" />
@@ -147,17 +147,17 @@
 		<!-- document with lists-->
 		<xsl:for-each select="key('Part', 'word/document.xml')">
 			<xsl:choose>
-				<xsl:when test="key('pPr', '')/w:numPr/w:numId">
+				<xsl:when test="key('numPr', '')/w:numId">
 					<!-- automatic list styles with empty num format for elements which has non-existent w:num attached -->
 					<xsl:apply-templates
-					  select="key('pPr', '')/w:numPr/w:numId[not(key('Part', 'word/numbering.xml')/w:numbering/w:num/@w:numId = @w:val)][1]"
+					  select="key('numPr', '')/w:numId[not(key('Part', 'word/numbering.xml')/w:numbering/w:num/@w:numId = @w:val)][1]"
 					  mode="automaticstyles"/>
 					<!-- automatic list styles-->
 					<xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:for-each select="key('Part', 'word/styles.xml')">
-						<xsl:if test="key('pPr', '')/w:numPr/w:numId">
+						<xsl:if test="key('numPr', '')/w:numId">
 							<!-- automatic list styles-->
 							<xsl:apply-templates select="key('Part', 'word/numbering.xml')/w:numbering/w:num"/>
 						</xsl:if>
@@ -736,8 +736,8 @@
 		<!--check if there's a any numId in document-->
 		<xsl:for-each select="key('Part', 'word/document.xml')">
 			<xsl:choose>
-				<xsl:when test="key('pPr','')/w:numPr/w:ins"/>
-				<xsl:when test="key('pPr', '')/w:numPr/w:numId">
+				<xsl:when test="key('numPr','')/w:ins"/>
+				<xsl:when test="key('numPr', '')/w:numId">
 					<xsl:call-template name="InsertListHeader">
 						<xsl:with-param name="numId" select="$numId"/>
 					</xsl:call-template>
@@ -745,7 +745,7 @@
 				<xsl:otherwise>
 					<!--check if there's a any numId in styles-->
 					<xsl:for-each select="key('Part', 'word/styles.xml')">
-						<xsl:if test="key('pPr', '')/w:numPr/w:numId">
+						<xsl:if test="key('numPr', '')/w:numId">
 							<xsl:call-template name="InsertListHeader">
 								<xsl:with-param name="numId" select="$numId"/>
 							</xsl:call-template>
@@ -1266,147 +1266,134 @@
 	<!-- insert a master page name when required -->
 	<xsl:template name="MasterPageName">
 		<xsl:if test="ancestor::w:body">
+
+			<!-- NB : precSectPr defines properties of preceding section,
+			whereas followingSectPr defines properties of current section -->
+			<!--xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
+			<xsl:param name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/-->
+			<!--<xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>-->
+
+			<xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
+			<xsl:variable name="precSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s) - 1)"/>
+			<xsl:variable name="followingSectPr" select="(w:sectPr | key('sectPr', number(ancestor-or-self::node()/@oox:s))[ancestor::w:p/w:pPr/w:sectPr])[1]"/>
+
 			<xsl:choose>
-				<!-- particular case : if paragraph is last one of a section -->
-				<xsl:when test="w:sectPr">
-					<xsl:call-template name="ComputeMasterPageName">
-						<xsl:with-param name="followingSectPr" select="w:sectPr"/>
-					</xsl:call-template>
+				<!-- first case : current section is continuous with preceding section (test if precSectPr exist to avoid bugs) -->
+				<xsl:when test="$precSectPr and $followingSectPr/w:type/@w:val = 'continuous' ">
+					<!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
+					<xsl:if
+					  test="$followingSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
+							  or $followingSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
+							  or $followingSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
+							  or $followingSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
+							  or $followingSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
+							  or $followingSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
+						<xsl:message terminate="no">
+							<xsl:text>feedback:Header/footer change after continuous section break.</xsl:text>
+						</xsl:message>
+					</xsl:if>
 				</xsl:when>
-				<xsl:otherwise>
-					<xsl:call-template name="ComputeMasterPageName"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:if>
-	</xsl:template>
 
-	<xsl:template name="ComputeMasterPageName">
-		<!-- NB : precSectPr defines properties of preceding section,
-        whereas followingSectPr defines properties of current section -->
-		<!--xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
-		<xsl:param name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/-->
-		<!--<xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>-->
-
-		<xsl:param name="precSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s) - 1)"/>
-		<xsl:param name="followingSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))[ancestor::w:p/w:pPr/w:sectPr]"/>
-		<xsl:param name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
-
-		<xsl:choose>
-			<!-- first case : current section is continuous with preceding section (test if precSectPr exist to avoid bugs) -->
-			<xsl:when test="$precSectPr and $followingSectPr/w:type/@w:val = 'continuous' ">
-				<!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
-				<xsl:if
-				  test="$followingSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
-						  or $followingSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
-						  or $followingSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
-						  or $followingSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
-						  or $followingSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
-						  or $followingSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
-					<xsl:message terminate="no">
-						<xsl:text>feedback:Header/footer change after continuous section break.</xsl:text>
-					</xsl:message>
-				</xsl:if>
-			</xsl:when>
-
-			<!-- beginning of document -->
-			<xsl:when test="not(preceding::w:p[ancestor::w:body])">
-				<xsl:choose>
-					<xsl:when test="$followingSectPr">
-						<xsl:choose>
-							<xsl:when test="$followingSectPr/w:titlePg">
-								<xsl:attribute name="style:master-page-name">
-									<xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
-								</xsl:attribute>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:attribute name="style:master-page-name">
-									<xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
-								</xsl:attribute>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:choose>
-							<xsl:when test="$mainSectPr/w:titlePg">
-								<xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:when>
-			<xsl:otherwise>
-				<!--clam: bugfix #1800794-->
-				<!--<xsl:if test="preceding::w:p[parent::w:body|parent::w:tbl/tr/tv][1]/w:pPr/w:sectPr">-->
-				
-				<!-- 20080715/divo: performance improvement by using xsl:key -->
-				<!--xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr"-->
-				<xsl:if test="key('p', number(ancestor-or-self::node()/@oox:id) - 1)/w:pPr/w:sectPr">
+				<!-- beginning of document -->
+				<xsl:when test="not(preceding::w:p[ancestor::w:body])">
 					<xsl:choose>
-						<xsl:when test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
-							<xsl:attribute name="style:master-page-name">
-								<!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
-									 master page names should be reviewed and unified : many names not consistent, many styles never used -->
-								<xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
-							</xsl:attribute>
+						<xsl:when test="$followingSectPr">
+							<xsl:choose>
+								<xsl:when test="$followingSectPr/w:titlePg">
+									<xsl:attribute name="style:master-page-name">
+										<xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
+									</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="style:master-page-name">
+										<xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+									</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:choose>
-								<xsl:when test="$followingSectPr">
-									<xsl:choose>
-										<xsl:when test="$followingSectPr/w:titlePg">
-											<xsl:attribute name="style:master-page-name">
-												<xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:if
-											  test="$followingSectPr/w:headerReference or $followingSectPr/w:footerReference">
-												<xsl:attribute name="style:master-page-name">
-													<xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
-												</xsl:attribute>
-											</xsl:if>
-										</xsl:otherwise>
-									</xsl:choose>
+								<xsl:when test="$mainSectPr/w:titlePg">
+									<xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:choose>
-										<xsl:when test="$mainSectPr/w:titlePg">
-											<xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:choose>
-												<xsl:when test="following-sibling::w:r/w:lastRenderedPageBreak and $precSectPr/w:type/@w:val = 'continuous' and generate-id(..) = generate-id($precSectPr/following::w:p[1])">
-													<xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
-												</xsl:when>
-												<xsl:when test="$precSectPr and $mainSectPr/w:type/@w:val = 'continuous' ">
-													<!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
-													<xsl:if
-													  test="$mainSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
-															  or $mainSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
-															  or $mainSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
-															  or $mainSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
-															  or $mainSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
-															  or $mainSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
-														<xsl:message terminate="no">
-															<xsl:text>feedback:Header/footer change after continuous section break.</xsl:text>
-														</xsl:message>
-													</xsl:if>
-												</xsl:when>
-												<xsl:otherwise>
-													<xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
-												</xsl:otherwise>
-											</xsl:choose>
-										</xsl:otherwise>
-									</xsl:choose>
+									<xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
 								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:otherwise>
 					</xsl:choose>
-				</xsl:if>
-			</xsl:otherwise>
-		</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<!--clam: bugfix #1800794-->
+					<!--<xsl:if test="preceding::w:p[parent::w:body|parent::w:tbl/tr/tv][1]/w:pPr/w:sectPr">-->
+
+					<!-- 20080715/divo: performance improvement by using xsl:key -->
+					<!--xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr"-->
+					<xsl:if test="key('p', number(ancestor-or-self::node()/@oox:id) - 1)/w:pPr/w:sectPr">
+						<xsl:choose>
+							<xsl:when test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
+								<xsl:attribute name="style:master-page-name">
+									<!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
+										 master page names should be reviewed and unified : many names not consistent, many styles never used -->
+									<xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:choose>
+									<xsl:when test="$followingSectPr">
+										<xsl:choose>
+											<xsl:when test="$followingSectPr/w:titlePg">
+												<xsl:attribute name="style:master-page-name">
+													<xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:if
+												  test="$followingSectPr/w:headerReference or $followingSectPr/w:footerReference">
+													<xsl:attribute name="style:master-page-name">
+														<xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+													</xsl:attribute>
+												</xsl:if>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:choose>
+											<xsl:when test="$mainSectPr/w:titlePg">
+												<xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:choose>
+													<xsl:when test="following-sibling::w:r/w:lastRenderedPageBreak and $precSectPr/w:type/@w:val = 'continuous' and generate-id(..) = generate-id($precSectPr/following::w:p[1])">
+														<xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+													</xsl:when>
+													<xsl:when test="$precSectPr and $mainSectPr/w:type/@w:val = 'continuous' ">
+														<!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
+														<xsl:if
+														  test="$mainSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
+																  or $mainSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
+																  or $mainSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
+																  or $mainSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
+																  or $mainSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
+																  or $mainSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
+															<xsl:message terminate="no">
+																<xsl:text>feedback:Header/footer change after continuous section break.</xsl:text>
+															</xsl:message>
+														</xsl:if>
+													</xsl:when>
+													<xsl:otherwise>
+														<xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+													</xsl:otherwise>
+												</xsl:choose>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>

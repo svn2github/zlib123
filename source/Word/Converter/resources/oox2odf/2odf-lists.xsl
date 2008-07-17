@@ -41,6 +41,7 @@
   <xsl:key name="numId" match="w:num" use="@w:numId"/>
   <xsl:key name="abstractNumId" match="w:abstractNum" use="@w:abstractNumId"/>
   <xsl:key name="numPicBullet" match="w:numPicBullet " use="@w:numPicBulletId"/>
+  <xsl:key name="paragraphsByStyleId" match="w:document/w:body/w:p" use="w:pPr/w:pStyle/@w:val"/>
 
   <!--insert num template for each text-list style -->
 
@@ -425,11 +426,9 @@
     <xsl:variable name="paragraph_ref_this_list_level"
       select="key('Part', 'word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val=$numId and w:pPr/w:numPr/w:ilvl/@w:val=$ilvl][1]"/>
 
-    <xsl:variable name="paragraph_ref_this_styleid"
-      select="key('Part', 'word/document.xml')/w:document/w:body/w:p[w:pPr/w:pStyle/@w:val=$StyleId][1]"/>    
-    
-    <xsl:variable name="style"
-      select="key('StyleId', $StyleId)[1]"/>
+    <xsl:variable name="paragraph_ref_this_styleid" select="key('paragraphsByStyleId', $StyleId)[1]"/>
+
+	<xsl:variable name="style" select="key('StyleId', $StyleId)[1]"/>
 
     <xsl:variable name="Hanging">
       <xsl:choose>        
