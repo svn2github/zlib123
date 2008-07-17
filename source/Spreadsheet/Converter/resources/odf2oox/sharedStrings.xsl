@@ -208,11 +208,13 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <xsl:choose>
         <xsl:when test="not(contains($value, '_x'))"><t xml:space="preserve"><xsl:value-of select="$value"/></t></xsl:when>
         <xsl:otherwise>
+          <t xml:space="preserve">
           <xsl:call-template name="HexaDecimalValue">
             <xsl:with-param name="value">
-              <t xml:space="preserve"><xsl:value-of select="$value"/></t>
+              <xsl:value-of select="$value"/>
             </xsl:with-param>
           </xsl:call-template>
+          </t>
         </xsl:otherwise>
       </xsl:choose>
     </r>
