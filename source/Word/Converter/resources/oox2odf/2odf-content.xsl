@@ -994,8 +994,10 @@
 		<!--
     makz: check if the w:bookmarkStart doesn't belong to a user field.
     user fields are translated to user-field-decl
+    
+    20080710/divo: w:bookmarkStart can also be directly below w:body. This condition was missing
     -->
-		<xsl:if test="ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='seperate')">
+    <xsl:if test="parent::w:body or (ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='seperate'))">
 
 			<xsl:variable name="NameBookmark">
 				<xsl:value-of select="@w:name"/>
@@ -1056,8 +1058,10 @@
 		<!--
     makz: check if the w:bookmarkStart doesn't belong to a user field.
     user fields are translated to user-field-decl
+    
+    20080710/divo: w:bookmarkEnd can also be directly below w:body. This condition was missing
     -->
-		<xsl:if test="ancestor::w:p and not(following-sibling::w:r[1]/w:fldChar/@w:fldCharType='end')">
+    <xsl:if test="parent::w:body or (ancestor::w:p and not(following-sibling::w:r[1]/w:fldChar/@w:fldCharType='end'))">
 			<xsl:variable name="NameBookmark">
 				<xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
 			</xsl:variable>
