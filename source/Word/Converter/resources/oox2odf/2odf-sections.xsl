@@ -16,15 +16,17 @@
   <!--
   Summary:  Writes a <text:section> for each sectPr that is applied.
             Sometimes it is not neccessary to write a section for each sectPr (if there is only the default sectPr)
-            The descission is made by "InsertDocumentBody"
+            The decision is made by "InsertDocumentBody"
   Author:   CleverAge
   Modified: makz (DIaLOGIKa)
             Changed from <xsl:template match="w:sectPr[parent::w:pPr]" mode="sections">
   -->
+	<xsl:key name="elementsByOoxSectionId" match="w:body/*" use="@oox:s"/>
+	
   <xsl:template match="w:sectPr" mode="sections">
-    <xsl:variable name="id">
+    <!--xsl:variable name="id">
       <xsl:value-of select="generate-id(preceding::w:p/w:pPr/w:sectPr)"/>
-    </xsl:variable>
+    </xsl:variable-->
     <xsl:variable name="id2">
       <xsl:value-of select="generate-id(.)"/>
     </xsl:variable>
@@ -32,7 +34,8 @@
       <xsl:when
         test="preceding::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]
         or parent::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]">
-        <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]" />
+		  <!-- select all top-level body elements which are in the current section -->
+          <xsl:apply-templates select="key('elementsByOoxSectionId', number(@oox:s))" />
       </xsl:when>
       <xsl:otherwise>
         <text:section>
@@ -42,7 +45,9 @@
           <xsl:attribute name="text:name">
             <xsl:value-of select="concat('S_',$id2)"/>
           </xsl:attribute>
-          <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"/>
+			<!-- select all top-level body elements which are in the current section -->
+            <!--xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(key('sectPr', number(@oox:s)))) = $id2]"/-->
+			<xsl:apply-templates select="key('elementsByOoxSectionId', number(@oox:s))"/>
         </text:section>
       </xsl:otherwise>
     </xsl:choose>

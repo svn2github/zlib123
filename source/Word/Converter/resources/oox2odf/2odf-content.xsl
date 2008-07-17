@@ -66,7 +66,7 @@
 	<xsl:key name="bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
 	<xsl:key name="bookmarksByName" match="w:bookmarkStart" use="@w:name"/>
 	<xsl:key name="pPr" match="w:pPr" use="''"/>
-	<xsl:key name="sectPr" match="w:sectPr" use="''"/>
+	<!--xsl:key name="sectPr" match="w:sectPr" use="''"/-->
 
 	<xsl:key name="p" match="w:p" use="@oox:id" />
 	<xsl:key name="sectPr" match="w:sectPr" use="@oox:s" />
@@ -236,9 +236,9 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<!--
-        There is only the default section, so we convert the childs directly. 
-        The properties of the default sectPr are applied tho the "Standard" master page
-        -->
+				There is only the default section, so we convert the childs directly. 
+				The properties of the default sectPr are applied tho the "Standard" master page
+				-->
 				<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()" />
 			</xsl:otherwise>
 		</xsl:choose>
@@ -1340,7 +1340,10 @@
 			<xsl:otherwise>
 				<!--clam: bugfix #1800794-->
 				<!--<xsl:if test="preceding::w:p[parent::w:body|parent::w:tbl/tr/tv][1]/w:pPr/w:sectPr">-->
-				<xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr">
+				
+				<!-- 20080715/divo: performance improvement by using xsl:key -->
+				<!--xsl:if test="preceding::w:p[parent::w:body|parent::w:tc][1]/w:pPr/w:sectPr"-->
+				<xsl:if test="key('p', number(ancestor-or-self::node()/@oox:id) - 1)/w:pPr/w:sectPr">
 					<xsl:choose>
 						<xsl:when test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
 							<xsl:attribute name="style:master-page-name">

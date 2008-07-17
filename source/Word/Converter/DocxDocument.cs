@@ -142,6 +142,10 @@ namespace OdfConverter.Wordprocessing
                                 case "proofErr":
                                 case "sdt":
                                 case "tbl":
+                                    // write the id of the following w:p
+                                    xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, _paraId.ToString());
+
+                                    // write the id of the current section
                                     xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
                                     break;
                                 case "r":
