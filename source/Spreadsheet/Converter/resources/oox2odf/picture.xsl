@@ -379,11 +379,10 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     <xsl:param name="min"/>
     <xsl:param name="PictureRow"/>
     <xsl:param name="AfterRow"/>
-
-    <xsl:variable name="numRow">
+    <!--Redundant Code-->
+    <!--<xsl:variable name="numRow">
       <xsl:value-of select="substring-before($PictureRow, ';')"/>
-    </xsl:variable>
-
+    </xsl:variable>-->    
     <xsl:choose>
       <xsl:when test="$AfterRow != ''">
 
@@ -750,11 +749,10 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
-    <xsl:variable name="sheetName">
+<!--Redundant-->
+    <!--<xsl:variable name="sheetName">
       <xsl:value-of select="@name"/>
-    </xsl:variable>
-
+    </xsl:variable>-->
     <xsl:for-each select="key('Part', concat('xl/',$Id))">
       <xsl:apply-templates select="e:worksheet/e:drawing" mode="PictureStyle">
         <xsl:with-param name="sheet">

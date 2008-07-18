@@ -145,7 +145,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
             <xsl:with-param name="id">
               <xsl:value-of select="@r:id"/>
             </xsl:with-param>
-            <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+	    <xsl:with-param name="document" select="string('xl/workbook.xml')"/>
           </xsl:call-template>
         </xsl:with-param>
       </xsl:call-template>
@@ -306,7 +306,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
             <xsl:with-param name="id">
               <xsl:value-of select="@r:id"/>
             </xsl:with-param>
-            <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+            <xsl:with-param name="document" select="string('xl/workbook.xml')"/>
           </xsl:call-template>
         </xsl:with-param>
       </xsl:call-template>
@@ -425,16 +425,11 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
             </xsl:call-template>
           </xsl:attribute>
           <xsl:attribute name="style:use-optimal-row-height">
-            <xsl:choose>
-              <xsl:when test="@customHeight">
+            <xsl:choose> 
+            <!--XSLT Best Practice-->                        
+              <xsl:when test="@customHeight or @thickTop or @thickBot">
                 <xsl:text>false</xsl:text>
-              </xsl:when>
-              <xsl:when test="@thickTop">
-                <xsl:text>false</xsl:text>
-              </xsl:when>
-              <xsl:when test="@thickBot">
-                <xsl:text>false</xsl:text>
-              </xsl:when>
+              </xsl:when>              
               <xsl:otherwise>
                 <xsl:text>true</xsl:text>
               </xsl:otherwise>

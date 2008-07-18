@@ -26,6 +26,14 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+Date        |ModifiedBy  |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+18-July-2008 Sateesh      1803299   Modification done to GetBuildInColor Template 
+									Updated index values according to ECMA-376.pdf Standard 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -688,28 +696,35 @@
         <xsl:text>808080</xsl:text>
       </xsl:when>
       <xsl:when test="$index=24">
-        <xsl:text>8080FF</xsl:text>
+        <!--<xsl:text>8080FF</xsl:text>-->
+		<xsl:text>9999FF</xsl:text>
       </xsl:when>
       <xsl:when test="$index=25">
-        <xsl:text>802060</xsl:text>
+		<!--<xsl:text>802060</xsl:text>-->
+		<xsl:text>993366</xsl:text>
       </xsl:when>
       <xsl:when test="$index=26">
-        <xsl:text>FFFFC0</xsl:text>
+		<!--<xsl:text>FFFFC0</xsl:text>-->
+		<xsl:text>FFFFCC</xsl:text>
       </xsl:when>
       <xsl:when test="$index=27">
-        <xsl:text>A0E0E0</xsl:text>
+		<!--<xsl:text>A0E0E0</xsl:text>-->
+		<xsl:text>CCFFFF</xsl:text>
       </xsl:when>
       <xsl:when test="$index=28">
-        <xsl:text>600080</xsl:text>
+        <!--<xsl:text>600080</xsl:text>-->
+		<xsl:text>660066</xsl:text>
       </xsl:when>
       <xsl:when test="$index=29">
         <xsl:text>FF8080</xsl:text>
       </xsl:when>
       <xsl:when test="$index=30">
-        <xsl:text>0080C0</xsl:text>
+        <!--<xsl:text>0080C0</xsl:text>-->
+		<xsl:text>0066CC</xsl:text>
       </xsl:when>
       <xsl:when test="$index=31">
-        <xsl:text>C0C0FF</xsl:text>
+		<!--<xsl:text>C0C0FF</xsl:text>-->
+		<xsl:text>CCCCFF</xsl:text>
       </xsl:when>
       <xsl:when test="$index=32">
         <xsl:text>000080</xsl:text>
@@ -748,11 +763,12 @@
         <xsl:text>FFFF99</xsl:text>
       </xsl:when>
       <xsl:when test="$index=44">
-        <xsl:text>A6CAF0</xsl:text>
+		<!--<xsl:text>A6CAF0</xsl:text>-->
+		<xsl:text>99CCFF</xsl:text>
       </xsl:when>
       <xsl:when test="$index=45">
         <!--<xsl:text>CC9CCC</xsl:text>-->
-	<xsl:text>ff99cc</xsl:text>
+		<xsl:text>FF99CC</xsl:text>
       </xsl:when>
       <xsl:when test="$index=46">
         <xsl:text>CC99FF</xsl:text>
@@ -767,16 +783,20 @@
         <xsl:text>33CCCC</xsl:text>
       </xsl:when>
       <xsl:when test="$index=50">
-        <xsl:text>339933</xsl:text>
+		<!--<xsl:text>339933</xsl:text>-->
+		<xsl:text>99CC00</xsl:text>
       </xsl:when>
       <xsl:when test="$index=51">
-        <xsl:text>FFD700</xsl:text>
+		<!--<xsl:text>FFD700</xsl:text>-->
+		<xsl:text>FFCC00</xsl:text>
       </xsl:when>
       <xsl:when test="$index=52">
-        <xsl:text>FFA500</xsl:text>
+		<!--<xsl:text>FFA500</xsl:text>-->
+		<xsl:text>FF9900</xsl:text>
       </xsl:when>
       <xsl:when test="$index=53">
-        <xsl:text>996666</xsl:text>
+		<!--<xsl:text>996666</xsl:text>-->
+		<xsl:text>FF6600</xsl:text>
       </xsl:when>
       <xsl:when test="$index=54">
         <xsl:text>666699</xsl:text>
@@ -785,10 +805,12 @@
         <xsl:text>969696</xsl:text>
       </xsl:when>
       <xsl:when test="$index=56">
-        <xsl:text>3333CC</xsl:text>
+        <!--<xsl:text>3333CC</xsl:text>-->
+		<xsl:text>003366</xsl:text>
       </xsl:when>
       <xsl:when test="$index=57">
-        <xsl:text>336666</xsl:text>
+        <!--<xsl:text>336666</xsl:text>-->
+		<xsl:text>339966</xsl:text>
       </xsl:when>
       <xsl:when test="$index=58">
         <xsl:text>003300</xsl:text>
@@ -797,7 +819,8 @@
         <xsl:text>333300</xsl:text>
       </xsl:when>
       <xsl:when test="$index=60">
-        <xsl:text>663300</xsl:text>
+		<xsl:text>993300</xsl:text>
+		<!--<xsl:text>663300</xsl:text>-->
       </xsl:when>
       <xsl:when test="$index=61">
         <xsl:text>993366</xsl:text>
@@ -806,7 +829,8 @@
         <xsl:text>333399</xsl:text>
       </xsl:when>
       <xsl:when test="$index=63">
-        <xsl:text>424242</xsl:text>
+        <!--<xsl:text>424242</xsl:text>-->
+		<xsl:text>333333</xsl:text>
       </xsl:when>
       <xsl:when test="$index=64">
         <xsl:text>000000</xsl:text>

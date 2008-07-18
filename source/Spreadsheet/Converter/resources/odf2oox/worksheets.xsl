@@ -93,33 +93,16 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
         <xsl:call-template name="InsertWorksheet">
           <xsl:with-param name="cellNumber" select="$cellNumber"/>
           <xsl:with-param name="sheetId" select="$sheetId"/>
-          <xsl:with-param name="tableId">
-            <xsl:value-of select="$tableId"/>
-          </xsl:with-param>
-          <xsl:with-param name="multilines">
-            <xsl:value-of select="$multilines"/>
-          </xsl:with-param>
-          <xsl:with-param name="hyperlinkStyle">
-            <xsl:value-of select="$hyperlinkStyle"/>
-          </xsl:with-param>
-          <xsl:with-param name="contentFontsCount">
-            <xsl:value-of select="$contentFontsCount"/>
-          </xsl:with-param>
-          <xsl:with-param name="styleFontsCount">
-            <xsl:value-of select="$styleFontsCount"/>
-          </xsl:with-param>
-          <xsl:with-param name="cellFormats">
-            <xsl:value-of select="$cellFormats"/>
-          </xsl:with-param>
-          <xsl:with-param name="cellStyles">
-            <xsl:value-of select="$cellStyles"/>
-          </xsl:with-param>
-          <xsl:with-param name="CheckIfConditional">
-            <xsl:value-of select="$CheckIfConditional"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellStyle">
-            <xsl:value-of select="$ConditionalCellStyle"/>
-          </xsl:with-param>
+					<xsl:with-param name="tableId" select ="$tableId">						
+					</xsl:with-param>
+					<xsl:with-param name="multilines" select ="$multilines"/>					
+					<xsl:with-param name="hyperlinkStyle" select ="$hyperlinkStyle"/>
+					<xsl:with-param name="contentFontsCount" select ="$contentFontsCount"/>
+					<xsl:with-param name="styleFontsCount" select ="$styleFontsCount"/>
+					<xsl:with-param name="cellFormats" select ="$cellFormats"/>
+					<xsl:with-param name="cellStyles" select="$cellStyles"/>
+					<xsl:with-param name="CheckIfConditional" select="$CheckIfConditional"/>
+					<xsl:with-param name="ConditionalCellStyle" select="$ConditionalCellStyle"/>
         </xsl:call-template>
       </pzip:entry>
     </xsl:if>
@@ -134,30 +117,14 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           "
         />
       </xsl:with-param>
-      <xsl:with-param name="sheetId">
-        <xsl:value-of select="$sheetId + 1"/>
-      </xsl:with-param>
-      <xsl:with-param name="multilines">
-        <xsl:value-of select="$multilines"/>
-      </xsl:with-param>
-      <xsl:with-param name="hyperlinkStyle">
-        <xsl:value-of select="$hyperlinkStyle"/>
-      </xsl:with-param>
-      <xsl:with-param name="contentFontsCount">
-        <xsl:value-of select="$contentFontsCount"/>
-      </xsl:with-param>
-      <xsl:with-param name="styleFontsCount">
-        <xsl:value-of select="$styleFontsCount"/>
-      </xsl:with-param>
-      <xsl:with-param name="cellFormats">
-        <xsl:value-of select="$cellFormats"/>
-      </xsl:with-param>
-      <xsl:with-param name="cellStyles">
-        <xsl:value-of select="$cellStyles"/>
-      </xsl:with-param>
-      <xsl:with-param name="CheckIfConditional">
-        <xsl:value-of select="$CheckIfConditional"/>
-      </xsl:with-param>
+			<xsl:with-param name="sheetId" select ="$sheetId + 1"/>
+			<xsl:with-param name="multilines" select="$multilines"/>
+			<xsl:with-param name="hyperlinkStyle" select="$hyperlinkStyle"/>
+			<xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+			<xsl:with-param name="styleFontsCount" select="$styleFontsCount"/>
+			<xsl:with-param name="cellFormats" select="$cellFormats"/>
+			<xsl:with-param name="cellStyles" select="$cellStyles"/>
+			<xsl:with-param name="CheckIfConditional" select="$CheckIfConditional"/>
     </xsl:apply-templates>
 
   </xsl:template>
@@ -258,57 +225,27 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 
       <xsl:call-template name="InsertViewSettings">
         <xsl:with-param name="sheetId" select="$sheetId"/>
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCellStyle">
-          <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
+				<xsl:with-param name="MergeCell" select="$MergeCell"/>					
+				<xsl:with-param name="MergeCellStyle" select="$MergeCellStyle"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertSheetContent">
         <xsl:with-param name="sheetId" select="$sheetId"/>
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCellStyle">
-          <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
-        <xsl:with-param name="ColumnTagNum">
-          <xsl:value-of select="$ColumnTagNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="defaultFontSize">
-          <xsl:value-of select="$defaultFontSize"/>
-        </xsl:with-param>
+				<xsl:with-param name="MergeCell" select="$MergeCell"/>
+				<xsl:with-param name="MergeCellStyle" select="$MergeCellStyle"/>
+				<xsl:with-param name="ColumnTagNum" select="$ColumnTagNum"/>
+				<xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
-        <xsl:with-param name="tableId">
-          <xsl:value-of select="$tableId"/>
-        </xsl:with-param>
-        <xsl:with-param name="multilines">
-          <xsl:value-of select="$multilines"/>
-        </xsl:with-param>
-        <xsl:with-param name="hyperlinkStyle">
-          <xsl:value-of select="$hyperlinkStyle"/>
-        </xsl:with-param>
-        <xsl:with-param name="contentFontsCount">
-          <xsl:value-of select="$contentFontsCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="styleFontsCount">
-          <xsl:value-of select="$styleFontsCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="cellFormats">
-          <xsl:value-of select="$cellFormats"/>
-        </xsl:with-param>
-        <xsl:with-param name="cellStyles">
-          <xsl:value-of select="$cellStyles"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckIfConditional">
-          <xsl:value-of select="$CheckIfConditional"/>
-        </xsl:with-param>
-        <xsl:with-param name="pivotCells">
-          <xsl:value-of select="$pivotCells"/>
-        </xsl:with-param>
+				<xsl:with-param name="tableId" select="$tableId"/>
+				<xsl:with-param name="multilines" select="$multilines"/>
+				<xsl:with-param name="hyperlinkStyle" select="$hyperlinkStyle"/>
+				<xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+				<xsl:with-param name="styleFontsCount" select="$styleFontsCount"/>
+				<xsl:with-param name="cellFormats" select="$cellFormats"/>
+				<xsl:with-param name="cellStyles" select="$cellStyles"/>
+				<xsl:with-param name="CheckIfConditional" select="$CheckIfConditional"/>
+				<xsl:with-param name="pivotCells" select="$pivotCells"/>
       </xsl:call-template>
 
       <!--RefNo-3 insert filter: Commented and added the code after sort -->
@@ -328,12 +265,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCellStyle">
-          <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
+				<xsl:with-param name="MergeCell" select="$MergeCell"/>
+				<xsl:with-param name="MergeCellStyle" select="$MergeCellStyle"/>
       </xsl:call-template>
       
 
@@ -346,7 +279,9 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           <xsl:with-param name="cellNumber">
             <xsl:text>1</xsl:text>
           </xsl:with-param>
-          <xsl:with-param name="tableName" select="@table:name"/>
+					<xsl:with-param name="tableName" >
+						<xsl:value-of select ="@table:name"/>
+					</xsl:with-param>
           <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
           <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
@@ -355,9 +290,7 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           <xsl:with-param name="tableName">
             <xsl:value-of select="@table:name"/>
           </xsl:with-param>
-          <xsl:with-param name="ConditionalCellStyle">
-            <xsl:value-of select="$ConditionalCellStyle"/>
-          </xsl:with-param>
+					<xsl:with-param name="ConditionalCellStyle" select="$ConditionalCellStyle"/>
         </xsl:call-template>
         
       </xsl:if>
@@ -373,7 +306,9 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
             <xsl:with-param name="cellNumber">
               <xsl:text>1</xsl:text>
             </xsl:with-param>
-            <xsl:with-param name="tableName" select="@table:name"/>
+						<xsl:with-param name="tableName" >
+							<xsl:value-of select="@table:name"/>
+						</xsl:with-param>
             <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
             <xsl:with-param name="MergeCell" select="$MergeCell"/>
           </xsl:apply-templates>
@@ -407,17 +342,11 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
               select="string-length($rowBreakes) - string-length(translate($rowBreakes,';',''))"/>
           </xsl:variable>
 
-          <rowBreaks>
-            <xsl:attribute name="count">
-              <xsl:value-of select="$countBreakes"/>
-            </xsl:attribute>
-            <xsl:attribute name="manualBreakCount">
-              <xsl:value-of select="$countBreakes"/>
-            </xsl:attribute>
-
-            <xsl:call-template name="InsertRowBreakes">
-              <xsl:with-param name="rowBreakes" select="$rowBreakes"/>
-            </xsl:call-template>
+					<!-- Attributes written inline as per XSLT best practices-->				
+					<rowBreaks count="{$countBreakes}" manualBreakCount="{$countBreakes}">
+						<xsl:call-template name="InsertRowBreakes">
+							<xsl:with-param name="rowBreakes" select="$rowBreakes"/>
+						</xsl:call-template>
           </rowBreaks>
         </xsl:if>
       </xsl:if>
@@ -437,17 +366,11 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
               select="string-length($colBreakes) - string-length(translate($colBreakes,';',''))"/>
           </xsl:variable>
 
-          <colBreaks>
-            <xsl:attribute name="count">
-              <xsl:value-of select="$countBreakes"/>
-            </xsl:attribute>
-            <xsl:attribute name="manualBreakCount">
-              <xsl:value-of select="$countBreakes"/>
-            </xsl:attribute>
-
-            <xsl:call-template name="InsertColBreakes">
-              <xsl:with-param name="colBreakes" select="$colBreakes"/>
-            </xsl:call-template>
+					<!-- Attributes written inline as per XSLT best practices-->					
+					<colBreaks count="{$countBreakes}" manualBreakCount="{$countBreakes}">
+						<xsl:call-template name="InsertColBreakes">
+							<xsl:with-param name="colBreakes" select="$colBreakes"/>
+						</xsl:call-template>
           </colBreaks>
         </xsl:if>
       </xsl:if>
@@ -913,26 +836,16 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
       </xsl:choose>
     </xsl:variable>
 
-    <sheetFormatPr>
-
-      <xsl:attribute name="defaultColWidth">
-        <xsl:value-of select="$defaultColWidth"/>
-      </xsl:attribute>
-
-      <xsl:attribute name="defaultRowHeight">
-        <xsl:value-of select="$defaultRowHeight"/>
-      </xsl:attribute>
-
-      <xsl:attribute name="customHeight">
-        <xsl:text>true</xsl:text>
-      </xsl:attribute>
-
-      <xsl:if test="$CheckRowHidden = 'true'">
-        <xsl:attribute name="zeroHeight">
-          <xsl:text>1</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
+		<!-- Attributes written inline as per XSLT best practices-->	
+		<sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}">
+			<xsl:attribute name="customHeight">
+				<xsl:text>true</xsl:text>
+			</xsl:attribute>
+			<xsl:if test="$CheckRowHidden = 'true'">
+				<xsl:attribute name="zeroHeight">
+					<xsl:text>1</xsl:text>
+				</xsl:attribute>
+			</xsl:if>
     </sheetFormatPr>
 
     <xsl:if test="descendant::table:table-column[1]">
@@ -958,49 +871,21 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
         <xsl:with-param name="sheetId" select="$sheetId"/>
         <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-        <xsl:with-param name="TableColumnTagNum">
-          <xsl:value-of select="$ColumnTagNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCellStyle">
-          <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckRowHidden">
-          <xsl:value-of select="$CheckRowHidden"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckIfDefaultBorder">
-          <xsl:value-of select="$CheckIfDefaultBorder"/>
-        </xsl:with-param>
+				<xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
+				<xsl:with-param name="MergeCell" select="$MergeCell"/>
+				<xsl:with-param name="MergeCellStyle" select="$MergeCellStyle"/>
+				<xsl:with-param name="CheckRowHidden" select="$CheckRowHidden"/>
+				<xsl:with-param name="CheckIfDefaultBorder" select="$CheckIfDefaultBorder"/>
         <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
-        <xsl:with-param name="tableId">
-          <xsl:value-of select="$tableId"/>
-        </xsl:with-param>
-        <xsl:with-param name="multilines">
-          <xsl:value-of select="$multilines"/>
-        </xsl:with-param>
-        <xsl:with-param name="hyperlinkStyle">
-          <xsl:value-of select="$hyperlinkStyle"/>
-        </xsl:with-param>
-        <xsl:with-param name="contentFontsCount">
-          <xsl:value-of select="$contentFontsCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="styleFontsCount">
-          <xsl:value-of select="$styleFontsCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="cellFormats">
-          <xsl:value-of select="$cellFormats"/>
-        </xsl:with-param>
-        <xsl:with-param name="cellStyles">
-          <xsl:value-of select="$cellStyles"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckIfConditional">
-          <xsl:value-of select="$CheckIfConditional"/>
-        </xsl:with-param>
-        <xsl:with-param name="pivotCells">
-          <xsl:value-of select="$pivotCells"/>
-        </xsl:with-param>
+				<xsl:with-param name="tableId" select="$tableId"/>
+				<xsl:with-param name="multilines" select="$multilines"/>
+				<xsl:with-param name="hyperlinkStyle" select="$hyperlinkStyle"/>
+				<xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+				<xsl:with-param name="styleFontsCount" select="$styleFontsCount"/>
+				<xsl:with-param name="cellFormats" select="$cellFormats"/>
+				<xsl:with-param name="cellStyles"  select="$cellStyles"/>
+				<xsl:with-param name="CheckIfConditional" select="$CheckIfConditional"/>
+				<xsl:with-param name="pivotCells" select="$pivotCells"/>
       </xsl:apply-templates>
 
     </sheetData>
@@ -1008,7 +893,9 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 	  <!-- check if filter can be conversed -->
 	  <xsl:variable name="ignoreFilterNew">
 		  <xsl:call-template name="MatchFilter">
-			  <xsl:with-param name="tableName" select="@table:name"/>
+				<xsl:with-param name="tableName">
+					<xsl:value-of select="@table:name"/>
+				</xsl:with-param>
 			  <xsl:with-param name="ignoreFilter">
 				  <xsl:text>check</xsl:text>
 			  </xsl:with-param>
@@ -1018,7 +905,9 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 	 <xsl:choose>
 		 <xsl:when test="$ignoreFilterNew = '' ">
 			 <xsl:call-template name="MatchFilter">
-				 <xsl:with-param name="tableName" select="@table:name"/>
+					<xsl:with-param name="tableName">
+						<xsl:value-of select="@table:name"/>
+					</xsl:with-param>
 			  </xsl:call-template>
 		  </xsl:when>
 		  <xsl:otherwise>
@@ -1028,7 +917,9 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 	  <!--End of RefNo-3-->
     <!-- insert sort -->
     <xsl:call-template name="InsertSort">
-      <xsl:with-param name="tableName" select="@table:name"/>
+			<xsl:with-param name="tableName">
+				<xsl:value-of select="@table:name"/>
+			</xsl:with-param>
     </xsl:call-template>
 
     <!-- insert data consolidation -->

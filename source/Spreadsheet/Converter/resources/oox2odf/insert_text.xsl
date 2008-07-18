@@ -64,9 +64,11 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
         <xsl:attribute name="office:value-type">
           <xsl:text>string</xsl:text>
         </xsl:attribute>
-        <xsl:variable name="id">
-          <xsl:value-of select="e:v"/>
-        </xsl:variable>
+         <!--Redundant Code-->
+        <!--<xsl:variable name="id">
+          <xsl:value-of select="e:v"/> 
+        </xsl:variable>-->
+        <!--end-->
         <text:p>
           <xsl:choose>
             <xsl:when test="key('ref',@r)[@oox:part = $partId]">
@@ -97,17 +99,22 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
 
                   </xsl:for-each>
                 </xsl:when>
-                <xsl:otherwise>
-                  <text:a>
+                <xsl:otherwise>   
+               <!--Changes As per XSLT Best Practices-->             
+                  <!--<text:a>
                     <xsl:attribute name="xlink:href">
                       <xsl:value-of select="$XlinkHref"/>
-                    </xsl:attribute>
-                    <xsl:choose>
+                    </xsl:attribute>-->                                
+                  <text:a xlink:href="{$XlinkHref}" >                 
+                    <!--<xsl:choose>
                       <xsl:when test="@t='s'"/>
                       <xsl:otherwise>
                         <xsl:value-of select="e:v"/>
                       </xsl:otherwise>
-                    </xsl:choose>
+                    </xsl:choose>-->                    
+                    <xsl:if test="@t !=string('s')">
+                      <xsl:value-of select="e:v"/>
+                    </xsl:if>                  
                     <pxsi:v>
                       <xsl:value-of select="e:v"/>
                     </pxsi:v>

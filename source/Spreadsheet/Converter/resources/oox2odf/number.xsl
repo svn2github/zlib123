@@ -445,9 +445,7 @@
           <xsl:otherwise>
             <number:number-style style:name="{generate-id(.)}">
               <xsl:call-template name="InsertNumberFormatting">
-                <xsl:with-param name="formatCode">
-                  <xsl:value-of select="@formatCode"/>
-                </xsl:with-param>
+                <xsl:with-param name="formatCode" select="@formatCode"/>
               </xsl:call-template>
             </number:number-style>
           </xsl:otherwise>
@@ -1142,9 +1140,7 @@
 
     <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
 
-      <xsl:variable name="VarNumFmtId">
-        <xsl:value-of select="@numFmtId"/>
-      </xsl:variable>
+      <xsl:variable name="VarNumFmtId" select="@numFmtId"/>
 
       <xsl:choose>
 
@@ -1194,9 +1190,7 @@
           <xsl:if test="not (preceding-sibling::e:xf/@numFmtId = $VarNumFmtId)">
             <number:number-style style:name="{concat('N',@numFmtId)}">
               <xsl:call-template name="InsertFixedNumFormat">
-                <xsl:with-param name="ID">
-                  <xsl:value-of select="@numFmtId"/>
-                </xsl:with-param>
+                <xsl:with-param name="ID" select="@numFmtId"/>
               </xsl:call-template>
             </number:number-style>
           </xsl:if>
@@ -1386,10 +1380,10 @@
     <!-- (int) number format ID -->
 
     <xsl:choose>
-      <xsl:when test="$ID = 12 or $ID = 13">
+      <!--<xsl:when test="$ID = 12 or $ID = 13">-->
 
         <!--fraction format -->
-        <number:fraction number:min-integer-digits="0">
+      <!--<number:fraction number:min-integer-digits="0">
           <xsl:attribute name="number:min-numerator-digits">
             <xsl:choose>
               <xsl:when test="$ID = 12">1</xsl:when>
@@ -1403,7 +1397,18 @@
             </xsl:choose>
           </xsl:attribute>
         </number:fraction>
+      </xsl:when>-->
+      <!--end of comment-->     
+      <xsl:when test="$ID=12">
+        <number:fraction number:min-integer-digits="0" number:min-numerator-digits="1" number:min-denominator-digits="1"/>
       </xsl:when>
+
+      <xsl:when test="$ID=13">
+        <number:fraction number:min-integer-digits="0" number:min-numerator-digits="2" number:min-denominator-digits="2"/>
+      </xsl:when>
+      
+      <!--end-->
+      
       <xsl:when test="$ID = 11">
 
         <!-- scientific format -->

@@ -1755,12 +1755,16 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
           <xsl:when test="$GetMinColWithElement &lt;= ($colNum - 2 + $EndColl)">
             <!--End of RefNo-1-->
         <xsl:if test="$GetMinColWithElement - $colNum &gt; 0">
-          <table:covered-table-cell>
+         
+          <!--<table:covered-table-cell>
             <xsl:attribute name="table:number-columns-repeated">
               <xsl:value-of select="$GetMinColWithElement - $colNum"/>
             </xsl:attribute>
-          </table:covered-table-cell>
+          </table:covered-table-cell>-->          
+        <!--XSLT Best Practices-->
+          <table:covered-table-cell table:number-columns-repeated="{$GetMinColWithElement - $colNum}"/>         
         </xsl:if>
+
 
         <table:covered-table-cell>
 
@@ -1887,12 +1891,16 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
             <!--Start of RefNo-1-->
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="($EndColl - 1) &gt; 0">
-              <table:covered-table-cell>
+            <xsl:if test="($EndColl - 1) &gt; 0">              
+              <!--<table:covered-table-cell>
                 <xsl:attribute name="table:number-columns-repeated">
                   <xsl:value-of select="$EndColl - 1"/>
                 </xsl:attribute>
-              </table:covered-table-cell>
+              </table:covered-table-cell>-->   
+              <!--Best Pactice, XSLT-->           
+              <table:covered-table-cell table:number-columns-repeated="{$EndColl - 1}"/>
+              <!--end-->
+              
             </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
@@ -1900,14 +1908,17 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
       </xsl:when>
       <!--RefNo-1-->
       <xsl:when test="$EndColl &gt; 1 and $GetMinColWithElement = '' and ($EndColl - 1) &gt; 0">
-        <table:covered-table-cell>
+        <!--<table:covered-table-cell>
           <xsl:attribute name="table:number-columns-repeated">
             <!--RefNo-1
             <xsl:value-of select="$EndColl - $prevCellCol"/>
             -->
             <xsl:value-of select="$EndColl - 1"/>
           </xsl:attribute>
-        </table:covered-table-cell>
+        </table:covered-table-cell>-->
+        <!--XSLT Best Practice-->
+        <table:covered-table-cell table:number-columns-repeated="{$EndColl - 1}"/>
+        <!--end-->
       </xsl:when>
     </xsl:choose>
 

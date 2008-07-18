@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -573,36 +573,20 @@
 
     <xsl:variable name="CheckIfBigMergeBefore">
       <xsl:call-template name="CheckIfBigMergeBefore">
-        <xsl:with-param name="prevCellCol">
-          <xsl:value-of select="$prevCellCol"/>
-        </xsl:with-param>
-        <xsl:with-param name="colNum">
-          <xsl:value-of select="$colNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="rowNum">
-          <xsl:value-of select="$rowNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="BigMergeCell">
-          <xsl:value-of select="$BigMergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
+        <xsl:with-param name="prevCellCol" select="$prevCellCol"/>
+		<xsl:with-param name="colNum" select="$colNum"/>
+		<xsl:with-param name="rowNum" select="$rowNum"/>
+		<xsl:with-param name="BigMergeCell" select="$BigMergeCell"/>
+		<xsl:with-param name="MergeCell" select="$MergeCell"/>
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="ElementsColl">
-      <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl, $ConditionalCol)"/>
-    </xsl:variable>
+    <xsl:variable name="ElementsColl" select="concat($PictureColl, $NoteColl, $ValidationColl, $ConditionalCol)"/>
 
     <xsl:variable name="GetMinCollWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
-        <xsl:with-param name="PictureRow">
-          <xsl:value-of select="concat(';', $ElementsColl)"/>
-        </xsl:with-param>
-        <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$prevCellCol"/>
-        </xsl:with-param>
+        <xsl:with-param name="PictureRow" select="concat(';', $ElementsColl)"/>
+	<xsl:with-param name="AfterRow" select="$prevCellCol"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -628,64 +612,28 @@
 
         <!-- Insert picture before this col -->
         <xsl:call-template name="InsertElementsBetweenTwoColl">
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="$sheet"/>
-          </xsl:with-param>
-          <xsl:with-param name="NameSheet">
-            <xsl:value-of select="$NameSheet"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureCell">
-            <xsl:value-of select="$PictureCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureRow">
-            <xsl:value-of select="$PictureRow"/>
-          </xsl:with-param>
-          <xsl:with-param name="NoteCell">
-            <xsl:value-of select="$NoteCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="NoteRow">
-            <xsl:value-of select="$NoteRow"/>
-          </xsl:with-param>
-          <xsl:with-param name="ElementsColl">
-            <xsl:value-of select="$ElementsColl"/>
-          </xsl:with-param>
-          <xsl:with-param name="rowNum">
-            <xsl:value-of select="$rowNum"/>
-          </xsl:with-param>
+          <xsl:with-param name="sheet" select="$sheet"/>
+		  <xsl:with-param name="NameSheet" select="$NameSheet"/>
+		  <xsl:with-param name="PictureCell" select="$PictureCell"/>
+		  <xsl:with-param name="PictureRow" select="$PictureRow"/>
+		  <xsl:with-param name="NoteCell" select="$NoteCell"/>
+		  <xsl:with-param name="NoteRow" select="$NoteRow"/>
+		  <xsl:with-param name="ElementsColl" select="$ElementsColl"/>
+		  <xsl:with-param name="rowNum" select="$rowNum"/>
           <xsl:with-param name="prevColl">
             <xsl:text>0</xsl:text>
           </xsl:with-param>
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
-          <xsl:with-param name="EndColl">
-            <xsl:value-of select="$colNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCell">
-            <xsl:value-of select="$ConditionalCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellStyle">
-            <xsl:value-of select="$ConditionalCellStyle"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellCol">
-            <xsl:value-of select="$ConditionalCellCol"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellAll">
-            <xsl:value-of select="$ConditionalCellAll"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellSingle">
-            <xsl:value-of select="$ConditionalCellSingle"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellMultiple">
-            <xsl:value-of select="$ConditionalCellMultiple"/>
-          </xsl:with-param>
-          <xsl:with-param name="ValidationCell">
-            <xsl:value-of select="$ValidationCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="ValidationRow">
-            <xsl:value-of select="$ValidationRow"/>
-          </xsl:with-param>
-          <xsl:with-param name="ValidationCellStyle">
-            <xsl:value-of select="$ValidationCellStyle"/>
-          </xsl:with-param>
+          <xsl:with-param name="EndColl" select="$colNum"/>
+		  <xsl:with-param name="ConditionalCell" select="$ConditionalCell"/>
+		  <xsl:with-param name="ConditionalCellStyle" select="$ConditionalCellStyle"/>
+		  <xsl:with-param name="ConditionalCellCol" select="$ConditionalCellCol"/>
+          <xsl:with-param name="ConditionalCellAll" select="$ConditionalCellAll"/>
+		  <xsl:with-param name="ConditionalCellSingle" select="$ConditionalCellSingle"/>
+		  <xsl:with-param name="ConditionalCellMultiple" select="$ConditionalCellMultiple"/>
+		  <xsl:with-param name="ValidationCell" select="$ValidationCell"/>
+		  <xsl:with-param name="ValidationRow" select="$ValidationRow"/>
+          <xsl:with-param name="ValidationCellStyle" select="$ValidationCellStyle"/>
         </xsl:call-template>
 
       </xsl:when>
@@ -919,84 +867,32 @@
       <xsl:when test="contains($CheckIfMerge,'true')">
 
         <xsl:call-template name="InsertCoveredTableCell">
-          <xsl:with-param name="BeforeMerge">
-            <xsl:value-of select="$BeforeMerge"/>
-          </xsl:with-param>
-          <xsl:with-param name="prevCellCol">
-            <xsl:value-of select="$prevCellCol"/>
-          </xsl:with-param>
-          <xsl:with-param name="BigMergeCell">
-            <xsl:value-of select="$BigMergeCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="MergeCell">
-            <xsl:value-of select="$MergeCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="this">
-            <xsl:value-of select="$this"/>
-          </xsl:with-param>
-          <xsl:with-param name="colNum">
-            <xsl:value-of select="$colNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="rowNum">
-            <xsl:value-of select="$rowNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="CheckIfMerge">
-            <xsl:value-of select="$CheckIfMerge"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureCell">
-            <xsl:value-of select="$PictureCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureRow">
-            <xsl:value-of select="$PictureRow"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureColl">
-            <xsl:value-of select="$PictureColl"/>
-          </xsl:with-param>
-          <xsl:with-param name="NoteCell">
-            <xsl:value-of select="$NoteCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="NoteRow">
-            <xsl:value-of select="$NoteRow"/>
-          </xsl:with-param>
-          <xsl:with-param name="NoteColl">
-            <xsl:value-of select="$NoteColl"/>
-          </xsl:with-param>
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="$sheet"/>
-          </xsl:with-param>
-          <xsl:with-param name="NameSheet">
-            <xsl:value-of select="$NameSheet"/>
-          </xsl:with-param>
-          <xsl:with-param name="sheetNr">
-            <xsl:value-of select="$sheetNr"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCell">
-            <xsl:value-of select="$ConditionalCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellStyle">
-            <xsl:value-of select="$ConditionalCellStyle"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellCol">
-            <xsl:value-of select="$ConditionalCellCol"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellAll">
-            <xsl:value-of select="$ConditionalCellAll"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellSingle">
-            <xsl:value-of select="$ConditionalCellSingle"/>
-          </xsl:with-param>
-          <xsl:with-param name="ConditionalCellMultiple">
-            <xsl:value-of select="$ConditionalCellMultiple"/>
-          </xsl:with-param>
-          <xsl:with-param name="ValidationCell">
-            <xsl:value-of select="$ValidationCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="ValidationRow">
-            <xsl:value-of select="$ValidationRow"/>
-          </xsl:with-param>
-          <xsl:with-param name="ValidationCellStyle">
-            <xsl:value-of select="$ValidationCellStyle"/>
-          </xsl:with-param>
+			<xsl:with-param name="BeforeMerge" select="$BeforeMerge"/>
+			<xsl:with-param name="prevCellCol" select="$prevCellCol"/>
+			<xsl:with-param name="BigMergeCell" select="$BigMergeCell"/>
+			<xsl:with-param name="MergeCell" select="$MergeCell"/>
+			<xsl:with-param name="this" select="$this"/>
+			<xsl:with-param name="colNum" select="$colNum"/>
+			<xsl:with-param name="rowNum" select="$rowNum"/>
+			<xsl:with-param name="CheckIfMerge" select="$CheckIfMerge"/>
+			<xsl:with-param name="PictureCell" select="$PictureCell"/>
+			<xsl:with-param name="PictureRow" select="$PictureRow"/>
+			<xsl:with-param name="PictureColl" select="$PictureColl"/>
+			<xsl:with-param name="NoteCell" select="$NoteCell"/>
+			<xsl:with-param name="NoteRow" select="$NoteRow"/>
+			<xsl:with-param name="NoteColl" select="$NoteColl"/>
+			<xsl:with-param name="sheet" select="$sheet"/>
+			<xsl:with-param name="NameSheet" select="$NameSheet"/>
+			<xsl:with-param name="sheetNr" select="$sheetNr"/>
+			<xsl:with-param name="ConditionalCell" select="$ConditionalCell"/>
+			<xsl:with-param name="ConditionalCellStyle" select="$ConditionalCellStyle"/>
+			<xsl:with-param name="ConditionalCellCol" select="$ConditionalCellCol"/>
+			<xsl:with-param name="ConditionalCellAll" select="$ConditionalCellAll"/>
+			<xsl:with-param name="ConditionalCellSingle" select="$ConditionalCellSingle"/>
+			<xsl:with-param name="ConditionalCellMultiple" select="$ConditionalCellMultiple"/>
+			<xsl:with-param name="ValidationCell" select="$ValidationCell"/>
+			<xsl:with-param name="ValidationRow" select="$ValidationRow"/>
+			<xsl:with-param name="ValidationCellStyle" select="$ValidationCellStyle"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -1331,84 +1227,32 @@
           <xsl:when
             test="$CheckIfMerge != 'false' and substring-after($CheckIfMerge, ':') &gt; 1">
             <xsl:call-template name="InsertCoveredTableCell">
-              <xsl:with-param name="BeforeMerge">
-                <xsl:value-of select="$BeforeMerge"/>
-              </xsl:with-param>
-              <xsl:with-param name="prevCellCol">
-                <xsl:value-of select="$prevCellCol"/>
-              </xsl:with-param>
-              <xsl:with-param name="BigMergeCell">
-                <xsl:value-of select="$BigMergeCell"/>
-              </xsl:with-param>
-              <xsl:with-param name="MergeCell">
-                <xsl:value-of select="$MergeCell"/>
-              </xsl:with-param>
-              <xsl:with-param name="this">
-                <xsl:value-of select="$this"/>
-              </xsl:with-param>
-              <xsl:with-param name="colNum">
-                <xsl:value-of select="$colNum + 1"/>
-              </xsl:with-param>
-              <xsl:with-param name="rowNum">
-                <xsl:value-of select="$rowNum"/>
-              </xsl:with-param>
-              <xsl:with-param name="CheckIfMerge">
-                <xsl:value-of select="$CheckIfMerge"/>
-              </xsl:with-param>
-              <xsl:with-param name="PictureCell">
-                <xsl:value-of select="$PictureCell"/>
-              </xsl:with-param>
-              <xsl:with-param name="PictureRow">
-                <xsl:value-of select="$PictureRow"/>
-              </xsl:with-param>
-              <xsl:with-param name="PictureColl">
-                <xsl:value-of select="$PictureColl"/>
-              </xsl:with-param>
-              <xsl:with-param name="NoteCell">
-                <xsl:value-of select="$NoteCell"/>
-              </xsl:with-param>
-              <xsl:with-param name="NoteRow">
-                <xsl:value-of select="$NoteRow"/>
-              </xsl:with-param>
-              <xsl:with-param name="NoteColl">
-                <xsl:value-of select="$NoteColl"/>
-              </xsl:with-param>
-              <xsl:with-param name="sheet">
-                <xsl:value-of select="$sheet"/>
-              </xsl:with-param>
-              <xsl:with-param name="NameSheet">
-                <xsl:value-of select="$NameSheet"/>
-              </xsl:with-param>
-              <xsl:with-param name="sheetNr">
-                <xsl:value-of select="$sheetNr"/>
-              </xsl:with-param>
-              <xsl:with-param name="ConditionalCell">
-                <xsl:value-of select="$ConditionalCell"/>
-              </xsl:with-param>
-              <xsl:with-param name="ConditionalCellStyle">
-                <xsl:value-of select="$ConditionalCellStyle"/>
-              </xsl:with-param>
-              <xsl:with-param name="ConditionalCellCol">
-                <xsl:value-of select="$ConditionalCellCol"/>
-              </xsl:with-param>
-              <xsl:with-param name="ConditionalCellAll">
-                <xsl:value-of select="$ConditionalCellAll"/>
-              </xsl:with-param>
-              <xsl:with-param name="ConditionalCellSingle">
-                <xsl:value-of select="$ConditionalCellSingle"/>
-              </xsl:with-param>
-              <xsl:with-param name="ConditionalCellMultiple">
-                <xsl:value-of select="$ConditionalCellMultiple"/>
-              </xsl:with-param>
-              <xsl:with-param name="ValidationCell">
-                <xsl:value-of select="$ValidationCell"/>
-              </xsl:with-param>
-              <xsl:with-param name="ValidationRow">
-                <xsl:value-of select="$ValidationRow"/>
-              </xsl:with-param>
-              <xsl:with-param name="ValidationCellStyle">
-                <xsl:value-of select="$ValidationCellStyle"/>
-              </xsl:with-param>
+				<xsl:with-param name="BeforeMerge" select="$BeforeMerge"/>
+				<xsl:with-param name="prevCellCol" select="$prevCellCol"/>
+				<xsl:with-param name="BigMergeCell" select="$BigMergeCell"/>
+				<xsl:with-param name="MergeCell" select="$MergeCell"/>
+				<xsl:with-param name="this" select="$this"/>
+				<xsl:with-param name="colNum" select="$colNum"/>
+				<xsl:with-param name="rowNum" select="$rowNum"/>
+				<xsl:with-param name="CheckIfMerge" select="$CheckIfMerge"/>
+				<xsl:with-param name="PictureCell" select="$PictureCell"/>
+				<xsl:with-param name="PictureRow" select="$PictureRow"/>
+				<xsl:with-param name="PictureColl" select="$PictureColl"/>
+				<xsl:with-param name="NoteCell" select="$NoteCell"/>
+				<xsl:with-param name="NoteRow" select="$NoteRow"/>
+				<xsl:with-param name="NoteColl" select="$NoteColl"/>
+				<xsl:with-param name="sheet" select="$sheet"/>
+				<xsl:with-param name="NameSheet" select="$NameSheet"/>
+				<xsl:with-param name="sheetNr" select="$sheetNr"/>
+				<xsl:with-param name="ConditionalCell" select="$ConditionalCell"/>
+				<xsl:with-param name="ConditionalCellStyle" select="$ConditionalCellStyle"/>
+				<xsl:with-param name="ConditionalCellCol" select="$ConditionalCellCol"/>
+				<xsl:with-param name="ConditionalCellAll" select="$ConditionalCellAll"/>
+				<xsl:with-param name="ConditionalCellSingle" select="$ConditionalCellSingle"/>
+				<xsl:with-param name="ConditionalCellMultiple" select="$ConditionalCellMultiple"/>
+				<xsl:with-param name="ValidationCell" select="$ValidationCell"/>
+				<xsl:with-param name="ValidationRow" select="$ValidationRow"/>
+				<xsl:with-param name="ValidationCellStyle" select="$ValidationCellStyle"/>
             </xsl:call-template>
           </xsl:when>
           <!-- when cell had 'centerContinuous' horizontal alignment -->

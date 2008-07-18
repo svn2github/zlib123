@@ -48,9 +48,7 @@
     <xsl:choose>
       <xsl:when test="contains($file,'/')">
         <xsl:call-template name="GetTarget">
-          <xsl:with-param name="file">
-            <xsl:value-of select="substring-after($file,'/')"/>
-          </xsl:with-param>
+          <xsl:with-param name="file" select="substring-after($file,'/')"/>
           <xsl:with-param name="id" select="$id"/>
           <xsl:with-param name="document" select="$document"/>
         </xsl:call-template>

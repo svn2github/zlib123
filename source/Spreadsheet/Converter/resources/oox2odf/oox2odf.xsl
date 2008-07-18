@@ -112,10 +112,12 @@
         </xsl:call-template>
       </xsl:variable>
       <!--i.e. $sheet = worksheets/sheet1.xml -->
-
-      <xsl:variable name="sheetNum">
+      <!--Redundant Code-->
+      <!--<xsl:variable name="sheetNum">
         <xsl:value-of select="position()"/>
-      </xsl:variable>
+      </xsl:variable>-->
+      
+      <!--end-->
 
       <!-- go to worksheet file and search for drawing -->
       <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:drawing">

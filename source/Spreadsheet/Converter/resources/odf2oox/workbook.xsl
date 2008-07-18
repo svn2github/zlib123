@@ -351,29 +351,15 @@
     <xsl:apply-templates
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[1]"
       mode="sheet">
-      <xsl:with-param name="cellNumber">0</xsl:with-param>
-      <xsl:with-param name="sheetId">1</xsl:with-param>
-      <xsl:with-param name="multilines">
-        <xsl:value-of select="$multilines"/>
-      </xsl:with-param>
-      <xsl:with-param name="hyperlinkStyle">
-        <xsl:value-of select="$hyperlinkStyle"/>
-      </xsl:with-param>
-      <xsl:with-param name="contentFontsCount">
-        <xsl:value-of select="$contentFontsCount"/>
-      </xsl:with-param>
-      <xsl:with-param name="styleFontsCount">
-        <xsl:value-of select="$styleFontsCount"/>
-      </xsl:with-param>
-      <xsl:with-param name="cellFormats">
-        <xsl:value-of select="$cellFormats"/>
-      </xsl:with-param>
-      <xsl:with-param name="cellStyles">
-        <xsl:value-of select="$cellStyles"/>
-      </xsl:with-param>
-      <xsl:with-param name="CheckIfConditional">
-        <xsl:value-of select="$CheckIfConditional"/>
-      </xsl:with-param>
+		  <xsl:with-param name="cellNumber" select ="number(0)"/>
+		  <xsl:with-param name="sheetId" select ="number(1)"/>
+		<xsl:with-param name="multilines" select ="$multilines"/>
+		<xsl:with-param name="hyperlinkStyle" select ="$hyperlinkStyle"/>
+		<xsl:with-param name="contentFontsCount" select ="$hyperlinkStyle"/>
+		<xsl:with-param name="styleFontsCount" select ="$styleFontsCount"/>
+		<xsl:with-param name="cellFormats" select ="$cellFormats"/>
+		<xsl:with-param name="cellStyles" select ="$cellStyles"/>
+		<xsl:with-param name="CheckIfConditional" select ="$CheckIfConditional"/>
     </xsl:apply-templates>
   </xsl:template>
 

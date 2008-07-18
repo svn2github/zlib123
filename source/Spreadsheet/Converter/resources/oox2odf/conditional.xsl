@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -423,9 +423,11 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="sheetName">
+    <!--Reduntant Code-->
+    <!--<xsl:variable name="sheetName">
       <xsl:value-of select="@name"/>
-    </xsl:variable>
+    </xsl:variable>-->
+    <!--end-->
 
     <!-- Check If Conditionals are in this sheet -->
 

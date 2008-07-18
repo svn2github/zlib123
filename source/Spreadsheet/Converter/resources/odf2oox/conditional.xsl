@@ -324,48 +324,48 @@
   <!-- Coditional Format -->
 
   <xsl:template name="InsertConditionalFormat">
-    <dxfs count="3">
-      <dxf>
-        <font>
-          <condense val="0"/>
-          <extend val="0"/>
-          <color rgb="FF9C0006"/>
-        </font>
-        <fill>
-          <patternFill>
-            <bgColor rgb="FFFFC7CE"/>
-          </patternFill>
-        </fill>
-      </dxf>
-      <xsl:for-each
-        select="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
-        <xsl:variable name="StyleApplyStyleName">
-          <xsl:value-of select="@style:apply-style-name"/>
-        </xsl:variable>
-        <dxf>
-          <xsl:for-each
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleApplyStyleName]">
-            <font>
-              <xsl:call-template name="InsertTextProperties">
-                <xsl:with-param name="mode">default</xsl:with-param>
-              </xsl:call-template>
-            </font>
-          </xsl:for-each>
-          <!-- style:table-cell-properties fo:background-color       -->
-          <xsl:for-each
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleApplyStyleName]">
-            <xsl:apply-templates select="style:table-cell-properties" mode="background-color">
-              <xsl:with-param name="Object">
-                <xsl:text>conditional</xsl:text>
-              </xsl:with-param>
-            </xsl:apply-templates>
-            <xsl:apply-templates select="style:table-cell-properties" mode="border"/>
-          </xsl:for-each>
+	  <dxfs count="3">
+		  <dxf>
+			  <font>
+				  <condense val="0"/>
+				  <extend val="0"/>
+				  <color rgb="FF9C0006"/>
+			  </font>
+			  <fill>
+				  <patternFill>
+					  <bgColor rgb="FFFFC7CE"/>
+				  </patternFill>
+			  </fill>
+		  </dxf>
+		  <xsl:for-each
+		 select="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+			  <xsl:variable name="StyleApplyStyleName">
+				  <xsl:value-of select="@style:apply-style-name"/>
+			  </xsl:variable>
+			  <dxf>
+				  <xsl:for-each
+					select="document('styles.xml')/office:document-styles/office:styles">
+					  <xsl:for-each select="style:style[@style:name=$StyleApplyStyleName]">
+						  <font>
+							  <xsl:call-template name="InsertTextProperties">
+								  <xsl:with-param name="mode">default</xsl:with-param>
+							  </xsl:call-template>
+						  </font>
+					  </xsl:for-each>
+					  <!-- style:table-cell-properties fo:background-color       -->
 
-        </dxf>
-      </xsl:for-each>
-
-    </dxfs>
+					  <xsl:for-each select="style:style[@style:name=$StyleApplyStyleName]">
+						  <xsl:apply-templates select="style:table-cell-properties" mode="background-color">
+							  <xsl:with-param name="Object">
+								  <xsl:text>conditional</xsl:text>
+							  </xsl:with-param>
+						  </xsl:apply-templates>
+						  <xsl:apply-templates select="style:table-cell-properties" mode="border"/>
+					  </xsl:for-each>
+				  </xsl:for-each>
+			  </dxf>
+		  </xsl:for-each>
+	  </dxfs>
   </xsl:template>
 
   <!-- Insert Formula of Coditional -->
