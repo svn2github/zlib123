@@ -339,7 +339,7 @@ Copyright (c) 2007, Sonata Software Limited
                     <xsl:choose >
                       <xsl:when test ="name()='text:list-item'">
                         <xsl:variable name ="currentNodeStyle">
-                          <xsl:call-template name ="getTextNodeForFontStyle">
+                          <xsl:call-template name ="getTextNodeForFontStyleForNotes">
                             <xsl:with-param name ="prClassName" select ="$prClassName"/>
                             <xsl:with-param name ="lvl" select ="$lvl"/>
                             <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
@@ -405,7 +405,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:choose >
                 <xsl:when test ="name()='text:list-item'">
                   <xsl:variable name ="currentNodeStyle">
-                    <xsl:call-template name ="getTextNodeForFontStyle">
+                    <xsl:call-template name ="getTextNodeForFontStyleForNotes">
                       <xsl:with-param name ="prClassName" select ="$prClassName"/>
                       <xsl:with-param name ="lvl" select ="$lvl"/>
                       <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
@@ -467,7 +467,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:choose >
                 <xsl:when test ="name()='text:list-item'">
                   <xsl:variable name ="currentNodeStyle">
-                    <xsl:call-template name ="getTextNodeForFontStyle">
+                    <xsl:call-template name ="getTextNodeForFontStyleForNotes">
                       <xsl:with-param name ="prClassName" select ="$prClassName"/>
                       <xsl:with-param name ="lvl" select ="$lvl"/>
                       <!-- parameter added by vijayeta, dated 11-7-07-->
@@ -1156,7 +1156,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  <xsl:template name ="getTextNodeForFontStyle">
+  <xsl:template name ="getTextNodeForFontStyleForNotes">
     <xsl:param name ="prClassName"/>
     <xsl:param name ="lvl" />
     <xsl:param name ="HyperlinksForBullets" />

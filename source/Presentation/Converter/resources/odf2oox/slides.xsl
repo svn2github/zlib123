@@ -70,7 +70,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="dpName">
           <xsl:value-of select="@draw:style-name" />
         </xsl:variable>
-        <xsl:for-each select="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
+        <xsl:for-each select="//style:style[@style:name= $dpName]/style:drawing-page-properties">
           <xsl:choose>
             <xsl:when test="@draw:fill='bitmap'">
               <xsl:variable name="var_imageName" select="@draw:fill-image-name"/>
@@ -197,7 +197,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:value-of select ="@draw:master-page-name"/>
           </xsl:variable>
 
-          <xsl:for-each select ="document('content.xml')//style:style[@style:name=$pageStyle]">
+          <xsl:for-each select ="//style:style[@style:name=$pageStyle]">
             <xsl:if test ="style:drawing-page-properties[@presentation:display-footer='true']">
               <!--<xsl:if test ="not($footerId ='')">-->
               <!--<xsl:if test ="document('content.xml')//presentation:footer-decl[@presentation:name=$footerId]">-->
@@ -336,7 +336,7 @@ Copyright (c) 2007, Sonata Software Limited
                         <!-- added by Vipul to insert line style-->
                         <!--start-->
                         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
-                        <xsl:for-each select ="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+                        <xsl:for-each select ="/office:document-content/office:automatic-styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
                           <xsl:if test="position()=1">
                           <xsl:call-template name ="getFillColor"/>
                           <xsl:call-template name ="getLineStyle"/>
@@ -796,8 +796,8 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:variable name ="paraId" select ="@text:style-name"/>
                 <xsl:variable name ="isNumberingEnabled">
                   <xsl:choose >
-                    <xsl:when test ="document('content.xml')//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering">
-                      <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering"/>
+                    <xsl:when test ="//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering">
+                      <xsl:value-of select ="//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering"/>
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select ="'false'"/>
@@ -956,8 +956,8 @@ Copyright (c) 2007, Sonata Software Limited
                     </xsl:call-template>
                   </xsl:variable>
                   <xsl:variable name ="isNumberingEnabled">
-                    <xsl:if test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
-                      <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                    <xsl:if test ="//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                      <xsl:value-of select ="//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
                     </xsl:if>
                     <!--<xsl:if test ="not(document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering)">
 											<xsl:value-of select ="'true'"/>
@@ -1026,8 +1026,8 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:variable>
             <xsl:variable name ="isNumberingEnabled">
               <xsl:choose >
-                <xsl:when test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
-                  <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                <xsl:when test ="//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                  <xsl:value-of select ="//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:variable name ="styleNameFromStyles" >
@@ -1125,10 +1125,10 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name ="isNumberingEnabled">
-              <xsl:if test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
-                <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+              <xsl:if test ="//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                <xsl:value-of select ="//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
               </xsl:if>
-              <xsl:if test ="not(document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering)">
+              <xsl:if test ="not(//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering)">
                 <xsl:value-of select ="'true'"/>
               </xsl:if>
             </xsl:variable>
@@ -1178,8 +1178,8 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:variable name ="paraId" select ="@text:style-name"/>
           <xsl:variable name ="isNumberingEnabled">
             <xsl:choose >
-              <xsl:when test ="document('content.xml')//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering">
-                <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering"/>
+              <xsl:when test ="//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering">
+                <xsl:value-of select ="//style:style[@style:name=$paraId]/style:paragraph-properties/@text:enable-numbering"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select ="'false'"/>
@@ -1507,7 +1507,7 @@ Copyright (c) 2007, Sonata Software Limited
     
       
           <xsl:choose>
-            <xsl:when test="document('content.xml')//presentation:date-time-decl[@presentation:name=$footerDateId]">
+            <xsl:when test="//presentation:date-time-decl[@presentation:name=$footerDateId]">
     <p:sp>
       <p:nvSpPr>
         <p:cNvPr id="16363" name="Date Placeholder 3" />
@@ -1529,8 +1529,7 @@ Copyright (c) 2007, Sonata Software Limited
         <a:bodyPr />
         <a:lstStyle />
         <a:p>
-              <xsl:for-each select ="document('content.xml') 
-					//presentation:date-time-decl[@presentation:name=$footerDateId] ">
+              <xsl:for-each select ="//presentation:date-time-decl[@presentation:name=$footerDateId] ">
                 <xsl:choose>
                   <xsl:when test="@presentation:source='current-date'" >
                     <xsl:choose>
@@ -1816,8 +1815,8 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:value-of select ="@text:style-name"/>
           </xsl:variable>
           <xsl:choose>
-            <xsl:when test="document('content.xml')//style:style[@style:name=$ParId]/style:paragraph-properties/@style:writing-mode='tb-rl'">
-              <xsl:for-each select ="document('content.xml')//style:style[@style:name=$ParId]/style:paragraph-properties">
+            <xsl:when test="//style:style[@style:name=$ParId]/style:paragraph-properties/@style:writing-mode='tb-rl'">
+              <xsl:for-each select ="//style:style[@style:name=$ParId]/style:paragraph-properties">
                 <xsl:if test ="@style:writing-mode='tb-rl'">
                   <xsl:attribute name ="vert">
                     <xsl:value-of select ="'vert'"/>
@@ -1825,8 +1824,8 @@ Copyright (c) 2007, Sonata Software Limited
                 </xsl:if>
               </xsl:for-each>
             </xsl:when>
-            <xsl:when test="document('content.xml')//style:style[@style:name=$prId]/style:paragraph-properties/@style:writing-mode='tb-rl'">
-              <xsl:for-each select ="document('content.xml')//style:style[@style:name=$prId]/style:paragraph-properties">
+            <xsl:when test="//style:style[@style:name=$prId]/style:paragraph-properties/@style:writing-mode='tb-rl'">
+              <xsl:for-each select ="//style:style[@style:name=$prId]/style:paragraph-properties">
                 <xsl:if test ="@style:writing-mode='tb-rl'">
                   <xsl:attribute name ="vert">
                     <xsl:value-of select ="'vert'"/>
@@ -1838,7 +1837,7 @@ Copyright (c) 2007, Sonata Software Limited
 
         </xsl:for-each>
       </xsl:for-each>
-      <xsl:for-each select ="document('content.xml')//style:style[@style:name=$prId]/style:graphic-properties">
+      <xsl:for-each select ="//style:style[@style:name=$prId]/style:graphic-properties">
         <xsl:call-template name ="tmpInternalPadding"/>
         <!-- Added by Vipul to Fix Bug 1794630 ODP: internal margins of textbox not retained -->
         <!--Start-->
@@ -2005,15 +2004,6 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:for-each>
 
   </xsl:template>
-
-  <!--<xsl:template name ="getDefaultFontSize">
-		<xsl:param name ="prClassName" />
-		<xsl:variable name ="LayoutName">
-			<xsl:call-template name ="getClassName" >
-				<xsl:with-param name ="clsName" select="$prClassName"/>
-			</xsl:call-template>
-		</xsl:variable>
-		</xsl:template>-->
   <!--Get SlideLayout Type-->
   <xsl:template name ="slidesRel" match ="/office:document-content/office:body/office:presentation/draw:page">
     <xsl:param name ="slideNo"/>
@@ -2102,7 +2092,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:variable name="dpName">
         <xsl:value-of select="@draw:style-name" />
       </xsl:variable>
-      <xsl:for-each select="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
+      <xsl:for-each select="//style:style[@style:name= $dpName]/style:drawing-page-properties">
         <xsl:if test="@draw:fill='bitmap'">
           <xsl:variable name="var_imageName" select="@draw:fill-image-name"/>
           <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$var_imageName]">
@@ -3908,7 +3898,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:variable name="styleName">
 					<xsl:value-of select="./@draw:style-name"/>
 				</xsl:variable>
-				<xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties">
+				<xsl:for-each select="//style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties">
 					
 						<xsl:attribute name="spd">
 							<xsl:choose>
@@ -4320,7 +4310,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:value-of select="./@draw:name"/>
 			</xsl:variable>
 
-			<xsl:if test="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
+			<xsl:if test="//style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
 				<xsl:call-template name="createSoundNode">					
 					<xsl:with-param name="styleName" select="$styleName"/>
 					<xsl:with-param name="loopSound">
@@ -4342,7 +4332,7 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:template name="createSoundNode">	
 		<xsl:param name="styleName"/>
 		<xsl:param name="loopSound"/>
-				<xsl:for-each select="./parent::node()/parent::node()/parent::node()/office:automatic-styles/style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
+				<xsl:for-each select="//style:style[@style:family='drawing-page' and @style:name=$styleName]/style:drawing-page-properties/presentation:sound">
 					<p:sndAc>
 						<p:stSnd>
 					<!--loop until next sound-->

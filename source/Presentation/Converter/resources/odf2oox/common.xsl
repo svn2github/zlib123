@@ -513,12 +513,18 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:call-template >
 			      </xsl:if>
 			<!--Font bold attribute -->
-			<xsl:if test="style:text-properties/@fo:font-weight[contains(.,'bold')]">
+        <xsl:choose>
+          <xsl:when test="style:text-properties/@fo:font-weight[contains(.,'bold')]">
 				<xsl:attribute name ="b">
 					<xsl:value-of select ="'1'"/>
 				</xsl:attribute >
-			</xsl:if >
-      <xsl:if test ="not(style:text-properties/@fo:font-weight[contains(.,'bold')]) and ($flagPresentationClass='No' or $prClassName='subtitle')">
+          </xsl:when >
+          <xsl:when test="style:text-properties/@fo:font-weight[contains(.,'normal')]">
+            <xsl:attribute name ="b">
+              <xsl:value-of select ="'0'"/>
+            </xsl:attribute >
+          </xsl:when >
+          <xsl:when test ="not(style:text-properties/@fo:font-weight[contains(.,'bold')]) and ($flagPresentationClass='No' or $prClassName='subtitle')">
         <xsl:call-template name="tmpgetDefualtTextProp">
           <xsl:with-param name="parentStyleName">
             <xsl:choose>
@@ -532,7 +538,8 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:with-param>
           <xsl:with-param name="attrName" select="'Bold'"/>
         </xsl:call-template>
-      </xsl:if>
+          </xsl:when>
+        </xsl:choose>
 			<!-- Kerning - Added by lohith.ar -->
 			<!-- Start -->
 			<xsl:if test ="style:text-properties/@style:letter-kerning = 'true'">
@@ -1651,38 +1658,7 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-  <xsl:template name ="getDefaultFontColor">
-    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-    <!--<xsl:for-each select="document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties">
-      <xsl:if test="position()=1">-->
-     
-      <xsl:choose >
-        <xsl:when test ="document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties/@fo:color">
-          <a:solidFill>
-            <a:srgbClr  >
-          <xsl:attribute name ="val">
-          <xsl:value-of select ="translate(substring-after(document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties/@fo:color,'#'),$lcletters,$ucletters)"/>
-          </xsl:attribute>
-            </a:srgbClr >
-          </a:solidFill>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="document('styles.xml')//style:style[@style:name = 'standard']//style:text-properties/@style:use-window-font-color='true'">
-            <a:solidFill>
-                <a:sysClr val="windowText"/>
-            </a:solidFill>
-          </xsl:if>
-          
-        </xsl:otherwise>
-      </xsl:choose>
-  
-         <!--</xsl:if>
-    </xsl:for-each>-->
-
-  
-  </xsl:template>
-  <xsl:template name="tmpgetDefualtTextProp">
+   <xsl:template name="tmpgetDefualtTextProp">
     <xsl:param name="parentStyleName"/>
     <xsl:param name="attrName"/>
     <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
@@ -1770,6 +1746,11 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:when test="@fo:font-weight[contains(.,'bold')]">
               <xsl:attribute name ="b">
                 <xsl:value-of select ="'1'"/>
+              </xsl:attribute >
+            </xsl:when>
+            <xsl:when test="@fo:font-weight[contains(.,'normal')]">
+              <xsl:attribute name ="b">
+                <xsl:value-of select ="'0'"/>
               </xsl:attribute >
             </xsl:when>
             <xsl:when test="not(@fo:font-weight[contains(.,'bold')]) and $prStyleName !=''">
@@ -2151,39 +2132,6 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	<xsl:template name ="getUnderlineFromStyles" >
-		<xsl:param name ="className"/>
-		<xsl:message terminate="no">progress:text:p</xsl:message>
-		<xsl:variable name ="defaultClsName">
-			<xsl:call-template name ="getClassName">
-				<xsl:with-param name ="clsName" select="$className"/>
-			</xsl:call-template>
-		</xsl:variable>
-    <xsl:for-each select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties">
-			<xsl:message terminate="no">progress:text:p</xsl:message>
-      <xsl:call-template name="tmpUnderLineStyle"/>
-      <!-- Stroke decoration code -->
-			<xsl:choose >
-        <xsl:when  test="@style:text-line-through-type = 'solid'">
-          <xsl:attribute name ="strike">
-            <xsl:value-of select ="'sngStrike'"/>
-          </xsl:attribute >
-        </xsl:when >
-        <xsl:when test="@style:text-line-through-type[contains(.,'double')]">
-          <xsl:attribute name ="strike">
-            <xsl:value-of select ="'dblStrike'"/>
-          </xsl:attribute >
-        </xsl:when >
-        <!-- style:text-line-through-style-->
-        <xsl:when test="@style:text-line-through-style = 'solid'">
-          <xsl:attribute name ="strike">
-            <xsl:value-of select ="'sngStrike'"/>
-					</xsl:attribute >
-				</xsl:when>
-      </xsl:choose>
-    </xsl:for-each>
-
-  </xsl:template>
   <xsl:template name="tmpUnderLineStyle">
     <xsl:param name="parentStyleName"/>
     <xsl:param name="flagPresentationClass"/>
@@ -2347,48 +2295,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:value-of select ="."/>
 		</xsl:if>
 	</xsl:template>
-	<xsl:template name ="insertSpace">
-		<xsl:param name ="spaceVal"/>
-		<xsl:choose>
-			<xsl:when test ="$spaceVal=1">
-				<xsl:value-of  select ="'&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=2">
-				<xsl:value-of  select ="'&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=3">
-				<xsl:value-of  select ="'&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=4">
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=5">
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=6">
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=7">
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=8">
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=9">
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal=10">
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-			<xsl:when test ="$spaceVal &gt; 10">
-				<xsl:call-template name ="insertSpace" >
-					<xsl:with-param name ="spaceVal" select ="$spaceVal -10 "/>
-				</xsl:call-template>
-				<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:template>
-	<xsl:template name ="paragraphTabstops">
+		<xsl:template name ="paragraphTabstops">
 		<a:tabLst>
 			<xsl:for-each select ="style:paragraph-properties/style:tab-stops/style:tab-stop">
 				<a:tab >
@@ -3468,9 +3375,9 @@ Copyright (c) 2007, Sonata Software Limited
                      <xsl:choose>
                    <xsl:when test="name()='draw:frame'">
                 <xsl:choose>
-                  <!--<xsl:when test="./draw:object or ./draw:object-ole">
+                  <xsl:when test="./draw:object or ./draw:object-ole">
                     <xsl:call-template name="tmpgrpValues"/>
-                    </xsl:when>-->
+                    </xsl:when>
                   <xsl:when test="./draw:image">
                     <xsl:if test ="contains(./draw:image/@xlink:href,'.png') or contains(./draw:image/@xlink:href,'.emf') or contains(./draw:image/@xlink:href,'.wmf')
                     or contains(./draw:image/@xlink:href,'.jfif') or contains(./draw:image/@xlink:href,'.jpe') 

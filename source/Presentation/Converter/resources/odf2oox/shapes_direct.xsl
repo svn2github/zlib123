@@ -3931,22 +3931,7 @@ Copyright (c) 2007, Sonata Software Limited
 
     </xsl:for-each>
   </xsl:template>
-  <!-- Blank lines in text-->
-  <xsl:template name ="processBR">
-    <xsl:param name ="T" />
-    <a:br>
-      <a:rPr lang="en-US" smtClean="0">
-        <!--Font Size -->
-        <xsl:if test ="not($T ='')">
-          <xsl:call-template name ="fontStyles">
-            <xsl:with-param name ="Tid" select ="$T" />
-          </xsl:call-template>
-        </xsl:if>
-      </a:rPr >
-
-    </a:br>
-  </xsl:template>
-  <!-- Get graphic properties from styles.xml -->
+   <!-- Get graphic properties from styles.xml -->
   <xsl:template name ="getDefaultStyle">
     <xsl:param name ="parentStyle" />
     <xsl:param name ="attributeName" />

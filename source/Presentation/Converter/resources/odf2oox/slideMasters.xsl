@@ -54,13 +54,13 @@ Copyright (c) 2007, Sonata Software Limited
     <p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
 		xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
 		xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+      <xsl:for-each select="document('styles.xml')">
       <p:cSld>
         <!--Added by sateesh - Background Color-->
-
         <xsl:variable name="dpName">
-          <xsl:value-of select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/@draw:style-name"/>
+            <xsl:value-of select="/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]/@draw:style-name"/>
         </xsl:variable>
-        <xsl:for-each select="document('styles.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
+        <xsl:for-each select="//style:style[@style:name= $dpName]/style:drawing-page-properties">
           <xsl:choose>
             <xsl:when test="@draw:fill='bitmap'">
               <xsl:variable name="var_imageName" select="@draw:fill-image-name"/>
@@ -184,7 +184,7 @@ Copyright (c) 2007, Sonata Software Limited
               <a:chExt cx="0" cy="0"/>
             </a:xfrm>
           </p:grpSpPr>
-          <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]">
+          <xsl:for-each select="office:document-styles/office:master-styles/style:master-page[@style:name=$slideMasterName]">
             <xsl:for-each select="node()">
               <xsl:choose>
                 <xsl:when test="name()='draw:frame'">
@@ -277,12 +277,12 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:value-of select="@presentation:style-name"/>
                             </xsl:variable>
                             <xsl:choose>
-                              <xsl:when test="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]">
-                                <xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
+                              <xsl:when test="/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]">
+                                <xsl:for-each select ="/office:document-styles/office:automatic-styles/style:style[@style:name=$prId] ">
                                   <xsl:variable name="styleName">
                                     <xsl:value-of select="@style:parent-style-name"/>
                                   </xsl:variable>
-                                  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]/style:graphic-properties">
+                                  <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$styleName]/style:graphic-properties">
                                     <xsl:call-template name="tmpSMShapeFillColor">
                                       <xsl:with-param name ="shapeCount" select ="$var_pos"/>
                                     </xsl:call-template>
@@ -290,8 +290,8 @@ Copyright (c) 2007, Sonata Software Limited
 
                                 </xsl:for-each>
                               </xsl:when>
-                              <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$prId]">
-                                <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$prId]/style:graphic-properties">
+                              <xsl:when test="/office:document-styles/office:styles/style:style[@style:name=$prId]">
+                                <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$prId]/style:graphic-properties">
                                   <xsl:call-template name="tmpSMShapeFillColor">
                                     <xsl:with-param name ="shapeCount" select ="$var_pos"/>
                                   </xsl:call-template>
@@ -305,7 +305,7 @@ Copyright (c) 2007, Sonata Software Limited
                                 <xsl:choose>
                                   <xsl:when test="@presentation:style-name[contains(.,'title')]">
                                     <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
-                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+                                    <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
                                       <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
                                       </xsl:if>
@@ -316,7 +316,7 @@ Copyright (c) 2007, Sonata Software Limited
                                     <xsl:variable name="var_titleName">
                                       <xsl:value-of select="concat($slideMasterName,'-title')"/>
                                     </xsl:variable>
-                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_titleName]/style:graphic-properties">
+                                    <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$var_titleName]/style:graphic-properties">
                                       <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
                                       </xsl:if>
@@ -329,7 +329,7 @@ Copyright (c) 2007, Sonata Software Limited
                                 <xsl:choose>
                                   <xsl:when test="@presentation:style-name[contains(.,'outline')]">
                                     <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
-                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+                                    <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
                                       <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
                                       </xsl:if>
@@ -339,7 +339,7 @@ Copyright (c) 2007, Sonata Software Limited
                                     <xsl:variable name="var_outlineName">
                                       <xsl:value-of select="concat($slideMasterName,'-outline1')"/>
                                     </xsl:variable>
-                                    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$var_outlineName]/style:graphic-properties">
+                                    <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$var_outlineName]/style:graphic-properties">
                                       <xsl:if test="position()=1">
                                       <xsl:call-template name ="getLineStyle"/>
                                       </xsl:if>
@@ -445,6 +445,7 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:choose>
             </xsl:for-each>
           </xsl:for-each >
+       
         </p:spTree>
       </p:cSld>
       <p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>
@@ -470,7 +471,7 @@ Copyright (c) 2007, Sonata Software Limited
             <xsl:variable name="titleName">
               <xsl:value-of select="concat($slideMasterName,'-title')"/>
             </xsl:variable>
-            <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$titleName]">
+            <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$titleName]">
               <xsl:attribute name ="algn">
                 <!--fo:text-align-->
                 <xsl:choose >
@@ -636,13 +637,13 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="masterOutlineName">
           <xsl:value-of select="concat($slideMasterName,'-outline1')"/>
         </xsl:variable>
-        <xsl:if test="document('styles.xml')//office:styles/style:style[@style:name=$masterOutlineName]">
+        <xsl:if test="//office:styles/style:style[@style:name=$masterOutlineName]">
           <p:bodyStyle>
             <a:lvl1pPr>
               <xsl:variable name="outlineName">
                 <xsl:value-of select="concat($slideMasterName,'-outline1')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName]">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true'">
@@ -897,7 +898,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName2">
                 <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName2]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName2]">
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
                     <xsl:variable name="margin">
@@ -1195,7 +1196,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName3">
                 <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName3]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName3]">
                 <!--<xsl:attribute name="marL">
                 <xsl:call-template name ="convertToPoints">
                   <xsl:with-param name ="unit" select ="'cm'"/>
@@ -1500,7 +1501,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName4">
                 <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName4]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName4]">
                 <!--<xsl:attribute name="marL">
                 <xsl:call-template name ="convertToPoints">
                   <xsl:with-param name ="unit" select ="'cm'"/>
@@ -1801,7 +1802,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName5">
                 <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName5]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName5]">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -2091,7 +2092,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName6">
                 <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName6]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName6]">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -2386,7 +2387,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName7">
                 <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName7]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName7]">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -2680,7 +2681,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName8">
                 <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName8]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName8]">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -2974,7 +2975,7 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:variable name="outlineName9">
                 <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
               </xsl:variable>
-              <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineName9]">
+              <xsl:for-each select="/office:document-styles/office:styles/style:style[@style:name=$outlineName9]">
                 <!--Margin-->
                 <xsl:choose>
                   <xsl:when test="./style:paragraph-properties/@text:enable-numbering='true' or document('styles.xml')//style:style[@style:name=$outlineName]/style:paragraph-properties/@text:enable-numbering='true'">
@@ -3264,7 +3265,7 @@ Copyright (c) 2007, Sonata Software Limited
             </a:lvl9pPr>
           </p:bodyStyle>
         </xsl:if>
-        <xsl:if test="not(document('styles.xml')//office:styles/style:style[@style:name=$masterOutlineName])">
+        <xsl:if test="not(//office:styles/style:style[@style:name=$masterOutlineName])">
           <p:bodyStyle>
             <a:lvl1pPr marL="342900" indent="-342900" algn="l" defTabSz="914400" rtl="0" eaLnBrk="1" latinLnBrk="0" hangingPunct="1">
               <a:spcBef>
@@ -3499,6 +3500,7 @@ Copyright (c) 2007, Sonata Software Limited
           </a:lvl9pPr>
         </p:otherStyle>
       </p:txStyles>
+      </xsl:for-each>
     </p:sldMaster>
 
   </xsl:template>
@@ -3513,7 +3515,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:variable name="outline1">
           <xsl:value-of select="concat($smName,'-outline1')"/>
         </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline1]/style:text-properties" >
+        <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$outline1]/style:text-properties" >
           <xsl:choose >
             <xsl:when test ="$paramName='b' and @fo:font-weight">
               <xsl:value-of  select ="@fo:font-weight"/>
@@ -3527,55 +3529,11 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test ="$outlineNo =2">
-        <xsl:variable name="outline2">
-          <xsl:value-of select="concat($smName,'-outline2')"/>
+      <xsl:when test ="$outlineNo &gt; 1 and $outlineNo &lt;= 9">
+        <xsl:variable name="outlineStyle">
+          <xsl:value-of select="concat($smName,'-outline',$outlineNo)"/>
         </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline2]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test ="$paramName='b' and @fo:font-weight">
-              <xsl:value-of  select ="@fo:font-weight"/>
-            </xsl:when>
-            <xsl:when test="$paramName='i' and @fo:font-style">
-              <xsl:value-of  select ="@fo:font-style"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="1" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =3">
-        <xsl:variable name="outline3">
-          <xsl:value-of select="concat($smName,'-outline3')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline3]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test ="$paramName='b' and @fo:font-weight">
-              <xsl:value-of  select ="@fo:font-weight"/>
-            </xsl:when>
-            <xsl:when test="$paramName='i' and @fo:font-style">
-              <xsl:value-of  select ="@fo:font-style"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="2" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =4">
-        <xsl:variable name="outline4">
-          <xsl:value-of select="concat($smName,'-outline4')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline4]/style:text-properties" >
+        <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$outlineStyle]/style:text-properties" >
           <xsl:choose >
             <xsl:when test ="$paramName='b' and @fo:font-weight">
               <xsl:value-of  select ="@fo:font-weight"/>
@@ -3585,117 +3543,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:when>
             <xsl:otherwise >
               <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="3" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =5">
-        <xsl:variable name="outline5">
-          <xsl:value-of select="concat($smName,'-outline5')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline5]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test ="$paramName='b' and @fo:font-weight">
-              <xsl:value-of  select ="@fo:font-weight"/>
-            </xsl:when>
-            <xsl:when test ="$paramName='i' and @fo:font-style">
-              <xsl:value-of  select ="@fo:font-style"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="4" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =6">
-        <xsl:variable name="outline6">
-          <xsl:value-of select="concat($smName,'-outline6')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline6]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test ="$paramName='b' and @fo:font-weight">
-              <xsl:value-of  select ="@fo:font-weight"/>
-            </xsl:when>
-            <xsl:when test ="$paramName='i' and @fo:font-style">
-              <xsl:value-of  select ="@fo:font-style"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="5" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =7">
-        <xsl:variable name="outline7">
-          <xsl:value-of select="concat($smName,'-outline7')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline7]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test ="$paramName='b' and @fo:font-weight">
-              <xsl:value-of  select ="@fo:font-weight"/>
-            </xsl:when>
-            <xsl:when test ="$paramName='i' and @fo:font-style">
-              <xsl:value-of  select ="@fo:font-style"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="6" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =8">
-        <xsl:variable name="outline8">
-          <xsl:value-of select="concat($smName,'-outline8')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline8]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test ="$paramName='b' and @fo:font-weight">
-              <xsl:value-of  select ="@fo:font-weight"/>
-            </xsl:when>
-            <xsl:when test ="$paramName='i' and @fo:font-style">
-              <xsl:value-of  select ="@fo:font-style"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="7" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =9">
-        <xsl:variable name="outline9">
-          <xsl:value-of select="concat($smName,'-outline9')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline9]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test ="$paramName='b' and @fo:font-weight">
-              <xsl:value-of  select ="@fo:font-weight"/>
-            </xsl:when>
-            <xsl:when test ="$paramName='i' and @fo:font-style">
-              <xsl:value-of  select ="@fo:font-style"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="BoldItalic">
-                <xsl:with-param name ="outlineNo" select ="8" />
+                <xsl:with-param name ="outlineNo" select ="$outlineNo - 1" />
                 <xsl:with-param name="smName" select="$smName"/>
                 <xsl:with-param name ="paramName" select ="$paramName"/>
               </xsl:call-template>
@@ -3732,11 +3580,11 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test ="$outlineNo =2">
-        <xsl:variable name="outline2">
-          <xsl:value-of select="concat($smName,'-outline2')"/>
+      <xsl:when test ="$outlineNo &gt; 1 and $outlineNo &lt;= 9">
+        <xsl:variable name="outlineStyle">
+          <xsl:value-of select="concat($smName,'-outline',$outlineNo)"/>
         </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline2]/style:text-properties" >
+        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineStyle]/style:text-properties" >
           <xsl:choose >
             <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
               <xsl:call-template name="Underline">
@@ -3750,7 +3598,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:when>
             <xsl:otherwise >
               <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="1" />
+                <xsl:with-param name ="outlineNo" select ="$outlineNo - 1" />
                 <xsl:with-param name="smName" select="$smName"/>
                 <xsl:with-param name ="paramName" select ="$paramName"/>
               </xsl:call-template>
@@ -3758,167 +3606,7 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test ="$outlineNo =3">
-        <xsl:variable name="outline3">
-          <xsl:value-of select="concat($smName,'-outline3')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline3]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
-              <xsl:call-template name="Underline">
-                <xsl:with-param name="uStyle" select="@style:text-underline-style"/>
-                <xsl:with-param name="uWidth" select="@style:text-underline-width"/>
-                <xsl:with-param name="uType" select="@style:text-underline-type"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="2" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =4">
-        <xsl:variable name="outline4">
-          <xsl:value-of select="concat($smName,'-outline4')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline4]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
-              <xsl:call-template name="Underline">
-                <xsl:with-param name="uStyle" select="@style:text-underline-style"/>
-                <xsl:with-param name="uWidth" select="@style:text-underline-width"/>
-                <xsl:with-param name="uType" select="@style:text-underline-type"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="3" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =5">
-        <xsl:variable name="outline5">
-          <xsl:value-of select="concat($smName,'-outline5')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline5]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
-              <xsl:call-template name="Underline">
-                <xsl:with-param name="uStyle" select="@style:text-underline-style"/>
-                <xsl:with-param name="uWidth" select="@style:text-underline-width"/>
-                <xsl:with-param name="uType" select="@style:text-underline-type"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="4" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =6">
-        <xsl:variable name="outline6">
-          <xsl:value-of select="concat($smName,'-outline6')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline6]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
-              <xsl:call-template name="Underline">
-                <xsl:with-param name="uStyle" select="@style:text-underline-style"/>
-                <xsl:with-param name="uWidth" select="@style:text-underline-width"/>
-                <xsl:with-param name="uType" select="@style:text-underline-type"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="5" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =7">
-        <xsl:variable name="outline7">
-          <xsl:value-of select="concat($smName,'-outline7')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline7]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
-              <xsl:call-template name="Underline">
-                <xsl:with-param name="uStyle" select="@style:text-underline-style"/>
-                <xsl:with-param name="uWidth" select="@style:text-underline-width"/>
-                <xsl:with-param name="uType" select="@style:text-underline-type"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="6" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =8">
-        <xsl:variable name="outline8">
-          <xsl:value-of select="concat($smName,'-outline8')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline8]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
-              <xsl:call-template name="Underline">
-                <xsl:with-param name="uStyle" select="@style:text-underline-style"/>
-                <xsl:with-param name="uWidth" select="@style:text-underline-width"/>
-                <xsl:with-param name="uType" select="@style:text-underline-type"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="7" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$outlineNo =9">
-        <xsl:variable name="outline9">
-          <xsl:value-of select="concat($smName,'-outline9')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline9]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$paramName='u' and @style:text-underline-style and @style:text-underline-width or @style:text-underline-type">
-              <xsl:call-template name="Underline">
-                <xsl:with-param name="uStyle" select="@style:text-underline-style"/>
-                <xsl:with-param name="uWidth" select="@style:text-underline-width"/>
-                <xsl:with-param name="uType" select="@style:text-underline-type"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="ULine">
-                <xsl:with-param name ="outlineNo" select ="8" />
-                <xsl:with-param name="smName" select="$smName"/>
-                <xsl:with-param name ="paramName" select ="$paramName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
+      
     </xsl:choose>
   </xsl:template>
   <xsl:template name ="FontColor">
@@ -3941,151 +3629,18 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test ="$lineNo =2">
-        <xsl:variable name="outline2">
-          <xsl:value-of select="concat($smasterName,'-outline2')"/>
+      <xsl:when test ="$lineNo &gt; 1 and $lineNo &lt;= 9">
+        <xsl:variable name="outlineStyle">
+          <xsl:value-of select="concat($smasterName,'-outline',$lineNo)"/>
         </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline2]/style:text-properties" >
+        <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$outlineStyle]/style:text-properties" >
           <xsl:choose >
             <xsl:when test="$parName='val' and @fo:color">
               <xsl:value-of select="substring-after(@fo:color,'#')"/>
             </xsl:when>
             <xsl:otherwise >
               <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="1" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =3">
-        <xsl:variable name="outline3">
-          <xsl:value-of select="concat($smasterName,'-outline3')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline3]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='val' and @fo:color">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="2" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =4">
-        <xsl:variable name="outline4">
-          <xsl:value-of select="concat($smasterName,'-outline4')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline4]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='val' and @fo:color">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="3" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =5">
-        <xsl:variable name="outline5">
-          <xsl:value-of select="concat($smasterName,'-outline5')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline5]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='val' and @fo:color">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="4" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =6">
-        <xsl:variable name="outline6">
-          <xsl:value-of select="concat($smasterName,'-outline6')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline6]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='val' and @fo:color">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="5" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =7">
-        <xsl:variable name="outline7">
-          <xsl:value-of select="concat($smasterName,'-outline7')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline7]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='val' and @fo:color">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="6" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =8">
-        <xsl:variable name="outline8">
-          <xsl:value-of select="concat($smasterName,'-outline8')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline8]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='val' and @fo:color">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="7" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =9">
-        <xsl:variable name="outline9">
-          <xsl:value-of select="concat($smasterName,'-outline9')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline9]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='val' and @fo:color">
-              <xsl:value-of select="substring-after(@fo:color,'#')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontColor">
-                <xsl:with-param name ="lineNo" select ="8" />
+                <xsl:with-param name ="lineNo" select ="$lineNo - 1" />
                 <xsl:with-param name="smasterName" select="$smasterName"/>
                 <xsl:with-param name ="parName" select ="$parName"/>
               </xsl:call-template>
@@ -4115,151 +3670,18 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test ="$lineNo =2">
-        <xsl:variable name="outline2">
-          <xsl:value-of select="concat($smasterName,'-outline2')"/>
+      <xsl:when test ="$lineNo &gt; 1 and $lineNo &lt;= 9">
+        <xsl:variable name="outlineStyle">
+          <xsl:value-of select="concat($smasterName,'-outline',$lineNo)"/>
         </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline2]/style:text-properties" >
+        <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$outlineStyle]/style:text-properties" >
           <xsl:choose >
             <xsl:when test="$parName='typeface' and @fo:font-family">
               <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
             </xsl:when>
             <xsl:otherwise >
               <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="1" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =3">
-        <xsl:variable name="outline3">
-          <xsl:value-of select="concat($smasterName,'-outline3')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline3]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='typeface' and @fo:font-family">
-              <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="2" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =4">
-        <xsl:variable name="outline4">
-          <xsl:value-of select="concat($smasterName,'-outline4')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline4]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='typeface' and @fo:font-family">
-              <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="3" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =5">
-        <xsl:variable name="outline5">
-          <xsl:value-of select="concat($smasterName,'-outline5')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline5]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='typeface' and @fo:font-family">
-              <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="4" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =6">
-        <xsl:variable name="outline6">
-          <xsl:value-of select="concat($smasterName,'-outline6')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline6]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='typeface' and @fo:font-family">
-              <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="5" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =7">
-        <xsl:variable name="outline7">
-          <xsl:value-of select="concat($smasterName,'-outline7')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline7]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='typeface' and @fo:font-family">
-              <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="6" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =8">
-        <xsl:variable name="outline8">
-          <xsl:value-of select="concat($smasterName,'-outline8')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline8]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='typeface' and @fo:font-family">
-              <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="7" />
-                <xsl:with-param name="smasterName" select="$smasterName"/>
-                <xsl:with-param name ="parName" select ="$parName"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:when>
-      <xsl:when test ="$lineNo =9">
-        <xsl:variable name="outline9">
-          <xsl:value-of select="concat($smasterName,'-outline9')"/>
-        </xsl:variable>
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outline9]/style:text-properties" >
-          <xsl:choose >
-            <xsl:when test="$parName='typeface' and @fo:font-family">
-              <xsl:value-of select="translate(@fo:font-family, &quot;'&quot;,'')"/>
-            </xsl:when>
-            <xsl:otherwise >
-              <xsl:call-template name ="FontFamily">
-                <xsl:with-param name ="lineNo" select ="8" />
+                <xsl:with-param name ="lineNo" select ="$lineNo - 1" />
                 <xsl:with-param name="smasterName" select="$smasterName"/>
                 <xsl:with-param name ="parName" select ="$parName"/>
               </xsl:call-template>
@@ -4277,7 +3699,7 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:value-of select="concat($smasterName,'-outline',$lineNo)"/>
     </xsl:variable>
 
-    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineNo]/style:text-properties" >
+    <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$outlineNo]/style:text-properties" >
       <xsl:choose >
         <xsl:when test="$parName='spc' and @fo:letter-spacing">
           <xsl:variable name="Unit">
@@ -4311,7 +3733,6 @@ Copyright (c) 2007, Sonata Software Limited
               </xsl:call-template>
             </xsl:when>
           </xsl:choose>
-
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
@@ -4323,7 +3744,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:variable name="outlineNo">
       <xsl:value-of select="concat($smasterName,'-outline',$lineNo)"/>
     </xsl:variable>
-    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineNo]/style:paragraph-properties" >
+    <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$outlineNo]/style:paragraph-properties" >
       <xsl:variable name="Unit">
         <xsl:call-template name="getConvertUnit">
           <xsl:with-param name="length" select="@style:line-spacing"/>
@@ -4396,7 +3817,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:variable name="outlineStyle">
       <xsl:value-of select="concat($smName,'-outline',$outlineNo)"/>
     </xsl:variable>
-    <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$outlineStyle]/style:paragraph-properties" >
+    <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$outlineStyle]/style:paragraph-properties" >
       <xsl:choose >
         <xsl:when test ="$paramName='algn' and @fo:text-align">
           <xsl:choose >
@@ -4445,7 +3866,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="lang">
-      <xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$prStyleName]/style:text-properties">
+      <xsl:for-each select ="/office:document-styles/office:styles/style:style[@style:name=$prStyleName]/style:text-properties">
         <xsl:if test="position()=1">
           <xsl:choose>
             <xsl:when test="@style:language-asian and @style:country-asian">
@@ -5240,14 +4661,14 @@ Copyright (c) 2007, Sonata Software Limited
           <a:avLst/>
         </a:prstGeom>
         <!-- Solid fill color -->
-        <xsl:for-each select ="document('styles.xml')/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]/style:graphic-properties ">
+        <xsl:for-each select ="/office:document-styles/office:automatic-styles/style:style[@style:name=$prId]/style:graphic-properties ">
           <xsl:call-template name="tmpSMShapeFillColor">
             <xsl:with-param name ="shapeCount" select ="'page-number'"/>
           </xsl:call-template>
         </xsl:for-each>
         <!--Line Color-->
         <xsl:variable name="var_PrStyleId" select="@presentation:style-name"/>
-        <xsl:for-each select ="document('styles.xml')//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
+        <xsl:for-each select ="//style:style[@style:name=$var_PrStyleId]/style:graphic-properties">
           <xsl:if test="position()=1">
           <xsl:call-template name ="getLineStyle"/>
           </xsl:if>
@@ -5554,7 +4975,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:variable name="listId">
       <xsl:value-of select="concat($masterName,'-outline1')"/>
     </xsl:variable>
-    <xsl:for-each select ="document('styles.xml')//style:style [@style:name=$listId]">
+    <xsl:for-each select ="//style:style [@style:name=$listId]">
       <xsl:choose>
         <xsl:when test="style:graphic-properties/text:list-style/child::node()[$level]">
           <xsl:call-template name ="convertToPoints">
@@ -5592,7 +5013,7 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:variable name="listId">
       <xsl:value-of select="concat($masterName,'-outline1')"/>
     </xsl:variable>
-    <xsl:for-each select ="document('styles.xml')//style:style [@style:name=$listId]">
+    <xsl:for-each select ="//style:style [@style:name=$listId]">
       <xsl:choose>
         <xsl:when test="style:graphic-properties/text:list-style/child::node()[$level]">
           <xsl:call-template name ="convertToPoints">
@@ -5630,96 +5051,17 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:variable name="listId">
       <xsl:value-of select="concat($masterName,'-outline1')"/>
     </xsl:variable>
-    <xsl:for-each select ="document('styles.xml')//style:style [@style:name=$listId]">
-      <xsl:choose>
-        <xsl:when test ="style:graphic-properties/text:list-style/child::node()[$level]">
+    <xsl:for-each select ="//style:style [@style:name=$listId]">
           <xsl:choose >
-            <xsl:when test ="$level=1 and style:graphic-properties/text:list-style/child::node()[1]/style:text-properties/@fo:color">
+        <xsl:when test ="style:graphic-properties/text:list-style/child::node()[$level]/style:text-properties/@fo:color">
               <a:buClr>
                 <a:srgbClr>
                   <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[1]/style:text-properties/@fo:color,'#')"/>
+                  <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[$level]/style:text-properties/@fo:color,'#')"/>
                   </xsl:attribute>
                 </a:srgbClr>
               </a:buClr>
             </xsl:when>
-            <xsl:when test ="$level=2 and style:graphic-properties/text:list-style/child::node()[2]/style:text-properties/@fo:color">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[2]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:when test ="$level=3 and style:graphic-properties/text:list-style/child::node()[3]/style:text-properties/@fo:color ">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[3]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:when test ="$level=4 and style:graphic-properties/text:list-style/child::node()[4]/style:text-properties/@fo:color">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[4]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:when test ="$level=5 and style:graphic-properties/text:list-style/child::node()[5]/style:text-properties/@fo:color">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[5]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:when test ="$level=6 and style:graphic-properties/text:list-style/child::node()[6]/style:text-properties/@fo:color">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[6]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:when test ="$level=7 and style:graphic-properties/text:list-style/child::node()[7]/style:text-properties/@fo:color">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[7]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:when test ="$level=8 and style:graphic-properties/text:list-style/child::node()[8]/style:text-properties/@fo:color">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[8]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:when test ="$level=9 and style:graphic-properties/text:list-style/child::node()[9]/style:text-properties/@fo:color">
-              <a:buClr>
-                <a:srgbClr>
-                  <xsl:attribute name ="val">
-                    <xsl:value-of select ="substring-after(style:graphic-properties/text:list-style/child::node()[9]/style:text-properties/@fo:color,'#')"/>
-                  </xsl:attribute>
-                </a:srgbClr>
-              </a:buClr>
-            </xsl:when>
-            <xsl:otherwise>
-              <a:buClrTx/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
         <xsl:otherwise>
           <a:buClr>
             <a:srgbClr val="000000">
@@ -5729,66 +5071,10 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:choose>
       <xsl:if test ="(style:graphic-properties/text:list-style/child::node()[$level]/style:text-properties[@fo:font-size] and not(substring-before(style:graphic-properties/text:list-style/child::node()[$level]/style:text-properties/@fo:font-size,'%') = 100)) ">
         <xsl:choose >
-          <xsl:when test ="$level=1 and style:graphic-properties/text:list-style/child::node()[1]/style:text-properties/@fo:font-size">
+          <xsl:when test ="style:graphic-properties/text:list-style/child::node()[$level]/style:text-properties/@fo:font-size">
             <a:buSzPct>
               <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[1]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=2 and style:graphic-properties/text:list-style/child::node()[2]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[2]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=3 and style:graphic-properties/text:list-style/child::node()[3]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[3]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=4 and style:graphic-properties/text:list-style/child::node()[4]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[4]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=5 and style:graphic-properties/text:list-style/child::node()[5]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[5]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=6 and style:graphic-properties/text:list-style/child::node()[6]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[6]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=7 and style:graphic-properties/text:list-style/child::node()[7]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[7]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=8 and style:graphic-properties/text:list-style/child::node()[8]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[8]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
-              </xsl:attribute>
-            </a:buSzPct>
-          </xsl:when>
-          <xsl:when test ="$level=9 and style:graphic-properties/text:list-style/child::node()[9]/style:text-properties/@fo:font-size">
-            <a:buSzPct>
-              <xsl:attribute name ="val">
-                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[9]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
+                <xsl:value-of select ="format-number(substring-before(style:graphic-properties/text:list-style/child::node()[$level]/style:text-properties/@fo:font-size,'%')*1000,'#.##')"/>
               </xsl:attribute>
             </a:buSzPct>
           </xsl:when>
@@ -5949,26 +5235,6 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:otherwise>
         <xsl:value-of select ="''"/>
       </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="getNumFormat">
-    <xsl:param name="format"/>
-    <xsl:param name="suff"/>
-    <xsl:param name ="prefix"/>
-    <xsl:choose>
-      <xsl:when test="$format= '1' and $suff=')' and not($prefix) ">arabicParenR</xsl:when>
-      <xsl:when test="$format= '1' and $suff=')' and $prefix='(' ">arabicParenBoth</xsl:when>
-      <xsl:when test="$format= '1' and $suff='.'">arabicPeriod</xsl:when>
-      <xsl:when test="$format= 'A' and $suff='.' ">alphaUcPeriod</xsl:when>
-      <xsl:when test="$format= 'A' and $suff=')' and not($prefix) ">alphaUcParenR</xsl:when>
-      <xsl:when test="$format= 'A' and $suff=')' and $prefix='(' ">alphaUcParenBoth</xsl:when>
-      <xsl:when test="$format= 'a' and $suff='.' ">alphaLcPeriod</xsl:when>
-      <xsl:when test="$format= 'a' and $suff=')' and not($prefix) ">alphaLcParenR</xsl:when>
-      <xsl:when test="$format= 'a' and $suff=')' and $prefix='(' ">alphaLcParenBoth</xsl:when>
-      <xsl:when test="$format= 'i' and $suff='.' ">romanLcPeriod</xsl:when>
-      <xsl:when test="$format= 'I' and $suff='.' ">romanUcPeriod</xsl:when>
-      <xsl:otherwise>arabicPeriod</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   <!--End-->
