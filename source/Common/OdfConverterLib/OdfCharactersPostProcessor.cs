@@ -184,6 +184,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 this.nextWriter.WriteString(EvalShadowExpression(text));
             }
+            else if (text.Contains("transFileName:"))
+            {
+
+                this.nextWriter.WriteString(EvaltransFileName(text));
+            }
+
             //Image Cropping Calculation Added by Sonata-15/11/2007
             else if (text.Contains("image-props"))
             {
@@ -250,6 +256,33 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string str = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.#####}", dblRetXY / 360000);
             return str + "cm";
         }
+
+        //To create the folder for the transition sound
+        private string EvaltransFileName(string text)
+        {
+            string returnInputFilePath = "";
+
+            // To get the input file name to be attached to the folder for transition sound.
+            // for Commandline tool
+            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            {
+                if (Environment.GetCommandLineArgs()[i].ToString().ToUpper() == "/I")
+                    returnInputFilePath = Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[i + 1]);
+            }
+
+            // To get the temporary file name to be attached to the folder for transition sound.
+            //for addins
+            if (returnInputFilePath == "")
+            {
+                returnInputFilePath = System.IO.Path.GetFileNameWithoutExtension(OdfConverter.OdfConverterLib.AbstractConverter.inputTempFileName);
+            }
+
+            return returnInputFilePath;
+
+            
+
+        }
+
         private string EvalgetCurrentSysDate(string text)
         {
             string str = "";
