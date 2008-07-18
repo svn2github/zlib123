@@ -267,8 +267,8 @@
               dialogika, clam: bugfix #1831298
               <xsl:when test="starts-with(w:lvlText/@w:val,concat('%',$lvl,'%',$lvl))">
               
-              dialogika, makz: 
-              changed that it works dynamically
+              dialogika, makz: bugfix #1827565 
+              changed that it works dynamically for more than 2 levels
               -->
             <xsl:when test="starts-with(w:lvlText/@w:val, concat('%',$lvl))">
               <xsl:variable name="cnt">

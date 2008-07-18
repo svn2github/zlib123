@@ -46,8 +46,7 @@
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
   <xsl:key name="ParagraphsByStyleId" match="/oox:package/oox:part[@oox:name = 'word/document.xml']/w:document/w:body/w:p/w:pPr/w:tabs/w:tab" use="../../w:pStyle/@w:val" />
-  <xsl:key name="default-styles"
-    match="w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on']" use="@w:type"/>
+  <xsl:key name="default-styles" match="w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on']" use="@w:type"/>
 
   <!-- 
   *************************************************************************
@@ -1052,14 +1051,12 @@
             <xsl:variable name="elementName" select="name()"/>
             <xsl:choose>
               <!-- insert attribute using template name -->
-              <xsl:when
-                test="self::w:autoSpaceDN or self::w:autoSpaceDE and not(key('default-styles', 'paragraph')[last()]/w:rPr[w:autoSpaceDN or w:autoSpaceDE])">
+              <xsl:when test="self::w:autoSpaceDN or self::w:autoSpaceDE and not(key('default-styles', 'paragraph')[last()]/w:rPr[w:autoSpaceDN or w:autoSpaceDE])">
                 <xsl:call-template name="InsertParagraphAutoSpace"/>
               </xsl:when>
               <xsl:otherwise>
                  <!--insert attributes using match--> 
-                <xsl:if
-                  test="not(key('default-styles', 'paragraph')[last()]/w:pPr/*[name() = $elementName])">
+                <xsl:if test="not(key('default-styles', 'paragraph')[last()]/w:pPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="pPrChildren"/>
                 </xsl:if>
               </xsl:otherwise>

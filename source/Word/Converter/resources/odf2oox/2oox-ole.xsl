@@ -108,12 +108,12 @@
     <xsl:param name="shapeId" />
     <xsl:param name="olePictureType" />
 
-    <xsl:variable name="shapeTypeId">
-      <xsl:text>#_x0000_t75</xsl:text>
-    </xsl:variable>
-
     <!-- insert the shape of the OLE object -->
-    <v:shape o:ole="">
+    <v:shapetype id="_x0000_t75" coordsize="21600,21600" o:spt="109" path="m,l,21600r21600,l21600,xe">
+      <v:stroke joinstyle="miter"/>
+      <v:path gradientshapeok="t" o:connecttype="rect"/>
+    </v:shapetype>
+    <v:shape o:ole="" type="#_x0000_t75">
 
       <xsl:variable name="styleName" select="@draw:style-name"/>
       <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
@@ -233,6 +233,7 @@
   -->
   <xsl:template name="InsertObjectPreview">
     <xsl:variable name="myId" select="generate-id(draw:image)" />
+    
     <v:imagedata o:title="">
       <xsl:attribute name="r:id">
         <xsl:value-of select="$myId"/>

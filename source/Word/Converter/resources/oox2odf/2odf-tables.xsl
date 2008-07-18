@@ -308,31 +308,27 @@
     <xsl:choose>
       <xsl:when test="$tblPr/w:tblW/@w:type='pct'">
         <!-- relative width -->
-        
-        <!--
-          <xsl:variable name="sectPr" select="following::w:sectPr[1]" />
-          <xsl:variable name="pgWidth" select="$sectPr/w:pgSz/@w:w" />
-          <xsl:variable name="pgMarLeft" select="$sectPr/w:pgMar/@w:left" />
-          <xsl:variable name="pgMarRight" select="$sectPr/w:pgMar/@w:right" />
-        -->
         <xsl:variable name="pct" select="$tblPr/w:tblW/@w:w div 5000" />
-
         <xsl:attribute name="style:rel-width">
           <xsl:value-of select="concat(100 * $pct, '%')"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="$tblPr/w:tblW/@w:type='dxa'">
         <!-- absolute width -->
-        
         <xsl:attribute name="svg:width">
           <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="$tblPr/w:tblPr/@w:w" />
+            <xsl:with-param name="length" select="$tblPr/w:tblW/@w:w" />
             <xsl:with-param name="unit" select="'cm'" />
           </xsl:call-template>
         </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <!--auto width-->
+        <xsl:attribute name="fo:min-width">
+          <xsl:text>0cm</xsl:text>
+        </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
   
   
@@ -345,27 +341,34 @@
     <xsl:param name="tblPr" />
 
     <xsl:attribute name="text:anchor-type">
-      <xsl:text>page</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$tblPr/w:tblpPr/@w:vertAnchor='text' or $tblPr/w:tblpPr/@w:horzAnchor='text'">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>paragraph</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
 
-    <xsl:attribute name="text:anchor-page-number">
-      <xsl:text>1</xsl:text>
-    </xsl:attribute>
+    <xsl:if test="$tblPr/w:tblpPr/@w:tblpX != ''">
+      <xsl:attribute name="svg:x">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpX" />
+          <xsl:with-param name="unit" select="'cm'" />
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
 
-    <xsl:attribute name="svg:x">
-      <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpX" />
-        <xsl:with-param name="unit" select="'cm'" />
-      </xsl:call-template>
-    </xsl:attribute>
+    <xsl:if test="$tblPr/w:tblpPr/@w:tblpY != ''">
+      <xsl:attribute name="svg:y">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpY" />
+          <xsl:with-param name="unit" select="'cm'" />
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
 
-    <xsl:attribute name="svg:y">
-      <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length" select="$tblPr/w:tblpPr/@w:tblpY" />
-        <xsl:with-param name="unit" select="'cm'" />
-      </xsl:call-template>
-    </xsl:attribute>
-    
   </xsl:template>
 
   <!--
@@ -376,71 +379,67 @@
   <xsl:template name="InsertTableFramePositionForStyle">
     <xsl:param name="tblpPr" />
 
-    <!-- vertical position -->
-    <xsl:variable name="vertPos">
-      <xsl:choose>
-        <xsl:when test="$tblpPr/@w:vertAnchor='page'">
-          <xsl:text>from-top</xsl:text>
-        </xsl:when>
-        <!-- insert other cases here -->
-        <xsl:otherwise>
-          <xsl:text>from-top</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <!-- vertical relation -->
-    <xsl:variable name="vertRel">
-      <xsl:choose>
-        <xsl:when test="$tblpPr/@w:vertAnchor='page'">
-          <xsl:text>page</xsl:text>
-        </xsl:when>
-        <!-- insert other cases here -->
-        <xsl:otherwise>
-          <xsl:text>page</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <!-- horizontal position -->
-    <xsl:variable name="horzPos">
-      <xsl:choose>
-        <xsl:when test="$tblpPr/@w:horzAnchor='margin'">
-          <xsl:text>from-left</xsl:text>
-        </xsl:when>
-        <!-- insert other cases here -->
-        <xsl:otherwise>
-          <xsl:text>from-left</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <!-- horizontal relation -->
-    <xsl:variable name="horzRel">
-      <xsl:choose>
-        <xsl:when test="$tblpPr/@w:horzAnchor='margin'">
-          <xsl:text>page-content</xsl:text>
-        </xsl:when>
-        <!-- insert other cases here -->
-        <xsl:otherwise>
-          <xsl:text>page-content</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:attribute name="style:vertical-pos">
-      <xsl:value-of select="$vertPos"/>
-    </xsl:attribute>
     <xsl:attribute name="style:vertical-rel">
-      <xsl:value-of select="$vertRel"/>
-    </xsl:attribute>
-    <xsl:attribute name="style:horizontal-pos">
-      <xsl:value-of select="$horzPos"/>
-    </xsl:attribute>
-    <xsl:attribute name="style:horizontal-rel">
-      <xsl:value-of select="$horzRel"/>
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:vertAnchor='page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:vertAnchor='margin'">
+          <xsl:text>paragraph-content</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:vertAnchor='text'">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
+      </xsl:choose>
     </xsl:attribute>
     
+    <xsl:attribute name="style:vertical-pos">
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:tblpYSpec = 'top'">
+          <xsl:text>top</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:tblpYSpec = 'center'">
+          <xsl:text>middle</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:tblpYSpec = 'bottom'">
+          <xsl:text>bottom</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:tblpY != ''">
+          <xsl:text>from-top</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
+    
+    <xsl:attribute name="style:horizontal-rel">
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:horzAnchor='page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:horzAnchor='margin'">
+          <xsl:text>paragraph-content</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:horzAnchor='text'">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
+    
+    <xsl:attribute name="style:horizontal-pos">
+      <xsl:choose>
+        <xsl:when test="$tblpPr/@w:tblpXSpec = 'left'">
+          <xsl:text>left</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:tblpXSpec = 'center'">
+          <xsl:text>center</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:tblpXSpec = 'right'">
+          <xsl:text>right</xsl:text>
+        </xsl:when>
+        <xsl:when test="$tblpPr/@w:tblpY != ''">
+          <xsl:text>from-left</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
   </xsl:template>
                 
                 
