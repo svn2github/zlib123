@@ -4408,46 +4408,7 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:attribute>
                   <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
                   <xsl:variable name="nodeTextSpan">
-                    <!--<xsl:value-of select ="a:t"/>-->
-                    <!--converts whitespaces sequence to text:s-->
-                    <!-- 1699083 bug fix  -->
-                    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-                    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-                    <xsl:choose >
-                      <xsl:when test ="a:rPr[@cap!='none']">
-                        <xsl:choose >
-                          <xsl:when test =".=''">
-                            <text:s/>
-                          </xsl:when>
-                          <xsl:when test ="not(contains(.,'  '))">
-                            <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-                          </xsl:when>
-                          <xsl:when test =". =' '">
-                            <text:s/>
-                          </xsl:when>
-                          <xsl:otherwise >
-                            <xsl:call-template name ="InsertWhiteSpaces">
-                              <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                            </xsl:call-template>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:when>
-                        <xsl:otherwise >
-                        <xsl:choose >
-                          <xsl:when test =".=''">
-                            <text:s/>
-                          </xsl:when>
-                          <xsl:when test ="not(contains(.,'  '))">
-                            <xsl:value-of select ="."/>
-                          </xsl:when>
-                          <xsl:otherwise >
-                            <xsl:call-template name ="InsertWhiteSpaces">
-                              <xsl:with-param name ="string" select ="."/>
-                            </xsl:call-template>
-                          </xsl:otherwise >
-                        </xsl:choose>
-                      </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:call-template name="tmpTextSpanNode"/>
                   </xsl:variable>
                   <!-- Added by lohith.ar - Code for text Hyperlinks -->
                   <xsl:if test="node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd)">
@@ -4503,146 +4464,6 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:for-each>
       <!--If no bullets are present or default bullets-->
    </xsl:template>
-  <xsl:template name ="InsertStylesForGraphicProperties"  >
-    <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
-      <!-- Added by vipul-->
-      <!--Start-->
-      <xsl:variable name="SlidePos" select="position()"/>
-      <!--End-->
-      <xsl:variable name ="SlideId">
-        <xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
-      </xsl:variable>
-      <xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree">
-        <xsl:call-template name ="getGraphicProperties">
-          <xsl:with-param name ="SlideId" select="$SlideId" />
-          <xsl:with-param name ="grID" select ="'gr'" />
-        </xsl:call-template>
-      </xsl:for-each>
-      <!--Added by Vipul to insert style for Layout shapes-->
-      <!--Start-->
-      <xsl:variable name ="slideRel">
-        <xsl:value-of select ="concat(concat('ppt/slides/_rels/',$SlideId),'.rels')"/>
-      </xsl:variable>
-      <xsl:variable name ="LayoutFileNo">
-        <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
-          <xsl:value-of select ="concat('ppt',substring(.,3))"/>
-        </xsl:for-each>
-      </xsl:variable>
-      <xsl:for-each select ="document($LayoutFileNo)/p:sldLayout/p:cSld/p:spTree/p:sp">
-        <xsl:if test="not(p:nvSpPr/p:nvPr/p:ph)">
-          <xsl:variable  name ="GraphicId">
-            <xsl:value-of select ="concat('SL',$SlidePos,'LYT','gr',position())"/>
-          </xsl:variable>
-          <xsl:variable name ="ParaId">
-            <xsl:value-of select ="concat('SL',$SlidePos,'LYT','PARA',position())"/>
-          </xsl:variable>
-          <xsl:variable name="flagTextBox">
-            <xsl:if test="p:nvSpPr/p:cNvSpPr/@txBox='1'">
-              <xsl:value-of select ="'True'"/>
-            </xsl:if>
-          </xsl:variable>
-          <style:style style:family="graphic" style:parent-style-name="standard">
-            <xsl:attribute name ="style:name">
-              <xsl:value-of select ="$GraphicId"/>
-            </xsl:attribute >
-            <style:graphic-properties>
-              <!--FILL-->
-              <xsl:call-template name ="Fill" />
-              <!--LINE COLOR-->
-              <xsl:call-template name ="LineColor" />
-              <!--LINE STYLE-->
-              <xsl:call-template name ="LineStyle"/>
-              <!--TEXT ALIGNMENT-->
-              <xsl:call-template name ="TextLayout" />
-            </style:graphic-properties >
-          </style:style>
-          <xsl:call-template name="tmpShapeTextProcess">
-            <xsl:with-param name="ParaId" select="$ParaId"/>
-            <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
-          </xsl:call-template>
-        </xsl:if>
-      </xsl:for-each>
-      <!--End-->
-    </xsl:for-each>
-  </xsl:template>
-  <xsl:template name="getGraphicProperties">
-    <xsl:param name ="SlideId" />
-    <xsl:param name ="grID" />
-    <!-- Graphic properties for shapes with p:sp nodes-->
-    <xsl:for-each select ="p:sp">
-      <!-- Generate graphic properties ID-->
-      <xsl:variable  name ="GraphicId">
-        <xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,position()))"/>
-      </xsl:variable>
-      <style:style style:family="graphic" style:parent-style-name="standard">
-        <xsl:attribute name ="style:name">
-          <xsl:value-of select ="$GraphicId"/>
-        </xsl:attribute >
-        <style:graphic-properties>
-
-          <!-- FILL -->
-          <xsl:call-template name ="Fill"/>
-
-           <!-- LINE COLOR -->
-          <xsl:call-template name ="LineColor" />
-
-          <!-- LINE STYLE -->
-          <xsl:call-template name ="LineStyle"/>
-
-          <!-- TEXT ALIGNMENT -->
-          <xsl:call-template name ="TextLayout" />
-
-		  <!-- SHADOW IMPLEMENTATION -->
-          <xsl:call-template name="tmpShapeShadow"/>
-          <xsl:if test="p:spPr/a:effectLst/a:innerShdw ">
-            <!-- warn if inner Shadow -->
-            <xsl:message terminate="no">translation.oox2odf.shapesTypeInnerShadow</xsl:message>
-          </xsl:if>
-          <xsl:message terminate="no">translation.oox2odf.shapesTypeOuterShadow</xsl:message>
-        </style:graphic-properties >
-        <!--Added by Sanjay to get correct Text Direction:Fixed Bug no-1958740-->
-        <xsl:if test ="p:txBody/a:bodyPr/@vert">
-          <style:paragraph-properties>
-              <xsl:call-template name ="getTextDirection">
-                <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
-              </xsl:call-template>
-             </style:paragraph-properties>
-        </xsl:if>
-        <!--End of Bug no-1958740-->
-      </style:style>
-      <!--</xsl:if >-->
-    </xsl:for-each>
-    <!-- Graphic properties for shapes with p:cxnSp nodes-->
-    <xsl:for-each select ="p:cxnSp">
-      <!-- Generate graphic properties ID-->
-      <xsl:variable  name ="GraphicId">
-        <xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,'Line',position()))"/>
-      </xsl:variable>
-
-      <style:style style:family="graphic" style:parent-style-name="standard">
-        <xsl:attribute name ="style:name">
-          <xsl:value-of select ="$GraphicId"/>
-        </xsl:attribute >
-        <style:graphic-properties>
-
-          <!-- LINE COLOR -->
-          <xsl:call-template name ="LineColor" />
-
-          <!-- LINE STYLE -->
-          <xsl:call-template name ="LineStyle"/>
-
-        </style:graphic-properties >
-      </style:style>
-
-    </xsl:for-each>
-    <!-- Graphic properties for grouped shapes with p:grpSp nodes-->
-    <xsl:for-each select ="p:grpSp">
-      <xsl:call-template name ="getGraphicProperties">
-        <xsl:with-param name ="SlideId" select="$SlideId" />
-        <xsl:with-param name ="grID" select ="concat('grp',generate-id())" />
-      </xsl:call-template>
-    </xsl:for-each>
-  </xsl:template>
   <!-- Get fill color for shape-->
   <xsl:template name="Fill">
     <xsl:param name="var_pos"/>
@@ -5112,7 +4933,9 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:choose>
      
       <xsl:call-template name="tmpInternalMargin"/>
-      <xsl:call-template name="tmpWrapSpAutoFit"/>
+      <xsl:call-template name="tmpWrapSpAutoFit">
+        <xsl:with-param name="flagshape" select="'yes'"/>
+      </xsl:call-template>
       </xsl:for-each>
   </xsl:template>
  

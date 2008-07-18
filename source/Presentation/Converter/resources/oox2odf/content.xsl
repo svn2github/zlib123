@@ -67,10 +67,7 @@ exclude-result-prefixes="p a r xlink rels">
          <xsl:call-template name ="DateFormats"/>
         <xsl:call-template name="InsertStyles"/>
         <xsl:call-template name="tmpNotesDrawingPageStyle"/>
-        
-        <!-- Graphic properties for shapes -->
-        <!--<xsl:call-template name ="InsertStylesForGraphicProperties"/>-->
-      </office:automatic-styles>
+          </office:automatic-styles>
       <office:body>
         <office:presentation>
           <xsl:call-template name ="insertTextFromHandoutMaster"/>
@@ -114,30 +111,29 @@ exclude-result-prefixes="p a r xlink rels">
       <xsl:variable name ="SlideFileName">
         <xsl:value-of select ="concat(concat('slide',position()),'.xml')"/>
       </xsl:variable>
-      <xsl:variable name ="LayoutFileName">
-        <xsl:call-template name="GetLayOutforSlide">
-          <xsl:with-param name="SlideName" select="$SlideFileName">  </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name ="slideRel">
+         <xsl:variable name ="slideRel">
         <xsl:value-of select ="concat('ppt/slides/_rels/',$SlideFileName,'.rels')"/>
       </xsl:variable>
-      <xsl:variable name ="LayoutFileNo">
-        <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
-          <xsl:value-of select ="concat('ppt',substring(.,3))"/>
-        </xsl:for-each>
-      </xsl:variable>
-      <xsl:variable name ="newLayout" >
+    <xsl:variable name ="LayoutFileName" >
         <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
           <xsl:value-of  select ="substring-after(.,'../slideLayouts/')"/>
         </xsl:for-each>
       </xsl:variable>
+      <xsl:variable name ="LayoutFileNo">
+        <xsl:value-of select="concat('ppt/slideLayouts/',$LayoutFileName)"/>
+      </xsl:variable>
+     
       <xsl:variable name ="LayoutRel" >
-        <xsl:value-of select ="concat('ppt/slideLayouts/_rels/',$newLayout,'.rels')"/>
+        <xsl:value-of select ="concat('ppt/slideLayouts/_rels/',$LayoutFileName,'.rels')"/>
       </xsl:variable>
       <xsl:variable name ="SMName" >
         <xsl:for-each select ="document($LayoutRel)//node()/@Target[contains(.,'slideMasters')]">
           <xsl:value-of  select ="substring-after(.,'../slideMasters/')"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:variable name="var_Themefile">
+        <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$SMName,'.rels'))//node()/@Target[contains(.,'slideLayouts')]">
+          <xsl:value-of select="concat('ppt',substring-after(.,'..'))"/>
         </xsl:for-each>
       </xsl:variable>
       <!--End-->
@@ -161,11 +157,10 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:attribute name ="presentation:background-objects-visible" >
             <xsl:value-of select ="'true'"/>
           </xsl:attribute>
+          <xsl:for-each select="document($pageSlide)/p:sld/p:cSld/p:spTree">
           <xsl:attribute name ="presentation:display-footer">
             <xsl:choose>
-              <xsl:when test ="document($pageSlide)/p:sld/p:cSld/p:spTree/p:sp
-                                          /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'ftr')]">
-
+                    <xsl:when test="./p:sp/p:nvSpPr/p:nvPr/p:ph[@type='ftr']">
                 <xsl:value-of select ="'true'"/>
               </xsl:when>
               <xsl:otherwise>
@@ -175,9 +170,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:attribute>
           <xsl:attribute name ="presentation:display-page-number" >
             <xsl:choose>
-              <xsl:when test ="document($pageSlide)/p:sld/p:cSld/p:spTree/p:sp
-                                          /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'sldNum')]">
-
+                <xsl:when test="./p:sp/p:nvSpPr/p:nvPr/p:ph[@type='sldNum']">
                 <xsl:value-of select ="'true'"/>
               </xsl:when>
               <xsl:otherwise>
@@ -187,9 +180,7 @@ exclude-result-prefixes="p a r xlink rels">
           </xsl:attribute>
           <xsl:attribute name ="presentation:display-date-time" >
             <xsl:choose>
-              <xsl:when test ="document($pageSlide)/p:sld/p:cSld/p:spTree/p:sp
-                                          /p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt')]">
-
+                <xsl:when test="./p:sp/p:nvSpPr/p:nvPr/p:ph[@type='dt']">
                 <xsl:value-of select ="'true'"/>
               </xsl:when>
               <xsl:otherwise>
@@ -197,13 +188,7 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
-          <!--Added by Sateesh for Background Color -->
-          <xsl:variable name="Layout">
-            <xsl:call-template name="GetLayOutforSlide">
-              <xsl:with-param name="SlideName" select="$SlideFileName">  </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:for-each select="document($pageSlide)/p:sld/p:cSld/p:bg">
+            <xsl:for-each select="../p:bg">
             <xsl:choose>
               <xsl:when test="p:bgPr/a:solidFill">
                 <xsl:for-each select="p:bgPr/a:solidFill">
@@ -218,213 +203,27 @@ exclude-result-prefixes="p a r xlink rels">
                           </xsl:call-template>
                   </xsl:when>
               <xsl:when test="(p:bgPr/a:blipFill or p:bgRef/a:blipFill) and p:bgPr/a:blipFill/a:blip/@r:embed ">
-                <xsl:attribute name="draw:fill-color">
-                  <xsl:value-of select="'#FFFFFF'"/>
-                </xsl:attribute>
-                <xsl:attribute name="draw:fill">
-                  <xsl:value-of select="'bitmap'"/>
-                </xsl:attribute>
-               <xsl:choose>
-                    <xsl:when test="p:bgPr/a:blipFill/a:stretch/a:fillRect">
-                      <xsl:attribute name="style:repeat">
-                        <xsl:value-of select="'stretch'"/>
-                      </xsl:attribute>
-                    </xsl:when>
-                    <xsl:when test="p:bgPr/a:blipFill/a:tile">
-                      <xsl:for-each select="./p:bgPr/a:blipFill/a:tile">
-                        <!--<xsl:if test="@tx">
-                      <xsl:attribute name="draw:fill-image-width">
-                        <xsl:value-of select ="concat(format-number(@tx div 360000, '#.##'), 'cm')"/>
-                      </xsl:attribute>
-                    </xsl:if>
-   
-                    <xsl:if test="@ty">
-                      <xsl:attribute name="draw:fill-image-height">
-                        <xsl:value-of select ="concat(format-number(@ty div 360000, '#.##'), 'cm')"/>
-                      </xsl:attribute>
-                    </xsl:if>-->
-                        <xsl:if test="@sx">
-                          <xsl:attribute name="draw:fill-image-ref-point-x">
-                            <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test="@sy">
-                          <xsl:attribute name="draw:fill-image-ref-point-y">
-                            <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test="@algn">
-                          <xsl:attribute name="draw:fill-image-ref-point">
-                            <xsl:choose>
-                              <xsl:when test="@algn='tl'">
-                                <xsl:value-of select ="'top-left'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='t'">
-                                <xsl:value-of select ="'top'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='tr'">
-                                <xsl:value-of select ="'top-right'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='r'">
-                                <xsl:value-of select ="'right'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='bl'">
-                                <xsl:value-of select ="'bottom-left'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='br'">
-                                <xsl:value-of select ="'bottom-right'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='b'">
-                                <xsl:value-of select ="'bottom'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='ctr'">
-                                <xsl:value-of select ="'center'"/>
-                              </xsl:when>
-                            </xsl:choose>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <!--<xsl:attribute name="draw:tile-repeat-offset">
-                      <xsl:value-of select ="'100% horizontal'"/>
-                    </xsl:attribute>-->
+                  <xsl:for-each select="p:bgPr">
+                    <xsl:call-template name="tmpPictureFillProp"/>
                       </xsl:for-each>
-                    </xsl:when>
-                  </xsl:choose>
-                <xsl:attribute name="draw:fill-image-name">
+                    <xsl:attribute name="draw:fill-image-name">
                   <xsl:value-of select="concat(substring-before($SlideFileName,'.xml'),'BackImg')"/>
                 </xsl:attribute>
               </xsl:when>
               <xsl:when test="p:bgRef and p:bgRef/@idx &gt; 1000">
               <xsl:variable name="idx" select="p:bgRef/@idx - 1000"/>
-                <xsl:variable name="var_Themefile">
-                      <xsl:variable name="layoutFile">
-                        <xsl:for-each select="document(concat('ppt/slides/_rels/',$SlideFileName,'.rels'))//node()/@Target[contains(.,'slideLayouts')]">
-                          <xsl:value-of select="substring-after(.,'../slideLayouts/')"/>
-                        </xsl:for-each>
-                      </xsl:variable>
-                      <xsl:variable name="SMFile">
-                        <xsl:for-each select="document(concat('ppt/slideLayouts/',$layoutFile))//node()/@Target[contains(.,'slideMasters')]">
-                          <xsl:value-of select="substring-after(.,'../slideMasters/')"/>
-                        </xsl:for-each>
-                      </xsl:variable>
-                      <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$SMFile,'.rels'))//node()/@Target[contains(.,'slideLayouts')]">
-                        <xsl:value-of select="concat('ppt',substring-after(.,'..'))"/>
+                <xsl:for-each select ="document($var_Themefile)/a:theme/a:themeElements/a:fmtScheme/a:bgFillStyleLst/child::node()[$idx]">
+                      <xsl:if test="name()='a:blipFill'">
+                        <xsl:if test="./a:blip/@r:embed">
+                          <xsl:for-each select="..">
+                          <xsl:call-template name="tmpPictureFillProp"/>
                       </xsl:for-each>
-                </xsl:variable>
-                <xsl:variable name="blnImage">
-                  <xsl:for-each select ="document($var_Themefile)/a:theme/a:themeElements/a:fmtScheme/a:bgFillStyleLst/child::node()[$idx]">
-                    <xsl:choose>
-                      <xsl:when test="name()='a:blipFill'">
-                       <xsl:choose>
-                          <xsl:when test="./a:blip/@r:embed">
-                        <xsl:value-of select="'1'"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="'0'"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="'0'"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:for-each>
-                </xsl:variable>
-                <xsl:if test="$blnImage='1'">
-                  <xsl:attribute name="draw:fill-color">
-                    <xsl:value-of select="'#FFFFFF'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name="draw:fill">
-                    <xsl:value-of select="'bitmap'"/>
-                  </xsl:attribute>
-                  <xsl:choose>
-                    <xsl:when test="p:bgPr/a:blipFill/a:stretch/a:fillRect">
-                      <xsl:attribute name="style:repeat">
-                        <xsl:value-of select="'stretch'"/>
-                      </xsl:attribute>
-                    </xsl:when>
-                    <xsl:when test="p:bgPr/a:blipFill/a:tile">
-                      <xsl:for-each select="./p:bgPr/a:blipFill/a:tile">
-                        <!--<xsl:if test="@tx">
-                      <xsl:attribute name="draw:fill-image-width">
-                        <xsl:value-of select ="concat(format-number(@tx div 360000, '#.##'), 'cm')"/>
-                      </xsl:attribute>
-                    </xsl:if>
-   
-                    <xsl:if test="@ty">
-                      <xsl:attribute name="draw:fill-image-height">
-                        <xsl:value-of select ="concat(format-number(@ty div 360000, '#.##'), 'cm')"/>
-                      </xsl:attribute>
-                    </xsl:if>-->
-                        <xsl:if test="@sx">
-                          <xsl:attribute name="draw:fill-image-ref-point-x">
-                            <xsl:value-of select ="concat(format-number(@sx div 1000, '#'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test="@sy">
-                          <xsl:attribute name="draw:fill-image-ref-point-y">
-                            <xsl:value-of select ="concat(format-number(@sy div 1000, '#'), '%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test="@algn">
-                          <xsl:attribute name="draw:fill-image-ref-point">
-                            <xsl:choose>
-                              <xsl:when test="@algn='tl'">
-                                <xsl:value-of select ="'top-left'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='t'">
-                                <xsl:value-of select ="'top'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='tr'">
-                                <xsl:value-of select ="'top-right'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='r'">
-                                <xsl:value-of select ="'right'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='bl'">
-                                <xsl:value-of select ="'bottom-left'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='br'">
-                                <xsl:value-of select ="'bottom-right'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='b'">
-                                <xsl:value-of select ="'bottom'"/>
-                              </xsl:when>
-                              <xsl:when test="@algn='ctr'">
-                                <xsl:value-of select ="'center'"/>
-                              </xsl:when>
-                            </xsl:choose>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <!--<xsl:attribute name="draw:tile-repeat-offset">
-                      <xsl:value-of select ="'100% horizontal'"/>
-                    </xsl:attribute>-->
-                      </xsl:for-each>
-                    </xsl:when>
-                  </xsl:choose>
-                  <xsl:attribute name="draw:fill-image-name">
+                   <xsl:attribute name="draw:fill-image-name">
                     <xsl:value-of select="concat(substring-before($SlideFileName,'.xml'),'BackImg')"/>
                   </xsl:attribute>
                 </xsl:if>
-                <xsl:if test="$blnImage='0'">
-                  <xsl:if test="p:bgRef/a:schemeClr/@val">
-                    <xsl:attribute name="draw:fill-color">
-                  <xsl:call-template name="getColorCode">
-                    <xsl:with-param name="color">
-                      <xsl:value-of select="p:bgRef/a:schemeClr/@val" />
-                    </xsl:with-param>
-                    <xsl:with-param name="lumMod">
-                      <xsl:value-of select="p:bgRef/a:schemeClr/a:lumMod/@val" />
-                    </xsl:with-param>
-                    <xsl:with-param name="lumOff">
-                      <xsl:value-of select="p:bgRef/a:schemeClr/a:lumOff/@val" />
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:attribute>
-                <xsl:attribute name="draw:fill">
-                  <xsl:value-of select="'solid'"/>
-                </xsl:attribute>
-                  </xsl:if>
-                </xsl:if>
+              </xsl:if>
+                    </xsl:for-each>
               </xsl:when>
               <xsl:when test="p:bgRef and p:bgRef/@idx &gt; 0  and p:bgRef/@idx &lt; 1000">
                 <xsl:choose>
@@ -458,9 +257,10 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:when>
           </xsl:choose>
           </xsl:for-each>
+          </xsl:for-each>
           <xsl:if test="not(document($pageSlide)/p:sld/p:cSld/p:bg)">
             <!-- GET COLOR FROM LAYOUT  -->
-            <xsl:for-each select="document(concat('ppt/slideLayouts/',$Layout))//p:cSld/p:bg">
+            <xsl:for-each select="document(concat('ppt/slideLayouts/',$LayoutFileName))//p:cSld/p:bg">
               <xsl:choose>
                 <xsl:when test="p:bgPr/a:solidFill">
                   <xsl:for-each select="p:bgPr/a:solidFill">
@@ -471,7 +271,7 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:when>
                 <xsl:when test="p:bgPr/a:gradFill">
                   <xsl:call-template name="tmpBackGrndGradFillColor">
-                    <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),substring-before($Layout,'.xml'),'-Gradient')"/>
+                    <xsl:with-param name="FileType" select="concat(substring-before($SMName,'.xml'),substring-before($LayoutFileName,'.xml'),'-Gradient')"/>
                             </xsl:call-template>
                    </xsl:when>
                 <xsl:when test="p:bgPr/a:blipFill or p:bgRef/a:blipFill and p:bgPr/a:blipFill/a:blip/@r:embed">
@@ -482,7 +282,7 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:value-of select="'bitmap'"/>
                   </xsl:attribute>
                   <xsl:attribute name="draw:fill-image-name">
-                    <xsl:value-of select="concat(substring-before($Layout,'.xml'),'BackImg')"/>
+                    <xsl:value-of select="concat(substring-before($LayoutFileName,'.xml'),'BackImg')"/>
                   </xsl:attribute>
                   <!--Code Added by Sanjay to fixed the  Bug-1877299-->
                   <xsl:choose>
@@ -502,11 +302,7 @@ exclude-result-prefixes="p a r xlink rels">
                 </xsl:when>
                 <xsl:when test="p:bgRef/@idx &gt; 1000">
                   <xsl:variable name="idx" select="p:bgRef/@idx - 1000"/>
-                  <xsl:variable name="var_Themefile">
-                        <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$Layout,'.rels'))//node()/@Target[contains(.,'theme')]">
-                          <xsl:value-of select="concat('ppt',substring-after(.,'..'))"/>
-                        </xsl:for-each>
-                  </xsl:variable>
+                 
                   <xsl:variable name="blnImage">
                     <xsl:for-each select ="document($var_Themefile)/a:theme/a:themeElements/a:fmtScheme/a:bgFillStyleLst/child::node()[$idx]">
                       <xsl:choose>
@@ -534,7 +330,7 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:value-of select="'bitmap'"/>
                     </xsl:attribute>
                     <xsl:attribute name="draw:fill-image-name">
-                      <xsl:value-of select="concat(substring-before($Layout,'.xml'),'BackImg')"/>
+                      <xsl:value-of select="concat(substring-before($LayoutFileName,'.xml'),'BackImg')"/>
                     </xsl:attribute>
                   </xsl:if>
                   <xsl:if test="$blnImage='0'">
@@ -628,7 +424,6 @@ exclude-result-prefixes="p a r xlink rels">
             </xsl:for-each>
           </xsl:if>
           <!--End-->
-
 			<!--added by yeswanth-->
 			<!--transition sound-->
 			<xsl:variable name ="relSlideNumber">
@@ -636,7 +431,6 @@ exclude-result-prefixes="p a r xlink rels">
 					<xsl:with-param name="string2rev" select="$pageSlide"/>
 				</xsl:call-template>
 			</xsl:variable>
-
 			<xsl:call-template name="TransSound">
 				<xsl:with-param name="slidenum" select="document($pageSlide)"/>
 				<xsl:with-param name="pageSlide" select="concat('ppt/slides/_rels/',$relSlideNumber,'.rels')"/>
@@ -644,9 +438,14 @@ exclude-result-prefixes="p a r xlink rels">
 			</xsl:call-template>
 			<!--end of code added by yeswanth-->
 			
-			
-        </style:drawing-page-properties>
+   </style:drawing-page-properties>
       </style:style>
+      <xsl:call-template name ="GetStylesFromSlide">
+        <xsl:with-param name="SlidePos" select="position()"/>
+        <xsl:with-param  name="LayoutFileName" select="$LayoutFileName"/>
+        <xsl:with-param  name="SMName" select="$SMName"/>
+        <xsl:with-param  name="ThemeName" select="$var_Themefile"/>
+      </xsl:call-template>
          </xsl:for-each >
     <style:style style:name="pr1" style:family="presentation" style:parent-style-name="Default-notes">
       <style:graphic-properties >
@@ -658,7 +457,6 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:for-each>
       </style:graphic-properties>
     </style:style>
-    <xsl:call-template name ="GetStylesFromSlide"/>
   </xsl:template>
   <xsl:template name ="InsertPresentationFooter" >
     <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
@@ -974,7 +772,8 @@ exclude-result-prefixes="p a r xlink rels">
                     </xsl:variable>
                     <xsl:variable name ="bulletTypeBool">
                       <xsl:for-each select ="document($slideRel)//rels:Relationships/rels:Relationship">
-                        <xsl:if test ="document($slideRel)//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">
+                      <!--<xsl:if test ="document($slideRel)//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">-->
+                      <xsl:if test ="@Target[contains(.,'slideLayouts')]">
                           <xsl:variable name ="layout" select ="substring-after((@Target),'../slideLayouts/')"/>
                           <xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
                             <xsl:choose >
@@ -1130,46 +929,7 @@ exclude-result-prefixes="p a r xlink rels">
                                           </xsl:attribute>
                                           <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
                                           <xsl:variable name="nodeTextSpan">
-                                            <!--<xsl:value-of select ="a:t"/>-->
-                                            <!--converts whitespaces sequence to text:s-->
-                                            <!-- 1699083 bug fix  -->
-                                            <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-                                            <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-                                            <xsl:choose >
-                                              <xsl:when test ="a:rPr[@cap!='none'] or $layoutCap !=''">
-                                                <xsl:choose >
-                                                  <xsl:when test =".=''">
-                                                    <text:s/>
-                                                  </xsl:when>
-                                                  <xsl:when test ="not(contains(.,'  '))">
-                                                    <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-                                                  </xsl:when>
-                                                  <xsl:when test =". =' '">
-                                                    <text:s/>
-                                                  </xsl:when>
-                                                  <xsl:otherwise >
-                                                    <xsl:call-template name ="InsertWhiteSpaces">
-                                                      <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                                                    </xsl:call-template>
-                                                  </xsl:otherwise>
-                                                </xsl:choose>
-                                              </xsl:when>
-                                               <xsl:otherwise >
-                                                <xsl:choose >
-                                                  <xsl:when test =".=''">
-                                                    <text:s/>
-                                                  </xsl:when>
-                                                  <xsl:when test ="not(contains(.,'  '))">
-                                                    <xsl:value-of select ="."/>
-                                                  </xsl:when>
-                                                  <xsl:otherwise >
-                                                    <xsl:call-template name ="InsertWhiteSpaces">
-                                                      <xsl:with-param name ="string" select ="."/>
-                                                    </xsl:call-template>
-                                                  </xsl:otherwise >
-                                                </xsl:choose>
-                                              </xsl:otherwise>
-                                            </xsl:choose>
+                                          <xsl:call-template name="tmpTextSpanNode"/>
                                           </xsl:variable>
                                           <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                           <xsl:if test="node()/a:hlinkClick">
@@ -1231,46 +991,7 @@ exclude-result-prefixes="p a r xlink rels">
                                         </xsl:attribute>
                                         <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
                                         <xsl:variable name="nodeTextSpan">
-                                          <!--<xsl:value-of select ="a:t"/>-->
-                                          <!--converts whitespaces sequence to text:s-->
-                                          <!-- 1699083 bug fix  -->
-                                          <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-                                          <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-                                          <xsl:choose >
-                                            <xsl:when test ="a:rPr[@cap!='none'] or $layoutCap !=''">
-                                              <xsl:choose >
-                                                <xsl:when test =".=''">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:when test ="not(contains(.,'  '))">
-                                                  <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-                                                </xsl:when>
-                                                <xsl:when test =". =' '">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:otherwise >
-                                                  <xsl:call-template name ="InsertWhiteSpaces">
-                                                    <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                                                  </xsl:call-template>
-                                                </xsl:otherwise>
-                                              </xsl:choose>
-                                            </xsl:when>
-                                            <xsl:otherwise >
-                                              <xsl:choose >
-                                                <xsl:when test =".=''">
-                                                  <text:s/>
-                                                </xsl:when>
-                                                <xsl:when test ="not(contains(.,'  '))">
-                                                  <xsl:value-of select ="."/>
-                                                </xsl:when>
-                                                <xsl:otherwise >
-                                                  <xsl:call-template name ="InsertWhiteSpaces">
-                                                    <xsl:with-param name ="string" select ="."/>
-                                                  </xsl:call-template>
-                                                </xsl:otherwise >
-                                              </xsl:choose>
-                                            </xsl:otherwise>
-                                          </xsl:choose>
+                                        <xsl:call-template name="tmpTextSpanNode"/>
                                         </xsl:variable>
                                         <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                         <xsl:if test="node()/a:hlinkClick">
@@ -1333,46 +1054,7 @@ exclude-result-prefixes="p a r xlink rels">
                                     </xsl:attribute>
                                     <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
                                     <xsl:variable name="nodeTextSpan">
-                                      <!--<xsl:value-of select ="a:t"/>-->
-                                      <!--converts whitespaces sequence to text:s-->
-                                      <!-- 1699083 bug fix  -->
-                                      <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-                                      <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-                                      <xsl:choose >
-                                        <xsl:when test ="a:rPr[@cap!='none'] or $layoutCap !=''">
-                                          <xsl:choose >
-                                            <xsl:when test =".=''">
-                                              <text:s/>
-                                            </xsl:when>
-                                            <xsl:when test ="not(contains(.,'  '))">
-                                              <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-                                            </xsl:when>
-                                            <xsl:when test =". =' '">
-                                              <text:s/>
-                                            </xsl:when>
-                                            <xsl:otherwise >
-                                              <xsl:call-template name ="InsertWhiteSpaces">
-                                                <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-                                              </xsl:call-template>
-                                            </xsl:otherwise>
-                                          </xsl:choose>
-                                        </xsl:when>
-                                        <xsl:otherwise >
-                                          <xsl:choose >
-                                            <xsl:when test =".=''">
-                                              <text:s/>
-                                            </xsl:when>
-                                            <xsl:when test ="not(contains(.,'  '))">
-                                              <xsl:value-of select ="."/>
-                                            </xsl:when>
-                                            <xsl:otherwise >
-                                              <xsl:call-template name ="InsertWhiteSpaces">
-                                                <xsl:with-param name ="string" select ="."/>
-                                              </xsl:call-template>
-                                            </xsl:otherwise >
-                                          </xsl:choose>
-                                        </xsl:otherwise>
-                                      </xsl:choose>
+                                        <xsl:call-template name="tmpTextSpanNode"/>
                                     </xsl:variable>
                                     <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                     <xsl:if test="node()/a:hlinkClick">
@@ -2354,60 +2036,38 @@ exclude-result-prefixes="p a r xlink rels">
      </draw:g>
   </xsl:template>
     <xsl:template name ="GetStylesFromSlide" >
-       <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
-        <xsl:variable name="SlidePos" select="position()"/>
+    <xsl:param name="SlidePos"/>
+    <xsl:param name="LayoutFileName"/>
+    <xsl:param name="SMName"/>
+    <xsl:param name="ThemeName"/>
+
       <xsl:variable name ="SlideNumber">
         <xsl:value-of  select ="concat('slide',position())" />
       </xsl:variable>
       <xsl:variable name ="SlideId">
-        <xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
-      </xsl:variable>
-      <xsl:variable name ="LayoutFileName">
-        <xsl:call-template name="GetLayOutforSlide">
-          <xsl:with-param name="SlideName" select="$SlideId">  </xsl:with-param>
-        </xsl:call-template>
+        <xsl:value-of  select ="concat($SlideNumber,'.xml')" />
       </xsl:variable>
         <xsl:variable name ="slideRel">
         <xsl:value-of select ="concat(concat('ppt/slides/_rels/',$SlideNumber,'.xml'),'.rels')"/>
       </xsl:variable>
-      <xsl:call-template name="tmpNotesStyle">
-        <xsl:with-param name="slideRel" select="$slideRel"/>
-      </xsl:call-template>
-       <xsl:variable name ="layout" >
-        <xsl:for-each select ="document($slideRel)//rels:Relationships/rels:Relationship">
-          <xsl:if test ="document($slideRel)//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">
-            <xsl:value-of select ="substring-after((@Target),'../slideLayouts/')"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:variable>
-      <xsl:variable name ="LayoutNew" >
-        <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
-          <xsl:value-of  select ="substring-after(.,'../slideLayouts/')"/>
-        </xsl:for-each>
-      </xsl:variable>
-      <xsl:variable name ="LayoutRel" >
-        <xsl:value-of select ="concat('ppt/slideLayouts/_rels/',$LayoutNew,'.rels')"/>
-      </xsl:variable>
-      <xsl:variable name ="SMName" >
-        <xsl:for-each select ="document($LayoutRel)//node()/@Target[contains(.,'slideMasters')]">
-          <xsl:value-of  select ="substring-after(.,'../slideMasters/')"/>
-        </xsl:for-each>
-      </xsl:variable>
-      <xsl:variable name ="SMRel" >
-        <xsl:value-of select ="concat('ppt/slideMasters/_rels/',$SMName,'.rels')"/>
-      </xsl:variable>
-      <xsl:variable name ="ThemeName" >
-        <xsl:for-each select ="document($SMRel)//node()/@Target[contains(.,'theme')]">
-          <xsl:value-of  select="concat('ppt',substring-after(.,'..'))"/>
-        </xsl:for-each>
-      </xsl:variable>
-      <xsl:variable name ="DefFont">
+           <xsl:variable name ="DefFont">
         <xsl:for-each select ="document($ThemeName)/a:theme/a:themeElements/a:fontScheme/a:majorFont/a:latin/@typeface">
           <xsl:value-of select ="."/>
         </xsl:for-each>
       </xsl:variable>
+         <xsl:call-template name="tmpNotesStyle">
+           <xsl:with-param name="slideRel" select="$slideRel"/>
+           <xsl:with-param name="DefFont" select="$DefFont"/>
+         </xsl:call-template>
+
+
+    <xsl:variable name ="LayoutRel" >
+      <xsl:value-of select ="concat('ppt/slideLayouts/_rels/',$LayoutFileName,'.rels')"/>
+    </xsl:variable>
+
+
       <xsl:variable name ="bulletTypeBool">
-        <xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
+        <xsl:for-each select ="document(concat('ppt/slideLayouts/',$LayoutFileName))//p:sldLayout">
           <xsl:choose >
             <!-- Changes made by vijayeta, bug fix, 1739703, date:10-7-07-->
             <!-- Fix for the bug, number 45,Internal Defects.xls date 8th aug '07-->
@@ -2577,20 +2237,12 @@ exclude-result-prefixes="p a r xlink rels">
                   
                 </xsl:variable>
                 <!-- Added by vijayeta, on 16th july-->
-                <xsl:variable name ="newLayout" >
-                  <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
-                    <xsl:value-of  select ="concat('ppt/slideLayouts/_rels/',substring-after(.,'../slideLayouts/'))"/>
-                  </xsl:for-each>
-                </xsl:variable>
+                 
                 <xsl:variable name="lytFileName">
-                  <xsl:value-of select="substring-after($newLayout,'ppt/slideLayouts/_rels/')"/>
+                      <xsl:value-of select="substring-after($LayoutFileName,'ppt/slideLayouts/_rels/')"/>
                 </xsl:variable>
                 <!-- aDDED BY VIJAYEA, TO GET SLIDE MASTER, ON 15TH JULY-->
-                <xsl:variable name ="slideMaster">
-                  <xsl:call-template name ="getmasterFromLayout">
-                    <xsl:with-param name ="layoutFile" select ="$newLayout"/>
-                  </xsl:call-template>
-                </xsl:variable>
+              
                 <!-- aDDED BY VIJAYEA, TO GET SLIDE MASTER, ON 15TH JULY-->
                 <!--If bullets present-->
                 <xsl:if test ="(a:p/a:pPr/a:buChar) or (a:p/a:pPr/a:buAutoNum) or (a:p/a:pPr/a:buBlip) ">
@@ -2598,10 +2250,10 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:with-param name ="slideRel" select ="$slideRel"/>
                     <xsl:with-param name ="ParaId" select ="$ParaId"/>
                     <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
-                    <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                        <xsl:with-param name ="slideMaster" select ="$SMName"/>
                     <xsl:with-param name ="var_TextBoxType" select ="$var_TextBoxType"/>
                     <xsl:with-param name ="var_index" select ="$var_index"/>
-                    <xsl:with-param name ="slideLayout" select ="$layout"/>
+                        <xsl:with-param name ="slideLayout" select ="$LayoutFileName"/>
                   </xsl:call-template>
                 </xsl:if>
                 <!-- bullets are default-->
@@ -2613,8 +2265,8 @@ exclude-result-prefixes="p a r xlink rels">
                                        <!-- Added by  vijayeta ,on 19th june-->
                     <xsl:call-template name ="insertDefaultBulletNumberStyle">
                       <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
-                      <xsl:with-param name ="slideLayout" select ="$layout"/>
-                      <xsl:with-param name ="slideMaster" select ="$slideMaster"/>
+                          <xsl:with-param name ="slideLayout" select ="$LayoutFileName"/>
+                          <xsl:with-param name ="slideMaster" select ="$SMName"/>
                       <xsl:with-param name ="var_TextBoxType" select ="$var_TextBoxType"/>
                       <xsl:with-param name ="var_index" select ="$var_index"/>
                     </xsl:call-template>
@@ -2679,15 +2331,15 @@ exclude-result-prefixes="p a r xlink rels">
                                 <xsl:when test="$layoutName='body'">
                                   <xsl:choose>
                                     <xsl:when test="$var_index != ''">
-                                      <xsl:if test="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index]">
-                                        <xsl:for-each select ="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index]">
+                                          <xsl:if test="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index]">
+                                            <xsl:for-each select ="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index]">
                                           <xsl:call-template name="tmpcheckbulletFlage">
                                             <xsl:with-param name="level" select="$levelForDefFont + 1"/>
                                           </xsl:call-template>
                                         </xsl:for-each>
                                       </xsl:if>
-                                      <xsl:if test="not(document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index])">
-                                        <xsl:for-each select ="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[not(@type) and @idx=$var_index]">
+                                          <xsl:if test="not(document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index])">
+                                            <xsl:for-each select ="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[not(@type) and @idx=$var_index]">
                                           <xsl:call-template name="tmpcheckbulletFlage">
                                             <xsl:with-param name="level" select="$levelForDefFont + 1"/>
                                           </xsl:call-template>
@@ -2695,7 +2347,7 @@ exclude-result-prefixes="p a r xlink rels">
                                       </xsl:if>
                                     </xsl:when>
                                     <xsl:when test="$var_index = ''">
-                                      <xsl:for-each select ="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and not(@idx)]">
+                                          <xsl:for-each select ="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and not(@idx)]">
                                         <xsl:call-template name="tmpcheckbulletFlage">
                                           <xsl:with-param name="level" select="$levelForDefFont + 1"/>
                                         </xsl:call-template>
@@ -2704,21 +2356,21 @@ exclude-result-prefixes="p a r xlink rels">
                                   </xsl:choose>
                                 </xsl:when>
                                 <xsl:when test="$layoutName='' and $var_index != ''">
-                                  <xsl:for-each select ="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[not(@type) and @idx=$var_index]">
+                                      <xsl:for-each select ="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[not(@type) and @idx=$var_index]">
                                     <xsl:call-template name="tmpcheckbulletFlage">
                                       <xsl:with-param name="level" select="$levelForDefFont + 1"/>
                                     </xsl:call-template>
                                   </xsl:for-each>
                                 </xsl:when>
                                 <xsl:when test="$layoutName='subTitle' and $var_index != ''">
-                                  <xsl:for-each select ="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index]">
+                                      <xsl:for-each select ="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and @idx=$var_index]">
                                     <xsl:call-template name="tmpcheckbulletFlage">
                                       <xsl:with-param name="level" select="$levelForDefFont + 1"/>
                                     </xsl:call-template>
                                   </xsl:for-each>
                                 </xsl:when>
                                 <xsl:when test="$layoutName='subTitle' and $var_index = ''">
-                                  <xsl:for-each select ="document(concat('ppt/slideLayouts/',$lytFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and not(@idx)]">
+                                      <xsl:for-each select ="document(concat('ppt/slideLayouts/',$LayoutFileName))/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$layoutName and not(@idx)]">
                                     <xsl:call-template name="tmpcheckbulletFlage">
                                       <xsl:with-param name="level" select="$levelForDefFont + 1" />
                                     </xsl:call-template>
@@ -3170,7 +2822,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:for-each>
            <!--End-->
       </xsl:for-each>
-    </xsl:for-each>
+  
   </xsl:template>
   <xsl:template name="tmpSlideGroupStyle">
     <xsl:param name="SlideId"/>
@@ -3712,7 +3364,7 @@ exclude-result-prefixes="p a r xlink rels">
        <xsl:with-param name="SMName" select="$SMName"/>
       </xsl:call-template>
       </xsl:attribute>
-    <xsl:if test="a:srgbClr/a:srgbClr/a:alpha/@val or a:schemeClr/a:alpha/@val">
+    <xsl:if test="a:srgbClr/a:alpha/@val or a:schemeClr/a:alpha/@val">
        <xsl:call-template name="tmpFillTransperancy">
         <xsl:with-param name="SMName" select="$SMName"/>
                       </xsl:call-template>                        
@@ -4125,14 +3777,7 @@ exclude-result-prefixes="p a r xlink rels">
   </xsl:template>
   <!-- added by Vipul to get back color of title, sub title, outline from slide layout-->
   <!-- start-->
-  <xsl:template name="GetLayOutforSlide">
-    <xsl:param name="SlideName" />
-    <xsl:for-each select="document(concat('ppt/slides/_rels/',$SlideName,'.rels'))//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">
-      <xsl:value-of select="substring(.,17)" />
-    </xsl:for-each>
-  </xsl:template>
-  
-  <xsl:template name="tmpCommanTextProperty">
+    <xsl:template name="tmpCommanTextProperty">
     <xsl:param name="LayoutFileName"/>
     <xsl:param name="spType"/>
     <xsl:param name="index"/>
@@ -4465,8 +4110,7 @@ exclude-result-prefixes="p a r xlink rels">
     </xsl:choose>
   </xsl:template>
   
-     
-  <xsl:template name="tmpCommanParaProperty">
+       <xsl:template name="tmpCommanParaProperty">
     <xsl:param name="LayoutFileName"/>
     <xsl:param name="spType"/>
     <xsl:param name="index"/>
@@ -4686,12 +4330,30 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:choose>
             <xsl:when test="$spType='title'">
               <xsl:for-each select ="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:titleStyle/child::node()[name()=$nodeName]">
+				  <xsl:choose>
+					  <xsl:when test="@marL">
                 <xsl:call-template name="tmpMarginLet"/>
+					  </xsl:when>
+					  <xsl:otherwise>
+						  <xsl:attribute name ="fo:margin-left">
+							  <xsl:value-of select="'0cm'"/>
+						  </xsl:attribute >
+					  </xsl:otherwise>
+				  </xsl:choose>
               </xsl:for-each>
               </xsl:when>
             <xsl:otherwise>
               <xsl:for-each select ="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+				  <xsl:choose>
+					  <xsl:when test="@marL">
                 <xsl:call-template name="tmpMarginLet"/>
+					  </xsl:when>
+					  <xsl:otherwise>
+						  <xsl:attribute name ="fo:margin-left">
+							  <xsl:value-of select="'0cm'"/>
+						  </xsl:attribute >
+					  </xsl:otherwise>
+				  </xsl:choose>
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
@@ -5104,12 +4766,19 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
         <xsl:if test ="not(a:lstStyle/child::node()[name()=$nodeName]/@indent)">
-          <xsl:for-each select ="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]/@indent">
-                <xsl:if test=".">
+          <xsl:for-each select ="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
+			  <xsl:choose>
+				  <xsl:when test="@indent">
                   <xsl:attribute name ="fo:text-indent">
                     <xsl:value-of select="concat(format-number(. div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
-                </xsl:if>
+				  </xsl:when>
+				  <xsl:otherwise>
+					  <xsl:attribute name ="fo:text-indent">
+						  <xsl:value-of select="'0cm'"/>
+					  </xsl:attribute>
+				  </xsl:otherwise>
+			  </xsl:choose>
               </xsl:for-each>
             </xsl:if>
           </xsl:when>
@@ -6296,17 +5965,27 @@ exclude-result-prefixes="p a r xlink rels">
 					</xsl:choose>
 				</xsl:variable>
 				
-				<xsl:variable name="varDestMediaFileTargetPath">
-					<xsl:value-of select="concat($FolderNameGUID,'|',$extractfilename)"/>
+				<xsl:variable name="TransFOlderName">
+					<xsl:value-of select="'transFileName:'" />
 				</xsl:variable>
-				<xsl:variable name="varMediaFilePathForOdp">
-					<xsl:value-of select="concat('../',$FolderNameGUID,'/',$soundfilename)"/>
-				</xsl:variable>
+				
+				<!--comment added by yeswanth.s , 18 July 2008-->
+				<!--Here for this attribute, TransFOlderName should be in seperate value-of. so 3 value-of has been used-->
 				<xsl:attribute name ="xlink:href">
-					<xsl:value-of select ="$varMediaFilePathForOdp"/>
+					<xsl:value-of select ="concat('../',$FolderNameGUID,'-')"/>
+					<xsl:value-of select="$TransFOlderName"/>
+					<xsl:value-of select="concat('/',$soundfilename)"/>
 				</xsl:attribute>
 				<!--some code here-->
-				<pzip:extract pzip:source="{concat('ppt/media/',$soundfilename)}" pzip:target="{$varDestMediaFileTargetPath}" />
+				<!--comment added by yeswanth.s , 18 July 2008-->
+				<!--Here for this 'pzip:target' attribute, TransFOlderName should be in seperate value-of. so 3 value-of has been used-->
+				<pzip:extract pzip:source="{concat('ppt/media/',$soundfilename)}">
+					<xsl:attribute name ="pzip:target">
+					<xsl:value-of select ="concat($FolderNameGUID,'-')"/>
+					<xsl:value-of select="$TransFOlderName"/>
+					<xsl:value-of select="concat('|',$extractfilename)"/>
+				</xsl:attribute>
+				</pzip:extract> 
 				<!--end-->
 				
 			</presentation:sound>			

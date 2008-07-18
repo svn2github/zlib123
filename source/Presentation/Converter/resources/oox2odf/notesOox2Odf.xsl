@@ -54,12 +54,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
   
   <xsl:template name ="tmpNotesStyle">
     <xsl:param name="slideRel"/>
-    <xsl:variable name ="DefFont">
-      <xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:fontScheme
-						/a:majorFont/a:latin/@typeface">
-        <xsl:value-of select ="."/>
-      </xsl:for-each>
-    </xsl:variable>
+    <xsl:param name="DefFont"/>
     <xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'notesSlides')]">
       <xsl:variable name ="NotesNumber">
         <xsl:value-of  select ="substring-before(substring-after(.,'../notesSlides/'),'.xml')" />
@@ -833,7 +828,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
 
                     </xsl:attribute >
                     <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle/child::node()[name()=$nodeName]">
-                      <xsl:call-template name="tmpListlevelProp"/>
+                      <xsl:call-template name="tmBulletListLevelProp"/>
                     </xsl:for-each >
                     <style:text-properties style:font-charset="x-symbol">
                       <xsl:call-template name="tmpBulletFont"/>
@@ -920,7 +915,7 @@ exclude-result-prefixes="p a r xlink rels xmlns">
                     </xsl:call-template>
                     <style:list-level-properties>
                       <xsl:for-each select ="document(concat('ppt/notesMasters/',$notesMaster))//p:notesMaster/p:notesStyle/child::node()[name()=$nodeName]">
-                        <xsl:call-template name="tmpListlevelProp"/>
+                        <xsl:call-template name="tmBulletListLevelProp"/>
                       </xsl:for-each >
                     </style:list-level-properties>
                     <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">

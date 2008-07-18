@@ -54,46 +54,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							</xsl:attribute>
 							<!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
 							<xsl:variable name="nodeTextSpan">
-								<!--<xsl:value-of select ="a:t"/>-->
-								<!--converts whitespaces sequence to text:s-->
-								<!-- 1699083 bug fix  -->
-								<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-								<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-								<xsl:choose >
-									<xsl:when test ="a:rPr[@cap!='none']">
-										<xsl:choose >
-											<xsl:when test =".=''">
-												<text:s/>
-											</xsl:when>
-											<xsl:when test ="not(contains(.,'  '))">
-												<xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-											</xsl:when>
-											<xsl:when test =". =' '">
-												<text:s/>
-											</xsl:when>
-											<xsl:otherwise >
-												<xsl:call-template name ="InsertWhiteSpaces">
-													<xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-												</xsl:call-template>
-											</xsl:otherwise>
-										</xsl:choose>
-									</xsl:when>
-								<xsl:otherwise >
-										<xsl:choose >
-											<xsl:when test =".=''">
-												<text:s/>
-											</xsl:when>
-											<xsl:when test ="not(contains(.,'  '))">
-												<xsl:value-of select ="."/>
-											</xsl:when>
-											<xsl:otherwise >
-												<xsl:call-template name ="InsertWhiteSpaces">
-													<xsl:with-param name ="string" select ="."/>
-												</xsl:call-template>
-											</xsl:otherwise >
-										</xsl:choose>
-									</xsl:otherwise>
-								</xsl:choose>
+                <xsl:call-template name="tmpTextSpanNode"/>
 							</xsl:variable>
 							<!-- Added by lohith.ar - Code for text Hyperlinks -->
 							<xsl:if test="node()/a:hlinkClick and not(node()/a:hlinkClick/a:snd) ">
@@ -271,14 +232,14 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:when test="$flageShape='True'">
                         <style:list-level-properties>
                           <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
-                            <xsl:call-template name="tmpListlevelProp"/>
+                            <xsl:call-template name="tmBulletListLevelProp"/>
 												</xsl:for-each>
                         </style:list-level-properties>
                       </xsl:when>
                       <xsl:otherwise>
                         <style:list-level-properties>
                         <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
-                          <xsl:call-template name="tmpListlevelProp"/>
+                          <xsl:call-template name="tmBulletListLevelProp"/>
                         </xsl:for-each >
                         </style:list-level-properties>
                       </xsl:otherwise>
@@ -372,12 +333,12 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:choose>
                         <xsl:when test="$flageShape='True'">
                           <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
-                            <xsl:call-template name="tmpListlevelProp"/>
+                            <xsl:call-template name="tmBulletListLevelProp"/>
                           </xsl:for-each >
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
-                            <xsl:call-template name="tmpListlevelProp"/>
+                            <xsl:call-template name="tmBulletListLevelProp"/>
                           </xsl:for-each >
                         </xsl:otherwise>
                       </xsl:choose>
@@ -522,12 +483,12 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:choose>
                         <xsl:when test="$flageShape='True'">
                           <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
-                            <xsl:call-template name="tmpListlevelProp"/>
+                            <xsl:call-template name="tmBulletListLevelProp"/>
                         </xsl:for-each>
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
-                            <xsl:call-template name="tmpListlevelProp"/>
+                            <xsl:call-template name="tmBulletListLevelProp"/>
                           </xsl:for-each >
                         </xsl:otherwise>
                       </xsl:choose>
@@ -620,12 +581,12 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:choose>
                         <xsl:when test="$flageShape='True'">
                           <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
-                            <xsl:call-template name="tmpListlevelProp"/>
+                            <xsl:call-template name="tmBulletListLevelProp"/>
                           </xsl:for-each >
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
-                            <xsl:call-template name="tmpListlevelProp"/>
+                            <xsl:call-template name="tmBulletListLevelProp"/>
                           </xsl:for-each >
                         </xsl:otherwise>
                       </xsl:choose>
@@ -849,12 +810,12 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <xsl:choose>
                       <xsl:when test="$flageShape='True'">
                         <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
-                          <xsl:call-template name="tmpListlevelProp"/>
+                          <xsl:call-template name="tmBulletListLevelProp"/>
                         </xsl:for-each >
                       </xsl:when>
                       <xsl:otherwise>
                         <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
-                          <xsl:call-template name="tmpListlevelProp"/>
+                          <xsl:call-template name="tmBulletListLevelProp"/>
                         </xsl:for-each >
                       </xsl:otherwise>
                     </xsl:choose>
@@ -949,12 +910,12 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <xsl:choose>
                       <xsl:when test="$flageShape='True'">
                         <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]">
-                          <xsl:call-template name="tmpListlevelProp"/>
+                          <xsl:call-template name="tmBulletListLevelProp"/>
                         </xsl:for-each >
                       </xsl:when>
                       <xsl:otherwise>
                         <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
-                          <xsl:call-template name="tmpListlevelProp"/>
+                          <xsl:call-template name="tmBulletListLevelProp"/>
                         </xsl:for-each>
                       </xsl:otherwise>
                     </xsl:choose>
@@ -1105,34 +1066,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
       </xsl:choose>
     </xsl:if>
      </xsl:template>
-  <xsl:template name="tmpListlevelProp">
-    <xsl:choose>
-      <xsl:when test="@indent &lt; 0">
-        <xsl:attribute name ="text:min-label-width">
-          <xsl:value-of select="concat(format-number((0 - @indent) div 360000, '#.##'), 'cm')"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="@indent">
-        <xsl:attribute name ="text:min-label-width">
-          <xsl:value-of select="concat(format-number(@indent div 360000, '#.##'), 'cm')"/>
-        </xsl:attribute>
-      </xsl:when>
-    </xsl:choose>
-    <xsl:choose>
-      <xsl:when test ="@marL and @indent">
-      <xsl:attribute name ="text:space-before">
-        <xsl:value-of select="concat(format-number( (@marL + @indent) div 360000, '#.##'), 'cm')"/>
-      </xsl:attribute>
-      </xsl:when>
-      <xsl:when test ="@marL and not(@indent)">
-        <xsl:attribute name ="text:space-before">
-          <xsl:value-of select="concat(format-number( @marL div 360000, '#.##'), 'cm')"/>
-        </xsl:attribute>
-      </xsl:when>
-    </xsl:choose>
-
-  </xsl:template>
-  <xsl:template name ="insertDefaultBulletNumberStyle">
+    <xsl:template name ="insertDefaultBulletNumberStyle">
     <xsl:param name ="listStyleName"/>
     <xsl:param name ="slideLayout" />
     <xsl:param name ="slideMaster" />
@@ -2762,9 +2696,18 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 							</xsl:if>
 						</style:list-level-properties>
 						<style:text-properties style:font-charset="x-symbol">
+							<!--code added by yeswanth.s for bug#2019519 , 17 July 2008-->
 							<xsl:attribute name="fo:font-family">
+								<xsl:choose>
+									<xsl:when test="./a:buFont/@typeface">
+										<xsl:value-of select="./a:buFont/@typeface"/>										
+								    </xsl:when>
+									<xsl:otherwise>
 								<xsl:value-of select="$textFont"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:attribute>
+							<!--end of code added by yeswanth.s-->
 							
 							<xsl:choose>
 								<xsl:when test="$buSize !=''">
@@ -3024,7 +2967,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     </xsl:variable>
     <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMaster))//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[$newTextLvl][name()=$nodeName]">
       <style:list-level-properties>
-        <xsl:call-template name="tmpListlevelProp"/>
+        <xsl:call-template name="tmBulletListLevelProp"/>
       </style:list-level-properties>
     </xsl:for-each>
   </xsl:template>
@@ -3058,7 +3001,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 								<xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/child::node()[name()=$nodeName]/@marL">
 									<xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/child::node()[name()=$nodeName]">
 										<style:list-level-properties>
-											<xsl:call-template name="tmpListlevelProp"/>
+											<xsl:call-template name="tmBulletListLevelProp"/>
 										</style:list-level-properties>
 									</xsl:for-each>
 								</xsl:when>
@@ -3194,7 +3137,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 								<xsl:when test="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/child::node()[name()=$nodeName]/@marL">
 									<xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/child::node()[name()=$nodeName]">
 										<style:list-level-properties>
-											<xsl:call-template name="tmpListlevelProp"/>
+											<xsl:call-template name="tmBulletListLevelProp"/>
 										</style:list-level-properties>
 									</xsl:for-each>
 								</xsl:when>
