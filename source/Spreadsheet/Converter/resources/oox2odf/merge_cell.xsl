@@ -1910,9 +1910,9 @@ RefNo-1 7-Nov-2007 Sandeep S     1802631   Modification done to fix columns shif
       <xsl:when test="$EndColl &gt; 1 and $GetMinColWithElement = '' and ($EndColl - 1) &gt; 0">
         <!--<table:covered-table-cell>
           <xsl:attribute name="table:number-columns-repeated">
-            <!--RefNo-1
+           RefNo-1
             <xsl:value-of select="$EndColl - $prevCellCol"/>
-            -->
+            
             <xsl:value-of select="$EndColl - 1"/>
           </xsl:attribute>
         </table:covered-table-cell>-->
