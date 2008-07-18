@@ -1137,7 +1137,8 @@
 							</v:handles>
 							<o:lock v:ext="edit" shapetype="t"/>
 						</v:shapetype>
-						<v:shape id="_x0000_s1036" type="#_x0000_t38">
+            <!-- Sona: Defect 2019239-->
+						<v:shape id="_x0000_s1036" type="#_x0000_t38" adj="10800,22173,-43579">
 							<xsl:attribute name="style">
 								<xsl:call-template name ="GetLineCoordinatesODF">
 									<xsl:with-param name="shape" select="."/>
@@ -1171,7 +1172,7 @@
 							</v:handles>
 							<o:lock v:ext="edit" shapetype="t"/>
 						</v:shapetype>
-						<v:shape id="_x0000_s1033" type="#_x0000_t34">
+						<v:shape id="_x0000_s1033" type="#_x0000_t34" adj=",-249300,-14316">
 							<xsl:attribute name="style">
 								<xsl:call-template name ="GetLineCoordinatesODF">
 									<xsl:with-param name="shape" select="."/>
