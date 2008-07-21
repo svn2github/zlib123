@@ -158,12 +158,12 @@
 
       <!-- Display name-->
       <xsl:choose>
-        <xsl:when test="@style:name='Sender' ">
+        <!--xsl:when test="@style:name='Sender' ">
           <w:name w:val="envelope return"/>
         </xsl:when>
         <xsl:when test="@style:name='Addressee' ">
           <w:name w:val="envelope address"/>
-        </xsl:when>
+        </xsl:when-->
         <xsl:when test="@style:display-name">
           <w:name w:val="{@style:display-name}"/>
         </xsl:when>
@@ -186,12 +186,12 @@
 		
       <!-- Parent style name -->
       <xsl:choose>
-        <xsl:when test="@style:parent-style-name = 'Addressee' ">
+        <!--xsl:when test="@style:parent-style-name = 'Addressee' ">
           <w:basedOn w:val="EnvelopeAddress"/>
         </xsl:when>
         <xsl:when test="@style:parent-style-name = 'Sender' ">
           <w:basedOn w:val="EnvelopeReturn"/>
-        </xsl:when>
+        </xsl:when-->
         <xsl:when test="@style:parent-style-name">
           <w:basedOn w:val="{@style:parent-style-name}"/>
         </xsl:when>
