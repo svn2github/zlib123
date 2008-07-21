@@ -999,7 +999,7 @@
         "Subject" = "8:"
         "ARPCONTACT" = "8:Sonata Software Limited"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Build: 4666"
+        "ARPCOMMENTS" = "8:Build: 4728"
         "ARPURLINFOABOUT" = "8:http://odf-converter.sourceforge.net/"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
@@ -1095,7 +1095,7 @@
                                                                     "Condition" = "8:ALLUSERS=1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 2.0 (Build 4649)"
+                                                                    "Value" = "8:Version 2.0 (Build 4728)"
                                                                     }
                                                                 }
                                                             }
@@ -1281,7 +1281,7 @@
                                                                     "Condition" = "8:ALLUSERS<>1"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Version 2.0 (Build 4649)"
+                                                                    "Value" = "8:Version 2.0 (Build 4728)"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_99733AD7B3CC4F7BB47D7E8F6DD9C9F4"
                                                                     {
