@@ -42,6 +42,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" exclude-result-prefixes="a r">
 
   <xsl:import href="cell.xsl"/>
@@ -79,7 +80,20 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         <xsl:choose>
           <!-- insert chart -->
           <xsl:when test="contains($chart, 'true')">
-            <xdr:twoCellAnchor>
+           
+           <xsl:variable name="ChartStock">
+             <xsl:choose>
+               <xsl:when test="document(concat(substring-after(draw:object/@xlink:href,'./'),'/content.xml'))/office:document-content/office:body/office:chart/chart:chart/@chart:class = 'chart:stock'">
+                 <xsl:text>true</xsl:text>
+               </xsl:when>
+               <xsl:otherwise>
+                 <xsl:text>false</xsl:text>
+               </xsl:otherwise>
+             </xsl:choose>
+           </xsl:variable>
+           
+            <xsl:if test="not($ChartStock = 'true' and (count((document(concat(substring-after(draw:object/@xlink:href,'./'),'/content.xml'))/office:document-content/office:body/office:chart/chart:chart/chart:plot-area/chart:series)) &gt; 4) )">
+           <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:graphicFrame macro="">
                 <xdr:nvGraphicFramePr>
@@ -102,6 +116,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
               </xdr:graphicFrame>
               <xdr:clientData/>
             </xdr:twoCellAnchor>
+            </xsl:if>
           </xsl:when>
 
           <!-- insert picture -->
