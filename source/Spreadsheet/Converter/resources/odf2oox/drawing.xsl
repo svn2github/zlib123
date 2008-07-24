@@ -92,6 +92,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
              </xsl:choose>
            </xsl:variable>
            
+           <!-- max 4 series in StockChart are supported in Excel -->
             <xsl:if test="not($ChartStock = 'true' and (count((document(concat(substring-after(draw:object/@xlink:href,'./'),'/content.xml'))/office:document-content/office:body/office:chart/chart:chart/chart:plot-area/chart:series)) &gt; 4) )">
            <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
