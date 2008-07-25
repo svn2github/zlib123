@@ -4217,14 +4217,22 @@ Copyright (c) 2007, Sonata Software Limited
                                 <xsl:value-of select ="'datetime1'"/>
                               </xsl:attribute>
                           <a:rPr  dirty="0" smtClean="0">
+                            
                                 <xsl:variable name ="textId">
                                   <xsl:value-of select ="./parent::node()/@text:style-name"/>
                                 </xsl:variable>
-                                <xsl:if test ="not($textId ='')">
+                            <xsl:choose>
+                              <xsl:when test ="$textId !=''">
                                   <xsl:call-template name ="tmpSMfontStyles">
                                     <xsl:with-param name ="TextStyleID" select ="$textId" />
                                   </xsl:call-template>
-                                </xsl:if>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:attribute name="lang">
+                                  <xsl:value-of select="'en-US'"/>
+                                </xsl:attribute>
+                              </xsl:otherwise>
+                            </xsl:choose>
                               </a:rPr>
                               <a:t> </a:t>
                             </a:fld>
@@ -4235,11 +4243,18 @@ Copyright (c) 2007, Sonata Software Limited
                                 <xsl:variable name ="textId">
                                   <xsl:value-of select ="@text:style-name"/>
                                 </xsl:variable>
-                                <xsl:if test ="not($textId ='')">
+                            <xsl:choose>
+                              <xsl:when test ="$textId !=''">
                                   <xsl:call-template name ="tmpSMfontStyles">
                                     <xsl:with-param name ="TextStyleID" select ="$textId" />
                                   </xsl:call-template>
-                                </xsl:if>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:attribute name="lang">
+                                  <xsl:value-of select="'en-US'"/>
+                                </xsl:attribute>
+                              </xsl:otherwise>
+                            </xsl:choose>
                               </a:rPr>
                               <a:t>
                                 <xsl:call-template name ="insertTab" />
@@ -4260,11 +4275,18 @@ Copyright (c) 2007, Sonata Software Limited
                             <xsl:variable name ="textId">
                               <xsl:value-of select ="./parent::node()/@text:style-name"/>
                             </xsl:variable>
-                            <xsl:if test ="not($textId ='')">
+                        <xsl:choose>
+                          <xsl:when test ="$textId !=''">
                               <xsl:call-template name ="tmpSMfontStyles">
                                 <xsl:with-param name ="TextStyleID" select ="$textId" />
                               </xsl:call-template>
-                            </xsl:if>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:attribute name="lang">
+                              <xsl:value-of select="'en-US'"/>
+                            </xsl:attribute>
+                          </xsl:otherwise>
+                        </xsl:choose>
                           </a:rPr>
                           <a:t> </a:t>
                         </a:fld>
@@ -4275,11 +4297,18 @@ Copyright (c) 2007, Sonata Software Limited
                         <xsl:variable name ="textId">
                           <xsl:value-of select ="@text:style-name"/>
                         </xsl:variable>
-                        <xsl:if test ="not($textId ='')">
+                        <xsl:choose>
+                          <xsl:when test ="$textId !=''">
                           <xsl:call-template name ="tmpSMfontStyles">
                             <xsl:with-param name ="TextStyleID" select ="$textId" />
                           </xsl:call-template>
-                        </xsl:if>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:attribute name="lang">
+                              <xsl:value-of select="'en-US'"/>
+                            </xsl:attribute>
+                          </xsl:otherwise>
+                        </xsl:choose>
                       </a:rPr>
                       <a:t>
                         <xsl:call-template name ="insertTab" />

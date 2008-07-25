@@ -1241,6 +1241,7 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:param name ="fontscale"/>
     <xsl:param name="index"/>
     <xsl:param name="SMName"/>
+    <xsl:param name="DefFontMinor"/>
 	<xsl:message terminate="no">progress:p:cSld</xsl:message>
 
     <xsl:if test ="@lang">
@@ -1254,6 +1255,7 @@ exclude-result-prefixes="p a r xlink ">
             </xsl:if>
     <xsl:call-template name="tmpFontName">
       <xsl:with-param name="DefFont" select="$DefFont"/>
+      <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
     </xsl:call-template>
 	  <!-- strike style:text-line-through-style-->
     <xsl:if test ="@strike">
@@ -1524,17 +1526,30 @@ exclude-result-prefixes="p a r xlink ">
   </xsl:template>
   <xsl:template name="tmpFontName">
     <xsl:param name="DefFont"/>
+    <xsl:param name="DefFontMinor"/>
     <xsl:choose>
       <xsl:when test ="a:latin/@typeface">
         <xsl:attribute name ="fo:font-family">
           <xsl:variable name ="typeFaceVal" select ="a:latin/@typeface"/>
           <xsl:for-each select ="a:latin/@typeface">
-            <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+            <xsl:choose>
+              <xsl:when test="$typeFaceVal='+mn-lt'">
+                <xsl:choose>
+                  <xsl:when test="$DefFontMinor!=''">
+                    <xsl:value-of  select ="$DefFontMinor"/>
+                  </xsl:when>
+                  <xsl:otherwise>
               <xsl:value-of  select ="$DefFont"/>
-            </xsl:if>
-            <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:when test="$typeFaceVal='+mj-lt'">
+                <xsl:value-of  select ="$DefFont"/>
+              </xsl:when>
+              <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
               <xsl:value-of select ="."/>
-            </xsl:if>
+              </xsl:when>
+            </xsl:choose>
           </xsl:for-each>
         </xsl:attribute>
       </xsl:when>
@@ -1542,30 +1557,64 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:attribute name ="fo:font-family">
           <xsl:variable name ="typeFaceVal" select ="a:ea/@typeface"/>
           <xsl:for-each select ="a:rPr/a:ea/@typeface">
-            <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+            <xsl:choose>
+              <xsl:when test="$typeFaceVal='+mn-ea'">
+                <xsl:choose>
+                  <xsl:when test="$DefFontMinor!=''">
+                    <xsl:value-of  select ="$DefFontMinor"/>
+                  </xsl:when>
+                  <xsl:otherwise>
               <xsl:value-of  select ="$DefFont"/>
-            </xsl:if>
-            <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:when test="$typeFaceVal='+mj-ea'">
+                <xsl:value-of  select ="$DefFont"/>
+              </xsl:when>
+              <xsl:when test="not($typeFaceVal='+mn-ea' or $typeFaceVal='+mj-ea')">
               <xsl:value-of select ="."/>
-            </xsl:if>
+              </xsl:when>
+            </xsl:choose>
           </xsl:for-each>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/@idx">
+      <xsl:when test ="parent::node()/parent::node()/parent::node()/parent::node()/p:style/a:fontRef/@idx">
+        <xsl:choose>
+          <xsl:when test="parent::node()/parent::node()/parent::node()/parent::node()/p:style/a:fontRef[@idx='major']">
         <xsl:attribute name ="fo:font-family">
           <xsl:value-of select="$DefFont"/>
         </xsl:attribute>
+      </xsl:when>
+          <xsl:when test="parent::node()/parent::node()/parent::node()/parent::node()/p:style/a:fontRef[@idx='minor']">
+            <xsl:attribute name ="fo:font-family">
+              <xsl:value-of select="$DefFontMinor"/>
+            </xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+       
       </xsl:when>
       <xsl:when test ="a:sym/@typeface and @lang!='en-US'">
         <xsl:attribute name ="fo:font-family">
           <xsl:variable name ="typeFaceVal" select ="a:sym/@typeface"/>
           <xsl:for-each select ="a:sym/@typeface">
-            <xsl:if test ="$typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym'">
+            <xsl:choose>
+              <xsl:when test="$typeFaceVal='+mn-sym'">
+                <xsl:choose>
+                  <xsl:when test="$DefFontMinor!=''">
+                    <xsl:value-of  select ="$DefFontMinor"/>
+                  </xsl:when>
+                  <xsl:otherwise>
               <xsl:value-of  select ="$DefFont"/>
-            </xsl:if>
-            <xsl:if test ="not($typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym')">
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:when test="$typeFaceVal='+mj-sym'">
+                <xsl:value-of  select ="$DefFont"/>
+              </xsl:when>
+              <xsl:when test="not($typeFaceVal='+mn-sym' or $typeFaceVal='+mj-sym')">
               <xsl:value-of select ="."/>
-            </xsl:if>
+              </xsl:when>
+            </xsl:choose>
           </xsl:for-each>
         </xsl:attribute >
       </xsl:when>
@@ -1573,12 +1622,24 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:attribute name ="fo:font-family">
           <xsl:variable name ="typeFaceVal" select ="a:cs/@typeface"/>
           <xsl:for-each select ="a:rPr/a:cs/@typeface">
-            <xsl:if test ="$typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs'">
+            <xsl:choose>
+              <xsl:when test="$typeFaceVal='+mn-cs'">
+                <xsl:choose>
+                  <xsl:when test="$DefFontMinor!=''">
+                    <xsl:value-of  select ="$DefFontMinor"/>
+                  </xsl:when>
+                  <xsl:otherwise>
               <xsl:value-of  select ="$DefFont"/>
-            </xsl:if>
-            <xsl:if test ="not($typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs')">
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:when test="$typeFaceVal='+mj-cs'">
+                <xsl:value-of  select ="$DefFont"/>
+              </xsl:when>
+              <xsl:when test="not($typeFaceVal='+mn-cs' or $typeFaceVal='+mj-cs')">
               <xsl:value-of select ="."/>
-            </xsl:if>
+              </xsl:when>
+            </xsl:choose>
           </xsl:for-each>
         </xsl:attribute >
       </xsl:when>
@@ -2486,6 +2547,7 @@ exclude-result-prefixes="p a r xlink ">
     <xsl:param name="TypeId"/>
     <xsl:param name="SMName"/>
     <xsl:param name="DefFont"/>
+    <xsl:param name="DefFontMinor"/>
     <xsl:param name="flagTextBox"/>
     
     <xsl:variable name ="slideRel" select ="concat('ppt/slides/_rels/',$TypeId,'.xml.rels')"/>
@@ -2632,6 +2694,7 @@ exclude-result-prefixes="p a r xlink ">
                 <xsl:for-each select ="a:rPr">
                 <xsl:call-template name="tmpSlideTextProperty">
                   <xsl:with-param name="DefFont" select="$DefFont"/>
+                  <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
                   <xsl:with-param name="fontscale" select="$var_fontScale"/>
                   <xsl:with-param name="SMName" select="$SMName"/>
                 </xsl:call-template>
@@ -2639,6 +2702,7 @@ exclude-result-prefixes="p a r xlink ">
                 <!-- added by vipul to get text propreties from Presentation.xml-->
                 <xsl:call-template name="tmpPresentationDefaultTextProp">
                   <xsl:with-param name="DefFont" select="$DefFont"/>
+                  <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
                   <xsl:with-param name="level" select="$levelForDefFont+1"/>
                   <xsl:with-param name="fontscale" select="$var_fontScale"/>
                   <xsl:with-param name="SMName" select="$SMName"/>
@@ -2658,6 +2722,7 @@ exclude-result-prefixes="p a r xlink ">
                 <xsl:for-each select ="a:rPr">
                 <xsl:call-template name="tmpSlideTextProperty">
                   <xsl:with-param name="DefFont" select="$DefFont"/>
+                  <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
                   <xsl:with-param name="fontscale" select="$var_fontScale"/>
                   <xsl:with-param name="SMName" select="$SMName"/>
                 </xsl:call-template>
@@ -2665,6 +2730,7 @@ exclude-result-prefixes="p a r xlink ">
                 <!-- added by vipul to get text propreties from Presentation.xml-->
                 <xsl:call-template name="tmpPresentationDefaultTextProp">
                   <xsl:with-param name="DefFont" select="$DefFont"/>
+                  <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
                   <xsl:with-param name="level" select="$levelForDefFont+1"/>
                   <xsl:with-param name="fontscale" select="$var_fontScale"/>
                   <xsl:with-param name="SMName" select="$SMName"/>
@@ -3382,6 +3448,7 @@ exclude-result-prefixes="p a r xlink ">
   <xsl:template name ="tmpPresentationDefaultTextProp">
     <xsl:param name="level"/>
     <xsl:param name="DefFont"/>
+    <xsl:param name="DefFontMinor"/>
     <xsl:param name="SMName"/>
     <xsl:param name="flagTextBox"/>
     <xsl:message terminate="no">progress:p:cSld</xsl:message>
@@ -3402,24 +3469,7 @@ exclude-result-prefixes="p a r xlink ">
           </xsl:attribute>
         </xsl:for-each>
       </xsl:if>
-  <!--<xsl:if test ="not(a:rPr/a:latin/@typeface ) and not(parent::node()/parent::node()/parent::node()/p:style/a:fontRef/@idx)">
-      <xsl:if test="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface">
-        <xsl:attribute name ="fo:font-family">
-          <xsl:variable name ="typeFaceVal" select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface"/>
-          <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface">
-            <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
-              <xsl:value-of  select ="$DefFont"/>
-            </xsl:if>
-            <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
-              <xsl:value-of select ="."/>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:attribute>
-      </xsl:if>
-     
-     
-    </xsl:if>-->
-    <xsl:if test ="not(a:rPr/@strike)">
+      <xsl:if test ="not(a:rPr/@strike)">
       <xsl:for-each select="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr[@strike!='noStrike']">
               <xsl:attribute name ="style:text-line-through-style">
                 <xsl:value-of select ="'solid'"/>
@@ -3506,9 +3556,9 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:if>
     </xsl:if>
     <xsl:choose>
-      <xsl:when test ="a:rPr/a:ea/@typeface and a:rPr/@lang!='en-US'"/>
       <xsl:when test ="a:rPr/a:latin/@typeface"/>
-      <xsl:when test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/@idx"/>
+      <xsl:when test ="a:rPr/a:ea/@typeface and a:rPr/@lang!='en-US'"/>
+      <xsl:when test ="parent::node()/parent::node()/parent::node()/parent::node()/p:style/a:fontRef/@idx"/>
       <xsl:when test ="a:rPr/a:sym/@typeface and a:rPr/@lang!='en-US'"/>
       <xsl:when test ="a:rPr/a:cs/@typeface and a:rPr/@lang!='en-US'"/>
       <xsl:otherwise>
@@ -3516,16 +3566,29 @@ exclude-result-prefixes="p a r xlink ">
           <xsl:attribute name ="fo:font-family">
             <xsl:variable name ="typeFaceVal" select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface"/>
             <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:defaultTextStyle/child::node()[name()=$nodeName]/a:defRPr/a:latin/@typeface">
-              <xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+                <xsl:choose>
+                  <xsl:when test="$typeFaceVal='+mn-lt'">
+                    <xsl:choose>
+                      <xsl:when test="$DefFontMinor!=''">
+                        <xsl:value-of  select ="$DefFontMinor"/>
+                      </xsl:when>
+                      <xsl:otherwise>
                 <xsl:value-of  select ="$DefFont"/>
-              </xsl:if>
-              <xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:when>
+                  <xsl:when test="$typeFaceVal='+mj-lt'">
+                    <xsl:value-of  select ="$DefFont"/>
+                  </xsl:when>
+                  <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
                 <xsl:value-of select ="."/>
-              </xsl:if>
+                  </xsl:when>
+                </xsl:choose>
             </xsl:for-each>
           </xsl:attribute>
         </xsl:if>
       </xsl:otherwise>
+    
     </xsl:choose>
     <xsl:if test ="not(a:rPr/a:solidFill/a:srgbClr/@val )
                    and not(a:rPr/a:solidFill/a:schemeClr/@val)

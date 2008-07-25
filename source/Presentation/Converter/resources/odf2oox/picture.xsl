@@ -399,6 +399,8 @@ Copyright (c) 2007, Sonata Software Limited
     <xsl:param name ="FileName" />
     <xsl:param name ="imageName" />
     <xsl:param name ="fillType" />
+    <xsl:param name ="opacity" />
+    
     <xsl:variable name ="imageSerialNo">
       <xsl:choose>
         <xsl:when test="$fillType='shape'">
@@ -429,10 +431,18 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:attribute name ="r:embed">
         <xsl:value-of select ="$imageSerialNo"/>
       </xsl:attribute>
+      <xsl:if test="$opacity!=''">
+        <a:alphaModFix >
+          <xsl:attribute name="amt">
+            <xsl:value-of select="$opacity * 1000 "/>
+          </xsl:attribute>
+        </a:alphaModFix>
+      </xsl:if>
       <!--Added by sanjay for fixing the Defect 1877163-->
       <xsl:call-template name="LuminanceContrast">
         <xsl:with-param name="parentGrStyle" select="parent::node()/@draw:style-name"/>
       </xsl:call-template>
+      
       <!--End of 1877163-->
     </a:blip >
   </xsl:template>

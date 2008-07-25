@@ -1302,14 +1302,14 @@ Copyright (c) 2007, Sonata Software Limited
 
     <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$SMName]/draw:frame[@presentation:class='footer']">
       <xsl:variable name="footerValue">
-        <xsl:for-each select ="draw:text-box/text:p">
-          <xsl:if test="./text:span/presentation:footer or ./presentation:footer">
+        <xsl:choose>
+          <xsl:when test="draw:text-box/text:p//presentation:footer">
             <xsl:value-of select="'false'"/>
-          </xsl:if>
-          <xsl:if test="not(text:span/presentation:footer) or not(./presentation:footer)">
+          </xsl:when>
+          <xsl:otherwise>
             <xsl:value-of select="'true'"/>
-          </xsl:if>
-        </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
       <xsl:if test="$footerValue='true' or document('content.xml')//presentation:footer-decl[@presentation:name=$footerId] ">
         <p:sp>
@@ -1336,9 +1336,8 @@ Copyright (c) 2007, Sonata Software Limited
             <a:p>
               <xsl:if test ="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$SMName]/draw:frame[@presentation:class='footer']">
                 <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$SMName]/draw:frame[@presentation:class='footer']">
-
                   <xsl:choose>
-                    <xsl:when test="document('content.xml') //presentation:footer-decl[@presentation:name=$footerId] and contains($footerValue,'false')">
+                    <xsl:when test="document('content.xml') //presentation:footer-decl[@presentation:name=$footerId]">
                       <a:r>
                         <a:rPr dirty="0" smtClean="0"/>
                         <a:t>
@@ -1533,7 +1532,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:choose>
                   <xsl:when test="@presentation:source='current-date'" >
                     <xsl:choose>
-                      <xsl:when test="document('styles.xml')//style:master-page[@style:name=$SMName]/draw:frame[@presentation:class='date-time']/draw:text-box/text:p/text:span/presentation:date-time">
+                      <xsl:when test="document('styles.xml')//style:master-page[@style:name=$SMName]/draw:frame[@presentation:class='date-time']/draw:text-box/text:p//presentation:date-time">
                     <a:fld >
                       <xsl:attribute name ="id">
                         <xsl:value-of select ="'{86419996-E19B-43D7-A4AA-D671C2F15715}'"/>
@@ -1575,7 +1574,7 @@ Copyright (c) 2007, Sonata Software Limited
                           </xsl:otherwise>
                         </xsl:choose>
                       </xsl:attribute>
-                      <a:rPr smtClean="0" />
+                      <a:rPr smtClean="0" lang="en-US"/>
                       <a:t>
                         <xsl:value-of select ="."/>
                       </a:t>
@@ -1597,11 +1596,18 @@ Copyright (c) 2007, Sonata Software Limited
                                               <xsl:variable name ="textId">
                                                 <xsl:value-of select ="@text:style-name"/>
                                               </xsl:variable>
-                                              <xsl:if test ="not($textId ='')">
+                                              <xsl:choose>
+                                                <xsl:when test ="$textId !=''">
                                                 <xsl:call-template name ="tmpSMfontStyles">
                                                   <xsl:with-param name ="TextStyleID" select ="$textId" />
                                                 </xsl:call-template>
-                                              </xsl:if>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                  <xsl:attribute name="lang">
+                                                    <xsl:value-of select="'en-US'"/>
+                                                  </xsl:attribute>
+                                                </xsl:otherwise>
+                                              </xsl:choose>
                                             </a:rPr>
                                             <a:t>
                                               <xsl:call-template name ="insertTab" />
@@ -1616,11 +1622,19 @@ Copyright (c) 2007, Sonata Software Limited
                                           <xsl:variable name ="textId">
                                             <xsl:value-of select ="@text:style-name"/>
                                           </xsl:variable>
-                                          <xsl:if test ="not($textId ='')">
+                                          <xsl:choose>
+                                            <xsl:when test ="$textId !=''">
                                             <xsl:call-template name ="tmpSMfontStyles">
                                               <xsl:with-param name ="TextStyleID" select ="$textId" />
                                             </xsl:call-template>
-                                          </xsl:if>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                              <xsl:attribute name="lang">
+                                                <xsl:value-of select="'en-US'"/>
+                                              </xsl:attribute>
+                                            </xsl:otherwise>
+                                          </xsl:choose>
+                                      
                                         </a:rPr>
                                         <a:t>
                                           <xsl:call-template name ="insertTab" />

@@ -30,6 +30,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
   xmlns:odf="urn:odf"
+  xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"  
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -1279,6 +1280,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:call-template name="tmpBitmapFill">
             <xsl:with-param name="FileName" select="concat('bitmap',$var_pos)" />
             <xsl:with-param name="var_imageName" select="style:graphic-properties/@draw:fill-image-name" />
+            <xsl:with-param  name="opacity" select="substring-before(style:graphic-properties/@draw:opacity,'%')"/>
         </xsl:call-template>
         </xsl:when>
           <xsl:when test ="not(style:graphic-properties/@draw:fill) and $parentStyle!=''">
@@ -1301,6 +1303,7 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name="tmpBitmapFill">
     <xsl:param name="var_imageName"/>
     <xsl:param name="FileName"/>
+    <xsl:param name="opacity"/>
    
     <xsl:if test="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name=$var_imageName]">
       <a:blipFill dpi="0" rotWithShape="1">
@@ -1308,7 +1311,9 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="FileName" select="$FileName" />
           <xsl:with-param name="imageName" select="$var_imageName" />
           <xsl:with-param name="fillType" select="'shape'" />
+          <xsl:with-param name="opacity" select="$opacity" />
         </xsl:call-template>
+        
         <xsl:if test="@style:repeat='stretch'">
           <a:stretch>
             <a:fillRect />
@@ -2324,7 +2329,14 @@ Copyright (c) 2007, Sonata Software Limited
                               <xsl:with-param name="length" select="./parent::node()/parent::node()/@fo:margin-left"/>
                             </xsl:call-template>
                           </xsl:variable>
+                          <xsl:choose>
+                            <xsl:when test="$MarL!=''">
                           <xsl:value-of select=" $Tabposition + $MarL"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                              <xsl:value-of select=" $Tabposition"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:value-of select ="@style:position"/>
@@ -2738,6 +2750,18 @@ Copyright (c) 2007, Sonata Software Limited
 
     <xsl:for-each  select ="document('styles.xml')//style:style[@style:name =$TextStyleID ]">
       <xsl:if test="position()=1">
+        <xsl:choose>
+          <xsl:when test="style:text-properties/@style:language-asian and style:text-properties/@style:country-asian">
+            <xsl:attribute name ="lang">
+              <xsl:value-of select="concat(style:text-properties/@style:language-asian,'-',style:text-properties/@style:country-asian)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name ="lang">
+              <xsl:value-of select="'en-US'"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
       <xsl:message terminate="no">progress:text:p</xsl:message>
       <!-- Added by lohith :substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0  because sz(font size) shouldnt be zero - 16filesbug-->
       <xsl:if test="style:text-properties/@fo:font-size and substring-before(style:text-properties/@fo:font-size,'pt')&gt; 0 ">
@@ -5210,6 +5234,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name="tmpBitmapFill">
           <xsl:with-param name="FileName" select="concat('bitmap',$shapeCount)" />
           <xsl:with-param name="var_imageName" select="@draw:fill-image-name"/>
+          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
               </xsl:call-template>
             </xsl:when>
       <xsl:when test="(@draw:fill='bitmap') and $grpFlag='true'">
@@ -5217,6 +5242,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="FileName" select="concat('grpbitmap',$UniqueId)" />
           <xsl:with-param name="var_imageName" select="@draw:fill-image-name" />
           <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -5707,7 +5733,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:for-each>
             <a:graphic>
               <a:graphicData uri="http://schemas.openxmlformats.org/presentationml/2006/ole">
-                <p:oleObj   imgW="2790476" imgH="533474">
+                <p:oleObj showAsIcon="1" imgW="2790476" imgH="533474">
                   <xsl:attribute name="spid">
                                     <xsl:value-of select="concat('_x0000_s', $pageNo * 1024 + $shapeCount)"/>
                                   </xsl:attribute>
@@ -5794,14 +5820,54 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:if test="./parent::node()/draw:image/@xlink:href">
             <xsl:choose>
               <xsl:when test="starts-with(./parent::node()/draw:image/@xlink:href,'./')">
+                <xsl:variable name="olePictureType">
+                  <xsl:call-template name="GetOLEPictureType">
+                    <xsl:with-param name="olePicture" select="substring-after(./parent::node()/draw:image/@xlink:href,'./')" />
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="$olePictureType='GDIMetaFile'">
+                    <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#"
+                 pzip:target="{concat('ppt/media/','oleObjectImage_',generate-id(),'.png')}"/>
+                  </xsl:when>
+                  <xsl:otherwise>
                 <pzip:copy   pzip:source="{substring-after(./parent::node()/draw:image/@xlink:href,'./')}"
                    pzip:target="{concat('ppt/media/','oleObjectImage_',generate-id(),'.png')}" />
+                  </xsl:otherwise>
+                </xsl:choose>
+
               </xsl:when>
             </xsl:choose>
           </xsl:if>
           </xsl:if>
         </xsl:for-each>
         
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="GetOLEPictureType">
+    <xsl:param name="olePicture" />
+    <xsl:variable name="allManifestEntries" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry" />
+    <xsl:variable name="type" select="$allManifestEntries[@manifest:full-path=$olePicture]/@manifest:media-type" />
+
+    <xsl:choose>
+      <xsl:when test="contains($type,'application/x-openoffice-gdimetafile')">
+        <xsl:text>GDIMetaFile</xsl:text>
+      </xsl:when>
+      <!-- picture is a WMF -->
+      <xsl:when test="$type='application/x-openoffice-wmf;windows_formatname=&quot;Image WMF&quot;'">
+        <xsl:text>wmf</xsl:text>
+      </xsl:when>
+      <!-- picture is a PNG -->
+      <xsl:when test="$type='image/png'">
+        <xsl:text>png</xsl:text>
+      </xsl:when>
+      <!-- picture is a JPG -->
+      <xsl:when test="$type='image/jpeg'">
+        <xsl:text>jpeg</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>png</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

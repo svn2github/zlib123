@@ -132,7 +132,7 @@ exclude-result-prefixes="p a r xlink rels">
         </xsl:for-each>
       </xsl:variable>
       <xsl:variable name="var_Themefile">
-        <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$SMName,'.rels'))//node()/@Target[contains(.,'slideLayouts')]">
+        <xsl:for-each select="document(concat('ppt/slideMasters/_rels/',$SMName,'.rels'))//node()/@Target[contains(.,'theme')]">
           <xsl:value-of select="concat('ppt',substring-after(.,'..'))"/>
         </xsl:for-each>
       </xsl:variable>
@@ -929,7 +929,46 @@ exclude-result-prefixes="p a r xlink rels">
                                           </xsl:attribute>
                                           <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
                                           <xsl:variable name="nodeTextSpan">
-                                          <xsl:call-template name="tmpTextSpanNode"/>
+                                            <!--<xsl:value-of select ="a:t"/>-->
+                                            <!--converts whitespaces sequence to text:s-->
+                                            <!-- 1699083 bug fix  -->
+                                            <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                                            <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                                            <xsl:choose >
+                                              <xsl:when test ="a:rPr[@cap!='none'] or ($layoutCap !='none' and $layoutCap!='')">
+                                                <xsl:choose >
+                                                  <xsl:when test =".=''">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:when test ="not(contains(.,'  '))">
+                                                    <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                                                  </xsl:when>
+                                                  <xsl:when test =". =' '">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:otherwise >
+                                                    <xsl:call-template name ="InsertWhiteSpaces">
+                                                      <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                                    </xsl:call-template>
+                                                  </xsl:otherwise>
+                                                </xsl:choose>
+                                              </xsl:when>
+                                              <xsl:otherwise >
+                                                <xsl:choose >
+                                                  <xsl:when test =".=''">
+                                                    <text:s/>
+                                                  </xsl:when>
+                                                  <xsl:when test ="not(contains(.,'  '))">
+                                                    <xsl:value-of select ="."/>
+                                                  </xsl:when>
+                                                  <xsl:otherwise >
+                                                    <xsl:call-template name ="InsertWhiteSpaces">
+                                                      <xsl:with-param name ="string" select ="."/>
+                                                    </xsl:call-template>
+                                                  </xsl:otherwise >
+                                                </xsl:choose>
+                                              </xsl:otherwise>
+                                            </xsl:choose>
                                           </xsl:variable>
                                           <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                           <xsl:if test="node()/a:hlinkClick">
@@ -1054,7 +1093,46 @@ exclude-result-prefixes="p a r xlink rels">
                                     </xsl:attribute>
                                     <!-- varibale 'nodeTextSpan' added by lohith.ar - need to have the text inside <text:a> tag if assigned with hyperlinks -->
                                     <xsl:variable name="nodeTextSpan">
-                                        <xsl:call-template name="tmpTextSpanNode"/>
+                                      <!--<xsl:value-of select ="a:t"/>-->
+                                      <!--converts whitespaces sequence to text:s-->
+                                      <!-- 1699083 bug fix  -->
+                                      <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                                      <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                                      <xsl:choose >
+                                        <xsl:when test ="a:rPr[@cap!='none'] or ($layoutCap !='none' and $layoutCap!='')">
+                                          <xsl:choose >
+                                            <xsl:when test =".=''">
+                                              <text:s/>
+                                            </xsl:when>
+                                            <xsl:when test ="not(contains(.,'  '))">
+                                              <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                                            </xsl:when>
+                                            <xsl:when test =". =' '">
+                                              <text:s/>
+                                            </xsl:when>
+                                            <xsl:otherwise >
+                                              <xsl:call-template name ="InsertWhiteSpaces">
+                                                <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                              </xsl:call-template>
+                                            </xsl:otherwise>
+                                          </xsl:choose>
+                                        </xsl:when>
+                                        <xsl:otherwise >
+                                          <xsl:choose >
+                                            <xsl:when test =".=''">
+                                              <text:s/>
+                                            </xsl:when>
+                                            <xsl:when test ="not(contains(.,'  '))">
+                                              <xsl:value-of select ="."/>
+                                            </xsl:when>
+                                            <xsl:otherwise >
+                                              <xsl:call-template name ="InsertWhiteSpaces">
+                                                <xsl:with-param name ="string" select ="."/>
+                                              </xsl:call-template>
+                                            </xsl:otherwise >
+                                          </xsl:choose>
+                                        </xsl:otherwise>
+                                      </xsl:choose>
                                     </xsl:variable>
                                     <!-- Added by lohith.ar - Code for text Hyperlinks -->
                                     <xsl:if test="node()/a:hlinkClick">
@@ -2055,6 +2133,11 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:value-of select ="."/>
         </xsl:for-each>
       </xsl:variable>
+      <xsl:variable name ="DefFontMinor">
+        <xsl:for-each select ="document($ThemeName)/a:theme/a:themeElements/a:fontScheme/a:minorFont/a:latin/@typeface">
+          <xsl:value-of select ="."/>
+        </xsl:for-each>
+      </xsl:variable>
          <xsl:call-template name="tmpNotesStyle">
            <xsl:with-param name="slideRel" select="$slideRel"/>
            <xsl:with-param name="DefFont" select="$DefFont"/>
@@ -2139,6 +2222,7 @@ exclude-result-prefixes="p a r xlink rels">
                     <xsl:with-param name="ParaId" select="$ParaId"/>
                     <xsl:with-param name="TypeId" select="$SlideNumber"/>
                     <xsl:with-param name="DefFont" select="$DefFont"/>
+                    <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
                     <xsl:with-param name="SMName" select="$SMName"/>
                   </xsl:call-template>
                 </xsl:when>
@@ -2751,6 +2835,9 @@ exclude-result-prefixes="p a r xlink rels">
                        <xsl:with-param name="TypeId" select="concat('SL',$SlidePos)"/>
                        <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
                        <xsl:with-param name="SMName" select="$SMName"/>
+                       <xsl:with-param name="DefFont" select="$DefFont"/>
+                        <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
+                       
                                           </xsl:call-template>
                    </xsl:if>
                  </xsl:for-each>
@@ -2810,6 +2897,7 @@ exclude-result-prefixes="p a r xlink rels">
                   <xsl:with-param name="var_pos" select="$var_pos"/>
                      <xsl:with-param name="SlidePos" select="concat('SL',$SlidePos)"/>
                   <xsl:with-param name="DefFont" select="$DefFont"/>
+                  <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
                   <xsl:with-param name="SMName" select="$SMName"/>
                   <xsl:with-param name="flagGroup" select="'True'"/>
                   <xsl:with-param name="SlideId" select="$SlideId"/>
@@ -2830,6 +2918,7 @@ exclude-result-prefixes="p a r xlink rels">
     <xsl:param name="SlideNumber"/>
     <xsl:param name="SMName"/>
     <xsl:param name="DefFont"/>
+    <xsl:param name="DefFontMinor"/>
     <xsl:param name="var_pos"/>
     <xsl:param name="slideRel"/>
               <xsl:for-each select="node()">
@@ -2919,6 +3008,7 @@ exclude-result-prefixes="p a r xlink rels">
                       <xsl:with-param name="flagTextBox" select="$flagTextBox"/>
                       <xsl:with-param name="SMName" select="$SMName"/>
                       <xsl:with-param name="DefFont" select="$DefFont"/>
+                      <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
                     </xsl:call-template>
                   </xsl:if>
                 </xsl:when>
@@ -2978,6 +3068,7 @@ exclude-result-prefixes="p a r xlink rels">
           <xsl:call-template name="tmpSlideGroupStyle">
             <xsl:with-param name="SlidePos" select="$SlidePos"/>
             <xsl:with-param name="DefFont" select="$DefFont"/>
+            <xsl:with-param name="DefFontMinor" select="$DefFontMinor"/>
             <xsl:with-param name="SMName" select="$SMName"/>
             <xsl:with-param name="flagGroup" select="'True'"/>
             <xsl:with-param name="SlideId" select="$SlideId"/>
@@ -4766,11 +4857,29 @@ exclude-result-prefixes="p a r xlink rels">
               </xsl:attribute>
             </xsl:if>
         <xsl:if test ="not(a:lstStyle/child::node()[name()=$nodeName]/@indent)">
+          <xsl:choose>
+            <xsl:when test="$spType='title'">
+              <xsl:for-each select ="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:titleStyle/child::node()[name()=$nodeName]">
+                <xsl:choose>
+                  <xsl:when test="@indent">
+                    <xsl:attribute name ="fo:text-indent">
+                      <xsl:value-of select="concat(format-number(@indent div 360000, '#.##'), 'cm')"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name ="fo:text-indent">
+                      <xsl:value-of select="'0cm'"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
           <xsl:for-each select ="document(concat('ppt/slideMasters/',$SMName))//p:txStyles/p:bodyStyle/child::node()[name()=$nodeName]">
 			  <xsl:choose>
 				  <xsl:when test="@indent">
                   <xsl:attribute name ="fo:text-indent">
-                    <xsl:value-of select="concat(format-number(. div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number(@indent div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
 				  </xsl:when>
 				  <xsl:otherwise>
@@ -4780,6 +4889,9 @@ exclude-result-prefixes="p a r xlink rels">
 				  </xsl:otherwise>
 			  </xsl:choose>
               </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        
             </xsl:if>
           </xsl:when>
           <xsl:when test="$AttrType='lineSpacing'">

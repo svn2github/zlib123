@@ -2200,6 +2200,7 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:call-template name="tmpBitmapFill">
           <xsl:with-param name="FileName" select="concat('bitmap',$shapeCount)" />
           <xsl:with-param name="var_imageName" select="@draw:fill-image-name" />
+          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -2208,6 +2209,7 @@ Copyright (c) 2007, Sonata Software Limited
           <xsl:with-param name="FileName" select="concat('grpbitmap',$UniqueId)" />
           <xsl:with-param name="var_imageName" select="@draw:fill-image-name" />
           <xsl:with-param name ="UniqueId" select ="$UniqueId" />
+          <xsl:with-param  name="opacity" select="substring-before(@draw:opacity,'%')"/>
         </xsl:call-template>
       </xsl:when>
       
