@@ -4409,7 +4409,7 @@
 
         <!-- in list -->
 
-        <xsl:message terminate="no">translation.oox2odf.lists.indentation.directFormatting</xsl:message>
+        <!--<xsl:message terminate="no">translation.oox2odf.lists.indentation.directFormatting</xsl:message>-->
 
         <xsl:attribute name="fo:margin-left">0cm</xsl:attribute>
 
