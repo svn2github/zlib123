@@ -50,7 +50,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
       
         protected bool isDirectTransform = true;
-        protected ArrayList skipedPostProcessors = null;
+        protected ArrayList skippedPostProcessors = null;
         protected string externalResource = null;
         protected bool packaging = true;
         protected Assembly resourcesAssembly;
@@ -70,7 +70,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected AbstractConverter(Assembly resourcesAssembly)
         {
             this.resourcesAssembly = resourcesAssembly;
-            this.skipedPostProcessors = new ArrayList();
+            this.skippedPostProcessors = new ArrayList();
             this.compiledProcessors = new Hashtable();
         }
 
@@ -80,9 +80,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             get { return this.isDirectTransform; }
         }
 
-        public ArrayList SkipedPostProcessors
+        public ArrayList SkippedPostProcessors
         {
-            set { this.skipedPostProcessors = value; }
+            set { this.skippedPostProcessors = value; }
         }
 
         public string ExternalResources
@@ -174,13 +174,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             if (!this.compiledProcessors.Contains(xslLocation))
             {
-                // create a xsl transformer
+                // create an XSL transformer
 
-                // JP - 03/07/2007
                 // Activation of XSL Debugging only in "DEBUG" compilation mode
-
 #if DEBUG
-        XslCompiledTransform xslt = new XslCompiledTransform(true);
+                XslCompiledTransform xslt = new XslCompiledTransform(true);
 #else
                 XslCompiledTransform xslt = new XslCompiledTransform();
 #endif
@@ -196,7 +194,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     Type compiledStylesheet = this.LoadPrecompiledXslt();
 
                     // check if optimization of precompiled XSLT works on current 
-                    // .Net Framework installation and with current conversion direction
+                    // .NET Framework installation and with current conversion direction
+                    // (this feature requires .NET Framework 2.0 SP1)
                     if (mi != null && compiledStylesheet != null)
                     {
                         // dynamically invoke xslt.Load(compiledStylesheet);
@@ -218,54 +217,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             return (XslCompiledTransform)this.compiledProcessors[xslLocation];
         }
-
-        
-      
-//        protected XslCompiledTransform Load(bool computeSize)
-//        {
-//            string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
-//            XPathDocument xslDoc = null;
-//            XmlUrlResolver resolver = this.ResourceResolver;
-
-//            if (this.ExternalResources == null)
-//            {
-//                if (computeSize)
-//                {
-//                    xslLocation = this.DirectTransform ? ODFToOOX_COMPUTE_SIZE_XSL : OOXToODF_COMPUTE_SIZE_XSL;
-//                }
-//                EmbeddedResourceResolver emr = (EmbeddedResourceResolver) resolver;
-//                emr.IsDirectTransform = this.DirectTransform;
-//                xslDoc = new XPathDocument(emr.GetInnerStream(xslLocation));
-//            }
-//            else
-//            {
-//                xslDoc =  new XPathDocument(this.ExternalResources + "/" + xslLocation);
-//            }
-
-//            if (!this.compiledProcessors.Contains(xslLocation))
-//            {
-//                // create a xsl transformer
-
-//                // JP - 03/07/2007
-//                // Activation of XSL Debugging only in "DEBUG" compilation mode
-
-//#if DEBUG
-//                XslCompiledTransform xslt = new XslCompiledTransform(true);
-//#else
-//                XslCompiledTransform xslt = new XslCompiledTransform();
-//#endif
-
-//                //JP - 03/07/2007
-
-
-
-//                // compile the stylesheet. 
-//                // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
-//                xslt.Load(xslDoc, this.XsltProcSettings, this.ResourceResolver);
-//                this.compiledProcessors.Add(xslLocation, xslt);
-//            }
-//            return (XslCompiledTransform) this.compiledProcessors[xslLocation];
-//        }
 
         /// <summary>
         /// Pull the xslt settings
@@ -369,6 +320,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
+                    parameters.AddParam("generator", "", "OpenXML/ODF Translator HUTZLI");
                     XmlWriter finalWriter;
                     if (this.packaging)
                     {
@@ -457,7 +409,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 for (int i = procNames.Length - 1; i >= 0; --i)
                 {
-                    if (!Contains(procNames[i], this.skipedPostProcessors))
+                    if (!Contains(procNames[i], this.skippedPostProcessors))
                     {
                         Type type = Type.GetType(procNames[i]);
                         object [] parameters = { currentProc };
