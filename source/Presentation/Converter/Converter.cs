@@ -39,7 +39,7 @@ namespace Sonata.OdfConverter.Presentation
     public class Converter : AbstractConverter
     {
         private readonly string ODF_TEXT_MIME = "application/vnd.oasis.opendocument.presentation";
-       
+
         public Converter() : base(Assembly.GetExecutingAssembly()) { }
 
         protected override Type LoadPrecompiledXslt()
@@ -65,7 +65,7 @@ namespace Sonata.OdfConverter.Presentation
             return stylesheet;
         }
 
-       
+
         protected override string[] DirectPostProcessorsChain
         {
             get
@@ -92,7 +92,7 @@ namespace Sonata.OdfConverter.Presentation
         protected override void CheckOdfFile(string fileName)
         {
             // Test for encryption
-            XmlDocument docContent, docStyle,doc;
+            XmlDocument docContent, docStyle, doc;
             try
             {
                 XmlReaderSettings settings = new XmlReaderSettings();
@@ -108,18 +108,18 @@ namespace Sonata.OdfConverter.Presentation
                 docContent = new XmlDocument();
                 XmlReader readerContent = XmlReader.Create("content.xml", settings);
                 docContent.Load(readerContent);
-         
-                 string svgNameSpace = docContent.DocumentElement.Attributes["xmlns:svg"].Value.ToString();
-                 if (svgNameSpace == "http://www.w3.org/2000/svg")
-                 {
-                     throw new NotAnOdfDocumentException("Could not convert " + fileName
-                                                    + ". Invalid OASIS OpenDocument file");
-                 }
-               
+
+                string svgNameSpace = docContent.DocumentElement.Attributes["xmlns:svg"].Value.ToString();
+                if (svgNameSpace == "http://www.w3.org/2000/svg")
+                {
+                    throw new NotAnOdfDocumentException("Could not convert " + fileName
+                                                   + ". Invalid OASIS OpenDocument file");
+                }
+
             }
             catch (Exception e)
             {
-                 throw new NotAnOdfDocumentException(e.Message);
+                throw new NotAnOdfDocumentException(e.Message);
             }
 
             XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
@@ -140,13 +140,13 @@ namespace Sonata.OdfConverter.Presentation
                                                     + ". Invalid OASIS OpenDocument file");
             }
 
-             }
+        }
 
         protected override void CheckOoxFile(string fileName)
         {
             //Validator for pptx
             PptxValidator v = new PptxValidator();
-            v.validate(fileName); 
+            v.validate(fileName);
         }
 
     }
