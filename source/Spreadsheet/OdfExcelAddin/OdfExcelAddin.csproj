@@ -39,6 +39,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <SignAssembly>true</SignAssembly>
+    <AssemblyDelaySign>false</AssemblyDelaySign>
     <AssemblyOriginatorKeyFile>..\..\OdfConverter.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
