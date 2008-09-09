@@ -63,6 +63,11 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:preserve-space elements="text:p text:span number:text"/>
 
 	<xsl:param name="outputFile"/>
+
+  <!-- a string containing detailed information on environment and
+       converter version to be added to the document's meta data -->
+  <xsl:param name="generator"/>
+  
 	<xsl:output method="xml" encoding="UTF-8"/>
 
 

@@ -324,8 +324,11 @@
   <xsl:template name="GetApplicationExtendedProperty">
     <!-- @Description: Application extended properties -->
     <!-- @Context: Any -->
+    <xsl:param name="generator" />
     <Application
-        xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">OpenXML/ODF Translator</Application>
+        xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
+      <xsl:value-of select="$generator"/>
+    </Application>
   </xsl:template>
 
   <!-- document security extended property -->

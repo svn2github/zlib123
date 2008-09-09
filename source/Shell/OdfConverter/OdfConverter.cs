@@ -39,31 +39,21 @@ using CleverAge.OdfConverter.OdfConverterLib;
 using Sonata.OdfConverter.Presentation;
 using CleverAge.OdfConverter.Spreadsheet;
 using Wordprocessing = OdfConverter.Wordprocessing;
+using System.Collections.Generic;
 
 
 namespace CleverAge.OdfConverter.CommandLineTool
 {
-    enum ControlType : int
-    {
-        CTRL_C_EVENT = 0,
-        CTRL_BREAK_EVENT = 1,
-        CTRL_CLOSE_EVENT = 2,
-        CTRL_LOGOFF_EVENT = 5,
-        CTRL_SHUTDOWN_EVENT = 6
-    };
+    //enum ControlType : int
+    //{
+    //    CTRL_C_EVENT = 0,
+    //    CTRL_BREAK_EVENT = 1,
+    //    CTRL_CLOSE_EVENT = 2,
+    //    CTRL_LOGOFF_EVENT = 5,
+    //    CTRL_SHUTDOWN_EVENT = 6
+    //};
 
-    enum Direction 
-    { 
-        None,
-        OdtToDocx, 
-        DocxToOdt, 
-        OdsToXlsx, 
-        XlsxToOds, 
-        OdpToPptx, 
-        PptxToOdp 
-    };
-
-    delegate int ControlHandlerFonction(ControlType control);
+    //delegate int ControlHandlerFunction(ControlType control);
 
     class Word
     {
@@ -201,28 +191,29 @@ namespace CleverAge.OdfConverter.CommandLineTool
     }
 
     /// <summary>
-    /// ODFConverterTest is a CommandLine Program to test the conversion
-    /// of an OpenDocument file into an OpenXML file.
+    /// OdfConverter is a CommandLine wrapper for the OpenXML - ODF translators
     /// 
     /// Execute the command without argument to see the options.
     /// </summary>
     public class OdfConverter
     {
-        private string input = null;                     // input path
-        private string output = null;                    // output path
-        private bool validate = false;                   // validate the result of the transformations
-        private bool open = false;                       // try to open the result of the transformations
-        private bool recursiveMode = false;              // go in subfolders ?
-        private bool replace = false;					 // override existing files ?
-        private string reportPath = null;                // file to save report
-        private int reportLevel = Report.INFO_LEVEL;     // file to save report
-        private string xslPath = null;                   // Path to an external stylesheet
-        private ArrayList skipedPostProcessors = null;   // Post processors to skip (identified by their names)
-        private bool packaging = true;                   // Build the zip archive after conversion
+        private ConversionOptions _options = new ConversionOptions();
+        
+        //private string input = null;                     // input path
+        //private string output = null;                    // output path
+        //private bool validate = false;                   // validate the result of the transformations
+        //private bool open = false;                       // try to open the result of the transformations
+        //private bool recursiveMode = false;              // go in subfolders ?
+        //private bool replace = false;					 // override existing files ?
+        //private string reportPath = null;                // file to save report
+        private int reportLevel = ConversionReport.INFO_LEVEL;     // file to save report
+        //private string xslPath = null;                   // Path to an external stylesheet
+        //private ArrayList skippedPostProcessors = null;  // Post processors to skip (identified by their names)
+        //private bool packaging = true;                   // Build the zip archive after conversion
 
 	   	private Direction transformDirection = Direction.OdtToDocx; // direction of conversion
 		private bool transformDirectionOverride = false; // whether conversion direction has been specified
-        private Report report = null;
+        private ConversionReport report = null;
         private Word word = null;
         private Excel excel = null;
         private Presentation presentation = null; 
@@ -230,30 +221,30 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private OdfValidator odfValidator = null;
         private Direction batch = Direction.None;
 
-#if MONO
-		static bool SetConsoleCtrlHandler(ControlHandlerFonction handlerRoutine, bool add) 
-		{ return true; }
-#else
-		[DllImport("kernel32")]
-        static extern bool SetConsoleCtrlHandler(ControlHandlerFonction handlerRoutine, bool add);
-#endif
+//#if MONO
+//        static bool SetConsoleCtrlHandler(ControlHandlerFunction handlerRoutine, bool add) 
+//        { return true; }
+//#else
+//        [DllImport("kernel32")]
+//        static extern bool SetConsoleCtrlHandler(ControlHandlerFunction handlerRoutine, bool add);
+//#endif
 
-        int MyHandler(ControlType control)
-        {
-            //Console.WriteLine("MyHandler: " + control.ToString());
-            if (word != null)
-            {
-                try
-                {
-                    word.Quit();
-                }
-                catch
-                {
-                    Console.WriteLine("Unable to close Word, please close it manually");
-                }
-            }
-            return 0;
-        }
+//        int MyHandler(ControlType control)
+//        {
+//            //Console.WriteLine("MyHandler: " + control.ToString());
+//            if (word != null)
+//            {
+//                try
+//                {
+//                    word.Quit();
+//                }
+//                catch
+//                {
+//                    Console.WriteLine("Unable to close Word, please close it manually");
+//                }
+//            }
+//            return 0;
+//        }
 
         /// <summary>
         /// Main program.
@@ -266,8 +257,8 @@ namespace CleverAge.OdfConverter.CommandLineTool
             // behaviour between add-in and command-line-tool which makes detecting and fixing bugs more difficult
             // System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             OdfConverter tester = new OdfConverter();
-            ControlHandlerFonction myHandler = new ControlHandlerFonction(tester.MyHandler);
-            SetConsoleCtrlHandler(myHandler, true);
+            //ControlHandlerFunction myHandler = new ControlHandlerFunction(tester.MyHandler);
+            //SetConsoleCtrlHandler(myHandler, true);
             try
             {
                 tester.ParseCommandLine(args);
@@ -281,7 +272,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             try
             {
-                tester.Proceed();
+                tester.proceed();
                 Console.WriteLine("Done.");
             }
             catch (Exception ex)
@@ -293,12 +284,17 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private OdfConverter()
         {
-            this.skipedPostProcessors = new ArrayList();
         }
 
-        private void Proceed()
+        protected ConversionOptions Options
         {
-            this.report = new Report(this.reportPath, this.reportLevel);
+            get { return _options; }
+            set { _options = value; }
+        }
+
+        private void proceed()
+        {
+            this.report = new ConversionReport(this.Options.ReportPath, this.Options.ReportLevel);
 
             switch (this.batch)
             {
@@ -313,17 +309,17 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     this.ProceedBatchOox();
                     break;
                 default:  // no batch mode
-                    // instanciate word if needed
-                    if (this.transformDirection == Direction.OdtToDocx && this.open)
+                    // instanciate Word if needed
+                    if (this.transformDirection == Direction.OdtToDocx && this.Options.Open)
                     {
                         word = new Word();
                         word.Visible = false;
                     }
 
-                    this.ProceedSingleFile(this.input, this.output, this.transformDirection);
+                    this.ProceedSingleFile(this.Options.InputPath, this.Options.OutputPath, this.transformDirection);
 
                     // close word if needed
-                    if (this.open)
+                    if (this.Options.Open)
                     {
                         word.Quit();
                     }
@@ -336,14 +332,14 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private void ProceedBatchOdf()
         {
             // instanciate word if needed
-            if (this.open && (this.batch == Direction.OdtToDocx))
+            if (this.Options.Open && (this.batch == Direction.OdtToDocx))
             {
                 this.word = new Word();
                 this.word.Visible = false;
             }
             
             // instanciate excel if needed
-            if (this.open && (this.batch == Direction.OdsToXlsx))
+            if (this.Options.Open && (this.batch == Direction.OdsToXlsx))
             {
                 
                 this.excel = new Excel();
@@ -351,57 +347,53 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
            
             // instanciate Presentation if needed
-            if (this.open && (this.batch == Direction.OdpToPptx))
+            if (this.Options.Open && (this.batch == Direction.OdpToPptx))
             {
                 this.presentation = new Presentation();
                 this.presentation.Visible = false;
             }
 
             // instanciate validator if needed
-            if (this.validate)
+            if (this.Options.Validate)
             {
                 this.report.AddComment("Instanciating validator, please wait...");
                 this.ooxValidator = new OoxValidator(this.report);
                 this.report.AddComment("Validator instanciated");
             }
 
-            SearchOption option = SearchOption.TopDirectoryOnly;
-            if (this.recursiveMode)
-            {
-                option = SearchOption.AllDirectories;
-            }
-
-            string ext = null;
+            string pattern = "";
             string targetExt = null;
 
             switch (this.batch)
             {
                 case Direction.OdtToDocx:
-                    ext = "odt";
+                    pattern = "*.odt;*.ott";
                     targetExt = ".docx";
                     break;
                 case Direction.OdsToXlsx:
-                    ext = "ods";
+                    pattern = "*.ods";
                     targetExt = ".xlsx";
                     break;
                 case Direction.OdpToPptx:
-                    ext = "odp";
+                    pattern = "*.odp";
                     targetExt = ".pptx";
                     break;
                 default:
                     throw new ArgumentException("unsupported batch type");
             }
-            string [] files = Directory.GetFiles(this.input, "*."+ext, option);
+
+            string[] files = GetFiles(this.Options.InputPath, pattern, this.Options.RecursiveMode);
+
             int nbFiles = files.Length;
             int nbConverted = 0;
             int nbValidatedAndOpened = 0;
             int nbValidatedAndNotOpened = 0;
             int nbNotValidatedAndOpened = 0;
             int nbNotValidatedAndNotOpened = 0;
-            this.report.AddComment("Processing " + nbFiles + " " + ext.ToUpper() + " file(s)");
+            this.report.AddComment("Processing " + nbFiles + " ODF file(s)");
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, targetExt, this.replace);
+                string output = this.GenerateOutputName(this.Options.OutputPath, input, targetExt, this.Options.ForceOverwrite);
                 int result = this.ProceedSingleFile(input, output, this.batch);
                 switch (result)
                 {
@@ -428,24 +420,23 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 }
             }
             // close word if needed
-            if (this.open)
+            if (this.Options.Open)
             {
                 word.Quit();
-
             }
-            string varResult = null;
-            if (ext == "odp" || ext=="pptx")
-            {
-                varResult = "PowerPoint";
-            }
-            if (ext == "ods" || ext == "xlsx")
-            {
-                varResult = "Excel";
-            }
-            if (ext == "odt" || ext == "docx")
-            {
-                varResult = "Word";
-            }
+            //string varResult = null;
+            //if (ext == "odp" || ext=="pptx")
+            //{
+            //    varResult = "PowerPoint";
+            //}
+            //if (ext == "ods" || ext == "xlsx")
+            //{
+            //    varResult = "Excel";
+            //}
+            //if (ext == "odt" || ext == "docx")
+            //{
+            //    varResult = "Word";
+            //}
 
             this.report.AddComment("Results: " + nbConverted + " file(s) over " + nbFiles + " were converted successfully.");
 
@@ -459,43 +450,65 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private void ProceedBatchOox()
         {
-            string ext;
+            string pattern;
             string targetExt;
             switch (this.batch)
             {
                 case Direction.DocxToOdt:
-                    ext = "docx";
+                    pattern = "*.docx;*.docm;*.dotx;*.dotm";
                     targetExt = ".odt";
                     break;
                 case Direction.XlsxToOds:
-                    ext = "xlsx";
+                    pattern = "*.xlsx";
                     targetExt = ".ods";
                     break;
                 case Direction.PptxToOdp:
-                    ext = "pptx";
+                    pattern = "*.pptx";
                     targetExt = ".odp";
                     break;
                 default:
                     throw new ArgumentException("wrong batch mode");
             }
-            // instanciate validator if needed
-            if (this.validate)
+            // instantiate validator if needed
+            if (this.Options.Validate)
             {
-                this.report.AddComment("Instanciating validator, please wait...");
+                this.report.AddComment("Instantiating validator, please wait...");
                 this.odfValidator = new OdfValidator(this.report);
                 this.report.AddComment("Validator instanciated");
             }
-            SearchOption option = SearchOption.TopDirectoryOnly;
-            if (this.recursiveMode)
-            {
-                option = SearchOption.AllDirectories;
-            }
-            string [] files = Directory.GetFiles(this.input, "*."+ext, option);
+
+            string[] files = GetFiles(this.Options.InputPath, pattern, this.Options.RecursiveMode);
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, targetExt, this.replace);
-                this.ProceedSingleFile(input, output, this.batch);
+                // do not process temp files of Office
+                if (!Path.GetFileName(input).StartsWith("~$"))
+                {
+                    string output = this.GenerateOutputName(this.Options.OutputPath, input, targetExt, this.Options.ForceOverwrite);
+                    this.ProceedSingleFile(input, output, this.batch);
+                }
             }
+        }
+
+        /// <summary>
+        /// Retrieve a list of files from a folder fulfilling a certain search pattern
+        /// </summary>
+        /// <param name="path">The directory to search</param>
+        /// <param name="searchPattern">A ;-separated list of wildcard patterns to match against the files in <paramref name="path"/></param>
+        /// <param name="recursive">If true, the search includes all subdirectories, otherwise only the only the current directory searched.</param>
+        /// <returns>A String array containing the names of files in the specified directory that 
+        ///     match the specified search pattern. File names include the full path. </returns>
+        private string[] GetFiles(string path, string searchPattern, bool recursive)
+        {
+            string[] m_arExt = searchPattern.Split(';');
+
+            SearchOption option = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+            List<string> strFiles = new List<string>();
+            foreach (string filter in m_arExt)
+            {
+                strFiles.AddRange(System.IO.Directory.GetFiles(path, filter, option));
+            }
+            return strFiles.ToArray();
         }
 
         private int ProceedSingleFile(string input, string output, Direction transformDirection)
@@ -503,13 +516,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
             bool converted = false;
             bool validated = false;
             bool opened = false;
-            report.AddLog(input, "Converting file: " + input + " into " + output, Report.INFO_LEVEL);
+            report.AddLog(input, "Converting file: " + input + " into " + output, ConversionReport.INFO_LEVEL);
             converted = ConvertFile(input, output, transformDirection);
-            if (converted && this.validate)
+            if (converted && this.Options.Validate)
             {
                 validated = ValidateFile(input, output, transformDirection);
             }
-            if (converted && this.open)
+            if (converted && this.Options.Open)
             {
                 opened = TryToOpen(input, output, transformDirection);
             }
@@ -531,13 +544,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
                 DateTime start = DateTime.Now;
                 AbstractConverter converter = ConverterFactory.Instance(transformDirection);
-                converter.ExternalResources = this.xslPath;
-                converter.SkipedPostProcessors = this.skipedPostProcessors;
+                converter.ExternalResources = this.Options.XslPath;
+                converter.SkippedPostProcessors = this.Options.SkippedPostProcessors;
                 converter.DirectTransform =
                     transformDirection == Direction.OdtToDocx
                     || transformDirection == Direction.OdpToPptx
                     || transformDirection == Direction.OdsToXlsx;
-                converter.Packaging = this.packaging;
+                converter.Packaging = this.Options.Packaging;
 
                 // TODO: optionally we could also add a progress bar to the command line
                 // then we would need to count the paragraphs, runs, etc.
@@ -545,46 +558,46 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
-                this.report.AddLog(input, "Conversion succeeded", Report.INFO_LEVEL);
-                this.report.AddLog(input, "Total conversion time: " + duration, Report.INFO_LEVEL);
+                this.report.AddLog(input, "Conversion succeeded", ConversionReport.INFO_LEVEL);
+                this.report.AddLog(input, "Total conversion time: " + duration, ConversionReport.INFO_LEVEL);
                 return true;
             }
             catch (EncryptedDocumentException)
             {
-                this.report.AddLog(input, "Conversion failed - Input file is encrypted", Report.WARNING_LEVEL);
+                this.report.AddLog(input, "Conversion failed - Input file is encrypted", ConversionReport.WARNING_LEVEL);
                 return false;
             }
             catch (NotAnOdfDocumentException e)
             {
-                this.report.AddLog(input, "Conversion failed - Input file is not a valid ODF file", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid ODF file", ConversionReport.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                 return false;
             }
             catch (NotAnOoxDocumentException e)
             {
-                this.report.AddLog(input, "Conversion failed - Input file is not a valid Office OpenXML file", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid Office OpenXML file", ConversionReport.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                 return false;
             }
             catch (ZipException e)
             {
-                this.report.AddLog(input, "Conversion failed - Input file is not a valid file for conversion or might be password protected", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid file for conversion or might be password protected", ConversionReport.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message, ConversionReport.DEBUG_LEVEL);
                 return false;
             }
             //Pradeep Nemadi - Bug 1747083 Start
             //IOException is added to fix this bug
             catch (IOException e)
             {
-                this.report.AddLog(input, "Conversion failed - " + e.Message, Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                this.report.AddLog(input, "Conversion failed - " + e.Message, ConversionReport.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                 return false;
             }
             //Pradeep Nemadi - Bug 1747083 end
             catch (Exception e)
             {
-                this.report.AddLog(input, "Conversion failed - Error during conversion", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                this.report.AddLog(input, "Conversion failed - Error during conversion", ConversionReport.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                 return false;
             }
         }
@@ -604,19 +617,19 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         this.report.AddComment("Validator instanciated");
                     }
                     this.ooxValidator.validate(output);
-                    this.report.AddLog(input, "Converted file (" + output + ") is valid", Report.INFO_LEVEL);
+                    this.report.AddLog(input, "Converted file (" + output + ") is valid", ConversionReport.INFO_LEVEL);
                     return true;
                 }
                 catch (OoxValidatorException e)
                 {
-                    this.report.AddLog(input, "Converted file (" + output + ") is invalid", Report.WARNING_LEVEL);
-                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, "Converted file (" + output + ") is invalid", ConversionReport.WARNING_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }
                 catch (Exception e)
                 {
-                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, Report.ERROR_LEVEL);
-                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, ConversionReport.ERROR_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }
             }
@@ -631,19 +644,19 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         this.report.AddComment("Validator instanciated");
                     }
                     this.odfValidator.validate(output);
-                    this.report.AddLog(input, "Converted file (" + output + ") is valid", Report.INFO_LEVEL);
+                    this.report.AddLog(input, "Converted file (" + output + ") is valid", ConversionReport.INFO_LEVEL);
                     return true;
                 }
                 catch (OdfValidatorException e)
                 {
-                    this.report.AddLog(input, "Converted file (" + output + ") is invalid", Report.WARNING_LEVEL);
-                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, "Converted file (" + output + ") is invalid", ConversionReport.WARNING_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }
                 catch (Exception e)
                 {
-                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, Report.ERROR_LEVEL);
-                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, ConversionReport.ERROR_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }
             }
@@ -658,13 +671,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 {
                     string filename = Path.GetFullPath(output);
                     word.Open(filename);
-                    this.report.AddLog(input, "Converted file opened successfully in Word", Report.INFO_LEVEL);
+                    this.report.AddLog(input, "Converted file opened successfully in Word", ConversionReport.INFO_LEVEL);
                     return true;
                 }
                 catch (Exception e)
                 {
-                    this.report.AddLog(input, "Converted file (" + output + ") could not be opened in Word", Report.ERROR_LEVEL);
-                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, "Converted file (" + output + ") could not be opened in Word", ConversionReport.ERROR_LEVEL);
+                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }
             }
@@ -675,13 +688,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 {
                     string filename = Path.GetFullPath(output);
                     presentation.Open(filename);
-                    this.report.AddLog(input, "Converted file opened successfully in PowerPoint", Report.INFO_LEVEL);
+                    this.report.AddLog(input, "Converted file opened successfully in PowerPoint", ConversionReport.INFO_LEVEL);
                     return true;
                 }
                 catch (Exception e)
                 {
-                    this.report.AddLog(input, "Converted file (" + output + ") could not be opened in PowerPoint", Report.ERROR_LEVEL);
-                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, "Converted file (" + output + ") could not be opened in PowerPoint", ConversionReport.ERROR_LEVEL);
+                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }
             }
@@ -702,6 +715,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             Console.WriteLine("     /BATCH-PPTX        Do a batch conversion over every PPTX file in the input folder (Note: use /F to replace existing files)");
             Console.WriteLine("     /BATCH-ODS         Do a batch conversion over every ODS file in the input folder (Note: use /F to replace existing files)");
             Console.WriteLine("     /BATCH-XLSX        Do a batch conversion over every XLSX file in the input folder (Note: use /F to replace existing files)");
+            Console.WriteLine("     /R                 Process subfolders recursively during batch conversion");
             //Console.WriteLine("     /V                 Validate the result of the transformation against the schemas");
             //Console.WriteLine("     /OPEN              Try to open the converted files (works only for ODF->OOX, Microsoft Word required)");
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
@@ -735,14 +749,14 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         {
                             throw new OdfCommandLineException("Input missing");
                         }
-                        this.input = args[i];
+                        this.Options.InputPath = args[i];
                         break;
                     case "/O":
                         if (++i == args.Length)
                         {
                             throw new OdfCommandLineException("Output missing");
                         }
-                        this.output = args[i];
+                        this.Options.OutputPath = args[i];
                         break;
                     //case "/V":
                     //    this.validate = true;
@@ -769,10 +783,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         }
                         break;
                     case "/R":
-                        this.recursiveMode = true;
+                        this.Options.RecursiveMode = true;
                         break;
                     case "/NOPACKAGING":
-                        this.packaging = false;
+                        this.Options.Packaging = false;
                         break;
                     case "/BATCH-ODT":
                         this.batch = Direction.OdtToDocx; 
@@ -797,21 +811,21 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         {
                             throw new OdfCommandLineException("Post processing name missing");
                         }
-                        this.skipedPostProcessors.Add(args[i]);
+                        this.Options.SkippedPostProcessors.Add(args[i]);
                         break;
                     case "/REPORT":
                         if (++i == args.Length)
                         {
                             throw new OdfCommandLineException("Report file missing");
                         }
-                        this.reportPath = args[i];
+                        this.Options.ReportPath = args[i];
                         break;
                     case "/XSLT":
                         if (++i == args.Length)
                         {
                             throw new OdfCommandLineException("XSLT path missing");
                         }
-                        this.xslPath = args[i];
+                        this.Options.XslPath = args[i];
                         break;
                     case "/CV":
                         OoxValidator.test();
@@ -845,12 +859,12 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         this.transformDirectionOverride = true;
                         break;
 					case "/F":
-						this.replace = true;
+						this.Options.ForceOverwrite = true;
 						break;
                     default:
-                        if (string.IsNullOrEmpty(this.input))
+                        if (string.IsNullOrEmpty(this.Options.InputPath))
                         {
-                            this.input = args[i];
+                            this.Options.InputPath = args[i];
                         }
                         break;
                 }
@@ -859,7 +873,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private void CheckPaths()
         {
-            if (this.input == null)
+            if (string.IsNullOrEmpty(this.Options.InputPath))
             {
                 throw new OdfCommandLineException("Input is missing");
             }
@@ -875,35 +889,35 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private void CheckBatch()
         {
-            if (!Directory.Exists(this.input))
+            if (!Directory.Exists(this.Options.InputPath))
             {
                 throw new OdfCommandLineException("Input folder does not exist");
             }
-            if (File.Exists(this.output))
+            if (File.Exists(this.Options.OutputPath))
             {
                 throw new OdfCommandLineException("Output must be a folder");
             }
-            if (this.output == null || this.output.Length == 0)
+            if (string.IsNullOrEmpty(this.Options.OutputPath))
             {
                 // use input folder as output folder
-                this.output = this.input;
+                this.Options.OutputPath = this.Options.InputPath;
             }
-            if (!Directory.Exists(this.output))
+            if (!Directory.Exists(this.Options.OutputPath))
             {
                 try
                 {
-                    Directory.CreateDirectory(this.output);
+                    Directory.CreateDirectory(this.Options.OutputPath);
                 }
                 catch (Exception)
                 {
-                    throw new OdfCommandLineException("Cannot create output folder");
+                    throw new OdfCommandLineException(string.Format("Cannot create output folder {0}", this.Options.OutputPath));
                 }
             }
         }
 
         private void CheckSingleFile()
         {
-            if (!File.Exists(this.input))
+            if (!File.Exists(this.Options.InputPath))
             {
                 throw new OdfCommandLineException("Input file does not exist");
             }
@@ -936,17 +950,17 @@ namespace CleverAge.OdfConverter.CommandLineTool
             else
             {
                 extension = ".docx";
-                string inputExtension = Path.GetExtension(this.input).ToLowerInvariant();
+                string inputExtension = Path.GetExtension(this.Options.InputPath).ToLowerInvariant();
                 string outputExtension = "";
-                if (this.output != null)
+                if (!string.IsNullOrEmpty(this.Options.OutputPath))
                 {
-                    FileInfo fi = new FileInfo(this.output);
-                    outputExtension = fi.Extension;
-                    //outputExtension = this.output.Substring(this.output.LastIndexOf("."));
+                    FileInfo fi = new FileInfo(this.Options.OutputPath);
+                    outputExtension = fi.Extension.ToLowerInvariant();
                 }
                 switch (inputExtension)
                 {
                     case ".odt":
+                    case ".ott":
                         if (outputExtension.Equals(".docx") || outputExtension.Equals(""))
                         {
                             this.transformDirection = Direction.OdtToDocx;
@@ -958,10 +972,18 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         }
                         break;
                     case ".docx":
+                    case ".docm":
+                    case ".dotx":
+                    case ".dotm":
                         if (outputExtension.Equals(".odt") || outputExtension.Equals(""))
                         {
                             this.transformDirection = Direction.DocxToOdt;
                             extension = ".odt";
+                        }
+                        else if (outputExtension.Equals(".ott"))
+                        {
+                            this.transformDirection = Direction.DocxToOdt;
+                            extension = ".ott";
                         }
                         else
                         {
@@ -1016,31 +1038,40 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         throw new OdfCommandLineException("Input file extension [" + inputExtension + "] is not supported.");
                 }
             }
-            if (!this.packaging)
+            if (!this.Options.Packaging)
             {
                 extension = ".xml";
             }
 
-            if (!File.Exists(this.output) && (this.output == null) )
+            if (!File.Exists(this.Options.OutputPath) && (this.Options.OutputPath == null))
             {
-                string outputPath = this.output;
+                string outputPath = this.Options.OutputPath;
                 if (outputPath == null)
                 {
                     // we take input path
-                    outputPath = Path.GetDirectoryName(this.input);
+                    outputPath = Path.GetDirectoryName(this.Options.InputPath);
                 }
-                this.output = GenerateOutputName(outputPath, this.input, extension, this.replace);
+                this.Options.OutputPath = GenerateOutputName(outputPath, this.Options.InputPath, extension, this.Options.ForceOverwrite);
             }
         }
 
-        private string GenerateOutputName(string rootPath, string input, string extension, bool replace)
+        private string GenerateOutputName(string rootPath, string input, string targetExtension, bool replace)
         {
             string rawFileName = Path.GetFileNameWithoutExtension(input);
-            string output = Path.Combine(rootPath, rawFileName + extension);
+
+            // support recursive batch conversion 
+            string outputSubfolder = "";
+            if (Path.GetDirectoryName(input).Length > this.Options.InputPath.Length)
+            {
+                outputSubfolder = Path.GetDirectoryName(input).Substring(this.Options.InputPath.Length + 1);
+            }
+
+            string output = Path.Combine(Path.Combine(rootPath, outputSubfolder), rawFileName + targetExtension);
+            
             int num = 0;
             while (!replace && File.Exists(output))
             {
-                output = Path.Combine(rootPath, rawFileName + "_" + ++num + extension);
+                output = Path.Combine(Path.Combine(rootPath, outputSubfolder), rawFileName + "_" + ++num + targetExtension);
             }
             return output;
         }
@@ -1091,79 +1122,5 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     throw new ArgumentException("invalid transform direction type");
             }
         }
-    }
-
-    public class Report
-    {
-        public const int DEBUG_LEVEL = 1;
-        public const int INFO_LEVEL = 2;
-        public const int WARNING_LEVEL = 3;
-        public const int ERROR_LEVEL = 4;
-
-        private StreamWriter writer = null;
-        private int level = INFO_LEVEL;
-
-        public Report(string filename, int level)
-        {
-            this.level = level;
-            if (filename != null)
-            {
-                this.writer = new StreamWriter(new FileStream(filename, FileMode.Create, FileAccess.Write));
-                Console.WriteLine("Using report file: " + filename);
-            }
-        }
-
-        public void AddComment(string message)
-        {
-            string text = "*** " + message;
-
-            if (this.writer != null)
-            {
-                this.writer.WriteLine(text);
-                this.writer.Flush();
-            }
-            Console.WriteLine(text);
-        }
-
-        public void AddLog(string filename, string message, int level)
-        {
-            if (level >= this.level)
-            {
-                string label = null;
-                switch (level)
-                {
-                    case 4:
-                        label = "ERROR";
-                        break;
-                    case 3:
-                        label = "WARNING";
-                        break;
-                    case 2:
-                        label = "INFO";
-                        break;
-                    default:
-                        label = "DEBUG";
-                        break;
-                }
-                string text = "[" + label + "]" + "[" + filename + "] " + message;
-
-                if (this.writer != null)
-                {
-                    this.writer.WriteLine(text);
-                    this.writer.Flush();
-                }
-                Console.WriteLine(text);
-            }
-        }
-
-        public void Close()
-        {
-            if (this.writer != null)
-            {
-                this.writer.Close();
-                this.writer = null;
-            }
-        }
-
     }
 }

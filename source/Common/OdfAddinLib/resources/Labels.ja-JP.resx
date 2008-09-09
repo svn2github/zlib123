@@ -138,8 +138,17 @@
   <data name="AllFileType" xml:space="preserve">
     <value>すべてのファイル</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument テキスト ファイル</value>
+  <data name="OdfFileTypeOdt" xml:space="preserve">
+    <value>OpenDocument テキスト</value>
+  </data>
+  <data name="OdfFileTypeOtt" xml:space="preserve">
+    <value>OpenDocument テキストテンプレート</value>
+  </data>
+  <data name="OdfFileTypeOds" xml:space="preserve">
+    <value>OpenDocument 表計算</value>
+  </data>
+  <data name="OdfFileTypeOdp" xml:space="preserve">
+    <value>OpenDocument プレゼンテーション</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
     <value>この機能はまだ実装されていません</value>

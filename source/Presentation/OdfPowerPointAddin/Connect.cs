@@ -50,6 +50,8 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
     [ClassInterface(ClassInterfaceType.AutoDispatch)]
     public class Connect : AbstractOdfAddin
     {
+        protected const string ODF_FILE_TYPE_ODP = "OdfFileTypeOdp";
+
         protected const string IMPORT_ODF_FILE_FILTER = "*.odp";
         protected const string EXPORT_ODF_FILE_FILTER = " (*.odp)|*.odp|";
 
@@ -247,7 +249,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                 
                 sfd.AddExtension = true;
                 sfd.DefaultExt = "odp";
-                sfd.Filter = this._addinLib.GetString(ODF_FILE_TYPE) + this.ExportOdfFileFilter
+                sfd.Filter = this._addinLib.GetString(this.OdfFileType) + this.ExportOdfFileFilter
                              + this._addinLib.GetString(ALL_FILE_TYPE) + this.ExportAllFileFilter;
                 sfd.InitialDirectory = doc.GetString("Path");
                 sfd.OverwritePrompt = true;
@@ -351,6 +353,11 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                 }
                 
             }
+        }
+
+        protected override string OdfFileType
+        {
+            get { return ODF_FILE_TYPE_ODP; }
         }
 
         protected override string ImportOdfFileFilter

@@ -66,6 +66,11 @@
   <xsl:preserve-space elements="text:p text:span number:text"/>
 
   <xsl:param name="outputFile"/>
+  
+  <!-- a string containing detailed information on environment and
+       converter version to be added to the document's meta data -->
+  <xsl:param name="generator"/>
+  
   <xsl:output method="xml" encoding="UTF-8"/>
 
   <!-- App version number -->
@@ -744,7 +749,9 @@
       xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
       xmlns:dc="http://purl.org/dc/elements/1.1/">
       <xsl:call-template name="GetDocSecurityExtendedProperty"/>
-      <xsl:call-template name="GetApplicationExtendedProperty"/>
+      <xsl:call-template name="GetApplicationExtendedProperty">
+        <xsl:with-param name="generator" select="$generator"/>
+      </xsl:call-template>
       <xsl:for-each select="document('meta.xml')/office:document-meta/office:meta">
         <xsl:apply-templates select="meta:editing-duration"/>
       </xsl:for-each>

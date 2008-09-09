@@ -77,12 +77,12 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private XmlReader grammarName = null;
         private Grammar grammar = null;
-        private Report report;
+        private ConversionReport report;
 
 		/// <summary>
 		/// Initialize the validator
 		/// </summary>
-		public OdfValidator(Report report)
+		public OdfValidator(ConversionReport report)
 		{
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.ValidationType = ValidationType.None;
@@ -130,7 +130,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [content.xml]: " + e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(fileName, "Problem validating ODT file [content.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
             }
             try
             {
@@ -141,11 +141,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipEntryNotFoundException)
             {
-                this.report.AddLog(fileName, "Entry not found: styles.xml", Report.DEBUG_LEVEL);
+                this.report.AddLog(fileName, "Entry not found: styles.xml", ConversionReport.DEBUG_LEVEL);
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [styles.xml]: " + e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(fileName, "Problem validating ODT file [styles.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
             }
             try
             {
@@ -156,11 +156,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipEntryNotFoundException)
             {
-                this.report.AddLog(fileName, "Entry not found: meta.xml", Report.DEBUG_LEVEL);
+                this.report.AddLog(fileName, "Entry not found: meta.xml", ConversionReport.DEBUG_LEVEL);
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [meta.xml]: " + e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(fileName, "Problem validating ODT file [meta.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
             }
             try
             {
@@ -171,11 +171,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipEntryNotFoundException)
             {
-                this.report.AddLog(fileName, "Entry not found: settings.xml", Report.DEBUG_LEVEL);
+                this.report.AddLog(fileName, "Entry not found: settings.xml", ConversionReport.DEBUG_LEVEL);
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [settings.xml]: " + e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(fileName, "Problem validating ODT file [settings.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
             }
             if (!isValid)
             {
@@ -185,10 +185,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private class ErrorReporter:Tenuto.Verifier.ErrorHandler
         {
-            private Report report;
+            private ConversionReport report;
             private string filename;
 
-            public ErrorReporter(Report report, string filename)
+            public ErrorReporter(ConversionReport report, string filename)
             {
                 this.report = report;
                 this.filename = filename;
@@ -196,16 +196,16 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
             public void Error(string msg)
             {
-                this.report.AddLog(this.filename, msg, Report.DEBUG_LEVEL);
+                this.report.AddLog(this.filename, msg, ConversionReport.DEBUG_LEVEL);
             }
 
         }
 
         private class ReportController : GrammarReaderController
         {
-            private Report report;
+            private ConversionReport report;
 
-            public ReportController(Report report)
+            public ReportController(ConversionReport report)
             {
                 this.report = report;
             }

@@ -48,12 +48,17 @@
   <xsl:import href="chart.xsl"/>
 
   <xsl:param name="outputFile"/>
+
+  <!-- a string containing detailed information on environment and
+       converter version to be added to the document's meta data -->
+  <xsl:param name="generator"/>
+
   <xsl:output method="xml" encoding="UTF-8"/>
 
   <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
 
   <!-- App version number -->
-  <xsl:variable name="app-version">1.0.0</xsl:variable>
+  <xsl:variable name="app-version">2.0.0</xsl:variable>
 
   <xsl:template match="/oox:package">
     <pzip:archive pzip:target="{$outputFile}">
@@ -83,7 +88,10 @@
 
       <!-- meta -->
       <pzip:entry pzip:target="meta.xml">
-        <xsl:call-template name="meta"/>
+        <xsl:call-template name="meta">
+          <xsl:with-param name="app-version" select="$app-version" />
+          <xsl:with-param name="generator" select="$generator" />
+        </xsl:call-template>
       </pzip:entry>
 
       <!-- settings  -->
@@ -116,7 +124,7 @@
       <!--<xsl:variable name="sheetNum">
         <xsl:value-of select="position()"/>
       </xsl:variable>-->
-      
+
       <!--end-->
 
       <!-- go to worksheet file and search for drawing -->

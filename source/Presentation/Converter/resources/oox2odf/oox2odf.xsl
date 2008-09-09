@@ -42,15 +42,20 @@ Copyright (c) 2007, Sonata Software Limited
 	<xsl:import href="customAnim.xsl"/>
 	<xsl:import href="notesOox2Odf.xsl"/>
 	<!-- Import Bullets and numbering-->
-	<xsl:import href ="BulletsNumberingoox2odf.xsl"/>
+	<xsl:import href="BulletsNumberingoox2odf.xsl"/>
 	<xsl:import href="SlideMaster.xsl"/>
 	<xsl:import href="notesMaster.xsl"/>
 	
 	<xsl:param name="outputFile"/>
+
+  <!-- a string containing detailed information on environment and
+       converter version to be added to the document's meta data -->
+  <xsl:param name="generator"/>
+  
 	<xsl:output method="xml" encoding="UTF-8"/>
 
 	<!-- App version number -->
-	<xsl:variable name="app-version">1.0.0</xsl:variable>
+	<xsl:variable name="app-version">2.0.0</xsl:variable>
 	<xsl:template match="/oox:source">
 		<pzip:archive pzip:target="{$outputFile}">
 			<!-- Manifest -->
@@ -91,7 +96,10 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:call-template name="settings" />
 			</pzip:entry>
 			<pzip:entry pzip:target="meta.xml">
-				<xsl:call-template name="meta" />
+        <xsl:call-template name="meta">
+          <xsl:with-param name="app-version" select="$app-version" />
+          <xsl:with-param name="generator" select="$generator" />
+        </xsl:call-template>
 			</pzip:entry>
 			<pzip:entry pzip:target="Configurations2/accelerator/current.xml">
 				<xsl:call-template name="InsertManifestFileEntry"/>

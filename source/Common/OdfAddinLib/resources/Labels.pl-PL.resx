@@ -138,8 +138,17 @@
   <data name="AllFileType" xml:space="preserve">
     <value>Wszystkie pliki</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>Dokument tekstowy</value>
+  <data name="OdfFileTypeOdt" xml:space="preserve">
+    <value>OpenDocument Dokument tekstowy</value>
+  </data>
+  <data name="OdfFileTypeOtt" xml:space="preserve">
+    <value>OpenDocument Szablon dokumentu tekstowego</value>
+  </data>
+  <data name="OdfFileTypeOds" xml:space="preserve">
+    <value>OpenDocument Arkusz kalkulacyjny</value>
+  </data>
+  <data name="OdfFileTypeOdp" xml:space="preserve">
+    <value>OpenDocument Prezentacja</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
     <value>Przepraszamy, ta funkcja nie jest jeszcze wprowadzona.</value>

@@ -20,15 +20,16 @@
     <!-- @Description: Generates the openOffice element containing the document metadata. -->
     <!-- @Context: Any -->
 
+    <xsl:param name="generator"/>
     <xsl:param name="app-version"/>
     <!-- The application version -->
 
     <office:document-meta>
       <office:meta>
         <!-- generator -->
-        <meta:generator><xsl:text>OpenXML/ODF Translator </xsl:text><xsl:if test="$app-version">
-            <xsl:value-of select="$app-version"/>
-          </xsl:if>
+        <meta:generator>
+          <xsl:value-of select="$generator"/>
+          <xsl:value-of select="concat(' ', $app-version)"/>
         </meta:generator>
         <!-- title -->
         <xsl:apply-templates

@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="AbstractConverter.cs" />
     <Compile Include="AbstractPostProcessor.cs" />
+    <Compile Include="ConversionOptions.cs" />
+    <Compile Include="ConversionReport.cs" />
     <Compile Include="EmbeddedResourceResolver.cs" />
     <Compile Include="EncryptedDocumentException.cs" />
     <Compile Include="Matrix.cs" />

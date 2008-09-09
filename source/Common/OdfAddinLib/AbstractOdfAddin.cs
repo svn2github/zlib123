@@ -58,8 +58,7 @@ namespace OdfConverter.OdfConverterLib
             Office2003 = 11,
             Office2007 = 12
         }
-        
-        protected const string ODF_FILE_TYPE = "OdfFileType";
+
         protected const string ALL_FILE_TYPE = "AllFileType";
         protected const string IMPORT_ALL_FILE_FILTER = "*.*";
         protected const string IMPORT_LABEL = "OdfImportLabel";
@@ -97,7 +96,7 @@ namespace OdfConverter.OdfConverterLib
 
                 // add filter for ODT files
                 fileDialog.Invoke("Filters").Invoke("Clear");
-                fileDialog.Invoke("Filters").Invoke("Add", this._addinLib.GetString(ODF_FILE_TYPE), this.ImportOdfFileFilter, Type.Missing);
+                fileDialog.Invoke("Filters").Invoke("Add", this._addinLib.GetString(this.OdfFileType), this.ImportOdfFileFilter, Type.Missing);
                 fileDialog.Invoke("Filters").Invoke("Add", this._addinLib.GetString(ALL_FILE_TYPE), this.ImportAllFileFilter, Type.Missing);
                 // set title
                 fileDialog.SetString("Title", this._addinLib.GetString(IMPORT_LABEL));
@@ -126,7 +125,7 @@ namespace OdfConverter.OdfConverterLib
                 ofd.Multiselect = true;
                 ofd.SupportMultiDottedExtensions = true;
                 ofd.DefaultExt = "odt";
-                ofd.Filter = this._addinLib.GetString(ODF_FILE_TYPE) + this.ExportOdfFileFilter
+                ofd.Filter = this._addinLib.GetString(this.OdfFileType) + this.ExportOdfFileFilter
                              + this._addinLib.GetString(ALL_FILE_TYPE) + this.ExportAllFileFilter;
 
                 ofd.Title = this._addinLib.GetString(IMPORT_LABEL);
@@ -526,6 +525,17 @@ namespace OdfConverter.OdfConverterLib
             {
                 return _addinLib;
             }
+        }
+
+        /// <summary>
+        /// Return a localized nice name of the ODF file type, e.g.
+        ///     - OpenDocument Text
+        ///     - OpenDocument Spreadsheet
+        ///     - OpenDocument Presentation
+        /// </summary>
+        protected abstract string OdfFileType
+        {
+            get;
         }
 
         protected abstract string ImportOdfFileFilter

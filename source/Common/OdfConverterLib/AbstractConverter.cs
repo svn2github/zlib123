@@ -33,8 +33,8 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 using System.Reflection;
-using System.Collections;
 using CleverAge.OdfConverter.OdfZipUtils;
+using System.Collections.Generic;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -50,11 +50,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
       
         protected bool isDirectTransform = true;
-        protected ArrayList skippedPostProcessors = null;
+        protected List<string> skippedPostProcessors = null;
         protected string externalResource = null;
         protected bool packaging = true;
         protected Assembly resourcesAssembly;
-        protected Hashtable compiledProcessors;
+        protected Dictionary<string, XslCompiledTransform> compiledProcessors;
         //Added by Sonata-15/11/2007   
         //static varibale is used for getting temporary input file name
         public static string inputTempFileName;
@@ -70,8 +70,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         protected AbstractConverter(Assembly resourcesAssembly)
         {
             this.resourcesAssembly = resourcesAssembly;
-            this.skippedPostProcessors = new ArrayList();
-            this.compiledProcessors = new Hashtable();
+            this.skippedPostProcessors = new List<string>();
+            this.compiledProcessors = new Dictionary<string, XslCompiledTransform>();
         }
 
         public bool DirectTransform
@@ -80,8 +80,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             get { return this.isDirectTransform; }
         }
 
-        public ArrayList SkippedPostProcessors
+        public List<string> SkippedPostProcessors
         {
+            get { return this.skippedPostProcessors; }
             set { this.skippedPostProcessors = value; }
         }
 
@@ -172,7 +173,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 xslDoc = new XPathDocument(this.ExternalResources + "/" + xslLocation);
             }
 
-            if (!this.compiledProcessors.Contains(xslLocation))
+            if (!this.compiledProcessors.ContainsKey(xslLocation))
             {
                 // create an XSL transformer
 
@@ -421,7 +422,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return currentProc;
         }
 
-        protected bool Contains(string processorFullName, ArrayList names)
+        protected bool Contains(string processorFullName, List<string> names)
         {
             foreach (string name in names)
             {

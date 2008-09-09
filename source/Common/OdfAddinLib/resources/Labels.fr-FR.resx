@@ -141,8 +141,17 @@
   <data name="AllFileType" xml:space="preserve">
     <value>Tous les fichiers</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>Fichiers textes OpenDocument</value>
+  <data name="OdfFileTypeOdt" xml:space="preserve">
+    <value>Texte OpenDocument</value>
+  </data>
+  <data name="OdfFileTypeOtt" xml:space="preserve">
+    <value>Modèle de texte OpenDocument</value>
+  </data>
+  <data name="OdfFileTypeOds" xml:space="preserve">
+    <value>Classeur OpenDocument</value>
+  </data>
+  <data name="OdfFileTypeOdp" xml:space="preserve">
+    <value>Présentation OpenDocument</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
     <value>Désolé, cette fonctionnalité n'est pas implémentée.</value>

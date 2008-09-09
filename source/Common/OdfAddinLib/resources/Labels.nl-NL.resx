@@ -138,8 +138,17 @@
   <data name="AllFileType" xml:space="preserve">
     <value>Alle bestanden</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument-tekstbestanden</value>
+  <data name="OdfFileTypeOdt" xml:space="preserve">
+    <value>OpenDocument Tekst</value>
+  </data>
+  <data name="OdfFileTypeOtt" xml:space="preserve">
+    <value>OpenDocument Tekst Sjabloon</value>
+  </data>
+  <data name="OdfFileTypeOds" xml:space="preserve">
+    <value>OpenDocument-werkblad</value>
+  </data>
+  <data name="OdfFileTypeOdp" xml:space="preserve">
+    <value>OpenDocument-presentatie</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
     <value>Sorry, deze functie is nog niet geïmplementeerd</value>
