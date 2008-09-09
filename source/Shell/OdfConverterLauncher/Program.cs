@@ -285,7 +285,7 @@ namespace OdfConverterLauncher
                         app = new Excel();
                         output = addin.AddinLib.GetTempFileName(input, ".xlsx");
                     }
-                    else if (input.ToUpper().EndsWith(".ODT"))
+                    else if (input.ToUpper().EndsWith(".ODT") || input.ToUpper().EndsWith(".OTT"))
                     {
                         addin = new OdfConverter.Wordprocessing.OdfWordAddin.Connect();
                         app = new Word();
