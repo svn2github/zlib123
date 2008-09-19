@@ -276,7 +276,7 @@
   <!--
   Summary: Returns the type of the image.
   Returns '' if type is not supported
-  AUthor: makz (DIaLOGIKa)
+  Author: makz (DIaLOGIKa)
   Date: 9.11.2007
   -->
   <xsl:template name="GetOLEPictureType">
@@ -288,6 +288,10 @@
       <!-- picture is a WMF -->
       <xsl:when test="$type='application/x-openoffice-wmf;windows_formatname=&quot;Image WMF&quot;'">
         <xsl:text>wmf</xsl:text>
+      </xsl:when>
+      <!-- picture is a WMF -->
+      <xsl:when test="$type='application/x-openoffice-wmf;windows_formatname=&quot;Image EMF&quot;'">
+        <xsl:text>emf</xsl:text>
       </xsl:when>
       <!-- picture is a PNG -->
       <xsl:when test="$type='image/png'">
