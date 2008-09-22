@@ -1524,14 +1524,14 @@
   Summary:  Returns the left padding of the first cell in dxa
   Author:   makz (DIaLOGIKa)
   Params:   tblPr: The w:tblPr node of the table
-            styleName: The name of the style thta should be used
+            styleName: The name of the style that should be used
   -->
   <xsl:template name="GetTableIndent">
     <xsl:param name="tblPr" />
     <xsl:param name="styleName" />
 
     <xsl:choose>
-      <xsl:when test="$tblPr/w:tblInd and $tblPr/w:tblInd/@w:type='dxa'">
+      <xsl:when test="$tblPr and $tblPr/w:tblInd and $tblPr/w:tblInd/@w:type='dxa'">
         <!--  iThere is direct formatting -->
         <xsl:value-of select="$tblPr/w:tblInd/@w:w"/>
       </xsl:when>
@@ -1543,7 +1543,7 @@
           <xsl:with-param name="styleName" select="$style/w:basedOn/@w:val" />
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="key('StyleId', 'TableNormal')">
+      <xsl:when test="$tblPr and key('StyleId', 'TableNormal')">
         <!-- Use the TableNormal Style -->
         <xsl:variable name="style" select="key('StyleId', 'TableNormal')" />
         <xsl:call-template name="GetTableIndent">
