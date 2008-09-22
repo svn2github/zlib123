@@ -1464,15 +1464,15 @@
   -->
   <xsl:template name="ComputeGridWidth">
     <xsl:param name="grid" />
-    <xsl:param name="width" select="'0'" />
-    <xsl:param name="iterator" select="'0'" />
+    <xsl:param name="width" select="0" />
+    <xsl:param name="iterator" select="1" />
 
     <xsl:choose>
-      <xsl:when test="$iterator &lt; count($grid/w:gridCol)">
+      <xsl:when test="$iterator &lt;= count($grid/w:gridCol)">
         <xsl:call-template name="ComputeGridWidth">
           <xsl:with-param name="grid" select="$grid" />
           <xsl:with-param name="iterator" select="$iterator + 1"/>
-          <xsl:with-param name="width" select="$width + $grid/w:gridCol/@w:w"/>
+          <xsl:with-param name="width" select="$width + $grid/w:gridCol[number($iterator)]/@w:w"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
