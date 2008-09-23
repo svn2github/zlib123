@@ -433,8 +433,7 @@
   <!-- Preprocess oox sections properties -->
   <xsl:template name="sectionsPreProcessing">
     <psect:master-pages>
-      <xsl:for-each
-        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
+      <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
         <psect:master-page psect:name="{@style:name}">
           <xsl:if test="@style:next-style-name">
             <xsl:attribute name="psect:next-style">
@@ -447,9 +446,19 @@
           <xsl:apply-templates
             select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration"
             mode="note"/>
-          <xsl:apply-templates
-            select="key('page-layouts', @style:page-layout-name)[1]/style:page-layout-properties"
-            mode="master-page"/>
+
+          <!--
+          Context Switch For Each 
+          -->
+          <xsl:variable name="header" select="style:header" />
+          <xsl:variable name="footer" select="style:footer" />
+          <xsl:for-each select="key('page-layouts', @style:page-layout-name)[1]/style:page-layout-properties">
+            <xsl:call-template name="InsertPageLayoutProperties" >
+              <xsl:with-param name="hasHeader" select="$header" />
+              <xsl:with-param name="hasFooter" select="$footer" />
+            </xsl:call-template>
+          </xsl:for-each>
+
 
           <!--clam, dialogika: bugfix 1947998-->
           <xsl:variable name="all-master-pages" select="document('styles.xml')//style:master-page"></xsl:variable>

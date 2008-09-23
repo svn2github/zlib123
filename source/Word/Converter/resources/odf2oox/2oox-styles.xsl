@@ -1782,12 +1782,15 @@
 
 
   <!-- Page Layout Properties -->
-  <xsl:template match="style:page-layout-properties" mode="master-page">
+  <xsl:template name="InsertPageLayoutProperties">
+    <xsl:param name="hasFooter"/>
+    <xsl:param name="hasHeader"/>
+    
     <!-- background color lost if it is not main layout -->
-    <xsl:if
-      test="@fo:background-color != 'transparent' and parent::style:page-layout/@style:name != $default-master-style/@style:page-layout-name">
+    <xsl:if test="@fo:background-color != 'transparent' and parent::style:page-layout/@style:name != $default-master-style/@style:page-layout-name">
       <xsl:message terminate="no">translation.odf2oox.pageBgColor</xsl:message>
     </xsl:if>
+    
     <!-- page type -->
     <!-- TODO : review. This entails a page jump on an even or odd page with a potential unwanted blank page in between... -->
     <!--xsl:if test="parent::style:page-layout/@style:page-usage">
@@ -1800,6 +1803,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:if-->
+    
     <!-- page size -->
     <xsl:choose>
       <xsl:when
@@ -1821,7 +1825,10 @@
           mode="master-page"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="ComputePageMargins"/>
+        <xsl:call-template name="ComputePageMargins">
+          <xsl:with-param name="hasFooter" select="$hasFooter" />
+          <xsl:with-param name="hasHeader" select="$hasHeader" />
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
     <!-- paper source : must be a decimal number in OOX. Cannot convert codes -->
@@ -1950,11 +1957,12 @@
 
   <!-- Page margin properties -->
   <xsl:template name="ComputePageMargins">
+    <xsl:param name="hasFooter" />
+    <xsl:param name="hasHeader" />
+    
     <!-- report loss of header/footer properties -->
-    <xsl:variable name="header-properties"
-      select="parent::style:page-layout/style:header-style/style:header-footer-properties"/>
-    <xsl:variable name="footer-properties"
-      select="parent::style:page-layout/style:footer-style/style:header-footer-properties"/>
+    <xsl:variable name="header-properties" select="parent::style:page-layout/style:header-style/style:header-footer-properties"/>
+    <xsl:variable name="footer-properties" select="parent::style:page-layout/style:footer-style/style:header-footer-properties"/>
     <!-- this attribute exists when the user choose to automatically adapt the header/footer height,
           otherwise svg:height is used and it gives the exact header/footer height -->
     <xsl:if test="$header-properties/@fo:min-height">
@@ -1964,8 +1972,7 @@
       <xsl:message terminate="no">translation.odf2oox.footerDistance</xsl:message>
     </xsl:if>
     <w:pgMar>
-      <xsl:if
-        test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
+      <xsl:if test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
         <xsl:attribute name="w:top">
           <!-- distance from top edge of the page to document body -->
           <xsl:variable name="top">
@@ -1975,7 +1982,7 @@
           </xsl:variable>
           <xsl:choose>
             <!-- additional header height -->
-            <xsl:when test="$header-properties">
+            <xsl:when test="$hasHeader">
               <xsl:variable name="min-header-height">
                 <xsl:call-template name="twips-measure">
                   <xsl:with-param name="length">
@@ -1998,16 +2005,14 @@
           </xsl:choose>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if
-        test="@fo:margin != 'none' or @fo:margin-left != 'none' or @fo:padding != 'none' or @fo:padding-left != 'none' ">
+      <xsl:if test="@fo:margin != 'none' or @fo:margin-left != 'none' or @fo:padding != 'none' or @fo:padding-left != 'none' ">
         <xsl:attribute name="w:left">
           <xsl:call-template name="GetPageMargin">
             <xsl:with-param name="side">left</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if
-        test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
+      <xsl:if test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
         <xsl:attribute name="w:bottom">
           <xsl:variable name="bottom">
             <xsl:call-template name="GetPageMargin">
@@ -2016,7 +2021,7 @@
           </xsl:variable>
           <xsl:choose>
             <!-- additional footer height -->
-            <xsl:when test="$footer-properties">
+            <xsl:when test="$hasFooter">
               <xsl:variable name="min-footer-height">
                 <xsl:call-template name="twips-measure">
                   <xsl:with-param name="length">
@@ -2039,8 +2044,7 @@
           </xsl:choose>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if
-        test="@fo:margin != 'none' or @fo:margin-right != 'none' or @fo:padding != 'none' or @fo:padding-right != 'none' ">
+      <xsl:if test="@fo:margin != 'none' or @fo:margin-right != 'none' or @fo:padding != 'none' or @fo:padding-right != 'none' ">
         <xsl:attribute name="w:right">
           <xsl:call-template name="GetPageMargin">
             <xsl:with-param name="side">right</xsl:with-param>
@@ -2048,16 +2052,14 @@
         </xsl:attribute>
       </xsl:if>
       <!-- header and footer distance from page : get page margin -->
-      <xsl:if
-        test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
+      <xsl:if test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
         <xsl:attribute name="w:header">
           <xsl:call-template name="GetPageMargin">
             <xsl:with-param name="side">top</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if
-        test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
+      <xsl:if test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
         <xsl:attribute name="w:footer">
           <xsl:call-template name="GetPageMargin">
             <xsl:with-param name="side">bottom</xsl:with-param>
