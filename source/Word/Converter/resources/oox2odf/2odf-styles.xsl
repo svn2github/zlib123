@@ -2714,7 +2714,9 @@
                 </xsl:otherwise>
               </xsl:choose>            
 
-          </xsl:if>          
+          </xsl:if>
+
+          <xsl:call-template name="InsertPageNumberOffset" />
 
           <xsl:call-template name="setFoMarginTop">
             <xsl:with-param name="setParagraphWBefore" select="$DefaultBefore"/>
@@ -3845,7 +3847,6 @@
       w:afterAutospacing and w:beforeAutospacing attributes are lost
       w:afterLines and w:beforeLines attributes are lost 
     -->
-
     <xsl:variable name="StyleId">
       <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
     </xsl:variable>
@@ -3996,6 +3997,8 @@
     <!-- insert default properties for bidi paragraphs -->
     <xsl:call-template name="InsertDefaultBidiProperties"/>
 
+    <xsl:call-template name="InsertPageNumberOffset" />
+
     <!-- Sets top and/or bottom  margin if contextual spacing applies -->
     <xsl:variable name="isContextualSpacing">
       <xsl:call-template name="isContextualSpacing"/>
@@ -4065,7 +4068,8 @@
     <!-- drop cap properties -->
     <xsl:call-template name="InsertDropCapProperties"/>
   </xsl:template>
-
+  
+  
   <xsl:template name="contextualSpacing">
     <!-- @Description: Sets top and bottom margin to zero to emulate contextual spacing feature
             Expects that template isContextualSpacing is called before calling this template for 

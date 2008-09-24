@@ -7,6 +7,8 @@
   xmlns:oox="urn:oox"
   exclude-result-prefixes="oox">
 
+  <xsl:key name="elementsByOoxSectionId" match="w:body/*" use="@oox:s"/>
+
   <!-- 
   *************************************************************************
   MATCHING TEMPLATES
@@ -21,8 +23,6 @@
   Modified: makz (DIaLOGIKa)
             Changed from <xsl:template match="w:sectPr[parent::w:pPr]" mode="sections">
   -->
-	<xsl:key name="elementsByOoxSectionId" match="w:body/*" use="@oox:s"/>
-	
   <xsl:template match="w:sectPr" mode="sections">
     <!--xsl:variable name="id">
       <xsl:value-of select="generate-id(preceding::w:p/w:pPr/w:sectPr)"/>
@@ -45,9 +45,9 @@
           <xsl:attribute name="text:name">
             <xsl:value-of select="concat('S_',$id2)"/>
           </xsl:attribute>
-			<!-- select all top-level body elements which are in the current section -->
+			      <!-- select all top-level body elements which are in the current section -->
             <!--xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/child::node()[(generate-id(key('sectPr', number(@oox:s)))) = $id2]"/-->
-			<xsl:apply-templates select="key('elementsByOoxSectionId', number(@oox:s))"/>
+			      <xsl:apply-templates select="key('elementsByOoxSectionId', number(@oox:s))"/>
         </text:section>
       </xsl:otherwise>
     </xsl:choose>

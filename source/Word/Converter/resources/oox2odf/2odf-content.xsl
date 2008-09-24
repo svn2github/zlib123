@@ -257,6 +257,10 @@
 			<style:paragraph-properties>
 				<xsl:call-template name="InsertDefaultTabStop"/>
 				<xsl:call-template name="InsertParagraphProperties"/>
+
+        <xsl:for-each select="parent::w:p"> <!--context switch -->
+          <xsl:call-template name="InsertPageNumberOffset" />
+        </xsl:for-each>
 			</style:paragraph-properties>
 			<!-- add text-properties to empty paragraphs. -->
 			<!--clam, dialogika: bugfix 1752761-->
@@ -274,7 +278,7 @@
 		<xsl:if test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
 			<style:style style:name="{generate-id(.)}" style:family="paragraph">
 				<xsl:call-template name="MasterPageName"/>
-				<xsl:call-template name="InsertDefaultParagraphProperties"/>
+        <xsl:call-template name="InsertDefaultParagraphProperties"/>
 			</style:style>
 		</xsl:if>
 		<xsl:apply-templates mode="automaticstyles"/>
@@ -804,8 +808,9 @@
 					</xsl:call-template>
 				</xsl:variable>
 				<text:p>
-					<xsl:if
-					  test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
+          
+          <!-- Reference the style -->
+					<xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
 						<xsl:attribute name="text:style-name">
 							<xsl:choose>
 								<xsl:when test="./w:r/w:ptab/@w:alignment = 'right' and ./w:pPr/w:pStyle/@w:val = 'Footer'">
@@ -817,6 +822,7 @@
 							</xsl:choose>
 						</xsl:attribute>
 					</xsl:if>
+          
 					<xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
 						<text:change-end>
 							<xsl:attribute name="text:change-id">
@@ -824,7 +830,9 @@
 							</xsl:attribute>
 						</text:change-end>
 					</xsl:if>
-					<xsl:apply-templates/>
+          
+          <xsl:apply-templates/>
+          
 					<!--      if this following paragraph is attached to this one in track changes mode-->
 					<xsl:if test="w:pPr/w:rPr/w:del">
 						<xsl:call-template name="InsertDeletedParagraph"/>
@@ -1276,7 +1284,6 @@
 			<xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
 			<xsl:variable name="precSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s) - 1)"/>
 			<xsl:variable name="followingSectPr" select="(w:sectPr | key('sectPr', number(ancestor-or-self::node()/@oox:s))[ancestor::w:p/w:pPr/w:sectPr])[1]"/>
-
 			<xsl:choose>
 				<!-- first case : current section is continuous with preceding section (test if precSectPr exist to avoid bugs) -->
 				<xsl:when test="$precSectPr and $followingSectPr/w:type/@w:val = 'continuous' ">
@@ -1293,7 +1300,6 @@
 						</xsl:message>
 					</xsl:if>
 				</xsl:when>
-
 				<!-- beginning of document -->
 				<xsl:when test="not(preceding::w:p[ancestor::w:body])">
 					<xsl:choose>
@@ -1396,4 +1402,45 @@
 			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
+
+  
+  <!--
+  Summary:  Writes the offset for page numbers. 
+            The calling context must be a w:p node
+  Author:   makz (DIaLOGIKa)
+  -->
+  <xsl:template name="InsertPageNumberOffset">
+    <!-- 
+    Only change the page number offset for a paragraph in the body ...
+    -->
+    <xsl:if test="ancestor::w:body">
+
+      <!--
+      ... and only if this is the first paragraph in the section ...
+      -->
+      <xsl:if test="not(preceding-sibling::w:p) or preceding-sibling::w:p[1]/w:pPr/w:sectPr">
+
+        <xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
+        <xsl:variable name="followingSectPr" select="following-sibling::w:p[w:pPr/w:sectPr]/w:pPr/w:sectPr"/>
+
+        <xsl:choose>
+          <xsl:when test="$followingSectPr and $followingSectPr/w:pgNumType/@w:start">
+            <!-- there is a sectPr for this paragraph -->
+            <xsl:attribute name="style:page-number">
+              <xsl:value-of select="$followingSectPr/w:pgNumType/@w:start"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$mainSectPr and $mainSectPr/w:pgNumType/@w:start">
+            <!-- use the main sectPr -->
+            <xsl:attribute name="style:page-number">
+              <xsl:value-of select="$mainSectPr/w:pgNumType/@w:start"/>
+            </xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
+    
 </xsl:stylesheet>
