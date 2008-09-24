@@ -4965,18 +4965,20 @@
         </xsl:for-each>
         
 		<xsl:for-each select="key('StyleId', $parentStyleId)/w:pPr/w:tabs/w:tab">
-			<xsl:if
-			  test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos)">
-			  <xsl:variable name="pos">
-				<xsl:value-of select="./@w:pos"/>
-			  </xsl:variable>
-			  <!--clam, dialogika: bugfix 1839626-->
-			  <xsl:if test="not($me/w:tab[@w:pos=$pos][@w:val='clear'])">
-				<xsl:call-template name="InsertTabs">
-					<xsl:with-param name="MarginLeft" select="$MarginLeft"/>
-				</xsl:call-template>
-			  </xsl:if>
-			</xsl:if>
+      <xsl:variable name="currentPos" select="./@w:pos" />
+      <xsl:variable name="existingParentPos" select="key('ParagraphsByStyleId', $parentStyleId)[@w:pos=$currentPos][@w:val!='clear']" />
+      <xsl:if test="not($existingParentPos)">
+        <!--test="not(key('ParagraphsByStyleId', $parentStyleId)/@w:pos = ./@w:pos)">-->
+        <xsl:variable name="pos">
+          <xsl:value-of select="./@w:pos"/>
+        </xsl:variable>
+        <!--clam, dialogika: bugfix 1839626-->
+        <xsl:if test="not($me/w:tab[@w:pos=$pos][@w:val='clear'])">
+          <xsl:call-template name="InsertTabs">
+            <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:if>
 		</xsl:for-each>
 		  
 		<xsl:for-each select="key('StyleId', $parentParentStyleId)/w:pPr/w:tabs/w:tab">
