@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (c) 2008, DIaLOGIKa
  * All rights reserved.
  *
@@ -14,7 +14,7 @@
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY DIaLOGIKa ``AS IS´´ AND ANY
+ * THIS SOFTWARE IS PROVIDED BY DIaLOGIKa ``AS IS AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
  * DISCLAIMED. IN NO EVENT SHALL DIaLOGIKa BE LIABLE FOR ANY
@@ -188,11 +188,14 @@ namespace OdfConverter.OdfConverterLib
 
             // read Office version info
             int version;
+            using (new UILanguageHelper())
+            {
             int.TryParse(_application.GetString("Version"),
                 NumberStyles.Float,
                 CultureInfo.InvariantCulture,
                 out version);
             _officeVersion = (OfficeVersion)version;
+            }
 
             Application.EnableVisualStyles();
 
@@ -586,4 +589,26 @@ namespace OdfConverter.OdfConverterLib
             }
         }
     }
+
+    class UILanguageHelper : IDisposable
+    {
+        private CultureInfo currentCulture;
+
+        public UILanguageHelper()
+        {
+            // save current culture and set culture to en-US 
+            currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+        }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            // return to normal culture 
+            System.Threading.Thread.CurrentThread.CurrentCulture = currentCulture;
+        }
+
+        #endregion
+    } 
 }
