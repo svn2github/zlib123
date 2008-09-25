@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -37,7 +37,7 @@
     xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     exclude-result-prefixes="table r">
-    <xsl:import href="conditional.xsl"/>
+    <!--<xsl:import href="conditional.xsl"/>-->
 
     <!-- search validation -->
     <xsl:template match="table:table-row" mode="validation">

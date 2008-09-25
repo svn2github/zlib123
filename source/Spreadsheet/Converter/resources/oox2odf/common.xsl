@@ -1807,4 +1807,42 @@ Date        |ModifiedBy  |BugNo.   |Modification                                
     </xsl:choose>
   </xsl:template>
 
+	<xsl:template name ="getTableRangeSheetName">
+		<xsl:param name ="tblName"/>
+		<!-- Step 1: from worksheet get path for sheets-->
+		<xsl:variable name ="tblSheetName">
+			<xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets">
+				<xsl:for-each select ="e:sheet">
+					<xsl:variable name="sheet">
+						<xsl:call-template name="GetTarget">
+							<xsl:with-param name="id">
+								<xsl:value-of select="@r:id"/>
+							</xsl:with-param>
+							<xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name ="sheetName">
+						<xsl:value-of select ="@name"/>
+					</xsl:variable>
+					<xsl:for-each select ="key('Part', concat('xl/',$sheet))/e:worksheet/e:tableParts/e:tablePart">
+						<xsl:variable name ="tablePart">
+							<xsl:call-template name="GetTarget">
+								<xsl:with-param name="id">
+									<xsl:value-of select="@r:id"/>
+								</xsl:with-param>
+								<xsl:with-param name="document">
+									<xsl:value-of select="concat('xl/',$sheet)"/>
+								</xsl:with-param>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:for-each select ="document(concat('xl/',substring-after($tablePart,'../')))//node()[name()='table' and @name=$tblName]">
+							<xsl:value-of select ="concat(@ref,'|',$sheetName)"/>
+						</xsl:for-each>
+					</xsl:for-each>
+				</xsl:for-each>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:value-of select ="$tblSheetName"/>
+	</xsl:template>
+
 </xsl:stylesheet>

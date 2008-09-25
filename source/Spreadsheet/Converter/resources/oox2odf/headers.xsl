@@ -1,4 +1,4 @@
-<!--
+﻿<!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
   * 
@@ -33,7 +33,7 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" exclude-result-prefixes="a e">
 
-  <xsl:import href="common.xsl"/>
+  <!--<xsl:import href="common.xsl"/>-->
 
   <xsl:template name="InsertHeaderFooterStyles">
     <xsl:param name="activeTab"/>

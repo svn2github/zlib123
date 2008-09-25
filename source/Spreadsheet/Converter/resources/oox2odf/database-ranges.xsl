@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -30,7 +30,7 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e ">
 
-	<xsl:import href="common.xsl"/>
+	<!--<xsl:import href="common.xsl"/>-->
 
 	<xsl:template name="InsertDatabaseRange">
 		<xsl:param name="number"/>

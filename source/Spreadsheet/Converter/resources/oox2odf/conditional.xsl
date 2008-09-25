@@ -43,10 +43,10 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="e oox r">
 
-  <xsl:import href="common.xsl"/>
+  <!--<xsl:import href="common.xsl"/>
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
-  <xsl:import href="styles.xsl"/>
+  <xsl:import href="styles.xsl"/>-->
   
   <xsl:key name="XfStyle" match="e:xf" use="@oox:id"/>
 
@@ -496,7 +496,14 @@
     </xsl:variable>
     
     <xsl:variable name="s">
+		<xsl:choose>
+			<xsl:when test ="not(contains($sqref,':'))">
       <xsl:value-of select="parent::e:worksheet/e:sheetData/e:row/e:c[@r = $sqref]/@s"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="''"/>
+			</xsl:otherwise>
+		</xsl:choose>      	
     </xsl:variable>
     
     <xsl:if test="$s != ''">

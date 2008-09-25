@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -47,16 +47,20 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   exclude-result-prefixes="table r text style fo dc svg">
 
 <!--RefNO-2:xmlns and Exclude prefix svg is added-->
-  <xsl:import href="measures.xsl"/>
+  <!--<xsl:import href="measures.xsl"/>-->
 
   <!-- template which inserts sharedstringscontent -->
   <xsl:template name="InsertSharedStrings">
     <sst>
+		<xsl:for-each select="document('content.xml')">
       <xsl:variable name="Count">
         <!-- string can be in a simple row or a header row -->
-        <xsl:value-of
+				<!--<xsl:value-of
           select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))] |
           document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-header-rows/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])"
+        />-->
+				<xsl:value-of
+				select="count(office:document-content/office:body/office:spreadsheet/table:table//table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])"
         />
       </xsl:variable>
       <!-- possibly unnecessary attribute-->
@@ -67,6 +71,7 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
         <xsl:value-of select="$Count"/>
       </xsl:attribute>
       <xsl:call-template name="InsertString"/>
+		</xsl:for-each>
     </sst>
   </xsl:template>
 
@@ -75,7 +80,7 @@ RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
     <!-- string can be in a simple row or a header row -->
     <!--this is shortened version for grouping-->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]
+      select="office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]
       ">
       <si>
         <pxsi:maxlength xmlns:pxsi="urn:cleverage:xmlns:post-processings:cellText">        

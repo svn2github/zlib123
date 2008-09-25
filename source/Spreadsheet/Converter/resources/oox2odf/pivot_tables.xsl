@@ -40,9 +40,9 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="common.xsl"/>
-  <xsl:import href="measures.xsl"/>
+  <xsl:import href="measures.xsl"/>-->
 
 
   <xsl:template name="InsertPilotTables">
@@ -289,21 +289,92 @@
                   <xsl:variable name="apos">
                     <xsl:text>&apos;</xsl:text>
                   </xsl:variable>
+				  <xsl:variable name ="isSourceSimpleData">
+						<xsl:if test ="@ref and @sheet">
+							<xsl:value-of select ="'true'"/>
+						</xsl:if>
+						<xsl:if test ="@name">
+							<xsl:value-of select ="'false'"/>
+						</xsl:if>
+					</xsl:variable>
+				  <xsl:variable name ="sourceRange">
+						<xsl:choose>
+							<xsl:when test ="$isSourceSimpleData='true'">
+								<xsl:value-of select ="@ref"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:variable name ="isNamedRange">
+									<xsl:call-template name ="CheckIfNamedRange">
+										<xsl:with-param name ="name">
+											<xsl:value-of select ="@name"/>
+										</xsl:with-param>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test ="$isNamedRange!=''">
+										<xsl:value-of select ="$isNamedRange"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:variable name ="tblSheetName">
+											<xsl:call-template name ="getTableRangeSheetName">
+												<xsl:with-param name ="tblName">
+													<xsl:value-of select ="@name"/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:variable>
+										<xsl:value-of select ="$tblSheetName"/>
+									</xsl:otherwise>
+								</xsl:choose>
+								<!--<xsl:variable name ="tableName">
+									<xsl:value-of select ="@name"/>
+								</xsl:variable>-->
+								<!-- $sheet = worksheets/sheet1.xml-->
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
                   <xsl:variable name="sheetSourceName">
-                    <xsl:value-of select="@sheet"/>
-                  </xsl:variable>
-                  <xsl:variable name="firstSourceAdress">
-                    <xsl:value-of select="substring-before(@ref,':')"/>
-                  </xsl:variable>
+						<xsl:choose>
+							<xsl:when test ="$isSourceSimpleData='true'">
+								<xsl:value-of select ="@sheet"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="substring-after($sourceRange,'|')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+                 <xsl:variable name="firstSourceAdress">
+						<xsl:choose>
+							<xsl:when test ="$isSourceSimpleData='true'">
+								<xsl:value-of select="substring-before($sourceRange,':')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="substring-before(substring-before($sourceRange,'|'),':')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
                   <xsl:variable name="lastSourceAdress">
-                    <xsl:value-of select="substring-after(@ref,':')"/>
-                  </xsl:variable>
+						<xsl:choose>
+							<xsl:when test ="$isSourceSimpleData='true'">
+								<xsl:value-of select="substring-after($sourceRange,':')"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="substring-after(substring-before($sourceRange,'|'),':')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
                   <xsl:variable name ="sheetNameId">
                     <xsl:value-of select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet[@name=$sheetSourceName]/@r:id"/>
                   </xsl:variable>
                   <xsl:variable name ="target">
-                    <xsl:value-of select ="key('Part','xl/_rels/workbook.xml.rels')//rels:Relationship[@Id=$sheetNameId]/@Target"/>
-                  </xsl:variable>
+						<xsl:choose>
+							<xsl:when test ="$isSourceSimpleData='true'">
+								<xsl:value-of select ="key('Part','xl/_rels/workbook.xml.rels')//rels:Relationship[@Id=$sheetNameId]/@Target"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select ="$sheet"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
                   <xsl:variable name ="lastAddressFromSheet">
                     <xsl:if test ="$target != ''">
                       <xsl:for-each select ="key('Part',concat('xl/',$target))//e:worksheet">
@@ -345,6 +416,8 @@
 															  where as the data source has only 51 rows. On comparing both the values the condition is eliminated and the attribute value is set.
 									-->
                   <table:source-cell-range>
+					  <xsl:choose>
+						  <xsl:when test ="$isSourceSimpleData='true'">
                     <xsl:if test ="$rowNumFromSheet!='' and $rowNumFromCache &gt; $rowNumFromSheet">
                       <xsl:attribute name="table:cell-range-address">
                         <xsl:value-of
@@ -363,6 +436,14 @@
                           select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"/>
                       </xsl:attribute>
                     </xsl:if>
+						  </xsl:when>
+						  <xsl:otherwise>
+							  <xsl:attribute name="table:cell-range-address">
+								  <xsl:value-of
+									select="concat($apos,$sheetSourceName,$apos,'.',$firstSourceAdress,':',$apos,$sheetSourceName,$apos,'.',$lastSourceAdress)"/>
+							  </xsl:attribute>
+						  </xsl:otherwise>
+					  </xsl:choose>
                     <!-- Insert Filters-->
                     <xsl:for-each
                       select="key('Part', concat('xl/',$TargetPilotFile))/e:pivotTableDefinition/e:filters">
@@ -1149,7 +1230,8 @@
 				<xsl:variable name="apos">
 					<xsl:text>&apos;</xsl:text>
 				</xsl:variable>
-
+					<xsl:choose>
+						<xsl:when test ="@ref and @sheet">
 				<xsl:variable name="sheetSourceName">
 					<xsl:value-of select="@sheet"/>
 				</xsl:variable>
@@ -1164,6 +1246,11 @@
 				<xsl:if test ="$sheetSourceName != '' and $firstSourceAdress!='' and $lastSourceAdress!='' ">
 					<xsl:value-of select ="'true'"/>
 				</xsl:if>
+						</xsl:when>
+						<xsl:when test ="@name">
+							<xsl:value-of select ="'true'"/>
+						</xsl:when>
+					</xsl:choose>
 			</xsl:for-each>
 		</xsl:for-each >
 	</xsl:variable>
@@ -1174,5 +1261,40 @@
 		<xsl:value-of select ="'false'"/>
 	</xsl:if>
 </xsl:template>
+	<xsl:template name ="CheckIfNamedRange">
+		<xsl:param name ="name"/>
+		<xsl:for-each select="key('Part','xl/workbook.xml')//e:definedNames/e:definedName[@name=$name]">
+			<xsl:variable name ="range">
+				<xsl:value-of select ="."/>
+			</xsl:variable>
+			<xsl:variable name ="sheetName">
+				<xsl:value-of select ="substring-before(substring-before($range,':'),'!')"/>
+			</xsl:variable>
+			<xsl:choose>
+				<xsl:when test ="substring-after($range,':')!=''">
+					<xsl:variable name ="part1">
+							<xsl:value-of select ="translate(substring-after(substring-before($range,':'),'!'),'!-$#():,.+','')"/>
+						</xsl:variable>
+						<xsl:variable name ="part2">
+							<xsl:variable name ="endRange">
+								<xsl:value-of select ="substring-after($range,':')"/>
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test ="contains($endRange,'!')">
+									<xsl:value-of select ="translate(substring-after($endRange,'!'),'!-$#():,.+','')"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select ="translate($endRange,'!-$#():,.+','')"/>
+								</xsl:otherwise>	
+							</xsl:choose>
+						</xsl:variable>
+						<xsl:value-of select ="concat($part1,':',$part2,'|',$sheetName)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select ="concat(translate(substring-after($range,'!'),'!-$#():,.+',''),'|',$sheetName)"/>
+					</xsl:otherwise>
+				</xsl:choose>					
+		</xsl:for-each>
+	</xsl:template>
 <!--End of Vijayeta, 1803593,sales.xlsx,konto2006.xlsx-->
 </xsl:stylesheet>

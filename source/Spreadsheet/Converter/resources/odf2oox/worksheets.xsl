@@ -50,7 +50,7 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
 
   <!--<xsl:import href="measures.xsl"/>-->
-  <xsl:import href="pixel-measure.xsl"/>
+  <!--<xsl:import href="pixel-measure.xsl"/>
   <xsl:import href="page.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="conditional.xsl"/>
@@ -58,7 +58,7 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
   <xsl:import href="sortFilter.xsl"/>
   <xsl:import href="validation.xsl"/>
   <xsl:import href="data_consolidation.xsl"/>
-  <xsl:import href="scenario.xsl"/>
+  <xsl:import href="scenario.xsl"/>-->
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
@@ -83,7 +83,7 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
     <xsl:param name="CheckIfConditional"/>
 
     <xsl:variable name="ConditionalCellStyle">
-      <xsl:for-each select="document('content.xml')/office:document-content/office:automatic-styles/style:style[style:map]">
+      <xsl:for-each select="/office:document-content/office:automatic-styles/style:style[style:map]">
         <xsl:value-of select="concat(@style:name, '|')"/>
       </xsl:for-each>
     </xsl:variable>

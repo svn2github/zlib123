@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -52,8 +52,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
   <!-- @Description: This stylesheet is used for charts conversion -->
   <!-- @Created: 2007-05-24 -->
 
-  <xsl:import href="number.xsl"/>
-  <xsl:import href="gradient.xsl"/>
+  <!--<xsl:import href="number.xsl"/>
+  <xsl:import href="gradient.xsl"/>-->
 
   <xsl:key name="rows" match="table:table-rows" use="''"/>
   <xsl:key name="header" match="table:table-header-rows" use="''"/>

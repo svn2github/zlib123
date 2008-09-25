@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -48,8 +48,8 @@ RefNo-2 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   exclude-result-prefixes="e r v">
 
-  <xsl:import href="common.xsl"/>
-  <xsl:import href="measures.xsl"/>
+  <!--<xsl:import href="common.xsl"/>
+  <xsl:import href="measures.xsl"/>-->
   <xsl:key name="Stroke" match="v:stroke" use="''"/>
 
   <!-- Get cell with note -->

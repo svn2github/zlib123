@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -338,7 +338,7 @@
 			  </fill>
 		  </dxf>
 		  <xsl:for-each
-		 select="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+		 select="office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
 			  <xsl:variable name="StyleApplyStyleName">
 				  <xsl:value-of select="@style:apply-style-name"/>
 			  </xsl:variable>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -42,8 +42,8 @@
   xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:dc="http://purl.org/dc/elements/1.1/"
   exclude-result-prefixes="svg table r text style number fo">
 
-  <xsl:import href="sharedStrings.xsl"/>
-  <xsl:import href="styles.xsl"/>
+  <!--<xsl:import href="sharedStrings.xsl"/>
+  <xsl:import href="styles.xsl"/>-->
 
   <xsl:template name="comments">
     <xsl:param name="sheetNum"/>

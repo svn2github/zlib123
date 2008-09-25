@@ -40,11 +40,11 @@
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e oox r v">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="insert_cols.xsl"/>
   <xsl:import href="date_time.xsl"/>
   <xsl:import href="insert_text.xsl"/>
-  <xsl:import href="elements.xsl"/>
+  <xsl:import href="elements.xsl"/>-->
 
   <!--xsl:key name="hyperlinkPosition" match="e:c" use="'@r'"/-->
   <xsl:key name="ref" match="e:hyperlink" use="@ref"/>

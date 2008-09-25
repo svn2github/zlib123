@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -49,7 +49,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   exclude-result-prefixes="svg table r text style number fo draw">
 
-  <xsl:import href="measures.xsl"/>
+  <!--<xsl:import href="measures.xsl"/>-->
 	<xsl:key name="text" match="number:text-style" use="@style:name"/>
   <xsl:key name="number" match="number:number-style" use="@style:name"/>
   <xsl:key name="percentage" match="number:percentage-style" use="@style:name"/>
@@ -61,6 +61,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
   <xsl:template name="styles">
     <styleSheet>
+		<xsl:for-each select ="document('content.xml')">
       <xsl:call-template name="InsertNumFormats"/>
       <xsl:call-template name="InsertFonts"/>
       <xsl:call-template name="InsertFills"/>
@@ -69,6 +70,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <xsl:call-template name="InsertCellStyles"/>
       <xsl:call-template name="InsertConditionalFormat"/>
       <xsl:call-template name="InsertTableStyles"/>
+		</xsl:for-each>
     </styleSheet>
   </xsl:template>
 
@@ -77,7 +79,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
   <xsl:template name="InsertNumFormats">
 
     <!-- message about  not supported quarter and week date format-->
-	  <xsl:for-each select ="document('content.xml')/office:document-content/office:automatic-styles">
+	  <xsl:for-each select ="office:document-content/office:automatic-styles">
 		  <xsl:choose>
 			  <xsl:when test="number:date-style/number:quarter">
 				  <xsl:message terminate="no">translation.odf2oox.QuarterDateFormat</xsl:message>
@@ -104,7 +106,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <!-- number of all number styles in content.xml -->
       <xsl:variable name="countNumber">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+          select="count(office:document-content/office:automatic-styles/number:number-style)"
         />
       </xsl:variable>
 
@@ -118,7 +120,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <!-- number of all percentage styles in content.xml -->
       <xsl:variable name="countPercentage">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
+          select="count(office:document-content/office:automatic-styles/number:percentage-style)"
         />
       </xsl:variable>
 
@@ -132,7 +134,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <!-- number of all currency styles in content.xml -->
       <xsl:variable name="countCurrency">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
+          select="count(office:document-content/office:automatic-styles/number:currency-style)"
         />
       </xsl:variable>
 
@@ -146,7 +148,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <!-- number of all date styles in content.xml -->
       <xsl:variable name="countDate">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:date-style)"
+          select="count(office:document-content/office:automatic-styles/number:date-style)"
         />
       </xsl:variable>
 
@@ -160,7 +162,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <!-- number of all time styles in content.xml -->
       <xsl:variable name="countTime">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
+          select="count(office:document-content/office:automatic-styles/number:time-style)"
         />
       </xsl:variable>
 
@@ -179,7 +181,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
       <!-- apply number styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:number-style[1]"
+        select="office:document-content/office:automatic-styles/number:number-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">1</xsl:with-param>
         <xsl:with-param name="styleName"/>
@@ -189,7 +191,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
                     Date     : 4th Jul '08
                     Desc     : user defined format #####Bf handeled-->
 		<xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:text-style[1]"
+        select="office:document-content/office:automatic-styles/number:text-style[1]"
         mode="numFormat">
 			<xsl:with-param name="numId">1</xsl:with-param>
 			<xsl:with-param name="styleName"/>
@@ -207,7 +209,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
       <!-- apply percentage styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style[1]"
+        select="office:document-content/office:automatic-styles/number:percentage-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of select="$countNumber+$countStyleNumber+1"/>
@@ -227,7 +229,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
       <!-- apply currency styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:currency-style[1]"
+        select="office:document-content/office:automatic-styles/number:currency-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of
@@ -250,7 +252,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
       <!-- apply date styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:date-style[1]"
+        select="office:document-content/office:automatic-styles/number:date-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of
@@ -274,7 +276,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
       <!-- apply time styles from content.xml -->
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/number:time-style[1]"
+        select="office:document-content/office:automatic-styles/number:time-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of
@@ -305,17 +307,19 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
     <fonts>
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)])"
+          select="count(office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)])"
         />
       </xsl:attribute>
 
       <!-- default font-->
+		<xsl:for-each
+              select="document('styles.xml')">
       <xsl:choose>
         <xsl:when
-          test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties">
+				  test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties">
           <font>
             <xsl:for-each
-              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties">
+						  select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties">
               <xsl:call-template name="InsertTextProperties">
                 <xsl:with-param name="mode">default</xsl:with-param>
               </xsl:call-template>
@@ -331,13 +335,14 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
           </font>
         </xsl:otherwise>
       </xsl:choose>
+		</xsl:for-each>
 
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="office:document-content/office:automatic-styles"
         mode="fonts"/>
 		<!--Code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
 		<xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="office:document-content/office:automatic-styles"
         mode="notesFonts"/>
 		<!--End of code added  by vijayeta, Fix for the bug 1797056, date: 2nd Nov '07-->
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
@@ -347,7 +352,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
       <!--hyperlink font properties-->
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)and not(ancestor::office:annotation)]">
+          test="descendant::text:a[not(ancestor::draw:custom-shape)and not(ancestor::office:annotation)]">
 
           <xsl:call-template name="InsertHyperlinkTextStyle"/>
 
@@ -366,7 +371,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
         <patternFill patternType="gray125"/>
       </fill>
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="office:document-content/office:automatic-styles"
         mode="background-color"/>
 
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
@@ -457,7 +462,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
         <diagonal/>
       </border>
       <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles"
+        select="office:document-content/office:automatic-styles"
         mode="border"/>
 
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
@@ -472,9 +477,9 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 		<xsl:variable name="multilines">
 			<xsl:choose>
 				<xsl:when
-				  test="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p[2]]">
+				  test="office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p[2]]">
 					<xsl:for-each
-					  select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::text:p[last()]">
+					  select="office:document-content/office:body/office:spreadsheet/descendant::text:p[last()]">
 						<xsl:number count="table:table-cell[text:p[2]]" level="any"/>
 					</xsl:for-each>
 				</xsl:when>
@@ -591,11 +596,15 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 			</cellStyleXfs>
 
 			<cellXfs>
-
+                          <xsl:variable name ="ValOfCount">
+				  <xsl:for-each select ="document('content.xml')">					  
+					  <xsl:value-of
+					  select="count(office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(descendant::text:a[@xlink:href and not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)])"/>					  
+					</xsl:for-each>
+				</xsl:variable>
 				<xsl:attribute name="count">
 					<xsl:value-of
-					  select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/descendant::text:a[@xlink:href and not(ancestor::draw:custom-shape) and not(ancestor::office:annotation)])"
-        />
+					  select="$ValOfCount"/>
 				</xsl:attribute>
 
 				<!-- default style -->
@@ -1756,7 +1765,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
     <xsl:variable name="styleNumStyleCount">
       <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/number:number-style)"
+        select="count(office:styles/number:number-style)"
       />
     </xsl:variable>
 
@@ -1768,7 +1777,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
     <xsl:variable name="stylePercentStyleCount">
       <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"
+        select="count(office:styles/number:percentage-style)"
       />
     </xsl:variable>
 
@@ -1780,7 +1789,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
     <xsl:variable name="styleCurrencyStyleCount">
       <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/number:currency-style)"
+        select="count(office:styles/number:currency-style)"
       />
     </xsl:variable>
 
@@ -1792,7 +1801,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
     <xsl:variable name="styleDateStyleCount">
       <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/number:date-style)"
+        select="count(office:styles/number:date-style)"
       />
     </xsl:variable>
 
@@ -1810,7 +1819,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
     <xsl:variable name="styleFontsCount">
       <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
+        select="count(office:styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
       />
     </xsl:variable>
 
@@ -1847,7 +1856,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
                 <xsl:value-of select="@table:style-name"/>
               </xsl:variable>
               <xsl:for-each
-                select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$TableStyleName]">
+                select="office:styles/style:style[@style:name=$TableStyleName]">
                 <xsl:value-of
                   select="count(preceding-sibling::style:style[@style:family='table-cell']) + 1"/>
               </xsl:for-each>
@@ -1899,7 +1908,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
                       <xsl:value-of select="@table:style-name"/>
                     </xsl:variable>
                     <xsl:for-each
-                      select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$cellStyleName]">
+                      select="office:styles/style:style[@style:name=$cellStyleName]">
                       <xsl:call-template name="XfId"/>
                     </xsl:for-each>
                   </xsl:otherwise>
@@ -1930,7 +1939,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
                 <!-- when style is in styles.xml -->
                 <xsl:otherwise>
                   <xsl:for-each
-                    select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
+                    select="office:styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
                     <xsl:call-template name="SetFormatProperties">
                       <xsl:with-param name="multiline">
                         <xsl:text>true</xsl:text>
@@ -2004,7 +2013,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
                     <!-- when style is in styles.xml -->
                     <xsl:otherwise>
                       <xsl:for-each
-                        select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$columnCellStyle]">
+                        select="office:styles/style:style[@style:name=$columnCellStyle]">
 
 
                         <xsl:attribute name="xfId">
@@ -2031,7 +2040,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
                   <xsl:attribute name="xfId">
                     <xsl:value-of
-                      select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
+                      select="count(office:styles/style:style[@style:family = 'table-cell']) + 1"
                     />
                   </xsl:attribute>
 
@@ -2043,14 +2052,14 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
                   <xsl:variable name="styleFontCount">
                     <xsl:value-of
-                      select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
+                      select="count(office:styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
                     />
                   </xsl:variable>
 
                   <xsl:attribute name="fontId">
                     <xsl:choose>
                       <xsl:when
-                        test="document('styles.xml')/office:document-styles/office:styles/style:style[contains(@style:name, 'Hyperlink') and @style:family = 'table-cell']">
+                        test="office:styles/style:style[contains(@style:name, 'Hyperlink') and @style:family = 'table-cell']">
                         <xsl:value-of select="$contentFontCount + $styleFontCount + 2"/>
                       </xsl:when>
                       <xsl:otherwise>
@@ -2700,7 +2709,9 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
     <!--RefNo-1<xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[descendant::text:a]">-->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/descendant::table:table-row/table:table-cell[descendant::text:a]">
+      select="document('content.xml')">
+		  <xsl:for-each
+			select="office:document-content/office:body/office:spreadsheet/table:table/descendant::table:table-row/table:table-cell[descendant::text:a]">
 
       <!--RefNo-2:variable to chk multiline-->
       <xsl:variable name="hypMultiLine">
@@ -2714,10 +2725,10 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]">
+					test="/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]">
 
           <xsl:apply-templates
-            select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
+						select="/office:document-content/office:automatic-styles/style:style[@style:name=$StyleName]"
             mode="cellFormats">
             <xsl:with-param name="numStyleCount">
               <xsl:value-of select="$numStyleCount"/>
@@ -2890,7 +2901,7 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 
 
     </xsl:for-each>
-
+	  </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="table:table-cell" mode="HyperlinkStyle">

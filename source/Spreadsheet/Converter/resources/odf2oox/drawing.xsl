@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -45,8 +45,8 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
   xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" exclude-result-prefixes="a r">
 
-  <xsl:import href="cell.xsl"/>
-  <xsl:import href="common.xsl"/>
+  <!--<xsl:import href="cell.xsl"/>
+  <xsl:import href="common.xsl"/>-->
 
   <!-- Insert Drawing (picture, chart)  -->
   <xsl:template name="InsertDrawing">

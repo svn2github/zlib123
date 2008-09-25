@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -49,8 +49,8 @@
   <!-- @Description: This stylesheet is used for charts conversion -->
   <!-- @Created: 2007-05-24 -->
 
-  <xsl:import href="relationships.xsl"/>
-  <xsl:import href="Gradient.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
+  <xsl:import href="Gradient.xsl"/>-->
 
   <xsl:key name="dataSeries" match="c:ser" use="@oox:part"/>
   <xsl:key name="numPoints" match="c:val" use="@oox:part"/>
@@ -1349,6 +1349,21 @@
               <xsl:call-template name="InsertXAxis"/>
             </xsl:for-each>
             
+            <xsl:for-each
+              select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
+              <xsl:call-template name="InsertYAxis"/>
+            </xsl:for-each>
+          </xsl:when>
+          
+          <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:barChart">
+            <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:dateAx">
+              <xsl:call-template name="InsertXAxis"/>
+            </xsl:for-each>
+
+            <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx">
+              <xsl:call-template name="InsertXAxis"/>
+            </xsl:for-each>
+
             <xsl:for-each
               select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
               <xsl:call-template name="InsertYAxis"/>

@@ -29,7 +29,7 @@
 Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-RefNo-1 22-Jan-2008 Sandeep S     1832335   to avoid New line inserted in note content after roundtrip conversions                 
+RefNo-1 08-sep-2008 Sandeep S     New feature   Changes for formula implementation.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 */
 
@@ -38,6 +38,7 @@ using System.Xml;
 using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using CleverAge.OdfConverter.OdfZipUtils;
+using System.Text.RegularExpressions;
 
 
 namespace CleverAge.OdfConverter.Spreadsheet
@@ -122,6 +123,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 this.nextWriter.WriteString(ConditionalModification(stringSqref[text].ToString()));              
                 ElementName = "";
             }
+            //Start of RefNo-1
+            else if (text.StartsWith("sonataOdfFormula"))
+            {
+                this.nextWriter.WriteString(GetFormula(text.Substring(16)));
+            }
+            //End of RefNo-1
             else
             {
                 this.nextWriter.WriteString(text);
@@ -290,5 +297,370 @@ namespace CleverAge.OdfConverter.Spreadsheet
             return result;
         }
 
+        //Start of RefNo-1 : Methods for formula translation
+        protected string GetFormula(string strOdfFormula)
+        {
+            string strOoxFormula = "";
+            if (strOdfFormula != "")
+            {
+                //TODO : chk for the other namespaces:Eg Engginering formulas.
+                if (strOdfFormula.StartsWith("oooc:"))
+                {
+                    strOoxFormula = TranslateToOoxFormula(strOdfFormula.Substring(6));
+                }
+                else
+                {
+                    strOoxFormula = strOdfFormula;
+                }
+            }
+            else
+            {
+                strOoxFormula = strOdfFormula;
+            }
+            return strOoxFormula;
+        }
+
+        protected string TranslateToOoxFormula(string strOdfFormula)
+        {
+            string strFinalFormula = "";
+            string strExpToTrans = "";
+
+            //TODO : chk for other representations starting with &_;
+            //to replace &quot; with " operator.
+            strOdfFormula = strOdfFormula.Replace("&quot;", "\"");
+            //to replace parameter seperation operator.
+            strOdfFormula = strOdfFormula.Replace(';', ',');
+            //to replace union operator 
+            strOdfFormula = strOdfFormula.Replace('!', ' ');
+            //replace &apos; with ' operator
+            strOdfFormula = strOdfFormula.Replace("&apos;", "'");
+            /*The functions whose names end with _ADD return the same results as the corresponding Microsoft Excel functions. Use the functions without _ADD to get results based on international standards. For example, the WEEKNUM function calculates the week number of a given date based on international standard ISO 6801, while WEEKNUM_ADD returns the same week number as Microsoft Excel.
+             XML representation contains the namespace com.sun.star.sheet.addin.Analysis.getWeeknum(*/
+            strOdfFormula = strOdfFormula.Replace("com.sun.star.sheet.addin.Analysis.get", "");
+            strOdfFormula = strOdfFormula.Replace("com.sun.star.sheet.addin.DateFunctions.get", "");
+            strOdfFormula = strOdfFormula.Replace("com.sun.star.sheet.addin.DateFunctions.getDiff", "");
+
+            strOdfFormula = strOdfFormula.Replace("ERRORTYPE(", "ERROR.TYPE(");
+            //chk for parameter discripency
+
+            //TODO : chk for the '[' within the string
+            //to translate cell reference
+            if (strOdfFormula.Contains("["))
+            {
+                while (strOdfFormula.Contains("["))
+                {
+                    int intStart = strOdfFormula.IndexOf('[');
+                    int intEnd = strOdfFormula.IndexOf(']');
+                    strFinalFormula = strFinalFormula + strOdfFormula.Substring(0, intStart);
+                    strExpToTrans = strOdfFormula.Substring(intStart + 1, intEnd - intStart - 1);
+                    strOdfFormula = strOdfFormula.Substring(intEnd + 1);
+
+                    strFinalFormula = strFinalFormula + TranslateToOoxCellRef(strExpToTrans);
+                    if (!strOdfFormula.Contains("["))
+                    {
+                        strFinalFormula = strFinalFormula + strOdfFormula;
+                    }
+                }
+            }
+            else
+            {
+                strFinalFormula = strOdfFormula;
+            }
+
+            return strFinalFormula = TransFormulaParms(strFinalFormula);
+
+        }
+
+        protected string TranslateToOoxCellRef(string strOdfCellRef)
+        {
+            if (strOdfCellRef.StartsWith("."))
+            {
+                return strOdfCellRef = strOdfCellRef.Replace(".", ""); 
+            }
+            else
+            {
+                //TODO : chk for sheet name
+                strOdfCellRef = strOdfCellRef.Replace(":.", ":");
+                return strOdfCellRef = strOdfCellRef.Replace('.', '!');
+            }
+        }
+
+        protected string TransFormulaParms(string strFormula)
+        {
+            string strTransFormula = "";
+            string strFormulaToTrans = "";
+            string strExpression = "";
+
+            //chking for key word
+            if (strFormula.Contains("ADDRESS(") || strFormula.Contains("CELING(") || strFormula.Contains("FLOOR("))
+            {
+                while (strFormula != "")
+                {
+                    //TODO : Include other formulas. need to chk which formula is comming first.
+                    if (strFormula.Contains("ADDRESS(") || strFormula.Contains("CELING(") || strFormula.Contains("FLOOR("))
+                    {
+                        int[] arrIndex = new int[3];
+
+                        string strFunction = "";
+                        int intFunction = 0;
+                        int intIndex = 0;
+
+                        arrIndex[0] = strFormula.IndexOf("ADDRESS(");//ADD 4th parm:1
+                        arrIndex[1] = strFormula.IndexOf("CELING(");//remove 3rd parm
+                        arrIndex[2] = strFormula.IndexOf("FLOOR(");//remove 3rd parm
+
+
+                        if (arrIndex[0] >= 0 && arrIndex[0] > arrIndex[1] && arrIndex[0] > arrIndex[2])
+                        {
+                            strFunction = "ADDRESS(";
+                            intFunction = 1;
+                            intIndex = arrIndex[0];
+
+                        }
+                        else if (arrIndex[1] >= 0 && arrIndex[1] > arrIndex[0] && arrIndex[1] > arrIndex[2])
+                        {
+                            strFunction = "CELING(";
+                            intFunction = 2;
+                            intIndex = arrIndex[1];
+                        }
+                        else if (arrIndex[2] >= 0 && arrIndex[2] > arrIndex[1] && arrIndex[2] > arrIndex[0])
+                        {
+                            strFunction = "FLOOR(";
+                            intFunction = 3;
+                            intIndex = arrIndex[2];
+                        }
+                        //|| strFormula.Contains("CELING(") || strFormula.Contains("FLOOR("))
+
+                        string strConvertedExp = "";
+                        strTransFormula = strTransFormula + strFormula.Substring(0, intIndex);
+                        strFormulaToTrans = strFormula.Substring(intIndex);
+                        if (strFormulaToTrans.Contains(")"))
+                        {
+                            strExpression = GetExpression(strFormulaToTrans);
+                        }
+                        if (strExpression != "")
+                        {
+                            //TODO : if function with one parm and second to be added.
+                            if (strExpression.Contains(","))
+                            {
+                                if (intFunction == 1)
+                                {
+                                    strConvertedExp = AddRemoveParm(strExpression, 4, true, false, "1");
+                                }
+                                else
+                                {
+                                    strConvertedExp = AddRemoveParm(strExpression, 3, false, true, "");
+                                }
+                            }
+                            else
+                            {
+                                strConvertedExp = strExpression;
+                            }
+                            //use converted and send remaining for chk
+                            strTransFormula = strTransFormula + strConvertedExp;
+                            strFormula = strFormulaToTrans.Remove(0, strExpression.Length);
+                        }
+                        else
+                        {
+                            //remove the key word and send remaing for chk
+                            strTransFormula = strTransFormula + strFormulaToTrans.Substring(0, strFunction.Length);
+                            strFormula = strFormulaToTrans.Substring(strFormula.Length);
+                        }
+                    }
+                    else
+                    {
+                        strTransFormula = strTransFormula + strFormula;
+                        strFormula = "";
+                    }
+                }
+            }
+            else
+            {
+                strTransFormula = strFormula;
+            }
+            return strTransFormula;
+        }
+
+        protected string AddRemoveParm(string strExpresion, int intPossition, bool blnParmAdd, bool blnParmRemove, string strParmAdd)
+        {
+            string strTransFormula = "";
+            string strFormulaKeyword = strExpresion.Substring(0, strExpresion.IndexOf('('));
+            strExpresion = strExpresion.Substring(strExpresion.IndexOf('(') + 1);
+            strExpresion = strExpresion.Substring(0, strExpresion.Length - 1);
+
+            ArrayList arlParms = GetParms(strExpresion);
+
+            if (arlParms.Count >= intPossition)
+            {
+                if (blnParmAdd == true && blnParmRemove == false)
+                {
+                    strTransFormula = strFormulaKeyword + "(";
+                    for (int i = 0; i < arlParms.Count; i++)
+                    {
+                        if (intPossition == i + 1)
+                        {
+                            strTransFormula = strTransFormula + strParmAdd + "," + arlParms[i].ToString() + ",";
+                        }
+                        else
+                        {
+                            strTransFormula = strTransFormula + arlParms[i].ToString() + ",";
+                        }
+                    }
+                    strTransFormula = strTransFormula.Substring(0, strTransFormula.Length - 1) + ")";
+                }
+                else if (blnParmAdd == false && blnParmRemove == true)
+                {
+                    strTransFormula = strFormulaKeyword + "(";
+                    for (int i = 0; i < arlParms.Count; i++)
+                    {
+                        if (intPossition != i + 1)
+                        {
+                            strTransFormula = strTransFormula + arlParms[i].ToString() + ",";
+                        }
+                    }
+                    strTransFormula = strTransFormula.Substring(0, strTransFormula.Length - 1) + ")";
+                }
+            }
+            else
+            {
+                strTransFormula = strFormulaKeyword + "(" + strExpresion + ")";
+            }
+            return strTransFormula;
+
+        }
+
+        protected string GetExpression(string strExpression)
+        {
+            string strChkValidExp = "";
+            bool blnValidExp = false;
+            int intChkFrom = 0;
+
+            while (!blnValidExp)
+            {
+                if (intChkFrom == 0)
+                    intChkFrom = strExpression.IndexOf(')');
+                else
+                    intChkFrom = strExpression.IndexOf(')', intChkFrom + 1);
+                strChkValidExp = strExpression.Substring(0, intChkFrom + 1);
+
+                blnValidExp = IsValidExpression(strChkValidExp);
+            }
+
+            return strChkValidExp;
+
+
+        }
+
+        protected ArrayList GetParms(string strExpression)
+        {
+            ArrayList arlParms = new ArrayList();
+
+            string[] strArrParm = strExpression.Split(',');
+            string strExpToVald = "";
+            if (strArrParm.Length > 0)
+            {
+
+                for (int i = 0; i < strArrParm.Length; i++)
+                {
+                    if (strExpToVald == "")
+                    {
+                        strExpToVald = strArrParm[i].ToString();
+                    }
+                    else
+                    {
+                        strExpToVald = strExpToVald + "," + strArrParm[i].ToString();
+                    }
+                    if (strExpToVald.StartsWith("\""))
+                    {
+                        if (IsValidString(strExpToVald))
+                        {
+                            arlParms.Add(strExpToVald);
+                            strExpToVald = "";
+                        }
+                    }
+                    else if (IsValidExpression(strExpToVald))
+                    {
+                        strExpToVald = TransFormulaParms(strExpToVald);
+                        arlParms.Add(strExpToVald);
+                        strExpToVald = "";
+                    }
+                }
+            }
+
+            return arlParms;
+
+        }
+
+        protected bool IsValidString(string strExpression)
+        {
+            int intQoutes;
+            MatchCollection matches = Regex.Matches(strExpression, @"[""]");
+            intQoutes = matches.Count;
+            intQoutes = intQoutes % 2;
+
+            if (intQoutes == 0)
+                return true;
+            else
+                return false;
+        }
+
+        protected bool IsValidExpression(string strExpression)
+        {
+            int intOpenBracket;
+            int intClosedBracket;
+            int intOpenFlower;
+            int intClosedFlower;
+            int intQoutes;
+
+
+            MatchCollection matches = Regex.Matches(strExpression, @"[""]");
+            intQoutes = matches.Count;
+            intQoutes = intQoutes % 2;
+
+            if (intQoutes == 0)
+            {
+                string strChkQoutes = strExpression;
+                while (strChkQoutes.Contains(@""""))
+                {
+                    int intStart = 0;
+                    int intEnd = 0;
+                    intStart = strChkQoutes.IndexOf('"');
+                    intEnd = strChkQoutes.IndexOf('"', intStart + 1);
+
+                    string strRemvChars = strChkQoutes.Substring(intStart + 1, intEnd - intStart - 1);
+
+                    Regex r = new Regex(@"[(){}]");
+                    strRemvChars = r.Replace(strRemvChars, " ");
+
+                    strChkQoutes = strChkQoutes.Substring(0, intStart) + strRemvChars + strChkQoutes.Substring(intEnd + 1);
+                    //strChkQoutes = strChkQoutes.Substring(0, intStart);
+                }
+                strExpression = strChkQoutes;
+            }
+
+            matches = Regex.Matches(strExpression, @"[/(]");
+            intOpenBracket = matches.Count;
+            matches = Regex.Matches(strExpression, @"[/)]");
+            intClosedBracket = matches.Count;
+            matches = Regex.Matches(strExpression, @"[/{]");
+            intOpenFlower = matches.Count;
+            matches = Regex.Matches(strExpression, @"[/}]");
+            intClosedFlower = matches.Count;
+            matches = Regex.Matches(strExpression, @"[""]");
+            intQoutes = matches.Count;
+            intQoutes = intQoutes % 2;
+
+            if (intOpenBracket == intClosedBracket && intOpenFlower == intClosedFlower && intQoutes == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        }
+        //End of RefNo-1
     }
 }

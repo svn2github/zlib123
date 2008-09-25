@@ -38,12 +38,12 @@
   xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
   exclude-result-prefixes="office style table config text pxsi">
 
-  <xsl:import href="worksheets.xsl"/>
+  <!--<xsl:import href="worksheets.xsl"/>
   <xsl:import href="cell.xsl"/>
   <xsl:import href="sharedStrings.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="ole_objects.xsl"/>
-  <xsl:import href="change_tracking.xsl"/>
+  <xsl:import href="change_tracking.xsl"/>-->
 
   <xsl:key name="ConfigItem" match="config:config-item" use="@config:name"/>
   <xsl:key name="style" match="style:style" use="@style:name"/>
@@ -242,6 +242,104 @@
 					<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>
 				</definedName>
 			</xsl:for-each>
+		 <!--
+		  Feature: Named Ranges
+		  By     : Vijayeta
+		  Date   :11th Sept '08
+		  -->
+		<xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:named-expressions">
+			<xsl:for-each select ="child::node()">
+				<xsl:variable name ="isFunction">
+					<xsl:choose>
+						<xsl:when test="name()='table:named-range'">
+							<xsl:value-of select ="'false'"/>
+						</xsl:when>
+						<xsl:when test ="name()='table:named-expression'">
+							<xsl:value-of select ="'true'"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name ="range">
+					<xsl:choose>
+						<xsl:when test="$isFunction='false'">
+							<xsl:value-of select ="substring-after(@table:cell-range-address,'$')"/>
+						</xsl:when>
+						<xsl:when test="$isFunction='true'">
+							<xsl:value-of select ="@table:expression"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:variable name ="namedRange">
+					<xsl:choose>
+						<xsl:when test ="substring-before($range,':')!=''">
+							<xsl:variable name ="part1">
+								<xsl:choose>
+									<xsl:when test="$isFunction='false'">
+										<xsl:value-of select ="translate(substring-before($range,':'),'.','!')"/>
+									</xsl:when>
+									<xsl:when test="$isFunction='true'">
+										<xsl:choose>
+											<xsl:when test ="contains($range,'(')  and contains($range,')')">
+												<xsl:value-of select ="concat(translate(substring-before($range,'$'),'[',''),translate(substring-after(substring-before($range,':'),'$'),'.','!'))"/>
+											</xsl:when>
+											<xsl:otherwise>
+												
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name ="part2">
+								<xsl:choose>
+									<xsl:when test="$isFunction='false'">
+										<xsl:value-of select ="substring-after(substring-after($range,':'),'.')"/>
+									</xsl:when>
+									<xsl:when test="$isFunction='true'">
+										<xsl:value-of select ="translate(substring-after(substring-after($range,':'),'.'),']','')"/>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:value-of select ="concat($part1,':',$part2)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="translate($range,'.','!')"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:if 
+					test ="$isFunction='false' or ($isFunction='true' and contains(@table:expression,'(') and contains(@table:expression,')'))">
+					<definedName>
+						<xsl:attribute name ="name">
+							<xsl:value-of select ="@table:name"/>
+						</xsl:attribute>
+						<!--<xsl:value-of select ="$namedRange"/>-->
+						<xsl:choose>
+							<xsl:when test="$isFunction='false'">
+								<xsl:value-of select ="$namedRange"/>
+							</xsl:when>
+							<xsl:when test="$isFunction='true'">
+								<xsl:variable name ="namedRange1">
+									<!--<xsl:choose >
+										<xsl:when test ="contains(@table:expression,'(') and contains(@table:expression,')')">-->
+											<xsl:value-of select ="concat(substring-before(@table:expression,'$'),substring-after(@table:expression,'$'))"/>
+										<!--</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select ="''"/>
+										</xsl:otherwise>
+									</xsl:choose>-->
+								</xsl:variable>
+								<!--<xsl:if test ="	$namedRange1!=''">-->
+									<xsl:value-of select="concat('sonataOdfFormulaoooc:=', $namedRange1)"/>
+								<!--</xsl:if>-->
+								<!--<xsl:value-of select="concat('sonataOdfFormulaoooc:=', $namedRange1)"/>-->
+							</xsl:when>
+						</xsl:choose>
+					</definedName>
+				</xsl:if>
+			</xsl:for-each>
+			
+		</xsl:for-each>
+		<!-- end of code for the feature 'Named Ranges'-->		
 			<!--End-->
     </definedNames>
 
@@ -257,6 +355,46 @@
           <xsl:variable name="cellAddress">
             <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
           </xsl:variable>
+		<!--
+		Defect: 1894250
+		Fixed By: Vijayeta
+		Desc : Performance related defect, where in the pivot range of the source table(table:cell-range-address) in input is row num 65536,
+			   where as the source table spans only upto 1089 rows. Hence, the code iterates 65536 times, and resulting in long conversion time.
+			   Here this part of code takes a count of rows in source table and compares it with the value of attribute table:cell-range-address.
+		Date: 10th Sep '08	
+		variables: rowCount,columnForRowCount,rowNumCellRange
+		-->
+			<xsl:variable name ="rowCount">
+				<xsl:call-template name ="getTableRowCount">
+					<xsl:with-param name="sheetName">
+						<xsl:value-of select="$sheetName"/>
+					</xsl:with-param>
+					<xsl:with-param name="cellAddress">
+						<xsl:value-of select="$cellAddress"/>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:variable name ="columnForRowCount">
+						<xsl:if test ="$cellAddress != ''">
+				<xsl:call-template name="NumbersToChars">
+					<xsl:with-param name="num">
+						<xsl:variable name ="number">
+							<xsl:call-template name="GetColNum">
+								<xsl:with-param name="cell" select="substring-after(substring-after($cellAddress,':'),'.')"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:value-of select ="$number - 1"/>
+					</xsl:with-param>
+				</xsl:call-template>
+						</xsl:if>
+			</xsl:variable>
+			<xsl:variable name ="rowNumCellRange">
+						<xsl:if test ="$cellAddress != ''">
+				<xsl:call-template name="GetRowNum">
+					<xsl:with-param name="cell" select="substring-after(substring-after($cellAddress,':'),'.')"/>
+				</xsl:call-template>
+						</xsl:if>
+			</xsl:variable>
           <xsl:variable name="CreatePivotTable">
             <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
               <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
@@ -265,7 +403,15 @@
                   <xsl:value-of select="substring-before(substring-after($cellAddress,'.'),':')"/>
                 </xsl:with-param>
                 <xsl:with-param name="cellEnd">
+					  <xsl:choose>
+						  <xsl:when test ="$rowNumCellRange &gt; $rowCount ">
+							  <xsl:value-of select ="concat($columnForRowCount,$rowCount)"/>
+						  </xsl:when>
+						  <xsl:otherwise>
                   <xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>
+						  </xsl:otherwise>
+					  </xsl:choose>
+					  <!--<xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>-->
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:for-each>
@@ -293,10 +439,10 @@
 
   <!-- insert all sheets -->
   <xsl:template name="InsertSheets">
-
+	  <xsl:for-each select="document('content.xml')">
     <xsl:variable name="multilines">
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
+				select="office:document-content/office:body/office:spreadsheet">
         <xsl:value-of select="count(descendant::table:table-cell/text:p[2])"/>
       </xsl:for-each>
     </xsl:variable>
@@ -312,20 +458,20 @@
 
     <xsl:variable name="cellFormats">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
+				select="count(office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
       />
     </xsl:variable>
 
     <xsl:variable name="cellStyles">
       <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
+				select="count(office:document-styles/office:styles/style:style[@style:family='table-cell'])"
       />
     </xsl:variable>
 
     <xsl:variable name="CheckIfConditional">
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
+					test="office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -337,7 +483,7 @@
     
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style)"
+				select="count(office:document-content/office:automatic-styles/style:style)"
       />
     </xsl:variable>
     
@@ -349,7 +495,7 @@
 
     <!-- convert first table -->
     <xsl:apply-templates
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[1]"
+			select="office:document-content/office:body/office:spreadsheet/table:table[1]"
       mode="sheet">
 		  <xsl:with-param name="cellNumber" select ="number(0)"/>
 		  <xsl:with-param name="sheetId" select ="number(1)"/>
@@ -361,6 +507,7 @@
 		<xsl:with-param name="cellStyles" select ="$cellStyles"/>
 		<xsl:with-param name="CheckIfConditional" select ="$CheckIfConditional"/>
     </xsl:apply-templates>
+	  </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="CheckSheetName">

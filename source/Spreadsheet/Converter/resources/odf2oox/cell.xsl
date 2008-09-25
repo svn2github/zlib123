@@ -38,6 +38,7 @@ RefNo-4 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in g
 RefNo-5 03-Jun-2008 Sandeep S     1780009   Parts of borders of merged cells are not retained(Grouped rows)
 RefNo-6 03-Jun-2008 sandeep S     1704269   Changes done to retain the cell style in case of merged cell.
 RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merged cell style i.e. To deferentiate b/w A3 and AA3
+RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -53,7 +54,7 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table r">
 
-  <xsl:import href="measures.xsl"/>
+  <!--<xsl:import href="measures.xsl"/>-->
 
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
@@ -1836,7 +1837,16 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
               <xsl:attribute name="t">
                 <xsl:value-of select="$Type"/>
               </xsl:attribute>
-
+              <!--Strat of RefNo-8: Check for formula -->
+              <xsl:if test="@table:formula">
+                <xsl:call-template name="tmpFormula">
+                  <xsl:with-param name="cellNum" select="$cellNum"/>
+                  <xsl:with-param name="colNumber" select="$colNumber"/>
+                  <xsl:with-param name="rowNumber" select="$rowNumber"/>
+                  <xsl:with-param name="colChar" select="$colChar"/>
+                </xsl:call-template>
+              </xsl:if>
+              <!--End of RefNo-8: Check for formula -->
               <v>
                 <xsl:choose>
                   <xsl:when test="$Type = 'n' ">
@@ -1858,6 +1868,16 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
 
             <!-- percentage -->
             <xsl:when test="@office:value-type = 'percentage'">
+              <!--Strat of RefNo-8: Check for formula -->
+              <xsl:if test="@table:formula">
+                <xsl:call-template name="tmpFormula">
+                  <xsl:with-param name="cellNum" select="$cellNum"/>
+                  <xsl:with-param name="colNumber" select="$colNumber"/>
+                  <xsl:with-param name="rowNumber" select="$rowNumber"/>
+                  <xsl:with-param name="colChar" select="$colChar"/>
+                </xsl:call-template>
+              </xsl:if>
+              <!--End of RefNo-8: Check for formula -->
               <v>
                 <xsl:choose>
                   <xsl:when test="@office:value">
@@ -1872,6 +1892,16 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
 
             <!-- currency -->
             <xsl:when test="@office:value-type = 'currency'">
+              <!--Strat of RefNo-8: Check for formula -->
+              <xsl:if test="@table:formula">
+                <xsl:call-template name="tmpFormula">
+                  <xsl:with-param name="cellNum" select="$cellNum"/>
+                  <xsl:with-param name="colNumber" select="$colNumber"/>
+                  <xsl:with-param name="rowNumber" select="$rowNumber"/>
+                  <xsl:with-param name="colChar" select="$colChar"/>
+                </xsl:call-template>
+              </xsl:if>
+              <!--End of RefNo-8: Check for formula -->
               <v>
                 <xsl:value-of select="@office:value"/>
               </v>
@@ -1879,6 +1909,16 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
 
             <!-- date -->
             <xsl:when test="@office:value-type='date'">
+              <!--Strat of RefNo-8: Check for formula -->
+              <xsl:if test="@table:formula">
+                <xsl:call-template name="tmpFormula">
+                  <xsl:with-param name="cellNum" select="$cellNum"/>
+                  <xsl:with-param name="colNumber" select="$colNumber"/>
+                  <xsl:with-param name="rowNumber" select="$rowNumber"/>
+                  <xsl:with-param name="colChar" select="$colChar"/>
+                </xsl:call-template>
+              </xsl:if>
+              <!--End of RefNo-8: Check for formula -->
               <v>
                 <xsl:call-template name="DateToNumber">
                   <xsl:with-param name="value">
@@ -1890,6 +1930,16 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
 
             <!-- time-->
             <xsl:when test="@office:value-type = 'time'">
+              <!--Strat of RefNo-8: Check for formula -->
+              <xsl:if test="@table:formula">
+                <xsl:call-template name="tmpFormula">
+                  <xsl:with-param name="cellNum" select="$cellNum"/>
+                  <xsl:with-param name="colNumber" select="$colNumber"/>
+                  <xsl:with-param name="rowNumber" select="$rowNumber"/>
+                  <xsl:with-param name="colChar" select="$colChar"/>
+                </xsl:call-template>
+              </xsl:if>
+              <!--End of RefNo-8: Check for formula -->
               <v>
                 <xsl:call-template name="TimeToNumber">
                   <xsl:with-param name="value">
@@ -1899,10 +1949,53 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
               </v>
             </xsl:when>
 
+            <!--Start of RefNo-8: For bollean value-->
+            <xsl:when test="@office:value-type = 'boolean'">
+              <xsl:attribute name="t">b</xsl:attribute>
+              <xsl:if test="not(@office:boolean-value = 'true' or @office:boolean-value = 'false')">
+                <xsl:attribute name="t">e</xsl:attribute>
+              </xsl:if>
+              <xsl:if test="@table:formula">
+                <xsl:call-template name="tmpFormula">
+                  <xsl:with-param name="cellNum" select="$cellNum"/>
+                  <xsl:with-param name="colNumber" select="$colNumber"/>
+                  <xsl:with-param name="rowNumber" select="$rowNumber"/>
+                  <xsl:with-param name="colChar" select="$colChar"/>
+                </xsl:call-template>
+              </xsl:if>
+              <v>
+                <xsl:choose>
+                  <xsl:when test="@office:boolean-value='false'">
+                    <xsl:value-of select="'0'"/>
+                  </xsl:when>
+                  <xsl:when test="@office:boolean-value='true'">
+                    <xsl:value-of select="'1'"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="text:p"/>
+                  </xsl:otherwise>
+                </xsl:choose>                
+              </v>
+            </xsl:when>
+            <!--End of RefNo-8-->
+
             <!-- last or when number cell has error -->
+            <!--Strat of RefNo-8: Check for formula -->
             <xsl:when
-              test="not(@office:value-type='float') and @office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">
+              test="not(@office:value-type='float') and @office:value-type = 'string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">
+            <!--<xsl:when
+              test="not(@office:value-type='float') and @office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">-->
               <xsl:attribute name="t">s</xsl:attribute>
+              
+              <xsl:if test="@table:formula">
+                <xsl:call-template name="tmpFormula">
+                  <xsl:with-param name="cellNum" select="$cellNum"/>
+                  <xsl:with-param name="colNumber" select="$colNumber"/>
+                  <xsl:with-param name="rowNumber" select="$rowNumber"/>
+                  <xsl:with-param name="colChar" select="$colChar"/>
+                </xsl:call-template>
+              </xsl:if>
+              <!--End of RefNo-8: Check for formula -->
               <v>
                 <xsl:value-of select="number($cellNumber)"/>
               </v>
@@ -2256,5 +2349,138 @@ RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merg
   </xsl:template>
 
   <xsl:template match="text()" mode="cell"/>
+
+  <!--Strat of RefNo-8: to get formula : Sanjay-->
+  <xsl:template name="tmpFormula">
+    <xsl:param name="cellNum"/>
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="colChar"/>
+    <xsl:variable name="extLink">
+      <xsl:text>[&apos;file:///</xsl:text>
+    </xsl:variable>      
+    
+    <xsl:choose>
+      <xsl:when test="not(
+                        (contains(@table:formula,$extLink))
+                    or (contains(@table:formula,'ARABIC(')) 
+                    or (contains(@table:formula,'DDE('))
+                    or (contains(@table:formula,'JIS('))
+                    or (contains(@table:formula,'SHEET('))
+                    or (contains(@table:formula,'SHEETS('))
+                    or (contains(@table:formula,'STYLE('))
+                    or (contains(@table:formula,'MUNIT(')) 
+                    or (contains(@table:formula,'DURATION(') and not(contains(@table:formula,'getDuration(')))                    
+                    or (contains(@table:formula,'ACOT('))
+                    or (contains(@table:formula,'ACOTH('))
+                    or (contains(@table:formula,'COT('))
+                    or (contains(@table:formula,'COTH('))
+                    or (contains(@table:formula,'BASE(')) 
+                    or (contains(@table:formula,'B('))
+                    or (contains(@table:formula,'COMBINA('))
+                    or (contains(@table:formula,'CURRENT(')) 
+                    or (contains(@table:formula,'DAYS('))
+                    or (contains(@table:formula,'getDaysInMonth(')) 
+                    or (contains(@table:formula,'getDaysInYear(')) 
+                    or (contains(@table:formula,'DDE('))
+                    or (contains(@table:formula,'EASTERSUNDAY(')) 
+                    or (contains(@table:formula,'EFFECTIVE(')) 
+                    or (contains(@table:formula,'FORMULA('))
+                    or (contains(@table:formula,'GAUSS(')) 
+                    or (contains(@table:formula,'ISFORMULA(')) 
+                    or (contains(@table:formula,'getIsLeapYear('))
+                    or (contains(@table:formula,'getDiffMonths('))
+                    or (contains(@table:formula,'PERMUTATIONA(')) 
+                    or (contains(@table:formula,'PHI('))
+                    or (contains(@table:formula,'getRot13('))
+                    or (contains(@table:formula,'CONVERT(') and not(contains(@table:formula,'getConvert(')))
+                    or (contains(@table:formula,'WEEKNUM(') and not(contains(@table:formula,'getWeeknum(')))
+                    or (contains(@table:formula,'getDiffWeeks('))
+                    or (contains(@table:formula,'getWeeksInYear('))
+                    or (contains(@table:formula,'getDiffYears('))
+                    or (contains(@table:formula,'DECIMAL('))
+                    or (contains(@table:formula,'ZGZ('))
+                    or (contains(@office:string-value,'#NAME?'))
+                    or (contains(@office:string-value,'#N/A'))                    
+                    or (text:p='Err:518')
+                    or (text:p='Err:511')
+                    or (text:p='#VALUE!')
+                    or (text:p='Err:504')
+                    or (text:p='Err:502')
+                    or (text:p='Err:501')
+                    or (text:p='Err:501')
+                    or (text:p='Err:502')
+                    or (text:p='Err:503')
+                    or (text:p='Err:504')
+                    or (text:p='Err:508')
+                    or (text:p='Err:509')
+                    or (text:p='Err:510')
+                    or (text:p='Err:511')
+                    or (text:p='Err:512')
+                    or (text:p='Err:513')
+                    or (text:p='Err:514')
+                    or (text:p='Err:516')
+                    or (text:p='Err:517')
+                    or (text:p='Err:518')
+                    or (text:p='Err:519')
+                    or (text:p='Err:520')
+                    or (text:p='Err:521')
+                    or (text:p='Err:522')
+                    or (text:p='Err:523')
+                    or (text:p='Err:524')
+                    or (text:p='Err:525')
+                    or (text:p='Err:526')
+                    or (text:p='Err:527')
+                    or (text:p='Err:532')
+                    or (text:p='#REF!')
+                    or (text:p='#N/A')
+                    or (text:p='#NAME?')
+                    or (text:p='#DIV/0!')
+                    or (text:p='#NUM!'))">
+        <f>
+          <xsl:choose>
+            <xsl:when test="@table:number-matrix-columns-spanned or @table:number-matrix-rows-spanned">
+              <xsl:variable name="tmpColumnSpanNo">
+                <xsl:value-of select="@table:number-matrix-columns-spanned"/>
+              </xsl:variable>
+              <xsl:variable name="tmpRowSpanNo">
+                <xsl:value-of select="@table:number-matrix-rows-spanned"/>
+              </xsl:variable>
+              <xsl:attribute name="t">
+                <xsl:value-of select="'array'"/>
+              </xsl:attribute>
+              <xsl:attribute name="ref">
+                <xsl:choose>
+                  <xsl:when test="($tmpColumnSpanNo='1') and ($tmpRowSpanNo='1')">
+                    <xsl:value-of select="$cellNum"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="tmpColChar">
+                      <xsl:choose>
+                        <xsl:when test="$tmpColumnSpanNo &gt; 1">
+                          <xsl:call-template name="NumbersToChars">
+                            <xsl:with-param name="num" select="($colNumber + $tmpColumnSpanNo - 1)"/>
+                          </xsl:call-template>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$colChar"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:variable>
+                    <xsl:variable name="tmpCR1">
+                      <xsl:value-of select="($rowNumber + $tmpRowSpanNo) - 1 "/>
+                    </xsl:variable>
+                    <xsl:value-of select="concat($cellNum,':',(concat($tmpColChar,$tmpCR1)))"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+          <xsl:value-of select="concat('sonataOdfFormula', @table:formula)"/>
+        </f>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <!--End of RefNo-8-->
 
 </xsl:stylesheet>

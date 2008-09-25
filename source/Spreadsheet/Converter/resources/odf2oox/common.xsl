@@ -514,4 +514,32 @@
   </xsl:choose>
   
 </xsl:template>
+	<!--
+	Defect: 1894250
+	Fixed By: Vijayeta
+	Desc : Performance related defect, where in the pivot range of the source table(table:cell-range-address) in input is row num 65536,
+	       where as the source table spans only upto 1089 rows. Hence, the code iterates 65536 times, and resulting in long conversion time.
+		   Here this part of code takes a count of rows in source table and compares it with the value of attribute table:cell-range-address.
+    Date: 10th Sep '08	
+	-->
+	<xsl:template name ="getTableRowCount">
+		<xsl:param name="sheetName"/>
+		<xsl:param name="cellAddress"/>
+		<xsl:variable name ="rowCount">
+			<xsl:for-each select ="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+				<xsl:value-of select ="count(table:table-row)"/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name ="countRowsRepeated">
+			<xsl:for-each select ="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+				<xsl:value-of select ="count(table:table-row[@table:number-rows-repeated])"/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name ="sumRowsRepeated">
+			<xsl:for-each select ="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
+				<xsl:value-of select ="sum(table:table-row/@table:number-rows-repeated)"/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:value-of select ="$rowCount + $sumRowsRepeated - $countRowsRepeated"/>
+	</xsl:template>	
 </xsl:stylesheet>

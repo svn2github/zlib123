@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
     * Copyright (c) 2006, Clever Age
     * All rights reserved.
@@ -41,8 +41,8 @@
     xmlns:x="urn:schemas-microsoft-com:office:excel"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
 
-    <xsl:import href="common.xsl"/>
-    <xsl:import href="cell.xsl"/>
+    <!--<xsl:import href="common.xsl"/>
+    <xsl:import href="cell.xsl"/>-->
 
 
 

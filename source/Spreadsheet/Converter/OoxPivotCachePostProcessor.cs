@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -956,7 +956,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 int keyRow = Convert.ToInt32(rowStart) - 1;
 
                 string key = sheetNum + "#" + keyCol.ToString() + ":" + keyRow.ToString();
-
+                string modifiedFieldName = null;
                 if (pivotCellsText.ContainsKey(key))
                 {
                     if (!fieldNamesText[0].ContainsKey((string)pivotCellsText[key]))
@@ -968,6 +968,31 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         fieldNamesText[1].Add(col, (string)pivotCellsText[key]);
 
                     }
+                    //Field with the same name occurs more than once, then increment second occurence of the field
+                    //like Year to Year2...
+                    else if(fieldNamesText[0].ContainsKey((string)pivotCellsText[key]))
+                    {
+                        if (fieldNamesText[0].ContainsKey((string)pivotCellsText[key]))
+                        {
+                            int i = 2, j = 1;
+                            modifiedFieldName = string.Concat((string)pivotCells[key], i);
+                            myLabel:
+                            if (fieldNamesText[0].Contains((string)modifiedFieldName))
+                            {
+                                j = j++;
+                                modifiedFieldName = string.Concat((string)pivotCells[key], i + j);
+                                i = i + j;
+                                if (fieldNamesText[0].Contains((string)modifiedFieldName))
+                                    goto myLabel;
+                            }
+                        }
+                        fieldNames[0].Add(modifiedFieldName, col);
+                        fieldNames[1].Add(col, modifiedFieldName);
+
+                        fieldNamesText[0].Add(modifiedFieldName, col);
+                        fieldNamesText[1].Add(col, modifiedFieldName);
+                    }
+                    //End
                 }
             }
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -51,8 +51,8 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e oox r c xdr draw rels xlink">
 
-  <xsl:import href="relationships.xsl"/>
-  <xsl:import href="chart.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
+  <xsl:import href="chart.xsl"/>-->
   <!-- Added by vijayeta, fix fo the bug 1760182-->
   <xsl:import href="insert_text.xsl"/>
 
@@ -1851,8 +1851,9 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
 
   <xsl:template name="InsertTextBoxTextStyles">
     <!-- get all sheet Id's -->
-    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-
+		  <!-- Perofomance-->
+		<xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook">
+			<xsl:for-each select="e:sheets/e:sheet">
       <xsl:variable name="sheet">
         <xsl:call-template name="GetTarget">
           <xsl:with-param name="id">
@@ -1864,8 +1865,9 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
       <!--i.e. $sheet = worksheets/sheet1.xml -->
 
       <!-- go to worksheet file and search for drawing -->
-      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:drawing">
-
+				  <!-- Perofomance-->
+				<xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet">
+					<xsl:for-each select="e:drawing">
         <xsl:variable name="drawing">
           <xsl:call-template name="GetTarget">
             <xsl:with-param name="id">
@@ -1898,6 +1900,8 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         </xsl:for-each>
       </xsl:for-each>
     </xsl:for-each>
+				</xsl:for-each>
+		</xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertTextBoxParagraphStyle">

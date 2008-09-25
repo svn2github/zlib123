@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
   <!--
       * Copyright (c) 2006, Clever Age
       * All rights reserved.
@@ -31,6 +31,7 @@ Modification Log
 LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content missing and 1832335 New line inserted in note content after roundtrip conversions                                              
+RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -50,6 +51,27 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
 
   <xsl:key name="SharedStrings" match="e:sst/e:si" use="@oox:id"/>
 
+  <!--Start of RefNo-2:Formula implemetation-->
+  <xsl:variable name="invalidChars">
+    <xsl:text>&apos;!-$#():,.+^&amp;=&lt;&gt;%{};"</xsl:text>
+  </xsl:variable>
+  
+  <xsl:variable name ="sheetNames">
+    <xsl:for-each select ="key('Part','xl/workbook.xml')//e:sheets/e:sheet">
+      <xsl:variable name="checkedName">
+        <xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="position()"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of select="@name"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select ="concat(@name,':',$checkedName,'::')"/>
+    </xsl:for-each>
+  </xsl:variable>
+  <!--End of RefNo-2-->
   <xsl:template name="InsertText">
     <xsl:param name="position"/>
     <xsl:param name="colNum"/>
@@ -58,7 +80,91 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
     <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="partId" select="ancestor::e:worksheet/@oox:part" />
+    <!--Start of RefNo-2:Formula implemetation-->
+    <xsl:if test="e:f">
+      <!--Add code for not compatible formulas-->
+      <xsl:choose>
+        <!--chk for sheet sheets n style-->
+        <!--(contains(.,'([') or contains(.,'{[') or contains(.,' [') or contains(.,',[') or starts-with(.,'[')) or -->
+        <xsl:when test="not(
+                           (contains(.,'([') or contains(.,'{[') or contains(.,' [') or contains(.,',[') or starts-with(.,'[')) 
+                        or (contains(.,'AVERAGEIF('))
+                        or (contains(.,'AVERAGEIFS('))
+                        or (contains(.,'COUNTIFS('))
+                        or (contains(.,'CUBEKPIMEMBER('))
+                        or (contains(.,'CUBERANKEDMEMBER('))
+                        or (contains(.,'CUBESET('))
+                        or (contains(.,'CUBESETCOUNT('))
+                        or (contains(.,'CUBEVALUE('))                       
+                        or (contains(.,'GETPIVOTDATA('))
+                        or (contains(.,'IFERROR('))
+                        or (contains(.,'RTD('))
+                        or (contains(.,'SUMIFS(')))">
+          <xsl:choose>
+            <xsl:when test="contains(.,'!')">          
+              <xsl:choose>
+                <xsl:when test="string-length($sheetNames) = string-length(translate($sheetNames,$invalidChars,''))">
+                  <xsl:attribute name="table:formula">
+                    <xsl:value-of select="concat('sonataOoxFormula',e:f)"/>
+                 </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="table:formula">
+                    <xsl:value-of select="concat('sonataOoxFormula',e:f,'##shtName##',$sheetNames)"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>       
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="table:formula">
+                <xsl:value-of select="concat('sonataOoxFormula',e:f)"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>        
+      </xsl:choose>
     
+      <!--TODO caluculate correct value-->
+      <xsl:if test="e:f/@t='array'">
+        <xsl:choose>
+          <xsl:when test="not(contains(@r,':'))">
+            <xsl:attribute name="table:number-matrix-columns-spanned">
+              <xsl:value-of select="1"/>
+            </xsl:attribute>
+            <xsl:attribute name="table:number-matrix-rows-spanned">
+              <xsl:value-of select="1"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="refSpan" select="substring-after(@r,':')"/>
+              <!--A2:C3 C3 -(3-colNum)+1= 3 || 3-rowNum+1 = 2-->
+              <xsl:variable name="spanColNum">
+                <xsl:call-template name="GetColNum">
+                  <xsl:with-param name="cell">
+                    <xsl:value-of select="$refSpan"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="spanRowNum">
+                <xsl:call-template name="GetRowNum">
+                  <xsl:with-param name="cell">
+                    <xsl:value-of select="$refSpan"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:attribute name="table:number-matrix-columns-spanned">
+              <xsl:value-of select="$spanColNum - $colNum + 1"/>
+            </xsl:attribute>
+            <xsl:attribute name="table:number-matrix-rows-spanned">
+              <xsl:value-of select="$spanRowNum - $rowNum + 1"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+      
+    </xsl:if>
+    <!--End of RefNo-2-->
+    <!--boolean to be handeled-->
     <xsl:choose>
       <xsl:when test="@t='s' or key('ref',@r)[@oox:part = $partId]">
         <xsl:attribute name="office:value-type">
@@ -201,6 +307,26 @@ RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content miss
           </xsl:call-template>
         </text:p>
       </xsl:when>
+      <!--Start of RefNo-2:Added boolean value type-->
+      <xsl:when test="@t = 'b'">
+        <xsl:attribute name="office:value-type">
+          <xsl:text>boolean</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="office:value">
+          <xsl:choose>
+            <xsl:when test="e:v = '0'">
+              <xsl:value-of select="'false'"/>
+            </xsl:when>
+            <xsl:when test="e:v = '1'">
+              <xsl:value-of select="'true'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="e:v"/>
+            </xsl:otherwise>            
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:when>
+      <!--End of RefNo-2-->
       <xsl:otherwise>
         <xsl:variable name="numStyle">
           <xsl:value-of select="key('numFmtId',key('Xf', $position)/@numFmtId)/@formatCode" />

@@ -33,6 +33,7 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 RefNo-1 22-Jan-2008 Sandeep S     1833074   Changes for fixing Cell Content missing and 1832335 New line inserted in note content after roundtrip conversions                                              
 RefNo-2 23-May-2008 Sandeep S     1898009   Changes for fixing:XLSX borders in grouped columns lost
 RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet not printed after conversion(issue with the sheet names)
+RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to the list (issue with the sheet names) 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -61,7 +62,7 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e r pxsi oox">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="database-ranges.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="table_body.xsl"/>
@@ -77,7 +78,7 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
   <xsl:import href="groups.xsl"/>
   <xsl:import href="scenario.xsl"/>
   <xsl:import href="change_tracking.xsl"/>
-  <xsl:import href="pivot_tables.xsl"/>
+  <xsl:import href="pivot_tables.xsl"/>-->
 
 
   <!--xsl:key name="Sst" match="e:si" use="''"/-->
@@ -169,13 +170,16 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
         <xsl:call-template name="InsertScenarioStyles"/>
         <!-- Insert Note Shape properties -->
         <!--xsl:comment>Note Styles</xsl:comment-->
-        <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+		   <!-- Perofomance-->
+		  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook">
+			  <xsl:for-each select="e:sheets/e:sheet">
           <xsl:call-template name="InsertNoteStyles">
             <xsl:with-param name="sheetNr">
               <xsl:value-of select="position()"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:for-each>
+		  </xsl:for-each>
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
     </office:document-content>
@@ -202,13 +206,16 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
         </xsl:apply-templates>
 
         <!-- insert strings from sharedStrings to be moved later by post-processor-->
-        <xsl:for-each select="key('Part', 'xl/sharedStrings.xml')/e:sst">
+		    <!-- Perofomance-->
+		  <xsl:for-each select="key('Part', 'xl/sharedStrings.xml')">
+			  <xsl:for-each select="e:sst">
           <pxsi:sst xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
             <xsl:for-each select="e:si">
               <xsl:call-template name="e:si"/>
             </xsl:for-each>
           </pxsi:sst>
         </xsl:for-each>
+		  </xsl:for-each>
 
         <!--xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
           <xsl:call-template name="gaga" >
@@ -233,6 +240,142 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
             </xsl:with-param>
           </xsl:apply-templates>
         </table:database-ranges>
+		  <!--
+		  Feature: Named Ranges
+		  By     : Vijayeta
+		  Date   :11th Sept '08
+		  -->
+		  <table:named-expressions>
+			  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
+				  <xsl:if test ="not(contains(@name,'_xlnm.Print_Area')) and not(contains(@name, '_xlnm.Print_Titles'))">
+					  <xsl:variable name ="range">
+						  <xsl:value-of select ="."/>
+					  </xsl:variable>
+					  <xsl:variable name ="isSingleRange">
+						  <xsl:variable name ="sheet">
+							  <xsl:value-of select ="substring-before($range,'!')"/>
+						  </xsl:variable>
+						  <xsl:if test ="contains(substring-after($range,'!'),$sheet)">
+							  <xsl:value-of select ="'false'"/>
+						  </xsl:if>
+						  <xsl:if test ="not(contains(substring-after($range,'!'),$sheet))">
+							  <xsl:value-of select ="'true'"/>
+						  </xsl:if>
+					  </xsl:variable>
+					  <xsl:variable name ="isFunction">
+						  <xsl:choose>
+							  <xsl:when test="not(contains($range,'(') and contains($range,')')) and (contains($range,':') or $isSingleRange='true')  ">
+								  <xsl:value-of select ="'false'"/>
+							  </xsl:when>
+							  <xsl:when test="contains($range,'(') and contains($range,')')">
+								  <xsl:value-of select ="'true'"/>
+							  </xsl:when>
+							  <xsl:otherwise>
+								  <xsl:value-of select ="''"/>
+							  </xsl:otherwise>
+						  </xsl:choose>
+					  </xsl:variable>
+					  <xsl:variable name ="cellRangeAddress">
+						  <xsl:choose>
+							  <xsl:when test ="substring-after($range,':')!=''">
+								  <xsl:variable name ="part1">
+									  <xsl:choose>
+										  <xsl:when test="$isFunction='false'">
+											  <xsl:value-of select ="translate(substring-before($range,':'),'!','.')"/>
+										  </xsl:when>
+										  <xsl:when test="$isFunction='true'">
+											  <xsl:value-of select ="translate(substring-after(substring-before($range,':'),'('),'!','.')"/>
+										  </xsl:when>
+									  </xsl:choose>
+								  </xsl:variable>
+								  <xsl:variable name ="part2">
+									  <xsl:variable name ="endRange">
+										  <xsl:value-of select ="substring-after($range,':')"/>
+									  </xsl:variable>
+									  <xsl:choose>
+										  <xsl:when test ="contains($endRange,'!')">
+											  <xsl:choose>
+												  <xsl:when test="$isFunction='false'">
+													  <xsl:value-of select ="concat('.',translate(substring-after($endRange,'!'),'!',''))"/>
+												  </xsl:when>
+												  <xsl:when test="$isFunction='true'">
+													  <xsl:value-of select ="concat('.',translate(substring-before(substring-after($endRange,'!'),')'),'!',''))"/>
+												  </xsl:when>
+											  </xsl:choose>
+										  </xsl:when>
+										  <xsl:otherwise>
+											  <xsl:choose>
+												  <xsl:when test="$isFunction='false'">
+													  <xsl:value-of select ="concat('.',$endRange)"/>
+												  </xsl:when>
+												  <xsl:when test="$isFunction='true'">
+													  <xsl:value-of select ="concat('.',substring-before($endRange,')'))"/>
+												  </xsl:when>
+											  </xsl:choose>
+										  </xsl:otherwise>
+									  </xsl:choose>
+									  <!--<xsl:value-of select ="concat('.',translate(substring-after($range,':'),'!','.'))"/>-->
+								  </xsl:variable>
+								  <xsl:value-of select ="concat($part1,':',$part2)"/>
+							  </xsl:when>
+							  <xsl:otherwise>
+								  <xsl:choose>
+									  <xsl:when test="$isFunction='false'">
+										  <xsl:value-of select ="translate($range,'!','.')"/>
+									  </xsl:when>
+									  <xsl:when test="$isFunction='true'">
+										  <xsl:value-of select ="translate(substring-after(substring-before($range,')'),'('),'!','.')"/>
+									  </xsl:when>									 
+								  </xsl:choose>								  
+							  </xsl:otherwise>
+						  </xsl:choose>
+					  </xsl:variable>
+				      <xsl:choose>
+						  <xsl:when test="$isFunction='false'">
+							  <xsl:variable name ="baseAddress">
+									  <xsl:choose>
+										  <xsl:when test ="substring-after($range,':')!=''">
+											  <xsl:value-of select ="translate(substring-before($range,':'),'!','.')"/>
+										  </xsl:when>
+										  <xsl:otherwise>
+											  <xsl:value-of select ="translate($range,'!','.')"/>
+										  </xsl:otherwise>
+									  </xsl:choose>
+								  </xsl:variable>								  
+								  <table:named-range>
+									  <xsl:attribute name ="table:name">
+										  <xsl:value-of select ="@name"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:base-cell-address">
+										  <xsl:value-of select ="concat('$',$baseAddress)"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:cell-range-address">
+										  <xsl:value-of select ="concat('$',$cellRangeAddress)"/>
+									  </xsl:attribute>
+								  </table:named-range>
+							  </xsl:when>
+						  <xsl:when test="$isFunction='true'">
+								  <xsl:variable name ="function">
+									  <xsl:value-of select ="substring-before($range,'(')"/>
+								  </xsl:variable>
+								  <table:named-expression>
+									  <xsl:attribute name ="table:name">
+										  <xsl:value-of select ="@name"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:base-cell-address">
+										  <xsl:value-of select ="'$Sheet1.$A$1'"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:expression">
+										  <xsl:value-of select ="concat($function,'([$',$cellRangeAddress,'])')"/>
+										  <!--<xsl:value-of select ="concat('sonataOoxFormula',$function,'([$',$cellRangeAddress,'])','##shtName##',$sheetNames)"/>-->
+									  </xsl:attribute>
+								  </table:named-expression>
+							  </xsl:when>
+						  </xsl:choose> 
+				  </xsl:if>
+			  </xsl:for-each>
+		  </table:named-expressions>
+		  <!-- end of code for the feature 'Named Ranges'-->
 
         <!--xsl:variable name="pivotTables"-->
         <xsl:call-template name="InsertPilotTables"/>
@@ -361,24 +504,31 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+	  <!-- Perofomance-->
     <xsl:variable name="BigMergeCell">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
+		<xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet">
+			<xsl:for-each select="e:mergeCells">
         <xsl:apply-templates select="e:mergeCell[1]" mode="BigMergeColl"/>
       </xsl:for-each>
+		</xsl:for-each>
     </xsl:variable>
-
+	    <!-- Perofomance-->
     <xsl:variable name="BigMergeRow">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
+		<xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet">
+			<xsl:for-each select="e:mergeCells">
         <xsl:apply-templates select="e:mergeCell[1]" mode="BigMergeRow"/>
       </xsl:for-each>
+		</xsl:for-each>
     </xsl:variable>
 
     <!-- variable with merge cell -->
+	   <!-- Perofomance-->
     <xsl:variable name="MergeCell">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
+		<xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet">
+			<xsl:for-each select="e:mergeCells">
         <xsl:apply-templates select="e:mergeCell[1]" mode="merge"/>
       </xsl:for-each>
+		</xsl:for-each>
     </xsl:variable>
 
 
@@ -515,10 +665,11 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
       </xsl:for-each>
     </xsl:variable>
 
+	    <!-- Perofomance-->
     <xsl:variable name="removeFilter">
       <xsl:if test="key('Part', concat('xl/',$Id))/e:worksheet/e:autoFilter">
-
-        <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:autoFilter">
+			<xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet">
+				<xsl:for-each select="e:autoFilter">
           <xsl:variable name="filtersNum">
             <xsl:value-of select="count(e:filterColumn/e:filters)"/>
           </xsl:variable>
@@ -539,7 +690,7 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
               <xsl:with-param name="cell" select="substring-after(@ref,':')"/>
             </xsl:call-template>
           </xsl:if>
-
+				</xsl:for-each>
         </xsl:for-each>
       </xsl:if>
     </xsl:variable>
@@ -583,7 +734,9 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
       <xsl:variable name="apostrof">
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
-      <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
+		  <!-- Perofomance-->
+		<xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook">
+			<xsl:for-each select="e:definedNames/e:definedName">
         <!-- for the current sheet -->
         <xsl:if test="not(contains(self::node(),'#REF'))">
           <!-- if print range with apostrophes -->
@@ -786,6 +939,7 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
           </xsl:if>
         </xsl:if>
       </xsl:for-each>
+		</xsl:for-each>
       
       <xsl:variable name="GroupRowStart">
         <xsl:call-template name="GroupRow">
@@ -1229,15 +1383,20 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
     <xsl:param name="AllRowBreakes"/>
     <xsl:param name="rSheredStrings"/>
 
-    <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:oleObjects">
+	  <!-- Perofomance-->
+	  <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet">
+		  <xsl:for-each select="e:oleObjects">
       <xsl:call-template name="InsertOLEObjects"/>
     </xsl:for-each>
+	  </xsl:for-each>
 
-
+	   <!-- Perofomance-->
     <xsl:variable name="ManualColBreaks">
-      <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks/e:brk">
+		  <xsl:for-each select="key('Part', concat('xl/',$sheet))/e:worksheet">
+			  <xsl:for-each select="e:colBreaks/e:brk">
         <xsl:value-of select="concat(@id,';')"/>
       </xsl:for-each>
+		  </xsl:for-each>
     </xsl:variable>
 
 
@@ -2829,8 +2988,9 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
     <xsl:param name="sheetNumber"/>
 
     <!--Start of RefNo-3: code to chk for the invalid charecters-->
+    <!--Start of RefNo-4: Added some more invalid special charecters to the list-->    
     <xsl:variable name="invalidChars">
-      <xsl:text>&apos;!-$#():,.+</xsl:text>
+      <xsl:text>&apos;!-$#():,.+^&amp;=&lt;&gt;%{};"</xsl:text>
     </xsl:variable>
 
     <xsl:variable name="strTrnName" select="translate($name,$invalidChars,'')"/>
@@ -2839,16 +2999,16 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
       <!--RefNo-3:Replaced $name with $strTrnName-->
-      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $strTrnName][2]">
+      <xsl:when test="parent::node()/e:sheet[translate(@name,$invalidChars,'') = $strTrnName][2]">
         <xsl:variable name="nameConflictsBefore">
           <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
           <!--RefNo-3:Replaced $name with $strTrnName-->
           <xsl:value-of
-            select="count(parent::node()/e:sheet[translate(@name,'!$-():#,.+','') = $strTrnName and position() &lt; $sheetNumber])"
+            select="count(parent::node()/e:sheet[translate(@name,$invalidChars,'') = $strTrnName and position() &lt; $sheetNumber])"
           />
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
-        <xsl:value-of select="concat(translate(@name,'!$-()#:,.+',''),'_',$nameConflictsBefore + 1)"/>
+        <xsl:value-of select="concat(translate(@name,$invalidChars,''),'_',$nameConflictsBefore + 1)"/>
       </xsl:when>
       <xsl:otherwise>
         <!--RefNo-3:Replaced $name with $strTrnName-->
@@ -2859,9 +3019,9 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
 
   <xsl:template name="rSheredStrings">
     <xsl:param name="result"/>
-
-    <xsl:for-each select="key('Part', 'xl/sharedStrings.xml')/e:sst">
-
+	    <!-- Perofomance-->
+	  <xsl:for-each select="key('Part', 'xl/sharedStrings.xml')">
+		  <xsl:for-each select="e:sst">
       <xsl:apply-templates select="e:si[1]" mode="r">
         <xsl:with-param name="result">
           <xsl:choose>
@@ -2877,7 +3037,7 @@ RefNo-3 20-Jun-2008 Sandeep S     1906975   Changes done to fix deffect Sheet no
           <xsl:text>0</xsl:text>
         </xsl:with-param>
       </xsl:apply-templates>
-
+		  </xsl:for-each>
     </xsl:for-each>
 
   </xsl:template>

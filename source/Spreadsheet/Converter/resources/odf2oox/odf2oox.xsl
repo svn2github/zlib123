@@ -61,6 +61,20 @@
   <xsl:import href="chart.xsl"/>
   <xsl:import href="drawing.xsl"/>
   <xsl:import href="connections.xsl"/>
+  <xsl:import href="measures.xsl"/>
+  <xsl:import href="gradient.xsl"/>
+  <xsl:import href="cell.xsl"/>
+	<xsl:import href="conditional.xsl"/>
+	<xsl:import href="worksheets.xsl"/>	
+	<xsl:import href="ole_objects.xsl"/>
+	<xsl:import href="change_tracking.xsl"/>
+	<xsl:import href="pixel-measure.xsl"/>
+	<xsl:import href="page.xsl"/>
+	<xsl:import href="border.xsl"/>	
+	<xsl:import href="sortFilter.xsl"/>
+	<xsl:import href="validation.xsl"/>
+	<xsl:import href="data_consolidation.xsl"/>
+	<xsl:import href="scenario.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p text:span number:text"/>
@@ -506,6 +520,46 @@
             <xsl:variable name="cellAddress">
               <xsl:value-of select="table:source-cell-range/@table:cell-range-address"/>
             </xsl:variable>
+			<!--
+			Defect: 1894250
+			Fixed By: Vijayeta
+			Desc : Performance related defect, where in the pivot range of the source table(table:cell-range-address) in input is row num 65536,
+				   where as the source table spans only upto 1089 rows. Hence, the code iterates 65536 times, and resulting in long conversion time.
+				   Here this part of code takes a count of rows in source table and compares it with the value of attribute table:cell-range-address.
+			Date: 10th Sep '08	
+			variables: rowCount,columnForRowCount,rowNumCellRange
+			-->
+			<xsl:variable name ="rowCount">
+				  <xsl:call-template name ="getTableRowCount">
+					  <xsl:with-param name="sheetName">
+						  <xsl:value-of select="$sheetName"/>
+					  </xsl:with-param>
+					  <xsl:with-param name="cellAddress">
+						  <xsl:value-of select="$cellAddress"/>
+					  </xsl:with-param>
+				  </xsl:call-template>
+			  </xsl:variable>
+			<xsl:variable name ="columnForRowCount">
+				<xsl:if test ="$cellAddress != ''">
+				  <xsl:call-template name="NumbersToChars">
+					  <xsl:with-param name="num">
+						  <xsl:variable name ="number">
+							  <xsl:call-template name="GetColNum">
+								  <xsl:with-param name="cell" select="substring-after(substring-after($cellAddress,':'),'.')"/>
+							  </xsl:call-template>
+						  </xsl:variable>
+						  <xsl:value-of select ="$number - 1"/>
+					  </xsl:with-param>
+				  </xsl:call-template>
+				</xsl:if>
+			  </xsl:variable>
+			<xsl:variable name ="rowNumCellRange">
+				<xsl:if test ="$cellAddress != ''">
+				  <xsl:call-template name="GetRowNum">
+					  <xsl:with-param name="cell" select="substring-after(substring-after($cellAddress,':'),'.')"/>
+				  </xsl:call-template>
+				</xsl:if>
+			  </xsl:variable>
             <xsl:variable name="CreatePivotTable">
               <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[@table:name=$sheetName]">
                 <xsl:apply-templates select="table:table-row[1]" mode="checkPivotCells">
@@ -514,7 +568,15 @@
                     <xsl:value-of select="substring-before(substring-after($cellAddress,'.'),':')"/>
                   </xsl:with-param>
                   <xsl:with-param name="cellEnd">
+						<xsl:choose>
+							<xsl:when test ="$rowNumCellRange &gt; $rowCount ">
+								<xsl:value-of select ="concat($columnForRowCount,$rowCount)"/>
+							</xsl:when>
+							<xsl:otherwise>
                     <xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+						<!--<xsl:value-of select="substring-after(substring-after($cellAddress,':'),'.')"/>-->						
                   </xsl:with-param>
                 </xsl:apply-templates>
               </xsl:for-each>
@@ -546,14 +608,29 @@
                   </xsl:variable>
                   
                   <xsl:variable name="rowEnd">
-                    <xsl:call-template name="GetRowNum">
-                      <xsl:with-param name="cell">
-                        <xsl:value-of
-                          select="substring-after(substring-after(@table:cell-range-address,':'),'.')"
-                        />
-                      </xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:variable>
+					<!--
+					Defect: 1894250
+					Fixed By: Vijayeta
+					Desc : Performance related defect, where in the pivot range of the source table(table:cell-range-address) in input is row num 65536,
+						   where as the source table spans only upto 1089 rows. Hence, the code iterates 65536 times, and resulting in long conversion time.
+						   Here this part of code takes a count of rows in source table and compares it with the value of attribute table:cell-range-address.
+					Date: 10th Sep '08	
+					variables: rowCount,columnForRowCount,rowNumCellRange
+					-->
+						<xsl:call-template name="GetRowNum">
+							<xsl:with-param name="cell">
+								<xsl:choose>
+									<xsl:when test ="$rowNumCellRange &gt; $rowCount">
+										<xsl:value-of select ="concat($columnForRowCount,$rowCount)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>
+									</xsl:otherwise>
+								</xsl:choose>
+								<!--<xsl:value-of select="substring-after(substring-after(@table:cell-range-address,':'),'.')"/>-->
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:variable>
                   
                   <xsl:variable name="colEnd">
                     <xsl:call-template name="GetColNum">

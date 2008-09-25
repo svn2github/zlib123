@@ -30,7 +30,7 @@
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
 
-  <xsl:import href="common.xsl"/>
+  <!--<xsl:import href="common.xsl"/>-->
 
   <xsl:template name="MatchFilter">
     <!-- @Description: Checks if filter can be conversed and returnes true or false when parameter 'ignoreFilter' is not empty otherwise makes the conversion -->

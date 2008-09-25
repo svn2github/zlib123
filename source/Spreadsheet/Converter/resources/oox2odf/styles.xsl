@@ -58,11 +58,11 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   xmlns:oox="urn:oox"
   exclude-result-prefixes="a e oox r number v">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="headers.xsl"/>
   <xsl:import href="insert_cols.xsl"/>
-  <xsl:import href="note.xsl"/>
+  <xsl:import href="note.xsl"/>-->
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Font" match="e:styleSheet/e:fonts/e:font" use="@oox:id"/>
@@ -122,8 +122,11 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   </xsl:template>
 
   <xsl:template name="InsertFonts">
-    <xsl:for-each select="key('Part', 'xl/styles.xml')/e:styleSheet/e:fonts/e:font[e:name]">
+	  <!-- Perofomance-->
+    <xsl:for-each select="key('Part', 'xl/styles.xml')">
+		<xsl:for-each select ="e:styleSheet/e:fonts/e:font[e:name]">
       <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>
+    </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
 
@@ -137,8 +140,10 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   </xsl:template>
 
   <!-- insert column styles from all sheets -->
+	  <!-- Perofomance-->
   <xsl:template name="InsertColumnStyles">
-    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+	  <xsl:for-each select="key('Part', 'xl/workbook.xml')">
+		  <xsl:for-each select="e:workbook/e:sheets/e:sheet">
       <xsl:call-template name="InsertSheetColumnStyles">
         <xsl:with-param name="sheet">
           <xsl:call-template name="GetTarget">
@@ -150,6 +155,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </xsl:with-param>
       </xsl:call-template>
     </xsl:for-each>
+	  </xsl:for-each>
   </xsl:template>
 
   <!-- insert column styles from selected sheet -->
@@ -296,10 +302,11 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </xsl:if>
 
   </xsl:template>
-
+	  <!-- Perofomance-->
   <!-- insert row styles from all sheets -->
   <xsl:template name="InsertRowStyles">
-    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+		<xsl:for-each select="key('Part', 'xl/workbook.xml')">
+			<xsl:for-each select="e:workbook/e:sheets/e:sheet">
       <xsl:call-template name="InsertSheetRowStyles">
         <xsl:with-param name="sheet">
           <xsl:call-template name="GetTarget">
@@ -311,6 +318,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </xsl:with-param>
       </xsl:call-template>
     </xsl:for-each>
+		</xsl:for-each>
   </xsl:template>
 
   <!-- insert row styles from selected sheet -->
@@ -441,8 +449,10 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   </xsl:template>
 
   <!--  Insert Table Properties -->
+	  <!-- Perofomance-->
   <xsl:template name="InsertStyleTableProperties">
-    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+		<xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook">
+			<xsl:for-each select="e:sheets/e:sheet">
       <style:style>
         <xsl:attribute name="style:name">
           <xsl:value-of select="generate-id()"/>
@@ -483,6 +493,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         </style:table-properties>
       </style:style>
     </xsl:for-each>
+		</xsl:for-each>
   </xsl:template>
 
   <!-- insert number styles-->
@@ -496,12 +507,14 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   </xsl:template>
 
   <xsl:template name="InsertCellStyles">
-
-    <xsl:for-each select="key('Part', 'xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf">
+	    <!-- Perofomance-->
+	  <xsl:for-each select="key('Part', 'xl/styles.xml')/e:styleSheet">
+		  <xsl:for-each select="e:cellXfs/e:xf">
       <style:style style:name="{generate-id(.)}" style:family="table-cell">
         <xsl:call-template name="InsertCellFormat"/>
       </style:style>
     </xsl:for-each>
+	  </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertMergeCellStyles">
@@ -529,10 +542,13 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     </xsl:variable>
 
     <!-- get a ';'-separated list of all merged cells for sheet $Id -->
+	   <!-- Perofomance-->
     <xsl:variable name="MergeCell">
-      <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:mergeCells">
+		  <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet">
+			  <xsl:for-each select="e:mergeCells">
         <xsl:apply-templates select="e:mergeCell[1]" mode="merge"/>
       </xsl:for-each>
+		  </xsl:for-each>
     </xsl:variable>
 
     <xsl:for-each select="key('Part', concat('xl/',$Id))/e:worksheet/e:sheetData">
@@ -963,15 +979,16 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
     <!-- @Context: none -->
 
     <xsl:apply-templates select="key('Part', 'xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]" mode="automaticstyles"/>
-
-    <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+	    <!-- Perofomance-->
+	  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook">
+		  <xsl:for-each select="e:sheets/e:sheet">
       <xsl:apply-templates select="key('Part', concat('xl/comments', position(), '.xml'))/e:comments">
         <xsl:with-param name="number">
           <xsl:value-of select="position()"/>
         </xsl:with-param>
       </xsl:apply-templates>
     </xsl:for-each>
-
+	  </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="e:comments">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -38,6 +38,14 @@
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="oox e r xdr c">
 
+  <!--<xsl:import href="content.xsl"/>
+  <xsl:import href="common-meta.xsl"/>
+  <xsl:import href="relationships.xsl"/>
+  <xsl:import href="settings.xsl"/>
+  <xsl:import href="common.xsl"/>
+  <xsl:import href="styles.xsl"/>
+  <xsl:import href="merge_cell.xsl"/>
+  <xsl:import href="chart.xsl"/>-->
   <xsl:import href="content.xsl"/>
   <xsl:import href="common-meta.xsl"/>
   <xsl:import href="relationships.xsl"/>
@@ -46,6 +54,27 @@
   <xsl:import href="styles.xsl"/>
   <xsl:import href="merge_cell.xsl"/>
   <xsl:import href="chart.xsl"/>
+	<xsl:import href="border.xsl"/>
+	<xsl:import href="database-ranges.xsl"/>
+	<xsl:import href="table_body.xsl"/>
+	<xsl:import href="number.xsl"/>
+	<xsl:import href="picture.xsl"/>
+	<xsl:import href="conditional.xsl"/>
+	<xsl:import href="validation.xsl"/>
+	<xsl:import href="elements.xsl"/>
+	<xsl:import href="ole_objects.xsl"/>
+	<xsl:import href="connections.xsl"/>
+	<xsl:import href="groups.xsl"/>
+	<xsl:import href="scenario.xsl"/>
+	<xsl:import href="change_tracking.xsl"/>
+	<xsl:import href="pivot_tables.xsl"/>
+	<xsl:import href="Gradient.xsl"/>
+	<xsl:import href="measures.xsl"/>
+	<xsl:import href="insert_text.xsl"/>
+	<xsl:import href="headers.xsl"/>
+	<xsl:import href="insert_cols.xsl"/>
+	<xsl:import href="note.xsl"/>
+	<xsl:import href="date_time.xsl"/>
 
   <xsl:param name="outputFile"/>
 
