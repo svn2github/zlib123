@@ -5451,25 +5451,61 @@
 
   <!-- conversion of text properties -->
   <xsl:template name="InsertTextProperties">
+    
     <!-- attributes using match -->
     <xsl:apply-templates mode="rPrChildren"/>
 
     <!--clam bugfix #1806204 special case: hyperlink without style-->
-    <xsl:choose>
-      <xsl:when test="ancestor::w:hyperlink and not(./w:rStyle) and not(./w:u) and (not(w:color) or w:color/@w:val = 'auto')">
-        <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
-        <xsl:attribute name="style:text-underline-type">none</xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:if test="./w:rStyle/@w:val = 'Hyperlink' and not(w:color)">
+    <!-- makz: modified to fix hyperlink problems in TOCs-->
+    <xsl:if test="ancestor::w:hyperlink">
+      <!-- 
+      These are the run properties of a hyperlink.
+      So it needs special threatment.
+      -->
+      <xsl:choose>
+        <xsl:when test="not(w:rStyle) and not(w:u) and (not(w:color) or w:color/@w:val = 'auto')">
+          <!--
+          If there is no style referenced and no underline style is set and no color is set, 
+          Word uses black color and no underlining. Open Office would use blue and underlining.
+          For this reason we must write the default settings of Word:
+          -->
+          <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">none</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="starts-with(ancestor::w:p/w:pPr/w:pStyle/@w:val, 'TOC')">
+          <!-- 
+          If this hyperlink is inside a TOC, Word always uses the color und underline style of the TOC style.
+          The formatting properties of the Hyperlink style are ignored.
+          
+          Open Office always uses the color and the style of the Hyperlink style.
+          For that reason we must write the color and underline style of the matching TOC level.
+          -->
+          <xsl:variable name="tocStyle" select="key('StyleId', ancestor::w:p/w:pPr/w:pStyle/@w:val)" />
+          <xsl:attribute name="fo:color">
+            <xsl:choose>
+              <xsl:when test="$tocStyle/w:rPr/w:color/@w:val">
+                <xsl:value-of select="concat('#', $tocStyle/w:rPr/w:color/@w:val)" />
+              </xsl:when>
+              <xsl:otherwise>#000000</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:attribute name="style:text-underline-type">
+            <xsl:choose>
+              <xsl:when test="$tocStyle/w:rPr/w:u">single</xsl:when>
+              <xsl:otherwise>none</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="./w:rStyle/@w:val = 'Hyperlink' and not(w:color)">
           <xsl:variable name="parentStyle" select="key('StyleId','Hyperlink')"></xsl:variable>
           <xsl:if test="$parentStyle/w:rPr/w:color">
-            <xsl:attribute name="fo:color"><xsl:value-of select="concat('#',$parentStyle/w:rPr/w:color/@w:val)"></xsl:value-of>
+            <xsl:attribute name="fo:color">
+              <xsl:value-of select="concat('#',$parentStyle/w:rPr/w:color/@w:val)"></xsl:value-of>
             </xsl:attribute>
           </xsl:if>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
     
     <!-- other attributes forbidden in drop cap text style -->
     <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
