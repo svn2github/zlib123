@@ -88,7 +88,7 @@ namespace OdfConverterLauncher
             // set culture to match current application culture or user's choice
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
-                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "Language", null) as string;
+                .GetValue(@"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\Odf Add-in for Word", "Language", null) as string;
 
             if (languageVal != null)
             {
@@ -158,7 +158,7 @@ namespace OdfConverterLauncher
             // set culture to match current application culture or user's choice
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
-                .GetValue(@"HKEY_CURRENT_USER\Software\Sonata\Odf Add-in for Presentation", "Language", null) as string;
+                .GetValue(@"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\Odf Add-in for Presentation", "Language", null) as string;
 
 
             if (languageVal != null)
@@ -226,7 +226,7 @@ namespace OdfConverterLauncher
             // set culture to match current application culture or user's choice
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
-                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "Language", null) as string;
+                .GetValue(@"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\Odf Add-in for Excel", "Language", null) as string;
 
             if (languageVal != null)
             {
