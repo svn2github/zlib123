@@ -1,0 +1,20 @@
+LIBRARY	"test"
+; 32-bit sample Rtf converter library
+DESCRIPTION		'Sample Converter'
+
+CODE			MOVEABLE DISCARDABLE LOADONCALL PURE
+DATA			MOVEABLE SINGLE PRELOAD
+
+; unimplemented optional exports commented out
+EXPORTS
+		DllMain
+		InitConverter32
+		UninitConverter
+		IsFormatCorrect32
+		ForeignToRtf32
+		RtfToForeign32
+		GetReadNames
+		GetWriteNames
+		RegisterApp
+		FRegisterConverter
+;		CchFetchLpszError
