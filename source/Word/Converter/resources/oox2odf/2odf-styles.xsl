@@ -625,6 +625,7 @@
   <!-- create styles -->
   <xsl:template match="w:style[@w:type != 'numbering' ]">
     <xsl:message terminate="no">progress:w:style</xsl:message>
+    
     <xsl:variable name="currentStyleId">
       <xsl:value-of select="@w:styleId"/>
     </xsl:variable>
@@ -647,7 +648,18 @@
         and key('StyleId', concat(substring-before($currentStyleId,'Reference'),'_20_anchor'))
         ) or (
         ($currentStyleId='FootnoteText' or $currentStyleId='EndnoteText')
-        and key('StyleId', concat(substring-before($currentStyleId,'Text'),'_20_Symbol')) )"/>
+        and key('StyleId', concat(substring-before($currentStyleId,'Text'),'_20_Symbol')) )" />
+      
+
+      <!--
+      makz: I commented this out because I could not find any reason for renaming the Endnote/Foonote Styles.
+            Renaming these styles caused problems if a paragraph referenced the original style (e.g. Footenotetext).
+            In this case The style could not be found and the properties could not be applied to the paragraph/run.
+            See bug #2101970
+            
+            Note: For making this working I had to change the Footenotes-Configuration in 2odf-footnotes.xsl because
+            the configurationr reference these styles.
+      
       <xsl:when test="$currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference'">
         <style:style
           style:name="{concat(substring-before($currentStyleId,'Reference'),'_20_anchor')}"
@@ -661,6 +673,7 @@
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:when>
+      
       <xsl:when test="$currentStyleId='FootnoteText' or $currentStyleId='EndnoteText'">
         <style:style style:name="{concat(substring-before($currentStyleId,'Text'),'_20_Symbol')}"
           style:display-name="{concat(substring-before(self::node()/w:name/@w:val,'text'),'symbol')}">
@@ -673,6 +686,7 @@
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:when>
+      -->
       
       <!--math: bugfix #1934315 START-->
       <!--<xsl:when test="contains($currentStyleId,'TOC')">-->
@@ -966,6 +980,8 @@
         </xsl:if>
         <!-- document styles -->
         <xsl:call-template name="InsertDefaultStyles"/>
+        
+        <!-- insert the normal styles -->
         <xsl:apply-templates select="key('Part', 'word/styles.xml')/w:styles"/>
         
         <!--clam: special hyperlink style for toc (bug #1806204)-->
