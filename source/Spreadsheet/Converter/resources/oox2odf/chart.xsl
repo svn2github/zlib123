@@ -1355,6 +1355,8 @@
             </xsl:for-each>
           </xsl:when>
           
+          <!--code added by Mallika for the bug no 2030295 and file name Pilot_Temperatures.xlsx -->
+          
           <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:barChart">
             <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:dateAx">
               <xsl:call-template name="InsertXAxis"/>
@@ -1364,11 +1366,17 @@
               <xsl:call-template name="InsertXAxis"/>
             </xsl:for-each>
 
-            <xsl:for-each
+            <!--<xsl:for-each
               select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
+              <xsl:call-template name="InsertYAxis"/>
+            </xsl:for-each>-->
+
+            <xsl:for-each
+             select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
               <xsl:call-template name="InsertYAxis"/>
             </xsl:for-each>
           </xsl:when>
+          <!--end of added code-->
           
           <xsl:otherwise>
             <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
