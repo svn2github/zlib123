@@ -55,8 +55,8 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
         protected const string IMPORT_ODF_FILE_FILTER = "*.odp";
         protected const string EXPORT_ODF_FILE_FILTER = " (*.odp)|*.odp|";
 
-        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\Sonata\ODF Add-in for Presentation";
-        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\Sonata\ODF Add-in for Presentation";
+        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\ODF Add-in for Presentation";
+        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Presentation";
         
         /// <summary>
         /// Class name for PowerPoint12 documents
