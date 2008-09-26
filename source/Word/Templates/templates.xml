@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<o:featuredcontent lcid="1033" xmlns:o="urn:schemas-microsoft-com:office:office">
+    <o:application id="WD">
+        <o:featuredtemplates startdate="2007-01-01" enddate="2030-12-31">
+
+            <!-- FAX -->
+            <o:featuredtemplate title="ODF-compatible Fax" source="ODFFax.dotx" >
+                <o:media mediatype="png" filename="ODFFax.png" source="ODFFax.png" />
+                <o:preview filename="ODFFaxBig.png" source="ODFFaxBig.png" />
+            </o:featuredtemplate>
+
+            <!-- LETTER -->
+            <o:featuredtemplate title="ODF-compatible Letter" source="ODFLetter.dotx" >
+                <o:media mediatype="png" filename="ODFLetter.png" source="ODFLetter.png" />
+                <o:preview filename="ODFLetterBig.png" source="ODFLetterBig.png" />
+            </o:featuredtemplate>
+			
+			<!-- MEMO -->
+            <o:featuredtemplate title="ODF-compatible Memo" source="ODFMemo.dotx" >
+                <o:media mediatype="png" filename="ODFMemo.png" source="ODFMemo.png" />
+                <o:preview filename="ODFMemoBig.png" source="ODFMemoBig.png" />
+            </o:featuredtemplate>
+			
+			<!-- REPORT -->
+            <o:featuredtemplate title="ODF-compatible Report" source="ODFReport.dotx" >
+                <o:media mediatype="png" filename="ODFReport.png" source="ODFReport.png" />
+                <o:preview filename="ODFReportBig.png" source="ODFReportBig.png" />
+            </o:featuredtemplate>
+
+        </o:featuredtemplates>
+    </o:application>
+</o:featuredcontent>
