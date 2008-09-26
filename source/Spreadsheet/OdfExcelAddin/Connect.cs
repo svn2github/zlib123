@@ -53,8 +53,8 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         protected const string IMPORT_ODF_FILE_FILTER = "*.ods";
         protected const string EXPORT_ODF_FILE_FILTER = " (*.ods)|*.ods|";
 
-        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\Clever Age\ODF Add-in for Excel";
-        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\Clever Age\ODF Add-in for Excel";
+        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\ODF Add-in for Excel";
+        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Excel";
         
         /// <summary>
         /// Class name for Excel12 documents
