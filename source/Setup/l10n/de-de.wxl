@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="de-de" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	<String Id="lcid">1031</String>
+	<String Id="ApplicationName">ODF Add-In für Microsoft Office</String>
+	<String Id="ReadmePath">Readme.de-de.html</String>
+
+	<String Id="Error2000">Eine neuere Version dieses Prokukts ist bereits installiert.</String>
+	
+	<String Id="OpenWithWord">Mit Microsoft Word öffnen</String>
+	<String Id="OpenWithExcel">Mit Microsoft Excel öffnen</String>
+	<String Id="OpenWithPowerPoint">Mit Microsoft PowerPoint öffnen</String>
+
+	<String Id="FileTypeOdt">OpenDocument Text</String>
+	<String Id="FileTypeOds">OpenDocument Tabellendokument</String>
+	<String Id="FileTypeOdp">OpenDocument Präsentation</String>
+
+	<String Id="TemplateTitleODFFax">ODF-kompatibles Fax</String>
+	<String Id="TemplateTitleODFLetter">ODF-kompatibler Brief</String>
+	<String Id="TemplateTitleODFMemo">ODF-kompatibles Memo</String>
+	<String Id="TemplateTitleODFReport">ODF-kompatibler Bericht</String>
+
+
+	<String Id="MyDlgTitle" Overridable="yes">[ProductName] Setup</String>
+	<String Id="MyDlgBannerBitmap" Overridable="yes" Localizable="no">WixUI_Bmp_Banner</String>
+
+	<String Id="MyFileAssociationDlgTitle" Overridable="yes">{\WixUI_Font_Title}Dateiverknüpfungene</String>
+	<String Id="MyFileAssociationDlgDescription" Overridable="yes">OpenDocument-Dateien mit Microsoft Office verknüpfen</String>
+	<String Id="MyFileAssociationDlgDetailedDescription" Overridable="yes">Bitte wählen Sie die Dateitypen aus, die Sie mit Microsoft Office verknüpfen möchten:</String>
+
+	<String Id="MyExitDlgShowReadme">Readme anzeigen</String>
+
+	<String Id="MyInstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
+	<String Id="MyInstallScopeDlgDescription" Overridable="yes">Wählen Sie eine Installationsart und einen Zielordner aus.</String>
+	<String Id="MyInstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Installationsart</String>
+	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">&amp;Für aktuellen Benutzer ([USERNAME]) installieren</String>
+	<String Id="MyInstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] ist nur für Ihr Benutzerkonto verfügbar. Sie benötigen keine lokalen Administratorberechtigungen.</String>
+	<String Id="MyInstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] unterstützt keine Einzelbenutzerinstallation.</String>
+	<String Id="MyInstallScopeDlgPerMachine" Overridable="yes">Für alle Benutzer auf diesem &amp;Computer installieren</String>
+	<String Id="MyInstallScopeDlgPerMachineDescription" Overridable="yes">[ProductName] wird standardmäßig in einem Einzelbenutzerordner installiert und ist für alle Benutzer verfügbar. Der Zielordner kann geändert werden. Dafür benötigen Sie lokale Administratorberechtigungen.</String>
+	<String Id="MyInstallScopeDlgFolderLabel" Overridable="yes">Installations&amp;ordner:</String>
+	<String Id="MyInstallScopeDlgChange" Overridable="yes">&amp;Ändern...</String>
+
+	<String Id="msierrXmlConfigFailedRead" Overridable="yes">There was a failure while configuring XML files.</String>
+	<String Id="msierrXmlConfigFailedOpen" Overridable="yes">Failed to open XML file [3], system error: [2]</String>
+	<String Id="msierrXmlConfigFailedSelect" Overridable="yes">Failed to find node: [3] in XML file: [4], system error: [2]</String>
+	<String Id="msierrXmlConfigFailedSave" Overridable="yes">Failed to save changes to XML file [3], system error: [2]</String>
+
+
+
+</WixLocalization>

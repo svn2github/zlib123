@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+		<UI>
+			<Dialog Id="MyFileAssociationDlg" Width="370" Height="270" Title="!(loc.MyDlgTitle)" NoMinimize="yes">
+
+				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.MyDlgBannerBitmap)" />
+				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+				<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MyFileAssociationDlgTitle)" />
+				<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MyFileAssociationDlgDescription)" />
+				<Control Id="DetailedDescription" Type="Text" X="25" Y="55" Height="30" Width="300" Transparent="yes" NoPrefix="yes" Text="!(loc.MyFileAssociationDlgDetailedDescription)" />
+
+				<Control Id="AssociateWord" Type="CheckBox" Property="FILE_ASSOCIATION_ODT" CheckBoxValue="1" X="35" Y="85" Height="15" Width="200" Default="no" Text="OpenDocument Text Documents (.odt)" Disabled="yes">
+					<!-- only enable if feature WORDADDIN is to be installed or not to be uninstalled -->
+					<Condition Action="enable"><![CDATA[ (&WORDADDIN=3) OR NOT (&WORDADDIN=2) AND (!WORDADDIN=3)]]></Condition>
+				</Control>
+				<Control Id="AssociateExcel" Type="CheckBox" Property="FILE_ASSOCIATION_ODS" CheckBoxValue="1" X="35" Y="110" Height="15" Width="200" Default="no" Text="OpenDocument Spreadsheets (.ods)" Disabled="yes">
+					<!-- only enable if feature EXCELADDIN is to be installed -->
+					<Condition Action="enable"><![CDATA[ (&EXCELADDIN=3) OR NOT (&EXCELADDIN=2) AND (!EXCELADDIN=3)]]></Condition>
+				</Control>
+				<Control Id="AssociatePowerPoint" Type="CheckBox" Property="FILE_ASSOCIATION_ODP" CheckBoxValue="1" X="35" Y="135" Height="15" Width="200" Default="no" Text="OpenDocument Presentations (.odp)" Disabled="yes">
+					<!-- only enable if feature POWERPOINTADDIN is to be installed -->
+					<Condition Action="enable"><![CDATA[ (&POWERPOINTADDIN=3) OR NOT (&POWERPOINTADDIN=2) AND (!POWERPOINTADDIN=3)]]></Condition>
+				</Control>
+
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+				</Control>
+			</Dialog>
+		</UI>
+	</Fragment>
+</Wix>

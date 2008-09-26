@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+		<FeatureGroup Id="Assemblies">
+			<ComponentRef Id="OdfAddinLib.dll"/>
+			<ComponentRef Id="OdfConverterLib.dll" />
+			<ComponentRef Id="OdfZipUtils.dll" />
+
+			<ComponentRef Id="OdfConverterLauncher.exe" />
+			<ComponentRef Id="OdfConverter.exe" />
+
+			<ComponentRef Id="OdfExcelAddin.dll" />
+			<ComponentRef Id="OdfExcelAddinShim.dll" />
+
+			<ComponentRef Id="OdfPowerPointAddin.dll" />
+			<ComponentRef Id="OdfPowerPointAddinShim.dll" />
+
+			<ComponentRef Id="OdfWordAddin.dll" />
+			<ComponentRef Id="OdfWordAddinShim.dll" />
+
+			<ComponentRef Id="PresentationConverter.dll" />
+			<ComponentRef Id="PresentationConverter2Odf.dll" />
+			<ComponentRef Id="PresentationConverter2Oox.dll" />
+
+			<ComponentRef Id="SpreadsheetConverter.dll"/>
+			<ComponentRef Id="SpreadsheetConverter2Odf.dll"/>
+			<ComponentRef Id="SpreadsheetConverter2Oox.dll"/>
+
+			<ComponentRef Id="WordprocessingConverter.dll"/>
+			<ComponentRef Id="WordprocessingConverter2Odf.dll"/>
+			<ComponentRef Id="WordprocessingConverter2Oox.dll"/>
+
+			<ComponentRef Id="zlibwapi.dll"/>
+
+			<ComponentRef Id="de_DE_OdfAddinLib.resources.dll"/>
+			<ComponentRef Id="de_DE_OdfPowerPointAddin.resources.dll"/>
+			<ComponentRef Id="de_DE_OdfExcelAddin.resources.dll"/>
+			<ComponentRef Id="de_DE_OdfWordAddin.resources.dll"/>
+
+			<ComponentRef Id="fr_FR_OdfAddinLib.resources.dll"/>
+			<ComponentRef Id="fr_FR_OdfPowerPointAddin.resources.dll"/>
+			<ComponentRef Id="fr_FR_OdfExcelAddin.resources.dll"/>
+			<ComponentRef Id="fr_FR_OdfWordAddin.resources.dll"/>
+
+			<ComponentRef Id="ja_JP_OdfAddinLib.resources.dll"/>
+			<ComponentRef Id="ja_JP_OdfPowerPointAddin.resources.dll"/>
+			<ComponentRef Id="ja_JP_OdfExcelAddin.resources.dll"/>
+			<ComponentRef Id="ja_JP_OdfWordAddin.resources.dll"/>
+
+			<ComponentRef Id="nl_NL_OdfAddinLib.resources.dll"/>
+			<ComponentRef Id="nl_NL_OdfPowerPointAddin.resources.dll"/>
+			<ComponentRef Id="nl_NL_OdfExcelAddin.resources.dll"/>
+			<ComponentRef Id="nl_NL_OdfWordAddin.resources.dll"/>
+
+			<ComponentRef Id="pl_PL_OdfAddinLib.resources.dll"/>
+			<ComponentRef Id="pl_PL_OdfPowerPointAddin.resources.dll"/>
+			<ComponentRef Id="pl_PL_OdfExcelAddin.resources.dll"/>
+			<ComponentRef Id="pl_PL_OdfWordAddin.resources.dll"/>
+
+			<ComponentRef Id="zh_CHS_OdfAddinLib.resources.dll"/>
+			<ComponentRef Id="zh_CHS_OdfPowerPointAddin.resources.dll"/>
+			<ComponentRef Id="zh_CHS_OdfExcelAddin.resources.dll"/>
+			<ComponentRef Id="zh_CHS_OdfWordAddin.resources.dll"/>
+		</FeatureGroup>
+
+		<Feature Id="WORDADDIN" Title="ODF Add-in for Microsoft Word" Level="1" ConfigurableDirectory="INSTALLDIR"
+				 Description='Installs and registers the ODF Add-in for Microsoft Word.' Display='expand' AllowAdvertise='no'>
+			<FeatureGroupRef Id="Assemblies"/>
+
+			<ComponentRef Id="Readme"/>
+
+			<ComponentRef Id="RegistryEntriesWord"/>
+			<ComponentRef Id="FileAssociationOdt"/>
+			<ComponentRef Id="RegistryEntryContextMenuOdt"/>
+
+			<ComponentRef Id="RegistryFixKB908002"/>
+
+			<Feature Id="TEMPLATES" Title="ODF-compatible Templates" Level="1" ConfigurableDirectory="ODFTEMPLATEFOLDER"
+					 Description="Installs a set of Word templates especially designed for interoperability with the OpenDocument Format."
+					 AllowAdvertise='no'
+					 TypicalDefault='install'>
+				<ComponentRef Id="Templates2007"/>
+				<ComponentRef Id="RegistryTemplates2007"/>
+				<ComponentRef Id="RegistryTemplates"/>
+				
+				<ComponentRef Id="ODFFax.dotx"/>
+				<ComponentRef Id="ODFFax.png"/>
+				<ComponentRef Id="ODFFaxBig.png"/>
+				
+				<ComponentRef Id="ODFLetter.dotx"/>
+				<ComponentRef Id="ODFLetter.png"/>
+				<ComponentRef Id="ODFLetterBig.png"/>
+				
+				<ComponentRef Id="ODFMemo.dotx"/>
+				<ComponentRef Id="ODFMemo.png"/>
+				<ComponentRef Id="ODFMemoBig.png"/>
+				
+				<ComponentRef Id="ODFReport.dotx"/>
+				<ComponentRef Id="ODFReport.png"/>
+				<ComponentRef Id="ODFReportBig.png"/>
+
+				<ComponentRef Id="ODFFax.dot"/>
+				<ComponentRef Id="ODFLetter.dot"/>
+				<ComponentRef Id="ODFMemo.dot"/>
+				<ComponentRef Id="ODFReport.dot"/>
+			</Feature>
+		</Feature>
+
+		<Feature Id="EXCELADDIN" Title="ODF Add-in for Microsoft Excel"
+				 Level="1" ConfigurableDirectory='INSTALLDIR'
+				 Description='Installs and registers the ODF Add-in for Microsoft Excel.'
+				 AllowAdvertise='no'
+				 TypicalDefault='install'>
+			<FeatureGroupRef Id="Assemblies"/>
+
+			<ComponentRef Id="Readme"/>
+			<ComponentRef Id="RegistryEntriesExcel"/>
+			
+			<ComponentRef Id="FileAssociationOds"/>
+			<ComponentRef Id="RegistryEntryContextMenuOds"/>
+
+			<ComponentRef Id="RegistryFixKB908002"/>
+
+		</Feature>
+
+		<Feature Id="POWERPOINTADDIN" Title="ODF Add-in for Microsoft PowerPoint"
+				 Level="1" ConfigurableDirectory='INSTALLDIR'
+				 Description='Installs and registers the ODF Add-in for Microsoft PowerPoint.'
+				 AllowAdvertise='no'
+				 TypicalDefault='install'>
+			<FeatureGroupRef Id="Assemblies"/>
+
+			<ComponentRef Id="Readme"/>
+			<ComponentRef Id="RegistryEntriesPowerPoint"/>
+			
+			<ComponentRef Id="FileAssociationOdp"/>
+			<ComponentRef Id="RegistryEntryContextMenuOdp"/>
+
+			<ComponentRef Id="RegistryFixKB908002"/>
+
+		</Feature>
+	</Fragment>
+</Wix>

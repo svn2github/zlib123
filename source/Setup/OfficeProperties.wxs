@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+		<!-- get the user-specific APPDATA folder -->
+		<Property Id="APPDIR" Secure="yes">
+			<RegistrySearch Id="RegSearch_AppData" Type="directory" Key="Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" Name="AppData" Root="HKCU" />
+		</Property>
+		
+		<!-- search for installed versions of Office -->
+		<Property Id="WORD2007INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2007InstallRoot" Type="directory" Key="Software\Microsoft\Office\12.0\Word\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+		<Property Id="WORD2003INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2003InstallRoot" Type="directory" Key="Software\Microsoft\Office\11.0\Word\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+		<Property Id="WORD2002INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2002InstallRoot" Type="directory" Key="SOFTWARE\Microsoft\Office\10.0\Word\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+		<Property Id="WORD2000INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2000InstallRoot" Type="directory" Key="SOFTWARE\Microsoft\Office\9.0\Word\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+
+		<Property Id="EXCEL2007INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_Excel2007InstallRoot" Type="directory" Key="Software\Microsoft\Office\12.0\Excel\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+		<Property Id="EXCEL2003INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_Excel2003InstallRoot" Type="directory" Key="Software\Microsoft\Office\11.0\Excel\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+		<Property Id="EXCEL2002INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_Excel2002InstallRoot" Type="directory" Key="SOFTWARE\Microsoft\Office\10.0\Excel\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+
+		<Property Id="POWERPOINT2007INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_PowerPoint2007InstallRoot" Type="directory" Key="Software\Microsoft\Office\12.0\PowerPoint\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+		<Property Id="POWERPOINT2003INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_PowerPoint2003InstallRoot" Type="directory" Key="Software\Microsoft\Office\11.0\PowerPoint\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+		<Property Id="POWERPOINT2002INSTALLROOT" Secure="yes">
+			<RegistrySearch Id="RegSearch_PowerPoint2002InstallRoot" Type="directory" Key="SOFTWARE\Microsoft\Office\10.0\PowerPoint\InstallRoot" Name="Path" Root="HKLM"/>
+		</Property>
+
+		<!-- detect Word 2007 template folder -->
+		<Property Id="WORD2007TEMPLATE1" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2007Template1" Type="raw" Key="Software\Policies\Microsoft\Office\12.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2007TEMPLATE2" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2007Template2" Type="raw" Key="Software\Microsoft\Office\12.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2007TEMPLATE3" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2007Template3" Type="raw" Key="Software\Policies\Microsoft\Office\12.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2007TEMPLATE4" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2007Template4" Type="raw" Key="Software\Microsoft\Office\12.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="TEMPLATEDIR2007" Secure="yes">
+			<RegistrySearch Id="RegSearch_TemplateDir2007" Type="raw" Key="Software\Microsoft\Office\12.0\Common\General" Name="Templates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2007TEMPLATE5" Secure="yes">
+			<DirectorySearch Id="DirSearch_Word2007Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2007]" Depth="0" />
+		</Property>
+
+		<!-- detect Word 2003 template folder -->
+		<Property Id="WORD2003TEMPLATE1" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2003Template1" Type="raw" Key="Software\Policies\Microsoft\Office\11.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2003TEMPLATE2" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2003Template2" Type="raw" Key="Software\Microsoft\Office\11.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2003TEMPLATE3" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2003Template3" Type="raw" Key="Software\Policies\Microsoft\Office\11.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2003TEMPLATE4" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2003Template4" Type="raw" Key="Software\Microsoft\Office\11.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="TEMPLATEDIR2003" Secure="yes">
+			<RegistrySearch Id="RegSearch_TemplateDir2003" Type="raw" Key="Software\Microsoft\Office\11.0\Common\General" Name="Templates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2003TEMPLATE5" Secure="yes">
+			<DirectorySearch Id="DirSearch_Word2003Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2003]" Depth="0" />
+		</Property>
+
+
+		<!-- detect Word 2002 template folder -->
+		<Property Id="WORD2002TEMPLATE1" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2002Template1" Type="raw" Key="Software\Policies\Microsoft\Office\10.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2002TEMPLATE2" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2002Template2" Type="raw" Key="Software\Microsoft\Office\10.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2002TEMPLATE3" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2002Template3" Type="raw" Key="Software\Policies\Microsoft\Office\10.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2002TEMPLATE4" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2002Template4" Type="raw" Key="Software\Microsoft\Office\10.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="TEMPLATEDIR2002" Secure="yes">
+			<RegistrySearch Id="RegSearch_TemplateDir2002" Type="raw" Key="Software\Microsoft\Office\10.0\Common\General" Name="Templates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2002TEMPLATE5" Secure="yes">
+			<DirectorySearch Id="DirSearch_Word2002Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2002]" Depth="0" />
+		</Property>
+
+
+		<!-- detect Word 2000 template folder -->
+		<Property Id="WORD2000TEMPLATE1" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2000Template1" Type="raw" Key="Software\Policies\Microsoft\Office\9.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2000TEMPLATE2" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2000Template2" Type="raw" Key="Software\Microsoft\Office\9.0\Common\General" Name="SharedTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2000TEMPLATE3" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2000Template3" Type="raw" Key="Software\Policies\Microsoft\Office\9.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2000TEMPLATE4" Secure="yes">
+			<RegistrySearch Id="RegSearch_Word2000Template4" Type="raw" Key="Software\Microsoft\Office\9.0\Common\General" Name="UserTemplates" Root="HKCU" />
+		</Property>
+
+		<Property Id="TEMPLATEDIR2000" Secure="yes">
+			<RegistrySearch Id="RegSearch_TemplateDir2000" Type="raw" Key="Software\Microsoft\Office\9.0\Common\General" Name="Templates" Root="HKCU" />
+		</Property>
+
+		<Property Id="WORD2000TEMPLATE5" Secure="yes">
+			<DirectorySearch Id="DirSearch_Word2000Template5" Path="[APPDIR]Microsoft\[TEMPLATEDIR2000]" Depth="0" />
+		</Property>
+
+		<CustomAction Id="GetOfficeInfos" Property="ODFTEMPLATEFOLDER" Value="[TEMPLATEPATH]" />
+		
+		<!-- assing template folder for Word 2007 -->
+		<CustomAction Id="ActionWord2007TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE1]" />
+		<CustomAction Id="ActionWord2007TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE2]" />
+		<CustomAction Id="ActionWord2007TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE3]" />
+		<CustomAction Id="ActionWord2007TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE4]" />
+		<CustomAction Id="ActionWord2007TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE5]" />
+		<CustomAction Id="ActionWord2007TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+
+		<!-- assing template folder for Word 2003 -->
+		<CustomAction Id="ActionWord2003TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE1]" />
+		<CustomAction Id="ActionWord2003TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE2]" />
+		<CustomAction Id="ActionWord2003TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE3]" />
+		<CustomAction Id="ActionWord2003TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE4]" />
+		<CustomAction Id="ActionWord2003TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE5]" />
+		<CustomAction Id="ActionWord2003TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+
+		<!-- assing template folder for Word 2002 -->
+		<CustomAction Id="ActionWord2002TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE1]" />
+		<CustomAction Id="ActionWord2002TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE2]" />
+		<CustomAction Id="ActionWord2002TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE3]" />
+		<CustomAction Id="ActionWord2002TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE4]" />
+		<CustomAction Id="ActionWord2002TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE5]" />
+		<CustomAction Id="ActionWord2002TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+
+		<!-- assing template folder for Word 2000 -->
+		<CustomAction Id="ActionWord2000TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE1]" />
+		<CustomAction Id="ActionWord2000TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE2]" />
+		<CustomAction Id="ActionWord2000TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE3]" />
+		<CustomAction Id="ActionWord2000TemplateAssign4" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE4]" />
+		<CustomAction Id="ActionWord2000TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE5]" />
+		<CustomAction Id="ActionWord2000TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
+
+		<InstallExecuteSequence>
+			<!-- entry point -->
+			<Custom Action="GetOfficeInfos" After="LaunchConditions" />
+
+			<!-- call custom actions for Word 2007 -->
+			<Custom Action="ActionWord2007TemplateAssign1" After="GetOfficeInfos">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2007TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2007TemplateAssign2" After="ActionWord2007TemplateAssign1">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND WORD2007TEMPLATE2 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2007TemplateAssign3" After="ActionWord2007TemplateAssign2">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND (NOT WORD2007TEMPLATE2) AND WORD2007TEMPLATE3 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2007TemplateAssign4" After="ActionWord2007TemplateAssign3">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND (NOT WORD2007TEMPLATE2) AND (NOT WORD2007TEMPLATE3) AND WORD2007TEMPLATE4 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2007TemplateAssign5" After="ActionWord2007TemplateAssign4">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND (NOT WORD2007TEMPLATE2) AND (NOT WORD2007TEMPLATE3) AND (NOT WORD2007TEMPLATE4) AND WORD2007TEMPLATE5 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2007TemplateAssign6" After="ActionWord2007TemplateAssign5">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2007TEMPLATE1) AND (NOT WORD2007TEMPLATE2) AND (NOT WORD2007TEMPLATE3) AND (NOT WORD2007TEMPLATE4) AND (NOT WORD2007TEMPLATE5) AND (NOT ODFTEMPLATEFOLDER)</Custom>
+
+			<!-- call custom actions for Word 2003 -->
+			<Custom Action="ActionWord2003TemplateAssign1" After="ActionWord2007TemplateAssign6">WORD2003INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2003TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2003TemplateAssign2" After="ActionWord2003TemplateAssign1">WORD2003INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2003TEMPLATE1) AND WORD2003TEMPLATE2 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2003TemplateAssign3" After="ActionWord2003TemplateAssign2">WORD2003INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2003TEMPLATE1) AND (NOT WORD2003TEMPLATE2) AND WORD2003TEMPLATE3 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2003TemplateAssign4" After="ActionWord2003TemplateAssign3">WORD2003INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2003TEMPLATE1) AND (NOT WORD2003TEMPLATE2) AND (NOT WORD2003TEMPLATE3) AND WORD2003TEMPLATE4 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2003TemplateAssign5" After="ActionWord2003TemplateAssign4">WORD2003INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2003TEMPLATE1) AND (NOT WORD2003TEMPLATE2) AND (NOT WORD2003TEMPLATE3) AND (NOT WORD2003TEMPLATE4) AND WORD2003TEMPLATE5 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2003TemplateAssign6" After="ActionWord2003TemplateAssign5">WORD2003INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2003TEMPLATE1) AND (NOT WORD2003TEMPLATE2) AND (NOT WORD2003TEMPLATE3) AND (NOT WORD2003TEMPLATE4) AND (NOT WORD2003TEMPLATE5) AND (NOT ODFTEMPLATEFOLDER)</Custom>
+
+			<!-- call custom actions for Word 2002 -->
+			<Custom Action="ActionWord2002TemplateAssign1" After="ActionWord2003TemplateAssign6">WORD2002INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2002TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2002TemplateAssign2" After="ActionWord2002TemplateAssign1">WORD2002INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2002TEMPLATE1) AND WORD2002TEMPLATE2 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2002TemplateAssign3" After="ActionWord2002TemplateAssign2">WORD2002INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2002TEMPLATE1) AND (NOT WORD2002TEMPLATE2) AND WORD2002TEMPLATE3 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2002TemplateAssign4" After="ActionWord2002TemplateAssign3">WORD2002INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2002TEMPLATE1) AND (NOT WORD2002TEMPLATE2) AND (NOT WORD2002TEMPLATE3) AND WORD2002TEMPLATE4 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2002TemplateAssign5" After="ActionWord2002TemplateAssign4">WORD2002INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2002TEMPLATE1) AND (NOT WORD2002TEMPLATE2) AND (NOT WORD2002TEMPLATE3) AND (NOT WORD2002TEMPLATE4) AND WORD2002TEMPLATE5 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2002TemplateAssign6" After="ActionWord2002TemplateAssign5">WORD2002INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2002TEMPLATE1) AND (NOT WORD2002TEMPLATE2) AND (NOT WORD2002TEMPLATE3) AND (NOT WORD2002TEMPLATE4) AND (NOT WORD2002TEMPLATE5) AND (NOT ODFTEMPLATEFOLDER)</Custom>
+
+			<!-- call custom actions for Word 2000 -->
+			<Custom Action="ActionWord2000TemplateAssign1" After="ActionWord2002TemplateAssign6">WORD2000INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2000TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2000TemplateAssign2" After="ActionWord2000TemplateAssign1">WORD2000INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2000TEMPLATE1) AND WORD2000TEMPLATE2 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2000TemplateAssign3" After="ActionWord2000TemplateAssign2">WORD2000INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2000TEMPLATE1) AND (NOT WORD2000TEMPLATE2) AND WORD2000TEMPLATE3 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2000TemplateAssign4" After="ActionWord2000TemplateAssign3">WORD2000INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2000TEMPLATE1) AND (NOT WORD2000TEMPLATE2) AND (NOT WORD2000TEMPLATE3) AND WORD2000TEMPLATE4 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2000TemplateAssign5" After="ActionWord2000TemplateAssign4">WORD2000INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2000TEMPLATE1) AND (NOT WORD2000TEMPLATE2) AND (NOT WORD2000TEMPLATE3) AND (NOT WORD2000TEMPLATE4) AND WORD2000TEMPLATE5 AND (NOT ODFTEMPLATEFOLDER)</Custom>
+			<Custom Action="ActionWord2000TemplateAssign6" After="ActionWord2000TemplateAssign5">WORD2000INSTALLROOT AND (NOT TEMPLATEPATH) AND (NOT WORD2000TEMPLATE1) AND (NOT WORD2000TEMPLATE2) AND (NOT WORD2000TEMPLATE3) AND (NOT WORD2000TEMPLATE4) AND (NOT WORD2000TEMPLATE5) AND (NOT ODFTEMPLATEFOLDER)</Custom>
+
+		</InstallExecuteSequence>
+	</Fragment>
+</Wix>

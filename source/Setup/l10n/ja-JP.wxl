@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="ja-JP" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	<String Id="lcid">1041</String>
+	<String Id="ApplicationName">Microsoft Office 用 ODF アドイン</String>
+	<String Id="ReadmePath">Readme.ja-JP.html</String>
+
+	<String Id="Error2000">There is a newer version of this product installed.</String>
+	
+	<String Id="OpenWithWord">オープンは、 Microsoft Word</String>
+	<String Id="OpenWithExcel">オープンは、 Microsoft Excel</String>
+	<String Id="OpenWithPowerPoint">オープンは、 Microsoft PowerPoint</String>
+
+	<String Id="FileTypeOdt">OpenDocument テキスト</String>
+	<String Id="FileTypeOds">OpenDocument 表計算</String>
+	<String Id="FileTypeOdp">OpenDocument プレゼンテーション</String>
+
+	<String Id="TemplateTitleODFFax">ODF-compatible fax</String>
+	<String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
+	<String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
+	<String Id="TemplateTitleODFReport">ODF-compatible report</String>
+
+	<String Id="MyDlgTitle" Overridable="yes">[ProductName] Setup</String>
+	<String Id="MyDlgBannerBitmap" Overridable="yes" Localizable="no">WixUI_Bmp_Banner</String>
+
+	<String Id="MyFileAssociationDlgTitle" Overridable="yes">{\WixUI_Font_Title}File Associations</String>
+	<String Id="MyFileAssociationDlgDescription" Overridable="yes">Associate OpenDocument files with Microsoft Office</String>
+	<String Id="MyFileAssociationDlgDetailedDescription" Overridable="yes">Please select the file types that you wish to associate with Microsoft Office:</String>
+
+	<String Id="MyExitDlgShowReadme">Show Readme</String>
+
+	<String Id="MyInstallScopeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+	<String Id="MyInstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
+	<String Id="MyInstallScopeDlgDescription" Overridable="yes">インストールの種類とインストール先フォルダを選択してください。</String>
+	<String Id="MyInstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}インストールの種類</String>
+	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">ユーザー アカウント ([USERNAME]) にインストール(&amp;F)</String>
+	<String Id="MyInstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] はあなたのユーザー アカウントでのみ利用可能となります。ローカル管理者特権は必要ありません。</String>
+	<String Id="MyInstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] はユーザーごとのインストールをサポートしていません。</String>
+	<String Id="MyInstallScopeDlgPerMachine" Overridable="yes">このコンピュータのすべてのユーザーにインストール(&amp;C)</String>
+	<String Id="MyInstallScopeDlgPerMachineDescription" Overridable="yes">[ProductName] は既定でユーザーごとのフォルダにインストールされ、すべてのユーザーが利用可能です。インストール先フォルダを変更できます。ローカル管理者特権が必要です。</String>
+	<String Id="MyInstallScopeDlgFolderLabel" Overridable="yes">インストール フォルダ(&amp;F):</String>
+	<String Id="MyInstallScopeDlgChange" Overridable="yes">変更(&amp;C)...</String>
+
+	<String Id="msierrXmlConfigFailedRead" Overridable="yes">There was a failure while configuring XML files.</String>
+	<String Id="msierrXmlConfigFailedOpen" Overridable="yes">Failed to open XML file [3], system error: [2]</String>
+	<String Id="msierrXmlConfigFailedSelect" Overridable="yes">Failed to find node: [3] in XML file: [4], system error: [2]</String>
+	<String Id="msierrXmlConfigFailedSave" Overridable="yes">Failed to save changes to XML file [3], system error: [2]</String>
+	
+</WixLocalization>

@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLDIR" Name="OpenXML-ODF Translator">
+					<Component Id="OdfAddinLib.dll" Guid="782239E9-5D48-411E-B58C-54B6622CA1DC">
+						<File Name="$(var.OdfAddinLib.TargetFileName)" Source="$(var.OdfAddinLib.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="OdfConverterLib.dll" Guid="6A4DF956-833E-45FD-875D-7B3A51B6B0FD">
+						<File Name="$(var.OdfConverterLib.TargetFileName)" Source="$(var.OdfConverterLib.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="OdfZipUtils.dll" Guid="3CAF0C15-1ED7-4626-AE2C-E614E03CCC50">
+						<File Name="$(var.OdfZipUtils.TargetFileName)" Source="$(var.OdfZipUtils.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+
+					<Component Id="OdfConverterLauncher.exe" Guid="C07275F3-7D22-435E-A216-D92C15D341FC">
+						<File Name="$(var.OdfConverterLauncher.TargetFileName)" Source="$(var.OdfConverterLauncher.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_OdfConverterLauncher.exe" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+						</File>
+					</Component>
+					<Component Id="OdfConverter.exe" Guid="9E551E9F-A6ED-4C64-B196-4C8E7EB02D2A">
+						<File Name="$(var.CommandLineTool.TargetFileName)" Source="$(var.CommandLineTool.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_OdfConverter.exe" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+						</File>
+					</Component>
+
+					<Component Id="OdfPowerPointAddin.dll" Guid="6DD1293B-6213-42F3-B3A0-014BE22BE114">
+						<File Name="$(var.OdfPowerPointAddin.TargetFileName)" Source="$(var.OdfPowerPointAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="OdfPowerPointAddinShim.dll" Guid="C9DB8740-1EF4-4B2E-B2ED-E85D22329667">
+						<File Name="OdfPowerPointAddinShim.dll" Source="..\Presentation\OdfPowerPointAddinShim\$(var.Configuration)\OdfPowerPointAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<Class Id="7F459B4C-65F0-4D44-BB27-66C5FD3CA151" Context="InprocServer32" Description="OdfPowerPointAddin.Connect" ThreadingModel="apartment">
+								<ProgId Id="OdfPowerPointAddin.Connect" Description="Connect Class" />
+							</Class>
+						</File>
+					</Component>
+
+					<Component Id="OdfExcelAddin.dll" Guid="942084FA-171C-4258-8663-6520F610D585">
+						<File Name="$(var.OdfExcelAddin.TargetFileName)" Source="$(var.OdfExcelAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="OdfExcelAddinShim.dll" Guid="4BD5EA03-B96C-4D82-A850-105D25895C12">
+						<File Name="OdfExcelAddinShim.dll" Source="..\Spreadsheet\OdfExcelAddinShim\$(var.Configuration)\OdfExcelAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<Class Id="E00C9EBB-F140-4E6F-8C7B-EED19AE33AEA" Context="InprocServer32" Description="OdfExcelAddin.Connect" ThreadingModel="apartment">
+								<ProgId Id="OdfExcelAddin.Connect" Description="Connect Class" />
+							</Class>
+						</File>
+					</Component>
+
+					<Component Id="OdfWordAddin.dll" Guid="BB244339-58C5-4649-A670-F53063E28009">
+						<File Name="$(var.OdfWordAddin.TargetFileName)" Source="$(var.OdfWordAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="OdfWordAddinShim.dll" Guid="B21B741D-13DF-48F4-8D18-3A039F3D71E7">
+						<File Name="OdfWordAddinShim.dll" Source="..\Word\OdfWordAddinShim\$(var.Configuration)\OdfWordAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<Class Id="F474D30D-3450-423E-AE62-BD3307544E86" Context="InprocServer32" Description="OdfWordAddin.Connect" ThreadingModel="apartment">
+								<ProgId Id="OdfWordAddin.Connect" Description="Connect Class" />
+							</Class>
+						</File>
+					</Component>
+
+					<Component Id="PresentationConverter.dll" Guid="5B2F786B-AFFA-4557-BE2F-9072DA9B6681">
+						<File Name="PresentationConverter.dll" Source="..\Presentation\Converter\bin\$(var.Configuration)\PresentationConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="PresentationConverter2Odf.dll" Guid="E56B29F7-CF92-4A1E-9454-76DC3747F275">
+						<File Name="PresentationConverter2Odf.dll" Source="..\Presentation\Converter\bin\PresentationConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_PresentationConverter2Odf.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+						</File>
+					</Component>
+					<Component Id="PresentationConverter2Oox.dll" Guid="A3DCF059-B080-4CA6-843B-264BF0AE4527">
+						<File Name="PresentationConverter2Oox.dll" Source="..\Presentation\Converter\bin\PresentationConverter2Oox.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_PresentationConverter2Oox.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR' />
+						</File>
+					</Component>
+
+					<Component Id="SpreadsheetConverter.dll" Guid="55AC6AB5-BC9F-493B-A51C-1A15F2B39CDF">
+						<File Name="SpreadsheetConverter.dll" Source="..\Spreadsheet\Converter\bin\$(var.Configuration)\SpreadsheetConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="SpreadsheetConverter2Odf.dll" Guid="DFC1801C-EA21-417C-BF8C-07CEA7CD70C1">
+						<File Name="SpreadsheetConverter2Odf.dll" Source="..\Spreadsheet\Converter\bin\SpreadsheetConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_SpreadsheetConverter2Odf.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+						</File>
+					</Component>
+					<Component Id="SpreadsheetConverter2Oox.dll" Guid="969E2D56-1C95-4606-98CD-1665F71220AD">
+						<File Name="SpreadsheetConverter2Oox.dll" Source="..\Spreadsheet\Converter\bin\SpreadsheetConverter2Oox.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_SpreadsheetConverter2Oox.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+						</File>
+					</Component>
+
+					<Component Id="WordprocessingConverter.dll" Guid="422002BF-1AD8-47EF-8387-9A8846645502">
+						<File Name="WordprocessingConverter.dll" Source="..\Word\Converter\bin\$(var.Configuration)\WordprocessingConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+					<Component Id="WordprocessingConverter2Odf.dll" Guid="9D787C83-5F8D-4CD5-A38B-04E122184A78">
+						<File Name="WordprocessingConverter2Odf.dll" Source="..\Word\Converter\bin\WordprocessingConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_WordprocessingConverter2Odf.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+						</File>
+					</Component>
+					<Component Id="WordprocessingConverter2Oox.dll" Guid="5E2AF182-1078-4AF0-8D4B-963CFDFA0F3D">
+						<File Name="WordprocessingConverter2Oox.dll" Source="..\Word\Converter\bin\WordprocessingConverter2Oox.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+							<netfx:NativeImage Id="ngen_WordprocessingConverter2Oox.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+						</File>
+					</Component>
+
+					<Component Id="zlibwapi.dll" Guid="E0E73A04-D1CE-4E2E-98BC-EF0C26E3D294">
+						<File Name="zlibwapi.dll" Source="..\..\lib\zlibwapi.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+					</Component>
+
+					<Directory Id="de_DE" Name="de-DE">
+						<Component Id="de_DE_OdfAddinLib.resources.dll" Guid="51E00992-A516-4A8E-BAAA-DEC616714551">
+							<File Id="de_DE_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="de_DE_OdfPowerPointAddin.resources.dll" Guid="6B151790-86F6-4661-92DD-98AA6788A19E">
+							<File Id="de_DE_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="de_DE_OdfExcelAddin.resources.dll" Guid="D913400F-D6CF-4C89-A15B-1AE6E3F3B5AF">
+							<File Id="de_DE_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="de_DE_OdfWordAddin.resources.dll" Guid="7225B3CC-CAE5-4D9A-BD02-CB4883F64369">
+							<File Id="de_DE_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+					</Directory>
+
+					<Directory Id="fr_FR" Name="fr-FR">
+						<Component Id="fr_FR_OdfAddinLib.resources.dll" Guid="963813CC-1D3E-480B-90A4-2C73D295F324">
+							<File Id="fr_FR_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="fr_FR_OdfPowerPointAddin.resources.dll" Guid="440BAAC6-0650-4586-B6A8-8A5C9806B028">
+							<File Id="fr_FR_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="fr_FR_OdfExcelAddin.resources.dll" Guid="F7507E29-DF34-48E3-A589-B3934693A4F7">
+							<File Id="fr_FR_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="fr_FR_OdfWordAddin.resources.dll" Guid="6A2E932F-C038-4C11-9B9C-5AA3773E22B8">
+							<File Id="fr_FR_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+					</Directory>
+
+					<Directory Id="ja_JP" Name="ja-JP">
+						<Component Id="ja_JP_OdfAddinLib.resources.dll" Guid="35E43FE4-AD52-4A66-BCFF-0D7DA0C81E44">
+							<File Id="ja_JP_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="ja_JP_OdfPowerPointAddin.resources.dll" Guid="9478074C-6EC8-4208-8F2B-F1A31B0D2079">
+							<File Id="ja_JP_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="ja_JP_OdfExcelAddin.resources.dll" Guid="55400510-D1EC-4C79-85B9-3FEDBBA269D3">
+							<File Id="ja_JP_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="ja_JP_OdfWordAddin.resources.dll" Guid="E56DF382-3B1F-4EA5-BFE0-4C2165D29B36">
+							<File Id="ja_JP_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+					</Directory>
+
+					<Directory Id="nl_NL" Name="nl-NL">
+						<Component Id="nl_NL_OdfAddinLib.resources.dll" Guid="596400D6-77F9-47CF-B31E-288EEB3A343D">
+							<File Id="nl_NL_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="nl_NL_OdfPowerPointAddin.resources.dll" Guid="2E20B760-2F96-4EA8-B0EE-F401C8DC8776">
+							<File Id="nl_NL_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="nl_NL_OdfExcelAddin.resources.dll" Guid="6EF4350D-2BB7-4F08-B915-F96C7AEE761B">
+							<File Id="nl_NL_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="nl_NL_OdfWordAddin.resources.dll" Guid="6A994306-3656-4524-B3B7-7B5673D332DF">
+							<File Id="nl_NL_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+					</Directory>
+
+					<Directory Id="pl_PL" Name="pl-PL">
+						<Component Id="pl_PL_OdfAddinLib.resources.dll" Guid="E51D9B36-69ED-4958-8DA1-77A0DE12D81B">
+							<File Id="pl_PL_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="pl_PL_OdfPowerPointAddin.resources.dll" Guid="67C50D1B-4826-4988-9010-64EAC91B3322">
+							<File Id="pl_PL_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="pl_PL_OdfExcelAddin.resources.dll" Guid="516A94E2-FC38-4A0B-9753-341A53BD0E60">
+							<File Id="pl_PL_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="pl_PL_OdfWordAddin.resources.dll" Guid="70767388-0A5C-4CB0-A59E-8B7680D796CA">
+							<File Id="pl_PL_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+					</Directory>
+
+					<Directory Id="zh_CHS" Name="zh-CHS">
+						<Component Id="zh_CHS_OdfAddinLib.resources.dll" Guid="E3628CEC-A858-4A7E-BF55-0D4EA752C002">
+							<File Id="zh_CHS_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="zh_CHS_OdfPowerPointAddin.resources.dll" Guid="5810E638-3BC2-4C4C-9F31-F74F7B34EB7A">
+							<File Id="zh_CHS_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="zh_CHS_OdfExcelAddin.resources.dll" Guid="2C0D3068-41E0-4262-81CB-27F8DA0573A5">
+							<File Id="zh_CHS_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+						<Component Id="zh_CHS_OdfWordAddin.resources.dll" Guid="846779A3-93F9-42C6-B2FA-EAC89E40D7E7">
+							<File Id="zh_CHS_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+						</Component>
+					</Directory>
+
+					<Component Id="Readme" Guid="57A8A096-69FA-4136-A881-A1C1F940D0BA">
+						<File Id="Readme" Name="Readme.html" Source="$(var.ProjectDir)l10n\!(loc.ReadmePath)" DiskId="1" KeyPath="yes" />
+					</Component>
+
+					<!-- ODF-compatible Templates -->
+					<Directory Id="Templates" Name="Templates">
+						<!-- TODO Localize templates.xml + RegKey -->
+						<Component Id="Templates2007" Guid="58DEE7A9-FDC9-4E8D-B031-B13B3ED18706">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="templates.xml" Name="templates.xml" Source="$(var.SolutionDir)Word\Templates\templates.xml" DiskId="1" KeyPath="yes" />
+
+							<!-- modify templates.xml to point to template folder -->
+							<util:XmlConfig Id="ModifyTemplateLocationODFFax"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFFax.dotx'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFFax.dotx]" Name="source" Node="value" On="install"/>
+							<util:XmlConfig Id="ModifyTemplateLocationODFLetter"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFLetter.dotx'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFLetter.dotx]" Name="source" Node="value" On="install"/>
+							<util:XmlConfig Id="ModifyTemplateLocationODFMemo"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFMemo.dotx'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFMemo.dotx]" Name="source" Node="value" On="install"/>
+							<util:XmlConfig Id="ModifyTemplateLocationODFReport"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFReport.dotx'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFReport.dotx]" Name="source" Node="value" On="install"/>
+
+							<!-- localize template titles -->
+							<util:XmlConfig Id="ModifyTemplateTitleODFFax"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFFax'[\]]"
+										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFFax)" Name="title" Node="value" On="install"/>
+							<util:XmlConfig Id="ModifyTemplateTitleODFLetter"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFLetter'[\]]"
+										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFLetter)" Name="title" Node="value" On="install"/>
+							<util:XmlConfig Id="ModifyTemplateTitleODFMemo"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFMemo'[\]]"
+										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFMemo)" Name="title" Node="value" On="install"/>
+							<util:XmlConfig Id="ModifyTemplateTitleODFReport"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFReport'[\]]"
+										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFReport)" Name="title" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFFax.png" Guid="82036561-0A92-41DF-9CEA-3E794ABFDE24">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFFax.png" Name="ODFFax.png" Source="$(var.SolutionDir)Word\Templates\ODFFax.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFFax.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:media[\[]@filename='ODFFax.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFFax.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFFaxBig.png" Guid="ABB9B8B7-20B9-46F2-8FA9-823C374033CB">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFFaxBig.png" Name="ODFFaxBig.png" Source="$(var.SolutionDir)Word\Templates\ODFFaxBig.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFFaxBig.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:preview[\[]@filename='ODFFaxBig.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFFaxBig.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFLetter.png" Guid="22178335-1813-4BE0-B024-8AE2B9709DD4">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFLetter.png" Name="ODFLetter.png" Source="$(var.SolutionDir)Word\Templates\ODFLetter.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFLetter.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:media[\[]@filename='ODFLetter.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFLetter.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFLetterBig.png" Guid="1DEC4B12-4A07-46CA-AE74-4A84AFA214A4">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFLetterBig.png" Name="ODFLetterBig.png" Source="$(var.SolutionDir)Word\Templates\ODFLetterBig.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFLetterBig.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:preview[\[]@filename='ODFLetterBig.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFLetterBig.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFMemo.png" Guid="72379F47-B358-412E-AA57-687E9F4F9FCA">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFMemo.png" Name="ODFMemo.png" Source="$(var.SolutionDir)Word\Templates\ODFMemo.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFMemo.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:media[\[]@filename='ODFMemo.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFMemo.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFMemoBig.png" Guid="55416793-B4F2-4194-BCB3-A52C2199D882">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFMemoBig.png" Name="ODFMemoBig.png" Source="$(var.SolutionDir)Word\Templates\ODFMemoBig.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFMemoBig.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:preview[\[]@filename='ODFMemoBig.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFMemoBig.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFReport.png" Guid="589FF013-57F3-48DF-817F-3C37C5401F7C">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFReport.png" Name="ODFReport.png" Source="$(var.SolutionDir)Word\Templates\ODFReport.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFReport.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:media[\[]@filename='ODFReport.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFReport.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+						<Component Id="ODFReportBig.png" Guid="E451F962-6E5E-437D-897A-3AB303496F53">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<File Id="ODFReportBig.png" Name="ODFReportBig.png" Source="$(var.SolutionDir)Word\Templates\ODFReportBig.png" DiskId="1" KeyPath="yes" />
+							<util:XmlConfig Id="ModifyTemplateLocationODFReportBig.png"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate/o:preview[\[]@filename='ODFReportBig.png'[\]]"
+										  Action="create" File="[#templates.xml]" Value="[#ODFReportBig.png]" Name="source" Node="value" On="install"/>
+						</Component>
+
+
+						<Component Id="RegistryTemplates2007" Guid="7F9FC371-F8EC-4887-9890-261B52235575" DiskId="1">
+							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+							<RegistryKey Id="RegTemplates2007"
+										 Root="HKCU"
+										 Key="Software\Microsoft\Office\12.0\Common\Spotlight\Providers\ODF-compatible Templates"
+										 Action="createAndRemoveOnUninstall">
+								<RegistryValue Type="string" Name="ServiceURL" Value="[#templates.xml]" KeyPath="yes"/>
+							</RegistryKey>
+						</Component>
+					</Directory>
+				</Directory>
+			</Directory>
+
+			<!--  Word template folder  -->
+			<Directory Id="ODFTEMPLATEFOLDER" Name="Templates">
+				<Directory Id="OdfTemplates" Name="ODF-compatible Templates">
+					<Component Id="ODFFax.dotx" Guid="54432E95-2C89-4992-A204-0E8CA8DC47DD">
+						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+						<File Id="ODFFax.dotx" Name="ODFFax.dotx" Source="$(var.SolutionDir)Word\Templates\ODFFax.dotx" DiskId="1" KeyPath="yes" />
+					</Component>
+					<Component Id="ODFLetter.dotx" Guid="55F02E94-17A7-4CC6-8FEE-51A70BE2FE30">
+						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+						<File Id="ODFLetter.dotx" Name="ODFLetter.dotx" Source="$(var.SolutionDir)Word\Templates\ODFLetter.dotx" DiskId="1" KeyPath="yes" />
+					</Component>
+					<Component Id="ODFMemo.dotx" Guid="1B2E9F6E-0AF9-47EF-A3B5-076A2A6A8A61">
+						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+						<File Id="ODFMemo.dotx" Name="ODFMemo.dotx" Source="$(var.SolutionDir)Word\Templates\ODFMemo.dotx" DiskId="1" KeyPath="yes" />
+					</Component>
+					<Component Id="ODFReport.dotx" Guid="EA4ACAFC-A527-4432-9722-6249B4A12CFD">
+						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+						<File Id="ODFReport.dotx" Name="ODFReport.dotx" Source="$(var.SolutionDir)Word\Templates\ODFReport.dotx" DiskId="1" KeyPath="yes" />
+					</Component>
+
+					<Component Id="ODFFax.dot" Guid="97FB4E1B-0D0E-4985-A525-0DEA832A0262">
+						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+						<File Id="ODFFax.dot" Name="ODFFax.dot" Source="$(var.SolutionDir)Word\Templates\ODFFax.dot" DiskId="1" KeyPath="yes" />
+					</Component>
+					<Component Id="ODFLetter.dot" Guid="48F28B4B-F04F-44B1-989A-D0D35404DE10">
+						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+						<File Id="ODFLetter.dot" Name="ODFLetter.dot" Source="$(var.SolutionDir)Word\Templates\ODFLetter.dot" DiskId="1" KeyPath="yes" />
+					</Component>
+					<Component Id="ODFMemo.dot" Guid="9C094794-8755-461D-8AEC-1F22CE614A7D">
+						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+						<File Id="ODFMemo.dot" Name="ODFMemo.dot" Source="$(var.SolutionDir)Word\Templates\ODFMemo.dot" DiskId="1" KeyPath="yes" />
+					</Component>
+					<Component Id="ODFReport.dot" Guid="A91AA668-373F-4964-BBB4-2726FE461E4D">
+						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+						<File Id="ODFReport.dot" Name="ODFReport.dot" Source="$(var.SolutionDir)Word\Templates\ODFReport.dot" DiskId="1" KeyPath="yes" />
+					</Component>
+				</Directory>
+			</Directory>
+
+
+			<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                 REGISTRY SETTINGS
+                 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+			<Component Id="RegistryTemplates" Guid="405AEA6C-4BF0-4269-9DB5-25792EFF406E" DiskId="1">
+				<!-- HKMU means that the key will be created below HKCU 
+					 (Templates are only installed for the current user  -->
+				<RegistryKey Id="RegOptionsTemplatesInstalled"
+							 Root="HKCU"
+							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Word"
+							 Action="createAndRemoveOnUninstall">
+					<RegistryValue Type="integer" Name="TemplatesInstalled" Value="1" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
+
+			<Component Id="RegistryEntriesWord" Guid="4971F640-3107-439D-94F4-A22FC704BBB1" DiskId="1">
+				<!-- ADDIN REGISTRATION IN WORD -->
+				<!-- HKMU means that the key will be created below HKCU or HKLM depending on the value of ALLUSERS -->
+				<RegistryKey
+				  Id="RegKeyAddinMachineWord"
+				  Root="HKMU"
+				  Key="SOFTWARE\Microsoft\Office\Word\Addins\OdfWordAddin.Connect"
+				  Action="createAndRemoveOnUninstall">
+
+					<RegistryValue Id="RegDefaultAddinMachineWord"      Type="string" Value="Default Value"/>
+					<RegistryValue Id="RegLoadBehaviorAddinMachineWord" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
+					<RegistryValue Id="RegFriendlyNameAddinMachineWord" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
+					<RegistryValue Id="RegVersionAddinMachineWord"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
+				</RegistryKey>
+
+				<!-- ADDIN OPTIONS -->
+				<RegistryKey Id="RegOptionsWord"
+							 Root="HKMU"
+							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Word"
+							 Action="createAndRemoveOnUninstall">
+					<RegistryValue Type="string" Name="language" Value="!(loc.lcid)"/>
+				</RegistryKey>
+
+			</Component>
+
+			<Component Id="RegistryEntriesExcel" Guid="93FEDF02-01A0-4FAA-A514-0565FFEC0F76" DiskId="1">
+				<!-- ADDIN REGISTRATION IN EXCEL -->
+				<!-- HKMU means that the key will be created below HKCU or HKLM depending on the value of ALLUSERS -->
+				<RegistryKey
+				  Id="RegKeyAddinExcel"
+				  Root="HKMU"
+				  Key="SOFTWARE\Microsoft\Office\Excel\Addins\OdfExcelAddin.Connect"
+				  Action="createAndRemoveOnUninstall">
+
+					<RegistryValue Id="RegDefaultAddinMachineExcel"      Type="string" Value="Default Value"/>
+					<RegistryValue Id="RegLoadBehaviorAddinMachineExcel" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
+					<RegistryValue Id="RegFriendlyNameAddinMachineExcel" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
+					<RegistryValue Id="RegVersionAddinMachineExcel"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
+				</RegistryKey>
+
+				<!-- ADDIN OPTIONS -->
+				<RegistryKey Id="RegOptionsExcel"
+							 Root="HKMU"
+							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Excel"
+							 Action="createAndRemoveOnUninstall">
+					<RegistryValue Type="string" Name="language" Value="!(loc.lcid)"/>
+				</RegistryKey>
+
+			</Component>
+
+			<Component Id="RegistryEntriesPowerPoint" Guid="49B6952C-DDBA-4D66-8D5A-2FC6B4859E8C" DiskId="1">
+				<!-- ADDIN REGISTRATION IN POWERPOINT -->
+				<!-- HKMU means that the key will be created below HKCU or HKLM depending on the value of ALLUSERS -->
+				<RegistryKey
+				  Id="RegKeyAddinPowerPoint"
+				  Root="HKMU"
+				  Key="SOFTWARE\Microsoft\Office\PowerPoint\Addins\OdfPowerPointAddin.Connect"
+				  Action="createAndRemoveOnUninstall">
+
+					<RegistryValue Id="RegDefaultAddinMachinePowerPoint"      Type="string" Value="Default Value"/>
+					<RegistryValue Id="RegLoadBehaviorAddinMachinePowerPoint" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
+					<RegistryValue Id="RegFriendlyNameAddinMachinePowerPoint" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
+					<RegistryValue Id="RegVersionAddinMachinePowerPoint"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
+				</RegistryKey>
+
+				<!-- ADDIN OPTIONS -->
+				<RegistryKey Id="RegOptionsPowerPoint"
+							 Root="HKMU"
+							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for PowerPoint"
+							 Action="createAndRemoveOnUninstall">
+					<RegistryValue Type="string" Name="language" Value="!(loc.lcid)"/>
+				</RegistryKey>
+
+			</Component>
+
+			<Component Id="RegistryEntryContextMenuOdt" Guid="4BA5BA24-4F65-4BDF-99EB-CB4B947F31A9" DiskId="1">
+				<RegistryKey Id="RegKeyOdtContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
+							 Key="openDocument.WriterDocument.1\shell\!(loc.OpenWithWord)\Command">
+					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
+
+			<Component Id="RegistryEntryContextMenuOds" Guid="E0193721-BBB3-4358-BA53-EB77C614FC78" DiskId="1">
+				<RegistryKey Id="RegKeyOdsContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
+							 Key="openDocument.CalcDocument.1\shell\!(loc.OpenWithExcel)\Command">
+					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
+
+			<Component Id="RegistryEntryContextMenuOdp" Guid="1A9888DA-AA6E-4DA1-9A7F-1FADB7182262" DiskId="1">
+				<RegistryKey Id="RegKeyOdpContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
+							 Key="openDocument.ImpressDocument.1\shell\!(loc.OpenWithPowerPoint)\Command">
+					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
+
+			<!-- FIX for ALLUSERS setup and KB908002 -->
+			<Component Id="RegistryFixKB908002" Guid="C09D7EB0-EDA2-4DA0-A75D-C93E03B4111C" DiskId="1">
+				<Condition><![CDATA[ ALLUSERS=1 AND (WORD2002INSTALLROOT OR EXCEL2002INSTALLROOT OR POWERPOINT2002INSTALLROOT) ]]></Condition>
+				<RegistryKey Id="RegKeyFixKB908002" Root="HKCR" Action="create"
+							 Key="Interface\{000C0601-0000-0000-C000-000000000046}">
+					<RegistryValue Type="string" Value="IDummyOleComponentManager" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
+
+			<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                 FILE ASSOCIATIONS
+                 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+			<Component Id="FileAssociationOdt" Guid="1F338E6D-3B94-4C5B-864C-D97D26A55437" DiskId="1" KeyPath="yes">
+				<Condition><![CDATA[ FILE_ASSOCIATION_ODT ]]></Condition>
+				<ProgId Id='openDocument.WriterDocument.1' Description='!(loc.FileTypeOdt)'>
+					<Extension Id='odt' ContentType='application/vnd.oasis.opendocument.text'>
+						<Verb Id='open' Command='Open' Target='[#OdfConverterLauncher.exe]' Argument='"%1"'/>
+					</Extension>
+				</ProgId>
+			</Component>
+
+			<Component Id="FileAssociationOds" Guid="F50C041C-343F-467B-9759-F6AD1CA0CB9A" DiskId="1" KeyPath="yes">
+				<Condition><![CDATA[ FILE_ASSOCIATION_ODS ]]></Condition>
+				<ProgId Id='opendocument.CalcDocument.1' Description='!(loc.FileTypeOds)'>
+					<Extension Id='ods' ContentType='application/vnd.oasis.opendocument.spreadsheet'>
+						<Verb Id='open' Command='Open' Target='[#OdfConverterLauncher.exe]' Argument='"%1"' />
+					</Extension>
+				</ProgId>
+			</Component>
+
+			<Component Id="FileAssociationOdp" Guid="59C4C710-5FA0-487C-B425-613F77B39A29" DiskId="1" KeyPath="yes">
+				<Condition><![CDATA[ FILE_ASSOCIATION_ODP ]]></Condition>
+				<ProgId Id='opendocument.ImpressDocument.1' Description='!(loc.FileTypeOdp)'>
+					<Extension Id='odp' ContentType='application/vnd.oasis.opendocument.presentation'>
+						<Verb Id='open' Command='Open' Target='[#OdfConverterLauncher.exe]' Argument='"%1"' />
+					</Extension>
+				</ProgId>
+			</Component>
+		</Directory>
+
+	</Fragment>
+</Wix>
