@@ -707,8 +707,11 @@
         <xsl:when test="$align and $align != '' ">
           <xsl:value-of select="$align"/>
         </xsl:when>
-          <xsl:when test ="$relativeFrom='inner-margin-area' or $relativeFrom='outer-margin-area' ">
-            <xsl:text>from-inside</xsl:text>          
+        <xsl:when test ="$relativeFrom='inner-margin-area' ">
+            <xsl:text>inside</xsl:text>          
+        </xsl:when>
+        <xsl:when test ="$relativeFrom='outer-margin-area' ">
+          <xsl:text>outside</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>from-left</xsl:text>
