@@ -1182,9 +1182,48 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 Element element = (Element)this.store.Peek();
                 element.AddChild(text);
             }
+            //Sona: Code for Rotation
             else
             {
                 Attribute attr = (Attribute)store.Peek();
+                if (text.Contains("draw-transform"))
+                {
+                    char[] separator = new char[1] { ';' };
+                    string[] splitStr = text.Split(separator);
+                    string rotStr = "";
+                    string xStr = "";
+                    string yStr = "";
+                    Double angle;
+                    Double x;
+                    Double y;
+                    foreach (string str in splitStr)
+                    {
+                        if (str.StartsWith("rotation"))
+                        {
+                            rotStr = str.Replace("rotation:", "");
+                            rotStr.Trim();
+                            //Convert emu to degrees
+                            angle = Convert.ToDouble(EvalRotationExpression(rotStr)) / 60000;
+                            text = text.Replace(rotStr, angle.ToString());
+                        }
+                        if (str.StartsWith("margin-left"))
+                        {
+                            xStr = str.Replace("margin-left:", "");
+                            xStr.Trim();
+                            //convert emu to points
+                            x = (Convert.ToInt32(EvalRotationExpression(xStr)) * 72) / (360000 * 2.54);
+                            text = text.Replace(xStr, x.ToString() + "pt");
+                        }
+                        if (str.StartsWith("margin-top"))
+                        {
+                            yStr = str.Replace("margin-top:", "");
+                            yStr.Trim();
+                            //convert emu to points
+                            y = (Convert.ToInt32(EvalRotationExpression(yStr)) * 72) / (360000 * 2.54);
+                            text = text.Replace(yStr, y.ToString() + "pt");
+                        }
+                    }
+                }
                 attr.Value += text;
             }
         }

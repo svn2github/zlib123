@@ -1436,6 +1436,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     string hPath = HyperLinkPath(text);
                     attr.Value += hPath;
                 }
+                //Sona: Added code for rotation
+                else if (text.Contains("draw-transform"))
+                {
+                    string rotStr = EvalRotationExpression(text);
+                    attr.Value += rotStr;
+                }
+                else if (text.Contains("svg-x") || text.Contains("svg-y"))
+                {
+                    attr.Value += EvalExpression(text);
+                }
                 else
                 {
                 attr.Value += text;
