@@ -2376,7 +2376,7 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
                     or (contains(@table:formula,'COT('))
                     or (contains(@table:formula,'COTH('))
                     or (contains(@table:formula,'BASE(')) 
-                    or (contains(@table:formula,'B('))
+                    or (contains(@table:formula,'B(') and not(contains(@table:formula,'DB(')) and not(contains(@table:formula,'DDB(')) and not(contains(@table:formula,'PROB(')))
                     or (contains(@table:formula,'COMBINA('))
                     or (contains(@table:formula,'CURRENT(')) 
                     or (contains(@table:formula,'DAYS('))
