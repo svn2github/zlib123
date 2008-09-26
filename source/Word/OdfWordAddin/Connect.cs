@@ -35,6 +35,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using OdfConverter.Office;
 using OdfConverter.OdfConverterLib;
+using System.Text;
 
 namespace OdfConverter.Wordprocessing.OdfWordAddin
 {
@@ -48,12 +49,16 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
     [ClassInterface(ClassInterfaceType.AutoDispatch)]
     public class Connect : AbstractOdfAddin
     {
-        protected const string IMPORT_ODF_FILE_FILTER = "*.odt";
-        protected const string EXPORT_ODF_FILE_FILTER = " (*.odt)|*.odt|";
+        protected const string ODF_FILE_TYPE_ODT = "OdfFileTypeOdt";
+        protected const string ODF_FILE_TYPE_OTT = "OdfFileTypeOtt";
 
-        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\Clever Age\ODF Add-in for Word";
-        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\Clever Age\ODF Add-in for Word";
-        
+        protected const string IMPORT_ODF_FILE_FILTER = "*.odt; *.ott";
+        protected const string EXPORT_ODF_FILE_FILTER_ODT = " (*.odt)|*.odt|";
+        protected const string EXPORT_ODF_FILE_FILTER_OTT = " (*.ott)|*.ott|";
+
+        protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\ODF Add-in for Word";
+        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML - ODF Translator\ODF Add-in for Word";
+
         /// <summary>
         /// Class name for Word12 documents
         /// </summary>
@@ -65,6 +70,11 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         private int _word12SaveFormat = -1;
 
         /// <summary>
+        /// This property indicates whether ODF-compatible templates have been installed together with the add-in.
+        /// </summary>
+        private bool _templatesInstalled = false;
+
+        /// <summary>
         ///		Implements the constructor for the Add-in object.
         ///		Place your initialization code within this method.
         /// </summary>
@@ -72,9 +82,11 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         {
             this._addinLib = new OdfAddinLib(this, new OdfConverter.Wordprocessing.Converter());
             this._addinLib.OverrideResourceManager = new System.Resources.ResourceManager("OdfWordAddin.resources.Labels", Assembly.GetExecutingAssembly());
+
+            this._templatesInstalled = ((int)Microsoft.Win32.Registry.GetValue(this.RegistryKeyUser, "TemplatesInstalled", 0) != 0);
         }
 
-                
+
         /// <summary>
         /// Initializes Word12Format field
         /// </summary>
@@ -150,25 +162,25 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                 case OfficeVersion.Office2000:
                     doc.Invoke("SaveAs",
                         fileName, _word12SaveFormat, Type.Missing, Type.Missing, addToRecentFiles,
-                        Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
+                        Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                         Type.Missing, Type.Missing);
                     break;
 
                 default:
-                    doc.Invoke("SaveAs", 
+                    doc.Invoke("SaveAs",
                         fileName, _word12SaveFormat, Type.Missing, Type.Missing, addToRecentFiles,
-                        Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
-                        Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
+                        Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                        Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                         Type.Missing, Type.Missing, Type.Missing);
                     break;
             }
             return doc;
         }
-        
+
         protected override void InitializeAddin()
         {
             this._word12SaveFormat = FindWord12SaveFormat();
-            
+
             // Tell Word that the Normal.dot template should not be saved (unless the user later on makes it dirty)
             this._application.Invoke("NormalTemplate").SetBool("Saved", true);
         }
@@ -179,7 +191,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         protected override void importOdf()
         {
             foreach (string odfFile in getOpenFileNames())
-        	{
+            {
                 // create a temporary file
                 string fileName = this._addinLib.GetTempFileName(odfFile, ".docx");
 
@@ -195,12 +207,12 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     bool addToRecentFiles = false;
                     bool isVisible = true;
                     bool openAndRepair = false;
-                    
+
                     // conversion may have been cancelled and file deleted.
                     if (File.Exists((string)fileName))
                     {
                         LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
-                        
+
                         // update document fields
                         //doc.Invoke("Fields").Invoke("Update");
 
@@ -247,13 +259,15 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
             else
             {
                 System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
-                
+
                 sfd.AddExtension = true;
                 sfd.DefaultExt = "odt";
-                sfd.Filter = this._addinLib.GetString(ODF_FILE_TYPE) + this.ExportOdfFileFilter
+                sfd.Filter = this._addinLib.GetString(this.OdfFileType) + this.ExportOdfFileFilter
+                             + this._addinLib.GetString(ODF_FILE_TYPE_OTT) + EXPORT_ODF_FILE_FILTER_OTT
                              + this._addinLib.GetString(ALL_FILE_TYPE) + this.ExportAllFileFilter;
                 sfd.InitialDirectory = doc.GetString("Path");
                 sfd.OverwritePrompt = true;
+                sfd.SupportMultiDottedExtensions = true;
                 sfd.Title = this._addinLib.GetString(EXPORT_LABEL);
                 string ext = '.' + sfd.DefaultExt;
                 sfd.FileName = doc.GetString("FullName").Substring(0, doc.GetString("FullName").LastIndexOf('.')) + ext;
@@ -264,7 +278,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     // name of the file to create
                     string odfFileName = sfd.FileName;
                     // multi dotted extensions support
-                    if (!odfFileName.EndsWith(ext))
+                    if (!(odfFileName.ToLower().EndsWith(".odt") || odfFileName.ToLower().EndsWith(".ott")))
                     {
                         odfFileName += ext;
                     }
@@ -314,7 +328,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                             tempDocxName = this._addinLib.GetTempPath((string)sourceFileName, ".docx");
 
                             SaveDocumentAs(newDoc, tempDocxName);
-                            
+
                             // close and remove the duplicated file
                             newDoc.Invoke("Close", WdSaveOptions.wdDoNotSaveChanges, WdOriginalFormat.wdOriginalDocumentFormat, Type.Missing);
 
@@ -346,7 +360,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                             return;
                         }
                     }
-                    
+
                     this._addinLib.OoxToOdf(sourceFileName, odfFileName, true);
 
                     if (tempDocxName != null && File.Exists((string)tempDocxName))
@@ -359,6 +373,44 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
             }
         }
 
+        /// <summary>
+        /// Event handler for Office 2007
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
+        public virtual void NewDocument(IRibbonControl control)
+        {
+            try
+            {
+                // HACK: It is not possible to set the selection in this dialog
+                System.Windows.Forms.SendKeys.Send("+{TAB}+{TAB}+{TAB}{DOWN}{DOWN}{DOWN}{DOWN} ");
+                _application.Invoke("CommandBars").Invoke("FindControl", Type.Missing, 18, Type.Missing, Type.Missing).Invoke("Execute");
+            }
+            catch
+            {
+            }
+        }
+
+        #region Office 2007 Members
+        protected override Stream getCustomUI()
+        {
+            Assembly asm = Assembly.GetExecutingAssembly();
+            foreach (string name in asm.GetManifestResourceNames())
+            {
+                if (!this._templatesInstalled && name.EndsWith("customUI.xml")
+                    || this._templatesInstalled && name.EndsWith("customUITemplates.xml"))
+                {
+                    return asm.GetManifestResourceStream(name);
+                }
+            }
+            return null;
+        }
+        #endregion
+
+        protected override string OdfFileType
+        {
+            get { return ODF_FILE_TYPE_ODT; }
+        }
+
         protected override string ImportOdfFileFilter
         {
             get { return IMPORT_ODF_FILE_FILTER; }
@@ -366,7 +418,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
 
         protected override string ExportOdfFileFilter
         {
-            get { return EXPORT_ODF_FILE_FILTER; }
+            get { return EXPORT_ODF_FILE_FILTER_ODT; }
         }
 
         public override string RegistryKeyUser

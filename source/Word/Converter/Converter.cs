@@ -17,11 +17,12 @@ namespace OdfConverter.Wordprocessing
     {
 
         private const string ODF_TEXT_MIME = "application/vnd.oasis.opendocument.text";
-
+        private const string ODF_TEXT_TEMPLATE_MIME = "application/vnd.oasis.opendocument.text-template";
 
         public Converter()
             : base(Assembly.GetExecutingAssembly())
-        { }
+        {
+        }
 
         protected override Type LoadPrecompiledXslt()
         {
@@ -45,29 +46,29 @@ namespace OdfConverter.Wordprocessing
             }
             return stylesheet;
         }
-      
-        protected override string [] DirectPostProcessorsChain
+
+        protected override string[] DirectPostProcessorsChain
         {
             get
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
-                return new string []  {
-                   "OdfConverter.Wordprocessing.OoxChangeTrackingPostProcessor,"+fullname,
-                   "CleverAge.OdfConverter.OdfConverterLib.OoxSpacesPostProcessor",
-        	       "OdfConverter.Wordprocessing.OoxSectionsPostProcessor,"+fullname, 
-        	       "OdfConverter.Wordprocessing.OoxAutomaticStylesPostProcessor,"+fullname,
-        	       "OdfConverter.Wordprocessing.OoxParagraphsPostProcessor,"+fullname,
-        	       "CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor"
+                return new string[]  {
+                   //"OdfConverter.Wordprocessing.OoxChangeTrackingPostProcessor,"+fullname,
+                   //"CleverAge.OdfConverter.OdfConverterLib.OoxSpacesPostProcessor",
+                   //"OdfConverter.Wordprocessing.OoxSectionsPostProcessor,"+fullname, 
+                   //"OdfConverter.Wordprocessing.OoxAutomaticStylesPostProcessor,"+fullname,
+                   //"OdfConverter.Wordprocessing.OoxParagraphsPostProcessor,"+fullname,
+                   //"CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor"
                 };
             }
         }
 
-        protected override string [] ReversePostProcessorsChain
+        protected override string[] ReversePostProcessorsChain
         {
             get
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
-                return new string []  {
+                return new string[]  {
                     "OdfConverter.Wordprocessing.OdfParagraphPostProcessor,"+fullname,
 			        "OdfConverter.Wordprocessing.OdfCheckIfIndexPostProcessor,"+fullname,
         	        "CleverAge.OdfConverter.OdfConverterLib.OdfCharactersPostProcessor",
@@ -113,10 +114,12 @@ namespace OdfConverter.Wordprocessing
 
             XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='"
                                                 + ODF_TEXT_MIME + "']", nsmgr);
-            if (node == null)
+
+            XmlNodeList mediaTypeNodes = doc.SelectNodes(
+                "/manifest:manifest/manifest:file-entry[@manifest:media-type='" + ODF_TEXT_MIME + "' or @manifest:media-type='" + ODF_TEXT_TEMPLATE_MIME + "']", nsmgr);
+            if (mediaTypeNodes.Count == 0)
             {
-                throw new NotAnOdfDocumentException("Could not convert " + fileName
-                                                    + ". Invalid OASIS OpenDocument file");
+                throw new NotAnOdfDocumentException("Could not convert " + fileName + ". Invalid OASIS OpenDocument file");
             }
         }
 
@@ -137,7 +140,7 @@ namespace OdfConverter.Wordprocessing
                 XmlReaderSettings xrs = new XmlReaderSettings();
                 // do not look for DTD
                 xrs.ProhibitDtd = false;
-                    
+
                 DocxDocument doc = new DocxDocument(inputFile);
 
                 // uncomment for testing

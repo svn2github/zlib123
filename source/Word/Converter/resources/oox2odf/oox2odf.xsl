@@ -53,6 +53,11 @@
   <xsl:import href="2odf-track.xsl"/>
 
   <xsl:param name="outputFile"/>
+
+  <!-- a string containing detailed information on environment and
+       converter version to be added to the document's meta data -->
+  <xsl:param name="generator"/>
+  
   <xsl:output method="xml" encoding="UTF-8"/>
 
   <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
@@ -94,7 +99,7 @@
 
   <!-- App version number -->
   <xsl:variable name="app-version">2.0.0</xsl:variable>
-
+  
   <xsl:template match="/oox:package">
 
     <pzip:archive pzip:target="{$outputFile}">
@@ -102,8 +107,18 @@
       <!-- Manifest -->
       <pzip:entry pzip:target="META-INF/manifest.xml">
         <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
-          <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text"
-            manifest:full-path="/"/>
+          <manifest:file-entry manifest:full-path="/">
+            <xsl:attribute name="manifest:media-type">
+              <xsl:choose>
+                <xsl:when test="substring($outputFile, string-length($outputFile) - 2) = 'ott'">
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.text-template'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.text'"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </manifest:file-entry>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="styles.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
@@ -136,7 +151,8 @@
       <!-- meta -->
       <pzip:entry pzip:target="meta.xml">
         <xsl:call-template name="meta">
-          <xsl:with-param name="app-version" select="$app-version"/>
+          <xsl:with-param name="app-version" select="$app-version" />
+          <xsl:with-param name="generator" select="$generator" />
         </xsl:call-template>
       </pzip:entry>
 

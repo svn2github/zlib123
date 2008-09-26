@@ -116,7 +116,7 @@
     
     <xsl:message terminate="no">progress:text:p</xsl:message>
     <!-- insert frames for first paragraph of document if we are in an envelope  -->
-    <xsl:call-template name="InsertEnvelopeFrames"/>
+    <!--xsl:call-template name="InsertEnvelopeFrames"/-->
 
     <!--dialogika, clam: bugfix not neccessary anymore because each section break has its own paragraph now-->
     <!--clam bugfix #1615689-->

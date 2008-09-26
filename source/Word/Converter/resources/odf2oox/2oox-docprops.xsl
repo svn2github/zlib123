@@ -35,6 +35,7 @@
   <xsl:import href="common-meta.xsl"/>  
 
   <xsl:template name="docprops-app">
+    <xsl:param name="generator"/>
     <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
       xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
 		<xsl:for-each select="document('meta.xml')/office:document-meta/office:meta">
@@ -43,7 +44,9 @@
 			<!-- word count -->
 			<xsl:apply-templates select="meta:document-statistic/@meta:word-count"/>
 			<!-- application property -->
-			<xsl:call-template name="GetApplicationExtendedProperty"/>
+			<xsl:call-template name="GetApplicationExtendedProperty">
+        <xsl:with-param name="generator" select="$generator"/>
+      </xsl:call-template>
 			<!-- doc security -->
 			<xsl:call-template name="GetDocSecurityExtendedProperty"/>
 			<!-- paragraph count -->

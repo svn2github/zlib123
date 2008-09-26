@@ -60,6 +60,11 @@
   <xsl:preserve-space elements="text:p text:span number:text"/>
   
   <xsl:param name="outputFile"/>
+
+  <!-- a string containing detailed information on environment and
+       converter version to be added to the document's meta data -->
+  <xsl:param name="generator"/>
+  
   <xsl:output method="xml" encoding="UTF-8"/>
 
   <!-- App version number -->
@@ -74,7 +79,7 @@
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"/>
 
   <xsl:template match="/odf:source">
-    <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
+    <!--xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction-->
 
     <pzip:archive pzip:target="{$outputFile}">
 
@@ -88,7 +93,9 @@
 
       <!-- Document app properties -->
       <pzip:entry pzip:target="docProps/app.xml">
-        <xsl:call-template name="docprops-app"/>
+        <xsl:call-template name="docprops-app">
+          <xsl:with-param name="generator" select="$generator"/>
+        </xsl:call-template>
       </pzip:entry>
 
       <!-- Document custom properties -->
