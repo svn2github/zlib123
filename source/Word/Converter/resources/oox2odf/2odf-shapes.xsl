@@ -195,6 +195,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox">
 						<xsl:with-param name ="shapetype" select ="'isosceles-triangle'"/>
 					</xsl:apply-templates >
@@ -225,6 +226,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'right-triangle'"/>
 					</xsl:apply-templates >
@@ -248,6 +250,7 @@
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Line'"/>
 					</xsl:apply-templates >
+          <xsl:call-template name ="AltText"/>
 					<!--</xsl:for-each>-->
 				</draw:line>
 			</xsl:when >
@@ -263,6 +266,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:call-template name="GetLineCoordinates"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Elbow Connector'"/>
@@ -282,6 +286,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:call-template name="GetLineCoordinates"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Curved Connector'"/>
@@ -302,6 +307,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Flowchart Process'"/>
 					</xsl:apply-templates >
@@ -323,6 +329,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Flowchart Alternate Process'"/>
 					</xsl:apply-templates >
@@ -354,6 +361,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Flowchart Decision'"/>
 					</xsl:apply-templates >
@@ -374,6 +382,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Flowchart Data'"/>
 					</xsl:apply-templates >
@@ -394,6 +403,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Flowchart Predefined Process'"/>
 					</xsl:apply-templates >
@@ -414,6 +424,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Internal Storage'"/>
 					</xsl:apply-templates >
@@ -434,6 +445,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Document'"/>
 					</xsl:apply-templates >
@@ -454,6 +466,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Multi Document'"/>
 					</xsl:apply-templates >
@@ -474,6 +487,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Terminator'"/>
 					</xsl:apply-templates >
@@ -494,6 +508,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Collate'"/>
 					</xsl:apply-templates >
@@ -514,6 +529,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Sort'"/>
 					</xsl:apply-templates >
@@ -534,6 +550,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Extract'"/>
 					</xsl:apply-templates >
@@ -554,6 +571,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Merge'"/>
 					</xsl:apply-templates >
@@ -574,6 +592,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Sorted Data'"/>
 					</xsl:apply-templates >
@@ -594,6 +613,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Delay'"/>
 					</xsl:apply-templates >
@@ -614,6 +634,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Sequential Access Storage'"/>
 					</xsl:apply-templates >
@@ -634,6 +655,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Magnetic Disk'"/>
 					</xsl:apply-templates >
@@ -654,6 +676,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Direct Access Storage'"/>
 					</xsl:apply-templates >
@@ -674,6 +697,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'FlowChart Display'"/>
 					</xsl:apply-templates >
@@ -694,6 +718,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Rectangular Callout'"/>
 					</xsl:apply-templates >
@@ -760,6 +785,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Rounded Rectangular Callout'"/>
 					</xsl:apply-templates >
@@ -824,6 +850,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Oval Callout'"/>
 					</xsl:apply-templates >
@@ -870,6 +897,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Right Arrow'"/>
 					</xsl:apply-templates >
@@ -900,6 +928,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Left Arrow'"/>
 					</xsl:apply-templates >
@@ -930,6 +959,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Up Arrow'"/>
 					</xsl:apply-templates >
@@ -960,6 +990,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Down Arrow'"/>
 					</xsl:apply-templates >
@@ -990,6 +1021,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Trapezoid'"/>
 					</xsl:apply-templates >
@@ -1019,6 +1051,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Can'"/>
 					</xsl:apply-templates >
@@ -1049,6 +1082,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Cube'"/>
 					</xsl:apply-templates >
@@ -1084,6 +1118,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Octagon'"/>
 					</xsl:apply-templates >
@@ -1114,6 +1149,7 @@
 					<xsl:call-template name="InsertShapeHeight"/>
 					<xsl:call-template name="InsertshapeAbsolutePos"/>
 					<xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name ="AltText"/>
 					<xsl:apply-templates select="v:textbox" >
 						<xsl:with-param name ="shapetype" select ="'Parallelogram'"/>
 					</xsl:apply-templates >
@@ -1289,6 +1325,7 @@
 							</xsl:variable>
 							<xsl:call-template name="InsertAnchorType"/>
 							<xsl:call-template name="InsertShapeZindex"/>
+              <xsl:call-template name ="AltText"/>
 							<xsl:call-template name="InsertLinePos1">
 								<xsl:with-param name="flip">
 									<xsl:value-of select="$flip"/>
@@ -1342,6 +1379,8 @@
 									<xsl:call-template name="InsertShapeHeight"/>
 									<xsl:call-template name="InsertshapeAbsolutePos"/>
 									<xsl:call-template name="InsertShapeZindex"/>
+                  <xsl:call-template name ="AltText"/>
+                
 									<xsl:apply-templates select="v:textbox">
 										<xsl:with-param name ="shapetype" select ="'Rectangle'"/>
 									</xsl:apply-templates >
@@ -1361,6 +1400,7 @@
 									<xsl:call-template name="InsertShapeHeight"/>
 									<xsl:call-template name="InsertshapeAbsolutePos"/>
 									<xsl:call-template name="InsertShapeZindex"/>
+                  <xsl:call-template name ="AltText"/>
 									<xsl:apply-templates select="v:textbox" >
 										<xsl:with-param name ="shapetype" select ="'Oval'"/>
 									</xsl:apply-templates >
@@ -1380,6 +1420,7 @@
 									<xsl:call-template name="InsertShapeHeight"/>
 									<xsl:call-template name="InsertshapeAbsolutePos"/>
 									<xsl:call-template name="InsertShapeZindex"/>
+                  <xsl:call-template name ="AltText"/>
 									<xsl:apply-templates select="v:textbox" >
 										<xsl:with-param name ="shapetype" select ="'Rounded Rectangle'"/>
 									</xsl:apply-templates >
@@ -1439,6 +1480,37 @@
   -->
 
 	<!--
+  Summary: Writes Texture,Picture fill style
+  Author: Vipul
+  Date: 6.09.2008
+  -->
+  <xsl:template match="v:fill[@type='tile' or @type='pattern' or @type='frame']" mode="officestyles">
+    <xsl:variable name="parentShape" select="parent::node()" />
+    <xsl:variable name="PicFillName" select="concat('BitmapFill_', generate-id(.))" />
+    <xsl:variable name="PicrelId" select="parent::node()/v:fill/@r:id" />
+    <xsl:variable name="PicfileSource">
+      <xsl:for-each select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$PicrelId]/@Target">
+        <xsl:value-of select="."/>
+      </xsl:for-each>
+    </xsl:variable> 
+    <draw:fill-image  xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+      <xsl:attribute name="draw:name">
+        <xsl:value-of select="$PicFillName"/>
+      </xsl:attribute>
+      <xsl:attribute name="draw:display-name">
+        <xsl:value-of select="$PicFillName"/>
+      </xsl:attribute>
+    
+      <xsl:attribute name="xlink:href">
+        <xsl:value-of select="concat('Pictures',substring-after($PicfileSource,'media'))"/>
+      </xsl:attribute>
+    </draw:fill-image>
+    <pzip:copy   pzip:source="{concat('word/',$PicfileSource)}"
+                       pzip:target="{concat('Pictures',substring-after($PicfileSource,'media'))}" />
+
+   
+  </xsl:template>
+	<!--
   Summary: Writes gradient fill style
   Author: makz
   Date: 6.11.2007
@@ -1490,6 +1562,14 @@
 			<xsl:attribute name="draw:start-intensity">
 				<xsl:choose>
 					<xsl:when test="@opacity">
+                <xsl:choose>
+                  <xsl:when test="contains(@opacity,'f')">
+                    <xsl:value-of select="round((number(substring-before(@opacity,'f')) div 65536) * 100) "/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="round(@opacity * 100) "/>
+                  </xsl:otherwise>
+                </xsl:choose>
 						<!-- calculate opacity -->
 					</xsl:when>
 					<xsl:otherwise>
@@ -1500,6 +1580,15 @@
 			<xsl:attribute name="draw:end-intensity">
 				<xsl:choose>
 					<xsl:when test="@o:opacity2">
+         
+                <xsl:choose>
+                  <xsl:when test="contains(@o:opacity2,'f')">
+                    <xsl:value-of select="round((number(substring-before(@o:opacity2,'f')) div 65536) * 100) "/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="round(@o:opacity2 * 100) "/>
+                  </xsl:otherwise>
+                </xsl:choose>
 						<!-- calculate opacity -->
 					</xsl:when>
 					<xsl:otherwise>
@@ -1659,12 +1748,13 @@
 				</xsl:call-template>
 			</style:graphic-properties>
 		</style:style>
-		<xsl:call-template name="getDashType">
+    <!-- Sona: #2014221 and Arrow Feature Continuation-->
+    <!--<xsl:call-template name="getDashType">
 			<xsl:with-param name="shape" select="$vmlElement" />
 		</xsl:call-template>
 		<xsl:call-template name="InsertArrowStyle">
 			<xsl:with-param name="shape" select="$vmlElement" />
-		</xsl:call-template>
+		</xsl:call-template>-->
 		<xsl:apply-templates mode="automaticpict"/>
 	</xsl:template>
 
@@ -1875,7 +1965,8 @@
 				<xsl:variable name="weight">
 					<xsl:choose>
 						<xsl:when test ="($actualShape/@strokeweight) and ($actualShape/@strokeweight!='')">
-							<xsl:value-of select ="$actualShape/@strokeweight"/>
+              <!-- Sona: Fixed Arrow width defect #2014180-->
+              <xsl:value-of select ="substring-before($actualShape/@strokeweight,'pt')"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$lineWeightDefault"/>
@@ -1937,10 +2028,12 @@
 	</xsl:template>
 
 	<xsl:template name="InsertShapeShadow">
-		<xsl:for-each select="v:shadow">
-			<xsl:attribute name="style:shadow">
+    <xsl:param name ="shape"></xsl:param>
+    <!-- Sona: Shadow implementation-->
+    <xsl:for-each select="$shape/v:shadow">
+      <xsl:attribute name="draw:shadow">
 				<xsl:choose>
-					<xsl:when test="@on = 'false' or @on = 'f' or @on = '0'">none</xsl:when>
+          <xsl:when test="not(@on) or @on = 'false' or @on = 'f' or @on = '0'">hidden</xsl:when>
 					<xsl:otherwise>
 						<!-- report lost attributes -->
 						<xsl:if test="@opacity">
@@ -1957,6 +2050,11 @@
 							<xsl:message terminate="no"
               >translation.oox2odf.shape.shadow.complexPerspective</xsl:message>
 						</xsl:if>
+            <xsl:value-of select ="'visible'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name ="draw:shadow-color">
 						<!-- compute color -->
 						<xsl:call-template name="InsertColor">
 							<xsl:with-param name="color">
@@ -1972,43 +2070,74 @@
 								</xsl:choose>
 							</xsl:with-param>
 						</xsl:call-template>
-						<xsl:text> </xsl:text>
+        <!--<xsl:text> </xsl:text>-->
+      </xsl:attribute>
+
+      <!-- Transperency percentage-->
+      <xsl:if test="@opacity">
+        <xsl:attribute name="draw:shadow-opacity">
+          <xsl:choose>
+            <xsl:when test ="contains(@opacity,'%')">
+              <xsl:value-of select ="@opacity"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select ="concat(@opacity*100,'%')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
+
 						<!-- shadow offset -->
 						<xsl:choose>
 							<xsl:when test="@offset">
+          <xsl:attribute name="draw:shadow-offset-x">
 								<!-- horizontal distance -->
 								<xsl:call-template name="ComputeShadowDistance">
 									<xsl:with-param name="distance" select="substring-before(@offset, ',')"/>
 									<xsl:with-param name="origin" select="substring-before(@origin, ',')"/>
 									<xsl:with-param name="side">width</xsl:with-param>
 								</xsl:call-template>
-								<xsl:text> </xsl:text>
+            <!--<xsl:text> </xsl:text>-->
+          </xsl:attribute>
+          <xsl:attribute name="draw:shadow-offset-y">
 								<!-- vertical distance -->
 								<xsl:call-template name="ComputeShadowDistance">
 									<xsl:with-param name="distance" select="substring-after(@offset, ',')"/>
 									<xsl:with-param name="origin" select="substring-after(@origin, ',')"/>
 									<xsl:with-param name="side">height</xsl:with-param>
 								</xsl:call-template>
+          </xsl:attribute>
 							</xsl:when>
 							<xsl:otherwise>
+          <!-- Default, if no offset value is present-->
+          <xsl:if test="not(@offset2)">
+            <xsl:attribute name="draw:shadow-offset-x">
+              <xsl:text>0.061cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="draw:shadow-offset-y">
+              <xsl:text>0.061cm</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
 								<xsl:if test="@offset2">
+            <xsl:attribute name="draw:shadow-offset-x">
 									<xsl:call-template name="ComputeShadowDistance">
 										<xsl:with-param name="distance" select="substring-before(@offset2, ',')"/>
 										<xsl:with-param name="origin" select="substring-before(@origin, ',')"/>
 										<xsl:with-param name="side">width</xsl:with-param>
 									</xsl:call-template>
-									<xsl:text> </xsl:text>
+              <!--<xsl:text> </xsl:text>-->
+            </xsl:attribute>
+            <xsl:attribute name="draw:shadow-offset-y">
 									<xsl:call-template name="ComputeShadowDistance">
 										<xsl:with-param name="distance" select="substring-after(@offset2, ',')"/>
 										<xsl:with-param name="origin" select="substring-after(@origin, ',')"/>
 										<xsl:with-param name="side">height</xsl:with-param>
 									</xsl:call-template>
+            </xsl:attribute>
 								</xsl:if>
 							</xsl:otherwise>
 						</xsl:choose>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
+
 		</xsl:for-each>
 	</xsl:template>
 
@@ -2062,8 +2191,8 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:value-of select="number($distanceVal) + number($originVal)"/>
-		<xsl:text>cm</xsl:text>
+    <xsl:value-of select="concat((number($distanceVal) + number($originVal)),'cm')"/>
+    <!--<xsl:text>cm</xsl:text>-->
 	</xsl:template>
 
 	<!--
@@ -2088,9 +2217,29 @@
 		<xsl:if test="$isFilled = 'f'">
 			<xsl:attribute name="style:background-transparency">100%</xsl:attribute>
 			<!-- Sona : For Fill:No Color-->
-			<xsl:attribute name="draw:opacity">0%</xsl:attribute>
+      <!--<xsl:attribute name="draw:opacity">0%</xsl:attribute>-->
+		</xsl:if>
+    <!-- Sona: Added code for transparency-->
+    <xsl:if test="(not($isFilled) or $isFilled != 'f') and $shape/v:fill/@opacity">
+      <xsl:attribute name="style:background-transparency">
+        <xsl:if test ="contains($shape/v:fill/@opacity,'f')">
+          <xsl:value-of select ="concat(100-(((substring-before($shape/v:fill/@opacity,'f')) div 65536) * 100),'%')"/>
+        </xsl:if>
+        <xsl:if test="not(contains($shape/v:fill/@opacity,'f'))">
+          <xsl:value-of select="concat(100-(($shape/v:fill/@opacity)*100),'%')"/>
 		</xsl:if>
 
+      </xsl:attribute>
+      <xsl:attribute name="draw:opacity">
+        <xsl:if test ="contains($shape/v:fill/@opacity,'f')">
+          <xsl:value-of select ="concat((((substring-before($shape/v:fill/@opacity,'f')) div 65536) * 100),'%')"/>
+        </xsl:if>
+        <xsl:if test="not(contains($shape/v:fill/@opacity,'f'))">
+          <xsl:value-of select="concat((($shape/v:fill/@opacity)*100),'%')"/>
+        </xsl:if>
+
+      </xsl:attribute>
+    </xsl:if>
 		<!-- Insert background-color -->
 		<xsl:if test="(not($isFilled) or $isFilled != 'f') and $fillcolor != ''">
 			<xsl:attribute name="fo:background-color">
@@ -2113,15 +2262,92 @@
 				<xsl:with-param name="color" select="$fillcolor"/>
 			</xsl:call-template>
 		</xsl:attribute>
-
-		<!-- If the shape has a gradient fill -->
-		<xsl:if test="$shape/v:fill[@type='gradient']">
+    <!--added by chhavi to fix bug 2003056-->
+    <xsl:if test ="$isFilled = 'f'">
+      <xsl:attribute name="draw:fill">
+        <xsl:text>none</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+    <!--end here-->
+ <!--Edited by Sona to implement Picture fill-->
+<xsl:choose>
+      <xsl:when test="$shape/v:fill[@type='tile' or @type='frame' or @type='pattern']">
+        <xsl:attribute name="draw:fill">
+          <xsl:text>bitmap</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="draw:fill-image-name">
+          <xsl:value-of select="concat('BitmapFill_', generate-id($shape/v:fill))"/>
+        </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="$shape/v:fill[@type='tile']">
+            <xsl:attribute name="draw:fill-image-ref-point-x">
+              <xsl:value-of select ="'100%'"/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:fill-image-ref-point-y">
+              <xsl:value-of select ="'100%'"/>
+            </xsl:attribute>
+            <xsl:if test="$shape/v:fill/@recolor">
+              <xsl:attribute name="draw:fill-image-ref-point">
+                <xsl:choose>
+                  <xsl:when test="$shape/v:fill/@recolor='tl'">
+                    <xsl:value-of select ="'top-left'"/>
+                  </xsl:when>
+                  <xsl:when test="$shape/v:fill/@recolor='t'">
+                    <xsl:value-of select ="'top'"/>
+                  </xsl:when>
+                  <xsl:when test="$shape/v:fill/@recolor='tr'">
+                    <xsl:value-of select ="'top-right'"/>
+                  </xsl:when>
+                  <xsl:when test="$shape/v:fill/@recolor='r'">
+                    <xsl:value-of select ="'right'"/>
+                  </xsl:when>
+                  <xsl:when test="@recolor='bl'">
+                    <xsl:value-of select ="'bottom-left'"/>
+                  </xsl:when>
+                  <xsl:when test="$shape/v:fill/@recolor='br'">
+                    <xsl:value-of select ="'bottom-right'"/>
+                  </xsl:when>
+                  <xsl:when test="$shape/v:fill/@recolor='b'">
+                    <xsl:value-of select ="'bottom'"/>
+                  </xsl:when>
+                  <xsl:when test="$shape/v:fill/@recolor='ctr'">
+                    <xsl:value-of select ="'center'"/>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:when>
+          <xsl:when test="$shape/v:fill[@type='frame']">
+            <xsl:attribute name="style:repeat">
+              <xsl:value-of select ="'stretch'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$shape/v:fill[@type='gradient']">
 			<xsl:attribute name="draw:fill">
 				<xsl:text>gradient</xsl:text>
 			</xsl:attribute>
 			<xsl:attribute name="draw:fill-gradient-name">
 				<xsl:value-of select="concat('Gradient_', generate-id($shape/v:fill))"/>
 			</xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+    <!-- If the shape has a gradient fill -->
+
+    <xsl:if test="$shape/v:fill/@opacity">
+        <xsl:attribute name="draw:opacity">
+          <xsl:choose>
+            <xsl:when test="contains($shape/v:fill/@opacity,'f')">
+              <xsl:value-of select="concat(round((number(substring-before($shape/v:fill/@opacity,'f')) div 65536) * 100),'%') "/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat(round($shape/v:fill/@opacity * 100),'%') "/>
+            </xsl:otherwise>
+          </xsl:choose>
+      </xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
@@ -2229,6 +2455,7 @@
 			<xsl:otherwise>
 				<xsl:call-template name="InsertGraphicPosH">
 					<xsl:with-param name="align" select="$horizontalPos"/>
+          <xsl:with-param name="relativeFrom" select="$horizontalRel" />
 				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -2368,6 +2595,17 @@
 				</xsl:when>
 			</xsl:choose>
 		</xsl:attribute>
+
+    <!-- Sona: Wrap implementation and also Defect #2025699 -->
+    <xsl:if test ="$wrap/@type = 'tight' or $wrap/@type = 'through'">
+      <xsl:attribute name="style:wrap-contour">
+        <xsl:value-of select ="'true'"/>
+      </xsl:attribute>
+      <xsl:attribute name="style:wrap-contour-mode">
+        <xsl:value-of select ="'outside'"/>
+      </xsl:attribute>
+    </xsl:if>
+
 	</xsl:template>
 
 	<xsl:template name="InsertShapeFromTextDistance">
@@ -2448,6 +2686,10 @@
 				<xsl:when test="$horizontalRelative='page' and $horizontalPosition='left'">
 					<xsl:text>0</xsl:text>
 				</xsl:when>
+        <!--Sona Added margin for completing Shape Wrap feature-->
+        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-left'))">
+          <xsl:text>0.13in</xsl:text>
+        </xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name="GetShapeProperty">
 						<xsl:with-param name="propertyName" select="'mso-wrap-distance-left'"/>
@@ -2469,6 +2711,10 @@
 				<xsl:when test="$horizontalRelative='page' and $horizontalPosition='right'">
 					<xsl:text>0</xsl:text>
 				</xsl:when>
+        <!--Sona Added margin for completing Shape Wrap feature-->
+        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-right'))">
+          <xsl:text>0.13in</xsl:text>
+        </xsl:when>
 				<xsl:otherwise>
 					<xsl:call-template name="GetShapeProperty">
 						<xsl:with-param name="propertyName" select="'mso-wrap-distance-right'"/>
@@ -2520,7 +2766,8 @@
 							<xsl:text>shape</xsl:text>
 						</xsl:when>
 						<!-- there is a v:stroke element, then paint the border if stroked isn't disabled -->
-						<xsl:when test="$shape/v:stroke and ($shape/@stroked!='f' or $shape/@stroked!='false' or $shape/@stroked='0')">
+						<xsl:when test="$shape/v:stroke and ($shape/@stroked!='f' and $shape/@stroked!='false' and $shape/@stroked!='0')">
+              <!--changed by chhavi ,shape to none ,to fix bugs 2003927 , 2003016-->
 							<xsl:text>shape</xsl:text>
 						</xsl:when>
 						<xsl:otherwise>
@@ -2535,7 +2782,7 @@
 							<xsl:text>shapetype</xsl:text>
 						</xsl:when>
 						<!-- there is a v:stroke element, then paint the border if stroked isn't disabled -->
-						<xsl:when test="$shapetype/v:stroke and ($shapetype/@stroked!='f' and $shapetype/@stroked!='false' or $shapetype/@stroked='0')">
+						<xsl:when test="$shapetype/v:stroke and ($shapetype/@stroked!='f' and $shapetype/@stroked!='false' and $shapetype/@stroked!='0')">
 							<xsl:text>shapetype</xsl:text>
 						</xsl:when>
 						<xsl:otherwise>
@@ -2671,7 +2918,8 @@
 				</xsl:if>
 
 				<!-- the border is dashed -->
-				<xsl:if test="$dashStyle">
+        <!-- Sona: Defect #2019374 contd-->
+        <xsl:if test="$dashStyle!='' and $dashStyle!='solid'">
 					<xsl:attribute name="draw:stroke">
 						<xsl:text>dash</xsl:text>
 					</xsl:attribute>
@@ -2899,7 +3147,7 @@
 			<xsl:when test ="(($weight &gt; '1.95') and ($type = 'block') and ($arrowWidth='narrow') and ($arrowLength='short')) or (($weight &gt; '1.95') and ($type = 'block') and ($arrowWidth='narrow') and ($arrowLength='long')) or (($weight &gt; '1.95') and ($type = 'block') and ($arrowWidth='narrow'))">
 				<xsl:value-of select ="concat(($weightincm) * (3.5),'cm')"/>
 			</xsl:when>
-			<xsl:when test ="(($weight &lt; '1.95')  and ($type = 'block') and ($arrowWidth='narrow') and ($arrowLength='short')) or (($weight &lt; '1.95')  and ($type = 'block') and ($arrowWidth='narrow') and ($arrowLength='narrow')) or (($weight &lt; '1.95')  and ($type = 'block') and ($arrowWidth='narrow'))">
+      <xsl:when test ="(($weight &lt; '1.95') and ($type = 'block') and ($arrowWidth='narrow') and ($arrowLength='short')) or (($weight &lt; '1.95')  and ($type = 'block') and ($arrowWidth='narrow') and ($arrowLength='long')) or (($weight &lt; '1.95')  and ($type = 'block') and ($arrowWidth='narrow'))">
 				<xsl:value-of select ="concat($sm-med,'cm')"/>
 			</xsl:when>
 			<!-- selection for (top row arrow type) and non-selection of (arrow size as 'arrow') -->
@@ -2926,18 +3174,18 @@
 			</xsl:when>
 
 			<!-- selection for (middle row arrow type) and (arrow size as 'arrow') -->
-			<xsl:when test ="(($weight &gt; '2.25') and ($type = 'block')) or (($weight &gt; '2.25') and ($type = 'block') and ($arrowLength='short')) or (($weight &gt; '2.25') and ($type = 'block') and ($arrowLength='long'))">
+      <xsl:when test ="(($weight &gt; '2.25') and ($type = 'block') and ($arrowLength='short')) or (($weight &gt; '2.25') and ($type = 'block') and ($arrowLength='long')) or (($weight &gt; '2.25') and ($type = 'block'))">
 				<xsl:value-of select ="concat(($weightincm) * (4.5),'cm')"/>
 			</xsl:when>
-			<xsl:when test ="(($weight &lt; '2.25') and ($type = 'block')) or (($weight &lt; '2.25')  and ($type = 'block') and ($arrowLength='short')) or (($weight &lt; '2.25')  and ($type = 'block') and ($arrowLength='long'))">
+      <xsl:when test ="(($weight &lt; '2.25')  and ($type = 'block') and ($arrowLength='short')) or (($weight &lt; '2.25')  and ($type = 'block') and ($arrowLength='long')) or (($weight &lt; '2.25') and ($type = 'block'))">
 				<xsl:value-of select ="concat($med-med,'cm')"/>
 			</xsl:when>
 
 			<!-- selection for (middle row arrow type) and non-selection of (arrow size as 'arrow') -->
-			<xsl:when test ="(($weight &gt; '2.25')) or (($weight &gt; '2.25') and ($arrowLength='short')) or (($weight &gt; '2.25') and ($arrowLength='long'))">
+      <xsl:when test ="(($weight &gt; '2.25') and ($arrowLength='short')) or (($weight &gt; '2.25') and ($arrowLength='long')) or (($weight &gt; '2.25'))">
 				<xsl:value-of select ="concat(($weightincm) * (3),'cm')"/>
 			</xsl:when>
-			<xsl:when test ="(($weight &lt; '2.25')) or (($weight &lt; '2.25') and ($arrowLength='short')) or (($weight &lt; '2.25') and ($arrowLength='long'))">
+      <xsl:when test ="(($weight &lt; '2.25') and ($arrowLength='short')) or (($weight &lt; '2.25') and ($arrowLength='long')) or (($weight &lt; '2.25'))">
 				<xsl:value-of select ="concat($med-sm,'cm')"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -3032,7 +3280,7 @@
     <!--Sona Wrap and resize-->    
       <xsl:attribute name ="fo:wrap-option">
         <xsl:choose>
-          <xsl:when test ="$wrapStyle='none' and $wrapStyle='none'">
+        <xsl:when test ="$wrapStyle='none'">
             <xsl:value-of select="'wrap'"/>
           </xsl:when>
           <xsl:otherwise>
@@ -3223,7 +3471,7 @@
     See bug: 1747143
     -->
 		<xsl:if test="name($shape/..)!='v:group'">
-
+      <xsl:variable name="posX">
       <xsl:if test="not(contains($shape/@style,'mso-left-percent'))">
 				<xsl:variable name="x">
 					<xsl:choose>
@@ -3316,14 +3564,16 @@
             </xsl:otherwise>
           </xsl:choose>
 							</xsl:variable>
-        <xsl:variable name="posX">
+        
           <xsl:value-of select="$x"/>
+        </xsl:if>
         </xsl:variable>
+      <xsl:if test="$posX !='' and not(contains($shape/@style,'rotation'))">
         <xsl:attribute name="svg:x">
           <xsl:value-of select="$posX"/>
         </xsl:attribute>
       </xsl:if>
-
+      <xsl:variable name="posY">
       <xsl:if test="not(contains($shape/@style,'mso-top-percent'))">
         <xsl:variable name="y">
           <xsl:choose>
@@ -3411,9 +3661,11 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="posY">
+        
           <xsl:value-of select="$y"/>
+        </xsl:if>
         </xsl:variable>
+      <xsl:if test="$posY !='' and not(contains($shape/@style,'rotation'))">
 				<xsl:attribute name="svg:y">
 					<xsl:value-of select="$posY"/>
 				</xsl:attribute>
@@ -3421,10 +3673,10 @@
 
       <!--<xsl:if test="contains($shape/@style,'mso-left-percent')">-->
       <xsl:variable name="marTop">
-        <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:top"/>
+        <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:top"/>
       </xsl:variable>
       <xsl:variable name="marBottom">
-        <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:bottom"/>
+        <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:bottom"/>
       </xsl:variable>
       <xsl:variable name="relativeHeight">
         <xsl:call-template name="GetShapeProperty">
@@ -3432,11 +3684,13 @@
           <xsl:with-param name="propertyName" select="'mso-top-percent'"/>
         </xsl:call-template>
       </xsl:variable>
-      <xsl:if test="contains($shape/@style,'mso-top-percent')">
+      
         <xsl:variable name ="verRelPos">
+        <xsl:if test="contains($shape/@style,'mso-top-percent')">        
           <xsl:choose >
             <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:margin')">
-              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440 * ($relativeHeight div 1000)"/>
+              <!--<xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440 * ($relativeHeight div 1000)"/>-->
+              <xsl:value-of select ="(((key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h div 1440)-($marTop div 1440)- ($marBottom div 1440))) * ($relativeHeight div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:top-margin-area')">
               <xsl:value-of select ="$marTop div 1440 * ($relativeHeight div 1000) "/>
@@ -3444,7 +3698,8 @@
             <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:bottom-margin-area')">
               <!--<xsl:value-of select ="$marBottom div 1440 "/>-->
               <!--<xsl:value-of select ="(//w:pgSz/@w:h div 1440) -(($marBottom div 1440) * ($relativeHeight div 1000))"/>-->
-              <xsl:value-of select ="((ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440)-($marBottom div 1440)) +($marBottom div 1440 * $relativeHeight div 1000)"/>
+              <!--<xsl:value-of select ="((ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440)-($marBottom div 1440)) +($marBottom div 1440 * $relativeHeight div 1000)"/>-->
+              <xsl:value-of select ="((key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h div 1440))-((1-($relativeHeight div 1000))* ($marBottom div 1440)) "/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:inner-margin-area')">
               <xsl:value-of select ="$marTop div 1440 * ($relativeHeight div 1000) "/>
@@ -3453,13 +3708,15 @@
               <xsl:value-of select ="$marBottom div 1440 * ($relativeHeight div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-vertical-relative:page')">
-              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440 * ($relativeHeight div 1000)"/>
+              <xsl:value-of select ="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h div 1440 * ($relativeHeight div 1000)"/>
             </xsl:when>
             <!--<xsl:otherwise >
             <xsl:value-of select ="//w:pgSz/@w:h div 1440"/>
           </xsl:otherwise>-->
           </xsl:choose>
+        </xsl:if>
         </xsl:variable>
+        <xsl:if test="$verRelPos !='' and not(contains($shape/@style,'rotation'))">
         <xsl:attribute name="svg:y">
           <xsl:value-of select ="concat((format-number($verRelPos*2.54,'#.##')),'cm')"/>
         </xsl:attribute>
@@ -3468,8 +3725,8 @@
 
       <xsl:variable name="marLeft">
         <xsl:choose>
-          <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:left">
-            <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:left"/>
+          <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left">
+            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left"/>
           </xsl:when>
           <!--<xsl:otherwise>
           <xsl:value-of select="//w:pgMar/@w:header"/>
@@ -3478,8 +3735,8 @@
       </xsl:variable>
       <xsl:variable name="marRight">
         <xsl:choose>
-          <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:right">
-            <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:right"/>
+          <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right">            
+            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right"/>
           </xsl:when>
           <!--<xsl:otherwise>
           <xsl:value-of select="//w:pgMar/@w:footer"/>
@@ -3492,18 +3749,21 @@
           <xsl:with-param name="propertyName" select="'mso-left-percent'"/>
         </xsl:call-template>
       </xsl:variable>
-      <xsl:if test="contains($shape/@style,'mso-left-percent')">
+     
         <xsl:variable name ="horRelPos">
+      <xsl:if test="contains($shape/@style,'mso-left-percent')">
+        
           <xsl:choose >
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:margin')">
-              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440 * ($relativeWidth div 1000)"/>
+              <xsl:value-of select ="(((key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w div 1440)- ($marRight div 1440)- ($marLeft div 1440)))* ($relativeWidth div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:left-margin-area')">
               <xsl:value-of select ="$marLeft div 1440 * ($relativeWidth div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:right-margin')">
               <!--<xsl:value-of select ="((//w:pgSz/@w:w div 1440)-($marRight div 1440))) -(($marRight div 1440) * ($relativeWidth div 1000))"/>-->
-              <xsl:value-of select ="((ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440)-($marRight div 1440)) +($marRight div 1440 * $relativeWidth div 1000)"/>
+             
+              <xsl:value-of select ="((key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w div 1440)-($marRight div 1440)) +($marRight div 1440 * $relativeWidth div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:inner-margin-area')">
               <xsl:value-of select ="$marLeft div 1440 * ($relativeWidth div 1000) "/>
@@ -3512,19 +3772,127 @@
               <xsl:value-of select ="$marRight div 1440 * ($relativeWidth div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:page')">
-              <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440 * ($relativeWidth div 1000)"/>
+              <xsl:value-of select ="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w div 1440 * ($relativeWidth div 1000)"/>
             </xsl:when>
             <!--<xsl:otherwise >
             <xsl:value-of select ="//w:pgSz/@w:w div 1440"/>
           </xsl:otherwise>-->
           </xsl:choose>
+      </xsl:if>
         </xsl:variable>
+      <xsl:if test="$horRelPos !='' and not(contains($shape/@style,'rotation'))">
 				<xsl:attribute name="svg:x">
           <xsl:value-of select ="concat((format-number($horRelPos * 2.54,'#.##')),'cm')"/>
 				</xsl:attribute>
 			</xsl:if>
+      <!--Sona : Rotation Implementation -->
+      <xsl:variable name ="shapeTypeId">
+        <xsl:value-of select ="substring-after(@type,'#')"/>
+      </xsl:variable>
+      <xsl:variable name ="pathId">
+        <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+          <xsl:if test ="position()=1">
+            <xsl:value-of select ="@path"/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+      
+      <xsl:if test="contains($shape/@style,'rotation') and $pathId !='m,l21600,21600e' and $pathId != 'm,l@0,0@0,21600,21600,21600e' and $pathId !='m,c@0,0@1,5400@1,10800@1,16200@2,21600,21600,21600e'">
+        <xsl:variable name ="xCord">
+          <xsl:choose>
+            <xsl:when test="$horRelPos !=''">
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="length" select="concat((format-number($horRelPos * 2.54,'#.##')),'cm')"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="length" select="$posX"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name ="yCord">
+          <xsl:choose>
+            <xsl:when test="$verRelPos !=''">
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="length" select="concat((format-number($verRelPos*2.54,'#.##')),'cm')"/>
+              </xsl:call-template>
+            </xsl:when>
+          <xsl:otherwise>
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="$posY"/>
+          </xsl:call-template>
+          </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name ="xCenter">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="substring-before(substring-after($shape/@style,concat('width',':')),';')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name ="yCenter">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="substring-before(substring-after($shape/@style,concat('height',':')),';')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name ="var_flipH">
+          <xsl:choose>
+            <xsl:when test="substring-before(substring-after($shape/@style,concat('flip',':')),';') = 'x'">
+              <xsl:value-of select="1"/>
+            </xsl:when>
+            <xsl:when test="substring-before(substring-after($shape/@style,concat('flip',':')),';') = 'x y'">
+              <xsl:value-of select="1"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="0"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name ="var_flipV">
+          <xsl:choose>
+            <xsl:when test="substring-before(substring-after($shape/@style,concat('flip',':')),';') = 'y'">
+              <xsl:value-of select="1"/>
+            </xsl:when>
+            <xsl:when test="substring-before(substring-after($shape/@style,concat('flip',':')),';') = 'x y'">
+              <xsl:value-of select="1"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="0"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name ="angle">
+          <xsl:choose>
+            <xsl:when test="($var_flipH='1' and $var_flipV='0') or ($var_flipH='0' and $var_flipV='1')">
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="length" select="concat(360-substring-before(substring-after($shape/@style,concat('rotation',':')),';'),'degrees')"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="emu-measure">
+                <xsl:with-param name="length" select="concat(substring-before(substring-after($shape/@style,concat('rotation',':')),';'),'degrees')"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:attribute name ="draw:transform">
+          <xsl:value-of select ="concat('draw-transform:',$xCord, ':',$yCord, ':',$xCenter, ':', $yCenter, ':', $var_flipH, ':', $var_flipV, ':', $angle)"/>
+        </xsl:attribute>
+      </xsl:if>
+
+    </xsl:if>
+	</xsl:template>
+  <!--added by chhavi for alttext-->
+  <xsl:template name="AltText">
+    <xsl:param name="shape" select="."/>
+    <xsl:if test="$shape/@alt!=''">
+      <xsl:element name="svg:desc">
+        <xsl:value-of select ="$shape/@alt"/>        
+      </xsl:element>          
 		</xsl:if>
 	</xsl:template>
+  <!--end here-->
 
 	<!--
   Summary: Writes the anchor-type attribute
@@ -4118,7 +4486,102 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
+    <!-- Sona: Line Rotation implementation-->
+    <xsl:if test ="contains($shape/@style,'rotation')">
+      <xsl:variable name ="xCenter">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param  name="length" select ="concat((number(substring-before($leftMargin,'cm')) + (number(substring-before($width,'cm')) div 2)),'cm')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name ="yCenter">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param  name="length" select ="concat((number(substring-before($topMargin,'cm')) + (number(substring-before($height,'cm')) div 2)),'cm')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name ="rot">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="concat(substring-before(substring-after($shape/@style,concat('rotation',':')),';'),'degrees')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name ="angle">
+        <xsl:if test ="not(contains($shape/@style,'rotation'))">
+          <xsl:value-of select="0" />
+        </xsl:if>
+        <xsl:if test ="contains($shape/@style,'rotation')">
+          <xsl:value-of select ="(number($rot) div 60000) * ((22 div 7) div 180)"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name ="cxBy2">
+        <!--
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param  name="length" select ="concat(((-1 * number(substring-before($width,'cm'))) div 2),'cm')"/>
+          </xsl:call-template>
+        </xsl:if>
+        <xsl:if test ="($flip != 'x') and ($flip != 'x y') ">-->
+      <xsl:call-template name="emu-measure">
+        <xsl:with-param  name="length" select ="concat((number(substring-before($width,'cm')) div 2),'cm')"/>
+      </xsl:call-template>
+      <!--</xsl:if>-->
+    </xsl:variable>
+    <xsl:variable name ="cyBy2">
+      <!--<xsl:if test ="($flip = 'y') or ($flip = 'x y')">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param  name="length" select ="concat(((-1 * number(substring-before($height,'cm'))) div 2),'cm')"/>
+          </xsl:call-template>
+        </xsl:if>
+        <xsl:if test ="($flip != 'y') and ($flip != 'x y')">-->
+      <xsl:call-template name="emu-measure">
+        <xsl:with-param  name="length" select ="concat((number(substring-before($height,'cm')) div 2),'cm')"/>
+      </xsl:call-template>
+      <!--</xsl:if>-->
+    </xsl:variable>
+    <xsl:attribute name ="svg:x1">
+      <xsl:if test ="($flip = 'x') or ($flip = 'x y')">
+        <xsl:value-of select ="concat('svg-x2:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+      </xsl:if>
+      <xsl:if test ="($flip != 'x') and ($flip != 'x y') ">
+        <xsl:value-of select ="concat('svg-x1:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+      </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:y1">
+        <xsl:if test ="($flip = 'y') or ($flip = 'x y')">
+          <xsl:value-of select ="concat('svg-y2:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+        </xsl:if>
+        <xsl:if test ="($flip != 'y') and ($flip != 'x y')">
+          <xsl:value-of select ="concat('svg-y1:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+        </xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:x2">
+        <xsl:if test ="($flip = 'x') or ($flip = 'x y')">
+          <xsl:value-of select ="concat('svg-x1:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+        </xsl:if>
+        <xsl:if test ="($flip != 'x') and ($flip != 'x y') ">
+          <xsl:value-of select ="concat('svg-x2:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+        </xsl:if>        
+      </xsl:attribute>
+      <xsl:attribute name ="svg:y2">
+        <xsl:if test ="($flip = 'y') or ($flip = 'x y')">
+          <xsl:value-of select ="concat('svg-y1:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+        </xsl:if>
+        <xsl:if test ="($flip != 'y') and ($flip != 'x y')">
+          <xsl:value-of select ="concat('svg-y2:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+        </xsl:if>
+      </xsl:attribute>
+      <!--<xsl:attribute name ="svg:x1">
+        <xsl:value-of select ="concat('svg-x1:',7.2365*360000, ':', -2.2095*360000, ':', 1.3095*360000, ':', 1.04761)"/>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:y1">
+        <xsl:value-of select ="concat('svg-y1:',4.7755*360000, ':', -2.2095*360000, ':', 1.3095*360000, ':', 1.04761)"/>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:x2">
+        <xsl:value-of select ="concat('svg-x2:',7.2365*360000, ':', -2.2095*360000, ':', 1.3095*360000, ':', 1.04761)"/>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:y2">
+        <xsl:value-of select ="concat('svg-y2:',4.7755*360000, ':', -2.2095*360000, ':', 1.3095*360000, ':', 1.04761)"/>
+      </xsl:attribute>-->
+    </xsl:if>
 
+    <xsl:if test ="not(contains($shape/@style,'rotation'))">
 		<xsl:choose>
 			<xsl:when test="$flip='y'">
 				<xsl:attribute name="svg:x1">
@@ -4178,7 +4641,7 @@
 			</xsl:otherwise>
 		</xsl:choose>
 
-
+    </xsl:if>
 	</xsl:template>
 
 	<xsl:template name="GetLineProperty">
@@ -4202,6 +4665,42 @@
     </xsl:call-template>-->
 		<xsl:value-of select="$propertyValue"/>
 	</xsl:template>
+
+  <xsl:template name="emu-measure">
+    <!-- @Private -->
+    <!-- @Description: Convert to emu (1cm = 360000 emu) -->
+    <!-- @Context: None -->
+
+    <!-- (string) The length including the unit -->
+    <xsl:param name="length"/>
+
+    <xsl:choose>
+      <xsl:when test="contains($length, 'cm')">
+        <xsl:value-of select="round(number(substring-before($length, 'cm')) * 360000)"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'mm')">
+        <xsl:value-of select="round(number(substring-before($length, 'mm')) * 36000)"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'in')">
+        <xsl:value-of select="round(number(substring-before($length, 'in')) * 360000 * 2.54)"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'pt')">
+        <xsl:value-of select="round(number(substring-before($length, 'pt')) * 360000 * 2.54 div 72)"
+        />
+      </xsl:when>
+      <xsl:when test="contains($length, 'px')">
+        <xsl:value-of select="round(number(substring-before($length, 'px')) * 360000 div 37.87)"/>
+      </xsl:when>
+      <!-- Sona: For converting angles in degrees-->
+      <xsl:when test="contains($length, 'degrees')">
+        <xsl:value-of select="round(number(substring-before($length, 'degrees')) * 60000)"/>
+      </xsl:when>
+      <xsl:when test="not($length) or $length='' ">0</xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$length"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
 
 

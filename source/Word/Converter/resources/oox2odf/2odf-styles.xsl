@@ -946,9 +946,19 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
-        
+        <!-- Sona: #2014221 and Arrow Feature Continuation-->
+        <xsl:for-each select ="key('Part', 'word/document.xml')/w:document/w:body//v:shape">
+          <xsl:call-template name="getDashType">
+            <xsl:with-param name="shape" select="." />
+          </xsl:call-template>
+          <xsl:call-template name="InsertArrowStyle">
+            <xsl:with-param name="shape" select="." />
+          </xsl:call-template>
+        </xsl:for-each>
         <!--gradient fill -->
         <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//v:fill[@type='gradient']" mode="officestyles" />
+        <!-- Vipul: Picture Fill-->  
+<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//v:fill[@type='tile' or @type='pattern' or @type='frame']" mode="officestyles" />
         
         <!--heading numbering style, insert outline numbering style only if heading style is linked to level in Word (numId and outlineLvl are in styles.xml Heading style defintion) -->
         <xsl:if test="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">

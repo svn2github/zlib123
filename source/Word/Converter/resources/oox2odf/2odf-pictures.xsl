@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -697,6 +697,7 @@
 
   <xsl:template name="InsertGraphicPosH">
     <xsl:param name="align"/>
+    <xsl:param name="relativeFrom" />
 
     <xsl:attribute name="style:horizontal-pos">
       <xsl:choose>
@@ -705,6 +706,9 @@
         </xsl:when>
         <xsl:when test="$align and $align != '' ">
           <xsl:value-of select="$align"/>
+        </xsl:when>
+          <xsl:when test ="$relativeFrom='inner-margin-area' or $relativeFrom='outer-margin-area' ">
+            <xsl:text>from-inside</xsl:text>          
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>from-left</xsl:text>
