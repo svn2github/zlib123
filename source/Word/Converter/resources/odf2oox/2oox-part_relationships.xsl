@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -73,11 +73,19 @@
 
       <!-- OLE objects relationships -->
       <xsl:variable name="allOLEs" select="document('content.xml')/office:document-content/office:body//draw:object-ole | document('content.xml')/office:document-content/office:body//draw:object" />
+      <xsl:variable name="allShapes" select="document('content.xml')/office:document-content/office:body//draw:custom-shape 
+                                             | document('content.xml')/office:document-content/office:body//draw:ellipse 
+                                             | document('content.xml')/office:document-content/office:body//draw:rect 
+                                             | document('content.xml')/office:document-content/office:body//draw:line 
+                                             | document('content.xml')/office:document-content/office:body//draw:connector "/>
       
       <xsl:call-template name="InsertOleObjectsRelationships">
         <xsl:with-param name="oleObjects" select="$allOLEs"/>
       </xsl:call-template>
-
+    <!-- Sonata:Picture Fill Relationship -->
+      <xsl:call-template name="InsertShapesRelationships">
+        <xsl:with-param name="shapes" select="$allShapes"/>
+      </xsl:call-template>
       <!-- Images relationships -->
       <xsl:for-each select="document('content.xml')">
         <xsl:call-template name="InsertImagesRelationships">
@@ -115,6 +123,35 @@
     
   </xsl:template>
 
+      <!-- Soanta: Template to create Picture fill relationship -->
+  <xsl:template name="InsertShapesRelationships">
+    <xsl:param name="shapes" select="."/>
+    <xsl:for-each select="$shapes">
+      <xsl:variable name="shapeRelId" select="generate-id(.)"/>
+      <xsl:variable name="styleName" select="@draw:style-name"/>
+      <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
+      <xsl:variable name="shapeStyle" select="$automaticStyle"/>
+      <xsl:for-each select="$shapeStyle/style:graphic-properties[@draw:fill='bitmap']">
+        <xsl:variable name="BitmapName" select="@draw:fill-image-name"/>
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name = $BitmapName]">
+          <xsl:if test="@xlink:href !=''">
+            <Relationship  Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" 
+                                xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+              <xsl:attribute name="Id">
+                <xsl:value-of select="concat('Bitmap_',$shapeRelId)"/>
+              </xsl:attribute>
+              <xsl:attribute name="Target">
+                <xsl:value-of select="concat('media',substring-after(@xlink:href,'Pictures'))"/>
+              </xsl:attribute>
+            </Relationship>
+            <pzip:copy   pzip:source="{@xlink:href}"
+                         pzip:target="{concat('word/media',substring-after(@xlink:href,'Pictures'))}" />
+
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>  
 
   <!-- 
   Summary: inserts the rels for OLEs and copies the internal objects

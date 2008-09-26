@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -735,6 +735,29 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
+      <xsl:variable name="width">
+        <xsl:call-template name ="ConvertToCentimeters">
+          <xsl:with-param name="length" select="$frame/@svg:width"></xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="height">
+        <xsl:call-template name ="ConvertToCentimeters">
+          <xsl:with-param name="length" select="$frame/@svg:height"></xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="x2">
+        <xsl:call-template name ="ConvertToCentimeters">
+          <xsl:with-param name="length" select="substring-before(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' ')" />
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="y2">
+        <xsl:call-template name ="ConvertToCentimeters">
+          <xsl:with-param name="length" select ="substring-after(substring-before(substring-after(substring-after(@draw:transform,'translate'),'('),')'),' ')" />
+        </xsl:call-template>
+      </xsl:variable>
+
       <xsl:variable name="rotation">
         <xsl:if test="contains($frame/@draw:transform,'rotate')">
           <xsl:call-template name="DegreesAngle">
@@ -747,7 +770,7 @@
           </xsl:call-template>
         </xsl:if>
       </xsl:variable>
-
+      <!-- Sona: Implemented Rotation-->
       <!-- 
         declare an absolute positioning (ignored if margin-left/rigt=0)
         NB: it should not be compulsory to declare absolute positioning, but it causes troubles for images embedded in text-boxes in Word if not declared.
@@ -761,9 +784,14 @@
           <xsl:choose>
             <!-- if rotation, revert X and Y -->
             <xsl:when test="$rotation != '' ">
-              <xsl:call-template name="ComputeMarginXWithRotation">
+              <!--<xsl:call-template name="ComputeMarginXWithRotation">
                 <xsl:with-param name="angle" select="$rotation"/>
-              </xsl:call-template>
+              </xsl:call-template>-->
+              <xsl:value-of select ="concat('draw-transform:X:',substring-before($width,'cm'), ':',
+																   substring-before($height,'cm'), ':', 
+																   substring-before($x2,'cm'), ':', 
+                                   substring-before($y2,'cm'), ':', 
+																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="ComputeMarginX">
@@ -778,6 +806,9 @@
           <xsl:value-of select="$valX"/>
           <xsl:text>pt</xsl:text>
         </xsl:when>
+        <xsl:when test="contains($valX,'draw-transform')">
+          <xsl:value-of select="$valX"/>
+        </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
       <xsl:text>;</xsl:text>
@@ -789,9 +820,14 @@
           <xsl:choose>
             <!-- if rotation, revert X and Y -->
             <xsl:when test="$rotation != '' ">
-              <xsl:call-template name="ComputeMarginYWithRotation">
+              <!--<xsl:call-template name="ComputeMarginYWithRotation">
                 <xsl:with-param name="angle" select="$rotation"/>
-              </xsl:call-template>
+              </xsl:call-template>-->
+              <xsl:value-of select ="concat('draw-transform:Y:',substring-before($width,'cm'), ':',
+																   substring-before($height,'cm'), ':', 
+																   substring-before($x2,'cm'), ':', 
+                                   substring-before($y2,'cm'), ':', 
+																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="ComputeMarginY">
@@ -806,10 +842,22 @@
           <xsl:value-of select="$valY"/>
           <xsl:text>pt</xsl:text>
         </xsl:when>
+        <xsl:when test="contains($valY,'draw-transform')">
+          <xsl:value-of select="$valY"/>
+        </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
       <xsl:text>;</xsl:text>
+      <xsl:if test="$rotation != '' ">
+        <xsl:text>rotation:</xsl:text>
+        <xsl:value-of select ="concat('draw-transform:ROT:',substring-before($width,'cm'), ':',
+																   substring-before($height,'cm'), ':', 
+																   substring-before($x2,'cm'), ':', 
+                                   substring-before($y2,'cm'), ':', 
+																   substring-before(substring-after(substring-after($frame/@draw:transform,'rotate'),'('),')'))"/>
 
+        <xsl:text>;</xsl:text>
+      </xsl:if>
       <!-- horizontal position (overrides margin-left) -->
       <xsl:choose>
         <!-- centered position -->
@@ -874,7 +922,8 @@
     <xsl:param name="frame"/>
 
     <!-- wrapping of text (horizontal adjustment) -->
-    <xsl:if test="$frame/@fo:min-width or $frame/draw:text-box/@fo:min-height or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
+    <!-- Sona: wrap text styles-->
+    <xsl:if test="$frameStyle/style:graphic-properties/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-height or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true' or not($frameStyle/style:graphic-properties/@fo:wrap-option)">
       <!--
       makz: was uncommented in r2655 by rebet
       I commented it in for bugfix 1827515
@@ -1151,26 +1200,44 @@
   -->
   <xsl:template name="FrameToShapeShadow">
     <xsl:param name="frameStyle"/>
-
+    <!-- Sona: Shadow implementation-->
     <xsl:variable name="shadow">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$frameStyle"/>
-        <xsl:with-param name="attribName">style:shadow</xsl:with-param>
+        <xsl:with-param name="attribName">draw:shadow</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="shadowColor">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="attribName">draw:shadow-color</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="shadowOffsetX">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="attribName">draw:shadow-offset-x</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="shadowOffsetY">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="attribName">draw:shadow-offset-y</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:if test="$shadow != ''  and $shadow != 'none' ">
+    <xsl:if test="$shadow != ''  and $shadow != 'none' and $shadow != 'hidden'  ">
       <v:shadow on="t">
-        <xsl:if test="substring-before($shadow, ' ') != 'none' ">
+        <xsl:if test="$shadowColor != 'none' ">
           <xsl:attribute name="color">
-            <xsl:value-of select="substring-before($shadow, ' ')"/>
+            <xsl:value-of select="$shadowColor"/>
           </xsl:attribute>
         </xsl:if>
         <xsl:variable name="firstShadow">
-          <xsl:value-of select=" substring-before(substring-after($shadow, ' '), ' ')"/>
+          <xsl:value-of select="$shadowOffsetX"/>
         </xsl:variable>
         <xsl:variable name="secondShadow">
-          <xsl:value-of select=" substring-after(substring-after($shadow, ' '), ' ')"/>
+          <xsl:value-of select="$shadowOffsetY"/>
         </xsl:variable>
         <xsl:if test="$firstShadow != '' and $secondShadow != '' ">
           <xsl:attribute name="offset">
@@ -1189,9 +1256,12 @@
         <xsl:variable name="transparency">
           <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$frameStyle"/>
-            <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
+            <xsl:with-param name="attribName">draw:shadow-opacity</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+        <xsl:attribute name="opacity">
+          <xsl:value-of select ="substring-before($transparency,'%') div 100 "/>
+        </xsl:attribute>
         <xsl:if test="$transparency = '100%'">
           <xsl:attribute name="obscured">true</xsl:attribute>
         </xsl:if>
@@ -1239,13 +1309,27 @@
             <xsl:with-param name="attribName">style:number-wrapped-paragraphs</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+        <!-- Sona: Wrap implementation and also Defect #2025699 -->
+        <xsl:variable name="contour">
+          <xsl:call-template name="GetGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+            <xsl:with-param name="attribName">style:wrap-contour</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:choose>
           <xsl:when test="$wrappedPara=1">
             <w10:wrap type="none"/>
             <w10:anchorlock/>
           </xsl:when>
           <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test ="$contour='true'">
             <w10:wrap type="tight"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w10:wrap type="square"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -1271,7 +1355,7 @@
   -->
   <xsl:template name="InsertTextBox">
     <xsl:param name="frameStyle"/>
-    <xsl:param name="frame"/>
+    <xsl:param name="frame" select ="."/>
 
     <v:textbox>
       <xsl:attribute name="style">
@@ -1280,7 +1364,8 @@
           <xsl:value-of select="@draw:chain-next-name"/>
           <xsl:text>;</xsl:text>
         </xsl:if>
-        <xsl:if test="self::draw:text-box">
+        <!-- Sona: Textbox resize and wrapping-->
+        <xsl:if test="self::draw:text-box or ./text:p/node()">
           <!-- comment : OpenOffice will rather use fo:min-width when parent style defined, and draw:auto-grow-width if not -->
           <xsl:choose>
             <xsl:when test="$frame/@svg:width='0' and $frame/@svg:height='0'">
@@ -1296,6 +1381,7 @@
             <xsl:otherwise>
               <xsl:if test="not(parent::node()='draw:frame') 
                 and (not($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
+                       and $frameStyle/style:graphic-properties/@draw:auto-grow-width
                 or not($frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
               </xsl:if>
@@ -2412,6 +2498,78 @@
           </xsl:attribute>
         </w:jc>
       </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="ConvertToCentimeters">
+    <!-- @Description: Convert given unit to cm -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+
+    <xsl:param name="length"/>
+    <!-- (string) The length to convert (including the unit) -->
+    <xsl:param name="round">false</xsl:param>
+    <!-- (string) If set to true, the result will be rounded to the nearest integer, otherwise the result will be a 3 decimal digit -->
+    <xsl:param name="addUnit">true</xsl:param>
+    <!-- (string) If set to true, wil append 'cm' to the result -->
+
+    <xsl:variable name="newlength">
+      <!-- The convertion's result -->
+      <xsl:choose>
+        <xsl:when test="contains($length, 'cm')">
+          <xsl:value-of select="substring-before($length,'cm')"/>
+        </xsl:when>
+        <xsl:when test="contains($length, 'mm')">
+          <xsl:value-of select="format-number(substring-before($length, 'mm') div 10,'#.###')"/>
+        </xsl:when>
+        <xsl:when test="contains($length, 'in')">
+          <xsl:value-of select="format-number(substring-before($length, 'in') * 2.54,'#.###')"/>
+        </xsl:when>
+        <xsl:when test="contains($length, 'pt')">
+          <xsl:value-of
+            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
+        </xsl:when>
+        <xsl:when test="contains($length, 'twip')">
+          <xsl:value-of
+            select="format-number(substring-before($length, 'twip') * 2.54 div 1440,'#.###')"/>
+        </xsl:when>
+        <xsl:when test="contains($length, 'pica')">
+          <xsl:value-of
+            select="format-number(substring-before($length, 'pica') * 2.54 div 6,'#.###')"/>
+        </xsl:when>
+        <xsl:when test="contains($length, 'dpt')">
+          <xsl:value-of
+            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
+        </xsl:when>
+        <xsl:when test="contains($length, 'px')">
+          <xsl:value-of select="format-number(substring-before($length, 'px') * 0.0264,'#.###')"/>
+        </xsl:when>
+        <xsl:when test="not($length) or $length='' ">0</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="format-number($length * 2.54 div 1440,'#.###')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="roundLength">
+      <!-- The result of the rounding -->
+      <xsl:choose>
+        <xsl:when test="$round='true'">
+          <xsl:value-of select="round($newlength)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="(round($newlength * 1000)) div 1000"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$addUnit = 'true' ">
+        <xsl:value-of select="concat($roundLength, 'cm')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$roundLength"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 

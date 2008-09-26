@@ -169,11 +169,14 @@
 								<!-- Sona: Changed I/P parameter-->
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<!-- Sona: Changed I/P parameter-->
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Right Triangle -->
@@ -187,10 +190,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!--Text-->
@@ -226,10 +232,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!-- insert text-box -->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Alternate Process -->
@@ -255,10 +264,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!-- insert text-box -->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!--Flowchart Decision -->
@@ -272,10 +284,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Data -->
@@ -289,10 +304,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Predefined Process-->
@@ -306,10 +324,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Internal Storage-->
@@ -323,10 +344,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Document-->
@@ -340,10 +364,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Multi Document-->
@@ -357,10 +384,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Terminator-->
@@ -374,10 +404,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Collate-->
@@ -391,10 +424,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 
 					</xsl:when>
@@ -409,10 +445,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Extract-->
@@ -426,10 +465,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!--Flowchart Merge-->
@@ -443,10 +485,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Stored Data-->
@@ -460,10 +505,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Delay-->
@@ -477,10 +525,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Sequential Access-->
@@ -494,10 +545,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Megnetic Disk-->
@@ -510,10 +564,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Flowchart Direct Access Storage-->
@@ -526,10 +583,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!--Flowchart Display -->
@@ -544,10 +604,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Rectangular Callout-->
@@ -602,10 +665,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Round Rectangular Callout-->
@@ -660,10 +726,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Oval Callout-->
@@ -705,10 +774,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!--Right Arrow-->
@@ -734,10 +806,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Left Arrow-->
@@ -761,10 +836,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Up Arrow -->
@@ -788,10 +866,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Down Arrow-->
@@ -817,10 +898,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 
 
@@ -854,10 +938,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 
 						<!-- Can-->
@@ -880,10 +967,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Cube-->
@@ -910,10 +1000,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Octagon -->
@@ -942,10 +1035,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 					</xsl:when>
 					<!-- Parellelogram-->
@@ -977,10 +1073,13 @@
 								<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 								<xsl:with-param name="shape" select="."/>
 							</xsl:call-template>
+              <!-- Sona:Defect #2020254-->
+              <xsl:if test="./text:p/node()">
 							<!--insert text-box-->
 							<xsl:call-template name="InsertTextBox">
 								<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 							</xsl:call-template>
+              </xsl:if>
 						</v:shape>
 
 					</xsl:when>
@@ -1080,6 +1179,47 @@
 			</w:pict>
 		</w:r>
 	</xsl:template>
+  <!-- Sona: Defect #2019374-->
+  <xsl:template match="draw:text-box" mode="paragraph">
+    <w:r>
+      <w:rPr>
+        <xsl:variable name="prefixedStyleName">
+          <xsl:call-template name="GetPrefixedStyleName">
+            <xsl:with-param name="styleName" select="parent::draw:frame/@draw:style-name"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$prefixedStyleName!=''">
+          <w:rStyle w:val="{$prefixedStyleName}"/>
+        </xsl:if>
+      </w:rPr>
+      <w:pict>
+
+        <!-- this properties are needed to make z-index work properly -->
+        <v:shapetype  id="_x0000_t202" coordsize="21600,21600" path="m,l,21600r21600,l21600,xe"
+          xmlns:o="urn:schemas-microsoft-com:office:office">
+          <v:stroke joinstyle="miter"/>
+          <v:path gradientshapeok="t" o:connecttype="rect"/>
+        </v:shapetype>
+        <!-- Sona: Also fixed defect #2025700-->
+        <v:shape id="_x0000_s1026" type="#_x0000_t202">
+          <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name"/>
+          <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
+          <xsl:variable name="officeStyle" select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+          <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+
+          <xsl:call-template name="ConvertShapeProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="shape" select="parent::draw:frame"/>
+          </xsl:call-template>
+
+          <xsl:call-template name="InsertTextBox">
+            <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+            <xsl:with-param name="frame" select="parent::draw:frame"/>
+          </xsl:call-template>
+        </v:shape>
+      </w:pict>
+    </w:r>
+  </xsl:template>
 
 	<!-- Sona: Line Shapes-->
 	<xsl:template match="draw:line" mode="shapes">
@@ -1094,10 +1234,29 @@
 					<o:lock v:ext="edit" shapetype="t"/>
 				</v:shapetype>
 				<v:shape id="_x0000_s1026" type="#_x0000_t32">
+          <!--added by chhavi for alttext-->
+          <xsl:if test ="child::node()= svg:desc">
+            <xsl:attribute name="alt">
+              <xsl:value-of select="svg:desc/child::node()"/>
+            </xsl:attribute>
+          </xsl:if>
+          <!--end here-->
 					<xsl:attribute name="style">
 						<xsl:call-template name ="GetLineCoordinatesODF">
 							<xsl:with-param name="shape" select="."/>
 						</xsl:call-template>
+            <!-- Sona : Defect #2026780-->
+            <!-- z-Index-->
+            <xsl:call-template name="InsertShapeZIndex">
+              <xsl:with-param name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+              <xsl:with-param name="shape" select="."/>
+            </xsl:call-template>
+            
+            <!--Sona Added margin for completing Shape Wrap feature-->
+            <xsl:call-template name="FrameToShapeMargin">
+              <xsl:with-param name="frameStyle" select="$automaticStyle | $officeStyle"/>
+              <xsl:with-param name="frame" select="."/>
+            </xsl:call-template>
 					</xsl:attribute>
 					<xsl:attribute name="o:connectortype">
 						<xsl:value-of select="'straight'"/>
@@ -1113,6 +1272,10 @@
 					<xsl:call-template name="FrameToShapeWrap">
 						<xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
 					</xsl:call-template>
+          <!--Sona Added Shape shadow-->
+          <xsl:call-template name="FrameToShapeShadow">
+            <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
+          </xsl:call-template>
 				</v:shape>
 			</w:pict>
 		</w:r>
@@ -1143,6 +1306,18 @@
 								<xsl:call-template name ="GetLineCoordinatesODF">
 									<xsl:with-param name="shape" select="."/>
 								</xsl:call-template>
+                <!-- Sona : Defect #2026780-->
+                <!-- z-Index-->
+                <xsl:call-template name="InsertShapeZIndex">
+                  <xsl:with-param name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+                  <xsl:with-param name="shape" select="."/>
+                </xsl:call-template>
+
+                <!--Sona Added margin for completing Shape Wrap feature-->
+                <xsl:call-template name="FrameToShapeMargin">
+                  <xsl:with-param name="frameStyle" select="$automaticStyle | $officeStyle"/>
+                  <xsl:with-param name="frame" select="."/>
+                </xsl:call-template>
 							</xsl:attribute>
 							<xsl:attribute name="o:connectortype">
 								<xsl:value-of select="'curved'"/>
@@ -1158,8 +1333,57 @@
 							<xsl:call-template name="FrameToShapeWrap">
 								<xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
 							</xsl:call-template>
+              <!--Sona Added Shape shadow-->
+              <xsl:call-template name="FrameToShapeShadow">
+                <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
 						</v:shape>
 					</xsl:when>
+          <!-- Sona: Defect #2019464-->
+          <xsl:when test="@draw:type='line'">
+            <v:shapetype id="_x0000_t32" coordsize="21600,21600" o:spt="32" o:oned="t" path="m,l21600,21600e" filled="f">
+              <v:path arrowok="t" fillok="f" o:connecttype="none"/>
+              <o:lock v:ext="edit" shapetype="t"/>
+            </v:shapetype>
+            <v:shape id="_x0000_s1026" type="#_x0000_t32">
+              <xsl:attribute name="style">
+                <xsl:call-template name ="GetLineCoordinatesODF">
+                  <xsl:with-param name="shape" select="."/>
+                </xsl:call-template>
+                <!-- Sona : Defect #2026780-->
+                <!-- z-Index-->
+                <xsl:call-template name="InsertShapeZIndex">
+                  <xsl:with-param name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+                  <xsl:with-param name="shape" select="."/>
+                </xsl:call-template>
+
+                <!--Sona Added margin for completing Shape Wrap feature-->
+                <xsl:call-template name="FrameToShapeMargin">
+                  <xsl:with-param name="frameStyle" select="$automaticStyle | $officeStyle"/>
+                  <xsl:with-param name="frame" select="."/>
+                </xsl:call-template>
+              </xsl:attribute>
+              <xsl:attribute name="o:connectortype">
+                <xsl:value-of select="'straight'"/>
+              </xsl:attribute>
+              <xsl:call-template name="InsertShapeStroke">
+                <xsl:with-param name="shapeStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
+              <!-- Sona Added Dashed Lines-->
+              <xsl:call-template name="GetLineStroke">
+                <xsl:with-param name="shapeStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
+              <!--Sona Added Shape Wrap-->
+              <xsl:call-template name="FrameToShapeWrap">
+                <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
+              <!--Sona Added Shape shadow-->
+              <xsl:call-template name="FrameToShapeShadow">
+                <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
+            </v:shape>
+          </xsl:when>
+          <!-- Sona: Defect #2019464-->
 					<xsl:otherwise>
 						<v:shapetype id="_x0000_t34" coordsize="21600,21600" o:spt="34" o:oned="t" adj="10800" path="m,l@0,0@0,21600,21600,21600e" filled="f">
 							<v:stroke joinstyle="miter"/>
@@ -1177,6 +1401,18 @@
 								<xsl:call-template name ="GetLineCoordinatesODF">
 									<xsl:with-param name="shape" select="."/>
 								</xsl:call-template>
+                <!-- Sona : Defect #2026780-->
+                <!-- z-Index-->
+                <xsl:call-template name="InsertShapeZIndex">
+                  <xsl:with-param name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+                  <xsl:with-param name="shape" select="."/>
+                </xsl:call-template>
+
+                <!--Sona Added margin for completing Shape Wrap feature-->
+                <xsl:call-template name="FrameToShapeMargin">
+                  <xsl:with-param name="frameStyle" select="$automaticStyle | $officeStyle"/>
+                  <xsl:with-param name="frame" select="."/>
+                </xsl:call-template>
 							</xsl:attribute>
 							<xsl:attribute name="o:connectortype">
 								<xsl:value-of select="'elbow'"/>
@@ -1192,6 +1428,10 @@
 							<xsl:call-template name="FrameToShapeWrap">
 								<xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
 							</xsl:call-template>
+              <!--Sona Added Shape shadow-->
+              <xsl:call-template name="FrameToShapeShadow">
+                <xsl:with-param name="frameStyle" select="$automaticStyle|$officeStyle"/>
+              </xsl:call-template>
 						</v:shape>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -1221,12 +1461,13 @@
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 				<xsl:with-param name="shape" select="$shape"/>
 			</xsl:call-template>
-
+      <!-- Sona:Defect #2020254-->
+      <xsl:if test="$shape/text:p/node()">
 			<!-- reuse the frame template, attributes are the same -->
 			<xsl:call-template name="InsertTextBox">
 				<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 			</xsl:call-template>
-
+      </xsl:if>
 		</v:rect>
 	</xsl:template>
 
@@ -1248,11 +1489,13 @@
 				<xsl:with-param name="shape" select="$shape"/>
 			</xsl:call-template>
 
+      <!-- Sona:Defect #2020254-->
+      <xsl:if test="$shape/text:p/node()">
 			<!-- reuse the frame template, attributes are the same -->
 			<xsl:call-template name="InsertTextBox">
 				<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 			</xsl:call-template>
-
+      </xsl:if>
 		</v:roundrect>
 	</xsl:template>
 
@@ -1273,12 +1516,13 @@
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 				<xsl:with-param name="shape" select="$shape"/>
 			</xsl:call-template>
-
+      <!-- Sona:Defect #2020254-->
+      <xsl:if test="$shape/text:p/node()">
 			<!-- reuse the frame template, attributes are the same -->
 			<xsl:call-template name="InsertTextBox">
 				<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 			</xsl:call-template>
-
+      </xsl:if>
 		</v:oval>
 	</xsl:template>
 
@@ -1292,7 +1536,13 @@
 	<xsl:template name="ConvertShapeProperties">
 		<xsl:param name="shapeStyle"/>
 		<xsl:param name="shape"/>
-
+    <!--added by chhavi for alttext-->
+    <xsl:if test ="child::node()= svg:desc">
+      <xsl:attribute name="alt">
+        <xsl:value-of select="svg:desc/child::node()"/>
+      </xsl:attribute>
+    </xsl:if>
+    <!--end here-->
 		<xsl:if test="$shapeStyle != 0 or count($shapeStyle) &gt; 1">
 
 			<xsl:call-template name="InsertShapeStyleAttribute">
@@ -1306,6 +1556,7 @@
 
 			<xsl:call-template name="InsertShapeFill">
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+		  <xsl:with-param name="shape" select="$shape"/>
 			</xsl:call-template>
 
 			<!-- Sona Added Dashed Lines-->
@@ -1317,7 +1568,10 @@
 			<xsl:call-template name="FrameToShapeWrap">
 				<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 			</xsl:call-template>
-
+      <!--Sona Added Shape shadow-->
+      <xsl:call-template name="FrameToShapeShadow">
+        <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+      </xsl:call-template>
 		</xsl:if>
 	</xsl:template>
 
@@ -1337,7 +1591,8 @@
 			<!-- width: -->
 			<xsl:variable name="frameW">
 				<xsl:call-template name="point-measure">
-					<xsl:with-param name="length" select="@svg:width|@fo:min-width"/>
+          <!-- Sona: Defect #2019374-->
+          <xsl:with-param name="length" select="$shape/@svg:width|$shape/@fo:min-width"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
@@ -1345,20 +1600,17 @@
 			<!-- height: -->
 			<xsl:variable name="frameH">
 				<xsl:call-template name="point-measure">
-					<xsl:with-param name="length" select="@fo:min-height|@svg:height"/>
+          <!-- Sona: Defect #2019374-->
+          <xsl:with-param name="length" select="$shape/@fo:min-height|$shape/@svg:height"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 
-			<!-- z-index: -->
-			<xsl:choose>
-				<xsl:when test="@draw:z-index=0">
-					<xsl:value-of select="concat('z-index:',2516572155-@draw:z-index,';')"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="concat('z-index:',251659264+@draw:z-index,';')"/>
-				</xsl:otherwise>
-			</xsl:choose>
+      <!-- z-Index-->
+      <xsl:call-template name="InsertShapeZIndex">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
 
 			<!-- reuse the frame template, attributes are the same -->
 			<xsl:call-template name="FrameToRelativeShapePosition">
@@ -1376,17 +1628,67 @@
 			<xsl:call-template name="FrameToTextAnchor">
 				<xsl:with-param name="frameStyle" select="$shapeStyle"/>
 			</xsl:call-template>
+      
+      <!--Sona Added margin for completing Shape Wrap feature-->
+      <xsl:call-template name="FrameToShapeMargin">
+        <xsl:with-param name="frameStyle" select="$shapeStyle"/>
+        <xsl:with-param name="frame" select="$shape"/>
+      </xsl:call-template>
 		</xsl:attribute>
 	</xsl:template>
 
 
 	<!-- 
+  Summary:  Inserts the VML shape z-index
+  Author:   Sona 
+  -->
+  <xsl:template name ="InsertShapeZIndex">
+    <xsl:param name ="shapeStyle"></xsl:param>
+    <xsl:param name ="shape"></xsl:param>
+    <!-- z-index: -->
+    <!-- Sona: Defect #2026780-->
+    <xsl:variable name="frameWrap">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="runThrought">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:run-through</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$frameWrap='run-through' and $runThrought='background'">
+        <xsl:value-of select="concat('z-index:',-251658240,';')"/>
+      </xsl:when>
+      <xsl:when test="$frameWrap='run-through' and not($runThrought)">
+        <xsl:value-of select="concat('z-index:',251658240,';')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <!-- Sona: Defect #2019374-->
+          <xsl:when test="$shape/@draw:z-index=0">
+            <xsl:value-of select="concat('z-index:',2516572155-$shape/@draw:z-index,';')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat('z-index:',251659264+$shape/@draw:z-index,';')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- 
   Summary:  Inserts the VML shape fill
   Author:   CleverAge
   Params:   shapeStyle: The automatic style of the draw:shape
   -->
 	<xsl:template name="InsertShapeFill">
 		<xsl:param name="shapeStyle"/>
+	  <xsl:param name="shape"/>
 
 		<xsl:variable name="fillColor">
 			<xsl:call-template name="GetDrawnGraphicProperties">
@@ -1435,7 +1737,8 @@
 			<v:fill>
 				<xsl:if test="$opacity != '' ">
 					<xsl:attribute name="opacity">
-						<xsl:value-of select="$opacity"/>
+    <!-- Sonata: shape transperancy -->
+	<xsl:value-of select="number(substring-before($opacity,'%')) div 100"/>
 					</xsl:attribute>
 				</xsl:if>
 				<!-- other fill properties -->
@@ -1448,6 +1751,35 @@
 							</xsl:call-template>
 						</xsl:attribute>
 					</xsl:when>
+  <!-- Sonata: shape Picture Fill -->
+          <xsl:when test="$fillProperty = 'bitmap' ">
+            <xsl:variable name="BitmapName">
+              <xsl:call-template name="GetGraphicProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="attribName">draw:fill-image-name</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="stretch">
+              <xsl:value-of select="@style:repeat"/>
+            </xsl:variable>
+
+            <xsl:for-each select="document('styles.xml')//draw:fill-image[@draw:name = $BitmapName]">
+              <!-- radial gradients not handled yet -->
+              <xsl:choose>
+                <xsl:when test="$stretch='stretch'">
+                  <xsl:attribute name="type">frame</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                   <xsl:attribute name="type">tile</xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:attribute name="recolor">t</xsl:attribute>
+              <xsl:attribute name="color2">black</xsl:attribute>
+              <xsl:attribute name="r:id">
+                <xsl:value-of select="concat('Bitmap_',generate-id($shape))"/>
+              </xsl:attribute>
+            </xsl:for-each>
+          </xsl:when>
 					<xsl:when test="$fillProperty = 'gradient' ">
 						<!-- simple linear gradient -->
 						<xsl:variable name="gradientName">
@@ -1479,7 +1811,13 @@
 				</xsl:choose>
 			</v:fill>
 		</xsl:if>
-
+    <!--chhavi filled color-->
+    <xsl:if test="$fillProperty = 'none' ">
+      <xsl:attribute name="filled">
+        <xsl:value-of select="'f'"/>
+      </xsl:attribute>
+    </xsl:if>
+    <!--end here-->
 	</xsl:template>
 
 
@@ -1863,32 +2201,49 @@
 			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:stroke!='' and $shapeStyle/style:graphic-properties/@draw:stroke!='none'">
 				<xsl:variable name="drawStrokeDash" select="$shapeStyle/style:graphic-properties/@draw:stroke-dash"></xsl:variable>
 				<xsl:variable name ="strokeStyle" select ="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$drawStrokeDash]"></xsl:variable>
+        <!-- Sona: Arrow feature continuation -->
+        <xsl:variable name="Unit1">
+          <xsl:call-template name="GetUnit">
+            <xsl:with-param name="length" select="$strokeStyle/@draw:dots1-length"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="Unit2">
+          <xsl:call-template name="GetUnit">
+            <xsl:with-param name="length" select="$strokeStyle/@draw:dots2-length"/>
+          </xsl:call-template>
+        </xsl:variable>
 				<xsl:attribute name ="dashstyle">
 					<xsl:choose>
 						<xsl:when test ="$strokeStyle/@draw:dots1=2 and $strokeStyle/@draw:dots2=1">
 							<xsl:value-of select="'longDashDotDot'"/>
 						</xsl:when>
-						<xsl:when test =" not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,'in') &gt;'0.05'">
+            <xsl:when test =" not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,$Unit2) &gt;'0.05'">
 							<xsl:value-of select="'longDashDot'"/>
 						</xsl:when>
-						<xsl:when test ="not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,'in') &lt;= '0.05'">
+            <xsl:when test ="not($strokeStyle/@draw:dots1-length)and substring-before($strokeStyle/@draw:dots2-length,$Unit2) &lt;= '0.05'">
 							<xsl:value-of select="'dashDot'"/>
 						</xsl:when>
-						<xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,'in') &lt;= '0.02'">
+            <!-- Square Dot-->
+            <xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &lt;= '0.02'">
 							<xsl:value-of select="'1 1'"/>
 						</xsl:when>
-						<xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,'in') &lt;= '0.05'">
+            <xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &lt;= '0.05'">
 							<xsl:value-of select="'dash'"/>
 						</xsl:when>
-						<xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,'in') &gt; '0.05'">
+            <xsl:when test ="$strokeStyle/@draw:dots1-length=$strokeStyle/@draw:dots2-length and substring-before($strokeStyle/@draw:dots1-length,$Unit1) &gt; '0.05'">
 							<xsl:value-of select="'longDash'"/>
 						</xsl:when>
-						<xsl:when test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1 and $strokeStyle/@draw:dots2 ">
+            <!-- Sona : code update for square or round dots-->
+            <xsl:when test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
 							<xsl:value-of select="'1 1'"/>
 						</xsl:when>
+            <!--Sona: Defect #2019464-->
+            <xsl:otherwise>
+              <xsl:value-of select="'solid'"/>
+            </xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
-				<xsl:if test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1 and $strokeStyle/@draw:dots2 ">
+        <xsl:if test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
 					<xsl:attribute name ="endcap">
 						<xsl:value-of select ="'round'"/>
 					</xsl:attribute>
@@ -1917,6 +2272,10 @@
 						<xsl:when test ="$startArrow/@svg:d='m0 564 564 567 567-567-567-564z'">
 							<xsl:value-of select="'diamond'"/>
 						</xsl:when>
+            <!-- Sona: Defect #2019464-->
+            <xsl:otherwise>
+              <xsl:value-of select="'block'"/>
+            </xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
 				<xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-start-width">
@@ -1952,6 +2311,10 @@
 						<xsl:when test ="$endArrow/@svg:d='m0 564 564 567 567-567-567-564z'">
 							<xsl:value-of select="'diamond'"/>
 						</xsl:when>
+            <!-- Sona: Defect #2019464-->
+            <xsl:otherwise>
+              <xsl:value-of select="'block'"/>
+            </xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
 				<xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-end-width">
