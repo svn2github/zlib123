@@ -212,11 +212,17 @@
   </data>
   <data name="OdfPPTFileType" xml:space="preserve">
     <value>OpenDocument Presentation files </value>
-  </data>  
+  </data>
   <data name="OdfOptionsDescription" xml:space="preserve">
     <value>Enable/Disable FidelityMessage Dialog Box</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF Options</value>
+  </data>
+  <data name="OdfNewDocumentDescription" xml:space="preserve">
+    <value>Create a new ODF-compatible document</value>
+  </data>
+  <data name="OdfNewDocumentLabel" xml:space="preserve">
+    <value>New document</value>
   </data>
 </root>
