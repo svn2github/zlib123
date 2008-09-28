@@ -23,7 +23,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing (signed)|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-    <Cultures>en-US</Cultures>
+    <Cultures>en-US;de-DE</Cultures>
     <SuppressAllWarnings>False</SuppressAllWarnings>
     <Pedantic>True</Pedantic>
   </PropertyGroup>
@@ -172,8 +172,8 @@
 	</Target> 
 	-->
   <Target Name="AfterBuild">
-    <GenerateBootstrapper ApplicationFile="$(TargetName).msi" Culture="en-US" ApplicationName="ODF Add-in for Microsoft Office" BootstrapperItems="@(BootstrapperFile)" OutputPath="$(OutputPath)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetName).de-de.msi" Culture="de-DE" ApplicationName="ODF Add-in für Microsoft Office" BootstrapperItems="@(BootstrapperFile)" OutputPath="$(OutputPath)\de-DE" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetFileName)" Culture="en-US" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(OutputPath)en-US" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetFileName)" Culture="de-DE" ApplicationName="ODF Add-in für Microsoft Office" OutputPath="$(OutputPath)de-DE" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
   </Target>
   <PropertyGroup>
     <PostBuildEvent>echo $(ProjectDir)..\..\signing\sign.bat $(TargetDir)$(TargetName).en-US$(TargetExt)
