@@ -126,9 +126,7 @@
         </xsl:when>
         <!-- HYPERLINK -->
         <xsl:when test="$fieldType='HYPERLINK'">
-          <xsl:call-template name="InsertHyperlinkField">
-            <xsl:with-param name="parentRunNode" select="$parentRunNode"/>
-          </xsl:call-template>
+          <xsl:call-template name="InsertHyperlinkField" />
         </xsl:when>
         <!-- REF -->
         <xsl:when test="$fieldType='REF'">
@@ -689,6 +687,7 @@
   <xsl:template name="BuildFieldCode">
     <xsl:param name="instrText" select="."/>
     <xsl:param name="fieldCode" />
+    
     <!-- context must be w:instrText -->
     <xsl:choose>
       <!-- if next sibling instrText -->
@@ -699,8 +698,7 @@
         </xsl:call-template>
       </xsl:when>
       <!-- if next run with instrText, before end of field -->
-      <xsl:when
-        test="$instrText/parent::w:r/following-sibling::w:r/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
+      <xsl:when test="$instrText/parent::w:r/following-sibling::w:r/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
         <xsl:call-template name="BuildFieldCode">
           <!-- we know now that first run having instrText is before end of field -->
           <xsl:with-param name="instrText"
@@ -710,8 +708,7 @@
       </xsl:when>
       <!-- if next paragraph with instrText, before end of field :
         Find first paragraph having instrText before end of field, and then first run having instrText before end of field -->
-      <xsl:when
-        test="$instrText/ancestor::w:p/following-sibling::w:p/w:r[w:instrText or w:fldChar[@w:fldCharType = 'end']][1]/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
+      <xsl:when test="$instrText/ancestor::w:p/following-sibling::w:p/w:r[w:instrText or w:fldChar[@w:fldCharType = 'end']][1]/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
         <!-- check first is field does not end in context paragraph -->
         <xsl:choose>
           <xsl:when
@@ -2138,15 +2135,61 @@
     </text:bibliography-mark>
   </xsl:template>
 
+  
+  <!--
+  Summary:  Converts a Hyperlink Field to a text:a hyperlink
+  Author:   makz (DIaLOGIKa)
+  Date:     26.09.2008
+  -->
   <xsl:template name="InsertHyperlinkField">
-    <xsl:param name="parentRunNode"/>
-    <xsl:if test="$parentRunNode">
-      <xsl:for-each select="$parentRunNode">
-        <xsl:call-template name="InsertHyperlink"/>
-      </xsl:for-each>
-    </xsl:if>
+    
+    <xsl:variable name="link">
+      <xsl:variable name="instrLen" select="string-length(.)" />
+      <xsl:choose>
+        <xsl:when test="$instrLen &gt; 12">
+          <!--
+          The link is put right behind the HYPERLINK instruction
+          -->
+          <xsl:value-of select="substring-before(substring-after(., 'HYPERLINK &quot;'), '&quot;')" />
+        </xsl:when>
+        <xsl:when test="../following-sibling::w:r[w:instrText]">
+          <!--
+          The link is put in the following instrText
+          -->
+          <xsl:value-of select="../following-sibling::w:r[w:instrText]/w:instrText" />
+        </xsl:when>
+        <xsl:otherwise>
+          <!--
+          The link is put in the next instrText, but the field is spread over several 
+          paragraphs, so we must use "following::" to find it
+          -->
+          <xsl:value-of select="following::w:r[w:instrText][1]/w:instrText" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="text">
+      <xsl:choose>
+        <xsl:when test="../following-sibling::w:r[w:t]">
+          <xsl:value-of select="../following-sibling::w:r[w:t]/w:t" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="following::w:r[w:t][1]/w:t" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <text:a xlink:type="simple">
+      <xsl:attribute name="xlink:href">
+        <xsl:value-of select="$link" />
+      </xsl:attribute>
+
+      <xsl:value-of select="$text"/>
+    </text:a>
+    
   </xsl:template>
 
+  
   <xsl:template name="InsertField">
     <!--xsl:variable name="Gudule" select="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] "/-->
 
@@ -2190,11 +2233,11 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise>
+          <!--<xsl:otherwise>
             <xsl:apply-templates select="preceding::w:instrText[1][contains(.,'HYPERLINK')]">
               <xsl:with-param name="parentRunNode" select="."/>
             </xsl:apply-templates>
-          </xsl:otherwise>
+          </xsl:otherwise>-->
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>

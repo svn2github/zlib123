@@ -969,8 +969,7 @@
 					<xsl:variable name="document">
 						<xsl:call-template name="GetDocumentName" />
 					</xsl:variable>
-					<xsl:for-each
-					  select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
+					<xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
 						<xsl:if test="./@Id=$relationshipId">
 							<xsl:call-template name="GetLinkPath">
 								<xsl:with-param name="linkHref" select="@Target"/>
@@ -978,15 +977,8 @@
 						</xsl:if>
 					</xsl:for-each>
 				</xsl:if>
-				<!-- file or web page hyperlink -  fieldchar type (can contain several paragraphs in Word) -->
-				<xsl:if test="self::w:r">
-					<xsl:call-template name="GetLinkPath">
-						<xsl:with-param name="linkHref">
-							<xsl:value-of select="substring-before(substring-after(preceding::w:instrText[1],'&quot;'),'&quot;')" />
-						</xsl:with-param>
-					</xsl:call-template>
-				</xsl:if>
 			</xsl:attribute>
+      
 			<!--hyperlink text-->
 			<xsl:apply-templates/>
 		</text:a>
