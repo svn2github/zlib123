@@ -83,7 +83,8 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
             this._addinLib = new OdfAddinLib(this, new OdfConverter.Wordprocessing.Converter());
             this._addinLib.OverrideResourceManager = new System.Resources.ResourceManager("OdfWordAddin.resources.Labels", Assembly.GetExecutingAssembly());
 
-            this._templatesInstalled = ((int)Microsoft.Win32.Registry.GetValue(this.RegistryKeyUser, "TemplatesInstalled", 0) != 0);
+            object value = Microsoft.Win32.Registry.GetValue(this.RegistryKeyUser, "TemplatesInstalled", 0);
+            this._templatesInstalled = (value != null && (int)value != 0);
         }
 
 
@@ -270,7 +271,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                 sfd.SupportMultiDottedExtensions = true;
                 sfd.Title = this._addinLib.GetString(EXPORT_LABEL);
                 string ext = '.' + sfd.DefaultExt;
-                sfd.FileName = doc.GetString("FullName").Substring(0, doc.GetString("FullName").LastIndexOf('.')) + ext;
+                sfd.FileName = doc.GetString("FullName").Substring(0, doc.GetString("FullName").LastIndexOf('.')); // +ext;
 
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
@@ -278,9 +279,14 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
                     // name of the file to create
                     string odfFileName = sfd.FileName;
                     // multi dotted extensions support
-                    if (!(odfFileName.ToLower().EndsWith(".odt") || odfFileName.ToLower().EndsWith(".ott")))
+                    // Note: sfd.FilterIndex is 1-based
+                    if (!odfFileName.ToLower().EndsWith(".odt") && sfd.FilterIndex == 1)
                     {
-                        odfFileName += ext;
+                        odfFileName += ".odt";
+                    }
+                    else if (!odfFileName.ToLower().EndsWith(".ott") && sfd.FilterIndex == 2)
+                    {
+                        odfFileName += ".ott";
                     }
                     // name of the document to convert
                     string sourceFileName = doc.GetString("FullName");
