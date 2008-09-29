@@ -53,12 +53,12 @@ namespace OdfConverter.Wordprocessing
             {
                 string fullname = Assembly.GetExecutingAssembly().FullName;
                 return new string[]  {
-                   //"OdfConverter.Wordprocessing.OoxChangeTrackingPostProcessor,"+fullname,
-                   //"CleverAge.OdfConverter.OdfConverterLib.OoxSpacesPostProcessor",
-                   //"OdfConverter.Wordprocessing.OoxSectionsPostProcessor,"+fullname, 
-                   //"OdfConverter.Wordprocessing.OoxAutomaticStylesPostProcessor,"+fullname,
-                   //"OdfConverter.Wordprocessing.OoxParagraphsPostProcessor,"+fullname,
-                   //"CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor"
+                   "OdfConverter.Wordprocessing.OoxChangeTrackingPostProcessor,"+fullname,
+                   "CleverAge.OdfConverter.OdfConverterLib.OoxSpacesPostProcessor",
+                   "OdfConverter.Wordprocessing.OoxSectionsPostProcessor,"+fullname, 
+                   "OdfConverter.Wordprocessing.OoxAutomaticStylesPostProcessor,"+fullname,
+                   "OdfConverter.Wordprocessing.OoxParagraphsPostProcessor,"+fullname,
+                   "CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor"
                 };
             }
         }
