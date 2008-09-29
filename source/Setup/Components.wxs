@@ -209,30 +209,30 @@
 
 							<!-- modify templates.xml to point to template folder -->
 							<util:XmlConfig Id="ModifyTemplateLocationODFFax"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFFax.dotx'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFFax.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="[#ODFFax.dotx]" Name="source" Node="value" On="install"/>
 							<util:XmlConfig Id="ModifyTemplateLocationODFLetter"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFLetter.dotx'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFLetter.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="[#ODFLetter.dotx]" Name="source" Node="value" On="install"/>
 							<util:XmlConfig Id="ModifyTemplateLocationODFMemo"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFMemo.dotx'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFMemo.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="[#ODFMemo.dotx]" Name="source" Node="value" On="install"/>
 							<util:XmlConfig Id="ModifyTemplateLocationODFReport"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@source='ODFReport.dotx'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFReport.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="[#ODFReport.dotx]" Name="source" Node="value" On="install"/>
 
 							<!-- localize template titles -->
 							<util:XmlConfig Id="ModifyTemplateTitleODFFax"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFFax'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFFax.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFFax)" Name="title" Node="value" On="install"/>
 							<util:XmlConfig Id="ModifyTemplateTitleODFLetter"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFLetter'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFLetter.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFLetter)" Name="title" Node="value" On="install"/>
 							<util:XmlConfig Id="ModifyTemplateTitleODFMemo"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFMemo'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFMemo.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFMemo)" Name="title" Node="value" On="install"/>
 							<util:XmlConfig Id="ModifyTemplateTitleODFReport"
-										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]@title='ODFReport'[\]]"
+										  ElementPath="/o:featuredcontent/o:application/o:featuredtemplates/o:featuredtemplate[\[]o:media/@filename='ODFReport.png'[\]]"
 										  Action="create" File="[#templates.xml]" Value="!(loc.TemplateTitleODFReport)" Name="title" Node="value" On="install"/>
 						</Component>
 

@@ -62,7 +62,7 @@ First-time install dialog sequence:      Maintenance dialog sequence:
 			<Publish Dialog="MySetupTypeDlg" Control="CustomButton" Event="NewDialog" Value="MyInstallScopeDlg">1</Publish>
 			<Publish Dialog="MySetupTypeDlg" Control="CompleteButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
-			<Publish Dialog="MyInstallScopeDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+			<Publish Dialog="MyInstallScopeDlg" Control="Back" Event="NewDialog" Value="MySetupTypeDlg">1</Publish>
 			<Publish Dialog="MyInstallScopeDlg" Control="Next" Event="NewDialog" Value="MyCustomizeDlg">1</Publish>
 			
 			<Publish Dialog="MyCustomizeDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="1">WixUI_InstallMode = "Change"</Publish>

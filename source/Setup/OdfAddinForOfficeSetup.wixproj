@@ -39,8 +39,10 @@
     <Compile Include="Components.wxs" />
     <Compile Include="Features.wxs" />
     <Compile Include="Product.wxs" />
-    <Compile Include="ui\MyExitDlg.wxs" />
+    <Compile Include="UI.wxs" />
+    <Compile Include="OfficeProperties.wxs" />
     <Compile Include="ui\MyCustomizeDlg.wxs" />
+    <Compile Include="ui\MyExitDlg.wxs" />
     <Compile Include="ui\MyFatalErrorDlg.wxs" />
     <Compile Include="ui\MyFileAssociationsDlg.wxs" />
     <Compile Include="ui\MyInstallScopeDlg.wxs" />
@@ -51,8 +53,6 @@
     <Compile Include="ui\MySetupTypeDlg.wxs" />
     <Compile Include="ui\MyUserExitDlg.wxs" />
     <Compile Include="ui\MyWelcomeDlg.wxs" />
-    <Compile Include="UI.wxs" />
-    <Compile Include="OfficeProperties.wxs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperFile Include="Microsoft.Net.Framework.2.0">

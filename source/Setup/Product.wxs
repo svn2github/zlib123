@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Id="E9F69F74-BEE5-425C-A499-073FEBA76953"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
@@ -51,11 +53,11 @@
 		<Property Id="FILE_ASSOCIATION_ODS" />
 		<Property Id="FILE_ASSOCIATION_ODP" />
 
-		<Property Id='ARPCOMMENTS' Value='Build 4734' />
+		<Property Id='ARPCOMMENTS' Value='Build 4780' />
 		<Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata' />
 		<Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
 
-		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4734)'/>
+		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4780)'/>
 		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
 
@@ -68,7 +70,10 @@
 		<UIRef Id="WixUI_ErrorProgressText" />
 		<UI>
 			<Error Id="2000">!(loc.Error2000)</Error>
+			<Error Id="2001">Outlook is running. Please close and rerun setup.</Error>
 		</UI>
+		<Icon Id="InstallIcon" SourceFile="images\Icon.ico"/>
+		<Property Id="ARPPRODUCTICON" Value="InstallIcon" />
 
 
 		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -77,6 +82,35 @@
 		<CustomAction Id="ShowReadme" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
 		<CustomActionRef Id="GetOfficeInfos"/>
 		<CustomAction Id="NewerVersionDetected" Error="2000"/>
+		<CustomAction Id="FileAssociationOdtAssign" Property="FILE_ASSOCIATION_ODT" Value="1" />
+
+		<CustomAction Id="SetMsgBoxTitle" Property="MsgBoxTitle" Value="!(loc.MyDlgTitle)" />
+
+		<Property Id="CloseOutlookProgram">
+			<![CDATA[
+				Function Main()
+					on error resume next
+					set outlook = GetObject(, "Outlook.Application")
+
+					if not outlook is nothing then
+						on error goto 0
+						'if MsgBox("The following applications are running and will be closed. Please save any unsaved changes.", _
+						'		vbOkCancel + vbExclamation, Session.Property("MsgBoxTitle")) = vbOk then
+						'	outlook.quit
+						'end if
+					end if
+					
+					set outlook = Nothing
+								   
+					Main=1
+
+		      End Function
+			]]>
+		</Property>
+
+		<CustomAction Id="CloseOutlook" VBScriptCall="Main" Property="CloseOutlookProgram" Execute="immediate" />
+		<!--<util:CloseApplication Id="CloseOutlook" ElevatedCloseMessage="yes" RebootPrompt="no" CloseMessage="yes" Target="outlook.exe" />-->
+
 
 
 		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -98,7 +132,17 @@
 
 		<InstallExecuteSequence>
 			<Custom Action="NewerVersionDetected" After="FindRelatedProducts">NEWAPPFOUND</Custom>
+			<Custom Action="FileAssociationOdtAssign" After="LaunchConditions">?FileAssociationOdt</Custom>
 			<RemoveExistingProducts After="InstallValidate" />
+
+			<!--<Custom Action="SetMsgBoxTitle" Before="CloseOutlook">NOT Installed</Custom>
+			<Custom Action="CloseOutlook" Before="LaunchConditions">NOT Installed</Custom>-->
+
+
+
+			<!-- closing applications is buggy, maybe in the future an own custom action could be implemented to handle #2025782 -->
+			<!--<Custom Action="WixCloseApplications" Before="InstallValidate" />-->
+
 		</InstallExecuteSequence>
 
 	</Product>
