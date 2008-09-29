@@ -57,6 +57,28 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private bool    _packaging = true;                  // Build the zip archive after conversion
         private Direction _transformDirection = Direction.OdtToDocx; // direction of conversion
 
+        private bool _showUserInterface = false;
+        private string _generator;  
+
+        /// <summary>
+        /// Determines whether a progress dialog and other dialogs will be shown. Default is <code>false</code>.
+        /// </summary>
+        public bool ShowUserInterface
+        {
+            get { return _showUserInterface; }
+            set { _showUserInterface = value; }
+        }
+       
+        /// <summary>
+        /// This property contains information about the converter version and environment
+        /// It will be written to the document's meta data
+        /// </summary>
+        public string Generator
+        {
+            get { return _generator; }
+            set { _generator = value; }
+        }
+
         public string InputPath
         {
             get { return _inputPath; }

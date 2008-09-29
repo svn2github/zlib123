@@ -206,7 +206,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
         //private bool recursiveMode = false;              // go in subfolders ?
         //private bool replace = false;					 // override existing files ?
         //private string reportPath = null;                // file to save report
-        private int reportLevel = ConversionReport.INFO_LEVEL;     // file to save report
+        //private int reportLevel = ConversionReport.INFO_LEVEL;     // file to save report
         //private string xslPath = null;                   // Path to an external stylesheet
         //private ArrayList skippedPostProcessors = null;  // Post processors to skip (identified by their names)
         //private bool packaging = true;                   // Build the zip archive after conversion
@@ -771,13 +771,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         }
                         try
                         {
-                            this.reportLevel = int.Parse(args[i]);
+                            this.Options.ReportLevel = int.Parse(args[i]);
                         }
                         catch (Exception)
                         {
                             throw new OdfCommandLineException("Wrong level (must be 1,2 3 or 4)");
                         }
-                        if (this.reportLevel < 1 || this.reportLevel > 4)
+                        if (this.Options.ReportLevel < 1 || this.Options.ReportLevel > 4)
                         {
                             throw new OdfCommandLineException("Wrong level (must be 1,2 3 or 4)");
                         }

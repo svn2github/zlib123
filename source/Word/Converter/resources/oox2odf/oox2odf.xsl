@@ -110,7 +110,8 @@
           <manifest:file-entry manifest:full-path="/">
             <xsl:attribute name="manifest:media-type">
               <xsl:choose>
-                <xsl:when test="substring($outputFile, string-length($outputFile) - 2) = 'ott'">
+				  <!-- TODO: fix this. the name we have here is of the form abc.tmp only -->
+                <xsl:when test="substring($outputFile, string-length($outputFile) - 3) = 'ott'">
                   <xsl:value-of select="'application/vnd.oasis.opendocument.text-template'"/>
                 </xsl:when>
                 <xsl:otherwise>
