@@ -5,6 +5,7 @@
 	<String Id="ReadmePath" Localizable="no">Readme.en-us.html</String>
 
 	<String Id="Error2000">There is a newer version of this product installed.</String>
+	<String Id="RestartWarning">Please close the following applications for setup to complete:</String>
 	
 	<String Id="OpenWithWord">Open with Microsoft Word</String>
 	<String Id="OpenWithExcel">Open with Microsoft Excel</String>

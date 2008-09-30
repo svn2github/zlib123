@@ -2,10 +2,10 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-	<Product Id="E9F69F74-BEE5-425C-A499-073FEBA76953"
+	<Product Id="AC34B86A-EE32-41C4-BAC9-392A8343E01C"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-			 Version="2.5.0"
+			 Version="2.5.0.4787"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
@@ -19,7 +19,7 @@
 				- update VersionInfo and ARPCOMMENTS to the correct revision
 		-->
 
-		<Package Id="CB4A181E-1E72-4BAA-800A-52728E8BBC02" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
+		<Package Id="800EC0A3-3035-4FCB-BECF-6AC07D429EF3" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
 		<Media Id="1" Cabinet="OdfAddinforOfficeSetup.cab" EmbedCab="yes" />
 
 		<!-- remove previous versions of previous Word add-in -->
@@ -53,11 +53,11 @@
 		<Property Id="FILE_ASSOCIATION_ODS" />
 		<Property Id="FILE_ASSOCIATION_ODP" />
 
-		<Property Id='ARPCOMMENTS' Value='Build 4780' />
+		<Property Id='ARPCOMMENTS' Value='Build 4787' />
 		<Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata' />
 		<Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
 
-		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4780)'/>
+		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4787)'/>
 		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
 
@@ -70,8 +70,9 @@
 		<UIRef Id="WixUI_ErrorProgressText" />
 		<UI>
 			<Error Id="2000">!(loc.Error2000)</Error>
-			<Error Id="2001">Outlook is running. Please close and rerun setup.</Error>
 		</UI>
+		
+		<!-- icon to be displayed under Add/Remove Programs -->
 		<Icon Id="InstallIcon" SourceFile="images\Icon.ico"/>
 		<Property Id="ARPPRODUCTICON" Value="InstallIcon" />
 
@@ -85,34 +86,31 @@
 		<CustomAction Id="FileAssociationOdtAssign" Property="FILE_ASSOCIATION_ODT" Value="1" />
 
 		<CustomAction Id="SetMsgBoxTitle" Property="MsgBoxTitle" Value="!(loc.MyDlgTitle)" />
+		<CustomAction Id="SetMsgBoxText" Property="MsgBoxText" Value="!(loc.RestartWarning)"/>
 
 		<Property Id="CloseOutlookProgram">
 			<![CDATA[
 				Function Main()
 					on error resume next
 					set outlook = GetObject(, "Outlook.Application")
-
+					
 					if not outlook is nothing then
-						on error goto 0
+						MsgBox Session.Property("MsgBoxText") & vbCrLf & vbCrLf & "Microsoft Outlook", vbOk + vbExclamation, Session.Property("MsgBoxTitle")
 						'if MsgBox("The following applications are running and will be closed. Please save any unsaved changes.", _
 						'		vbOkCancel + vbExclamation, Session.Property("MsgBoxTitle")) = vbOk then
 						'	outlook.quit
 						'end if
 					end if
-					
+					Main = 1
 					set outlook = Nothing
-								   
-					Main=1
-
+					
 		      End Function
 			]]>
 		</Property>
 
-		<CustomAction Id="CloseOutlook" VBScriptCall="Main" Property="CloseOutlookProgram" Execute="immediate" />
-		<!--<util:CloseApplication Id="CloseOutlook" ElevatedCloseMessage="yes" RebootPrompt="no" CloseMessage="yes" Target="outlook.exe" />-->
-
-
-
+		<CustomAction Id="CloseOutlook" VBScriptCall="Main" Property="CloseOutlookProgram" Execute="immediate" Return="check"/>
+		
+		
 		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  FEATURES
              ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
@@ -129,19 +127,20 @@
 		<Condition Message="Microsoft Word konnte nicht gefunden werden!">WORD2007INSTALLROOT OR WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Condition>
         <Condition Message="Zur Installation des Produkts mÃ¼ssen Sie als administrative Rechte besitzen!">Privileged</Condition>
 		-->
-
+		
 		<InstallExecuteSequence>
 			<Custom Action="NewerVersionDetected" After="FindRelatedProducts">NEWAPPFOUND</Custom>
 			<Custom Action="FileAssociationOdtAssign" After="LaunchConditions">?FileAssociationOdt</Custom>
 			<RemoveExistingProducts After="InstallValidate" />
 
-			<!--<Custom Action="SetMsgBoxTitle" Before="CloseOutlook">NOT Installed</Custom>
-			<Custom Action="CloseOutlook" Before="LaunchConditions">NOT Installed</Custom>-->
-
-
+			<Custom Action="SetMsgBoxTitle" Before="CloseOutlook"></Custom>
+			<Custom Action="SetMsgBoxText" Before="CloseOutlook"></Custom>
+			<!-- Outlook < 2007 uses Word as editor. If Outlook is running, then the addin will only be visible after Outlook has been restarted (see #2025782) -->
+			<Custom Action="CloseOutlook" Before="LaunchConditions">WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Custom>
+			
 
 			<!-- closing applications is buggy, maybe in the future an own custom action could be implemented to handle #2025782 -->
-			<!--<Custom Action="WixCloseApplications" Before="InstallValidate" />-->
+			<!--<Custom Action="WixCloseApplications" After="InstallInitialize" >NOT Installed</Custom>-->
 
 		</InstallExecuteSequence>
 

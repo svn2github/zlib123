@@ -5,6 +5,7 @@
 	<String Id="ReadmePath">Readme.de-de.html</String>
 
 	<String Id="Error2000">Eine neuere Version dieses Prokukts ist bereits installiert.</String>
+	<String Id="RestartWarning">Bitte beenden Sie die folgenden Anwendungen, um die Installation abzuschließen:</String>
 	
 	<String Id="OpenWithWord">Mit Microsoft Word öffnen</String>
 	<String Id="OpenWithExcel">Mit Microsoft Excel öffnen</String>
