@@ -95,7 +95,7 @@
 					set outlook = GetObject(, "Outlook.Application")
 					
 					if not outlook is nothing then
-						MsgBox Session.Property("MsgBoxText") & vbCrLf & vbCrLf & "Microsoft Outlook", vbOk + vbExclamation, Session.Property("MsgBoxTitle")
+						MsgBox Session.Property("MsgBoxText") & vbCrLf & vbCrLf & "Microsoft Outlook", vbOkOnly + vbExclamation, Session.Property("MsgBoxTitle")
 						'if MsgBox("The following applications are running and will be closed. Please save any unsaved changes.", _
 						'		vbOkCancel + vbExclamation, Session.Property("MsgBoxTitle")) = vbOk then
 						'	outlook.quit
@@ -133,10 +133,11 @@
 			<Custom Action="FileAssociationOdtAssign" After="LaunchConditions">?FileAssociationOdt</Custom>
 			<RemoveExistingProducts After="InstallValidate" />
 
-			<Custom Action="SetMsgBoxTitle" Before="CloseOutlook"></Custom>
-			<Custom Action="SetMsgBoxText" Before="CloseOutlook"></Custom>
+			<!-- action removed because the message is always displayed on Win2k -->
+			<!--<Custom Action="SetMsgBoxTitle" Before="CloseOutlook"></Custom>
+			<Custom Action="SetMsgBoxText" Before="CloseOutlook"></Custom>-->
 			<!-- Outlook < 2007 uses Word as editor. If Outlook is running, then the addin will only be visible after Outlook has been restarted (see #2025782) -->
-			<Custom Action="CloseOutlook" Before="LaunchConditions">WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Custom>
+			<!--<Custom Action="CloseOutlook" Before="LaunchConditions">WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Custom>-->
 			
 
 			<!-- closing applications is buggy, maybe in the future an own custom action could be implemented to handle #2025782 -->
