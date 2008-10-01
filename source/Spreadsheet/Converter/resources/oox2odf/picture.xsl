@@ -1423,93 +1423,265 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
         </xsl:attribute>
       </xsl:when>
 
-      <!-- Solid line color-->
-      <xsl:when test="a:ln/a:solidFill">
-        <xsl:attribute name="draw:stroke">
-          <xsl:value-of select="'solid'"/>
-        </xsl:attribute>
+		<!-- Solid line color-->
+		<xsl:when test="a:ln/a:solidFill">
+			<xsl:attribute name="draw:stroke">
+				<xsl:value-of select="'solid'"/>
+			</xsl:attribute>
 
-        <!-- Standard color for border-->
-        <xsl:if test="a:ln/a:solidFill/a:srgbClr/@val">
-          <xsl:attribute name="svg:stroke-color">
-            <xsl:value-of select="concat('#',a:ln/a:solidFill/a:srgbClr/@val)"/>
-          </xsl:attribute>
+			<!-- Standard color for border-->
+			<xsl:if test="a:ln/a:solidFill/a:srgbClr/@val">
+				<xsl:attribute name="svg:stroke-color">
+					<xsl:value-of select="concat('#',a:ln/a:solidFill/a:srgbClr/@val)"/>
+				</xsl:attribute>
 
-          <!-- if color is specified with luminance factors -->
-          <xsl:if test="a:ln/a:solidFill/a:srgbClr/a:lumMod">
-            <xsl:attribute name="svg:stroke-color">
-              <xsl:call-template name="getColorCode">
-                <xsl:with-param name="color">
-                  <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name="lumMod">
-                  <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumMod/@val"/>
-                </xsl:with-param>
-                <xsl:with-param name="lumOff">
-                  <xsl:choose>
-                    <xsl:when test="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val">
-                      <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:text>0</xsl:text>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="noTheme">
-                  <xsl:text>true</xsl:text>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
+				<!-- if color is specified with luminance factors -->
+				<xsl:if test="a:ln/a:solidFill/a:srgbClr/a:lumMod">
+					<xsl:attribute name="svg:stroke-color">
+						<xsl:call-template name="getColorCode">
+							<xsl:with-param name="color">
+								<xsl:value-of select="a:ln/a:solidFill/a:srgbClr/@val"/>
+							</xsl:with-param>
+							<xsl:with-param name="lumMod">
+								<xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumMod/@val"/>
+							</xsl:with-param>
+							<xsl:with-param name="lumOff">
+								<xsl:choose>
+									<xsl:when test="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val">
+										<xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:lumOff/@val"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>0</xsl:text>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:with-param>
+							<xsl:with-param name="noTheme">
+								<xsl:text>true</xsl:text>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:attribute>
+				</xsl:if>
 
-          <!-- Transparency percentage-->
-          <xsl:if test="a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
-            <xsl:variable name="alpha">
-              <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
-            </xsl:variable>
+				<!-- Transparency percentage-->
+				<xsl:if test="a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
+					<xsl:variable name="alpha">
+						<xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
+					</xsl:variable>
 
-            <xsl:if test="($alpha != '') or ($alpha != 0)">
-              <xsl:attribute name="svg:stroke-opacity">
-                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
-              </xsl:attribute>
-            </xsl:if>
+					<xsl:if test="($alpha != '') or ($alpha != 0)">
+						<xsl:attribute name="svg:stroke-opacity">
+							<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+						</xsl:attribute>
+					</xsl:if>
 
-          </xsl:if>
-        </xsl:if>
+				</xsl:if>
+			</xsl:if>
 
-        <!-- Theme color for border -->
-        <xsl:if test="a:ln/a:solidFill/a:schemeClr/@val">
-          <xsl:attribute name="svg:stroke-color">
-            <xsl:call-template name="getColorCode">
-              <xsl:with-param name="color">
-                <xsl:value-of select="a:ln/a:solidFill/a:schemeClr/@val"/>
-              </xsl:with-param>
-              <xsl:with-param name="lumMod">
-                <xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-              </xsl:with-param>
-              <xsl:with-param name="lumOff">
-                <xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
+			<!-- Theme color for border -->
+			<xsl:if test="a:ln/a:solidFill/a:schemeClr/@val">
+				<xsl:attribute name="svg:stroke-color">
+					<xsl:call-template name="getColorCode">
+						<xsl:with-param name="color">
+							<xsl:value-of select="a:ln/a:solidFill/a:schemeClr/@val"/>
+						</xsl:with-param>
+						<xsl:with-param name="lumMod">
+							<xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+						</xsl:with-param>
+						<xsl:with-param name="lumOff">
+							<xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
 
-          <!-- Transparency percentage-->
-          <xsl:if test="a:ln/a:solidFill/a:schemeClr/a:alpha/@val">
-            <xsl:variable name="alpha">
-              <xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:alpha/@val"/>
-            </xsl:variable>
+				<!-- Transparency percentage-->
+				<xsl:if test="a:ln/a:solidFill/a:schemeClr/a:alpha/@val">
+					<xsl:variable name="alpha">
+						<xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:alpha/@val"/>
+					</xsl:variable>
 
-            <xsl:if test="($alpha != '') or ($alpha != 0)">
-              <xsl:attribute name="svg:stroke-opacity">
-                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
-              </xsl:attribute>
-            </xsl:if>
+					<xsl:if test="($alpha != '') or ($alpha != 0)">
+						<xsl:attribute name="svg:stroke-opacity">
+							<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+						</xsl:attribute>
+					</xsl:if>
 
-          </xsl:if>
-        </xsl:if>
-      </xsl:when>
+				</xsl:if>
+				<!-- Transparency percentage-->
+				<xsl:if test="a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
+					<xsl:variable name="alpha">
+						<xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
+					</xsl:variable>
 
-      <xsl:otherwise>
+					<xsl:if test="($alpha != '') or ($alpha != 0)">
+						<xsl:attribute name="svg:stroke-opacity">
+							<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+						</xsl:attribute>
+					</xsl:if>
+
+				</xsl:if>
+			</xsl:if>
+		</xsl:when>
+		<!-- gradient line color-->
+		<xsl:when test="a:ln/a:gradFill">
+			<xsl:attribute name="draw:stroke">
+				<xsl:value-of select="'solid'"/>
+			</xsl:attribute>
+			<xsl:for-each select="a:ln/a:gradFill/a:gsLst/a:gs[1]">
+				<!-- gradient color for border-->
+				<xsl:if test="a:srgbClr/@val">
+					<xsl:attribute name="svg:stroke-color">
+						<xsl:value-of select="concat('#',a:srgbClr/@val)"/>
+					</xsl:attribute>
+
+					<!-- if color is specified with luminance factors -->
+					<xsl:if test="a:srgbClr/a:lumMod">
+						<xsl:attribute name="svg:stroke-color">
+							<xsl:call-template name="getColorCode">
+								<xsl:with-param name="color">
+									<xsl:value-of select="a:srgbClr/@val"/>
+								</xsl:with-param>
+								<xsl:with-param name="lumMod">
+									<xsl:value-of select="a:srgbClr/a:lumMod/@val"/>
+								</xsl:with-param>
+								<xsl:with-param name="lumOff">
+									<xsl:choose>
+										<xsl:when test="a:srgbClr/a:lumOff/@val">
+											<xsl:value-of select="a:srgbClr/a:lumOff/@val"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:text>0</xsl:text>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:with-param>
+								<xsl:with-param name="noTheme">
+									<xsl:text>true</xsl:text>
+								</xsl:with-param>
+							</xsl:call-template>
+						</xsl:attribute>
+					</xsl:if>
+
+					<!-- Transparency percentage-->
+					<xsl:if test="a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
+						<xsl:variable name="alpha">
+							<xsl:value-of select="a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
+						</xsl:variable>
+
+						<xsl:if test="($alpha != '') or ($alpha != 0)">
+							<xsl:attribute name="svg:stroke-opacity">
+								<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+							</xsl:attribute>
+						</xsl:if>
+
+					</xsl:if>
+				</xsl:if>
+
+				<!-- Theme color for border -->
+				<xsl:if test="a:schemeClr/@val">
+					<xsl:attribute name="svg:stroke-color">
+						<xsl:call-template name="getColorCode">
+							<xsl:with-param name="color">
+								<xsl:value-of select="a:schemeClr/@val"/>
+							</xsl:with-param>
+							<xsl:with-param name="lumMod">
+								<xsl:value-of select="a:schemeClr/a:lumMod/@val"/>
+							</xsl:with-param>
+							<xsl:with-param name="lumOff">
+								<xsl:value-of select="a:schemeClr/a:lumOff/@val"/>
+							</xsl:with-param>
+						</xsl:call-template>
+					</xsl:attribute>
+
+					<!-- Transparency percentage-->
+					<xsl:if test="a:schemeClr/a:alpha/@val">
+						<xsl:variable name="alpha">
+							<xsl:value-of select="a:schemeClr/a:alpha/@val"/>
+						</xsl:variable>
+
+						<xsl:if test="($alpha != '') or ($alpha != 0)">
+							<xsl:attribute name="svg:stroke-opacity">
+								<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+							</xsl:attribute>
+						</xsl:if>
+
+					</xsl:if>
+					<!-- Transparency percentage-->
+					<xsl:if test="a:srgbClr/a:alpha/@val">
+						<xsl:variable name="alpha">
+							<xsl:value-of select="a:srgbClr/a:alpha/@val"/>
+						</xsl:variable>
+
+						<xsl:if test="($alpha != '') or ($alpha != 0)">
+							<xsl:attribute name="svg:stroke-opacity">
+								<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+							</xsl:attribute>
+						</xsl:if>
+
+					</xsl:if>
+				</xsl:if>
+			</xsl:for-each>
+
+		</xsl:when>
+		<!--added by Sonata to support Pattfill in Calc using work Around-->
+		<xsl:when test="a:ln/a:pattFill">
+			<xsl:attribute name="draw:stroke">
+				<xsl:value-of select="'solid'"/>
+			</xsl:attribute>
+
+			<!-- Standard color-->
+			<xsl:if test="a:ln/a:pattFill/a:fgClr/a:srgbClr/@val">
+				<xsl:attribute name="svg:stroke-color">
+					<xsl:value-of select="concat('#',a:ln/a:pattFill/a:fgClr/a:srgbClr/@val)"/>
+				</xsl:attribute>
+
+				<!-- Transparency percentage-->
+				<xsl:if test="a:ln/a:pattFill/a:fgClr/a:srgbClr/a:alpha/@val">
+					<xsl:variable name="alpha">
+						<xsl:value-of select="a:ln/a:pattFill/a:fgClr/a:srgbClr/a:alpha/@val"/>
+					</xsl:variable>
+
+					<xsl:if test="($alpha != '') or ($alpha != 0)">
+						<xsl:attribute name="svg:stroke-opacity">
+							<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+						</xsl:attribute>
+					</xsl:if>
+
+				</xsl:if>
+			</xsl:if>
+
+			<!--Theme color-->
+			<xsl:if test="a:ln/a:pattFill/a:fgClr/a:schemeClr/@val">
+
+				<xsl:attribute name="svg:stroke-color">
+					<xsl:call-template name="getColorCode">
+						<xsl:with-param name="color">
+							<xsl:value-of select="a:ln/a:pattFill/a:fgClr/a:schemeClr/@val"/>
+						</xsl:with-param>
+						<xsl:with-param name="lumMod">
+							<xsl:value-of select="a:ln/a:pattFill/a:fgClr/a:schemeClr/a:lumMod/@val"/>
+						</xsl:with-param>
+						<xsl:with-param name="lumOff">
+							<xsl:value-of select="a:ln/a:pattFill/a:fgClr/a:schemeClr/a:lumOff/@val"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+
+				<!-- Transparency percentage-->
+				<xsl:if test="a:ln/a:pattFill/a:fgClr/a:schemeClr/a:alpha/@val">
+					<xsl:variable name="alpha">
+						<xsl:value-of select="a:ln/a:pattFill/a:fgClr/a:schemeClr/a:alpha/@val"/>
+					</xsl:variable>
+
+					<xsl:if test="($alpha != '') or ($alpha != 0)">
+						<xsl:attribute name="svg:stroke-opacity">
+							<xsl:value-of select="concat(($alpha div 1000), '%')"/>
+						</xsl:attribute>
+					</xsl:if>
+
+				</xsl:if>
+			</xsl:if>
+		</xsl:when>
+
+		<xsl:otherwise>
         <!--Line reference-->
         <xsl:if
           test="not( (a:prstGeom/@prst='flowChartInternalStorage') or
