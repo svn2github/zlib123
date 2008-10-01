@@ -18,12 +18,12 @@
 
 					<Component Id="OdfConverterLauncher.exe" Guid="C07275F3-7D22-435E-A216-D92C15D341FC">
 						<File Name="$(var.OdfConverterLauncher.TargetFileName)" Source="$(var.OdfConverterLauncher.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_OdfConverterLauncher.exe" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+							<netfx:NativeImage Id="ngen_OdfConverterLauncher.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
 						</File>
 					</Component>
 					<Component Id="OdfConverter.exe" Guid="9E551E9F-A6ED-4C64-B196-4C8E7EB02D2A">
 						<File Name="$(var.CommandLineTool.TargetFileName)" Source="$(var.CommandLineTool.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_OdfConverter.exe" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+							<netfx:NativeImage Id="ngen_OdfConverter.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
 						</File>
 					</Component>
 
@@ -65,12 +65,12 @@
 					</Component>
 					<Component Id="PresentationConverter2Odf.dll" Guid="E56B29F7-CF92-4A1E-9454-76DC3747F275">
 						<File Name="PresentationConverter2Odf.dll" Source="..\Presentation\Converter\bin\PresentationConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_PresentationConverter2Odf.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+							<netfx:NativeImage Id="ngen_PresentationConverter2Odf.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
 						</File>
 					</Component>
 					<Component Id="PresentationConverter2Oox.dll" Guid="A3DCF059-B080-4CA6-843B-264BF0AE4527">
 						<File Name="PresentationConverter2Oox.dll" Source="..\Presentation\Converter\bin\PresentationConverter2Oox.dll" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_PresentationConverter2Oox.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR' />
+							<netfx:NativeImage Id="ngen_PresentationConverter2Oox.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR' />
 						</File>
 					</Component>
 
@@ -79,12 +79,12 @@
 					</Component>
 					<Component Id="SpreadsheetConverter2Odf.dll" Guid="DFC1801C-EA21-417C-BF8C-07CEA7CD70C1">
 						<File Name="SpreadsheetConverter2Odf.dll" Source="..\Spreadsheet\Converter\bin\SpreadsheetConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_SpreadsheetConverter2Odf.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+							<netfx:NativeImage Id="ngen_SpreadsheetConverter2Odf.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
 						</File>
 					</Component>
 					<Component Id="SpreadsheetConverter2Oox.dll" Guid="969E2D56-1C95-4606-98CD-1665F71220AD">
 						<File Name="SpreadsheetConverter2Oox.dll" Source="..\Spreadsheet\Converter\bin\SpreadsheetConverter2Oox.dll" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_SpreadsheetConverter2Oox.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+							<netfx:NativeImage Id="ngen_SpreadsheetConverter2Oox.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
 						</File>
 					</Component>
 
@@ -93,12 +93,12 @@
 					</Component>
 					<Component Id="WordprocessingConverter2Odf.dll" Guid="9D787C83-5F8D-4CD5-A38B-04E122184A78">
 						<File Name="WordprocessingConverter2Odf.dll" Source="..\Word\Converter\bin\WordprocessingConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_WordprocessingConverter2Odf.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+							<netfx:NativeImage Id="ngen_WordprocessingConverter2Odf.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
 						</File>
 					</Component>
 					<Component Id="WordprocessingConverter2Oox.dll" Guid="5E2AF182-1078-4AF0-8D4B-963CFDFA0F3D">
 						<File Name="WordprocessingConverter2Oox.dll" Source="..\Word\Converter\bin\WordprocessingConverter2Oox.dll" DiskId="1" KeyPath="yes" Checksum="yes">
-							<netfx:NativeImage Id="ngen_WordprocessingConverter2Oox.dll" Platform="32bit" Priority="0" AppBaseDirectory='INSTALLDIR'/>
+							<netfx:NativeImage Id="ngen_WordprocessingConverter2Oox.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
 						</File>
 					</Component>
 
