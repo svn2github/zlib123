@@ -32,7 +32,7 @@
 	<String Id="MyInstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
 	<String Id="MyInstallScopeDlgDescription" Overridable="yes">インストールの種類とインストール先フォルダを選択してください。</String>
 	<String Id="MyInstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}インストールの種類</String>
-	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">ユーザー アカウント ([USERNAME]) にインストール(&amp;F)</String>
+	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">ユーザー アカウント にインストール(&amp;F)</String>
 	<String Id="MyInstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] はあなたのユーザー アカウントでのみ利用可能となります。ローカル管理者特権は必要ありません。</String>
 	<String Id="MyInstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] はユーザーごとのインストールをサポートしていません。</String>
 	<String Id="MyInstallScopeDlgPerMachine" Overridable="yes">このコンピュータのすべてのユーザーにインストール(&amp;C)</String>

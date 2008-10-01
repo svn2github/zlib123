@@ -33,7 +33,7 @@
 	<String Id="MyInstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
 	<String Id="MyInstallScopeDlgDescription" Overridable="yes">Wählen Sie eine Installationsart und einen Zielordner aus.</String>
 	<String Id="MyInstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Installationsart</String>
-	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">&amp;Für aktuellen Benutzer ([USERNAME]) installieren</String>
+	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">&amp;Für aktuellen Benutzer installieren</String>
 	<String Id="MyInstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] ist nur für Ihr Benutzerkonto verfügbar. Sie benötigen keine lokalen Administratorberechtigungen.</String>
 	<String Id="MyInstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] unterstützt keine Einzelbenutzerinstallation.</String>
 	<String Id="MyInstallScopeDlgPerMachine" Overridable="yes">Für alle Benutzer auf diesem &amp;Computer installieren</String>

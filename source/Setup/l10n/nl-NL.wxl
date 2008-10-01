@@ -32,7 +32,7 @@
 	<String Id="MyInstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
 	<String Id="MyInstallScopeDlgDescription" Overridable="yes">Choose the installation scope and folder</String>
 	<String Id="MyInstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Installation Scope</String>
-	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">Install &amp;just for you ([USERNAME])</String>
+	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">Install &amp;just for you</String>
 	<String Id="MyInstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] will be installed in a per-user folder and be available just for your user account. You do not need local Administrator privileges.</String>
 	<String Id="MyInstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] does not support per-user installation.</String>
 	<String Id="MyInstallScopeDlgPerMachine" Overridable="yes">Install for all users of this &amp;machine</String>
