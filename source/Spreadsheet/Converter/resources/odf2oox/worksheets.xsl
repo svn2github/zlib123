@@ -772,6 +772,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
       <xsl:choose>
         <xsl:when test="descendant::table:table-row[@table:number-rows-repeated > 32768]">
           <xsl:for-each select="descendant::table:table-row[@table:number-rows-repeated > 32768]">
+<!-- Sonata: bug no:2025608 -->
+            <xsl:if test="position()=1">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="length">
                 <xsl:value-of
@@ -780,6 +782,7 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
               </xsl:with-param>
               <xsl:with-param name="unit">point</xsl:with-param>
             </xsl:call-template>
+            </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>13</xsl:otherwise>

@@ -48,6 +48,46 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
   <!--<xsl:import href="cell.xsl"/>
   <xsl:import href="common.xsl"/>-->
 
+  <!-- sonata:line style constants-->
+  <xsl:variable name ="dot">
+    <xsl:value-of select ="'0.07'"/>
+  </xsl:variable>
+  <xsl:variable name ="dash">
+    <xsl:value-of select ="'0.282'"/>
+  </xsl:variable>
+  <xsl:variable name ="longDash">
+    <xsl:value-of select ="'0.564'"/>
+  </xsl:variable>
+  <xsl:variable name ="distance">
+    <xsl:value-of select ="'0.211'"/>
+  </xsl:variable>
+  <xsl:variable name="sm-sm">
+    <xsl:value-of select ="'0.15'"/>
+  </xsl:variable>
+  <xsl:variable name="sm-med">
+    <xsl:value-of select ="'0.18'"/>
+  </xsl:variable>
+  <xsl:variable name="sm-lg">
+    <xsl:value-of select ="'0.2'"/>
+  </xsl:variable>
+  <xsl:variable name="med-sm">
+    <xsl:value-of select ="'0.21'" />
+  </xsl:variable>
+  <xsl:variable name="med-med">
+    <xsl:value-of select ="'0.25'"/>
+  </xsl:variable>
+  <xsl:variable name="med-lg">
+    <xsl:value-of select ="'0.3'" />
+  </xsl:variable>
+  <xsl:variable name="lg-sm">
+    <xsl:value-of select ="'0.31'" />
+  </xsl:variable>
+  <xsl:variable name="lg-med">
+    <xsl:value-of select ="'0.35'" />
+  </xsl:variable>
+  <xsl:variable name="lg-lg">
+    <xsl:value-of select ="'0.4'" />
+  </xsl:variable>
   <!-- Insert Drawing (picture, chart)  -->
   <xsl:template name="InsertDrawing">
     <xdr:wsDr>
@@ -93,7 +133,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
            </xsl:variable>
            
            <!-- max 4 series in StockChart are supported in Excel -->
-            <xsl:if test="not($ChartStock = 'true' and (count((document(concat(substring-after(draw:object/@xlink:href,'./'),'/content.xml'))/office:document-content/office:body/office:chart/chart:chart/chart:plot-area/chart:series)) &gt; 4) )">
+            <!--<xsl:if test="not($ChartStock = 'true')">-->
            <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:graphicFrame macro="">
@@ -117,7 +157,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
               </xdr:graphicFrame>
               <xdr:clientData/>
             </xdr:twoCellAnchor>
-            </xsl:if>
+            <!--</xsl:if>-->
           </xsl:when>
 
           <!-- insert picture -->
@@ -1183,8 +1223,255 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+<!-- Sonata: line style for charts component -->
   <xsl:template name="InsertDrawingBorder">
+    <xsl:param name ="parentStyle" />
+    <xsl:param name="chartDirectory"/>
+    <xsl:variable name="chartStyleDirectory">
+      <xsl:value-of select="concat($chartDirectory,'/styles.xml')"/>
+    </xsl:variable>
+    <a:ln>
+      <!-- Border width -->
+      <xsl:choose>
+        <xsl:when test ="@svg:stroke-width">
+          <xsl:attribute name ="w">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="@svg:stroke-width"/>
+              <xsl:with-param name="unit">emu</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:when>
+      
+      </xsl:choose>
+      <!-- Cap type-->
+      <xsl:if test ="@draw:stroke-dash">
+        <xsl:variable name ="dash" select ="@draw:stroke-dash" />
+        <xsl:if test ="document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$dash]">
+          <xsl:if test ="document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$dash]/@draw:style='round'">
+            <xsl:attribute name ="cap">
+              <xsl:value-of select ="'rnd'"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+      <xsl:if test="not(@draw:stroke = 'none' )">
+        <a:solidFill>
+          <a:srgbClr>
+            <xsl:attribute name="val">
+              <xsl:choose>
+                <xsl:when test="@svg:stroke-color != '' ">
+                  <xsl:value-of select="substring-after(@svg:stroke-color, '#')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>000000</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+            <xsl:if test="@svg:stroke-opacity != ''">
+              <xsl:variable name="transparency">
+                <xsl:value-of select="substring-before(@svg:stroke-opacity, '%')"/>
+              </xsl:variable>
+              <a:alpha>
+                <xsl:attribute name="val">
+                  <xsl:value-of select="$transparency * 1000"/>
+                </xsl:attribute>
+              </a:alpha>
+            </xsl:if>
+          </a:srgbClr>
+        </a:solidFill>
+      </xsl:if>
+      <!-- Dash type-->
+      <xsl:choose>
+        <xsl:when test ="(@draw:stroke='dash')">
+          <a:prstDash>
+            <xsl:attribute name ="val">
+              <xsl:call-template name ="getDashType">
+                <xsl:with-param name ="stroke-dash" select ="@draw:stroke-dash" />
+              </xsl:call-template>
+            </xsl:attribute>
+          </a:prstDash>
+        </xsl:when>
+        <xsl:when test ="not(@draw:stroke) and $parentStyle!=''">
+          <xsl:for-each select ="document($chartStyleDirectory)/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
+            <xsl:if test="@draw:stroke='dash'">
+              <a:prstDash>
+                <xsl:attribute name ="val">
+                  <xsl:call-template name ="getDashType">
+                    <xsl:with-param name ="stroke-dash" select ="@draw:stroke-dash" />
+                  </xsl:call-template>
+                </xsl:attribute>
+              </a:prstDash>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+    
+
+    </a:ln>
+  </xsl:template>
+  <xsl:template name ="getDashType">
+    <xsl:param name ="stroke-dash" />
+    <xsl:param name="chartStyleDirectory"/>
+    <xsl:if test ="document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
+      <xsl:for-each select="document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
+        <xsl:if test="position()=1">
+          <xsl:variable name="Unit1">
+            <xsl:call-template name="getConvertUnit">
+              <xsl:with-param name="length" select="@draw:dots1-length"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="Unit2">
+            <xsl:call-template name="getConvertUnit">
+              <xsl:with-param name="length" select="@draw:dots2-length"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="Unit3">
+            <xsl:call-template name="getConvertUnit">
+              <xsl:with-param name="length" select="@draw:distance"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name ="dots1" select="@draw:dots1"/>
+          <xsl:variable name ="dots1-length" select ="substring-before(@draw:dots1-length, $Unit1)" />
+          <xsl:variable name ="dots2" select="@draw:dots2"/>
+          <xsl:variable name ="dots2-length" select ="substring-before(@draw:dots2-length, $Unit2)"/>
+          <xsl:variable name ="distance" select ="substring-before(@draw:distance, $Unit3)" />
+
+
+
+          <xsl:choose>
+            <xsl:when test ="($dots1=1) and ($dots2=1)">
+              <xsl:choose>
+                <xsl:when test ="($dots1-length &lt;= $dot) and ($dots2-length &lt;= $dot)">
+                  <xsl:value-of select ="'sysDot'" />
+                </xsl:when>
+                <xsl:when test ="(($dots1-length &lt;= $dot) and ($dots2-length &lt;= $dash)) or
+										 (($dots1-length &lt;= $dash) and ($dots2-length &lt;= $dot)) ">
+                  <xsl:value-of select ="'dashDot'" />
+                </xsl:when>
+                <xsl:when test ="($dots1-length &lt;= $dash) and ($dots2-length &lt;= $dash)">
+                  <xsl:value-of select ="'dash'" />
+                </xsl:when>
+                <xsl:when test ="(($dots1-length &lt;= $dot) and (($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash))) or
+										 (($dots2-length &lt;= $dot) and (($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash))) ">
+                  <xsl:value-of select ="'lgDashDot'" />
+                </xsl:when>
+                <xsl:when test ="(($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash)) or 
+										 (($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash))">
+                  <xsl:value-of select ="'lgDash'" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select ="'sysDash'" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:when test ="(($dots1=2) and ($dots2=1)) or (($dots1=1) and ($dots2=2))">
+              <!--<xsl:if test ="(($dots1-length &lt;= $dot) and ($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash))">-->
+              <xsl:value-of select ="'lgDashDotDot'" />
+              <!--</xsl:if>-->
+            </xsl:when>
+            <!--<xsl:when test ="($dots1=1) and ($dots2=2)">
+					-->
+            <!--<xsl:if test ="(($dots2-length &lt;= $dot) and ($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash))">-->
+            <!--
+						<xsl:value-of select ="'lgDashDotDot'" />
+					-->
+            <!--</xsl:if>-->
+            <!--
+				</xsl:when>-->
+            <xsl:when test ="(($dots1 &gt;= 1) and not($dots2))">
+              <xsl:choose>
+                <xsl:when test ="($dots1-length &lt;= $dot)">
+                  <xsl:value-of select ="'sysDash'" />
+                </xsl:when>
+                <xsl:when test ="($dots1-length &gt;= $dot) and ($dots1-length &lt;= $dash)">
+                  <xsl:value-of select ="'dash'" />
+                </xsl:when>
+                <xsl:when test ="($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash)">
+                  <xsl:value-of select ="'lgDash'" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select ="'sysDash'" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:when test ="(($dots2 &gt;= 1) and not($dots1))">
+              <xsl:choose>
+                <xsl:when test ="($dots2-length &lt;= $dot)">
+                  <xsl:value-of select ="'sysDash'" />
+                </xsl:when>
+                <xsl:when test ="($dots2-length &gt;= $dot) and ($dots2-length &lt;= $dash)">
+                  <xsl:value-of select ="'dash'" />
+                </xsl:when>
+                <xsl:when test ="($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash)">
+                  <xsl:value-of select ="'lgDash'" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select ="'sysDash'" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select ="'sysDash'" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:if >
+    <xsl:if test ="not(document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash])">
+      <xsl:value-of select ="'sysDash'" />
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name ="getConvertUnit">
+    <xsl:param name ="length"/>
+    <xsl:choose>
+      <xsl:when test="contains($length,'cm')">
+        <xsl:value-of select="'cm'"/>
+      </xsl:when>
+      <xsl:when test="contains($length,'pt')">
+        <xsl:value-of select="'pt'"/>
+      </xsl:when>
+      <xsl:when test="contains($length,'in')">
+        <xsl:value-of select="'in'"/>
+      </xsl:when>
+      <!--mm to cm -->
+      <xsl:when test="contains($length,'mm')">
+        <xsl:value-of select="'mm'"/>
+      </xsl:when>
+      <!-- m to cm -->
+      <xsl:when test="contains($length,'m')">
+        <xsl:value-of select="'m'"/>
+      </xsl:when>
+      <!-- km to cm -->
+      <xsl:when test="contains($length,'km')">
+        <xsl:value-of select="'km'"/>
+      </xsl:when>
+      <!-- mi to cm -->
+      <xsl:when test="contains($length,'mi')">
+        <xsl:value-of select="'mi'"/>
+      </xsl:when>
+      <!-- ft to cm -->
+      <xsl:when test="contains($length,'ft')">
+        <xsl:value-of select="'ft'"/>
+      </xsl:when>
+      <!-- em to cm -->
+      <xsl:when test="contains($length,'em')">
+        <xsl:value-of select="'em'"/>
+      </xsl:when>
+      <!-- px to cm -->
+      <xsl:when test="contains($length,'px')">
+        <xsl:value-of select="'px'"/>
+      </xsl:when>
+      <!-- pc to cm -->
+      <xsl:when test="contains($length,'pc')">
+        <xsl:value-of select="'pc'"/>
+      </xsl:when>
+      <!-- ex to cm 1 ex to 6 px-->
+      <xsl:when test="contains($length,'ex')">
+        <xsl:value-of select="'ex'"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template >
+  <xsl:template name="InsertDrawingBorder1">
     <!-- line style -->
     <a:ln>
       <xsl:if test="@svg:stroke-width">
@@ -1221,6 +1508,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
                 </xsl:if>
               </a:srgbClr>
           </a:solidFill>
+          <xsl:if test="not(@draw:stroke-dash = 'none')">
+          <a:prstDash val="dash"/>
+        </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <a:noFill/>
