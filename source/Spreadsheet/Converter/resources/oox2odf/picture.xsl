@@ -1285,6 +1285,65 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
           </xsl:if>
         </xsl:if>
       </xsl:when>
+      <!--added by Sonata to support Pattfill in Calc using work Around-->
+      <xsl:when test="a:pattFill">
+        <xsl:attribute name="draw:fill">
+          <xsl:value-of select="'solid'"/>
+        </xsl:attribute>
+
+        <!-- Standard color-->
+        <xsl:if test="a:pattFill/a:fgClr/a:srgbClr/@val">
+          <xsl:attribute name="draw:fill-color">
+            <xsl:value-of select="concat('#',a:pattFill/a:fgClr/a:srgbClr/@val)"/>
+          </xsl:attribute>
+
+          <!-- Transparency percentage-->
+          <xsl:if test="a:pattFill/a:fgClr/a:srgbClr/a:alpha/@val">
+            <xsl:variable name="alpha">
+              <xsl:value-of select="a:pattFill/a:fgClr/a:srgbClr/a:alpha/@val"/>
+            </xsl:variable>
+
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name="draw:opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+
+          </xsl:if>
+        </xsl:if>
+
+        <!--Theme color-->
+        <xsl:if test="a:pattFill/a:fgClr/a:schemeClr/@val">
+
+          <xsl:attribute name="draw:fill-color">
+            <xsl:call-template name="getColorCode">
+              <xsl:with-param name="color">
+                <xsl:value-of select="a:pattFill/a:fgClr/a:schemeClr/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name="lumMod">
+                <xsl:value-of select="a:pattFill/a:fgClr/a:schemeClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name="lumOff">
+                <xsl:value-of select="a:pattFill/a:fgClr/a:schemeClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+
+          <!-- Transparency percentage-->
+          <xsl:if test="a:pattFill/a:fgClr/a:schemeClr/a:alpha/@val">
+            <xsl:variable name="alpha">
+              <xsl:value-of select="a:pattFill/a:fgClr/a:schemeClr/a:alpha/@val"/>
+            </xsl:variable>
+
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name="draw:opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+
+          </xsl:if>
+        </xsl:if>
+      </xsl:when>
 
       <!-- fill from style -->
       <xsl:when test="parent::node()/xdr:style/a:fillRef">
@@ -1681,87 +1740,93 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
 
   <xsl:template name="InsertLineDash">
 
-    <xsl:if test="a:prstDash/@val">
+    <!--Code added by Sonata-->
+    <xsl:if test="a:noFill">
       <xsl:attribute name="draw:stroke">
-        <xsl:text>solid</xsl:text>
+        <xsl:value-of select="'none'"/>
       </xsl:attribute>
     </xsl:if>
+    <!--End of 1953423-->
+    <xsl:if test ="not(a:noFill)">
+      <xsl:choose>
 
-    <!--xsl:choose>
-      <xsl:when test="(a:prstDash/@val = 'solid' ) or not(a:prstDash/@val)">
+        <xsl:when test ="a:prstDash/@val='solid'">
         <xsl:attribute name="draw:stroke">
-          <xsl:text>solid</xsl:text>
+            <xsl:value-of select ="'solid'"/>
         </xsl:attribute>
       </xsl:when>
 
       <xsl:otherwise>
         <xsl:attribute name="draw:stroke">
-          <xsl:text>dash</xsl:text>
+            <xsl:value-of select ="'dash'"/>
         </xsl:attribute>
 
         <xsl:attribute name="draw:stroke-dash">
 
           <xsl:choose>
             <xsl:when test="(a:prstDash/@val = 'sysDot' ) and (@cap = 'rnd' )">
-              <xsl:text>sysDotRound</xsl:text>
+                <xsl:value-of select ="'sysDotRound'"/>
             </xsl:when>
 
             <xsl:when test="a:prstDash/@val = 'sysDot' ">
-              <xsl:text>sysDot</xsl:text>
+                <xsl:value-of select ="'sysDot'"/>
             </xsl:when>
 
             <xsl:when test="(a:prstDash/@val = 'sysDash' ) and (@cap = 'rnd' )">
-              <xsl:text>sysDashRound</xsl:text>
+                <xsl:value-of select ="'sysDashRound'"/>
             </xsl:when>
 
             <xsl:when test="a:prstDash/@val = 'sysDash' ">
-              <xsl:text>sysDash</xsl:text>
+                <xsl:value-of select ="'sysDash'"/>
             </xsl:when>
 
             <xsl:when test="(a:prstDash/@val = 'dash' ) and (@cap = 'rnd' )">
-              <xsl:text>dashRound</xsl:text>
+                <xsl:value-of select ="'dashRound'"/>
             </xsl:when>
 
             <xsl:when test="a:prstDash/@val = 'dash' ">
-              <xsl:text>dash</xsl:text>
+                <xsl:value-of select ="'dash'"/>
             </xsl:when>
 
             <xsl:when test="(a:prstDash/@val = 'dashDot' ) and (@cap = 'rnd' )">
-              <xsl:text>dashDotRound</xsl:text>
+                <xsl:value-of select ="'dashDotRound'"/>
             </xsl:when>
 
             <xsl:when test="a:prstDash/@val = 'dashDot' ">
-              <xsl:text>dashDot</xsl:text>
+                <xsl:value-of select ="'dashDot'"/>
             </xsl:when>
 
             <xsl:when test="(a:prstDash/@val = 'lgDash' ) and (@cap = 'rnd' )">
-              <xsl:text>lgDashRound</xsl:text>
+                <xsl:value-of select ="'lgDashRound'"/>
             </xsl:when>
 
             <xsl:when test="a:prstDash/@val = 'lgDash' ">
-              <xsl:text>lgDash</xsl:text>
+                <xsl:value-of select ="'lgDash'"/>
             </xsl:when>
 
             <xsl:when test="(a:prstDash/@val = 'lgDashDot' ) and (@cap = 'rnd' )">
-              <xsl:text>lgDashDotRound</xsl:text>
+                <xsl:value-of select ="'lgDashDotRound'"/>
             </xsl:when>
 
             <xsl:when test="a:prstDash/@val = 'lgDashDot' ">
-              <xsl:text>lgDashDot</xsl:text>
+                <xsl:value-of select ="'lgDashDot'"/>
             </xsl:when>
 
             <xsl:when test="(a:prstDash/@val = 'lgDashDotDot' ) and (@cap = 'rnd' )">
-              <xsl:text>lgDashDotDotRound</xsl:text>
+                <xsl:value-of select ="'lgDashDotDotRound'"/>
             </xsl:when>
 
             <xsl:when test="a:prstDash/@val = 'lgDashDotDot' ">
-              <xsl:text>lgDashDotDot</xsl:text>
+                <xsl:value-of select ="'lgDashDotDot'"/>
             </xsl:when>
           </xsl:choose>
         </xsl:attribute>
 
       </xsl:otherwise>
-    </xsl:choose-->
+      </xsl:choose>
+    </xsl:if>
+    
+  
   </xsl:template>
 
   <xsl:template name="InsertTextLayout">
@@ -2090,7 +2155,13 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:if>
 
     <!-- bold -->
-    <xsl:if test="@b = 1">
+    <!--<xsl:if test="@b = 1">
+      <xsl:attribute name="fo:font-weight">
+        <xsl:value-of select="'bold'"/>
+      </xsl:attribute>
+    </xsl:if>-->
+
+    <xsl:if test="@b = 1 or not(@b)">
       <xsl:attribute name="fo:font-weight">
         <xsl:value-of select="'bold'"/>
       </xsl:attribute>

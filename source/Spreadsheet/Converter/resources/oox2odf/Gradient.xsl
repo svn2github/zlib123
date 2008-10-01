@@ -309,12 +309,18 @@
       </xsl:if>			
     </xsl:variable>
     <xsl:variable name ="NewColor">
-      <xsl:if test ="$ThemeColor != ''">
+      <xsl:choose>
+        <xsl:when test ="$ThemeColor != ''">
         <xsl:value-of select ="$ThemeColor"/>
-      </xsl:if>
-      <xsl:if test ="$BgTxColors !=''">
+        </xsl:when>
+        <xsl:when test ="$BgTxColors !=''">
         <xsl:value-of select ="$BgTxColors"/>
-      </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select ="$color"/>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </xsl:variable>
     <xsl:call-template name ="ConverThemeColor">
       <xsl:with-param name="color" select="$NewColor" />

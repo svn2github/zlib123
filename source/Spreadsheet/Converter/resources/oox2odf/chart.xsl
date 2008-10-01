@@ -43,7 +43,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:oox="urn:oox"
-  exclude-result-prefixes="e r c a xdr oox">
+  exclude-result-prefixes="e r c a xdr oox fo">
   
   <!-- @Filename: chart.xsl -->
   <!-- @Description: This stylesheet is used for charts conversion -->
@@ -60,7 +60,19 @@
   <xsl:key name="grouping" match="c:grouping" use="@oox:part"/>
   <xsl:key name="spPr" match="c:spPr" use="@oox:part"/>
   <xsl:key name="error" match="c:errBars" use="@oox:part"/>
-
+  <!-- Sonata: line style constants-->
+  <xsl:variable name ="dot">
+    <xsl:value-of select ="'0.07'"/>
+  </xsl:variable>
+  <xsl:variable name ="dash">
+    <xsl:value-of select ="'0.282'"/>
+  </xsl:variable>
+  <xsl:variable name ="longDash">
+    <xsl:value-of select ="'0.564'"/>
+  </xsl:variable>
+  <xsl:variable name ="distance">
+    <xsl:value-of select ="'0.211'"/>
+  </xsl:variable>
   <xsl:template name="CreateObjectCharts">
     <!-- @Description: Searches for all charts within workbook and starts conversion. -->
     <!-- @Context: None -->
@@ -256,21 +268,36 @@
               
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:dateAx[2]">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:dateAx[1]">
-                  <xsl:call-template name="InsertAxisXProperties"/>
+ <!--Edited by Sonata -->
+                  <xsl:call-template name="InsertAxisXProperties">
+                    <xsl:with-param name="axisYId" select="$axisYId"/>
+                  </xsl:call-template>
+                  <!--added by Sonata for bug no 2015014-->
+                  <xsl:call-template name="InsertAxisXTitleProperties"/>
+                  <!--end-->
                 </xsl:for-each>
               </xsl:if>
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:catAx[2]">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
-                  <xsl:call-template name="InsertAxisXProperties"/>
+<!--Edited by Sonata -->
+                  <xsl:call-template name="InsertAxisXProperties">
+                    <xsl:with-param name="axisYId" select="$axisYId"/>
+                  </xsl:call-template>
+                  <!--added by Sonata for bug no 2015014-->
+                  <xsl:call-template name="InsertAxisXTitleProperties"/>
+                  <!--end-->
                 </xsl:for-each>
               </xsl:if>
 
-              <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx">
+              <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
+                
                 <xsl:choose>
                   <xsl:when test="c:axId/@val = $axisYId">
                     <xsl:call-template name="InsertAxisYProperties">
                       <xsl:with-param name="axisXId" select="$axisXId"/>
                     </xsl:call-template>
+                    <xsl:call-template name="InsertAxisYTitleProperties"/>
+                    <xsl:call-template name="InsertMajorGridYProperties"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:call-template name="InsertSecondaryAxisYProperties">
@@ -289,7 +316,7 @@
             </xsl:when>
             <!-- scatter chart has two value axes -->
             <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:scatterChart or key('plotArea', c:chartSpace/@oox:part)/c:bubbleChart">
-              <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]/c:axPos">
+              <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
                 <xsl:call-template name="InsertAxisXProperties">
                   <xsl:with-param name="type">
                     <xsl:text>valAx</xsl:text>
@@ -297,12 +324,17 @@
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisXTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridXProperties"/>
+                <xsl:call-template name="InsertMinorGridXProperties"/>
+            
               </xsl:for-each>
               <xsl:for-each
                 select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
-                <xsl:call-template name="InsertAxisYProperties"/>
+                <xsl:call-template name="InsertAxisYProperties">
+                  <!--<xsl:with-param name="axisXId" select="$axisXId"/>-->
+                </xsl:call-template>
                 <xsl:call-template name="InsertAxisYTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridYProperties"/>
+                <xsl:call-template name="InsertMinorGridYProperties"/>
               </xsl:for-each>
             </xsl:when>
             <!-- insert axis X properties for stock chart -->
@@ -310,38 +342,73 @@
               <!-- stock chart may contain catAx or dateAx as X axis -->
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:catAx">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx">
-                  <xsl:call-template name="InsertAxisXProperties"/>
+                  <xsl:call-template name="InsertAxisXProperties">
+                  </xsl:call-template>
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
                   <xsl:call-template name="InsertMajorGridXProperties"/>
+                  <xsl:call-template name="InsertMinorGridXProperties"/>
                 </xsl:for-each>
               </xsl:if>
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:dateAx">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:dateAx">
-                  <xsl:call-template name="InsertAxisXProperties"/>
+                  <xsl:call-template name="InsertAxisXProperties">
+               
+                  </xsl:call-template>
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
                   <xsl:call-template name="InsertMajorGridXProperties"/>
+                  <xsl:call-template name="InsertMinorGridXProperties"/>
                 </xsl:for-each>
               </xsl:if>
               <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
-                <xsl:call-template name="InsertAxisYProperties"/>
+                <xsl:call-template name="InsertAxisYProperties">
+                
+                </xsl:call-template>
                 <xsl:call-template name="InsertAxisYTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridYProperties"/>
+                <xsl:call-template name="InsertMinorGridYProperties"/>
               </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
+              <xsl:variable name="axisYId">
+                <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
+                  <xsl:value-of select="c:axId/@val"/>
+                </xsl:for-each>
+              </xsl:variable>
+
+              <xsl:variable name="axisXId">
+                <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
+                  <xsl:value-of select="c:axId/@val"/>
+                </xsl:for-each>
+              </xsl:variable>
               <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
                 <xsl:call-template name="InsertAxisXProperties">
                   <xsl:with-param name="type">
                     <xsl:text>catAx</xsl:text>
                   </xsl:with-param>
+                  <xsl:with-param name="axisYId" select="$axisYId"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisXTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridXProperties"/>
+                <xsl:call-template name="InsertMinorGridXProperties"/>
               </xsl:for-each>
               <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
-                <xsl:call-template name="InsertAxisYProperties"/>
+                <!--test number format of the axis text-->
+                <xsl:variable name="formatcode">
+                  <xsl:if test="c:numFmt">
+                    <xsl:value-of select="c:numFmt/@formatCode"/>
+                  </xsl:if>
+                </xsl:variable>
+                <!-- Sonata: Number format-->
+                  <xsl:apply-templates select="c:numFmt"/>
+                
+                <xsl:call-template name="InsertAxisYProperties">
+                  <xsl:with-param name="numberformat" select="$formatcode"/>
+                  <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
+                  <xsl:with-param name="axisXId" select="$axisXId"/>
+                </xsl:call-template>
                 <xsl:call-template name="InsertAxisYTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridYProperties"/>
+                <xsl:call-template name="InsertMinorGridYProperties"/>
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
@@ -350,6 +417,8 @@
           <xsl:call-template name="InsertErrorProperties"/>
           <xsl:call-template name="InsertWallProperties"/>
           <xsl:call-template name="InsertFloorProperties"/>
+          <!-- Sonata: Stock range Properties-->
+          <xsl:call-template name="InsertStockRangeProperties"/>
         </office:automatic-styles>
         <office:body>
           <office:chart>
@@ -377,9 +446,109 @@
             <xsl:with-param name="chartId" select="$chartId"/>
             <xsl:with-param name="inputChart" select="$inputChart"/>
           </xsl:call-template>
+          <xsl:call-template name="InsertChartLineStyle">
+            <xsl:with-param name="chartId" select="$chartId"/>
+            <xsl:with-param name="inputChart" select="$inputChart"/>
+          </xsl:call-template>
         </office:styles>
       </office:document-styles>
     </pzip:entry>
+  </xsl:template>
+  <xsl:template name="InsertChartLineStyle">
+    <!-- @Description: Creates output chart line styles file -->
+    <!-- @Context: Input chart file root -->
+    <!-- @Author: Sonata-->
+    <xsl:param name="chartId"/>
+    <!-- unique chart identifier -->
+    <xsl:param name="inputChart"/>
+    <xsl:for-each select="key('spPr', c:chartSpace/@oox:part)/a:ln">
+      <!--Dash types-->
+      <xsl:if test ="a:prstDash/@val">
+        <xsl:call-template name ="getDashType">
+          <xsl:with-param name ="val" select ="a:prstDash/@val" />
+          <xsl:with-param name ="cap" select ="@cap" />
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:for-each>
+    
+  </xsl:template>
+  <xsl:template name ="getDashType">
+    <!-- @Description: dash types for chart line style-->
+    <!-- @Author: Sonata-->
+    <xsl:param name ="val" />
+    <xsl:param name ="cap" />
+    <xsl:choose>
+      <xsl:when test ="($val='sysDot')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'sysDot'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="dot1-length" select = "$dot" />
+          <xsl:with-param name ="distance" select ="$dot" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="($val='sysDash')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'sysDash'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="dot1-length" select = "$dot" />
+          <xsl:with-param name ="distance" select ="$dot" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="($val='dash')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'dash'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot2" select ="'1'" />
+          <xsl:with-param name ="dot2-length" select = "$dash" />
+          <xsl:with-param name ="distance" select ="$distance" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="($val='dashDot')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'dashDot'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="dot1-length" select = "$dot" />
+          <xsl:with-param name ="dot2" select ="'1'" />
+          <xsl:with-param name ="dot2-length" select = "$dash" />
+          <xsl:with-param name ="distance" select ="$distance" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="($val='lgDash')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'lgDash'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot2" select ="'1'" />
+          <xsl:with-param name ="dot2-length" select = "$longDash" />
+          <xsl:with-param name ="distance" select ="$distance" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="($val='lgDashDot')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'lgDashDot'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="dot1-length" select = "$dot" />
+          <xsl:with-param name ="dot2" select ="'1'" />
+          <xsl:with-param name ="dot2-length" select = "$longDash" />
+          <xsl:with-param name ="distance" select ="$distance" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="($val='lgDashDotDot')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'lgDashDotDot'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'2'" />
+          <xsl:with-param name ="dot1-length" select = "$dot" />
+          <xsl:with-param name ="dot2" select ="'1'" />
+          <xsl:with-param name ="dot2-length" select = "$longDash" />
+          <xsl:with-param name ="distance" select ="$distance" />
+        </xsl:call-template>
+      </xsl:when>
+
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertSeries">
@@ -1160,6 +1329,9 @@
       <xsl:if test="c:majorGridlines">
         <chart:grid chart:style-name="majorGridX" chart:class="major"/>
       </xsl:if>
+      <xsl:if test="c:minorGridlines">
+        <chart:grid chart:style-name="minorGridX" chart:class="minor"/>
+      </xsl:if>
 
       <xsl:variable name="points">
         <xsl:choose>
@@ -1230,6 +1402,14 @@
 
       <xsl:if test="c:majorGridlines">
         <chart:grid chart:style-name="majorGridY" chart:class="major"/>
+      </xsl:if>
+
+      <!--test number format of the axis text-->
+      <xsl:if test="c:numFmt">
+        <xsl:variable name="formatcode" select="@formatCode"/>
+      </xsl:if>
+      <xsl:if test="c:minorGridlines">
+        <chart:grid chart:style-name="minorGridY" chart:class="minor"/>
       </xsl:if>
 
     </chart:axis>
@@ -1312,7 +1492,7 @@
               <!-- if both are cat axes -->
               <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:catAx[2]">
                 <!-- insert the one that corresponds to stock chart -->
-                <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[2]">
+   <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
                   <xsl:call-template name="InsertXAxis"/>
                 </xsl:for-each>
               </xsl:when>
@@ -1416,6 +1596,9 @@
 
         <chart:wall chart:style-name="wall"/>
         <chart:floor chart:style-name="floor"/>
+
+        <chart:stock-range-line chart:style-name="stock-range"/> 
+        
       </chart:plot-area>
 
       <xsl:call-template name="InsertChartTable"/>
@@ -1427,31 +1610,9 @@
     <style:style style:name="chart" style:family="chart">
       <style:graphic-properties draw:fill-color="#ffffff" draw:stroke="solid"
         svg:stroke-color="#898989">
+        <!-- Sonata: chart fill properties-->
         <xsl:for-each select="c:chartSpace/c:spPr">
-
-          <!-- Insert fill -->
-          <xsl:choose>
-            <xsl:when test="a:gradFill">
-              <xsl:attribute name="draw:fill">
-                <xsl:text>gradient</xsl:text>
-              </xsl:attribute>
-              <xsl:for-each select="a:gradFill">
-                <xsl:attribute name="draw:fill-gradient-name">
-                  <xsl:value-of select="generate-id()"/>
-                </xsl:attribute>
-              </xsl:for-each>
-            </xsl:when>
-            <xsl:when test="a:blipFill">
-              <xsl:call-template name="InsertBitmapFill"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="InsertFill"/>
-            </xsl:otherwise>
-          </xsl:choose>
-
-          <!-- Insert Borders style, color -->
-          <xsl:call-template name="InsertLineColor"/>
-          <xsl:call-template name="InsertLineStyle"/>
+          <xsl:call-template name="InsertChartFillProperties"/>
         </xsl:for-each>
       </style:graphic-properties>
     </style:style>
@@ -1462,29 +1623,9 @@
       <style:style style:name="chart_title" style:family="chart">
         <style:chart-properties style:direction="ltr"/>
         <style:graphic-properties draw:stroke="none" draw:fill="none">
+          <!-- Sonata: chart Title fill properties-->
           <xsl:for-each select="c:spPr">
-            <!-- Insert fill -->
-            <xsl:choose>
-              <xsl:when test="a:gradFill">
-                <xsl:attribute name="draw:fill">
-                  <xsl:text>gradient</xsl:text>
-                </xsl:attribute>
-                <xsl:for-each select="a:gradFill">
-                  <xsl:attribute name="draw:fill-gradient-name">
-                    <xsl:value-of select="generate-id()"/>
-                  </xsl:attribute>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:when test="a:blipFill">
-                <xsl:call-template name="InsertBitmapFill"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="InsertFill"/>
-              </xsl:otherwise>
-            </xsl:choose>
-
-            <xsl:call-template name="InsertLineColor"/>
-            <xsl:call-template name="InsertLineStyle"/>
+            <xsl:call-template name="InsertChartFillProperties"/>
           </xsl:for-each>
         </style:graphic-properties>
         <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
@@ -1505,9 +1646,18 @@
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
+              <xsl:choose>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                    <xsl:call-template name="TextBoxRunProperties"/>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
               <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
                 <xsl:call-template name="TextBoxRunProperties"/>
               </xsl:for-each>
+            </xsl:when>
+              </xsl:choose>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
@@ -1521,13 +1671,7 @@
       </style:style>
     </xsl:for-each>
   </xsl:template>
-
-  <xsl:template name="InsertAxisXTitleProperties">
-    <xsl:for-each select="c:title">
-      <style:style style:name="axis-x_title" style:family="chart">
-        <style:chart-properties style:direction="ltr"/>
-        <style:graphic-properties draw:stroke="none" draw:fill="none">
-          <xsl:for-each select="c:spPr">
+  <xsl:template name="InsertChartFillProperties">
             <!-- Insert fill -->
             <xsl:choose>
               <xsl:when test="a:gradFill">
@@ -1538,6 +1682,33 @@
                   <xsl:attribute name="draw:fill-gradient-name">
                     <xsl:value-of select="generate-id()"/>
                   </xsl:attribute>
+          <xsl:for-each select="a:gsLst/a:gs[1]">
+            <xsl:choose>
+              <xsl:when test="a:srgbClr/a:alpha/@val">
+                <xsl:variable name="alpha">
+                  <xsl:value-of select="a:srgbClr/a:alpha/@val"/>
+                </xsl:variable>
+                <xsl:if test="($alpha != '') or ($alpha != 0)">
+                  <xsl:attribute name="draw:opacity">
+                    <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+                  </xsl:attribute>
+                </xsl:if>
+
+              </xsl:when>
+              <xsl:when test="a:schemeClr/a:alpha/@val">
+                <xsl:variable name="alpha">
+                  <xsl:value-of select="a:schemeClr/a:alpha/@val"/>
+                </xsl:variable>
+
+                <xsl:if test="($alpha != '') or ($alpha != 0)">
+                  <xsl:attribute name="draw:opacity">
+                    <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+                  </xsl:attribute>
+                </xsl:if>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
+
                 </xsl:for-each>
               </xsl:when>
               <xsl:when test="a:blipFill">
@@ -1548,25 +1719,54 @@
               </xsl:otherwise>
             </xsl:choose>
 
+    <!-- Insert Borders style, color -->
             <xsl:call-template name="InsertLineColor"/>
             <xsl:call-template name="InsertLineStyle"/>
+  </xsl:template>
+  <xsl:template name="InsertAxisXTitleProperties">
+    <xsl:for-each select="c:title">
+      <style:style style:name="axis-x_title" style:family="chart">
+        <style:chart-properties style:direction="ltr"/>
+        <style:graphic-properties draw:stroke="none" draw:fill="none">
+          <!-- Sonata: chart X Axis Title fill properties-->
+          <xsl:for-each select="c:spPr">
+            <xsl:call-template name="InsertChartFillProperties"/>
           </xsl:for-each>
         </style:graphic-properties>
-        <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="13pt"
+        <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
+          style:font-pitch="variable" fo:font-size="10pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="13pt" style:font-family-complex="Tahoma"
+          style:font-size-asian="10pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="13pt">
-
+          style:font-size-complex="10pt">
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
+              <xsl:choose>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                    <xsl:call-template name="TextBoxRunProperties"/>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
               <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
                 <xsl:call-template name="TextBoxRunProperties"/>
               </xsl:for-each>
             </xsl:when>
+              </xsl:choose>
+            </xsl:when>
+            <!--added for bug no:2016060-->
+            <xsl:when test="not(c:tx)">
+              <xsl:attribute name="fo:font-weight">
+                <xsl:value-of select="'bold'"/>
+              </xsl:attribute>
+              <!--<xsl:attribute name="fo:font-size">
+                <xsl:value-of select="'10pt'"/>
+              </xsl:attribute>-->
+            </xsl:when>
+            <!--end-->
+            
             <!-- default title -->
             <xsl:otherwise>
               <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
@@ -1600,51 +1800,38 @@
           </xsl:choose>
         </style:chart-properties>
         <style:graphic-properties draw:stroke="none" draw:fill="none">
+          <!-- Sonata: chart Y axis Title fill properties-->
           <xsl:for-each select="c:spPr">
-            <!-- Insert fill -->
-            <xsl:choose>
-              <xsl:when test="a:gradFill">
-                <xsl:attribute name="draw:fill">
-                  <xsl:text>gradient</xsl:text>
-                </xsl:attribute>
-                <xsl:for-each select="a:gradFill">
-                  <xsl:attribute name="draw:fill-gradient-name">
-                    <xsl:value-of select="generate-id()"/>
-                  </xsl:attribute>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:when test="a:blipFill">
-                <xsl:call-template name="InsertBitmapFill"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="InsertFill"/>
-              </xsl:otherwise>
-            </xsl:choose>
-
-            <xsl:call-template name="InsertLineColor"/>
-            <xsl:call-template name="InsertLineStyle"/>
+            <xsl:call-template name="InsertChartFillProperties"/>
           </xsl:for-each>
         </style:graphic-properties>
-        <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="13pt"
-          style:font-family-asian="&apos;MS Gothic&apos;"
-          style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="13pt" style:font-family-complex="Tahoma"
-          style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="13pt">
+        <style:text-properties fo:font-family="Calibri">
 
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
+              <xsl:choose>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                    <xsl:call-template name="TextBoxRunProperties"/>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
               <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
                 <xsl:call-template name="TextBoxRunProperties"/>
               </xsl:for-each>
             </xsl:when>
+               
+                
+              </xsl:choose>
+            </xsl:when>
             <!-- default title -->
+           
             <xsl:otherwise>
               <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
                 <xsl:call-template name="TextBoxRunProperties"/>
               </xsl:for-each>
+            
             </xsl:otherwise>
           </xsl:choose>
 
@@ -1665,9 +1852,33 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template name="InsertMinorGridXProperties">
+    <xsl:for-each select="c:minorGridlines/c:spPr">
+      <style:style style:name="minorGridX" style:family="chart">
+        <style:graphic-properties svg:stroke-width="0.1cm" svg:stroke-color="#000000"
+          draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
+          <xsl:call-template name="InsertLineColor"/>
+          <xsl:call-template name="InsertLineStyle"/>
+        </style:graphic-properties>
+      </style:style>
+    </xsl:for-each>
+  </xsl:template>
   <xsl:template name="InsertMajorGridYProperties">
     <xsl:for-each select="c:majorGridlines">
       <style:style style:name="majorGridY" style:family="chart">
+        <style:graphic-properties svg:stroke-width="0cm" svg:stroke-color="#000000"
+          draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
+          <xsl:for-each select="c:spPr">
+            <xsl:call-template name="InsertLineColor"/>
+            <xsl:call-template name="InsertLineStyle"/>
+          </xsl:for-each>
+        </style:graphic-properties>
+      </style:style>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="InsertMinorGridYProperties">
+    <xsl:for-each select="c:minorGridlines">
+      <style:style style:name="minorGridY" style:family="chart">
         <style:graphic-properties svg:stroke-width="0cm" svg:stroke-color="#000000"
           draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
           <xsl:for-each select="c:spPr">
@@ -1683,29 +1894,9 @@
     <xsl:for-each select="c:chartSpace/c:chart/c:legend">
       <style:style style:name="legend" style:family="chart">
         <style:graphic-properties draw:fill="none" draw:stroke="none">
+          <!-- Sonata: chart Legend fill properties-->
           <xsl:for-each select="c:spPr">
-            <!-- Insert fill -->
-            <xsl:choose>
-              <xsl:when test="a:gradFill">
-                <xsl:attribute name="draw:fill">
-                  <xsl:text>gradient</xsl:text>
-                </xsl:attribute>
-                <xsl:for-each select="a:gradFill">
-                  <xsl:attribute name="draw:fill-gradient-name">
-                    <xsl:value-of select="generate-id()"/>
-                  </xsl:attribute>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:when test="a:blipFill">
-                <xsl:call-template name="InsertBitmapFill"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="InsertFill"/>
-              </xsl:otherwise>
-            </xsl:choose>
-
-            <xsl:call-template name="InsertLineColor"/>
-            <xsl:call-template name="InsertLineStyle"/>
+            <xsl:call-template name="InsertChartFillProperties"/>
           </xsl:for-each>
         </style:graphic-properties>
         <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
@@ -1715,12 +1906,22 @@
           style:font-size-asian="10pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
           style:font-size-complex="10pt">
+
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
+              <xsl:choose>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
+                    <xsl:call-template name="TextBoxRunProperties"/>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
               <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
                 <xsl:call-template name="TextBoxRunProperties"/>
               </xsl:for-each>
+            </xsl:when>
+              </xsl:choose>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
@@ -1902,19 +2103,28 @@
             </xsl:attribute>
           </xsl:if>
         </style:chart-properties>
+        <style:graphic-properties draw:stroke="none" draw:fill="solid" draw:fill-color="#ffffff">
+          <!-- sonata:Insert Ploat Area Background style, color, fill, transparency -->
+          <xsl:for-each select="c:spPr">
+            <xsl:call-template name="InsertChartFillProperties"/>
+          </xsl:for-each>
+        </style:graphic-properties>
       </style:style>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertAxisXProperties">
+    <xsl:param name="axisYId"/>
     <style:style style:name="axis-x" style:family="chart" style:data-style-name="N0">
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
         chart:tick-marks-major-outer="true" chart:tick-marks-minor-inner="false"
-        chart:tick-marks-minor-outer="false" chart:logarithmic="false" chart:text-overlap="false"
+        chart:tick-marks-minor-outer="false" chart:logarithmic="false" chart:text-overlap="true"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
         style:direction="ltr">
 
-        <xsl:call-template name="SetAxisChartProperties"/>
+        <xsl:call-template name="SetAxisChartProperties">
+          <xsl:with-param name="axisId" select="$axisYId"/>
+        </xsl:call-template>
 
       </style:chart-properties>
       <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
@@ -1940,15 +2150,30 @@
 
   <xsl:template name="InsertAxisYProperties">
     <xsl:param name="axisXId"/>
-
-    <style:style style:name="axis-y" style:family="chart" style:data-style-name="N0">
+    <xsl:param name="numberformat"/>
+    <xsl:param name="dataStyleName"/>
+    <style:style style:name="axis-y" style:family="chart">
+      <!--code added by sonata for bug no:2107205-->
+      <xsl:choose>
+        <xsl:when test="$numberformat!=''">
+          <xsl:attribute name="style:data-style-name">
+            <xsl:value-of select="$dataStyleName"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="style:data-style-name">
+            <xsl:value-of select="N0"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      <!--end-->
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
-        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
+        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="true"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
         style:direction="ltr">
 
         <xsl:call-template name="SetAxisChartProperties">
-          <xsl:with-param name="axisXId" select="$axisXId"/>
+          <xsl:with-param name="axisId" select="$axisXId"/>
         </xsl:call-template>
 
       </style:chart-properties>
@@ -1973,17 +2198,441 @@
     </style:style>
   </xsl:template>
 
+ 
+  <xsl:template match="c:numFmt">
+
+    <!-- @Descripition: inserts number format style -->
+    <!-- @Context: None -->
+
+    <xsl:variable name="formatingMarks">
+      <xsl:call-template name="StripText">
+        <xsl:with-param name="formatCode" select="@formatCode"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+
+      <!-- date style -->
+      <xsl:when
+        test="(contains($formatingMarks,'y') or (contains($formatingMarks,'m') and not(contains($formatingMarks,'h') or contains($formatingMarks,'s')))or (contains($formatingMarks,'d') and not(contains($formatingMarks,'Red'))))">
+        <number:date-style style:name="{generate-id(.)}">
+          <xsl:call-template name="ProcessFormat">
+            <xsl:with-param name="format">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="processedFormat">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </number:date-style>
+      </xsl:when>
+
+      <!-- time style -->
+      <!-- 'and' at the end is for latvian currency -->
+      <xsl:when
+        test="contains($formatingMarks,'h') or contains($formatingMarks,'s') and not(contains($formatingMarks, '$Ls-426' ))">
+        <number:time-style style:name="{generate-id(.)}">
+          <xsl:if test="contains($formatingMarks,'[h')">
+            <xsl:attribute name="number:truncate-on-overflow">false</xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="ProcessFormat">
+            <xsl:with-param name="format">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,'[h')">
+                  <xsl:value-of select="translate(translate(@formatCode,'[h','h'),']','')"/>
+                </xsl:when>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="processedFormat">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,'[h')">
+                  <xsl:value-of select="translate(translate(@formatCode,'[h','h'),']','')"/>
+                </xsl:when>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </number:time-style>
+      </xsl:when>
+
+      <!-- when there are different formats for positive and negative numbers -->
+      <xsl:when
+        test="contains(@formatCode,';') and not(contains(substring-after(@formatCode,';'),';'))">
+        <xsl:choose>
+
+          <!-- currency style -->
+          <xsl:when
+            test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
+            <number:currency-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+            <number:currency-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:currency-style>
+          </xsl:when>
+
+          <!--percentage style -->
+          <xsl:when test="contains(substring-before(@formatCode,';'),'%')">
+            <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+            </number:percentage-style>
+            <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:percentage-style>
+          </xsl:when>
+
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+            <number:number-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:number-style>
+          </xsl:otherwise>
+
+        </xsl:choose>
+      </xsl:when>
+
+      <!-- when there are separate formats for positive numbers, negative numbers and zeros -->
+      <xsl:when test="contains(@formatCode,';') and contains(substring-after(@formatCode,';'),';')">
+        <xsl:choose>
+
+          <!-- currency style -->
+          <xsl:when
+            test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
+            <number:currency-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+            <number:currency-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(@formatCode,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
+                <number:currency-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:currency-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <xsl:variable name="text">
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"
+                    />
+                  </xsl:variable>
+                  <xsl:choose>
+
+                    <!-- text content -->
+                    <xsl:when test="contains($text,'@')">
+                      <number:text>
+                        <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
+                      </number:text>
+                      <number:text-content/>
+                      <number:text>
+                        <xsl:value-of select="translate(substring-after($text,'@'),'_-',' ')"/>
+                      </number:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($text,'_-',' ')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:currency-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:currency-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+
+          <!-- percentage style -->
+          <xsl:when test="contains(substring-before(@formatCode,';'),'%')">
+            <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:percentage-style>
+            <number:percentage-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(@formatCode,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:percentage-style>
+
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
+                <number:percentage-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:percentage-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <xsl:variable name="text">
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"
+                    />
+                  </xsl:variable>
+                  <xsl:choose>
+
+                    <!-- text content -->
+                    <xsl:when test="contains($text,'@')">
+                      <number:text>
+                        <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
+                      </number:text>
+                      <number:text-content/>
+                      <number:text>
+                        <xsl:value-of select="translate(substring-after($text,'@'),'_-',' ')"/>
+                      </number:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($text,'_-',' ')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:percentage-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:percentage-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+            <number:number-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(@formatCode,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
+                <number:number-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"
+                      />
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:number-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <xsl:variable name="text">
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"
+                    />
+                  </xsl:variable>
+                  <xsl:choose>
+
+                    <!-- text content -->
+                    <xsl:when test="contains($text,'@')">
+                      <number:text>
+                        <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
+                      </number:text>
+                      <number:text-content/>
+                      <number:text>
+                        <xsl:value-of select="translate(substring-after($text,'@'),'_-',' ')"/>
+                      </number:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($text,'_-',' ')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:number-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:number-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:choose>
+
+          <!-- currency style -->
+          <xsl:when
+            test="contains(@formatCode,'$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">
+            <number:currency-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+          </xsl:when>
+
+          <!--percentage style -->
+          <xsl:when test="contains(@formatCode,'%')">
+            <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+            </number:percentage-style>
+          </xsl:when>
+
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode" select="@formatCode"/>
+              </xsl:call-template>
+            </number:number-style>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+
+    </xsl:choose>
+
+  </xsl:template>
   <xsl:template name="InsertSecondaryAxisYProperties">
     <xsl:param name="axisXId"/>
 
     <style:style style:name="secondary_axis-y" style:family="chart" style:data-style-name="N0">
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
-        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
+        chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="true"
         text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
         style:direction="ltr">
 
         <xsl:call-template name="SetAxisChartProperties">
-          <xsl:with-param name="axisXId" select="$axisXId"/>
+          <xsl:with-param name="axisId" select="$axisXId"/>
         </xsl:call-template>
 
       </style:chart-properties>
@@ -2048,19 +2697,60 @@
 
         <style:chart-properties>
           <!-- symbols -->
-          <xsl:if test="c:marker/c:symbol/@val = 'none' ">
+          <xsl:choose>
+            <!-- radar chart symbols -->
+            <xsl:when
+              test="key('plotArea', @oox:part)/c:radarChart/c:radarStyle/@val = 'marker' and not(c:marker/c:symbol/@val = 'none')">
+              <xsl:attribute name="chart:symbol-type">
+                <xsl:text>automatic</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            
+            <xsl:when test="c:marker/c:symbol/@val = 'none' ">
             <xsl:attribute name="chart:symbol-type">
               <xsl:text>none</xsl:text>
             </xsl:attribute>
-          </xsl:if>
+            </xsl:when>
+            <xsl:when test="c:marker/c:symbol/@val != 'none' ">
+              <xsl:choose>
+                <xsl:when test="c:marker/c:symbol[@val='triangle' or @val='square' or @val='diamond']">
+                  <xsl:attribute name="chart:symbol-type">
+                    <xsl:text>named-symbol</xsl:text>
+                  </xsl:attribute>
+                  <xsl:attribute name="chart:symbol-name">
+                    <xsl:choose>
+                      <xsl:when test="c:marker/c:symbol/@val='triangle'">
+                        <xsl:text>arrow-up</xsl:text>
+                      </xsl:when>
+                      <xsl:when test="c:marker/c:symbol/@val='square'">
+                        <xsl:text>square</xsl:text>
+                      </xsl:when>
+                      <xsl:when test="c:marker/c:symbol/@val='diamond'">
+                        <xsl:text>diamond</xsl:text>
+                      </xsl:when>
+                    </xsl:choose>
 
-          <!-- radar chart symbols -->
-          <xsl:if
-            test="key('plotArea', @oox:part)/c:radarChart/c:radarStyle/@val = 'marker' and not(c:marker/c:symbol/@val = 'none')">
+                  </xsl:attribute>
+                  <xsl:if test="c:marker/c:size/@val">
+                    <xsl:variable name="marker_size">
+                      <xsl:value-of select="concat(c:marker/c:size/@val * 0.03526087,'cm') "/>
+                    </xsl:variable>
+                    <xsl:attribute name="chart:symbol-width">
+                      <xsl:value-of select="$marker_size"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="chart:symbol-height">
+                      <xsl:value-of select="$marker_size"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </xsl:when>
+                <xsl:otherwise>
             <xsl:attribute name="chart:symbol-type">
               <xsl:text>automatic</xsl:text>
             </xsl:attribute>
-          </xsl:if>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+          </xsl:choose>
           
           <xsl:if test="c:explosion">
             <xsl:attribute name="chart:pie-offset">
@@ -2238,31 +2928,9 @@
               <xsl:value-of select="$defaultColor"/>
             </xsl:attribute>
           </xsl:if>
-
+          <!-- Sonata: chart Data series fill properties-->
           <xsl:for-each select="c:spPr">
-
-            <!-- Insert fill -->
-            <xsl:choose>
-              <xsl:when test="a:gradFill">
-                <xsl:attribute name="draw:fill">
-                  <xsl:text>gradient</xsl:text>
-                </xsl:attribute>
-                <xsl:for-each select="a:gradFill">
-                  <xsl:attribute name="draw:fill-gradient-name">
-                    <xsl:value-of select="generate-id()"/>
-                  </xsl:attribute>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:when test="a:blipFill">
-                <xsl:call-template name="InsertBitmapFill"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="InsertFill"/>
-              </xsl:otherwise>
-            </xsl:choose>
-
-            <xsl:call-template name="InsertLineColor"/>
-            <xsl:call-template name="InsertLineStyle"/>
+            <xsl:call-template name="InsertChartFillProperties"/>
           </xsl:for-each>
 
         </style:graphic-properties>
@@ -2287,30 +2955,9 @@
         <style:style style:name="{concat('trend',$seriesNumber)}" style:family="chart">
           <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
             svg:stroke-color="#004586" svg:stroke-opacity="100%" draw:stroke-linejoin="none">
+            <!-- Sonata: chart trendline properties-->
             <xsl:for-each select="c:trendline/c:spPr">
-
-              <!-- Insert fill -->
-              <xsl:choose>
-                <xsl:when test="a:gradFill">
-                  <xsl:attribute name="draw:fill">
-                    <xsl:text>gradient</xsl:text>
-                  </xsl:attribute>
-                  <xsl:for-each select="a:gradFill">
-                    <xsl:attribute name="draw:fill-gradient-name">
-                      <xsl:value-of select="generate-id()"/>
-                    </xsl:attribute>
-                  </xsl:for-each>
-                </xsl:when>
-                <xsl:when test="a:blipFill">
-                  <xsl:call-template name="InsertBitmapFill"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:call-template name="InsertFill"/>
-                </xsl:otherwise>
-              </xsl:choose>
-
-              <xsl:call-template name="InsertLineColor"/>
-              <xsl:call-template name="InsertLineStyle"/>
+              <xsl:call-template name="InsertChartFillProperties"/>
             </xsl:for-each>
           </style:graphic-properties>
         </style:style>
@@ -2519,28 +3166,8 @@
         </xsl:if>
 
         <xsl:for-each select="c:dPt[c:idx/@val = $current]/c:spPr">
-          <!-- Insert fill -->
-          <xsl:choose>
-            <xsl:when test="a:gradFill">
-              <xsl:attribute name="draw:fill">
-                <xsl:text>gradient</xsl:text>
-              </xsl:attribute>
-              <xsl:for-each select="a:gradFill">
-                <xsl:attribute name="draw:fill-gradient-name">
-                  <xsl:value-of select="generate-id()"/>
-                </xsl:attribute>
-              </xsl:for-each>
-            </xsl:when>
-            <xsl:when test="a:blipFill">
-              <xsl:call-template name="InsertBitmapFill"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="InsertFill"/>
-            </xsl:otherwise>
-          </xsl:choose>
-
-          <xsl:call-template name="InsertLineColor"/>
-          <xsl:call-template name="InsertLineStyle"/>
+          <!-- Sonata: chart data point properties-->
+          <xsl:call-template name="InsertChartFillProperties"/>
         </xsl:for-each>
 
       </style:graphic-properties>
@@ -2568,45 +3195,108 @@
     <!-- c:chartSpace/c:chart/c:backWall -->
     <style:style style:name="wall" style:family="chart">
       <style:graphic-properties draw:stroke="none" draw:fill="solid" draw:fill-color="#ffffff">
-        <!-- Insert Borders Wall style, color, fill, transparency -->
-        <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:spPr">
-
-          <!-- Insert fill -->
-          <xsl:choose>
-            <xsl:when test="a:gradFill">
-              <xsl:attribute name="draw:fill">
-                <xsl:text>gradient</xsl:text>
-              </xsl:attribute>
-              <xsl:for-each select="a:gradFill">
-                <xsl:attribute name="draw:fill-gradient-name">
-                  <xsl:value-of select="generate-id()"/>
-                </xsl:attribute>
+     <xsl:choose>
+        <xsl:when test="c:chartSpace/c:chart/c:sideWall">
+          <!-- Sonata: chart ploat area fill properties-->
+          <xsl:for-each select="c:chartSpace/c:chart/c:sideWall/c:spPr">
+            <xsl:call-template name="InsertChartFillProperties"/>
               </xsl:for-each>
             </xsl:when>
-            <xsl:when test="a:blipFill">
-              <xsl:call-template name="InsertBitmapFill"/>
+        <xsl:when test="c:chartSpace/c:chart/c:plotArea">
+          <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
+            <!-- Insert Ploat Area Background style, color, fill, transparency -->
+            <xsl:for-each select="c:spPr">
+              <xsl:call-template name="InsertChartFillProperties"/>
+            </xsl:for-each>
+          </xsl:for-each>
             </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="InsertFill"/>
-            </xsl:otherwise>
-          </xsl:choose>
+      </xsl:choose>
+  </style:graphic-properties>
+    </style:style>
+  </xsl:template>
+<!--added by Sonata-->
+  <xsl:template name="InsertStockRangeProperties">
 
-          <xsl:call-template name="InsertLineColor"/>
-          <xsl:call-template name="InsertLineStyle"/>
+   <style:style style:name="stock-range" style:family="chart">
+      <style:graphic-properties >
+        <!-- Sonata: chart stock range fill properties-->
+        <xsl:for-each select="c:chartSpace/c:chart/c:plotArea/c:stockChart/c:hiLowLines/c:spPr">
+          <xsl:call-template name="InsertChartFillProperties"/>
         </xsl:for-each>
       </style:graphic-properties>
     </style:style>
   </xsl:template>
-
+  <!--end-->
   <xsl:template name="InsertFloorProperties">
     <!-- c:chartSpace/c:chart/c:floor -->
     <style:style style:name="floor" style:family="chart">
       <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.03cm"
         draw:marker-start-width="0.25cm" draw:marker-end-width="0.25cm" draw:fill="none"
-        draw:fill-color="#999999"/>
+        draw:fill-color="#999999">
+        <!-- Sonata: chart floor fill properties-->
+        <xsl:for-each select="c:chartSpace/c:chart/c:backWall/c:spPr">
+          <xsl:call-template name="InsertChartFillProperties"/>
+    </xsl:for-each>
+      </style:graphic-properties>
     </style:style>
   </xsl:template>
+  <xsl:template name ="AddDashType">
+    <!-- Sonata: Insert dash style for line style of chart-->
+    <xsl:param name ="name" />
+    <xsl:param name ="cap" />
+    <xsl:param name ="dot1" />
+    <xsl:param name ="dot1-length" />
+    <xsl:param name ="dot2" />
+    <xsl:param name ="dot2-length" />
+    <xsl:param name ="distance" />
+ <draw:stroke-dash>
+      <xsl:if test ="$cap='rnd'">
+        <xsl:attribute name ="draw:name">
+          <xsl:value-of select ="concat($name,'Round')"/>
+        </xsl:attribute>
+        <xsl:attribute name ="draw:style">
+          <xsl:value-of select ="'round'"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not($cap) or ($cap!='rnd')">
+        <xsl:attribute name ="draw:name">
+          <xsl:value-of select ="$name"/>
+        </xsl:attribute>
+        <xsl:attribute name ="draw:style">
+          <xsl:value-of select ="'rect'"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name ="draw:display-name">
+        <xsl:value-of select ="$name"/>
+      </xsl:attribute>
+      <xsl:if test ="(string-length($dot1) != 0)">
+        <xsl:attribute name ="draw:dots1">
+          <xsl:value-of select ="$dot1" />
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="(string-length($dot1-length) != 0)">
+        <xsl:attribute name ="draw:dots1-length">
+          <xsl:value-of select ="concat($dot1-length,'cm')" />
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="(string-length($dot2) != 0)">
+        <xsl:attribute name ="draw:dots2">
+          <xsl:value-of select ="$dot2" />
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="(string-length($dot2-length) != 0)">
+        <xsl:attribute name ="draw:dots2-length">
+          <xsl:value-of select ="concat($dot2-length,'cm')" />
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="(string-length($distance) != 0)">
+        <xsl:attribute name ="draw:distance">
+          <xsl:value-of select ="concat($distance,'cm')"/>
+        </xsl:attribute>
+      </xsl:if>
+    </draw:stroke-dash>
 
+  </xsl:template>
   <xsl:template name="InsertDrawFillImage">
     <xsl:param name="chartId"/>
     <xsl:param name="inputChart"/>
@@ -2690,7 +3380,7 @@
   </xsl:template>
 
   <xsl:template name="SetAxisChartProperties">
-    <xsl:param name="axisXId"/>
+    <xsl:param name="axisId"/>
 
     <!-- valAx id (for axis at) -->
     <xsl:variable name="id">
@@ -2716,6 +3406,20 @@
       </xsl:attribute>
     </xsl:if>
 
+	  <!--reverse direction-->
+
+	  <xsl:if test="c:scaling/c:orientation/@val='minMax'">
+		  <xsl:attribute name="chart:reverse-direction">
+			  <xsl:text>false</xsl:text>
+		  </xsl:attribute>
+	  </xsl:if>
+
+	  <xsl:if test="c:scaling/c:orientation/@val='maxMin'">
+		  <xsl:attribute name="chart:reverse-direction">
+			  <xsl:text>true</xsl:text>
+		  </xsl:attribute>
+	  </xsl:if>
+	  
     <!-- min/max value-->
     <xsl:if test="c:scaling/c:max">
       <xsl:attribute name="chart:maximum">
@@ -2817,13 +3521,15 @@
     </xsl:if>
 
     <!-- axis at -->
+    <!-- Edited by Sonata: to set Axis' start point -->
     <xsl:for-each
-      select="parent::node()/child::node()[contains(name(),'Ax') and c:axId/@val = $axisXId]">
-      <xsl:if test="c:crossesAt">
+      select="parent::node()/child::node()[contains(name(),'Ax')]/c:axId[@val =$axisId]">
+      <xsl:if test="../c:crossesAt/@val">
         <xsl:attribute name="chart:origin">
-          <xsl:value-of select="c:crossesAt/@val"/>
+          <xsl:value-of select="../c:crossesAt/@val"/>
         </xsl:attribute>
       </xsl:if>
+
     </xsl:for-each>
 
     <!--xsl:for-each select="parent::node()/c:valAx[generate-id(.) != $id][1]">
