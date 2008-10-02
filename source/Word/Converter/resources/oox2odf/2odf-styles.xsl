@@ -633,7 +633,7 @@
     <!--math: Added for bugfix #1934315 START-->    
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
-        <xsl:with-param name="Name">
+        <xsl:with-param name="name">
           <xsl:value-of select="$currentStyleId" />
         </xsl:with-param>
       </xsl:call-template>
@@ -693,6 +693,7 @@
       <xsl:when test="$isDefaultTOCStyle = 'true'">      
       <style:style style:name="{concat('Contents_20_',substring-after($currentStyleId,'TOC'))}"
           style:display-name="{concat('Contents',substring-after(self::node()/w:name/@w:val,'toc'))}">
+        
           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
             <xsl:attribute name="style:parent-style-name">
@@ -2935,7 +2936,7 @@
 
         <xsl:variable name="isDefaultTOCStyle">
           <xsl:call-template name ="CheckDefaultTOCStyle">
-            <xsl:with-param name="Name">
+            <xsl:with-param name="name">
               <xsl:value-of select="self::node()/@w:styleId" />
             </xsl:with-param>
           </xsl:call-template>
@@ -3412,7 +3413,7 @@
 
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
-        <xsl:with-param name="Name">
+        <xsl:with-param name="name">
           <xsl:value-of select="$StyleId" />
         </xsl:with-param>
       </xsl:call-template>
@@ -3455,7 +3456,7 @@
 
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
-        <xsl:with-param name="Name">
+        <xsl:with-param name="name">
           <xsl:value-of select="$StyleId" />
         </xsl:with-param>
       </xsl:call-template>
@@ -3582,7 +3583,7 @@
 
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
-        <xsl:with-param name="Name">
+        <xsl:with-param name="name">
           <xsl:value-of select="$StyleId" />
         </xsl:with-param>
       </xsl:call-template>
@@ -3648,7 +3649,7 @@
 
       <xsl:variable name="isDefaultTOCStyle">
         <xsl:call-template name ="CheckDefaultTOCStyle">
-          <xsl:with-param name="Name">
+          <xsl:with-param name="name">
             <xsl:value-of select="$StyleId" />
           </xsl:with-param>
         </xsl:call-template>
@@ -3722,7 +3723,7 @@
 
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
-        <xsl:with-param name="Name">
+        <xsl:with-param name="name">
           <xsl:value-of select="$StyleId" />
         </xsl:with-param>
       </xsl:call-template>
@@ -3798,7 +3799,7 @@
 
     <xsl:variable name="isDefaultTOCStyle">
       <xsl:call-template name ="CheckDefaultTOCStyle">
-        <xsl:with-param name="Name">
+        <xsl:with-param name="name">
           <xsl:value-of select="$StyleId" />
         </xsl:with-param>
       </xsl:call-template>

@@ -193,7 +193,7 @@
 
 					<xsl:variable name="isDefaultTOCStyle">
 						<xsl:call-template name ="CheckDefaultTOCStyle">
-							<xsl:with-param name="Name">
+							<xsl:with-param name="name">
 								<xsl:value-of select="w:pStyle/@w:val" />
 							</xsl:with-param>
 						</xsl:call-template>
