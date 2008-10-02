@@ -894,12 +894,14 @@
 
 	<!-- run -->
 	<xsl:template match="w:r">
+    <xsl:param name="ignoreFieldFlag" />
+    
 		<xsl:message terminate="no">progress:w:r</xsl:message>
 		<xsl:choose>
 
 			<!--fields-->
 			<!--xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate']"-->
-			<xsl:when test="@oox:f">
+			<xsl:when test="@oox:f and $ignoreFieldFlag!='true'">
 				<xsl:call-template name="InsertField"/>
 			</xsl:when>
 
@@ -1402,36 +1404,36 @@
   Author:   makz (DIaLOGIKa)
   -->
   <xsl:template name="InsertPageNumberOffset">
-    <!-- 
-    Only change the page number offset for a paragraph in the body ...
-    -->
-    <xsl:if test="ancestor::w:body">
-
-      <!--
-      ... and only if this is the first paragraph in the section ...
+      <!-- 
+      Only change the page number offset for a paragraph in the body ...
       -->
-      <xsl:if test="not(preceding-sibling::w:p) or preceding-sibling::w:p[1]/w:pPr/w:sectPr">
+      <xsl:if test="ancestor::w:body">
 
-        <xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
-        <xsl:variable name="followingSectPr" select="following-sibling::w:p[w:pPr/w:sectPr]/w:pPr/w:sectPr"/>
+        <!--
+        ... and only if this is the first paragraph in the section ...
+        -->
+        <xsl:if test="not(preceding-sibling::w:p) or preceding-sibling::w:p[1]/w:pPr/w:sectPr">
 
-        <xsl:choose>
-          <xsl:when test="$followingSectPr and $followingSectPr/w:pgNumType/@w:start">
-            <!-- there is a sectPr for this paragraph -->
-            <xsl:attribute name="style:page-number">
-              <xsl:value-of select="$followingSectPr/w:pgNumType/@w:start"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="$mainSectPr and $mainSectPr/w:pgNumType/@w:start">
-            <!-- use the main sectPr -->
-            <xsl:attribute name="style:page-number">
-              <xsl:value-of select="$mainSectPr/w:pgNumType/@w:start"/>
-            </xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
+          <xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
+          <xsl:variable name="followingSectPr" select="following-sibling::w:p[w:pPr/w:sectPr]/w:pPr/w:sectPr"/>
 
+          <xsl:choose>
+            <xsl:when test="$followingSectPr and $followingSectPr/w:pgNumType/@w:start">
+              <!-- there is a sectPr for this paragraph -->
+              <xsl:attribute name="style:page-number">
+                <xsl:value-of select="$followingSectPr/w:pgNumType/@w:start"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$mainSectPr and $mainSectPr/w:pgNumType/@w:start">
+              <!-- use the main sectPr -->
+              <xsl:attribute name="style:page-number">
+                <xsl:value-of select="$mainSectPr/w:pgNumType/@w:start"/>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+
+        </xsl:if>
       </xsl:if>
-    </xsl:if>
   </xsl:template>
 
     

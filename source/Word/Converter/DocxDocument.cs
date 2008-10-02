@@ -14,6 +14,7 @@ namespace OdfConverter.Wordprocessing
         protected int _sectPrId = 0;
         
         protected int _insideField = 0;
+        protected int _fieldId = 0;
 
         public DocxDocument(string fileName) : base(fileName)
         {
@@ -99,6 +100,7 @@ namespace OdfConverter.Wordprocessing
                                             {
                                                 fieldBegin = true;
                                                 _insideField++;
+                                                _fieldId++;
                                             }
                                             if (xtr.Value.Equals("end"))
                                             {
@@ -153,6 +155,7 @@ namespace OdfConverter.Wordprocessing
                                     {
                                         // add an attribute if we are inside a field definition
                                         xtw.WriteAttributeString(NS_PREFIX, "f", PACKAGE_NS, _insideField.ToString());
+                                        xtw.WriteAttributeString(NS_PREFIX, "fid", PACKAGE_NS, _fieldId.ToString());
                                     }
                                     break;
                                 case "sectPr":

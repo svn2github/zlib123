@@ -301,6 +301,9 @@
 
   <xsl:template match="text:subject[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" SUBJECT ">
+      <!--
+      makz: Commented out for bugfix 2088835
+      -->
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
@@ -313,6 +316,10 @@
 
   <xsl:template match="text:title[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" TITLE ">
+      <!--
+      makz: Commented out for bugfix 2088835
+      <xsl:apply-templates mode="paragraph"/>
+      -->
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>

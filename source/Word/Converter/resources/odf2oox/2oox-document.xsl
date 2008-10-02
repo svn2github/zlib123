@@ -46,7 +46,6 @@
   <xsl:import href="2oox-indexes.xsl"/>
   <xsl:import href="2oox-bookmarks.xsl"/>
 
-
   <xsl:key name="annotations" match="office:annotation" use="''"/>
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <xsl:key name="hyperlinks" match="text:a" use="''"/>
@@ -306,23 +305,64 @@
   </xsl:template>
 
 
-  <!-- Inserts the paragraph properties -->
+  <!--
+  Summary:  Inserts the direct formatting of a paragraph.
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+  Date:     30.09.2008
+  Params:   level:
+            isFirstRow:
+  -->
   <xsl:template name="InsertParagraphProperties">
     <xsl:param name="level"/>
     <xsl:param name="isFirstRow"/>
 
-    <!-- insert paragraph style -->
-    <xsl:call-template name="InsertParagraphStyle">
-      <xsl:with-param name="styleName">
-        <xsl:value-of select="@text:style-name"/>
-      </xsl:with-param>
-    </xsl:call-template>
-    
-    <!--  indent  -->
     <xsl:variable name="styleName">
       <xsl:value-of select="@text:style-name"/>
     </xsl:variable>
+    
+    <!-- 
+    makz: Insert paragraph style reference.
+          Do not add reference if the style is an automatic style.
+          Convert the properties of the automatic style to direct formatting instead.
+    -->
+    <xsl:choose>
+      <xsl:when test="key('automatic-styles', $styleName)">
 
+        <!-- 
+        makz: Reference the parent style of the automatic style
+        -->
+        <xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
+          <xsl:call-template name="InsertParagraphStyle">
+            <xsl:with-param name="styleName">
+              <xsl:value-of select="key('automatic-styles', $styleName)/@style:parent-style-name"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+
+        <!-- 
+        makz: Convert the automatic style
+        -->
+        <xsl:for-each select="key('automatic-styles', $styleName)">
+          <xsl:apply-templates select="style:paragraph-properties" mode="pPr"/>
+        </xsl:for-each>
+        
+      </xsl:when>
+      <xsl:when test="$styleName">
+
+        <!--
+        makz: Reference the normal style
+        -->
+        <xsl:call-template name="InsertParagraphStyle">
+          <xsl:with-param name="styleName">
+            <xsl:value-of select="$styleName"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
+      </xsl:when>
+    </xsl:choose>
+
+    <!--  indent  -->
     <xsl:if test="key('automatic-styles', $styleName)/style:paragraph-properties/@fo:margin-left">
 
       <!--math, dialogika: changed for correct indentation calculation of headings 
@@ -586,7 +626,6 @@
       
     </xsl:if>
 
-    
     <!-- insert page break before table when required -->
     <xsl:choose>
       <xsl:when test="$isFirstRow = 'true' ">
@@ -631,7 +670,6 @@
     <xsl:call-template name="InsertOutlineLevel">
       <xsl:with-param name="node" select="."/>
     </xsl:call-template>
-
 
     <!-- if we are in an annotation, we may have to insert annotation reference -->
     <xsl:call-template name="InsertAnnotationReference"/>
@@ -1171,21 +1209,74 @@
     </w:r>
   </xsl:template>
 
-  <!-- Inserts the Run properties -->
+  
+  <!--
+  Summary:  Inserts the direct formatting of a run.
+  Author:   CleverAge
+  Modified: makz (DIaLOGIKa)
+  Date:     30.09.2008
+  -->
   <xsl:template name="InsertRunProperties">
-    <!-- apply text properties if needed -->
-    <!-- test description : if there is an ancestor text:span or text:a,
+    <w:rPr>
+      <xsl:variable name="styleName">
+        <xsl:call-template name="GetStyleName"/>
+      </xsl:variable>
+      <xsl:variable name="paraStyleName" select="ancestor::text:p/@text:style-name" />
+
+      <!--
+        makz: If the parent paragraph has an automatic style we must convert it's text formatting.
+        This must be done before converting the properties of the run's automatic style due to the priority
+      -->
+      <xsl:if test="key('automatic-styles', $paraStyleName)">
+        <!-- context switch -->
+        <xsl:for-each select="key('automatic-styles', $paraStyleName)">
+          <xsl:apply-templates select="style:text-properties" mode="rPr"/>
+        </xsl:for-each>
+      </xsl:if>
+
+      <!-- 
+      makz: Convert the automatic style of the run to direct formatting.
+            If the run's referenced style is no automatic style, 
+            it is a normal style, so we need to reference it.
+      -->
+      <xsl:choose>
+        <xsl:when test="key('automatic-styles', $styleName)">
+          
+          <!-- 
+          makz: Add the parent style of the automatic style as style ref 
+          -->
+          <xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
+            <xsl:call-template name="InsertParagraphStyle">
+              <xsl:with-param name="styleName">
+                <xsl:value-of select="key('automatic-styles', $styleName)/@style:parent-style-name"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+          
+          <!-- 
+          makz: Convert the automatic style 
+          -->
+          <xsl:for-each select="key('automatic-styles', $styleName)">
+            <xsl:apply-templates select="style:text-properties" mode="rPr"/>
+          </xsl:for-each>
+
+        </xsl:when>
+        <xsl:when test="$styleName">
+          <!-- normal style -->
+          <xsl:call-template name="InsertRunStyle">
+            <xsl:with-param name="styleName" select="$styleName" />
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+
+      <!-- apply text properties if needed -->
+      <!-- test description : if there is an ancestor text:span or text:a,
       and that the first ancestor to come is not a text:p or text:h
     or if we are in a list-->
-    <xsl:if
-      test="ancestor-or-self::*[self::text:span or self::text:a or self::text:p or self::text:h][1][self::text:span or self::text:a]
+      <xsl:if
+        test="ancestor-or-self::*[self::text:span or self::text:a or self::text:p or self::text:h][1][self::text:span or self::text:a]
       or self::text:list-level-style-number|self::text:outline-level-style">
-      <w:rPr>
-        <xsl:call-template name="InsertRunStyle">
-          <xsl:with-param name="styleName">
-            <xsl:call-template name="GetStyleName"/>
-          </xsl:with-param>
-        </xsl:call-template>
+
         <!-- override text properties of link -->
         <xsl:if test="ancestor::text:a/@text:style-name">
           <xsl:variable name="linkStyleName" select="parent::text:a/@text:style-name"/>
@@ -1194,8 +1285,9 @@
               mode="rPr"/>
           </xsl:for-each>
         </xsl:if>
-      </w:rPr>
-    </xsl:if>
+
+      </xsl:if>
+    </w:rPr>
   </xsl:template>
 
   <!-- Inserts the style of a run -->

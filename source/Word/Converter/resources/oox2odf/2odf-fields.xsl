@@ -1190,13 +1190,47 @@
 
   <xsl:template name="InsertSubject">
     <text:subject>
+      <!--
+      makz: Changed for bugfix 2088835.
+      
       <xsl:apply-templates select="w:r/child::node()"/>
+      -->
+      <xsl:choose>
+        <xsl:when test="name() = 'w:fldSimple'">
+          <xsl:apply-templates select="w:r" />
+        </xsl:when>
+        <xsl:when test="name() = 'w:instrText'">
+          <!--get this field id -->
+          <xsl:variable name="fieldId" select="../@oox:fid" />
+          <!-- convert all runs of this field -->
+          <xsl:apply-templates select="../following-sibling::w:r[@oox:fid=$fieldId and w:t]">
+            <xsl:with-param name="ignoreFieldFlag" select="'true'" />
+          </xsl:apply-templates>
+        </xsl:when>
+      </xsl:choose>
     </text:subject>
   </xsl:template>
 
   <xsl:template name="InsertTitle">
     <text:title>
+      <!--
+      makz: Changed for bugfix 2088835.
+
       <xsl:apply-templates select="w:r/child::node()"/>
+      -->
+      <xsl:choose>
+        <xsl:when test="name() = 'w:fldSimple'">
+          <xsl:apply-templates select="w:r" />
+        </xsl:when>
+        <xsl:when test="name() = 'w:instrText'">
+          <!--get this field id -->
+          <xsl:variable name="fieldId" select="../@oox:fid" />
+          <!-- convert all runs of this field -->
+          <xsl:apply-templates select="../following-sibling::w:r[@oox:fid=$fieldId and w:t]">
+            <xsl:with-param name="ignoreFieldFlag" select="'true'" />
+          </xsl:apply-templates>
+        </xsl:when>
+      </xsl:choose>
     </text:title>
   </xsl:template>
 
@@ -1212,6 +1246,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
 
   <xsl:template name="InsertSequence">
     <xsl:param name="fieldCode"/>

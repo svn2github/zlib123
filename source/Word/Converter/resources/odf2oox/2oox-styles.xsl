@@ -68,11 +68,16 @@
       </w:docDefaults>
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
         mode="styles"/>
+      
+      <!--
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="styles"/>
       <xsl:apply-templates
-        select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"/>
+        select="document('styles.xml')/office:document-styles/office:automatic-styles" 
+        mode="styles"/>
+      -->
+      
       <!-- styles to ensure that hyperlinks will be matched and followed. -->
       <xsl:call-template name="InsertHyperlinkStyles"/>
       <!-- styles to ensure that indexes keep the same style when updated -->
