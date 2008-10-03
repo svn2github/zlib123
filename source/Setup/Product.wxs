@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Id="AC34B86A-EE32-41C4-BAC9-392A8343E01C"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-			 Version="2.5.0.4797"
+			 Version="2.5.0.4799"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
@@ -53,11 +53,11 @@
 		<Property Id="FILE_ASSOCIATION_ODS" />
 		<Property Id="FILE_ASSOCIATION_ODP" />
 
-		<Property Id='ARPCOMMENTS' Value='Build 4797' />
+		<Property Id='ARPCOMMENTS' Value='Build 4799' />
 		<Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata Software Ltd' />
 		<Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
 
-		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4797)'/>
+		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4799)'/>
 		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
 
