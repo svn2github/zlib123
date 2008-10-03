@@ -2129,7 +2129,9 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
             <style:style style:name="{generate-id(parent::node())}" style:family="text">
               <style:text-properties fo:font-family="Calibri" fo:font-size="11pt" fo:font-weight="normal"
                 fo:color="#000000">
-                <xsl:call-template name="TextBoxRunProperties"/>
+                <xsl:call-template name="TextBoxRunProperties">
+                  <xsl:with-param name="rPr" select="."/>
+                </xsl:call-template>
               </style:text-properties>
             </style:style>
           </xsl:for-each>
@@ -2305,72 +2307,122 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
   </xsl:template>
 
   <xsl:template name="TextBoxRunProperties">
-
+    <xsl:param name="defRPr" select="."/>
+    <xsl:param name="rPr" select="."/>
     <xsl:choose>
-      <xsl:when test="a:latin/@typeface != '+mn-lt' and a:latin/@typeface != '+mj-lt' ">
+      <xsl:when test="$rPr/a:latin/@typeface != '+mn-lt' and $rPr/a:latin/@typeface != '+mj-lt' ">
         <xsl:attribute name="fo:font-family">
           <xsl:value-of select="a:latin/@typeface"/>
         </xsl:attribute>
       </xsl:when>
-      <!--xsl:when test="not(a:latin) and a:cs">
+      <xsl:when test="$defRPr/a:latin/@typeface != '+mn-lt' and $defRPr/a:latin/@typeface != '+mj-lt' ">
             <xsl:attribute name="fo:font-family">
-              <xsl:value-of select="a:cs/@typeface"/>
+          <xsl:value-of select="a:latin/@typeface"/>
             </xsl:attribute>
-          </xsl:when-->
+      </xsl:when>
     </xsl:choose>
 
     <!-- font size -->
-    <xsl:if test="@sz">
+    <xsl:choose>
+      <xsl:when test="$rPr/@sz">
       <xsl:attribute name="fo:font-size">
-        <xsl:value-of select="concat(format-number(@sz div 100,'0.##'), 'pt')"/>
+          <xsl:value-of select="concat(format-number($rPr/@sz div 100,'0.##'), 'pt')"/>
       </xsl:attribute>
-    </xsl:if>
+      </xsl:when>
+      <xsl:when test="$defRPr/@sz">
+        <xsl:attribute name="fo:font-size">
+          <xsl:value-of select="concat(format-number($defRPr/@sz div 100,'0.##'), 'pt')"/>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
 
-    <!-- bold -->
-    <!--<xsl:if test="@b = 1">
+    <xsl:choose>
+      <xsl:when test="$rPr/@b = 1">
       <xsl:attribute name="fo:font-weight">
         <xsl:value-of select="'bold'"/>
       </xsl:attribute>
-    </xsl:if>-->
-
-    <xsl:if test="@b = 1 or not(@b)">
+      </xsl:when>
+      <xsl:when test="$defRPr/@b = 1">
       <xsl:attribute name="fo:font-weight">
         <xsl:value-of select="'bold'"/>
       </xsl:attribute>
-    </xsl:if>
+      </xsl:when>
+    </xsl:choose>
+
 
     <!-- Italic-->
-    <xsl:if test="@i = 1">
+    <xsl:choose>
+      <xsl:when test="$rPr/@i = 1">
       <xsl:attribute name="fo:font-style">
         <xsl:value-of select="'italic'"/>
       </xsl:attribute>
-    </xsl:if>
+      </xsl:when>
+      <xsl:when test="$defRPr/@i = 1">
+        <xsl:attribute name="fo:font-style">
+          <xsl:value-of select="'italic'"/>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+   
 
     <!-- font color -->
     <xsl:choose>
-      <xsl:when test="a:solidFill/a:srgbClr/@val">
+   
+        <xsl:when test="$rPr/a:solidFill or $defRPr/a:solidFill">
+          <xsl:choose>
+            <xsl:when test="$rPr/a:solidFill">
+              <xsl:choose>
+                <xsl:when test="$rPr/a:solidFill/a:srgbClr/@val">
         <xsl:attribute name="fo:color">
-          <xsl:value-of select="concat('#',a:solidFill/a:srgbClr/@val)"/>
+                    <xsl:value-of select="concat('#',$rPr/a:solidFill/a:srgbClr/@val)"/>
         </xsl:attribute>
       </xsl:when>
-
-      <!-- scheme color -->
-      <xsl:when test="a:solidFill/a:schemeClr/@val">
+ <!-- scheme color -->
+                <xsl:when test="$rPr/a:solidFill/a:schemeClr/@val">
         <xsl:attribute name="fo:color">
           <xsl:call-template name="getColorCode">
             <xsl:with-param name="color">
-              <xsl:value-of select="a:solidFill/a:schemeClr/@val"/>
+                        <xsl:value-of select="$rPr/a:solidFill/a:schemeClr/@val"/>
             </xsl:with-param>
             <xsl:with-param name="lumMod">
-              <xsl:value-of select="a:solidFill/a:schemeClr/a:lumMod/@val"/>
+                        <xsl:value-of select="$rPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
             </xsl:with-param>
             <xsl:with-param name="lumOff">
-              <xsl:value-of select="a:solidFill/a:schemeClr/a:lumOff/@val"/>
+                        <xsl:value-of select="$rPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:when test="$defRPr/a:solidFill">
+              <xsl:choose>
+                <xsl:when test="$defRPr/a:solidFill/a:srgbClr/@val">
+                  <xsl:attribute name="fo:color">
+                    <xsl:value-of select="concat('#',$defRPr/a:solidFill/a:srgbClr/@val)"/>
+                  </xsl:attribute>
+                </xsl:when>
 
+                <!-- scheme color -->
+                <xsl:when test="$defRPr/a:solidFill/a:schemeClr/@val">
+                  <xsl:attribute name="fo:color">
+                    <xsl:call-template name="getColorCode">
+                      <xsl:with-param name="color">
+                        <xsl:value-of select="$defRPr/a:solidFill/a:schemeClr/@val"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="lumMod">
+                        <xsl:value-of select="$defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="lumOff">
+                        <xsl:value-of select="$defRPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:attribute>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
       <!-- style color -->
       <xsl:when
         test="parent::node()/parent::node()/parent::node()/parent::node()/xdr:style/a:fontRef/a:srgbClr">
@@ -2404,7 +2456,116 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:choose>
 
     <!-- style:text-underline-style -->
-    <xsl:if test="@u != 'none' ">
+    <xsl:choose>
+      <xsl:when test="$rPr[@u != 'none'] ">
+        <xsl:call-template name="tmpUnderlineStyle">
+          <xsl:with-param name="node" select="$rPr"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$defRPr[@u != 'none'] ">
+        <xsl:call-template name="tmpUnderlineStyle">
+          <xsl:with-param name="node" select="$defRPr"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+    <!-- strike-through -->
+    <xsl:choose>
+      <xsl:when test="$rPr[@strike != 'noStrike'] ">
+        <xsl:attribute name="style:text-line-through-style">
+          <xsl:text>solid</xsl:text>
+        </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="$rPr[@strike = 'sngStrike'] ">
+            <xsl:attribute name="style:text-line-through-type">
+              <xsl:value-of select="'single'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$rPr[@strike = 'dblStrike'] ">
+            <xsl:attribute name="style:text-line-through-type">
+              <xsl:text>double</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+        </xsl:when>
+      <xsl:when test="$defRPr[@strike != 'noStrike'] ">
+          <xsl:attribute name="style:text-line-through-style">
+            <xsl:text>solid</xsl:text>
+          </xsl:attribute>
+          <xsl:choose>
+            <xsl:when test="$defRPr[@strike = 'sngStrike'] ">
+              <xsl:attribute name="style:text-line-through-type">
+                <xsl:value-of select="'single'"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$defRPr[@strike = 'dblStrike'] ">
+              <xsl:attribute name="style:text-line-through-type">
+                <xsl:text>double</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+    </xsl:choose>
+    <!-- text position -->
+    <xsl:choose>
+      <xsl:when test="$rPr[@baseline != 0]">
+        <xsl:attribute name="style:text-position">
+          <xsl:value-of select="concat($rPr/@baseline div 1000,'%' )"/>
+          <xsl:text> 75%</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$defRPr[@baseline != 0]">
+        <xsl:attribute name="style:text-position">
+          <xsl:value-of select="concat($defRPr/@baseline div 1000,'%' )"/>
+          <xsl:text> 75%</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+    <!-- character spacing -->
+    <xsl:choose>
+      <xsl:when test="$rPr/@spc">
+        <xsl:attribute name="fo:letter-spacing">
+          <xsl:variable name="length" select="$rPr/@spc"/>
+          <xsl:value-of select="concat(format-number($length * 2.54 div 7200,'0.###'),'cm')"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$defRPr/@spc">
+        <xsl:attribute name="fo:letter-spacing">
+          <xsl:variable name="length" select="$defRPr/@spc"/>
+          <xsl:value-of select="concat(format-number($length * 2.54 div 7200,'0.###'),'cm')"/>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+    <!--Kerning true or false -->
+    <xsl:choose>
+      <xsl:when test="$rPr[@kern != 0]">
+        <xsl:attribute name="style:letter-kerning">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$defRPr[@kern != 0]">
+        <xsl:attribute name="style:letter-kerning">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+    <!--Shadow fo:text-shadow-->
+    <xsl:choose>
+      <xsl:when test="$rPr/a:effectLst/a:outerShdw">
+        <xsl:attribute name="fo:text-shadow">
+          <xsl:text>1pt 1pt</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$defRPr/a:effectLst/a:outerShdw">
+        <xsl:attribute name="fo:text-shadow">
+          <xsl:text>1pt 1pt</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+   
+  </xsl:template>
+  <xsl:template name="tmpUnderlineStyle">
+    <xsl:param name="node"/>
+    <xsl:for-each select="$node">
       <!-- underline style -->
       <xsl:choose>
         <xsl:when test="@u = 'sng' ">
@@ -2606,57 +2767,8 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-    </xsl:if>
+    </xsl:for-each>
 
-    <!-- strike-through -->
-    <xsl:if test="@strike != 'noStrike' ">
-      <xsl:attribute name="style:text-line-through-style">
-        <xsl:text>solid</xsl:text>
-      </xsl:attribute>
-
-      <xsl:choose>
-        <xsl:when test="@strike = 'sngStrike' ">
-          <xsl:attribute name="style:text-line-through-type">
-            <xsl:value-of select="'single'"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:when test="@strike = 'dblStrike' ">
-          <xsl:attribute name="style:text-line-through-type">
-            <xsl:text>double</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:if>
-
-    <!-- text position -->
-    <xsl:if test="@baseline != 0">
-      <xsl:attribute name="style:text-position">
-        <xsl:value-of select="concat(@baseline div 1000,'%' )"/>
-        <xsl:text> 75%</xsl:text>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- character spacing -->
-    <xsl:if test="@spc">
-      <xsl:attribute name="fo:letter-spacing">
-        <xsl:variable name="length" select="@spc"/>
-        <xsl:value-of select="concat(format-number($length * 2.54 div 7200,'0.###'),'cm')"/>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!--Kerning true or false -->
-    <xsl:if test="@kern != 0">
-      <xsl:attribute name="style:letter-kerning">
-        <xsl:text>true</xsl:text>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!--Shadow fo:text-shadow-->
-    <xsl:if test="a:effectLst/a:outerShdw">
-      <xsl:attribute name="fo:text-shadow">
-        <xsl:text>1pt 1pt</xsl:text>
-      </xsl:attribute>
-    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

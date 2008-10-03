@@ -1646,24 +1646,16 @@
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
-              <xsl:choose>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                    <xsl:call-template name="TextBoxRunProperties"/>
-                  </xsl:for-each>
-                </xsl:when>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-              <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
-            </xsl:when>
-              </xsl:choose>
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+              </xsl:call-template>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
-              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
 
@@ -1740,42 +1732,29 @@
           style:font-size-asian="10pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
           style:font-size-complex="10pt">
-          <xsl:choose>
-            <!-- custom title -->
-            <xsl:when test="c:tx">
-              <xsl:choose>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                    <xsl:call-template name="TextBoxRunProperties"/>
-                  </xsl:for-each>
-                </xsl:when>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-              <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
-            </xsl:when>
-              </xsl:choose>
-            </xsl:when>
-            <!--added for bug no:2016060-->
-            <xsl:when test="not(c:tx)">
+          <!--added for bug no:2016060-->
+          <xsl:if test="not(c:tx) and not(c:txPr)">
               <xsl:attribute name="fo:font-weight">
-                <xsl:value-of select="'bold'"/>
+              <xsl:text>bold</xsl:text>
               </xsl:attribute>
-              <!--<xsl:attribute name="fo:font-size">
-                <xsl:value-of select="'10pt'"/>
-              </xsl:attribute>-->
-            </xsl:when>
-            <!--end-->
+          </xsl:if>
             
+            <xsl:choose>
+              <!-- custom title -->
+              <xsl:when test="c:tx">
+                <xsl:call-template name="TextBoxRunProperties">
+                  <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                  <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                </xsl:call-template>
+              </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
-              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
+                <xsl:call-template name="TextBoxRunProperties">
+                  <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
-
-        </style:text-properties>
+ </style:text-properties>
       </style:style>
     </xsl:for-each>
   </xsl:template>
@@ -1810,28 +1789,16 @@
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
-              <xsl:choose>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                    <xsl:call-template name="TextBoxRunProperties"/>
-                  </xsl:for-each>
-                </xsl:when>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-              <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
-            </xsl:when>
-               
-                
-              </xsl:choose>
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+              </xsl:call-template>
             </xsl:when>
             <!-- default title -->
-           
-            <xsl:otherwise>
-              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
-            
+         <xsl:otherwise>
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
 
@@ -1910,24 +1877,16 @@
           <xsl:choose>
             <!-- custom title -->
             <xsl:when test="c:tx">
-              <xsl:choose>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                  <xsl:for-each select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr">
-                    <xsl:call-template name="TextBoxRunProperties"/>
-                  </xsl:for-each>
-                </xsl:when>
-                <xsl:when test="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-              <xsl:for-each select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
-            </xsl:when>
-              </xsl:choose>
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+              </xsl:call-template>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
-              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
         </style:text-properties>
@@ -2141,9 +2100,22 @@
         style:font-size-asian="7pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
         style:font-size-complex="7pt">
-        <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-          <xsl:call-template name="TextBoxRunProperties"/>
-        </xsl:for-each>
+        <xsl:choose>
+          <!-- custom title -->
+          <xsl:when test="c:tx">
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+              <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:when>
+          <!-- default title -->
+          <xsl:otherwise>
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      
       </style:text-properties>
     </style:style>
   </xsl:template>
@@ -2191,9 +2163,21 @@
         style:font-size-asian="7pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
         style:font-size-complex="7pt">
-        <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-          <xsl:call-template name="TextBoxRunProperties"/>
-        </xsl:for-each>
+        <xsl:choose>
+          <!-- custom title -->
+          <xsl:when test="c:tx">
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+              <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:when>
+          <!-- default title -->
+          <xsl:otherwise>
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </style:text-properties>
     </style:style>
   </xsl:template>
@@ -2650,9 +2634,21 @@
         style:font-size-asian="7pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
         style:font-size-complex="7pt">
-        <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-          <xsl:call-template name="TextBoxRunProperties"/>
-        </xsl:for-each>
+        <xsl:choose>
+          <!-- custom title -->
+          <xsl:when test="c:tx">
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+              <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:when>
+          <!-- default title -->
+          <xsl:otherwise>
+            <xsl:call-template name="TextBoxRunProperties">
+              <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </style:text-properties>
     </style:style>
   </xsl:template>
@@ -2943,9 +2939,21 @@
           style:font-size-complex="6pt">
           <xsl:for-each select="c:dLbls">
             <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
-              <xsl:for-each select="c:txPr/a:p[1]/a:pPr/a:defRPr">
-                <xsl:call-template name="TextBoxRunProperties"/>
-              </xsl:for-each>
+              <xsl:choose>
+                <!-- custom title -->
+                <xsl:when test="c:tx">
+                  <xsl:call-template name="TextBoxRunProperties">
+                    <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                    <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                  </xsl:call-template>
+                </xsl:when>
+                <!-- default title -->
+                <xsl:otherwise>
+                  <xsl:call-template name="TextBoxRunProperties">
+                    <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:if>
           </xsl:for-each>
         </style:text-properties>
