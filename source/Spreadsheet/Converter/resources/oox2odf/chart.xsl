@@ -321,11 +321,23 @@
             </xsl:when>
             <!-- scatter chart has two value axes -->
             <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:scatterChart or key('plotArea', c:chartSpace/@oox:part)/c:bubbleChart">
+              <xsl:variable name="axisYId">
+                <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[2]">
+                  <xsl:value-of select="c:axId/@val"/>
+                </xsl:for-each>
+              </xsl:variable>
+
+              <xsl:variable name="axisXId">
+                <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
+                  <xsl:value-of select="c:axId/@val"/>
+                </xsl:for-each>
+              </xsl:variable>
               <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
                 <xsl:call-template name="InsertAxisXProperties">
                   <xsl:with-param name="type">
                     <xsl:text>valAx</xsl:text>
                   </xsl:with-param>
+                  <xsl:with-param name="axisYId" select="$axisYId"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisXTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridXProperties"/>
@@ -335,7 +347,7 @@
               <xsl:for-each
                 select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
                 <xsl:call-template name="InsertAxisYProperties">
-                  <!--<xsl:with-param name="axisXId" select="$axisXId"/>-->
+                  <xsl:with-param name="axisXId" select="$axisXId"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisYTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridYProperties"/>
