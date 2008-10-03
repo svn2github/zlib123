@@ -274,6 +274,8 @@
                   </xsl:call-template>
                   <!--added by Sonata for bug no 2015014-->
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
+                  <xsl:call-template name="InsertMinorGridXProperties"/>
+                  <xsl:call-template name="InsertMajorGridXProperties"/>
                   <!--end-->
                 </xsl:for-each>
               </xsl:if>
@@ -285,6 +287,8 @@
                   </xsl:call-template>
                   <!--added by Sonata for bug no 2015014-->
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
+                  <xsl:call-template name="InsertMinorGridXProperties"/>
+                  <xsl:call-template name="InsertMajorGridXProperties"/>
                   <!--end-->
                 </xsl:for-each>
               </xsl:if>
@@ -297,6 +301,7 @@
                       <xsl:with-param name="axisXId" select="$axisXId"/>
                     </xsl:call-template>
                     <xsl:call-template name="InsertAxisYTitleProperties"/>
+                    <xsl:call-template name="InsertMinorGridYProperties"/>
                     <xsl:call-template name="InsertMajorGridYProperties"/>
                   </xsl:when>
                   <xsl:otherwise>
@@ -1810,7 +1815,7 @@
   <xsl:template name="InsertMajorGridXProperties">
     <xsl:for-each select="c:majorGridlines/c:spPr">
       <style:style style:name="majorGridX" style:family="chart">
-        <style:graphic-properties svg:stroke-width="0.1cm" svg:stroke-color="#000000"
+        <style:graphic-properties svg:stroke-width="0.03cm" svg:stroke-color="#000000"
           draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
@@ -1822,7 +1827,7 @@
   <xsl:template name="InsertMinorGridXProperties">
     <xsl:for-each select="c:minorGridlines/c:spPr">
       <style:style style:name="minorGridX" style:family="chart">
-        <style:graphic-properties svg:stroke-width="0.1cm" svg:stroke-color="#000000"
+        <style:graphic-properties svg:stroke-width="0.03cm" svg:stroke-color="#000000"
           draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
           <xsl:call-template name="InsertLineColor"/>
           <xsl:call-template name="InsertLineStyle"/>
@@ -1833,7 +1838,7 @@
   <xsl:template name="InsertMajorGridYProperties">
     <xsl:for-each select="c:majorGridlines">
       <style:style style:name="majorGridY" style:family="chart">
-        <style:graphic-properties svg:stroke-width="0cm" svg:stroke-color="#000000"
+        <style:graphic-properties svg:stroke-width="0.03cm" svg:stroke-color="#000000"
           draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
           <xsl:for-each select="c:spPr">
             <xsl:call-template name="InsertLineColor"/>
@@ -1846,7 +1851,7 @@
   <xsl:template name="InsertMinorGridYProperties">
     <xsl:for-each select="c:minorGridlines">
       <style:style style:name="minorGridY" style:family="chart">
-        <style:graphic-properties svg:stroke-width="0cm" svg:stroke-color="#000000"
+        <style:graphic-properties svg:stroke-width="0.03cm" svg:stroke-color="#000000"
           draw:marker-start-width="0.35cm" draw:marker-end-width="0.35cm">
           <xsl:for-each select="c:spPr">
             <xsl:call-template name="InsertLineColor"/>

@@ -2309,16 +2309,23 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
   <xsl:template name="TextBoxRunProperties">
     <xsl:param name="defRPr" select="."/>
     <xsl:param name="rPr" select="."/>
+
+    <!-- font name -->
     <xsl:choose>
-      <xsl:when test="$rPr/a:latin/@typeface != '+mn-lt' and $rPr/a:latin/@typeface != '+mj-lt' ">
-        <xsl:attribute name="fo:font-family">
-          <xsl:value-of select="a:latin/@typeface"/>
-        </xsl:attribute>
+      <xsl:when test ="$rPr/a:latin/@typeface or
+                       $rPr/a:latin/@typeface or
+                       $rPr/a:sym/@typeface or $rPr/a:cs/@typeface">
+
+        <xsl:call-template name="tmpChartFontName">
+          <xsl:with-param name="node" select="$rPr"/>
+        </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$defRPr/a:latin/@typeface != '+mn-lt' and $defRPr/a:latin/@typeface != '+mj-lt' ">
-            <xsl:attribute name="fo:font-family">
-          <xsl:value-of select="a:latin/@typeface"/>
-            </xsl:attribute>
+      <xsl:when test ="$defRPr/a:latin/@typeface or
+                       $defRPr/a:latin/@typeface or
+                       $defRPr/a:sym/@typeface or $defRPr/a:cs/@typeface">
+        <xsl:call-template name="tmpChartFontName">
+          <xsl:with-param name="node" select="$defRPr"/>
+        </xsl:call-template>
       </xsl:when>
     </xsl:choose>
 
@@ -2562,6 +2569,73 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
       </xsl:when>
     </xsl:choose>
    
+  </xsl:template>
+  <xsl:template name="tmpChartFontName">
+    <xsl:param name="node"/>
+    <xsl:for-each select="$node">
+      <xsl:choose>
+        <xsl:when test="a:latin/@typeface">
+          <xsl:attribute name ="fo:font-family">
+            <xsl:variable name ="typeFaceVal" select ="a:latin/@typeface"/>
+            <xsl:for-each select ="a:latin/@typeface">
+              <xsl:choose>
+                <xsl:when test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt' ">
+                  <xsl:value-of  select ="'Calibri'"/>
+                </xsl:when>
+                <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  <xsl:value-of select ="."/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test ="a:ea/@typeface">
+          <xsl:attribute name ="fo:font-family">
+            <xsl:variable name ="typeFaceVal" select ="a:ea/@typeface"/>
+            <xsl:for-each select ="a:ea/@typeface">
+              <xsl:choose>
+                <xsl:when test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt' ">
+                  <xsl:value-of  select ="'Calibri'"/>
+                </xsl:when>
+                <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  <xsl:value-of select ="."/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test ="a:sym/@typeface">
+          <xsl:attribute name ="fo:font-family">
+            <xsl:variable name ="typeFaceVal" select ="a:sym/@typeface"/>
+            <xsl:for-each select ="a:sym/@typeface">
+              <xsl:choose>
+                <xsl:when test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt' ">
+                  <xsl:value-of  select ="'Calibri'"/>
+                </xsl:when>
+                <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  <xsl:value-of select ="."/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test ="a:cs/@typeface">
+          <xsl:attribute name ="fo:font-family">
+            <xsl:variable name ="typeFaceVal" select ="a:cs/@typeface"/>
+            <xsl:for-each select ="a:cs/@typeface">
+              <xsl:choose>
+                <xsl:when test="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt' ">
+                  <xsl:value-of  select ="'Calibri'"/>
+                </xsl:when>
+                <xsl:when test="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+                  <xsl:value-of select ="."/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
   <xsl:template name="tmpUnderlineStyle">
     <xsl:param name="node"/>
