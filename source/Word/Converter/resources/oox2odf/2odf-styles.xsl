@@ -2281,14 +2281,7 @@
                     </xsl:choose>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:choose>
-                      <xsl:when test="w:pgMar/@w:top &lt; 0">
-                        <xsl:value-of select="w:pgMar/@w:top"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="w:pgMar/@w:top"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:value-of select="w:pgMar/@w:top"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:otherwise>
@@ -2381,14 +2374,7 @@
                 </xsl:choose>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:choose>
-                  <xsl:when test="w:pgMar/@w:bottom &lt; 0">
-                    <xsl:value-of select="w:pgMar/@w:bottom"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="w:pgMar/@w:bottom"/>
-                  </xsl:otherwise>
-                </xsl:choose>
+                <xsl:value-of select="w:pgMar/@w:bottom"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
@@ -2409,8 +2395,7 @@
               <xsl:value-of select="$space"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of
-                select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>

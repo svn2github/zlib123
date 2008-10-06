@@ -255,12 +255,13 @@
 			<xsl:call-template name="MasterPageName"/>
 
 			<style:paragraph-properties>
-				<xsl:call-template name="InsertDefaultTabStop"/>
-				<xsl:call-template name="InsertParagraphProperties"/>
-
-        <xsl:for-each select="parent::w:p"> <!--context switch -->
+        <xsl:for-each select="parent::w:p">
+          <!--context switch -->
           <xsl:call-template name="InsertPageNumberOffset" />
         </xsl:for-each>
+
+        <xsl:call-template name="InsertDefaultTabStop"/>
+        <xsl:call-template name="InsertParagraphProperties"/>
 			</style:paragraph-properties>
 			<!-- add text-properties to empty paragraphs. -->
 			<!--clam, dialogika: bugfix 1752761-->
