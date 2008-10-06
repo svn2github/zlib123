@@ -62,7 +62,7 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e r pxsi oox">
 
-  <!--<xsl:import href="relationships.xsl"/>
+	<xsl:import href="relationships.xsl"/>
   <xsl:import href="database-ranges.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="table_body.xsl"/>
@@ -78,7 +78,7 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
   <xsl:import href="groups.xsl"/>
   <xsl:import href="scenario.xsl"/>
   <xsl:import href="change_tracking.xsl"/>
-  <xsl:import href="pivot_tables.xsl"/>-->
+	<xsl:import href="pivot_tables.xsl"/>
 
 
   <!--xsl:key name="Sst" match="e:si" use="''"/-->

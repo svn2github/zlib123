@@ -40,9 +40,9 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
-  <!--<xsl:import href="relationships.xsl"/>
+  <xsl:import href="relationships.xsl"/>
   <xsl:import href="common.xsl"/>
-  <xsl:import href="measures.xsl"/>-->
+  <xsl:import href="measures.xsl"/>
 
 
   <xsl:template name="InsertPilotTables">

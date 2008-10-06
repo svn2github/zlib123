@@ -49,8 +49,8 @@
   <!-- @Description: This stylesheet is used for charts conversion -->
   <!-- @Created: 2007-05-24 -->
 
-  <!--<xsl:import href="relationships.xsl"/>
-  <xsl:import href="Gradient.xsl"/>-->
+  <xsl:import href="relationships.xsl"/>
+  <xsl:import href="Gradient.xsl"/>
 
   <xsl:key name="dataSeries" match="c:ser" use="@oox:part"/>
   <xsl:key name="numPoints" match="c:val" use="@oox:part"/>

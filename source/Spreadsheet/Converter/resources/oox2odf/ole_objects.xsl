@@ -48,7 +48,7 @@ RefNo-1 15-Jul-2008 Sandeep S     1874669  Changes done to fix External Links ar
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r v">
 
-  <!--<xsl:import href="measures.xsl"/>-->
+  <xsl:import href="measures.xsl"/>
 
   <xsl:template name="InsertOLEObjects">
     <xsl:choose>

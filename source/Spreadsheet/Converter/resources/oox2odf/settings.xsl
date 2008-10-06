@@ -44,8 +44,8 @@ RefNo-1 16-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pan
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   exclude-result-prefixes="e r w">
 
-  <!--<xsl:import href="relationships.xsl"/>
-  <xsl:import href="common.xsl"/>-->
+  <xsl:import href="relationships.xsl"/>
+  <xsl:import href="common.xsl"/>
 
   <xsl:template name="InsertSettings">
     <office:document-settings>

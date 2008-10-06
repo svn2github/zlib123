@@ -50,7 +50,7 @@
     <!-- @Description: This stylesheet is used for charts conversion -->
     <!-- @Created: 2007-05-24 -->
     
-    <!--<xsl:import href="relationships.xsl"/>-->
+    <xsl:import href="relationships.xsl"/>
     
       <xsl:template name="tmpGradientFillTiletoRect">
     <xsl:param name="SMName"/>

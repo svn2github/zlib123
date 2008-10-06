@@ -30,7 +30,7 @@
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   
-  <!--<xsl:import href="relationships.xsl"/>-->
+  <xsl:import href="relationships.xsl"/>
 
   <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
   

@@ -58,11 +58,11 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   xmlns:oox="urn:oox"
   exclude-result-prefixes="a e oox r number v">
 
-  <!--<xsl:import href="relationships.xsl"/>
+  <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="headers.xsl"/>
   <xsl:import href="insert_cols.xsl"/>
-  <xsl:import href="note.xsl"/>-->
+  <xsl:import href="note.xsl"/>
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Font" match="e:styleSheet/e:fonts/e:font" use="@oox:id"/>
