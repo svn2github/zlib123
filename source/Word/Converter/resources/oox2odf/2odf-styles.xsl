@@ -3680,18 +3680,19 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <!-- use the default style -->
-            <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
-              <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
-            </xsl:when>
-            <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
-              <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
-            </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
+		  <xsl:when test="$StyleId = ''">
+			  <xsl:choose>
+				  <!-- use the default style -->
+				  <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
+					  <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left" />
+				  </xsl:when>
+				  <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
+					  <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+				  </xsl:when>
+				  <xsl:otherwise>0</xsl:otherwise>
+			  </xsl:choose>
+		  </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:template>
     <!--math, dialogika bugfix #1751701 indentation problem END-->
@@ -3754,17 +3755,22 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
-        <!-- use the default style -->
-        <xsl:choose>
-          <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right">
-            <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right" />
-          </xsl:when>
-          <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
-            <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
+		  <xsl:choose>
+			  <xsl:when test="$StyleId = ''">
+				  <!-- use the default style -->
+				  <xsl:choose>
+					  <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right">
+						  <xsl:value-of select="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:right" />
+					  </xsl:when>
+					  <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right != ''">
+						  <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:right"/>
+					  </xsl:when>
+					  <xsl:otherwise>0</xsl:otherwise>
+				  </xsl:choose>
+			  </xsl:when>
+			  <xsl:otherwise>0</xsl:otherwise>
+		  </xsl:choose>
+	  </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
