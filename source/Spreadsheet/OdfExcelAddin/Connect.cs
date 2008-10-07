@@ -49,13 +49,13 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
     public class Connect : AbstractOdfAddin
     {
         protected const string ODF_FILE_TYPE_ODS = "OdfFileTypeOds";
-        
+
         protected const string IMPORT_ODF_FILE_FILTER = "*.ods";
         protected const string EXPORT_ODF_FILE_FILTER = " (*.ods)|*.ods|";
 
         protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\ODF Add-in for Excel";
         protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Excel";
-        
+
         /// <summary>
         /// Class name for Excel12 documents
         /// </summary>
@@ -83,7 +83,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
             }
         }
 
-                
+
         /// <summary>
         /// Initializes Word12Format field
         /// </summary>
@@ -154,29 +154,29 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                     Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing,
                     Type.Missing, Type.Missing, Type.Missing);
                     break;
-                
-                
+
+
                 case OfficeVersion.Office2003:
                     doc.Invoke("SaveAs",
-                        fileName, Word12Class , Type.Missing, Type.Missing, Type.Missing,
-                        Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, 
-                        Type.Missing, Type.Missing, Type.Missing);                    
+                        fileName, Word12Class, Type.Missing, Type.Missing, Type.Missing,
+                        Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing,
+                        Type.Missing, Type.Missing, Type.Missing);
                     break;
                 default:
                     doc.Invoke("SaveAs",
                     fileName, XlFileFormat.xlOpenXMLWorkbook, Type.Missing, Type.Missing, Type.Missing,
                     Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                     Type.Missing, Type.Missing, Type.Missing);
-                    break; 
-               
+                    break;
+
             }
             return doc;
         }
-        
+
         protected override void InitializeAddin()
         {
             this._word12SaveFormat = FindWord12SaveFormat();
-            
+
             //// Tell Word that the Normal.dot template should not be saved (unless the user later on makes it dirty)
             //this._application.Invoke("NormalTemplate").SetBool("Saved", true);
         }
@@ -187,7 +187,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         protected override void importOdf()
         {
             foreach (string odfFile in getOpenFileNames())
-        	{
+            {
                 // create a temporary file
                 string fileName = this._addinLib.GetTempFileName(odfFile, ".xlsx");
 
@@ -201,7 +201,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                     bool addToRecentFiles = false;
                     bool isVisible = true;
                     bool openAndRepair = false;
-                    
+
                     // conversion may have been cancelled and file deleted.
                     if (File.Exists((string)fileName))
                     {
@@ -211,7 +211,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
                         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
                         LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
-                        
+
                         // and activate it
                         doc.Invoke("Activate");
 
@@ -237,90 +237,112 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
             try
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            LateBindingObject doc = _application.Invoke("ActiveWorkbook");
+                LateBindingObject doc = _application.Invoke("ActiveWorkbook");
 
-            // the second test deals with blank documents 
-            // (which are in a 'saved' state and have no extension yet(?))
-            if (!doc.GetBool("Saved")
-                || doc.GetString("FullName").IndexOf('.') < 0
-                || doc.GetString("FullName").IndexOf("http://") == 0
-                || doc.GetString("FullName").IndexOf("https://") == 0
-                || doc.GetString("FullName").IndexOf("ftp://") == 0
-                )
-            {
-                System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-            }
-            else
-            {
-                System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
-
-                sfd.AddExtension = true;
-                sfd.DefaultExt = "ods";
-                sfd.Filter = this._addinLib.GetString(this.OdfFileType) + this.ExportOdfFileFilter
-                             + this._addinLib.GetString(ALL_FILE_TYPE) + this.ExportAllFileFilter;
-                sfd.InitialDirectory = doc.GetString("Path");
-                sfd.OverwritePrompt = true;
-                sfd.Title = this._addinLib.GetString(EXPORT_LABEL);
-                string ext = '.' + sfd.DefaultExt;
-                sfd.FileName = doc.GetString("FullName").Substring(0, doc.GetString("FullName").LastIndexOf('.')) + ext;
-
-                // process the chosen documents	
-                if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
+                // the second test deals with blank documents 
+                // (which are in a 'saved' state and have no extension yet(?))
+                if (!doc.GetBool("Saved")
+                    || doc.GetString("FullName").IndexOf('.') < 0
+                    || doc.GetString("FullName").IndexOf("http://") == 0
+                    || doc.GetString("FullName").IndexOf("https://") == 0
+                    || doc.GetString("FullName").IndexOf("ftp://") == 0
+                    )
                 {
-                    // name of the file to create
-                    string odfFileName = sfd.FileName;
-                    // multi dotted extensions support
-                    if (!odfFileName.EndsWith(ext))
+                    System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                }
+                else
+                {
+                    System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+
+                    sfd.AddExtension = true;
+                    sfd.DefaultExt = "ods";
+                    sfd.Filter = this._addinLib.GetString(this.OdfFileType) + this.ExportOdfFileFilter
+                                 + this._addinLib.GetString(ALL_FILE_TYPE) + this.ExportAllFileFilter;
+                    sfd.InitialDirectory = doc.GetString("Path");
+                    sfd.OverwritePrompt = true;
+                    sfd.Title = this._addinLib.GetString(EXPORT_LABEL);
+                    string ext = '.' + sfd.DefaultExt;
+                    sfd.FileName = doc.GetString("FullName").Substring(0, doc.GetString("FullName").LastIndexOf('.')) + ext;
+
+                    // process the chosen documents	
+                    if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                     {
-                        odfFileName += ext;
-                    }
-                    // name of the document to convert
-                    string sourceFileName = doc.GetString("FullName");
-                    // name of the temporary Word12 file created if current file is not already a Word12 document
-                    string tempDocxName = null;
-                  
-                    if (!Path.GetExtension(doc.GetString("FullName")).Equals(".xlsx"))
-                    {
-
-                        // duplicate the file
-                        string tempCopyName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
-                        File.Copy((string)sourceFileName, (string)tempCopyName);
-
-                        // open the duplicated file
-                        bool confirmConversions = false;
-                        bool readOnly = false;
-                        bool addToRecentFiles = false;
-                        bool isVisible = false;
-
-                        //Converting readonly files 
-                        FileInfo lFi;
-
-                        lFi = new FileInfo((string)tempCopyName);
-
-                        if (lFi.IsReadOnly)
+                        // name of the file to create
+                        string odfFileName = sfd.FileName;
+                        // multi dotted extensions support
+                        if (!odfFileName.EndsWith(ext))
                         {
-                            lFi.IsReadOnly = false;
+                            odfFileName += ext;
+                        }
+                        // name of the document to convert
+                        string sourceFileName = doc.GetString("FullName");
+                        // name of the temporary Word12 file created if current file is not already a Word12 document
+                        string tempXlsxName = null;
+
+                        if (!Path.GetExtension(doc.GetString("FullName")).Equals(".xlsx"))
+                        {
+                            // if file is not currently in Excel12 format
+                            // 1. Create a copy
+                            // 2. Open it and do a "Save as Excel12" (copy needed not to perturb current openened document
+                            // 3. Convert the Excel12 copy to ODF
+                            // 4. Remove both temporary created files
+
+                            // duplicate the file to keep current file "as is"
+                            string tempCopyName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
+                            File.Copy((string)sourceFileName, (string)tempCopyName);
+
+                            //BUG FIX #1743469
+                            FileInfo fi = new FileInfo(tempCopyName);
+                            if (fi.IsReadOnly)
+                            {
+                                fi.IsReadOnly = false;
+                            }
+                            //BUG FIX #1743469
+
+                            // open the duplicated file
+                            bool confirmConversions = false;
+                            bool readOnly = false;
+                            bool addToRecentFiles = false;
+                            bool isVisible = false;
+
+                            LateBindingObject newDoc = OpenDocument(tempCopyName, confirmConversions, readOnly, addToRecentFiles, isVisible, false);
+
+                            newDoc.Invoke("Windows").Invoke("Item", 1).SetBool("Visible", false);
+
+                            // generate xlsx file from the duplicated file (under a temporary file)
+                            tempXlsxName = this._addinLib.GetTempPath((string)sourceFileName, ".xlsx");
+
+                            SaveDocumentAs(newDoc, tempXlsxName);
+
+                            // close and remove the duplicated file
+                            newDoc.Invoke("Close", WdSaveOptions.wdDoNotSaveChanges, WdOriginalFormat.wdOriginalDocumentFormat, Type.Missing);
+
+                            //BUG FIX #1743469
+                            try
+                            {
+                                File.Delete((string)tempCopyName);
+                            }
+                            catch (Exception ex)
+                            {
+                                //If delete does not work, don't stop the rest of the process
+                                //The tempFile will be deleted by the system
+                                System.Diagnostics.Trace.WriteLine(ex.ToString());
+                            }
+                            //BUG FIX #1743469
+
+                            // Now the file to be converted is
+                            sourceFileName = tempXlsxName;
                         }
 
-                        LateBindingObject newDoc = OpenDocument(tempCopyName, confirmConversions, readOnly, addToRecentFiles, isVisible, false);
-                        
-                        tempDocxName = this._addinLib.GetTempPath((string)sourceFileName, ".xlsx");
-                        
-                        SaveDocumentAs(newDoc, tempDocxName);
-                        
-                        sourceFileName = tempDocxName;
+                        this._addinLib.OoxToOdf(sourceFileName, odfFileName, true);
 
-                    }
-
-                    this._addinLib.OoxToOdf(sourceFileName, odfFileName, true);
-
-                    if (tempDocxName != null && File.Exists((string)tempDocxName))
-                    {
-                        this._addinLib.DeleteTempPath((string)tempDocxName);
+                        if (tempXlsxName != null && File.Exists((string)tempXlsxName))
+                        {
+                            this._addinLib.DeleteTempPath((string)tempXlsxName);
+                        }
                     }
                 }
             }
-        }
             finally
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = ci;
