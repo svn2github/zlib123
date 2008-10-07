@@ -1683,7 +1683,7 @@
           <xsl:call-template name="InsertPageLayoutProperties"/>
           <xsl:call-template name="InsertColumns"/>
         </style:page-layout-properties>
-        <xsl:if test="./w:headerReference/@w:type">
+        <xsl:if test="./w:headerReference/@w:type or preceding::w:headerReference/@w:type">
           <style:header-style>
             <style:header-footer-properties>
               <xsl:call-template name="InsertHeaderFooterProperties">
@@ -1692,7 +1692,7 @@
             </style:header-footer-properties>
           </style:header-style>
         </xsl:if>
-        <xsl:if test="./w:footerReference[@w:type='default' or @w:type='even']">
+        <xsl:if test="./w:footerReference[@w:type='default' or @w:type='even'] or preceding::w:footerReference[@w:type='default' or @w:type='even']">
           <style:footer-style>
             <style:header-footer-properties>
               <xsl:call-template name="InsertHeaderFooterProperties">
@@ -1709,7 +1709,7 @@
           <xsl:attribute name="style:page-usage">
             <xsl:text>mirrored</xsl:text>
           </xsl:attribute>
-        </xsl:if>
+        </xsl:if>       
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('PAGE', generate-id(.))"/>
         </xsl:attribute>
@@ -2248,9 +2248,8 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
           <xsl:with-param name="length">
             <xsl:choose>
-              <!--<xsl:when test="./w:headerReference/@w:type">-->
               <!--clam: Bugfix #1797903-->
-              <xsl:when test="//w:headerReference/@w:type">
+              <xsl:when test="preceding::w:headerReference/@w:type or ./w:headerReference/@w:type">
                 <xsl:choose>
                   <xsl:when test="w:pgMar/@w:top &lt; 0">
                     <xsl:value-of select="w:pgMar/@w:top"/>
@@ -2363,7 +2362,7 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
           <xsl:with-param name="length">
             <xsl:choose>
-              <xsl:when test="//w:footerReference[@w:type='default' or @w:type='even']">
+              <xsl:when test="preceding::w:footerReference[@w:type='default' or @w:type='even'] or ./w:footerReference[@w:type='default' or @w:type='even']">
                 <xsl:choose>
                   <xsl:when test="w:pgMar/@w:bottom &lt; 0">
                     <xsl:value-of select="w:pgMar/@w:bottom"/>
@@ -2497,11 +2496,6 @@
   <xsl:template name="InsertHeaderFooterProperties">
     <xsl:param name="object"/>
 
-    <!-- dynamic spacing always false : no spacing defined in OOX -->
-    <!--
-    
-    -->
-   
     <!-- min height calculated with page Margins properties. -->
     <xsl:variable name="min-height">
       <xsl:call-template name="ConvertTwips">
@@ -2511,7 +2505,7 @@
             <xsl:when test="$object = 'header' ">
               <xsl:choose>
                 <!-- if @w:header is not 0, we assume there's a header to compute in this section -->
-                <xsl:when test="w:pgMar[@w:header] and w:pgMar[@w:header != 0]">
+                <xsl:when test="w:pgMar[@w:header]">  <!--and w:pgMar[@w:header != 0]">-->
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:top &lt; 0">
                       <xsl:choose>
@@ -2566,7 +2560,7 @@
             <xsl:otherwise>
               <xsl:choose>
                 <!-- if @w:footer is not 0, we assume there's a footer to compute in this section -->
-                <xsl:when test="w:pgMar[@w:footer] and w:pgMar[@w:footer != 0]">
+                <xsl:when test="w:pgMar[@w:footer]">  <!--and w:pgMar[@w:footer != 0]">-->
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:bottom &lt; 0">
                       <xsl:choose>
@@ -2593,14 +2587,31 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-   
+
+    <!--clam, dialogika-->
+    <xsl:variable name="min-height-minus-height">
+      <xsl:variable name="min-height-without-unit">
+        <xsl:value-of select="substring($min-height, 0, string-length($min-height)-1)"/>
+      </xsl:variable>
+      <xsl:variable name="min-height-0point1">
+        <xsl:value-of select="$min-height-without-unit - 0.1"/>
+      </xsl:variable>
+      <xsl:value-of select="concat(string($min-height-0point1), 'cm')"/>
+    </xsl:variable>
 
     <!-- no spacing in OOX. -->
     <xsl:choose>
+      <!--clam, dialogika-->
       <xsl:when test="$object = 'header' ">
+        <xsl:attribute name="fo:margin-bottom">
+          <xsl:value-of select="$min-height-minus-height"/>
+        </xsl:attribute>
+        <xsl:attribute name="style:dynamic-spacing">true</xsl:attribute>
+      </xsl:when>
+      <!--<xsl:when test="$object = 'header' ">
         <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
         <xsl:attribute name="style:dynamic-spacing">false</xsl:attribute>
-      </xsl:when>
+      </xsl:when>-->
       <xsl:otherwise>
         <!--clam, dialogika: bugfix 1911678-->
         <xsl:attribute name="style:dynamic-spacing">true</xsl:attribute>
