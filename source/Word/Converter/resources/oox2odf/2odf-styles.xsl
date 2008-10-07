@@ -2616,7 +2616,7 @@
         <!--clam, dialogika: bugfix 1911678-->
         <xsl:attribute name="style:dynamic-spacing">true</xsl:attribute>
         <xsl:attribute name="fo:margin-top">
-          <xsl:value-of select="$min-height"/>
+          <xsl:value-of select="$min-height-minus-height"/>
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
