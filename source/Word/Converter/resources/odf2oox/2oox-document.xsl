@@ -697,16 +697,17 @@
             </xsl:if>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="key('styles', $styleName)">
-              <xsl:variable name="level">
-                <xsl:value-of
-                  select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level "
+              <!--clam, dialogika: bugfix 2101915-->
+              <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]">
+                <xsl:variable name="level">
+                  <xsl:value-of
+                    select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level "
                 />
-              </xsl:variable>
-              <xsl:if test="number($level)">
-                <w:pStyle w:val="{concat('TOC', $level)}"/>
+                </xsl:variable>
+                <xsl:if test="number($level)">
+                  <w:pStyle w:val="{concat('TOC', $level)}"/>
+                </xsl:if>
               </xsl:if>
-            </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
