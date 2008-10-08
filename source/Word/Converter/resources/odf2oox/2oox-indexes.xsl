@@ -42,9 +42,10 @@
   exclude-result-prefixes="office text table fo style draw xlink v svg number">
 
 
-  <xsl:strip-space elements="*"/>
-  <xsl:preserve-space elements="text:p"/>
-  <xsl:preserve-space elements="text:span"/>
+	<!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->
+	<!--<xsl:strip-space elements="*"/>
+    <xsl:preserve-space elements="text:p"/>
+    <xsl:preserve-space elements="text:span"/>-->
 
 
   <xsl:key name="toc" match="text:table-of-content" use="''"/>

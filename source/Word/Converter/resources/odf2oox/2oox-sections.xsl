@@ -40,7 +40,8 @@
   exclude-result-prefixes="office text table fo style v draw">
 
 
-  <xsl:strip-space elements="*"/>
+	<!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->
+	<!--<xsl:strip-space elements="*"/>-->
 
 
   <xsl:key name="master-pages" match="style:master-page" use="@style:name"/>
