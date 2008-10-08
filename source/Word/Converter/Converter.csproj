@@ -54,6 +54,7 @@
     <Compile Include="OdfCheckIfIndexPostProcessor.cs" />
     <Compile Include="OdfIndexSourceStylesPostProcessor.cs" />
     <Compile Include="OdfParagraphPostProcessor.cs" />
+    <Compile Include="OoxReplacementPostProcessor.cs" />
     <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
     <Compile Include="OoxChangeTrackingPostProcessor.cs" />
     <Compile Include="OoxParagraphsPostProcessor.cs" />

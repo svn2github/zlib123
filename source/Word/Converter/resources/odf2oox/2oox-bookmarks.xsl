@@ -280,7 +280,6 @@
             </xsl:for-each>
           </xsl:variable>
 
-
           <xsl:call-template name="InsertBookmarkStartTOC">
             <xsl:with-param name="linkNr" select="$linkNr"/>
             <xsl:with-param name="tocId" select="$myTocId"/>

@@ -65,6 +65,87 @@
   </xsl:template>
 
 
+
+  <xsl:template name="HexToDec">
+    <!-- @Description: This is a recurive algorithm converting a hex to decimal -->
+    <!-- @Context: None -->
+
+    <xsl:param name="number"/>
+    <!-- (string|number) The hex number to convert -->
+    <xsl:param name="step" select="0"/>
+    <!-- (number) The exponent (only used during convertion)-->
+    <xsl:param name="value" select="0"/>
+    <!-- (number) The result from the previous digit's convertion (only used during convertion) -->
+
+    <xsl:variable name="number1">
+      <!-- translates all letters to lower case -->
+      <xsl:value-of select="translate($number,'ABCDEF','abcdef')"/>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="string-length($number1) &gt; 0">
+
+        <xsl:variable name="one">
+          <!-- The last digit in the hex number -->
+          <xsl:choose>
+            <xsl:when test="substring($number1,string-length($number1) ) = 'a'">
+              <xsl:text>10</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'b'">
+              <xsl:text>11</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'c'">
+              <xsl:text>12</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'd'">
+              <xsl:text>13</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'e'">
+              <xsl:text>14</xsl:text>
+            </xsl:when>
+            <xsl:when test="substring($number1,string-length($number1)) = 'f'">
+              <xsl:text>15</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring($number1,string-length($number1))"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="power">
+          <!-- The result of the exponent calculation -->
+          <xsl:call-template name="Power">
+            <xsl:with-param name="base">16</xsl:with-param>
+            <xsl:with-param name="exponent">
+              <xsl:value-of select="number($step)"/>
+            </xsl:with-param>
+            <xsl:with-param name="value1">16</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:choose>
+          <xsl:when test="string-length($number1) = 1">
+            <xsl:value-of select="($one * $power )+ number($value)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="HexToDec">
+              <xsl:with-param name="number">
+                <xsl:value-of select="substring($number1,1,string-length($number1) - 1)"/>
+              </xsl:with-param>
+              <xsl:with-param name="step">
+                <xsl:value-of select="number($step) + 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="value">
+                <xsl:value-of select="($one * $power) + number($value)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+
   <xsl:template name="GetValue">
     <!-- @Description: Gets the unit-less value of a measured length -->  
     <!-- @Context: None -->
@@ -388,6 +469,45 @@
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="Power">
+    <!-- @Description: Calculates the power of a given number (i.e. x<sup>y</sup>) -->
+    <!-- @Context: None -->
+
+    <xsl:param name="base"/>
+    <!-- (number) The exponent base -->
+    <xsl:param name="exponent"/>
+    <!-- (number) The exponent (e.g. y)-->
+    <xsl:param name="value1"  select="$base"/>
+    <!-- (number) The number on which the exponent should be applied (e.g. x)  -->
+
+    <xsl:choose>
+      <xsl:when test="$exponent = 0">
+        <xsl:text>1</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$exponent &gt; 1">
+            <xsl:call-template name="Power">
+              <xsl:with-param name="base">
+                <xsl:value-of select="$base"/>
+              </xsl:with-param>
+              <xsl:with-param name="exponent">
+                <xsl:value-of select="$exponent -1"/>
+              </xsl:with-param>
+              <xsl:with-param name="value1">
+                <xsl:value-of select="$value1 * $base"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$value1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>

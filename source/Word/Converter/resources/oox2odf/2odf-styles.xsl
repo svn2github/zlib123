@@ -2156,8 +2156,7 @@
                 <xsl:with-param name="unit">cm</xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:value-of
-              select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="ConvertPoints">

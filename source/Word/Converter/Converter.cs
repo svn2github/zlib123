@@ -51,6 +51,8 @@ namespace OdfConverter.Wordprocessing
         {
             get
             {
+                //ODF -> DOCX
+
                 string fullname = Assembly.GetExecutingAssembly().FullName;
                 return new string[]  {
                    "OdfConverter.Wordprocessing.OoxChangeTrackingPostProcessor,"+fullname,
@@ -58,7 +60,8 @@ namespace OdfConverter.Wordprocessing
                    "OdfConverter.Wordprocessing.OoxSectionsPostProcessor,"+fullname, 
                    "OdfConverter.Wordprocessing.OoxAutomaticStylesPostProcessor,"+fullname,
                    "OdfConverter.Wordprocessing.OoxParagraphsPostProcessor,"+fullname,
-                   "CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor"
+                   "CleverAge.OdfConverter.OdfConverterLib.OoxCharactersPostProcessor", 
+                   "OdfConverter.Wordprocessing.OoxReplacementPostProcessor,"+fullname
                 };
             }
         }
@@ -67,6 +70,8 @@ namespace OdfConverter.Wordprocessing
         {
             get
             {
+                //DOCX -> ODF
+
                 string fullname = Assembly.GetExecutingAssembly().FullName;
                 return new string[]  {
                     "OdfConverter.Wordprocessing.OdfParagraphPostProcessor,"+fullname,

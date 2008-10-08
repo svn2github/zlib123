@@ -1073,8 +1073,12 @@
       <!-- TOC hyperlink -->
       <xsl:when test="ancestor::text:index-body and position() = 1">
         
-        <xsl:variable name="linkNr" select="count(../preceding-sibling::text:p) + 1"/>
         
+        
+        <!--
+        makz: new TOC Hyperlink Conversion
+        -->
+        <xsl:variable name="linkNr" select="count(../preceding-sibling::text:p) + 1"/>
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
             <xsl:value-of select="concat('Toc_', generate-id(ancestor::text:table-of-content), '_', $linkNr)"/>
