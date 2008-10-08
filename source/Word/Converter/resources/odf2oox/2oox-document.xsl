@@ -56,10 +56,10 @@
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
   <!-- key to find hyperlinks with a particular style. -->
   <xsl:key name="style-modified-hyperlinks" match="text:a" use="text:span/@text:style-name"/>
+  
   <!-- protected sections -->
   <xsl:variable name="protected-sections"
     select="document('content.xml')/office:document-content/office:body//text:section[@text:protected='true']"/>
-
 
   <!-- table of content count -->
   <xsl:variable name="tocCount">
@@ -1069,16 +1069,27 @@
   <!-- links -->
   <xsl:template match="text:a" mode="paragraph">
     <xsl:choose>
+      
       <!-- TOC hyperlink -->
       <xsl:when test="ancestor::text:index-body and position() = 1">
+        
+        <!--
         <xsl:variable name="tocId" select="count(../preceding-sibling::text:p)+1"/>
+        -->
+
+        <xsl:variable name="tocId">
+          <xsl:for-each select="key('headers', '')" >
+          </xsl:for-each>
+        </xsl:variable>
+        
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
             <xsl:value-of
-              select="concat('_Toc',$tocId,generate-id(ancestor::text:table-of-content))"/>
+              select="concat('_Toc_', $tocId, '_', generate-id(ancestor::text:table-of-content))"/>
           </xsl:attribute>
           <xsl:apply-templates mode="paragraph"/>
         </w:hyperlink>
+      
       </xsl:when>
 
       <!--text body link-->
