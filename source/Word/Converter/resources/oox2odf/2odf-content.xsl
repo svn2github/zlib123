@@ -675,6 +675,16 @@
 							<xsl:value-of select="generate-id(self::node())"/>
 						</xsl:attribute>
 					</xsl:if>
+
+          <!--clam, dialogika: bugfix #2088822-->
+          <xsl:variable name="myNum" select="key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId = $numId]"></xsl:variable>
+          <xsl:if test="$myNum/w:lvlOverride[@w:ilvl=$outlineLevel]/w:startOverride">
+            <xsl:attribute name="text:restart-numbering">true</xsl:attribute>
+            <xsl:attribute name="text:start-value">
+              <xsl:value-of select="$myNum/w:lvlOverride[@w:ilvl=$outlineLevel]/w:startOverride/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
+          
 					<!--header outline level -->
 					<xsl:call-template name="InsertHeadingOutlineLvl">
 						<xsl:with-param name="outlineLevel" select="$outlineLevel"/>
@@ -701,6 +711,7 @@
 							</xsl:attribute>
 						</text:change-start>
 					</xsl:if>
+          
 				</text:h>
 			</xsl:otherwise>
 		</xsl:choose>
