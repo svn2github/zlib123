@@ -33,6 +33,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="text fo style office draw">
 
 	<!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->
@@ -53,35 +54,21 @@
 
   <!-- Insert BookmarkStart or ReferenceMarkStart-->
   <xsl:template match="text:bookmark-start | text:reference-mark-start | text:bookmark" mode="paragraph">
-      <w:bookmarkStart>
-        <xsl:attribute name="w:id">
-          <xsl:call-template name="GenerateBookmarkId">
-            <xsl:with-param name="TextName">
-              <xsl:value-of select="@text:name"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="w:name">
-          <xsl:call-template name="SuppressForbiddenChars">
-            <xsl:with-param name="string" select="@text:name"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:bookmarkStart>
-      <xsl:if test="name()='text:bookmark'">
-        <w:bookmarkEnd>
-          <xsl:attribute name="w:id">
-            <xsl:call-template name="GenerateBookmarkId">
-              <xsl:with-param name="TextName">
-                <xsl:value-of select="@text:name"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </w:bookmarkEnd>
-      </xsl:if>
-  </xsl:template>
-
-  <!-- Insert BookmarkEnd -->
-  <xsl:template match="text:bookmark-end | text:reference-mark-end" mode="paragraph">
+    <w:bookmarkStart>
+      <xsl:attribute name="w:id">
+        <xsl:call-template name="GenerateBookmarkId">
+          <xsl:with-param name="TextName">
+            <xsl:value-of select="@text:name"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="w:name">
+        <xsl:call-template name="SuppressForbiddenChars">
+          <xsl:with-param name="string" select="@text:name"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </w:bookmarkStart>
+    <xsl:if test="name()='text:bookmark'">
       <w:bookmarkEnd>
         <xsl:attribute name="w:id">
           <xsl:call-template name="GenerateBookmarkId">
@@ -91,6 +78,20 @@
           </xsl:call-template>
         </xsl:attribute>
       </w:bookmarkEnd>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Insert BookmarkEnd -->
+  <xsl:template match="text:bookmark-end | text:reference-mark-end" mode="paragraph">
+    <w:bookmarkEnd>
+      <xsl:attribute name="w:id">
+        <xsl:call-template name="GenerateBookmarkId">
+          <xsl:with-param name="TextName">
+            <xsl:value-of select="@text:name"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </w:bookmarkEnd>
   </xsl:template>
 
   <!-- Insert Cross References (Bookmark) -->
@@ -149,9 +150,63 @@
     </xsl:choose>
   </xsl:template>
 
+
+  <!--
+  Summary:  Determines the outline level out of the given toc link
+  Author:   makz (DIaLOGIKa)
+  Params:   href: The href value of the toc link
+  -->
+  <xsl:template name="DetermineOutlineLevel">
+    <xsl:param name="href" />
+    <xsl:param name="outlineLevel" select="0" />
+
+    <xsl:choose>
+      <xsl:when test="starts-with($href, '#')">
+        <xsl:call-template name="DetermineOutlineLevel">
+          <xsl:with-param name="href" select="substring-after($href, '#')" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="substring-before($href, '.') != '' and number(substring-before($href, '.')) != 'NaN'">
+        <xsl:call-template name="DetermineOutlineLevel">
+          <xsl:with-param name="href" select="substring-after($href, '.')" />
+          <xsl:with-param name="outlineLevel" select="$outlineLevel + 1" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$outlineLevel" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <!--
+  Summary:  Determines the referenced text out of the given toc link
+  Author:   makz (DIaLOGIKa)
+  Params:   href: The href value of the toc link
+  -->
+  <xsl:template name="DetermineReferencedText">
+    <xsl:param name="href" />
+
+    <xsl:choose>
+      <xsl:when test="starts-with($href, '#')">
+        <xsl:call-template name="DetermineReferencedText">
+          <xsl:with-param name="href" select="substring-before(substring-after($href, '#'), '|')" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="substring-before($href, '.') != '' and number(substring-before($href, '.')) != 'NaN'">
+        <xsl:call-template name="DetermineReferencedText">
+          <xsl:with-param name="href" select="substring-after($href, '.')" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$href" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
   <xsl:template name="InsertTOCBookmark">
     <xsl:param name="tableOfContentsNum" select="$tocCount"/>
-	  <!--xsl:param name="tableOfContentsNum" select="count(key('toc',''))"/-->
     <xsl:param name="bookmarkType"/>
     <xsl:param name="styleName" select="@text:style-name"/>
 
@@ -166,20 +221,74 @@
         </xsl:variable>
 
         <xsl:if test="$isBookmarked = 'true' ">
+
+          <!--
+          makz: 
+          The template CalculateBookmarkId caused heavy performance problems 
+          and was replaced by the new toc/link mechanism below:
+          
           <xsl:variable name="bookmarkId">
             <xsl:call-template name="CalculateBookmarkId">
               <xsl:with-param name="counter" select="1"/>
               <xsl:with-param name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]"/>
             </xsl:call-template>
           </xsl:variable>
+          -->
+          
+          <xsl:variable name="myToc" select="key('toc', '')[number($tableOfContentsNum)]" />
+          <xsl:variable name="myTocId" select="generate-id($myToc)" />
+          
+          <!-- 
+          Try to find the hyperlink that references this heading.
+          We need the position of the paragraph that holds this hyperlink.
+          -->
+          <xsl:variable name="linkNr">
+
+            <xsl:variable name="myOutlineLevel" select="@text:outline-level" />
+            <xsl:variable name="myText" select="child::node()[1]" />
+            
+            <!--
+            Check every paragraph in my TOC
+            -->
+            <xsl:for-each select="$myToc/text:index-body/text:p">
+
+              <!--
+              Determine the outline level out of the href
+              -->
+              <xsl:variable name="outlinelvl">
+                <xsl:call-template name="DetermineOutlineLevel">
+                  <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
+                </xsl:call-template>
+              </xsl:variable>
+
+              <!--
+              Determine the referenced text out of the href
+              -->
+              <xsl:variable name="refText">
+                <xsl:call-template name="DetermineReferencedText">
+                  <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
+                </xsl:call-template>
+              </xsl:variable>
+
+              <!--
+              If this headings outline level and text match, this is the link that references this heading
+              -->
+              <xsl:if test="$myOutlineLevel = $outlinelvl and $myText = $refText">
+                <xsl:value-of select="position()"/>
+              </xsl:if>
+
+            </xsl:for-each>
+          </xsl:variable>
+
 
           <xsl:call-template name="InsertBookmarkStartTOC">
-            <xsl:with-param name="tocId" select="$bookmarkId"/>
-            <xsl:with-param name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]"/>
+            <xsl:with-param name="linkNr" select="$linkNr"/>
+            <xsl:with-param name="tocId" select="$myTocId"/>
           </xsl:call-template>
 
           <xsl:call-template name="InsertBookmarkEndTOC">
-            <xsl:with-param name="tocId" select="$bookmarkId"/>
+            <xsl:with-param name="linkNr" select="$linkNr"/>
+            <xsl:with-param name="tocId" select="$myTocId"/>
           </xsl:call-template>
         </xsl:if>
 
@@ -191,6 +300,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
 
   <!-- Insert BookmarkStart Id or BookmarkEnd Id -->
   <xsl:template name="GenerateBookmarkId">
@@ -256,17 +366,19 @@
 
   <!-- bookmark start mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkStartTOC">
+    <xsl:param name="linkNr"/>
     <xsl:param name="tocId"/>
-    <xsl:param name="tableOfContent"/>
-
-    <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId,generate-id($tableOfContent))}"/>
+    
+    <w:bookmarkStart w:id="{concat('http://www.dialogika.de/replace/bookmarkid/', $tocId, $linkNr)}"
+                     w:name="{concat('Toc_', $tocId, '_', $linkNr)}" />
   </xsl:template>
 
   <!-- bookmark end mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkEndTOC">
+    <xsl:param name="linkNr"/>
     <xsl:param name="tocId"/>
 
-    <w:bookmarkEnd w:id="{$tocId}"/>
+    <w:bookmarkEnd w:id="{concat('http://www.dialogika.de/replace/bookmarkid/', $tocId, $linkNr)}" />
   </xsl:template>
 
   <!-- checks if element has style or element used to generate TOC -->
@@ -342,8 +454,7 @@
   <xsl:template name="CalculateBookmarkId">
     <xsl:param name="counter"/>
     <xsl:param name="tableOfContent"/>
-    <xsl:param name="sourceStyleNum"
-      select="count($tableOfContent/text:table-of-content-source/text:index-source-styles)"/>
+    <xsl:param name="sourceStyleNum" select="count($tableOfContent/text:table-of-content-source/text:index-source-styles)"/>
 
     <xsl:choose>
 
@@ -353,8 +464,7 @@
           select="$counter 
           + count(preceding::text:h[child::node() and not(ancestor::text:index-body) 
           and @text:outline-level &lt; ($tableOfContent/text:table-of-content-source/@text:outline-level+1)])
-          + count(preceding::text:toc-mark-start[$tableOfContent/text:table-of-content-source/@text:use-index-marks != 'false' ])"
-        />
+          + count(preceding::text:toc-mark-start[$tableOfContent/text:table-of-content-source/@text:use-index-marks != 'false' ])" />
       </xsl:when>
 
       <!--count element with source styles-->
@@ -364,8 +474,7 @@
         <xsl:variable name="elementSum">
           <xsl:value-of
             select="$counter + count(preceding::text:p[@text:style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)]) +
-            count(preceding::text:p[key('automatic-styles',@text:style-name)/@style:parent-style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)])"
-          />
+            count(preceding::text:p[key('automatic-styles',@text:style-name)/@style:parent-style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)])" />
         </xsl:variable>
 
         <xsl:call-template name="CalculateBookmarkId">
@@ -374,6 +483,7 @@
           <xsl:with-param name="tableOfContent" select="$tableOfContent"/>
         </xsl:call-template>
       </xsl:when>
+      
       <xsl:otherwise>
         <xsl:value-of select="$counter"/>
       </xsl:otherwise>
@@ -390,7 +500,7 @@
     <xsl:variable name="indexOfObjects"
       select="generate-id(key('indexes','')[child::*/@text:caption-sequence-name = $textName])"/>
 
-    <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id,$indexOfObjects)}"/>
+    <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc', $id, $indexOfObjects)}"/>
     <w:r>
       <w:t>
         <xsl:value-of select="."/>

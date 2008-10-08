@@ -697,17 +697,16 @@
             </xsl:if>
           </xsl:when>
           <xsl:otherwise>
-              <!--clam, dialogika: bugfix 2101915-->
-              <xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$styleName]">
-                <xsl:variable name="level">
-                  <xsl:value-of
-                    select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level "
+            <xsl:if test="key('styles', $styleName)">
+              <xsl:variable name="level">
+                <xsl:value-of
+                  select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level "
                 />
-                </xsl:variable>
-                <xsl:if test="number($level)">
-                  <w:pStyle w:val="{concat('TOC', $level)}"/>
-                </xsl:if>
+              </xsl:variable>
+              <xsl:if test="number($level)">
+                <w:pStyle w:val="{concat('TOC', $level)}"/>
               </xsl:if>
+            </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -1066,6 +1065,7 @@
     </xsl:choose>
   </xsl:template>
 
+
   <!-- links -->
   <xsl:template match="text:a" mode="paragraph">
     <xsl:choose>
@@ -1073,23 +1073,15 @@
       <!-- TOC hyperlink -->
       <xsl:when test="ancestor::text:index-body and position() = 1">
         
-        <!--
-        <xsl:variable name="tocId" select="count(../preceding-sibling::text:p)+1"/>
-        -->
-
-        <xsl:variable name="tocId">
-          <xsl:for-each select="key('headers', '')" >
-          </xsl:for-each>
-        </xsl:variable>
+        <xsl:variable name="linkNr" select="count(../preceding-sibling::text:p) + 1"/>
         
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
-            <xsl:value-of
-              select="concat('_Toc_', $tocId, '_', generate-id(ancestor::text:table-of-content))"/>
+            <xsl:value-of select="concat('Toc_', generate-id(ancestor::text:table-of-content), '_', $linkNr)"/>
           </xsl:attribute>
           <xsl:apply-templates mode="paragraph"/>
         </w:hyperlink>
-      
+
       </xsl:when>
 
       <!--text body link-->
@@ -1133,10 +1125,21 @@
           <xsl:call-template name="MarkMasterPage"/>
           <w:pPr>
 
-            <!-- insert style -->
+            <!--
+            makz: Do no longer insert the style name because the automatic style will 
+                  be converted to paragraph properties.
+            
             <xsl:call-template name="InsertParagraphStyle">
               <xsl:with-param name="styleName" select="*[1]/@text:style-name"/>
             </xsl:call-template>
+            -->
+
+            <!--
+            makz: context switch for-each to insert the paragraph properties
+            -->
+            <xsl:for-each select="*[1][self::text:p or self::text:h]">
+              <xsl:call-template name="InsertParagraphProperties" />
+            </xsl:for-each>
 
             <!-- insert number -->
             <xsl:call-template name="InsertNumbering">
