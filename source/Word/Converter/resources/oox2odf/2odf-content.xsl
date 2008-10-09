@@ -606,24 +606,28 @@
 				These headings should not be put into a text:list element and used with the next case (xsl:apply-templates select="." mode="heading")-->
 			<!--<xsl:when test="not($outlineLevel != '' and $IsDefaultHeading='true' and key('StyleId',$styleId)/w:pPr/w:numPr/w:numId) 
 							and $numId != '' and $ilvl &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">-->
-			<xsl:when test="$numId != '' and $ilvl &lt; 10 and key('numId', $numId)">
 
-				<!--<xsl:when
+			<!--<xsl:when
 			      test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $ilvl &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">-->
 
-				<!--math, dialogika: bugfix #1947995 END-->
+			<!--math, dialogika: bugfix #1947995 END-->
 
-				<!--xsl:when
+			<!--xsl:when
 						test="$numId != '' and $ilvl &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
 						and not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
 
+			<!-- divo/20081009: check that we are 
+					- in a list
+					- maximum at level 9 (OOo does not support more than 10 list levels)
+					- and there is a numbering definition for the numId
+			-->
+			<xsl:when test="$numId != '' and $ilvl &lt; 10 and key('numId', $numId)">
 
 				<xsl:apply-templates select="." mode="list">
 					<xsl:with-param name="numId" select="$numId"/>
 					<xsl:with-param name="ilvl" select="$ilvl"/>
-					<xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
-					<!--<xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>-->
 				</xsl:apply-templates>
+				
 			</xsl:when>
 
 			<!--math, dialogika: changed for bugfix #1802258 BEGIN -->

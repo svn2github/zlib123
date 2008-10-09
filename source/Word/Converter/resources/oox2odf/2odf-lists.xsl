@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
+  * Copyright (c) 2008, DIaLOGIKa
   * All rights reserved.
   * 
   * Redistribution and use in source and binary forms, with or without
@@ -206,10 +207,10 @@
 						<xsl:otherwise />
 					</xsl:choose>
 					<!--<xsl:if test="w:rPr/w:rStyle">
-            <xsl:attribute name="text:style-name">
-              <xsl:value-of select="w:rPr/w:rStyle"/>
-            </xsl:attribute>
-          </xsl:if>-->
+					<xsl:attribute name="text:style-name">
+					  <xsl:value-of select="w:rPr/w:rStyle"/>
+					</xsl:attribute>
+				  </xsl:if>-->
 					<xsl:attribute name="text:bullet-char">
 						<xsl:call-template name="TextChar"/>
 					</xsl:attribute>
@@ -257,23 +258,33 @@
 					</xsl:call-template>
 					<xsl:choose>
 						<!--
-              dialogika, clam: bugfix #1831298
-              <xsl:when test="starts-with(w:lvlText/@w:val,concat('%',$lvl,'%',$lvl))">
-              
-              dialogika, makz: bugfix #1827565 
-              changed that it works dynamically for more than 2 levels
-              -->
+						  dialogika, clam: bugfix #1831298
+						  <xsl:when test="starts-with(w:lvlText/@w:val,concat('%',$lvl,'%',$lvl))">
+			              
+						  dialogika, makz: bugfix #1827565 
+						  changed that it works dynamically for more than 2 levels
+						  -->
 						<xsl:when test="starts-with(w:lvlText/@w:val, concat('%',$lvl))">
-							<xsl:variable name="cnt">
-								<xsl:call-template name="substring-count">
-									<xsl:with-param name="string" select="w:lvlText/@w:val" />
-									<xsl:with-param name="occurrence" select="concat('%',$lvl)" />
-								</xsl:call-template>
-							</xsl:variable>
 							<xsl:attribute name="style:num-letter-sync">true</xsl:attribute>
-							<xsl:attribute name="text:start-value">
-								<xsl:value-of select="1 + (($cnt - 1)*26)"/>
-							</xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="w:start and w:start/@w:val > 1">
+									<xsl:attribute name="text:start-value">
+										<xsl:value-of select="w:start/@w:val"/>
+									</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:variable name="cnt">
+										<xsl:call-template name="substring-count">
+											<xsl:with-param name="string" select="w:lvlText/@w:val" />
+											<xsl:with-param name="occurrence" select="concat('%',$lvl)" />
+										</xsl:call-template>
+									</xsl:variable>
+									
+									<xsl:attribute name="text:start-value">
+										<xsl:value-of select="1 + (($cnt - 1)*26)"/>
+									</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:if test="w:start and w:start/@w:val > 1">
@@ -557,46 +568,6 @@
 			</xsl:choose>
 		</xsl:variable>
 
-
-
-		<!--<xsl:variable name="WLeft">
-		  <xsl:choose>
-			<xsl:when test="$Ind/@w:left">
-			  <xsl:value-of select="$Ind/@w:left"/>
-			</xsl:when>
-			<xsl:otherwise>0</xsl:otherwise>
-		  </xsl:choose>
-		</xsl:variable>-->
-
-		<!--<xsl:variable name="WLeft">
-		  <xsl:choose>
-			<xsl:when test="$paragraph/w:pPr/w:ind/@w:left">
-			  <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:left"/>
-			</xsl:when>
-			<xsl:when test="$style/w:pPr/w:ind/@w:left">
-			  <xsl:value-of select="$style/w:pPr/w:ind/@w:left"/>
-			</xsl:when>
-			<xsl:when test="w:pPr/w:ind/@w:left">
-			  <xsl:value-of select="w:pPr/w:ind/@w:left"/>
-			</xsl:when>        
-			<xsl:otherwise>0</xsl:otherwise>
-		  </xsl:choose>
-		</xsl:variable>-->
-
-		<!--<xsl:variable name="WHanging">
-		  <xsl:choose>
-			<xsl:when test="$Ind/@w:hanging">
-			  <xsl:value-of select="$Ind/@w:hanging"/>
-			</xsl:when>
-			<xsl:otherwise>0</xsl:otherwise>
-		  </xsl:choose>
-		</xsl:variable>-->
-
-		<!--xsl:variable name="WFirstLine">
-		  <xsl:call-template name="FirstLine"/>
-		</xsl:variable>-->
-
-
 		<xsl:variable name="tabs"
 		  select="$paragraph_ref_this_list_level/w:pPr/w:tabs | $paragraph_ref_this_styleid/w:pPr/w:tabs | $style/w:pPr/w:tabs | w:pPr/w:tabs" />
 
@@ -705,127 +676,6 @@
 				<xsl:with-param name="unit">cm</xsl:with-param>
 			</xsl:call-template>
 		</xsl:attribute>
-
-		<!--<xsl:choose>
-      <xsl:when test="$Ind/@w:hanging">
-        <xsl:attribute name="text:space-before">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:choose>
-                <xsl:when test="$WFirstLine = 'NaN'">
-                  <xsl:value-of select="$WLeft - $WHanging"/>
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="text:min-label-width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:choose>
-                <xsl:when test="$WFirstLine = 'NaN'">
-                  <xsl:choose>
-                    <xsl:when
-                      test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')"
-                      >0</xsl:when>
-                    <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
-                    <xsl:when test="$tab != '' and (number($tab) - number($WLeft) >= 0) and not(number($WLeft) = number($WHanging))">
-                      <xsl:value-of select="number($tab) - number($WLeft) + number($WHanging)"/>
-                    </xsl:when>
-                    <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
-                      <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:hanging"/>
-                    </xsl:when>
-                    <xsl:when test="$style/w:pPr/w:ind/@w:hanging">
-                      <xsl:value-of select="$style/w:pPr/w:ind/@w:hanging"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="$Ind/@w:hanging"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:when>
-		<xsl:when test="$WFirstLine = '0'"><xsl:value-of
-                  select="/oox:package/oox:part[@oox:name='word/settings.xml']/w:settings/w:defaultTabStop/@w:val"/></xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="text:min-label-distance">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:choose>
-                <xsl:when test="$WFirstLine != 'NaN'">
-                  <xsl:choose>
-                    <xsl:when test="$tab != '' and $tab - $WFirstLine > 0 ">
-                      <xsl:value-of select="$tab - $WFirstLine"/>
-                    </xsl:when>
-                    <xsl:otherwise>0</xsl:otherwise>
-                  </xsl:choose>
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="text:space-before">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="number($WLeft)"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="text:min-label-width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:choose>
-                <xsl:when test="$WFirstLine = 'NaN'">
-                  <xsl:choose>
-                    <xsl:when
-                      test="../w:multiLevelType/@w:val='multilevel' and number($tab) > number($WLeft)">
-                      <xsl:value-of select="$tab - number($WLeft)"/>
-                    </xsl:when>
-                    <xsl:otherwise>0-->
-		<!--<xsl:value-of
-                      select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0-->
-		<!--</xsl:otherwise>
-                  </xsl:choose>
-                </xsl:when>
-                <xsl:when test="$WFirstLine = '0'">0-->
-		<!--<xsl:value-of
-                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/> placed in comment to obtain right space between number and text and replaced by 0-->
-		<!--</xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="text:min-label-distance">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:choose>
-                <xsl:when test="$tab != '' and $WFirstLine != 'NaN'">
-                  <xsl:value-of select="$tab - $WFirstLine"/>
-                </xsl:when>
-                <xsl:when test="$WFirstLine != 'NaN'">0</xsl:when>
-                <xsl:when test="(3 * number($WFirstLine)) &lt; (number($tab) - number($WLeft)) ">
-                  <xsl:value-of select="number($tab) - number($WLeft) - (2 * number($WFirstLine))"/>
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>-->
 
 		<!--math, dialogika: changed for correct indentation calculation END -->
 
@@ -1001,15 +851,16 @@
 		</xsl:choose>
 	</xsl:template>
 
-
-	<!-- paragraph which is the first element in list level-->
+	<!--This template converts (multi-level) list from the flat structure in OpenXML to a hierarchical/nested list structure in ODT.
+		
+		The list conversion is triggered on the first paragraph in the list, then this template and InsertListLevel are called recursively to 
+		create the nested structure of the entire list. This means that this template must check whether it is called on the first paragraph 
+		of a list or on a following one. In the latter case this template will exit immediately. -->
 	<xsl:template match="w:p" mode="list">
 		<xsl:param name="numId"/>
 		<xsl:param name="ilvl"/>
 		<xsl:param name="listLevel" select="number(-1)"/>
-		<xsl:param name="dummyOutlineLevel"/>
-		<!--<xsl:param name="isPrecedingHeading"/>-->
-
+		
 		<xsl:variable name="isStartOfList">
 			<xsl:call-template name="IsStartOfList">
 				<xsl:with-param name="node" select="."/>
@@ -1018,6 +869,9 @@
 			</xsl:call-template>
 		</xsl:variable>
 
+		<!--Proceed only for the first paragraph in a list. This template will recursively convert the following paragraphs that 
+			still belong to the same list. If later on the main paragraph template (match="w:p" in 2odt-content.xsl) is called on these following
+			paragraphs, don't do anything here -->
 		<xsl:if test="$isStartOfList='true' or $listLevel &gt;= 0">
 
 			<xsl:variable name="listNumStyle">
@@ -1050,6 +904,7 @@
 
 			<xsl:choose>
 				<xsl:when test="$isStartOfList='true' and $listLevel = -1">
+					<!-- the first time we create a list with a style reference -->
 					<text:list text:style-name="{$listNumStyle}">
 
 						<!--  TODO - continue numbering-->
@@ -1057,6 +912,7 @@
 
 						<xsl:choose>
 							<xsl:when test="$listLevel + 1 &lt; $ilvl">
+								<!-- a list level has been omitted, e.g. the list start with level 2 -->
 								<xsl:apply-templates select="." mode="list">
 									<xsl:with-param name="numId" select="$numId"/>
 									<xsl:with-param name="ilvl" select="$ilvl"/>
@@ -1068,25 +924,32 @@
 									<xsl:with-param name="ilvl" select="$ilvl"/>
 									<xsl:with-param name="numId" select="$numId"/>
 									<xsl:with-param name="listLevel" select="$listLevel + 1"/>
-									<xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
-									<!--math, dialogika: unused parameter-->
-									<!--<xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>-->
 								</xsl:call-template>
 							</xsl:otherwise>
 						</xsl:choose>
 					</text:list>
 				</xsl:when>
 				<xsl:when test="$listLevel &lt; $ilvl">
+					<!-- creating a nested list within a text:list-item node -->
 					<text:list-item>
 						<text:list>
-							<xsl:call-template name="InsertListLevel">
-								<xsl:with-param name="ilvl" select="$ilvl"/>
-								<xsl:with-param name="numId" select="$numId"/>
-								<xsl:with-param name="listLevel" select="$listLevel + 1"/>
-								<xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
-								<!--math, dialogika: unused parameter-->
-								<!--<xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>-->
-							</xsl:call-template>
+							<xsl:choose>
+								<xsl:when test="$listLevel + 1 &lt; $ilvl">
+									<!-- a list level has been omitted, e.g. the list jumps from level 1 to level 3-->
+									<xsl:apply-templates select="." mode="list">
+										<xsl:with-param name="numId" select="$numId"/>
+										<xsl:with-param name="ilvl" select="$ilvl"/>
+										<xsl:with-param name="listLevel" select="$listLevel + 1"/>
+									</xsl:apply-templates>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="InsertListLevel">
+										<xsl:with-param name="ilvl" select="$ilvl"/>
+										<xsl:with-param name="numId" select="$numId"/>
+										<xsl:with-param name="listLevel" select="$listLevel + 1"/>
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
 						</text:list>
 					</text:list-item>
 				</xsl:when>
@@ -1117,7 +980,6 @@
 
 			</xsl:if>
 		</xsl:if>
-
 	</xsl:template>
 	
 	<!-- converts element as list item and insert nested level if there is any -->
@@ -1126,10 +988,7 @@
 		<xsl:param name="ilvl"/>
 		<xsl:param name="numId"/>
 		<xsl:param name="listLevel"/>
-		<xsl:param name="dummyOutlineLevel"/>
-		<!--math, dialogika: unused parameter-->
-		<!--<xsl:param name="isPrecedingHeading"/>-->
-
+		
 		<xsl:choose>
 			<!-- if this paragraph is attached to preceding in track changes mode-->
 			<xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
@@ -1141,9 +1000,21 @@
 				<xsl:choose>
 					<xsl:when test="$listLevel = $ilvl">
 						<text:list-item>
-							<xsl:call-template name="InsertListItemContent">
-								<xsl:with-param name="node" select="$node"/>
-							</xsl:call-template>
+							<!-- insert list item content -->
+							<xsl:variable name="outlineLevel">
+								<xsl:call-template name="GetOutlineLevel">
+									<xsl:with-param name="node" select="$node"/>
+								</xsl:call-template>
+							</xsl:variable>
+
+							<xsl:choose>
+								<xsl:when test="$outlineLevel != ''">
+									<xsl:apply-templates select="$node" mode="heading"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:apply-templates select="$node" mode="paragraph"/>
+								</xsl:otherwise>
+							</xsl:choose>
 						</text:list-item>
 					</xsl:when>
 				</xsl:choose>
@@ -1177,7 +1048,6 @@
 								<xsl:with-param name="ilvl" select="$followingIlvl"/>
 								<xsl:with-param name="numId" select="$followingNumId"/>
 								<xsl:with-param name="listLevel" select="$listLevel"/>
-								<xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
 							</xsl:call-template>
 						</xsl:when>
 					</xsl:choose>
@@ -1186,36 +1056,9 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template name="InsertListItemContent">
-		<xsl:param name="node"/>
-
-		<xsl:variable name="outlineLevel">
-			<xsl:call-template name="GetOutlineLevel">
-				<xsl:with-param name="node" select="$node"/>
-			</xsl:call-template>
-		</xsl:variable>
-
-		<xsl:choose>
-			<xsl:when test="$outlineLevel != ''">
-				<xsl:apply-templates select="$node" mode="heading"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:apply-templates select="$node" mode="paragraph"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-
 	<!--  checks whether a paragraph node is the first one in a list -->
 	<xsl:template name="IsStartOfList">
 		<xsl:param name="node" select="."/>
-
-		<xsl:variable name="isPrecedingDefaultHeading">
-			<xsl:call-template name="CheckDefaultHeading">
-				<xsl:with-param name="Name">
-					<xsl:value-of select="key('StyleId',key('p', number(@oox:id)-1)/w:pPr/w:pStyle/@w:val)/w:name/@w:val"/>
-				</xsl:with-param>
-			</xsl:call-template>
-		</xsl:variable>
 
 		<xsl:variable name="numId">
 			<xsl:call-template name="GetListProperty">
@@ -1233,13 +1076,16 @@
 		
 		<xsl:choose>
 			<!-- item is the first one on a specific level if numId or ilvl have changed -->
-			<xsl:when test="$numId != $precedingNumId or ($numId != '' and $isPrecedingDefaultHeading='true')">true</xsl:when>
+			<xsl:when test="$numId != $precedingNumId ">true</xsl:when>
 			<xsl:otherwise>false</xsl:otherwise>
 		</xsl:choose>
 
 	</xsl:template>
 
-	<!--Return the id of the next node with list level ilvl in the same list or an empty nodeset if there is no such node following. 
+	<!--
+		Return the id of the next node with list level ilvl in the same list or an empty nodeset 
+		if there is no such node following. 
+		
 		The id is generated using generate-id() -->
 	<xsl:template name="GetNextItemOnIlvl">
 		<xsl:param name="node"/>
@@ -1265,8 +1111,6 @@
 			</xsl:variable>
 
 			<xsl:choose>
-				<!--<xsl:when test="$followingLevel = '' or $followingLevel &lt; $ilvl" />-->
-
 				<xsl:when test="$followingLevel = $ilvl">
 					<xsl:value-of select="generate-id($followingParagraph)"/>
 				</xsl:when>
@@ -1278,6 +1122,8 @@
 						<xsl:with-param name="numId" select="$numId"/>
 					</xsl:call-template>
 				</xsl:when>
+				<!--we return an empty string otherwise (namely if the list is not continued (i.e. $followingLevel='')
+					or if $followingLevel &lt; $ilvl-->
 			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
@@ -1400,14 +1246,6 @@
 								</xsl:attribute>
 							</xsl:if>
 							<style:list-level-properties>
-								<!--  <xsl:variable name="Ind" select="./w:pPr/w:ind"/>
-									<xsl:attribute name="text:space-before">
-									<xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
-									</xsl:attribute>
-									<xsl:attribute name="text:min-label-distance">
-									<xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
-									</xsl:attribute>-->
-
 								<!--math, dialogika: changed for correct indentation calculation BEGIN -->
 								<!--added parameter <xsl:with-param name="numId">-->
 
