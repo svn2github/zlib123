@@ -166,7 +166,7 @@
           <xsl:with-param name="href" select="substring-after($href, '#')" />
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="substring-before($href, '.') != '' and number(substring-before($href, '.')) != 'NaN'">
+      <xsl:when test="substring-before($href, '.') != '' and number(substring-before($href, '.')) >= 0">
         <xsl:call-template name="DetermineOutlineLevel">
           <xsl:with-param name="href" select="substring-after($href, '.')" />
           <xsl:with-param name="outlineLevel" select="$outlineLevel + 1" />
@@ -177,7 +177,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
 
   <!--
   Summary:  Determines the referenced text out of the given toc link
@@ -193,7 +192,7 @@
           <xsl:with-param name="href" select="substring-before(substring-after($href, '#'), '|')" />
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="substring-before($href, '.') != '' and number(substring-before($href, '.')) != 'NaN'">
+      <xsl:when test="substring-before($href, '.') != '' and number(substring-before($href, '.')) >= 0">
         <xsl:call-template name="DetermineReferencedText">
           <xsl:with-param name="href" select="substring-after($href, '.')" />
         </xsl:call-template>
@@ -203,6 +202,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
 
 
   <xsl:template name="InsertTOCBookmark">
@@ -244,40 +244,63 @@
           -->
           <xsl:variable name="linkNr">
 
-            <xsl:variable name="myOutlineLevel" select="@text:outline-level" />
-            <xsl:variable name="myText" select="child::node()[1]" />
-            
             <!--
-            Check every paragraph in my TOC
+            Thre is a difference between headers and list-headers.
             -->
-            <xsl:for-each select="$myToc/text:index-body/text:p">
+            <xsl:choose>
+              <xsl:when test="self::text:h">
+                <!--
+                For normal headers:
+                Try to find the TOC link that matches my outline level and my raw text
+                -->
+                <xsl:variable name="myText" select="string(child::node()[1])" />
+                <xsl:variable name="myOutlineLevel" select="number(@text:outline-level)" />
+                <xsl:for-each select="$myToc/text:index-body/text:p">
+                  <!--
+                  Determine the outline level out of the href
+                  -->
+                  <xsl:variable name="outlinelvl">
+                    <xsl:call-template name="DetermineOutlineLevel">
+                      <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <!--
+                  Determine the raw text out of the href
+                  -->
+                  <xsl:variable name="refText">
+                    <xsl:call-template name="DetermineReferencedText">
+                      <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <!--
+                  If this headings outline level and text match, this is the link that references this heading
+                  -->
+                  <xsl:if test="$myOutlineLevel = $outlinelvl and $myText = $refText">
+                    <xsl:value-of select="position()"/>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:when test="self::text:list-header[text:h]">
+                <!--
+                For list headers:
+                Try to find the TOC link that references my text!
+                -->
+                <xsl:variable name="myText" select="string(text:h/child::node()[1])" />
+                <xsl:for-each select="$myToc/text:index-body/text:p">
+                  <!--
+                  Determine the text out of the href
+                  -->
+                  <xsl:variable name="refText" select="substring-before(substring-after(text:a[1]/@xlink:href, '#'), '|')" />
+                  <!--
+                  If this headings text match, this is the link that references this heading
+                  -->
+                  <xsl:if test="$refText = $myText">
+                    <xsl:value-of select="position()"/>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:when>
+            </xsl:choose>
 
-              <!--
-              Determine the outline level out of the href
-              -->
-              <xsl:variable name="outlinelvl">
-                <xsl:call-template name="DetermineOutlineLevel">
-                  <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
-                </xsl:call-template>
-              </xsl:variable>
-
-              <!--
-              Determine the referenced text out of the href
-              -->
-              <xsl:variable name="refText">
-                <xsl:call-template name="DetermineReferencedText">
-                  <xsl:with-param name="href"  select="text:a[1]/@xlink:href" />
-                </xsl:call-template>
-              </xsl:variable>
-
-              <!--
-              If this headings outline level and text match, this is the link that references this heading
-              -->
-              <xsl:if test="$myOutlineLevel = $outlinelvl and $myText = $refText">
-                <xsl:value-of select="position()"/>
-              </xsl:if>
-
-            </xsl:for-each>
           </xsl:variable>
 
           <xsl:call-template name="InsertBookmarkStartTOC">
@@ -395,17 +418,26 @@
       <xsl:when test="ancestor::text:index-body">false</xsl:when>
 
       <!--checks if headings are used to generate TOC -->
-      <xsl:when test="self::text:h">
+      <xsl:when test="self::text:h or self::text:list-header[text:h]">
         <xsl:choose>
           <!-- headings aren't used -->
-          <xsl:when
-            test="$tableOfContent/text:table-of-content-source/@text:use-outline-level = 'false' "
-            >false</xsl:when>
+          <xsl:when test="$tableOfContent/text:table-of-content-source/@text:use-outline-level = 'false' " >
+            false
+          </xsl:when>
           <!-- check is current heading level is used to generate TOC -->
           <xsl:otherwise>
+            <xsl:variable name="outlineLvl">
+              <xsl:choose>
+                <xsl:when test="self::text:h">
+                  <xsl:value-of select="number(@text:outline-level)"/>
+                </xsl:when>
+                <xsl:when test="self::text:list-header">
+                  <xsl:value-of select="number(text:h/@text:outline-level)"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:variable>
             <xsl:choose>
-              <xsl:when
-                test="@text:outline-level &lt; ($tableOfContent/text:table-of-content-source/@text:outline-level+1)">
+              <xsl:when test="$outlineLvl &lt; ($tableOfContent/text:table-of-content-source/@text:outline-level+1)">
                 <xsl:text>true</xsl:text>
               </xsl:when>
               <xsl:otherwise>false</xsl:otherwise>
@@ -426,14 +458,14 @@
 
       <!--  checks if style or parent style is used as a source style for TOC-->
       <xsl:when test="$sourceStyleNum > 0">
-        <xsl:variable name="sourceStyleName"
+        <xsl:variable 
+          name="sourceStyleName"
           select="$tableOfContent/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
 
         <xsl:choose>
-          <xsl:when
-            test="(key('automatic-styles',$styleName) and key('automatic-styles',$styleName)/@style:parent-style-name = $sourceStyleName) 
-            or $styleName = $sourceStyleName"
-            >true</xsl:when>
+          <xsl:when test="(key('automatic-styles',$styleName) and key('automatic-styles',$styleName)/@style:parent-style-name = $sourceStyleName) or $styleName = $sourceStyleName">
+            true
+          </xsl:when>
 
           <!--  checks next source style-->
           <xsl:otherwise>

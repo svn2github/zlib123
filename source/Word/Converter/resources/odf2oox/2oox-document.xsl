@@ -1073,8 +1073,6 @@
       <!-- TOC hyperlink -->
       <xsl:when test="ancestor::text:index-body and position() = 1">
         
-        
-        
         <!--
         makz: new TOC Hyperlink Conversion
         -->

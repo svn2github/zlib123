@@ -1420,7 +1420,6 @@
       Only change the page number offset for a paragraph in the body ...
       -->
       <xsl:if test="ancestor::w:body">
-
         <!--
         ... and only if this is the first paragraph in the section ...
         -->
