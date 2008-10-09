@@ -87,8 +87,8 @@
 				<xsl:call-template name="InsertEndnoteStyles"/>
 				<xsl:call-template name="InsertFrameStyles"/>
 				<!--
-        makz: paragraph style for additional paragraph that should not be visible
-        -->
+					makz: paragraph style for additional paragraph that should not be visible
+				-->
 				<style:style style:name="http://www.dialogika.de/stylename/hiddenParagraph" style:family="paragraph" style:parent-style-name="Standard">
 					<style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
 				</style:style>
@@ -119,10 +119,10 @@
 	</xsl:template>
 
 	<!--
-  Summary: Inserst the declarations of all SET fields
-  Author: makz (DIaLOGIKa)
-  Date: 2.11.2007
-  -->
+		Summary: Insert the declarations of all SET fields
+		Author: makz (DIaLOGIKa)
+		Date: 2.11.2007
+	-->
 	<xsl:template name="InsertUserFieldDecls">
 		<text:user-field-decls>
 			<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//w:instrText" mode="UserFieldDecls" />
@@ -170,18 +170,16 @@
 	<xsl:template name="InsertFootnoteStyles">
 		<xsl:if
 		  test="key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr | 
-      key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
-			<xsl:apply-templates select="key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p"
-			  mode="automaticstyles"/>
+				key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
+			<xsl:apply-templates select="key('Part', 'word/footnotes.xml')/w:footnotes/w:footnote/w:p" mode="automaticstyles"/>
 		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="InsertEndnoteStyles">
 		<xsl:if
 		  test="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p/w:r/w:rPr | 
-      key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p/w:pPr">
-			<xsl:apply-templates select="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p"
-			  mode="automaticstyles"/>
+				key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p/w:pPr">
+			<xsl:apply-templates select="key('Part', 'word/endnotes.xml')/w:endnotes/w:endnote/w:p" mode="automaticstyles"/>
 		</xsl:if>
 	</xsl:template>
 
@@ -222,16 +220,16 @@
 
 
 	<!--
-  Summary:  Converts the child elements of the body and handels the section conversion
-  Author:   CleverAge
-  Modified: makz (DIaLOGIKa)
-  -->
+	  Summary:  Converts the child elements of the body and handels the section conversion
+	  Author:   CleverAge
+	  Modified: makz (DIaLOGIKa)
+	-->
 	<xsl:template name="InsertDocumentBody">
 		<xsl:choose>
 			<xsl:when test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr" >
 				<!--
-        There is more than the default sectPr, we need to write an own section for each sectPr.
-        -->
+					There is more than the default sectPr, we need to write an own section for each sectPr.
+				-->
 				<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr" mode="sections" />
 			</xsl:when>
 			<xsl:otherwise>
@@ -255,13 +253,13 @@
 			<xsl:call-template name="MasterPageName"/>
 
 			<style:paragraph-properties>
-        <xsl:for-each select="parent::w:p">
-          <!--context switch -->
-          <xsl:call-template name="InsertPageNumberOffset" />
-        </xsl:for-each>
+				<xsl:for-each select="parent::w:p">
+					<!--context switch -->
+					<xsl:call-template name="InsertPageNumberOffset" />
+				</xsl:for-each>
 
-        <xsl:call-template name="InsertDefaultTabStop"/>
-        <xsl:call-template name="InsertParagraphProperties"/>
+				<xsl:call-template name="InsertDefaultTabStop"/>
+				<xsl:call-template name="InsertParagraphProperties"/>
 			</style:paragraph-properties>
 			<!-- add text-properties to empty paragraphs. -->
 			<!--clam, dialogika: bugfix 1752761-->
@@ -279,7 +277,7 @@
 		<xsl:if test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
 			<style:style style:name="{generate-id(.)}" style:family="paragraph">
 				<xsl:call-template name="MasterPageName"/>
-        <xsl:call-template name="InsertDefaultParagraphProperties"/>
+				<xsl:call-template name="InsertDefaultParagraphProperties"/>
 			</style:style>
 		</xsl:if>
 		<xsl:apply-templates mode="automaticstyles"/>
@@ -312,17 +310,15 @@
 		<!-- do nothing. -->
 	</xsl:template>
 
-	<!--  get outline level from styles hierarchy for headings -->
+	<!--  get outline level from styles hierarchy -->
 	<xsl:template name="GetOutlineLevelByStyleId">
 		<xsl:param name="styleId"/>
-		<xsl:variable name="basedOn">
-			<xsl:value-of select="key('StyleId', $styleId)[1]/w:basedOn/@w:val"/>
-		</xsl:variable>
-		<!--  Search outlineLvl in style based on style -->
+
 		<xsl:choose>
 			<xsl:when test="key('StyleId', $styleId)[1]/w:pPr/w:outlineLvl/@w:val">
 				<xsl:value-of select="key('StyleId', $styleId)[1]/w:pPr/w:outlineLvl/@w:val"/>
 			</xsl:when>
+			<!--  Search outlineLvl recursively in style hierarchy -->
 			<xsl:when test="key('StyleId', $styleId)[1]/w:basedOn/@w:val">
 				<xsl:call-template name="GetOutlineLevelByStyleId">
 					<xsl:with-param name="styleId">
@@ -331,38 +327,25 @@
 				</xsl:call-template>
 			</xsl:when>
 		</xsl:choose>
-		<!--xsl:for-each select="key('Part', 'word/styles.xml')">
-      <xsl:variable name="basedOn">
-        <xsl:value-of select="key('StyleId', $outline)[1]/w:basedOn/@w:val"/>
-      </xsl:variable-->
-		<!--  Search outlineLvl in style based on style -->
-		<!--xsl:choose>
-        <xsl:when test="key('StyleId', $basedOn)[1]/w:pPr/w:outlineLvl/@w:val">
-          <xsl:value-of select="key('StyleId', $basedOn)[1]/w:pPr/w:outlineLvl/@w:val"/>
-        </xsl:when>
-        <xsl:when test="key('StyleId', $outline)[1]/w:basedOn/@w:val">
-          <xsl:call-template name="GetOutlineLevelByStyleId">
-            <xsl:with-param name="styleId">
-              <xsl:value-of select="key('StyleId', $outline)[1]/w:basedOn/@w:val"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:for-each-->
 	</xsl:template>
 
-	<!-- Get outlineLvl if the paragraf is heading -->
-	<xsl:template name="GetOutlineLevel">
-		<xsl:param name="node"/>
+	<!-- Get outlineLvl if the paragraph is heading -->
+	<!--<xsl:template name="GetOutlineLevel">
+		<xsl:param name="node" select="."/>
+		
 		<xsl:for-each select="key('Part', 'word/styles.xml')">
 			<xsl:choose>
 				<xsl:when test="$node/w:pPr/w:pStyle/@w:val">
 					<xsl:variable name="outline">
 						<xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
 					</xsl:variable>
-					<!--Search outlineLvl in styles.xml  -->
+					-->
+	<!--Search outlineLvl in styles.xml  -->
+	<!--
 					<xsl:choose>
-						<!--clam: "or w:basedOn/@w:val='Heading'" added because of bug #1785483-->
+						-->
+	<!--clam: "or w:basedOn/@w:val='Heading'" added because of bug #1785483-->
+	<!--
 						<xsl:when test="key('StyleId', $outline)[1][w:pPr/w:outlineLvl/@w:val and (w:basedOn/@w:val='Normal' or w:basedOn/@w:val='Heading')]">
 							<xsl:value-of select="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val"/>
 						</xsl:when>
@@ -376,7 +359,9 @@
 					<xsl:variable name="linkedStyleOutline">
 						<xsl:value-of select="key('StyleId', $outline)[1]/w:link/@w:val"/>
 					</xsl:variable>
-					<!--if outlineLvl is not defined search in parent style by w:link-->
+					-->
+	<!--if outlineLvl is not defined search in parent style by w:link-->
+	<!--
 					<xsl:choose>
 						<xsl:when test="key('StyleId', $linkedStyleOutline)[1]/w:pPr/w:outlineLvl/@w:val">
 							<xsl:value-of
@@ -393,6 +378,44 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:for-each>
+	</xsl:template>-->
+
+	<xsl:template name="GetOutlineLevel">
+		<xsl:param name="node" select="."/>
+
+		<xsl:variable name="outlineLevel">
+			<xsl:choose>
+				<xsl:when test="$node/w:pPr/w:pStyle/@w:val">
+					<xsl:call-template name="GetOutlineLevelByStyleId">
+						<xsl:with-param name="styleId">
+							<xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<!--if outlineLvl is not defined search in parent style by w:link-->
+					<xsl:call-template name="GetOutlineLevelByStyleId">
+						<xsl:with-param name="styleId">
+							<xsl:value-of select="key('StyleId', $node/w:r/w:rPr/w:rStyle/@w:val)[1]/w:link/@w:val"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+
+		<xsl:variable name="isDefaultHeading">
+			<xsl:call-template name="CheckDefaultHeading">
+				<xsl:with-param name="Name">
+					<xsl:value-of select="key('StyleId',$node/w:pPr/w:pStyle/@w:val)/w:name/@w:val" />
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+
+		<!-- a value of 9 means body text, i.e. it is equivalent to no outline level set -->
+		<xsl:if test="not($outlineLevel = '' or $outlineLevel = '9') and $isDefaultHeading='true'">
+			<xsl:value-of select="$outlineLevel"/>
+		</xsl:if>
+		
 	</xsl:template>
 
 	<!-- get outlineLvl if the paragraph's ancestor is heading -->
@@ -447,7 +470,7 @@
 
 	<!--math, dialogika: added for bugfix #1802258 BEGIN -->
 	<!--Checks recursively whether given style is default heading (must start with Counter = 1)-->
-	<xsl:template name ="CheckDefaultHeading">
+	<xsl:template name="CheckDefaultHeading">
 		<xsl:param name="Name" />
 		<xsl:param name="Counter" select="1"/>
 
@@ -470,7 +493,8 @@
 	<!--math, dialogika: added for bugfix #1802258 END -->
 
 
-	<!--  paragraphs, lists, headings-->
+	<!-- This templates checks several properties of the current paragraphs and then decides whether to create
+		a paragraphs, lists or headings by calling apply-templates in mode paragraph, heading or list -->
 	<xsl:template match="w:p">
 		<xsl:message terminate="no">progress:w:p</xsl:message>
 
@@ -481,7 +505,7 @@
 		</xsl:variable>
 
 		<xsl:variable name="dummyOutlineLevel">
-			<xsl:call-template name="GetDummyOutlineLevel">
+			<xsl:call-template name="GetOutlineLevel">
 				<xsl:with-param name="node" select="."/>
 			</xsl:call-template>
 		</xsl:variable>
@@ -493,7 +517,7 @@
 			</xsl:call-template>
 		</xsl:variable>
 
-		<xsl:variable name="level">
+		<xsl:variable name="ilvl">
 			<xsl:call-template name="GetListProperty">
 				<xsl:with-param name="node" select="."/>
 				<xsl:with-param name="property">w:ilvl</xsl:with-param>
@@ -502,14 +526,14 @@
 
 		<xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
 
-		<xsl:variable name="ifNormal">
+		<!--<xsl:variable name="ifNormal">
 			<xsl:for-each select="key('Part', 'word/styles.xml')">
 				<xsl:if test="key('StyleId', $styleId)/w:basedOn/@w:val='Normal'">true</xsl:if>
 			</xsl:for-each>
-		</xsl:variable>
+		</xsl:variable>-->
 
 		<!-- check if preceding paragraph is a heading in order not to lose numbered paragraphs inside headings-->
-		<xsl:variable name="isPrecedingHeading">
+		<!--<xsl:variable name="isPrecedingHeading">
 			<xsl:if test="$numId!=''">
 				<xsl:for-each select="key('p', number(@oox:id)-1)">
 					<xsl:variable name="precedingOutlineLevel">
@@ -534,8 +558,7 @@
 					<xsl:if test="$precedingOutlineLevel != '' and not(w:pPr/w:numPr) and $ifPrecedingNormal='true' and contains($precedingStyleId,'Heading') and $precedingNumId !=''">true</xsl:if>
 				</xsl:for-each>
 			</xsl:if>
-		</xsl:variable>
-
+		</xsl:variable>-->
 
 		<!--math, dialogika: added for bugfix #1802258 BEGIN -->
 		<xsl:variable name="IsDefaultHeading">
@@ -573,36 +596,38 @@
 
 			<!-- ignore paragraph if it's deleted in change tracking mode-->
 			<!--xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/-->
-			<xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
+			<xsl:when test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />
 
-			<!--  check if the paragraf is list element (it can be a heading but only if it's style is NOT linked to a list level 
-        - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
+			<!--  check if the paragraph is a list element (it can be a heading but only if it's style is NOT linked to a list level 
+				- for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
 
 			<!--math, dialogika: bugfix #1947995 BEGIN
-      It seems that outline numbering is only created for heading styles which have a numId defined in styles.xml.
-      These headings should not be put into a text:list element and used with the next case (xsl:apply-templates select="." mode="heading")-->
-
-			<xsl:when
-			  test="not($outlineLevel != '' and $IsDefaultHeading='true' and key('StyleId',$styleId)/w:pPr/w:numPr/w:numId) and $numId != '' and $level &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">
+				It seems that outline numbering is only created for heading styles which have a numId defined in styles.xml.
+				These headings should not be put into a text:list element and used with the next case (xsl:apply-templates select="." mode="heading")-->
+			<!--<xsl:when test="not($outlineLevel != '' and $IsDefaultHeading='true' and key('StyleId',$styleId)/w:pPr/w:numPr/w:numId) 
+							and $numId != '' and $ilvl &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">-->
+			<xsl:when test="$numId != '' and $ilvl &lt; 10 and key('numId', $numId)">
 
 				<!--<xsl:when
-      test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $level &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">-->
+			      test="not($outlineLevel != '' and not(w:pPr/w:numPr) and $ifNormal='true' and contains($styleId,'Heading')) and $numId != '' and $ilvl &lt; 10 and key('numId', $numId)/w:abstractNumId/@w:val != ''">-->
 
 				<!--math, dialogika: bugfix #1947995 END-->
 
 				<!--xsl:when
-          test="$numId != '' and $level &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
-          and not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
+						test="$numId != '' and $ilvl &lt; 10 and key('Part', 'word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
+						and not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
+
+
 				<xsl:apply-templates select="." mode="list">
 					<xsl:with-param name="numId" select="$numId"/>
-					<xsl:with-param name="level" select="$level"/>
+					<xsl:with-param name="ilvl" select="$ilvl"/>
 					<xsl:with-param name="dummyOutlineLevel" select="$dummyOutlineLevel"/>
-					<xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>
+					<!--<xsl:with-param name="isPrecedingHeading" select="$isPrecedingHeading"/>-->
 				</xsl:apply-templates>
 			</xsl:when>
 
 			<!--math, dialogika: changed for bugfix #1802258 BEGIN -->
-			<!--  check if the paragraf is heading -->
+			<!--  check if the paragraph is heading -->
 			<!--<xsl:when test="$outlineLevel != ''">-->
 			<xsl:when test="$outlineLevel != '' and $IsDefaultHeading='true'">
 				<!--math, dialogika: changed for bugfix #1802258 END -->
@@ -820,8 +845,8 @@
 					</xsl:call-template>
 				</xsl:variable>
 				<text:p>
-          
-          <!-- Reference the style -->
+
+					<!-- Reference the style -->
 					<xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
 						<xsl:attribute name="text:style-name">
 							<xsl:choose>
@@ -834,7 +859,7 @@
 							</xsl:choose>
 						</xsl:attribute>
 					</xsl:if>
-          
+
 					<xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
 						<text:change-end>
 							<xsl:attribute name="text:change-id">
@@ -842,9 +867,9 @@
 							</xsl:attribute>
 						</text:change-end>
 					</xsl:if>
-          
-          <xsl:apply-templates/>
-          
+
+					<xsl:apply-templates/>
+
 					<!--      if this following paragraph is attached to this one in track changes mode-->
 					<xsl:if test="w:pPr/w:rPr/w:del">
 						<xsl:call-template name="InsertDeletedParagraph"/>
@@ -906,8 +931,8 @@
 
 	<!-- run -->
 	<xsl:template match="w:r">
-    <xsl:param name="ignoreFieldFlag" />
-    
+		<xsl:param name="ignoreFieldFlag" />
+
 		<xsl:message terminate="no">progress:w:r</xsl:message>
 		<xsl:choose>
 
@@ -992,7 +1017,7 @@
 					</xsl:for-each>
 				</xsl:if>
 			</xsl:attribute>
-      
+
 			<!--hyperlink text-->
 			<xsl:apply-templates/>
 		</text:a>
@@ -1011,7 +1036,7 @@
     
     20080710/divo: w:bookmarkStart can also be directly below w:body. This condition was missing
     -->
-    <xsl:if test="parent::w:body or (ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='seperate'))">
+		<xsl:if test="parent::w:body or (ancestor::w:p and not(preceding-sibling::w:r[1]/w:fldChar/@w:fldCharType='seperate'))">
 
 			<xsl:variable name="NameBookmark">
 				<xsl:value-of select="@w:name"/>
@@ -1075,7 +1100,7 @@
     
     20080710/divo: w:bookmarkEnd can also be directly below w:body. This condition was missing
     -->
-    <xsl:if test="parent::w:body or (ancestor::w:p and not(following-sibling::w:r[1]/w:fldChar/@w:fldCharType='end'))">
+		<xsl:if test="parent::w:body or (ancestor::w:p and not(following-sibling::w:r[1]/w:fldChar/@w:fldCharType='end'))">
 			<xsl:variable name="NameBookmark">
 				<xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
 			</xsl:variable>
@@ -1409,43 +1434,43 @@
 		</xsl:if>
 	</xsl:template>
 
-  
-  <!--
+
+	<!--
   Summary:  Writes the offset for page numbers. 
             The calling context must be a w:p node
   Author:   makz (DIaLOGIKa)
   -->
-  <xsl:template name="InsertPageNumberOffset">
-      <!-- 
+	<xsl:template name="InsertPageNumberOffset">
+		<!-- 
       Only change the page number offset for a paragraph in the body ...
       -->
-      <xsl:if test="ancestor::w:body">
-        <!--
+		<xsl:if test="ancestor::w:body">
+			<!--
         ... and only if this is the first paragraph in the section ...
         -->
-        <xsl:if test="not(preceding-sibling::w:p) or preceding-sibling::w:p[1]/w:pPr/w:sectPr">
+			<xsl:if test="not(preceding-sibling::w:p) or preceding-sibling::w:p[1]/w:pPr/w:sectPr">
 
-          <xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
-          <xsl:variable name="followingSectPr" select="following-sibling::w:p[w:pPr/w:sectPr]/w:pPr/w:sectPr"/>
+				<xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
+				<xsl:variable name="followingSectPr" select="following-sibling::w:p[w:pPr/w:sectPr]/w:pPr/w:sectPr"/>
 
-          <xsl:choose>
-            <xsl:when test="$followingSectPr and $followingSectPr/w:pgNumType/@w:start">
-              <!-- there is a sectPr for this paragraph -->
-              <xsl:attribute name="style:page-number">
-                <xsl:value-of select="$followingSectPr/w:pgNumType/@w:start"/>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:when test="$mainSectPr and $mainSectPr/w:pgNumType/@w:start">
-              <!-- use the main sectPr -->
-              <xsl:attribute name="style:page-number">
-                <xsl:value-of select="$mainSectPr/w:pgNumType/@w:start"/>
-              </xsl:attribute>
-            </xsl:when>
-          </xsl:choose>
+				<xsl:choose>
+					<xsl:when test="$followingSectPr and $followingSectPr/w:pgNumType/@w:start">
+						<!-- there is a sectPr for this paragraph -->
+						<xsl:attribute name="style:page-number">
+							<xsl:value-of select="$followingSectPr/w:pgNumType/@w:start"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="$mainSectPr and $mainSectPr/w:pgNumType/@w:start">
+						<!-- use the main sectPr -->
+						<xsl:attribute name="style:page-number">
+							<xsl:value-of select="$mainSectPr/w:pgNumType/@w:start"/>
+						</xsl:attribute>
+					</xsl:when>
+				</xsl:choose>
 
-        </xsl:if>
-      </xsl:if>
-  </xsl:template>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
 
-    
+
 </xsl:stylesheet>
