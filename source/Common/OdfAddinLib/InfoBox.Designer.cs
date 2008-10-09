@@ -33,9 +33,9 @@
             this.OK = new System.Windows.Forms.Button();
             this.Details = new System.Windows.Forms.Button();
             this.grpDetails = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.txtDetails = new System.Windows.Forms.TextBox();
             this.chkbxIsErrorIgnored = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.grpDetails.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -67,17 +67,17 @@
             this.grpDetails.Name = "grpDetails";
             this.grpDetails.TabStop = false;
             // 
+            // label1
+            // 
+            resources.ApplyResources(this.label1, "label1");
+            this.label1.Name = "label1";
+            // 
             // txtDetails
             // 
             resources.ApplyResources(this.txtDetails, "txtDetails");
             this.txtDetails.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtDetails.Name = "txtDetails";
             this.txtDetails.ReadOnly = true;
-            // 
-            // label1
-            // 
-            resources.ApplyResources(this.label1, "label1");
-            this.label1.Name = "label1";
             // 
             // chkbxIsErrorIgnored
             // 
@@ -100,12 +100,12 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "InfoBox";
-            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Load += new System.EventHandler(this.InfoBox_Load);
             this.grpDetails.ResumeLayout(false);
             this.grpDetails.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

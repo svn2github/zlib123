@@ -59,7 +59,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConverterForm));
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.cancelButton = new System.Windows.Forms.Button();
-            this.lblMessage = new System.Windows.Forms.Label();            
+            this.lblMessage = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // progressBar1
@@ -80,13 +80,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             // 
             resources.ApplyResources(this.lblMessage, "lblMessage");
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.UseWaitCursor = true;                  
+            this.lblMessage.UseWaitCursor = true;
             // 
             // ConverterForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ControlBox = false;            
+            this.ControlBox = false;
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.progressBar1);
@@ -94,10 +94,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ConverterForm";
+            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.UseWaitCursor = true;
-            this.Activated += new System.EventHandler(this.ConverterForm_Activated);
             this.Load += new System.EventHandler(this.ConverterForm_Load);
+            this.Activated += new System.EventHandler(this.ConverterForm_Activated);
             this.ResumeLayout(false);
             this.PerformLayout();
 

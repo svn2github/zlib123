@@ -204,6 +204,54 @@
   <data name="&gt;&gt;Details.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
+  <data name="&gt;&gt;label1.Name" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="&gt;&gt;label1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label1.Parent" xml:space="preserve">
+    <value>grpDetails</value>
+  </data>
+  <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;txtDetails.Name" xml:space="preserve">
+    <value>txtDetails</value>
+  </data>
+  <data name="&gt;&gt;txtDetails.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtDetails.Parent" xml:space="preserve">
+    <value>grpDetails</value>
+  </data>
+  <data name="&gt;&gt;txtDetails.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="grpDetails.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 94</value>
+  </data>
+  <data name="grpDetails.Size" type="System.Drawing.Size, System.Drawing">
+    <value>374, 287</value>
+  </data>
+  <data name="grpDetails.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="grpDetails.Text" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="&gt;&gt;grpDetails.Name" xml:space="preserve">
+    <value>grpDetails</value>
+  </data>
+  <data name="&gt;&gt;grpDetails.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpDetails.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;grpDetails.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
     <value>9, 14</value>
   </data>
@@ -258,30 +306,6 @@
   <data name="&gt;&gt;txtDetails.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="grpDetails.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 94</value>
-  </data>
-  <data name="grpDetails.Size" type="System.Drawing.Size, System.Drawing">
-    <value>374, 287</value>
-  </data>
-  <data name="grpDetails.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="grpDetails.Text" xml:space="preserve">
-    <value>Details</value>
-  </data>
-  <data name="&gt;&gt;grpDetails.Name" xml:space="preserve">
-    <value>grpDetails</value>
-  </data>
-  <data name="&gt;&gt;grpDetails.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;grpDetails.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;grpDetails.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="chkbxIsErrorIgnored.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -332,6 +356,28 @@
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>388, 386</value>
+  </data>
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAIAEBAQAAAABAAoAQAAJgAAACAgEAAAAAQA6AIAAE4BAAAoAAAAEAAAACAAAAABAAQAAAAAAIAA
+        AAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAgAAAgAAAAICAAIAAAACAAIAAgIAAAICAgADAwMAAAAD/AAD/
+        AAAA//8A/wAAAP8A/wD//wAA////AACIiIiIiIgAAIiIN3OIhwAAh3dzN3MzAAB4h4iId3cAAIAAiIiI
+        iAAAgIiIiIgIAACAiIiIiAgAAICIiIiICAAAgIiIiIgIAACAiIiIiAgAAICIiIAACAAAgIiIiIh4AACA
+        iIiICHAAAIAAAAiHAAAAiIiIiIAAAAAAAAAAAAAAwAMAAMADAADAAwAAwAMAANwDAADQCwAA0AsAANAL
+        AADQCwAA0AsAANB7AADQAwAA0CcAAN+PAADAHwAA//8AACgAAAAgAAAAQAAAAAEABAAAAAAAAAIAAAAA
+        AAAAAAAAEAAAABAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD/
+        /wD/AAAA/wD/AP//AAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAd3d3d3d3d3
+        d3d3cAAAAAAHAAAAAAAAAAAAAHAAAAAABwAAADMzMzMAAABwAAAAAHd3d3c4iIiDMzMzMwAAAAB4d3d3
+        ODMzg3czMzMAAAAAeHd3dzgzM4N3MzMzAAAAAHiIiIg4MzODiIiIgwAAAAB3d3d3OIiIg3dzMzMAAAAA
+        CAAAALu7u7sAAABwAAAAAAgAAAAAAAAAAAAAcAAAAAAIAIiIiIiIiIiIAHAAAAAACAAAAAAAAAAAAABw
+        AAAAAAgAiIiIiIiIiIgAcAAAAAAIAAAAAAAAAAAAAHAAAAAACACIiIiIiIiIiABwAAAAAAgAAAAAAAAA
+        AAAAcAAAAAAIAIiIiIiIiIiIAHAAAAAACAAAAAAAAAAAAABwAAAAAAgAiIiIiIiIiIgAcAAAAAAIAAAA
+        AAAAAAAAAHAAAAAACACIiIiIiAAAAABwAAAAAAgAAAAAAAAHd3d3cAAAAAAIAIiIiIiIBwiIhHAAAAAA
+        CAAAAAAAAAcACGcAAAAAAAgAiIiIiIgHAIZwAAAAAAAIAAAAAAAABwB3AAAAAAAACAAAAAAAAAcHcAAA
+        AAAAAAgAAAAAAAAHhwAAAAAAAAAIiIiIiIiHd4AAAAAAAAAAAAAAAAAAAAAAAAAAAAD///////////gA
+        AB/7///f+/AP3/AAAA/wAAAP8AAAD/AAAA/wAAAP+/AP3/v//9/7AADf+///3/sAAN/7///f+wAA3/v/
+        /9/7AADf+///3/sAAN/7///f+wA/3/v/4B/7ACgf+//uP/sALH/7/+z/+//p//v/4//4AAf//////w==
+</value>
   </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterParent</value>
