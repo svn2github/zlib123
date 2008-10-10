@@ -1,44 +1,47 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
-  * Copyright (c) 2006, Clever Age
-  * Copyright (c) 2008, DIaLOGIKa
-  * All rights reserved.
-  * 
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted provided that the following conditions are met:
-  *
-  *     * Redistributions of source code must retain the above copyright
-  *       notice, this list of conditions and the following disclaimer.
-  *     * Redistributions in binary form must reproduce the above copyright
-  *       notice, this list of conditions and the following disclaimer in the
-  *       documentation and/or other materials provided with the distribution.
-  *     * Neither the name of Clever Age nor the names of its contributors 
-  *       may be used to endorse or promote products derived from this software
-  *       without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
-  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
-  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2006, Clever Age
+ * Copyright (c) 2008, DIaLOGIKa
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of copyright holders, nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:oox="urn:oox"
-  exclude-result-prefixes="w oox">
+				xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+				xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+				xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+				xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+				xmlns:xlink="http://www.w3.org/1999/xlink" 
+				xmlns:dc="http://purl.org/dc/elements/1.1/"
+				xmlns:v="urn:schemas-microsoft-com:vml"
+				xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+				xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+				xmlns:oox="urn:oox"
+				exclude-result-prefixes="w v r oox">
 
+	<!-- a key on all numberings defined in numbering.xml -->
 	<xsl:key name="numId" match="w:num" use="@w:numId"/>
 	<xsl:key name="abstractNumId" match="w:abstractNum" use="@w:abstractNumId"/>
 	<xsl:key name="numPicBullet" match="w:numPicBullet " use="@w:numPicBulletId"/>
@@ -49,9 +52,7 @@
 
 		<!-- apply abstractNum template with the same id -->
 		<xsl:apply-templates select="key('abstractNumId',w:abstractNumId/@w:val)">
-			<xsl:with-param name="id">
-				<xsl:value-of select="@w:numId"/>
-			</xsl:with-param>
+			<xsl:with-param name="id" select="@w:numId"/>
 		</xsl:apply-templates>
 
 	</xsl:template>
@@ -86,23 +87,16 @@
 
 						<!--math, dialogika: changed for correct indentation calculation BEGIN -->
 						<!--added parameter <xsl:with-param name="numId">-->
-
-						<xsl:apply-templates
-						  select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]">
-							<xsl:with-param name="numId">
-								<xsl:value-of select="$id"/>
-							</xsl:with-param>
+						<xsl:apply-templates select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]">
+							<xsl:with-param name="numId" select="$id"/>
 						</xsl:apply-templates>
-
 						<!--math, dialogika: changed for correct indentation calculation END -->
 
 					</xsl:when>
 
 					<xsl:otherwise>
 						<xsl:apply-templates select=".">
-							<xsl:with-param name="numId">
-								<xsl:value-of select="$id"/>
-							</xsl:with-param>
+							<xsl:with-param name="numId" select="$id"/>
 						</xsl:apply-templates>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -116,10 +110,8 @@
 		<xsl:param name="numId"/>
 		<!--math, dialogika: changed for correct indentation calculation END -->
 
-		<xsl:variable name="lvl">
-			<xsl:value-of select="number(@w:ilvl)+1"/>
-		</xsl:variable>
-
+		<xsl:variable name="lvl" select="number(@w:ilvl)+1"/>
+		
 		<xsl:choose>
 			<!-- if numFmt is none, nothing to do -->
 			<xsl:when test="w:numFmt/@w:val = 'none' ">
@@ -156,12 +148,8 @@
 				</xsl:variable>
 
 				<xsl:call-template name="CopyPictures">
-					<xsl:with-param name="document">
-						<xsl:value-of select="$document"/>
-					</xsl:with-param>
-					<xsl:with-param name="rId">
-						<xsl:value-of select="$rId"/>
-					</xsl:with-param>
+					<xsl:with-param name="document" select="$document"/>
+					<xsl:with-param name="rId" select="$rId"/>
 				</xsl:call-template>
 
 				<text:list-level-style-image>
@@ -175,13 +163,9 @@
 
 						<!--math, dialogika: changed for correct indentation calculation BEGIN -->
 						<!--added parameter <xsl:with-param name="numId">-->
-
 						<xsl:call-template name="InsertListLevelProperties">
-							<xsl:with-param name="numId">
-								<xsl:value-of select="$numId"/>
-							</xsl:with-param>
+							<xsl:with-param name="numId" select="$numId"/>
 						</xsl:call-template>
-
 						<!--math, dialogika: changed for correct indentation calculation END -->
 
 						<style:text-properties fo:font-size="96"/>
@@ -206,25 +190,15 @@
 						</xsl:when>
 						<xsl:otherwise />
 					</xsl:choose>
-					<!--<xsl:if test="w:rPr/w:rStyle">
-					<xsl:attribute name="text:style-name">
-					  <xsl:value-of select="w:rPr/w:rStyle"/>
-					</xsl:attribute>
-				  </xsl:if>-->
 					<xsl:attribute name="text:bullet-char">
 						<xsl:call-template name="TextChar"/>
 					</xsl:attribute>
 					<style:list-level-properties>
 
 						<!--math, dialogika: changed for correct indentation calculation BEGIN -->
-						<!--added parameter <xsl:with-param name="numId">-->
-
 						<xsl:call-template name="InsertListLevelProperties">
-							<xsl:with-param name="numId">
-								<xsl:value-of select="$numId"/>
-							</xsl:with-param>
+							<xsl:with-param name="numId" select="$numId"/>
 						</xsl:call-template>
-
 						<!--math, dialogika: changed for correct indentation calculation END -->
 
 					</style:list-level-properties>
@@ -252,17 +226,12 @@
 					</xsl:if>
 					<xsl:call-template name="NumFormat">
 						<xsl:with-param name="format" select="w:numFmt/@w:val"/>
-						<xsl:with-param name="BeforeAfterNum">
-							<xsl:value-of select="w:lvlText/@w:val"/>
-						</xsl:with-param>
+						<xsl:with-param name="BeforeAfterNum" select="w:lvlText/@w:val"/>
 					</xsl:call-template>
 					<xsl:choose>
 						<!--
 						  dialogika, clam: bugfix #1831298
-						  <xsl:when test="starts-with(w:lvlText/@w:val,concat('%',$lvl,'%',$lvl))">
-			              
-						  dialogika, makz: bugfix #1827565 
-						  changed that it works dynamically for more than 2 levels
+						  dialogika, makz: bugfix #1827565; changed that it works dynamically for more than 2 levels
 						  -->
 						<xsl:when test="starts-with(w:lvlText/@w:val, concat('%',$lvl))">
 							<xsl:attribute name="style:num-letter-sync">true</xsl:attribute>
@@ -294,9 +263,7 @@
 							</xsl:if>
 							<xsl:variable name="display">
 								<xsl:call-template name="CountDisplayListLevels">
-									<xsl:with-param name="string">
-										<xsl:value-of select="./w:lvlText/@w:val"/>
-									</xsl:with-param>
+									<xsl:with-param name="string" select="./w:lvlText/@w:val"/>
 									<xsl:with-param name="count">0</xsl:with-param>
 								</xsl:call-template>
 							</xsl:variable>
@@ -310,18 +277,12 @@
 
 
 					<style:list-level-properties>
-
 						<!--math, dialogika: changed for correct indentation calculation BEGIN -->
 						<!--added parameter <xsl:with-param name="numId">-->
-
 						<xsl:call-template name="InsertListLevelProperties">
-							<xsl:with-param name="numId">
-								<xsl:value-of select="$numId"/>
-							</xsl:with-param>
+							<xsl:with-param name="numId" select="$numId"/>
 						</xsl:call-template>
-
 						<!--math, dialogika: changed for correct indentation calculation END -->
-
 					</style:list-level-properties>
 				</text:list-level-style-number>
 			</xsl:otherwise>
@@ -360,9 +321,7 @@
 				<xsl:call-template name="AfterTextNumber">
 					<!--math, dialogika: this is wrong:-->
 					<!--!!! Parameter name used here is different as parameter name in template -> NumSuffix = NULL always !!!-->
-					<xsl:with-param name="string">
-						<xsl:value-of select="$BeforeAfterNum"/>
-					</xsl:with-param>
+					<xsl:with-param name="string" select="$BeforeAfterNum"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:if test="$NumSuffix != ''">
@@ -379,9 +338,7 @@
 		<xsl:choose>
 			<xsl:when test="contains(substring-after($BeforeAfterNum,'%'), '%')">
 				<xsl:call-template name="AfterTextNumber">
-					<xsl:with-param name="BeforeAfterNum">
-						<xsl:value-of select="substring-after($BeforeAfterNum,'%')"/>
-					</xsl:with-param>
+					<xsl:with-param name="BeforeAfterNum" select="substring-after($BeforeAfterNum,'%')"/>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
@@ -405,26 +362,14 @@
 
 		<xsl:variable name="ListStyleInd" select="w:pPr/w:ind"/>
 
-		<xsl:variable name="tab">
-			<xsl:value-of select="w:pPr/w:tabs/w:tab/@w:pos"/>
-		</xsl:variable>
-
-		<xsl:variable name="abstractNumId">
-			<xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
-		</xsl:variable>
-
-		<xsl:variable name="ilvl">
-			<xsl:value-of select="@w:ilvl"/>
-		</xsl:variable>
-
-		<!--<xsl:variable name="numId">
-		      <xsl:value-of select="../following-sibling::w:num[w:abstractNumId/@w:val=$abstractNumId]/@w:numId"/>
-			</xsl:variable>-->
-
-		<xsl:variable name="StyleId">
-			<xsl:value-of select="w:pStyle/@w:val"/>
-		</xsl:variable>
-
+		<xsl:variable name="tab" select="w:pPr/w:tabs/w:tab/@w:pos"/>
+		
+		<xsl:variable name="abstractNumId" select="parent::w:abstractNum/@w:abstractNumId"/>
+		
+		<xsl:variable name="ilvl" select="@w:ilvl"/>
+		
+		<xsl:variable name="StyleId" select="w:pStyle/@w:val"/>
+		
 		<xsl:variable name="paragraph_ref_this_list_level"
 		  select="key('Part', 'word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val=$numId and w:pPr/w:numPr/w:ilvl/@w:val=$ilvl][1]"/>
 
@@ -550,7 +495,6 @@
 				</xsl:when>
 
 				<!--Paragraph directly referencing this numID does *NOT* exist-->
-
 				<xsl:when test="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:firstLine">
 					<!-- Use direct formatting of paragraph referencing this paragraph style-->
 					<xsl:value-of select="$paragraph_ref_this_styleid/w:pPr/w:ind/@w:firstLine"/>
@@ -574,7 +518,7 @@
 		<xsl:variable name="SpaceToNextTab">
 
 			<xsl:variable name="MinTabOffset">
-				<xsl:value-of select ="350"/>
+				<xsl:value-of select="350"/>
 			</xsl:variable>
 
 			<xsl:choose>
@@ -621,7 +565,6 @@
 
 						<xsl:otherwise>
 							<!--no hanging-->
-
 							<xsl:variable name="DefaultTab">
 								<xsl:value-of select="key('Part', 'word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
 							</xsl:variable>
@@ -642,37 +585,22 @@
 
 						</xsl:otherwise>
 					</xsl:choose>
-
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 
-
-
 		<!--text:space-before-->
-
 		<xsl:attribute name="text:space-before">
 			<xsl:call-template name="ConvertTwips">
-				<xsl:with-param name="length">
-					<xsl:value-of select="$Left - $SpaceToNextTab"/>
-				</xsl:with-param>
+				<xsl:with-param name="length" select="$Left - $SpaceToNextTab"/>
 				<xsl:with-param name="unit">cm</xsl:with-param>
 			</xsl:call-template>
 		</xsl:attribute>
 
 		<!--text:min-label-width-->
-
 		<xsl:attribute name="text:min-label-width">
 			<xsl:call-template name="ConvertTwips">
-				<xsl:with-param name="length">
-					<!--<xsl:choose>
-            <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
-            <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
-            <xsl:otherwise>-->
-					<xsl:value-of select="$SpaceToNextTab"/>
-					<!--</xsl:otherwise>
-          </xsl:choose>-->
-				</xsl:with-param>
+				<xsl:with-param name="length" select="$SpaceToNextTab"/>
 				<xsl:with-param name="unit">cm</xsl:with-param>
 			</xsl:call-template>
 		</xsl:attribute>
@@ -723,7 +651,6 @@
 	</xsl:template>
 
 	<!--math, dialogika: Added template for getting min value of a node-set BEGIN -->
-
 	<xsl:template name="GetMinVal">
 		<xsl:param name="values"/>
 		<xsl:choose>
@@ -738,11 +665,9 @@
 			<xsl:otherwise>NaN</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-
 	<!--math, dialogika: Added template for getting min value of a node-set END -->
 
-	<!-- ➢types of bullets -->
-
+	<!-- bullet types -->
 	<xsl:template name="TextChar">
 		<xsl:param name="isNumPrefix"/>
 		<xsl:choose>
@@ -837,12 +762,8 @@
 		<xsl:choose>
 			<xsl:when test="string-length(substring-after($string,'%')) &gt; 0">
 				<xsl:call-template name="CountDisplayListLevels">
-					<xsl:with-param name="string">
-						<xsl:value-of select="substring-after($string,'%')"/>
-					</xsl:with-param>
-					<xsl:with-param name="count">
-						<xsl:value-of select="$count +1"/>
-					</xsl:with-param>
+					<xsl:with-param name="string" select="substring-after($string,'%')"/>
+					<xsl:with-param name="count" select="$count +1"/>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
@@ -874,42 +795,38 @@
 			paragraphs, don't do anything here -->
 		<xsl:if test="$isStartOfList='true' or $listLevel &gt;= 0">
 
-			<xsl:variable name="listNumStyle">
-				<xsl:choose>
-					<!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
-					<xsl:when test="key('numId', $numId)/w:lvlOverride">
-						<xsl:value-of select="concat('LO',$numId)"/>
-					</xsl:when>
-					<xsl:when
-					  test="key('abstractNumId', key('numId', $numId)/w:abstractNumId/@w:val)/w:numStyleLink">
-						<xsl:variable name="linkedStyle">
-							<xsl:value-of select="key('abstractNumId', key('numId', $numId)/w:abstractNumId/@w:val)/w:numStyleLink/@w:val" />
-						</xsl:variable>
-						<xsl:variable name="linkedNumId">
-							<xsl:value-of select="key('StyleId', $linkedStyle)/w:pPr/w:numPr/w:numId/@w:val" />
-						</xsl:variable>
-
-						<!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles BEGIN-->
-
-						<!--<xsl:value-of select="concat('L',key('numId', $linkedNumId)/w:abstractNumId/@w:val)" />-->
-						<xsl:value-of select="concat('L',$linkedNumId)" />-->
-					</xsl:when>
-					<xsl:otherwise>
-						<!--<xsl:value-of select="concat('L',key('numId', $numId)/w:abstractNumId/@w:val)" />-->
-						<xsl:value-of select="concat('L',$numId)" />
-					</xsl:otherwise>
-					<!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles END-->
-				</xsl:choose>
-			</xsl:variable>
-
 			<xsl:choose>
 				<xsl:when test="$isStartOfList='true' and $listLevel = -1">
 					<!-- the first time we create a list with a style reference -->
+
+					<xsl:variable name="listNumStyle">
+						<xsl:choose>
+							<!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
+							<xsl:when test="key('numId', $numId)/w:lvlOverride">
+								<xsl:value-of select="concat('LO',$numId)"/>
+							</xsl:when>
+							<xsl:when
+							  test="key('abstractNumId', key('numId', $numId)/w:abstractNumId/@w:val)/w:numStyleLink">
+								<xsl:variable name="linkedStyle" select="key('abstractNumId', key('numId', $numId)/w:abstractNumId/@w:val)/w:numStyleLink/@w:val" />
+								<xsl:variable name="linkedNumId" select="key('StyleId', $linkedStyle)/w:pPr/w:numPr/w:numId/@w:val" />
+
+								<!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles BEGIN-->
+								<!--<xsl:value-of select="concat('L',key('numId', $linkedNumId)/w:abstractNumId/@w:val)" />-->
+								<xsl:value-of select="concat('L',$linkedNumId)" />
+							</xsl:when>
+							<xsl:otherwise>
+								<!--<xsl:value-of select="concat('L',key('numId', $numId)/w:abstractNumId/@w:val)" />-->
+								<xsl:value-of select="concat('L',$numId)" />
+							</xsl:otherwise>
+							<!-- math, dialogika: bugfix #1771273 list style is referred to NumId to avoid duplicate list styles END-->
+						</xsl:choose>
+					</xsl:variable>
+
 					<text:list text:style-name="{$listNumStyle}">
 
 						<!--  TODO - continue numbering-->
 						<xsl:attribute name="text:continue-numbering">true</xsl:attribute>
-
+						
 						<xsl:choose>
 							<xsl:when test="$listLevel + 1 &lt; $ilvl">
 								<!-- a list level has been omitted, e.g. the list start with level 2 -->
@@ -933,6 +850,8 @@
 					<!-- creating a nested list within a text:list-item node -->
 					<text:list-item>
 						<text:list>
+							<xsl:attribute name="text:continue-numbering">true</xsl:attribute>
+							
 							<xsl:choose>
 								<xsl:when test="$listLevel + 1 &lt; $ilvl">
 									<!-- a list level has been omitted, e.g. the list jumps from level 1 to level 3-->
@@ -964,20 +883,14 @@
 			</xsl:variable>
 
 			<xsl:if test="$followingParagraphId != ''">
-
 				<xsl:variable name="followingParagraphOnLevel" select="following-sibling::w:p[generate-id() = $followingParagraphId]"/>
 
-				<!-- clam: bugfix #1788550 the list has to stop if the following paragraph is a numbered heading -->
-				<!--<xsl:if test="not(contains($followingParagraphOnLevel/w:pPr/w:pStyle/@w:val,'Heading') 
-								and not(contains(./w:pPr/w:pStyle/@w:val,'Heading')))">-->
-					<xsl:call-template name="InsertListLevel">
-						<xsl:with-param name="node" select="$followingParagraphOnLevel"/>
-						<xsl:with-param name="ilvl" select="$listLevel"/>
-						<xsl:with-param name="numId" select="$numId"/>
-						<xsl:with-param name="listLevel" select="$listLevel"/>
-					</xsl:call-template>
-				<!--</xsl:if>-->
-
+				<xsl:call-template name="InsertListLevel">
+					<xsl:with-param name="node" select="$followingParagraphOnLevel"/>
+					<xsl:with-param name="ilvl" select="$listLevel"/>
+					<xsl:with-param name="numId" select="$numId"/>
+					<xsl:with-param name="listLevel" select="$listLevel"/>
+				</xsl:call-template>
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
@@ -1174,11 +1087,9 @@
 		<text:outline-style>
 			<!--create outline level style only for styles which have outlineLvl and numId what means that list level is linked to a style -->
 			<xsl:for-each
-			  select="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr and contains(@w:styleId,'Heading')]">
-				<xsl:variable name="styleId">
-					<xsl:value-of select="@w:styleId"/>
-				</xsl:variable>
-
+			  select="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr and starts-with(@w:styleId,'Heading')]">
+				<xsl:variable name="styleId" select="@w:styleId"/>
+				
 				<xsl:variable name="numId">
 					<xsl:choose>
 						<xsl:when test="w:pPr/w:numPr/w:numId/@w:val">
@@ -1222,7 +1133,6 @@
 								</xsl:attribute>
 							</xsl:if>
 							<!--math, dialogika: Bugfix #1948002 Insert style:num-format="" if numFmt = 'none' -->
-							<!--<xsl:if test="./w:lvlText/@w:val != ''">-->
 							<xsl:call-template name="NumFormat">
 								<xsl:with-param name="format" select="./w:numFmt/@w:val"/>
 								<xsl:with-param name="BeforeAfterNum">
@@ -1231,12 +1141,9 @@
 									</xsl:if>
 								</xsl:with-param>
 							</xsl:call-template>
-							<!--</xsl:if>-->
 							<xsl:variable name="display">
 								<xsl:call-template name="CountDisplayListLevels">
-									<xsl:with-param name="string">
-										<xsl:value-of select="./w:lvlText/@w:val"/>
-									</xsl:with-param>
+									<xsl:with-param name="string" select="./w:lvlText/@w:val"/>
 									<xsl:with-param name="count">0</xsl:with-param>
 								</xsl:call-template>
 							</xsl:variable>
@@ -1247,19 +1154,13 @@
 							</xsl:if>
 							<style:list-level-properties>
 								<!--math, dialogika: changed for correct indentation calculation BEGIN -->
-								<!--added parameter <xsl:with-param name="numId">-->
-
 								<!--math, dialogika: Bugfix #1948002 InsertListLevelProperties only if numFmt is != none -->
 								<xsl:if test="./w:numFmt/@w:val != 'none'">
 									<xsl:call-template name="InsertListLevelProperties">
-										<xsl:with-param name="numId">
-											<xsl:value-of select="$numid"/>
-										</xsl:with-param>
+										<xsl:with-param name="numId" select="$numid"/>
 									</xsl:call-template>
 								</xsl:if>
-
 								<!--math, dialogika: changed for correct indentation calculation END -->
-
 							</style:list-level-properties>
 						</xsl:for-each>
 					</xsl:for-each>
