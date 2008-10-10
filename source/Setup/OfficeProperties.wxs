@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright (c) 2008, DIaLOGIKa
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of copyright holders, nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Fragment>
 		<!-- get the user-specific APPDATA folder -->
@@ -144,7 +172,7 @@
 
 		<CustomAction Id="GetOfficeInfos" Property="ODFTEMPLATEFOLDER" Value="[TEMPLATEPATH]" />
 		
-		<!-- assing template folder for Word 2007 -->
+		<!-- assigning template folder for Word 2007 -->
 		<CustomAction Id="ActionWord2007TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE1]" />
 		<CustomAction Id="ActionWord2007TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE2]" />
 		<CustomAction Id="ActionWord2007TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE3]" />
@@ -152,7 +180,7 @@
 		<CustomAction Id="ActionWord2007TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2007TEMPLATE5]" />
 		<CustomAction Id="ActionWord2007TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
 
-		<!-- assing template folder for Word 2003 -->
+		<!-- assigning template folder for Word 2003 -->
 		<CustomAction Id="ActionWord2003TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE1]" />
 		<CustomAction Id="ActionWord2003TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE2]" />
 		<CustomAction Id="ActionWord2003TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE3]" />
@@ -160,7 +188,7 @@
 		<CustomAction Id="ActionWord2003TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2003TEMPLATE5]" />
 		<CustomAction Id="ActionWord2003TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
 
-		<!-- assing template folder for Word 2002 -->
+		<!-- assigning template folder for Word 2002 -->
 		<CustomAction Id="ActionWord2002TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE1]" />
 		<CustomAction Id="ActionWord2002TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE2]" />
 		<CustomAction Id="ActionWord2002TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE3]" />
@@ -168,7 +196,7 @@
 		<CustomAction Id="ActionWord2002TemplateAssign5" Property="ODFTEMPLATEFOLDER" Value="[WORD2002TEMPLATE5]" />
 		<CustomAction Id="ActionWord2002TemplateAssign6" Property="ODFTEMPLATEFOLDER" Value="[APPDIR]Microsoft\Templates" />
 
-		<!-- assing template folder for Word 2000 -->
+		<!-- assigning template folder for Word 2000 -->
 		<CustomAction Id="ActionWord2000TemplateAssign1" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE1]" />
 		<CustomAction Id="ActionWord2000TemplateAssign2" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE2]" />
 		<CustomAction Id="ActionWord2000TemplateAssign3" Property="ODFTEMPLATEFOLDER" Value="[WORD2000TEMPLATE3]" />

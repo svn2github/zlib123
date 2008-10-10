@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
-    Copyright (c) Microsoft Corporation.  All rights reserved.
-    
-    The use and distribution terms for this software are covered by the
-    Common Public License 1.0 (http://opensource.org/licenses/cpl.php)
-    which can be found in the file CPL.TXT at the root of this distribution.
-    By using this software in any fashion, you are agreeing to be bound by
-    the terms of this license.
-    
-    You must not remove this notice, or any other, from this software.
+ * Copyright (c) 2008, DIaLOGIKa
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of copyright holders, nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<!--
-First-time install dialog sequence:      Maintenance dialog sequence:
- - WixUI_WelcomeDlg                     - WixUI_MaintenanceWelcomeDlg
- - WixUI_LicenseAgreementDlg            - WixUI_MaintenanceTypeDlg
- - WixUI_InstallDirDlg                    - WixUI_InstallDirDlg
-   - WixUI_VerifyReadyDlg                 - WixUI_VerifyReadyDlg
-   - WixUI_DiskCostDlg
--->
-
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Fragment>
 		<UI Id="UI">
@@ -51,22 +58,26 @@ First-time install dialog sequence:      Maintenance dialog sequence:
 			<Publish Dialog="MyExitDlg" Control="Finish" Event="DoAction" Value="ShowReadme" Order="998">SHOW_README = 1 and NOT Installed</Publish>
 			<Publish Dialog="MyExitDlg" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
 
-
+			<!-- ================================================
+					INSTALLATION DIALOGS
+				 ================================================ -->
 			<Publish Dialog="MyWelcomeDlg" Control="Next" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>
 
 			<Publish Dialog="MyLicenseAgreementDlg" Control="Back" Event="NewDialog" Value="MyWelcomeDlg">1</Publish>
-			<Publish Dialog="MyLicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MySetupTypeDlg">LicenseAccepted = "1"</Publish>
-
-			<Publish Dialog="MySetupTypeDlg" Control="Back" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>
+			<Publish Dialog="MyLicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MyInstallScopeDlg">LicenseAccepted = "1"</Publish>
+			
+			<!--different setup options (Complete, Custom) have been removed because they were creating too much confusion -->
+			<!--<Publish Dialog="MySetupTypeDlg" Control="Back" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>-->
 			<!--<Publish Dialog="MySetupTypeDlg" Control="TypicalButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>-->
-			<Publish Dialog="MySetupTypeDlg" Control="CustomButton" Event="NewDialog" Value="MyInstallScopeDlg">1</Publish>
-			<Publish Dialog="MySetupTypeDlg" Control="CompleteButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+			<!--<Publish Dialog="MySetupTypeDlg" Control="CustomButton" Event="NewDialog" Value="MyInstallScopeDlg">1</Publish>
+			<Publish Dialog="MySetupTypeDlg" Control="CompleteButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>-->
 
-			<Publish Dialog="MyInstallScopeDlg" Control="Back" Event="NewDialog" Value="MySetupTypeDlg">1</Publish>
+			<Publish Dialog="MyInstallScopeDlg" Control="Back" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>
 			<Publish Dialog="MyInstallScopeDlg" Control="Next" Event="NewDialog" Value="MyCustomizeDlg">1</Publish>
 			
 			<Publish Dialog="MyCustomizeDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="1">WixUI_InstallMode = "Change"</Publish>
 			<Publish Dialog="MyCustomizeDlg" Control="Back" Event="NewDialog" Value="MyInstallScopeDlg" Order="2">WixUI_InstallMode = "InstallCustom"</Publish>
+			<Publish Dialog="MyCustomizeDlg" Control="Back" Event="NewDialog" Value="MyInstallScopeDlg" Order="3"><![CDATA[WixUI_InstallMode <> "Change"]]></Publish>
 			<Publish Dialog="MyCustomizeDlg" Control="Next" Event="NewDialog" Value="MyFileAssociationDlg">1</Publish>
 
 			<Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>
@@ -77,7 +88,6 @@ First-time install dialog sequence:      Maintenance dialog sequence:
 			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
 			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
 
-			
 			<Publish Dialog="MyFileAssociationDlg" Control="Back" Event="NewDialog" Value="MyCustomizeDlg">1</Publish>
 			<Publish Dialog="MyFileAssociationDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 

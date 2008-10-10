@@ -1,22 +1,53 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright (c) 2008, DIaLOGIKa
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of copyright holders, nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Id="AC34B86A-EE32-41C4-BAC9-392A8343E01C"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-			 Version="2.5.0.4802"
+			 Version="!(wix.VersionNumber)"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
-		<!--  NOTE:
-			  When creating a new release, create
-				- change Product/@Id
-				- change Product/@Version 	   
-				- change Package/@Id
-				- leave Product/@UpgradeCode
+		<!--  IMPORTANT NOTE:
+			  When creating a new release, 
+				- set the value of Product/@Id to a new GUID
+				//(no longer needed)- increase Product/@Version (Note that MSI only checks the first three groups, i.e. 2.5.4802)
+				//(no longer needed)- set UpgradeVersion/@Minimum and UpgradeVersion/@Maximum below to the new version number 
+				- set the value of Package/@Id to a new GUID
+				- leave Product/@UpgradeCode the same
 				
-				- update VersionInfo and ARPCOMMENTS to the correct revision
+				- update VersionNumber, VersionInfo and ARPCOMMENTS to the correct revision
+							
+			  Note that GUID values should be all upper-case and without bracket 
 		-->
 
 		<Package Id="800EC0A3-3035-4FCB-BECF-6AC07D429EF3" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
@@ -36,8 +67,8 @@
 		</Upgrade>
 		<!--remove previous versions of this product-->
 		<Upgrade Id="7650D566-0CE2-4D71-8799-CF86735C15CC">
-			<UpgradeVersion Property="OLDAPPFOUND" IncludeMinimum="yes" Minimum="0.0.0.0" IncludeMaximum="no" Maximum="2.5.0.0"/>
-			<UpgradeVersion Property="NEWAPPFOUND" IncludeMinimum="no" Minimum="2.5.0.0"  OnlyDetect="yes"/>
+			<UpgradeVersion Property="OLDAPPFOUND" IncludeMinimum="yes" Minimum="0.0.0.0" IncludeMaximum="no" Maximum="!(wix.VersionNumber)"/>
+			<UpgradeVersion Property="NEWAPPFOUND" IncludeMinimum="no" Minimum="!(wix.VersionNumber)"  OnlyDetect="yes"/>
 		</Upgrade>
 
 		<PropertyRef Id="NETFRAMEWORK20"/>
@@ -57,6 +88,7 @@
 		<Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata Software Ltd' />
 		<Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
 
+		<WixVariable Id='VersionNumber' Value='2.5.4802.0'/>
 		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4802)'/>
 		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
