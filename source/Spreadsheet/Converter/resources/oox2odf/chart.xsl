@@ -49,8 +49,8 @@
   <!-- @Description: This stylesheet is used for charts conversion -->
   <!-- @Created: 2007-05-24 -->
 
-  <xsl:import href="relationships.xsl"/>
-  <xsl:import href="Gradient.xsl"/>
+	<!--<xsl:import href="relationships.xsl"/>-->
+	<!-- <xsl:import href="Gradient.xsl"/>-->
 
   <xsl:key name="dataSeries" match="c:ser" use="@oox:part"/>
   <xsl:key name="numPoints" match="c:val" use="@oox:part"/>
@@ -1576,9 +1576,21 @@
           <!--end of added code-->
           
           <xsl:otherwise>
+			  <!--Condition Added By Sateesh-->
+			  <!-- Bug#: 1877279, BugDescription: XLSX Roundtrip - Failure on open -->
+			  <xsl:choose>
+				  <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
             <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
               <xsl:call-template name="InsertXAxis"/>
             </xsl:for-each>
+				  </xsl:when>
+				  <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:dateAx[1]">
+					  <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:dateAx[1]">
+						  <xsl:call-template name="InsertXAxis"/>
+					  </xsl:for-each>	  
+				  </xsl:when>
+			  </xsl:choose>
+			  <!--End-->
             <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
               <xsl:call-template name="InsertYAxis"/>
             </xsl:for-each>

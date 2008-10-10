@@ -40,11 +40,11 @@
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e oox r v">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="insert_cols.xsl"/>
   <xsl:import href="date_time.xsl"/>
   <xsl:import href="insert_text.xsl"/>
-  <xsl:import href="elements.xsl"/>
+  <xsl:import href="elements.xsl"/>-->
 
   <!--xsl:key name="hyperlinkPosition" match="e:c" use="'@r'"/-->
   <xsl:key name="ref" match="e:hyperlink" use="@ref"/>
@@ -1184,6 +1184,12 @@
               </xsl:for-each>
             </xsl:variable>
 
+			  <!-- 
+			  Condition Added: Sonata
+			  Desc: An if condition added to prevent crash in file _fedict - Réactifs (un-shared).CONFIDENTIAL(1877279)
+			  -->
+			  <xsl:variable name="current" select="./@r"/>
+			  <xsl:if test="not(preceding-sibling::e:c[@r=$current])">
             <xsl:call-template name="InsertPictureInThisCell">
               <xsl:with-param name="sheet">
                 <xsl:value-of select="$sheet"/>
@@ -1201,6 +1207,7 @@
                 <xsl:value-of select="$Target"/>
               </xsl:with-param>
             </xsl:call-template>
+			  </xsl:if>
 
           </xsl:if>
 

@@ -40,9 +40,9 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="common.xsl"/>
-  <xsl:import href="measures.xsl"/>
+  <xsl:import href="measures.xsl"/>-->
 
 
   <xsl:template name="InsertPilotTables">
@@ -648,6 +648,156 @@
     <xsl:if
       test="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position() = $fieldNum + 1 and not(e:fieldGroup) and not(@formula)]">
 
+		<!--Code Added By Sateesh Reddy-->
+		<!--Bug Description:pivot table with 2 same column names-->
+		<xsl:variable name="firstCellAddress">
+			<xsl:for-each
+          select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheSource/e:worksheetSource">
+				<xsl:value-of select="substring-before(@ref,':')"/>
+			</xsl:for-each>
+		</xsl:variable>
+
+		<xsl:variable name="startRangeAddressRow">
+		  <xsl:if test="$firstCellAddress != ''">
+			<xsl:call-template name="GetRowNum">
+				<xsl:with-param name="cell" select="$firstCellAddress"/>
+			</xsl:call-template>
+		  </xsl:if>
+		</xsl:variable>
+
+		<xsl:variable name="startRangeAddressCol">
+		  <xsl:if test="$firstCellAddress != ''">
+			<xsl:call-template name="GetRowNum">
+				<xsl:with-param name="cell" select="$firstCellAddress"/>
+			</xsl:call-template>
+		  </xsl:if>
+		</xsl:variable>
+
+		<xsl:variable name="lastCellAddress">
+			<xsl:for-each
+          select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheSource/e:worksheetSource">
+				<xsl:value-of select="substring-after(@ref,':')"/>
+			</xsl:for-each>
+		</xsl:variable>
+
+		<xsl:variable name="endRangeAddressRow">
+		  <xsl:if test="$lastCellAddress != ''">
+			<xsl:call-template name="GetRowNum">
+				<xsl:with-param name="cell" select="$lastCellAddress"/>
+			</xsl:call-template>
+		  </xsl:if>
+		</xsl:variable>
+
+		<xsl:variable name="endRangeAddressCol">
+		  <xsl:if test="$lastCellAddress != ''">
+			<xsl:call-template name="GetRowNum">
+				<xsl:with-param name="cell" select="$lastCellAddress"/>
+			</xsl:call-template>
+		  </xsl:if>
+		</xsl:variable>
+
+		<xsl:variable name="sheetNameFromCache">
+			<xsl:for-each
+		  select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheSource/e:worksheetSource">
+				<xsl:value-of select="@sheet"/>
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:variable name="sourceDataSheetID">
+		  <xsl:if test="$sheetNameFromCache != ''">
+			<xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+				<xsl:if test="@name=$sheetNameFromCache">
+					<xsl:value-of select="@r:id"/>
+				</xsl:if>
+			</xsl:for-each>
+		  </xsl:if>
+		</xsl:variable>
+
+		<xsl:variable name ="target">
+			<xsl:value-of select ="key('Part','xl/_rels/workbook.xml.rels')//rels:Relationship[@Id=$sourceDataSheetID]/@Target"/>
+		</xsl:variable>
+
+		<xsl:variable name="rowDataNode">
+		  <xsl:if test="$startRangeAddressRow != ''">
+			<xsl:for-each select="key('Part', concat('xl/',$target))">
+					<xsl:for-each select="e:worksheet/e:sheetData/e:row">
+						<xsl:if test="@r=$startRangeAddressRow">
+							<xsl:value-of select="position()"/>
+						</xsl:if>
+					</xsl:for-each>
+			</xsl:for-each>
+		  </xsl:if>
+		</xsl:variable>
+		
+		<xsl:variable name="rowEndColValue">
+		  <xsl:if test="$rowDataNode != '' and $lastCellAddress != ''">
+			<xsl:value-of select="concat(translate($lastCellAddress,'0123456789',''),$rowDataNode)"/>
+		  </xsl:if>
+		</xsl:variable>
+
+		<xsl:variable name="startEndColValue">
+		  <xsl:if test="$rowDataNode != '' and $firstCellAddress != ''">
+			<xsl:value-of select="concat(translate($firstCellAddress,'0123456789',''),$rowDataNode)"/>
+		  </xsl:if>
+		</xsl:variable>
+
+		<!--Getting Values from PivotField names from source sheet-->
+		<xsl:variable name="sourceDataValues">
+		  <xsl:if test="$rowDataNode != '' and $startEndColValue != '' and $rowEndColValue != ''">
+			<xsl:for-each select="key('Part', concat('xl/',$target))">
+				<xsl:for-each select="e:worksheet/e:sheetData/child::node()[position()=$rowDataNode]">
+
+					<xsl:variable name="colStartNodePosition">
+						<xsl:for-each select="child::node()">
+							<xsl:if test="@r=$startEndColValue">
+								<xsl:value-of select="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					
+					<xsl:variable name="colEndNodePosition">
+						<xsl:for-each select="child::node()">
+							<xsl:if test="@r=$rowEndColValue">
+								<xsl:value-of select="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					
+					<xsl:for-each select="child::node()[position() &gt;= $colStartNodePosition  and position() &lt;= $colEndNodePosition]">
+						<xsl:if test="@t">
+							<xsl:variable name="valueField">
+								<xsl:value-of select="e:v/child::node()"/>
+							</xsl:variable>
+							<xsl:for-each select="key('Part', 'xl/sharedStrings.xml')/e:sst">
+								<xsl:for-each select="e:si[position()=$valueField + 1]">
+									<xsl:value-of select="concat('+',e:t/child::node())"/>
+								</xsl:for-each>
+							</xsl:for-each>
+						</xsl:if>
+						
+						<xsl:if test="not(@t)">
+							<xsl:value-of select="concat('+',child::node())"/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:for-each>
+			</xsl:for-each>
+		  </xsl:if>
+		 </xsl:variable>
+
+
+		<!--Getting Values from PivotCacheDefinition-->
+		<xsl:variable name="cacheDataValues">
+			<xsl:for-each
+          select="key('Part', concat('xl/',$cacheFile))/e:pivotCacheDefinition/e:cacheFields/e:cacheField[position()]">
+				<xsl:if test="@name">
+					<xsl:value-of select="concat('+',@name)"/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+
+		<!--End-->
+
+
       <table:data-pilot-field>
 
         <xsl:for-each
@@ -666,7 +816,20 @@
               </xsl:when>
 
               <xsl:otherwise>
+				  <xsl:variable name="cacheDataName">
                 <xsl:value-of select="@name"/>
+				  </xsl:variable>
+				  <!--Code Modified by Sateesh Reddy-->
+				  <!--Comparing Pivot field names with Source sheet column names-->
+				  <xsl:choose>
+					  <xsl:when test="$cacheDataName != '' and $cacheDataValues != '' and $sourceDataValues != ''">
+						<xsl:value-of select ="concat('ExcelPivotField_',$cacheDataName,'_',$cacheDataValues,'_',$sourceDataValues)"/>
+					  </xsl:when>
+					  <xsl:otherwise>
+			    	    <xsl:value-of select="$cacheDataName"/>		  
+					  </xsl:otherwise>
+				  </xsl:choose>
+				  <!--End-->
               </xsl:otherwise>
             </xsl:choose>
 

@@ -43,10 +43,10 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="e oox r">
 
-  <xsl:import href="common.xsl"/>
+ <!-- <xsl:import href="common.xsl"/>
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
-  <xsl:import href="styles.xsl"/>
+  <xsl:import href="styles.xsl"/>-->
   
   <xsl:key name="XfStyle" match="e:xf" use="@oox:id"/>
 

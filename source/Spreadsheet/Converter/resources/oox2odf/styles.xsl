@@ -58,11 +58,11 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
   xmlns:oox="urn:oox"
   exclude-result-prefixes="a e oox r number v">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="headers.xsl"/>
   <xsl:import href="insert_cols.xsl"/>
-  <xsl:import href="note.xsl"/>
+  <xsl:import href="note.xsl"/>-->
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Font" match="e:styleSheet/e:fonts/e:font" use="@oox:id"/>
@@ -187,9 +187,39 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
               </xsl:when>
               <xsl:otherwise>
                 <!-- Excel application default-->
-                <xsl:call-template name="ConvertFromCharacters">
+<!--<xsl:call-template name="ConvertFromCharacters">
                   <xsl:with-param name="value" select="'8.43'"/>
-                </xsl:call-template>
+                </xsl:call-template>-->
+					<!-- Here To calculate the def col width formula used is 
+				         width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+					     Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})
+					-->
+					<xsl:variable name="defaultFontSize">
+						<xsl:for-each select="key('Part', 'xl/styles.xml')">
+							<xsl:choose>
+								<xsl:when test="e:styleSheet/e:fonts/e:font">
+									<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:text>11</xsl:text>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:variable name="defaultFontStyle">
+						<xsl:for-each select="key('Part', 'xl/styles.xml')">
+							<xsl:choose>
+								<xsl:when test="e:styleSheet/e:fonts/e:font">
+									<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:text>11</xsl:text>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:for-each>
+					</xsl:variable>
+					<!--<xsl:value-of select="concat('sonataColumnWidth:','Lucida Handwriting|12')"/>-->
+					<xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyle,'|',$defaultFontSize)"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
@@ -215,9 +245,39 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
             </xsl:when>
             <xsl:otherwise>
               <!-- Excel application default-->
-              <xsl:call-template name="ConvertFromCharacters">
-                <xsl:with-param name="value" select="'8.43'"/>
-              </xsl:call-template>
+<!--<xsl:call-template name="ConvertFromCharacters">
+                  <xsl:with-param name="value" select="'8.43'"/>
+                </xsl:call-template>-->
+				<!-- Here To calculate the def col width formula used is 
+				width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+                Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})
+				-->
+				<xsl:variable name="defaultFontSize">
+					<xsl:for-each select="key('Part', 'xl/styles.xml')">
+						<xsl:choose>
+							<xsl:when test="e:styleSheet/e:fonts/e:font">
+								<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:text>11</xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name="defaultFontStyle">
+					<xsl:for-each select="key('Part', 'xl/styles.xml')">
+						<xsl:choose>
+							<xsl:when test="e:styleSheet/e:fonts/e:font">
+								<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:text>11</xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+				</xsl:variable>
+				<!--<xsl:value-of select="concat('sonataColumnWidth:','Lucida Handwriting|12')"/>-->
+				<xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyle,'|',$defaultFontSize)"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>

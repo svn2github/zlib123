@@ -40,6 +40,8 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.Drawing;
 
 
 namespace CleverAge.OdfConverter.Spreadsheet
@@ -146,6 +148,71 @@ namespace CleverAge.OdfConverter.Spreadsheet
             else if (this.sst)
             {
             }
+            //Code Added by Sateesh Reddy
+            //Description:pivot table with 2 same column names
+            else if (text.Contains("ExcelPivotField_"))
+            {
+                string[] arrVal = new string[3];
+                arrVal = text.Split('_');
+                string currentValue = arrVal[1].ToString();
+                string[] cacheValues = arrVal[2].Split('+');
+                string[] sheetValues = arrVal[3].Split('+');
+
+                if (cacheValues.Length == sheetValues.Length)
+                {
+                    int count = 0;
+
+                    for (int i = 1; i < sheetValues.Length; i++)
+                    {
+                        int b = 2;
+                        for (int k = 1; k < sheetValues.Length; k++)
+                        {
+                            if (sheetValues[i].Equals(sheetValues[k]))
+                            {
+                                count++;
+                                if (count > 1)
+                                {
+                                    string modifiedValue = string.Concat(sheetValues[k], b);
+                                    if (sheetValues[i].Equals(modifiedValue))
+                                    { }
+                                    else
+                                    {
+                                        sheetValues.SetValue(string.Concat(sheetValues[k], b), k);
+                                        b = b + 1;
+                                    }
+                                }
+                            }
+                        }
+                        count = 0;
+                    }
+                    int j = 1;
+                    for (int i = 1; i < cacheValues.Length; i++)
+                    {
+                        if (cacheValues[i].Equals(currentValue))
+                        {
+                            j = i;
+                        }
+                    }
+
+                    string excelPivotField = sheetValues[j].ToString();
+
+                    if (excelPivotField != null)
+                    {
+                        this.nextWriter.WriteString(excelPivotField);
+                    }
+                    else
+                    {
+                        this.nextWriter.WriteString(currentValue);
+                    }
+                }
+                else 
+                {
+                    this.nextWriter.WriteString(currentValue);
+                }
+                
+            }
+            //End Of Code for Pivot table names.
+
                
             /*
               Bug No.         :1805599
@@ -203,6 +270,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 }
             }
             //End of modification for the bug 1805599
+
+            else if (text.StartsWith("sonataColumnWidth:"))
+            {
+                this.nextWriter.WriteString(GetColumnWidth(text.Substring(18)));
+            }
 
              // Image Cropping   Added by Sonata
             else if (text.Contains("image-props"))
@@ -988,5 +1060,35 @@ namespace CleverAge.OdfConverter.Spreadsheet
         }
 
         //End of RefNo-2
+
+        protected string GetColumnWidth(string text)
+        {
+
+            string measureString = "0";
+            Font stringFont = new Font(text.Split('|')[0].ToString(), float.Parse(text.Split('|')[1].ToString()));
+            Form dummyForm = new Form();
+            Graphics g = dummyForm.CreateGraphics();
+            System.Drawing.SizeF size = g.MeasureString(measureString, stringFont);
+           //RectangleF layoutRect = new RectangleF(0, 0, size.Width, size.Height);
+            RectangleF layoutRect = new RectangleF(50.0F, 50.0F, size.Width, size.Height);
+            // Set string format.
+            CharacterRange[] characterRanges = { new CharacterRange(0, 1) };
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.SetMeasurableCharacterRanges(characterRanges);
+            Region[] result = g.MeasureCharacterRanges(measureString, stringFont, layoutRect, stringFormat);
+            //charWidth is nothing but  
+            double maxDigWidth = result[0].GetBounds(g).Width - 2; // minus 2 bound borders
+            //width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+            //Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})
+            dummyForm.Close();
+            double columnWidth = System.Math.Truncate((((8 * maxDigWidth) + 5) / maxDigWidth) * 256) / 256;
+            double columnWidthPx = System.Math.Truncate((((256 * columnWidth) + (System.Math.Truncate(128 / maxDigWidth))) / 256) * maxDigWidth);
+            //double columnWidthPx = System.Math.Truncate(((256 * columnWidth) + System.Math.Truncate(128 / maxDigWidth) / 256) * maxDigWidth);
+            double columnWidthInch = (columnWidthPx / 96.21212);
+            double columnWidthCM = columnWidthInch * 2.54;
+            return string.Concat(System.Math.Round(columnWidthCM,3).ToString(),"cm");
+
+        }
+
     }
 }

@@ -62,7 +62,7 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e r pxsi oox">
 
-	<xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="database-ranges.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="table_body.xsl"/>
@@ -78,7 +78,7 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
   <xsl:import href="groups.xsl"/>
   <xsl:import href="scenario.xsl"/>
   <xsl:import href="change_tracking.xsl"/>
-	<xsl:import href="pivot_tables.xsl"/>
+  <xsl:import href="pivot_tables.xsl"/>-->
 
 
   <!--xsl:key name="Sst" match="e:si" use="''"/-->
@@ -245,94 +245,97 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 		  By     : Vijayeta
 		  Date   :11th Sept '08
 		  -->
-		  <table:named-expressions>
+		  <!--<table:named-expressions>
 			  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
 				  <xsl:if test ="not(contains(@name,'_xlnm.Print_Area')) and not(contains(@name, '_xlnm.Print_Titles'))">
-					  <xsl:variable name ="range">
-						  <xsl:value-of select ="."/>
-					  </xsl:variable>
-					  <xsl:variable name ="isSingleRange">
-						  <xsl:variable name ="sheet">
-							  <xsl:value-of select ="substring-before($range,'!')"/>
+					  <xsl:if test ="not(contains(.,'#REF'))">
+						  <xsl:variable name ="range">
+							  <xsl:value-of select ="."/>
 						  </xsl:variable>
-						  <xsl:if test ="contains(substring-after($range,'!'),$sheet)">
-							  <xsl:value-of select ="'false'"/>
-						  </xsl:if>
-						  <xsl:if test ="not(contains(substring-after($range,'!'),$sheet))">
-							  <xsl:value-of select ="'true'"/>
-						  </xsl:if>
-					  </xsl:variable>
-					  <xsl:variable name ="isFunction">
-						  <xsl:choose>
-							  <xsl:when test="not(contains($range,'(') and contains($range,')')) and (contains($range,':') or $isSingleRange='true')  ">
+						  <xsl:variable name ="isSingleRange">
+							  <xsl:variable name ="sheet">
+								  <xsl:value-of select ="substring-before($range,'!')"/>
+							  </xsl:variable>
+							  <xsl:if test ="contains(substring-after($range,'!'),$sheet)">
 								  <xsl:value-of select ="'false'"/>
-							  </xsl:when>
-							  <xsl:when test="contains($range,'(') and contains($range,')')">
+							  </xsl:if>
+							  <xsl:if test ="not(contains(substring-after($range,'!'),$sheet))">
 								  <xsl:value-of select ="'true'"/>
-							  </xsl:when>
-							  <xsl:otherwise>
-								  <xsl:value-of select ="''"/>
-							  </xsl:otherwise>
-						  </xsl:choose>
-					  </xsl:variable>
-					  <xsl:variable name ="cellRangeAddress">
-						  <xsl:choose>
-							  <xsl:when test ="substring-after($range,':')!=''">
-								  <xsl:variable name ="part1">
+							  </xsl:if>
+						  </xsl:variable>
+						  <xsl:variable name ="isFunction">
+							  <xsl:choose>
+								  <xsl:when test="not(contains($range,'(') and contains($range,')')) and (contains($range,':') or $isSingleRange='true')  ">
+									  <xsl:value-of select ="'false'"/>
+								  </xsl:when>
+								  <xsl:when test="contains($range,'(') and contains($range,')')">
+									  <xsl:value-of select ="'true'"/>
+								  </xsl:when>
+								  <xsl:otherwise>
+									  <xsl:value-of select ="''"/>
+								  </xsl:otherwise>
+							  </xsl:choose>
+						  </xsl:variable>
+						  <xsl:variable name ="cellRangeAddress">
+							  <xsl:choose>
+								  <xsl:when test ="substring-after($range,':')!=''">
+									  <xsl:variable name ="part1">
+										  <xsl:choose>
+											  <xsl:when test="$isFunction='false'">
+												  <xsl:value-of select ="translate(substring-before($range,':'),'!','.')"/>
+											  </xsl:when>
+											  <xsl:when test="$isFunction='true'">
+												  <xsl:value-of select ="translate(substring-after(substring-before($range,':'),'('),'!','.')"/>
+											  </xsl:when>
+										  </xsl:choose>
+									  </xsl:variable>
+									  <xsl:variable name ="part2">
+										  <xsl:variable name ="endRange">
+											  <xsl:value-of select ="substring-after($range,':')"/>
+										  </xsl:variable>
+										  <xsl:choose>
+											  <xsl:when test ="contains($endRange,'!')">
+												  <xsl:choose>
+													  <xsl:when test="$isFunction='false'">
+														  <xsl:value-of select ="concat('.',translate(substring-after($endRange,'!'),'!',''))"/>
+													  </xsl:when>
+													  <xsl:when test="$isFunction='true'">
+														  <xsl:value-of select ="concat('.',translate(substring-before(substring-after($endRange,'!'),')'),'!',''))"/>
+													  </xsl:when>
+												  </xsl:choose>
+											  </xsl:when>
+											  <xsl:otherwise>
+												  <xsl:choose>
+													  <xsl:when test="$isFunction='false'">
+														  <xsl:value-of select ="concat('.',$endRange)"/>
+													  </xsl:when>
+													  <xsl:when test="$isFunction='true'">
+														  <xsl:value-of select ="concat('.',substring-before($endRange,')'))"/>
+													  </xsl:when>
+												  </xsl:choose>
+											  </xsl:otherwise>
+										  </xsl:choose>
+										  -->
+		  <!--<xsl:value-of select ="concat('.',translate(substring-after($range,':'),'!','.'))"/>-->
+		  <!--
+									  </xsl:variable>
+									  <xsl:value-of select ="concat($part1,':',$part2)"/>
+								  </xsl:when>
+								  <xsl:otherwise>
 									  <xsl:choose>
 										  <xsl:when test="$isFunction='false'">
-											  <xsl:value-of select ="translate(substring-before($range,':'),'!','.')"/>
+											  <xsl:value-of select ="translate($range,'!','.')"/>
 										  </xsl:when>
 										  <xsl:when test="$isFunction='true'">
-											  <xsl:value-of select ="translate(substring-after(substring-before($range,':'),'('),'!','.')"/>
+											  <xsl:value-of select ="translate(substring-after(substring-before($range,')'),'('),'!','.')"/>
 										  </xsl:when>
 									  </xsl:choose>
-								  </xsl:variable>
-								  <xsl:variable name ="part2">
-									  <xsl:variable name ="endRange">
-										  <xsl:value-of select ="substring-after($range,':')"/>
-									  </xsl:variable>
-									  <xsl:choose>
-										  <xsl:when test ="contains($endRange,'!')">
-											  <xsl:choose>
-												  <xsl:when test="$isFunction='false'">
-													  <xsl:value-of select ="concat('.',translate(substring-after($endRange,'!'),'!',''))"/>
-												  </xsl:when>
-												  <xsl:when test="$isFunction='true'">
-													  <xsl:value-of select ="concat('.',translate(substring-before(substring-after($endRange,'!'),')'),'!',''))"/>
-												  </xsl:when>
-											  </xsl:choose>
-										  </xsl:when>
-										  <xsl:otherwise>
-											  <xsl:choose>
-												  <xsl:when test="$isFunction='false'">
-													  <xsl:value-of select ="concat('.',$endRange)"/>
-												  </xsl:when>
-												  <xsl:when test="$isFunction='true'">
-													  <xsl:value-of select ="concat('.',substring-before($endRange,')'))"/>
-												  </xsl:when>
-											  </xsl:choose>
-										  </xsl:otherwise>
-									  </xsl:choose>
-									  <!--<xsl:value-of select ="concat('.',translate(substring-after($range,':'),'!','.'))"/>-->
-								  </xsl:variable>
-								  <xsl:value-of select ="concat($part1,':',$part2)"/>
-							  </xsl:when>
-							  <xsl:otherwise>
-								  <xsl:choose>
-									  <xsl:when test="$isFunction='false'">
-										  <xsl:value-of select ="translate($range,'!','.')"/>
-									  </xsl:when>
-									  <xsl:when test="$isFunction='true'">
-										  <xsl:value-of select ="translate(substring-after(substring-before($range,')'),'('),'!','.')"/>
-									  </xsl:when>									 
-								  </xsl:choose>								  
-							  </xsl:otherwise>
-						  </xsl:choose>
-					  </xsl:variable>
-				      <xsl:choose>
-						  <xsl:when test="$isFunction='false'">
-							  <xsl:variable name ="baseAddress">
+								  </xsl:otherwise>
+							  </xsl:choose>
+						  </xsl:variable>
+						  <xsl:choose>
+							  <xsl:when test="$isFunction='false'">
+								  <xsl:variable name ="baseAddress">
 									  <xsl:choose>
 										  <xsl:when test ="substring-after($range,':')!=''">
 											  <xsl:value-of select ="translate(substring-before($range,':'),'!','.')"/>
@@ -341,7 +344,7 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 											  <xsl:value-of select ="translate($range,'!','.')"/>
 										  </xsl:otherwise>
 									  </xsl:choose>
-								  </xsl:variable>								  
+								  </xsl:variable>
 								  <table:named-range>
 									  <xsl:attribute name ="table:name">
 										  <xsl:value-of select ="@name"/>
@@ -354,7 +357,7 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 									  </xsl:attribute>
 								  </table:named-range>
 							  </xsl:when>
-						  <xsl:when test="$isFunction='true'">
+							  <xsl:when test="$isFunction='true'">
 								  <xsl:variable name ="function">
 									  <xsl:value-of select ="substring-before($range,'(')"/>
 								  </xsl:variable>
@@ -367,11 +370,135 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 									  </xsl:attribute>
 									  <xsl:attribute name ="table:expression">
 										  <xsl:value-of select ="concat($function,'([$',$cellRangeAddress,'])')"/>
+										  -->
+		  <!--<xsl:value-of select ="concat('sonataOoxFormula',$function,'([$',$cellRangeAddress,'])','##shtName##',$sheetNames)"/>-->
+		  <!--
+									  </xsl:attribute>
+								  </table:named-expression>
+							  </xsl:when>
+						  </xsl:choose>
+					  </xsl:if>
+				  </xsl:if>
+			  </xsl:for-each>
+		  </table:named-expressions>-->
+		  <table:named-expressions>
+			  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
+				  <xsl:if test ="not(contains(@name,'_xlnm.Print_Area')) and not(contains(@name, '_xlnm.Print_Titles'))">
+					  <xsl:if test ="not(contains(.,'#REF')) and not(contains(.,'OFFSET'))">
+						  <xsl:variable name ="range">
+							  <xsl:value-of select ="."/>
+						  </xsl:variable>
+						  <xsl:variable name ="isFunction">
+							  <xsl:choose>
+								  <xsl:when test="not(contains($range,'(') and contains($range,')'))">
+									  <xsl:value-of select ="'false'"/>
+								  </xsl:when>
+								  <xsl:when test="contains($range,'(') and contains($range,')')">
+									  <xsl:variable name ="parenthesisContents">
+										  <xsl:value-of select ="substring-after($range,'!')"/>
+									  </xsl:variable>
+									  <xsl:choose>
+										  <xsl:when test ="contains($parenthesisContents,')')">
+											  <xsl:value-of select ="'true'"/>
+										  </xsl:when>
+										  <xsl:when test ="not(contains($parenthesisContents,')'))">
+											  <xsl:value-of select ="'false'"/>
+										  </xsl:when>
+									  </xsl:choose>
+								  </xsl:when>
+								  <xsl:otherwise>
+									  <xsl:value-of select ="''"/>
+								  </xsl:otherwise>
+							  </xsl:choose>
+						  </xsl:variable>
+						  <xsl:variable name ="cellRangeAddress">
+							  <xsl:choose>
+								  <xsl:when test="$isFunction='false'">
+									  <xsl:value-of select ="$range"/>
+								  </xsl:when>
+								  <xsl:when test="$isFunction='true'">
+									  <xsl:value-of select ="concat(substring-after(substring-before($range,'!'),'('),'!',substring-before(substring-after($range,'!'),')'))"/>
+								  </xsl:when>
+							  </xsl:choose>
+						  </xsl:variable>
+						  <xsl:variable name ="NamedRange">
+							  <xsl:value-of select ="substring-after($cellRangeAddress,'!')"/>
+						  </xsl:variable>
+						  <xsl:variable name ="sheetName">
+							  <xsl:value-of select ="substring-before($cellRangeAddress,'!')"/>
+						  </xsl:variable>
+						  <xsl:variable name ="apos">
+							  <xsl:text>&apos;</xsl:text>
+						  </xsl:variable>
+						  <xsl:variable name="checkedName">
+							  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+								  <xsl:call-template name="CheckSheetName">
+									  <xsl:with-param name="sheetNumber">
+										  <xsl:for-each
+											select="key('Part', 'xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+											  <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
+										  </xsl:for-each>
+									  </xsl:with-param>
+									  <xsl:with-param name="name">
+										  <xsl:value-of select="translate(@name,'!-$#():,.+','')"/>
+									  </xsl:with-param>
+								  </xsl:call-template>
+							  </xsl:for-each>
+						  </xsl:variable>
+						  <xsl:variable name ="correctName">
+							  <xsl:choose>
+								  <xsl:when test="starts-with($sheetName,$apos)">
+									  <xsl:value-of select="concat($apos,$checkedName,$apos)"/>
+								  </xsl:when>
+								  <xsl:otherwise>
+									  <xsl:value-of select="$checkedName"/>
+								  </xsl:otherwise>
+							  </xsl:choose>
+						  </xsl:variable>
+						  <xsl:choose>
+							  <xsl:when test="$isFunction='false'">
+								  <xsl:variable name ="baseAddress">
+									  <xsl:choose>
+										  <xsl:when test ="substring-after($NamedRange,':')!=''">
+											  <xsl:value-of select ="concat($correctName,'.',substring-before($NamedRange,':'))"/>
+										  </xsl:when>
+										  <xsl:otherwise>
+											  <xsl:value-of select ="concat($correctName,'.',$NamedRange)"/>
+										  </xsl:otherwise>
+									  </xsl:choose>
+								  </xsl:variable>
+								  <table:named-range>
+									  <xsl:attribute name ="table:name">
+										  <xsl:value-of select ="@name"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:base-cell-address">
+										  <xsl:value-of select ="concat('$',$baseAddress)"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:cell-range-address">
+										  <xsl:value-of select ="concat('$',$correctName,'.',$NamedRange)"/>
+									  </xsl:attribute>
+								  </table:named-range>
+							  </xsl:when>
+							  <xsl:when test="$isFunction='true'">
+								  <xsl:variable name ="function">
+									  <xsl:value-of select ="substring-before($range,'(')"/>
+								  </xsl:variable>
+								  <table:named-expression>
+									  <xsl:attribute name ="table:name">
+										  <xsl:value-of select ="@name"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:base-cell-address">
+										  <xsl:value-of select ="'$Sheet1.$A$1'"/>
+									  </xsl:attribute>
+									  <xsl:attribute name ="table:expression">
+										  <xsl:value-of select ="concat($function,'([$',$correctName,'.',$NamedRange,'])')"/>
+										  <!--<xsl:value-of select ="concat($function,'([$',$cellRangeAddress,'])')"/>-->
 										  <!--<xsl:value-of select ="concat('sonataOoxFormula',$function,'([$',$cellRangeAddress,'])','##shtName##',$sheetNames)"/>-->
 									  </xsl:attribute>
 								  </table:named-expression>
 							  </xsl:when>
-						  </xsl:choose> 
+						  </xsl:choose>
+					  </xsl:if>
 				  </xsl:if>
 			  </xsl:for-each>
 		  </table:named-expressions>
@@ -2230,8 +2357,9 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-
-    <xsl:if
+<!--By sateesh, Changed Condition if to when-->
+	  <xsl:choose>
+		  <xsl:when
       test="not(following-sibling::e:row) and ($PictureRow != '' or $NoteRow != '' or $ConditionalRow != '' or $ValidationRow != '' or $AllRowBreakes!='' )">
 
       <xsl:variable name="GetMinRowWithElementAfterLastRow">
@@ -2305,18 +2433,19 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
           <xsl:value-of select="$AllRowBreakes"/>
         </xsl:with-param>
       </xsl:call-template>
-    </xsl:if>
-
+	  </xsl:when>
     <!--Start of RefNo-2-->
-    <xsl:if test="not(following-sibling::e:row) and (../preceding-sibling::e:cols/e:col[@style])">
+		<xsl:when
+		  test="not(following-sibling::e:row) and (../preceding-sibling::e:cols/e:col[@style])">
       <table:table-row table:style-name="{concat('ro', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
       table:number-rows-repeated="65535">
         <table:table-cell table:number-columns-repeated="256"/>
       </table:table-row>
-    </xsl:if>
+		</xsl:when>
     <!--End of RefNo-2-->
+	  </xsl:choose>
   </xsl:template>
-
+<!--By sateesh, Changed Condition if to when-->
   <xsl:template match="e:row" mode="headers">
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>

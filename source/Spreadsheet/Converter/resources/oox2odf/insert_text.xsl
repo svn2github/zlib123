@@ -80,28 +80,31 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
     <xsl:param name="rSheredStrings"/>
 
     <xsl:variable name="partId" select="ancestor::e:worksheet/@oox:part" />
+	  <xsl:variable name="extLink">
+		  <xsl:text>&apos;[</xsl:text>
+	  </xsl:variable>
     <!--Start of RefNo-2:Formula implemetation-->
-    <xsl:if test="e:f">
+    <xsl:if test="e:f and not(e:f='')">
       <!--Add code for not compatible formulas-->
       <xsl:choose>
         <!--chk for sheet sheets n style-->
         <!--(contains(.,'([') or contains(.,'{[') or contains(.,' [') or contains(.,',[') or starts-with(.,'[')) or -->
         <xsl:when test="not(
-                           (contains(.,'([') or contains(.,'{[') or contains(.,' [') or contains(.,',[') or starts-with(.,'[')) 
-                        or (contains(.,'AVERAGEIF('))
-                        or (contains(.,'AVERAGEIFS('))
-                        or (contains(.,'COUNTIFS('))
-                        or (contains(.,'CUBEKPIMEMBER('))
-                        or (contains(.,'CUBERANKEDMEMBER('))
-                        or (contains(.,'CUBESET('))
-                        or (contains(.,'CUBESETCOUNT('))
-                        or (contains(.,'CUBEVALUE('))                       
-                        or (contains(.,'GETPIVOTDATA('))
-                        or (contains(.,'IFERROR('))
-                        or (contains(.,'RTD('))
-                        or (contains(.,'SUMIFS(')))">
+                           (contains(e:f,'([') or contains(e:f,'{[') or contains(e:f,' [') or contains(e:f,',[') or starts-with(e:f,'[') or contains(e:f, $extLink)) 
+                        or (contains(e:f,'AVERAGEIF('))
+                        or (contains(e:f,'AVERAGEIFS('))
+                        or (contains(e:f,'COUNTIFS('))
+                        or (contains(e:f,'CUBEKPIMEMBER('))
+                        or (contains(e:f,'CUBERANKEDMEMBER('))
+                        or (contains(e:f,'CUBESET('))
+                        or (contains(e:f,'CUBESETCOUNT('))
+                        or (contains(e:f,'CUBEVALUE('))                       
+                        or (contains(e:f,'GETPIVOTDATA('))
+                        or (contains(e:f,'IFERROR('))
+                        or (contains(e:f,'RTD('))
+                        or (contains(e:f,'SUMIFS(')))">
           <xsl:choose>
-            <xsl:when test="contains(.,'!')">          
+            <xsl:when test="contains(e:f,'!')">          
               <xsl:choose>
                 <xsl:when test="string-length($sheetNames) = string-length(translate($sheetNames,$invalidChars,''))">
                   <xsl:attribute name="table:formula">
@@ -312,7 +315,7 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
         <xsl:attribute name="office:value-type">
           <xsl:text>boolean</xsl:text>
         </xsl:attribute>
-        <xsl:attribute name="office:value">
+        <xsl:attribute name="office:boolean-value">
           <xsl:choose>
             <xsl:when test="e:v = '0'">
               <xsl:value-of select="'false'"/>
@@ -325,6 +328,19 @@ RefNo-2 22-Sep-2008 Sandeep S New feature Changes for formula implementation.
             </xsl:otherwise>            
           </xsl:choose>
         </xsl:attribute>
+        <text:p>
+          <xsl:choose>
+            <xsl:when test="e:v = '0'">
+              <xsl:value-of select="'FALSE'"/>
+            </xsl:when>
+            <xsl:when test="e:v = '1'">
+              <xsl:value-of select="'TRUE'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="e:v"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </text:p>
       </xsl:when>
       <!--End of RefNo-2-->
       <xsl:otherwise>

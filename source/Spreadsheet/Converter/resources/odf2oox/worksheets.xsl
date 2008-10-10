@@ -823,12 +823,12 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
     </xsl:variable>
 
     <!-- compute default column width -->
-    <xsl:variable name="defaultColWidth">
+    <!--<xsl:variable name="defaultColWidth">
       <xsl:choose>
         <xsl:when test="$CheckCollHidden != 'true' ">
           <xsl:call-template name="ConvertToCharacters">
             <xsl:with-param name="width">
-              <xsl:value-of select="concat('0.8925','in')"/>
+              --><!--<xsl:value-of select="concat('0.8925','in')"/>--><!--
             </xsl:with-param>
             <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
           </xsl:call-template>
@@ -837,10 +837,41 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           <xsl:text>0</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>-->
+	  <xsl:variable name="defaultFontStyle">
+		  <xsl:for-each select="document('styles.xml')">
+			  <xsl:choose>
+				  <xsl:when
+					test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@style:font-name">
+					  <xsl:value-of
+						select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@style:font-name"
+              />
+				  </xsl:when>
+				  <xsl:otherwise>'Arial'</xsl:otherwise>
+			  </xsl:choose>
+		  </xsl:for-each>
     </xsl:variable>
-
+	  <xsl:variable name="defaultFontSize1">
+		  <xsl:for-each select="document('styles.xml')">
+			  <xsl:choose>
+				  <xsl:when
+					test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
+					  <xsl:value-of
+						select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
+              />
+				  </xsl:when>
+				  <xsl:otherwise>10</xsl:otherwise>
+			  </xsl:choose>
+		  </xsl:for-each>
+	  </xsl:variable>
+	  <!--<xsl:variable name ="defaultFontStyle">
+		  <xsl:value-of select ="'Lucida Handwriting'"/>
+	  </xsl:variable>-->
 		<!-- Attributes written inline as per XSLT best practices-->	
-		<sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}">
+		<sheetFormatPr  defaultRowHeight="{$defaultRowHeight}">
+			<xsl:attribute name ="defaultColWidth">
+				<xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyle,'|',$defaultFontSize1)"/>
+			</xsl:attribute>
 			<xsl:attribute name="customHeight">
 				<xsl:text>true</xsl:text>
 			</xsl:attribute>

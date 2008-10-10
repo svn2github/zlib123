@@ -276,11 +276,17 @@
       <xsl:when test="$RepetedRow != ''">
       <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColCharEnd, $rowNumber + $RepetedRow + 1)"/>
       </xsl:when>
-      <xsl:when test="$ColChar != $ColCharEnd">
+<!--
+    Code Change: Sonata
+    Desc:        To avoid crash because of Condiitonal Formatting
+    Defect :     1828899
+ -->
+      <!--<xsl:when test="$ColChar != $ColCharEnd">
       <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColCharEnd, $rowNumber)"/>
-      </xsl:when>
+      </xsl:when>-->
       <xsl:otherwise>
-      <xsl:value-of select="concat($ColChar, $rowNumber)"/>
+      <!--<xsl:value-of select="concat($ColChar, $rowNumber)"/>-->
+        <xsl:value-of select="concat($ColChar, $rowNumber, ':', $ColCharEnd, $rowNumber)"/>
       </xsl:otherwise>
       </xsl:choose>
       </xsl:otherwise>

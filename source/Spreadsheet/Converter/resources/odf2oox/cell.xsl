@@ -1952,9 +1952,9 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
             <!--Start of RefNo-8: For bollean value-->
             <xsl:when test="@office:value-type = 'boolean'">
               <xsl:attribute name="t">b</xsl:attribute>
-              <xsl:if test="not(@office:boolean-value = 'true' or @office:boolean-value = 'false')">
+              <!--<xsl:if test="not(@office:boolean-value = 'true' or @office:boolean-value = 'false')">
                 <xsl:attribute name="t">e</xsl:attribute>
-              </xsl:if>
+              </xsl:if>-->
               <xsl:if test="@table:formula">
                 <xsl:call-template name="tmpFormula">
                   <xsl:with-param name="cellNum" select="$cellNum"/>
@@ -1965,7 +1965,7 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
               </xsl:if>
               <v>
                 <xsl:choose>
-                  <xsl:when test="@office:boolean-value='false'">
+                  <!--<xsl:when test="@office:boolean-value='false'">
                     <xsl:value-of select="'0'"/>
                   </xsl:when>
                   <xsl:when test="@office:boolean-value='true'">
@@ -1973,6 +1973,15 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="text:p"/>
+                  </xsl:otherwise>-->
+                  <xsl:when test="text:p='TRUE'">
+                    <xsl:value-of select="'1'"/>
+                  </xsl:when>
+                  <!--<xsl:when test="text:p='FALSE'">
+                    <xsl:value-of select="'0'"/>
+                  </xsl:when>-->
+                  <xsl:otherwise>
+					  <xsl:value-of select="'0'"/>
                   </xsl:otherwise>
                 </xsl:choose>                
               </v>
@@ -2359,10 +2368,22 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
     <xsl:variable name="extLink">
       <xsl:text>[&apos;file:///</xsl:text>
     </xsl:variable>      
-    
+    <xsl:variable name="tblRef">
+      <xsl:text>&apos;)</xsl:text>
+    </xsl:variable>
+    <xsl:variable name="blnFormulaWNamedRan">
+      <xsl:variable name="formula" select="@table:formula"/>
+      <xsl:for-each select="//table:named-expressions/table:named-range">
+        <xsl:if test="contains($formula,@table:name)">
+          <xsl:value-of select="'true'"/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <!--or (contains($blnFormulaWNamedRan,'true'))-->
     <xsl:choose>
       <xsl:when test="not(
                         (contains(@table:formula,$extLink))
+                    or (contains($blnFormulaWNamedRan,'true'))
                     or (contains(@table:formula,'ARABIC(')) 
                     or (contains(@table:formula,'DDE('))
                     or (contains(@table:formula,'JIS('))
@@ -2400,6 +2421,9 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
                     or (contains(@table:formula,'getDiffYears('))
                     or (contains(@table:formula,'DECIMAL('))
                     or (contains(@table:formula,'ZGZ('))
+                    or ((contains(@table:formula,'IF(') and (contains(@table:formula,' AND ') or contains(@table:formula,')AND(') or contains(@table:formula,' OR ') or contains(@table:formula,')OR(')))and not(contains(@table:formula,'COUNTIF(')) and not(contains(@table:formula,'SUMIF(')))
+                    or (contains(@table:formula,'TABLE('))                    
+                    or (contains(@table:formula,$tblRef))                    
                     or (contains(@office:string-value,'#NAME?'))
                     or (contains(@office:string-value,'#N/A'))                    
                     or (text:p='Err:518')
@@ -2435,6 +2459,7 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
                     or (text:p='#REF!')
                     or (text:p='#N/A')
                     or (text:p='#NAME?')
+                    or (text:p='#NOM ?')
                     or (text:p='#DIV/0!')
                     or (text:p='#NUM!'))">
         <f>

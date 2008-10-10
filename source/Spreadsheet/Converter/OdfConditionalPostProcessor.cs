@@ -39,6 +39,9 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfConverterLib;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.Text.RegularExpressions;
+using System.Drawing;
+using System.Windows.Forms;
+
 
 
 namespace CleverAge.OdfConverter.Spreadsheet
@@ -128,6 +131,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 this.nextWriter.WriteString(GetFormula(text.Substring(16)));
             }
+            else if (text.StartsWith("sonataColumnWidth:"))
+            {
+                this.nextWriter.WriteString(GetColumnWidth(text.Substring(18)));
+            }
+            
             //End of RefNo-1
             else
             {
@@ -381,7 +389,19 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 //TODO : chk for sheet name
                 strOdfCellRef = strOdfCellRef.Replace(":.", ":");
-                return strOdfCellRef = strOdfCellRef.Replace('.', '!');
+                //return strOdfCellRef = strOdfCellRef.Replace('.', '!');
+                
+                strOdfCellRef = strOdfCellRef.Replace('.', '!');
+                if (strOdfCellRef.Substring(0, strOdfCellRef.IndexOf('!')).StartsWith("$"))
+                {
+                    strOdfCellRef = strOdfCellRef.Replace("$", "");
+                }
+                if (!strOdfCellRef.Substring(0, strOdfCellRef.IndexOf('!')).StartsWith("'"))
+                {
+                    strOdfCellRef = "'" + strOdfCellRef.Replace("!", "'!");
+                }                
+                
+                return strOdfCellRef;
             }
         }
 
@@ -662,5 +682,34 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         }
         //End of RefNo-1
+
+        protected string GetColumnWidth(string text)
+        {
+
+            string measureString = "0";
+            Font stringFont = new Font(text.Split('|')[0].ToString(), float.Parse(text.Split('|')[1].ToString()));
+            Form dummyForm = new Form();
+            Graphics g = dummyForm.CreateGraphics();
+            System.Drawing.SizeF size = g.MeasureString(measureString, stringFont);
+            //RectangleF layoutRect = new RectangleF(0, 0, size.Width, size.Height);
+            RectangleF layoutRect = new RectangleF(50.0F, 50.0F, size.Width, size.Height);
+            // Set string format.
+            CharacterRange[] characterRanges = { new CharacterRange(0, 1) };
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.SetMeasurableCharacterRanges(characterRanges);
+            Region[] result = g.MeasureCharacterRanges(measureString, stringFont, layoutRect, stringFormat);
+            //charWidth is nothing but  
+            double maxDigWidth = result[0].GetBounds(g).Width - 2; // minus 2 bound borders
+            //width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+            //Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})
+            dummyForm.Close();
+            double columnWidth = System.Math.Truncate((((8 * maxDigWidth) + 5) / maxDigWidth) * 256) / 256;
+            double columnWidthPx = System.Math.Truncate((((256 * columnWidth) + (System.Math.Truncate(128 / maxDigWidth))) / 256) * maxDigWidth);
+            ////double columnWidthPx = System.Math.Truncate(((256 * columnWidth) + System.Math.Truncate(128 / maxDigWidth) / 256) * maxDigWidth);
+            //double columnWidthInch = (columnWidthPx / 96.21212);
+            double columnWidthPoints = columnWidthPx / 96.21212 * 72;
+            return columnWidthPoints.ToString();
+
+        }
     }
 }

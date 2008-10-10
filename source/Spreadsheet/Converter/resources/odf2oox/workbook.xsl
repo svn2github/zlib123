@@ -242,105 +242,202 @@
 					<xsl:value-of select="concat($partOne,'!','$',$firstColValue,'$',$firstRowValue,':','$',$secondColValue,'$',$secondRowValue)"/>
 				</definedName>
 			</xsl:for-each>
-		 <!--
+		<!--
 		  Feature: Named Ranges
 		  By     : Vijayeta
 		  Date   :11th Sept '08
 		  -->
+
 		<xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:named-expressions">
 			<xsl:for-each select ="child::node()">
-				<xsl:variable name ="isFunction">
-					<xsl:choose>
-						<xsl:when test="name()='table:named-range'">
-							<xsl:value-of select ="'false'"/>
-						</xsl:when>
-						<xsl:when test ="name()='table:named-expression'">
-							<xsl:value-of select ="'true'"/>
-						</xsl:when>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name ="range">
-					<xsl:choose>
-						<xsl:when test="$isFunction='false'">
-							<xsl:value-of select ="substring-after(@table:cell-range-address,'$')"/>
-						</xsl:when>
-						<xsl:when test="$isFunction='true'">
-							<xsl:value-of select ="@table:expression"/>
-						</xsl:when>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name ="namedRange">
-					<xsl:choose>
-						<xsl:when test ="substring-before($range,':')!=''">
-							<xsl:variable name ="part1">
-								<xsl:choose>
-									<xsl:when test="$isFunction='false'">
-										<xsl:value-of select ="translate(substring-before($range,':'),'.','!')"/>
-									</xsl:when>
-									<xsl:when test="$isFunction='true'">
-										<xsl:choose>
-											<xsl:when test ="contains($range,'(')  and contains($range,')')">
-												<xsl:value-of select ="concat(translate(substring-before($range,'$'),'[',''),translate(substring-after(substring-before($range,':'),'$'),'.','!'))"/>
-											</xsl:when>
-											<xsl:otherwise>
-												
-											</xsl:otherwise>
-										</xsl:choose>
-									</xsl:when>
-								</xsl:choose>
-							</xsl:variable>
-							<xsl:variable name ="part2">
-								<xsl:choose>
-									<xsl:when test="$isFunction='false'">
-										<xsl:value-of select ="substring-after(substring-after($range,':'),'.')"/>
-									</xsl:when>
-									<xsl:when test="$isFunction='true'">
-										<xsl:value-of select ="translate(substring-after(substring-after($range,':'),'.'),']','')"/>
-									</xsl:when>
-								</xsl:choose>
-							</xsl:variable>
-							<xsl:value-of select ="concat($part1,':',$part2)"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select ="translate($range,'.','!')"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:if 
-					test ="$isFunction='false' or ($isFunction='true' and contains(@table:expression,'(') and contains(@table:expression,')'))">
-					<definedName>
-						<xsl:attribute name ="name">
-							<xsl:value-of select ="@table:name"/>
-						</xsl:attribute>
-						<!--<xsl:value-of select ="$namedRange"/>-->
+				<!--<xsl:if test ="not(contains(@table:name,'Excel_BuiltIn_Print_Area')) and not(contains(@table:name,'Excel_BuiltIn_Print_Titles_1 1'))  and @table:name!='C' and @table:name!='c' and @table:name!='R' and @table:name!='r' ">-->
+				<xsl:if test ="not(contains(@table:name,'Excel_BuiltIn_Print_Area')) and not(contains(@table:name,'Excel_BuiltIn_Print_Titles_1 1'))">
+					<xsl:variable name ="isFunction">
+						<xsl:choose>
+							<xsl:when test="name()='table:named-range'">
+								<xsl:value-of select ="'false'"/>
+							</xsl:when>
+							<xsl:when test ="name()='table:named-expression'">
+								<xsl:value-of select ="'true'"/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:variable name ="range">
 						<xsl:choose>
 							<xsl:when test="$isFunction='false'">
-								<xsl:value-of select ="$namedRange"/>
+								<xsl:choose>
+									<xsl:when test ="starts-with(@table:cell-range-address,'$')">
+										<xsl:value-of select ="substring-after(@table:cell-range-address,'$')"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select ="@table:cell-range-address"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:when>
 							<xsl:when test="$isFunction='true'">
-								<xsl:variable name ="namedRange1">
-									<!--<xsl:choose >
+								<xsl:value-of select ="@table:expression"/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:variable name ="namedRange">
+						<xsl:choose>
+							<xsl:when test ="substring-after($range,':')!='' and not(contains($range,'file:///')) ">
+								<xsl:variable name ="part1">
+									<xsl:choose>
+										<xsl:when test="$isFunction='false'">
+											<xsl:value-of select ="translate(substring-before($range,':'),'.','!')"/>
+										</xsl:when>
+										<xsl:when test="$isFunction='true'">
+											<xsl:choose>
+												<xsl:when test ="contains($range,'(')  and contains($range,')')">
+													<xsl:value-of select ="concat(translate(substring-before($range,'$'),'[',''),translate(substring-after(substring-before($range,':'),'$'),'.','!'))"/>
+												</xsl:when>
+												<xsl:otherwise>
+
+												</xsl:otherwise>
+											</xsl:choose>
+										</xsl:when>
+									</xsl:choose>
+								</xsl:variable>
+								<xsl:variable name ="part2">
+									<xsl:choose>
+										<xsl:when test="$isFunction='false'">
+											<xsl:choose>
+												<xsl:when test ="contains(substring-after($range,':'),'.')">
+													<xsl:value-of select ="substring-after(substring-after($range,':'),'.')"/>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:value-of select ="substring-after($range,':')"/>
+												</xsl:otherwise>
+											</xsl:choose>
+										</xsl:when>
+										<xsl:when test="$isFunction='true'">
+											<xsl:choose>
+												<xsl:when test ="contains(substring-after($range,':'),'.')">
+													<xsl:value-of select ="translate(substring-after(substring-after($range,':'),'.'),']','')"/>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:value-of select ="translate(substring-after($range,':'),']','')"/>
+												</xsl:otherwise>
+											</xsl:choose>
+										</xsl:when>
+									</xsl:choose>
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test ="contains($part1,'#') or contains($part1,'file:///')">
+										<xsl:text>"</xsl:text>
+										<xsl:value-of select ="concat($part1,':',$part2)"/>
+										<xsl:text>"</xsl:text>
+									</xsl:when>
+									<xsl:when test ="not(contains($range,'#') or contains($part1,'file:///'))">
+										<xsl:value-of select ="concat($part1,':',$part2)"/>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:choose>
+									<xsl:when test ="contains($range,'#') or contains($range,'file:///')">
+										<xsl:text>"</xsl:text>
+										<xsl:value-of select ="translate($range,'.','!')"/>
+										<xsl:text>"</xsl:text>
+									</xsl:when>
+									<xsl:when test ="not(contains($range,'#') or contains($range,'file:///'))">
+										<xsl:value-of select ="translate($range,'.','!')"/>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:if 
+						test ="$isFunction='false' or ($isFunction='true' and contains(@table:expression,'(') and contains(@table:expression,')')
+						and not((contains(@table:expression,'ARABIC(')) 
+                    or (contains(@table:expression,'DDE('))
+                    or (contains(@table:expression,'JIS('))
+                    or (contains(@table:expression,'SHEET('))
+                    or (contains(@table:expression,'SHEETS('))
+                    or (contains(@table:expression,'STYLE('))
+                    or (contains(@table:expression,'MUNIT(')) 
+                    or (contains(@table:expression,'DURATION(') and not(contains(@table:expression,'getDuration(')))                    
+                    or (contains(@table:expression,'ACOT('))
+                    or (contains(@table:expression,'ACOTH('))
+                    or (contains(@table:expression,'COT('))
+                    or (contains(@table:expression,'COTH('))
+                    or (contains(@table:expression,'BASE(')) 
+                    or (contains(@table:expression,'B(') and not(contains(@table:expression,'DB(')) and not(contains(@table:expression,'DDB(')) and not(contains(@table:expression,'PROB(')))
+                    or (contains(@table:expression,'COMBINA('))
+                    or (contains(@table:expression,'CURRENT(')) 
+                    or (contains(@table:expression,'DAYS('))
+                    or (contains(@table:expression,'getDaysInMonth(')) 
+                    or (contains(@table:expression,'getDaysInYear(')) 
+                    or (contains(@table:expression,'DDE('))
+                    or (contains(@table:expression,'EASTERSUNDAY(')) 
+                    or (contains(@table:expression,'EFFECTIVE(')) 
+                    or (contains(@table:expression,'FORMULA('))
+                    or (contains(@table:expression,'GAUSS(')) 
+                    or (contains(@table:expression,'ISFORMULA(')) 
+                    or (contains(@table:expression,'getIsLeapYear('))
+                    or (contains(@table:expression,'getDiffMonths('))
+                    or (contains(@table:expression,'PERMUTATIONA(')) 
+                    or (contains(@table:expression,'PHI('))
+                    or (contains(@table:expression,'getRot13('))
+                    or (contains(@table:expression,'CONVERT(') and not(contains(@table:expression,'getConvert(')))
+                    or (contains(@table:expression,'WEEKNUM(') and not(contains(@table:expression,'getWeeknum(')))
+                    or (contains(@table:expression,'getDiffWeeks('))
+                    or (contains(@table:expression,'getWeeksInYear('))
+                    or (contains(@table:expression,'getDiffYears('))
+                    or (contains(@table:expression,'DECIMAL('))
+                    or (contains(@table:expression,'ZGZ('))
+					or (contains(@table:expression,'IF('))
+					or (contains(@table:expression,'OFFSET('))
+                    or (contains(@table:expression,'NA('))))">
+						<definedName>
+							<xsl:variable name ="definedTableName">
+								<xsl:choose>
+									<xsl:when test ="contains(@table:name,'Excel_BuiltIn_Print_Area')">
+										<xsl:value-of select ="concat('_',position(),@table:name)"/>
+									</xsl:when>
+									<xsl:when test ="@table:name = 'C' or @table:name = 'c' or @table:name = 'R' or @table:name = 'r'">
+										<xsl:value-of select ="concat('_',position(),@table:name)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select ="@table:name"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:attribute name ="name">
+								<xsl:value-of select ="$definedTableName"/>
+							</xsl:attribute>
+							<!--<xsl:value-of select ="$namedRange"/>-->
+							<xsl:choose>
+								<xsl:when test="$isFunction='false'">
+									<xsl:value-of select ="$namedRange"/>
+								</xsl:when>
+								<xsl:when test="$isFunction='true'">
+									<xsl:variable name ="namedRange1">
+										<!--<xsl:choose >
 										<xsl:when test ="contains(@table:expression,'(') and contains(@table:expression,')')">-->
-											<xsl:value-of select ="concat(substring-before(@table:expression,'$'),substring-after(@table:expression,'$'))"/>
+										<xsl:value-of select ="concat(substring-before(@table:expression,'$'),substring-after(@table:expression,'$'))"/>
 										<!--</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select ="''"/>
 										</xsl:otherwise>
 									</xsl:choose>-->
-								</xsl:variable>
-								<!--<xsl:if test ="	$namedRange1!=''">-->
+									</xsl:variable>
+									<!--<xsl:if test ="	$namedRange1!=''">-->
+
+									<!--</xsl:if>-->
+									<!--<xsl:value-of select="concat('sonataOdfFormulaoooc:=', $namedRange1)"/>-->
 									<xsl:value-of select="concat('sonataOdfFormulaoooc:=', $namedRange1)"/>
-								<!--</xsl:if>-->
-								<!--<xsl:value-of select="concat('sonataOdfFormulaoooc:=', $namedRange1)"/>-->
-							</xsl:when>
-						</xsl:choose>
-					</definedName>
+								</xsl:when>
+							</xsl:choose>
+						</definedName>
+					</xsl:if>
 				</xsl:if>
+
 			</xsl:for-each>
-			
 		</xsl:for-each>
-		<!-- end of code for the feature 'Named Ranges'-->		
-			<!--End-->
+		<!-- end of code for the feature 'Named Ranges'-->
+		<!--End-->
     </definedNames>
 
     <xsl:for-each select="table:data-pilot-tables">

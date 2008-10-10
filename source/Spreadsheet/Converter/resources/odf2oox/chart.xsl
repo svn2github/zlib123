@@ -2312,7 +2312,26 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 
       <xsl:choose>
         <!-- insert X and Y values-->
+<!--Fix for the defects 2138187 , Sonata-->
         <xsl:when test="$chartType = 'chart:scatter' ">
+			<xsl:choose>
+			  <xsl:when test="table:table-row/table:table-cell/@office:value-type='string'">
+				<c:xVal>
+			      <c:strRef>
+			        <c:strCache>
+					<c:ptCount val="{$numPoints}"/>
+					<xsl:for-each select="key('rows','')">
+						<xsl:call-template name="InsertPoints">
+							<!-- the x values are the first points -->
+							<xsl:with-param name="series" select="0"/>
+							<xsl:with-param name="seriesFrom" select="$seriesFrom"/>
+						</xsl:call-template>
+					</xsl:for-each>
+					</c:strCache>
+				  </c:strRef>
+				</c:xVal>
+			</xsl:when>
+			  <xsl:otherwise>
           <c:xVal>
             <c:numRef>
               <c:numCache>
@@ -2328,6 +2347,8 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               </c:numCache>
             </c:numRef>
           </c:xVal>
+			</xsl:otherwise>
+			</xsl:choose>
           <c:yVal>
             <c:numRef>
               <c:numCache>

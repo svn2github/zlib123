@@ -51,10 +51,11 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
   xmlns:oox="urn:oox"
   exclude-result-prefixes="e oox r c xdr draw rels xlink">
 
-  <xsl:import href="relationships.xsl"/>
+  <!--<xsl:import href="relationships.xsl"/>
   <xsl:import href="chart.xsl"/>
+  <xsl:import href="insert_text.xsl"/>-->
   <!-- Added by vijayeta, fix fo the bug 1760182-->
-  <xsl:import href="insert_text.xsl"/>
+ 
 
   <xsl:key name="drawing" match="e:drawing" use="@oox:part"/>
 
