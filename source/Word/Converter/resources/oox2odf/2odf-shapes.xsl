@@ -187,7 +187,7 @@
 			<xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m@0,l,21600r21600,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select =".">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -218,7 +218,7 @@
 			<xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,xe'"   >
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -238,7 +238,7 @@
 			<xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m,l21600,21600e'"   >
 				<draw:line text:anchor-type="paragraph" draw:z-index="0" draw:text-style-name="P1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -258,7 +258,7 @@
 			<xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m,l@0,0@0,21600,21600,21600e'"   >
 				<draw:connector text:anchor-type="paragraph" draw:z-index="0" draw:text-style-name="P1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -278,7 +278,7 @@
 			<xsl:when test="@type=concat('#', $shapeTypeId) and $pathId='m,c@0,0@1,5400@1,10800@1,16200@2,21600,21600,21600e'"   >
 				<draw:connector text:anchor-type="paragraph" draw:type="curve"  draw:z-index="0" draw:text-style-name="P1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -297,9 +297,28 @@
 			<!-- Flowchart Process-->
 			<!--<xsl:when test ="@path='m,l,21600r21600,l21600,xe' and following-sibling::v:shape/@type='#_x0000_t109'">-->
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,l21600,xe'">
+				<!--code added by yeswanth.s-->
+				<xsl:if test="./v:textbox">
+					<draw:frame draw:name="Frame1">
+						<xsl:attribute name="draw:style-name">
+							<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
+						</xsl:attribute>
+						<xsl:call-template name="InsertAnchorType"/>
+						<xsl:call-template name="InsertShapeWidth"/>
+						<xsl:call-template name="InsertShapeHeight"/>
+						<xsl:call-template name="InsertshapeAbsolutePos"/>
+						<xsl:call-template name="InsertShapeZindex"/>
+						<draw:text-box>
+							<xsl:apply-templates select="v:textbox" >
+								<xsl:with-param name ="shapetype" select ="'Flowchart Process'"/>
+							</xsl:apply-templates >
+						</draw:text-box>
+					</draw:frame>
+				</xsl:if>
+				<xsl:if test="not(./v:textbox)">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -315,13 +334,16 @@
 					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800"
 					  draw:type="flowchart-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
 				</draw:custom-shape>
+				</xsl:if>
+				
+
 			</xsl:when>
 			<!-- Flowchart Alternate Process-->
 			<!--<xsl:when test ="@path='m@0,qx0@0l0@2qy@0,21600l@1,21600qx21600@2l21600@0qy@1,xe'">-->
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,qx0@0l0@2qy@0,21600l@1,21600qx21600@2l21600@0qy@1,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -353,7 +375,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,l,10800,10800,21600,21600,10800xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -374,7 +396,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m4321,l21600,,17204,21600,,21600xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -395,7 +417,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,l21600,xem2610,nfl2610,21600em18990,nfl18990,21600e'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -416,7 +438,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l,21600r21600,l21600,xem4236,nfl4236,21600em,4236nfl21600,4236e'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -437,7 +459,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,20172v945,400,1887,628,2795,913c3587,21312,4342,21370,5060,21597v2037,,2567,-227,3095,-285c8722,21197,9325,20970,9855,20800v490,-228,945,-400,1472,-740c11817,19887,12347,19660,12875,19375v567,-228,1095,-513,1700,-740c15177,18462,15782,18122,16537,17950v718,-113,1398,-398,2228,-513c19635,17437,20577,17322,21597,17322l21597,,,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -458,7 +480,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,20465v810,317,1620,452,2397,725c3077,21325,3790,21417,4405,21597v1620,,2202,-180,2657,-272c7580,21280,8002,21010,8455,20917v422,-135,810,-405,1327,-542c10205,20150,10657,19967,11080,19742v517,-182,970,-407,1425,-590c13087,19017,13605,18745,14255,18610v615,-180,1262,-318,1942,-408c16975,18202,17785,18022,18595,18022r,-1670l19192,16252r808,l20000,14467r722,-75l21597,14392,21597,,2972,r,1815l1532,1815r,1860l,3675,,20465xem1532,3675nfl18595,3675r,12677em2972,1815nfl20000,1815r,12652e'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -479,7 +501,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m3475,qx,10800,3475,21600l18125,21600qx21600,10800,18125,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="4">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -500,7 +522,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m21600,21600l,21600,21600,,,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -521,7 +543,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,l,10800,10800,21600,21600,10800xem,10800nfl21600,10800e'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -542,7 +564,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,l21600,21600,,21600xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -563,7 +585,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l21600,,10800,21600xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -584,7 +606,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m3600,21597c2662,21202,1837,20075,1087,18440,487,16240,75,13590,,10770,75,8007,487,5412,1087,3045,1837,1465,2662,337,3600,l21597,v-937,337,-1687,1465,-2512,3045c18485,5412,18072,8007,17997,10770v75,2820,488,5470,1088,7670c19910,20075,20660,21202,21597,21597xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="4">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -605,7 +627,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,qx21600,10800,10800,21600l,21600,,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -626,7 +648,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='ar,,21600,21600,18685,18165,10677,21597l20990,21597r,-3432xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -647,7 +669,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,qx,3391l,18209qy10800,21600,21600,18209l21600,3391qy10800,xem,3391nfqy10800,6782,21600,3391e'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -668,7 +690,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m21600,10800qy18019,21600l3581,21600qx,10800,3581,l18019,qx21600,10800xem18019,21600nfqx14438,10800,18019,e'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -689,7 +711,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m17955,v862,282,1877,1410,2477,3045c21035,5357,21372,7895,21597,10827v-225,2763,-562,5300,-1165,7613c19832,20132,18817,21260,17955,21597r-14388,l,10827,3567,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="4">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -710,7 +732,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l0@8@12@24,0@9,,21600@6,21600@15@27@7,21600,21600,21600,21600@9@18@30,21600@8,21600,0@7,0@21@33@6,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -777,7 +799,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m3600,qx,3600l0@8@12@24,0@9,,18000qy3600,21600l@6,21600@15@27@7,21600,18000,21600qx21600,18000l21600@9@18@30,21600@8,21600,3600qy18000,l@7,0@21@33@6,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -842,7 +864,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='wr,,21600,21600@15@16@17@18l@21@22xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -889,7 +911,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l@0@1,0@1,0@2@0@2@0,21600,21600,10800xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -920,7 +942,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l@0@1,21600@1,21600@2@0@2@0,21600,,10800xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -951,7 +973,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m0@0l@1@0@1,21600@2,21600@2@0,21600@0,10800,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -982,7 +1004,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m0@0l@1@0@1,0@2,0@2@0,21600@0,10800,21600xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="$currentShape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -1013,7 +1035,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m,l@0,21600@1,21600,21600,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -1043,7 +1065,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m10800,qx0@1l0@2qy10800,21600,21600@2l21600@1qy10800,xem0@1qy10800@0,21600@1nfe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -1074,7 +1096,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l0@0,,21600@1,21600,21600@2,21600,xem0@0nfl@1@0,21600,em@1@0nfl@1,21600e'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="2">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -1110,7 +1132,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l0@0,0@2@0,21600@1,21600,21600@2,21600@0@1,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="3">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -1141,7 +1163,7 @@
 			<xsl:when test ="@type=concat('#', $shapeTypeId) and $pathId='m@0,l,21600@1,21600,21600,xe'">
 				<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
 					<xsl:attribute name="draw:style-name">
-						<xsl:value-of select="@id"/>
+						<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 					</xsl:attribute>
 					<!--<xsl:for-each select ="parent::node()/v:shape">-->
 					<xsl:call-template name="InsertAnchorType"/>
@@ -1181,10 +1203,10 @@
 	<xsl:template match="v:rect | v:line|v:shape|v:oval|v:roundrect">
 		<!-- version 1.1-->
 		<xsl:choose>
-      <xsl:when test =".//w:drawing">
-        <!--If picture inside any shape is present ignore the shape for converion
-        since it is causing the crash in ODT and also this feature is not compatible in ODT.-->
-      </xsl:when>
+      <!--<xsl:when test =".//w:drawing">
+        --><!--If picture inside any shape is present ignore the shape for converion
+        since it is causing the crash in ODT and also this feature is not compatible in ODT.--><!--
+      </xsl:when>-->
 			<xsl:when test="v:imagedata">
 				<xsl:variable name="document">
 					<xsl:call-template name="GetDocumentName">
@@ -1363,6 +1385,27 @@
 						<xsl:choose>
 							<!--Rectangle -->
 							<xsl:when  test ="self::v:rect" >
+								<!--added by yeswanth.s : converting rectangle with text into frame-->
+								<xsl:choose>
+									<xsl:when test="./v:textbox">
+										<draw:frame draw:name="Frame1">
+											<xsl:attribute name="draw:style-name">
+												<xsl:value-of select="@id"/>
+											</xsl:attribute>
+											<xsl:call-template name="InsertAnchorType"/>
+											<xsl:call-template name="InsertShapeWidth"/>
+											<xsl:call-template name="InsertShapeHeight"/>
+											<xsl:call-template name="InsertshapeAbsolutePos"/>
+											<xsl:call-template name="InsertShapeZindex"/>
+											<!--<draw:text-box fo:min-height="0in">-->
+											<draw:text-box>
+												<xsl:apply-templates select="v:textbox" >
+                          <xsl:with-param name ="shapetype" select ="'Rectangle'"/>
+												</xsl:apply-templates >
+											</draw:text-box>
+										</draw:frame>
+									</xsl:when>
+									<xsl:otherwise>
 								<draw:rect>
 									<xsl:attribute name="draw:style-name">
 										<xsl:value-of select="parent::node()/v:rect/@id"/>
@@ -1387,6 +1430,8 @@
 									<!--<xsl:call-template name="InsertParagraphToFrame"/>-->
 									<!--</xsl:for-each>-->
 								</draw:rect>
+                                    </xsl:otherwise>
+					            </xsl:choose>
 							</xsl:when>
 							<!-- Oval -->
 							<xsl:when  test ="self::v:oval">
@@ -1717,7 +1762,10 @@
 			<xsl:attribute name="style:name">
 				<xsl:choose>
 					<xsl:when test ="$vmlElement[1]=v:shape">
-						<xsl:value-of  select ="v:shape/@id"/>
+            <!--added by chhavi-->
+						<xsl:value-of  select ="concat(v:shape/@id,generate-id())"/>
+            <!--end here-->
+            <!--<xsl:value-of  select ="v:shape/@id"/>-->
 					</xsl:when>
 					<xsl:when test ="$vmlElement[1]=v:oval">
 						<xsl:value-of  select ="v:oval/@id"/>
@@ -1733,6 +1781,13 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
+				<!--code added by yeswanth.s : bug# 1838676-->
+				<xsl:if test="$vmlElement[1]/v:textbox">
+					<xsl:attribute name="style:parent-style-name">
+						<xsl:text>Frame</xsl:text>
+					</xsl:attribute>
+				</xsl:if>
+				<!--end-->
 			<!--in Word there are no parent style for image - make default Graphics in OO -->
 			<!--<xsl:attribute name="style:parent-style-name">
         <xsl:text>Graphics</xsl:text>
@@ -1986,7 +2041,8 @@
 
 	<xsl:template name="InsertTexboxTextDirection">
 		<xsl:param name="shape" select="."/>
-		<xsl:if test="@style = 'layout-flow:vertical' ">
+    <!-- Sona: Text direction  Defect #1989536-->
+    <xsl:if test="contains(@style,'layout-flow:vertical')">
 			<xsl:attribute name="style:writing-mode">
 				<xsl:text>tb-rl</xsl:text>
 			</xsl:attribute>
@@ -2002,7 +2058,7 @@
 				<xsl:with-param name="propertyName" select="'mso-fit-shape-to-text'"/>
 			</xsl:call-template>
 		</xsl:variable>
-
+    <!-- Sona: wrap and resize-->
 		<xsl:if test="$fitToText='t' or $fitToText='true' or (not($textbox/@w:h) and $textbox/@hRule!='exact')">
 			<xsl:attribute name="fo:min-height">
 				<xsl:choose>
@@ -2030,7 +2086,97 @@
 	<xsl:template name="InsertShapeShadow">
     <xsl:param name ="shape"></xsl:param>
     <!-- Sona: Shadow implementation-->
+    <xsl:variable name ="shapeTypeId">
+      <xsl:value-of select ="substring-after($shape/@type,'#')"/>
+    </xsl:variable>
+    <xsl:variable name ="pathId">
+      <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+        <xsl:if test ="position()=1">
+          <xsl:value-of select ="@path"/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
     <xsl:for-each select="$shape/v:shadow">
+      <xsl:choose>
+        <xsl:when test ="$pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox)">
+          <xsl:attribute name="style:shadow">
+            <xsl:choose>
+              <xsl:when test="not(@on) or @on = 'false' or @on = 'f' or @on = '0'">none</xsl:when>
+              <xsl:otherwise>
+                <!-- report lost attributes -->
+                <xsl:if test="@opacity">
+                  <xsl:message terminate="no">translation.oox2odf.shape.shadow</xsl:message>
+                </xsl:if>
+                <xsl:if test="@obscured">
+                  <xsl:message terminate="no">translation.oox2odf.shape.shadow.obscurity</xsl:message>
+                </xsl:if>
+                <xsl:if test="@type">
+                  <!-- TODO is this a copy & paste error? -->
+                  <xsl:message terminate="no">translation.oox2odf.shape.shadow.obscurity</xsl:message>
+                </xsl:if>
+                <xsl:if test="@matrix">
+                  <xsl:message terminate="no"
+              >translation.oox2odf.shape.shadow.complexPerspective</xsl:message>
+                </xsl:if>
+                <!-- compute color -->
+                <xsl:variable name ="frameShadowColor">
+                <xsl:call-template name="InsertColor">
+                  <xsl:with-param name="color">
+                    <xsl:choose>
+                      <xsl:when test="@color">
+                        <xsl:value-of select="@color"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:if test="@color2">
+                          <xsl:value-of select="@color2"/>
+                        </xsl:if>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
+                </xsl:variable>
+                <!-- shadow offset -->
+                <xsl:variable name ="frameShadowDistance">                
+                <xsl:choose>
+                  <xsl:when test="@offset">
+                    <!-- horizontal distance -->
+                    <xsl:call-template name="ComputeShadowDistance">
+                      <xsl:with-param name="distance" select="substring-before(@offset, ',')"/>
+                      <xsl:with-param name="origin" select="substring-before(@origin, ',')"/>
+                      <xsl:with-param name="side">width</xsl:with-param>
+                    </xsl:call-template>
+                    <xsl:text> </xsl:text>
+                    <!-- vertical distance -->
+                    <xsl:call-template name="ComputeShadowDistance">
+                      <xsl:with-param name="distance" select="substring-after(@offset, ',')"/>
+                      <xsl:with-param name="origin" select="substring-after(@origin, ',')"/>
+                      <xsl:with-param name="side">height</xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:if test="@offset2">
+                      <xsl:call-template name="ComputeShadowDistance">
+                        <xsl:with-param name="distance" select="substring-before(@offset2, ',')"/>
+                        <xsl:with-param name="origin" select="substring-before(@origin, ',')"/>
+                        <xsl:with-param name="side">width</xsl:with-param>
+                      </xsl:call-template>
+                      <xsl:text> </xsl:text>
+                      <xsl:call-template name="ComputeShadowDistance">
+                        <xsl:with-param name="distance" select="substring-after(@offset2, ',')"/>
+                        <xsl:with-param name="origin" select="substring-after(@origin, ',')"/>
+                        <xsl:with-param name="side">height</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:if>
+                  </xsl:otherwise>
+                </xsl:choose>
+                </xsl:variable>
+                <xsl:value-of select ="concat($frameShadowColor,$frameShadowDistance)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
       <xsl:attribute name="draw:shadow">
 				<xsl:choose>
           <xsl:when test="not(@on) or @on = 'false' or @on = 'f' or @on = '0'">hidden</xsl:when>
@@ -2137,7 +2283,8 @@
 								</xsl:if>
 							</xsl:otherwise>
 						</xsl:choose>
-
+        </xsl:otherwise>
+      </xsl:choose>
 		</xsl:for-each>
 	</xsl:template>
 
@@ -2687,7 +2834,8 @@
 					<xsl:text>0</xsl:text>
 				</xsl:when>
         <!--Sona Added margin for completing Shape Wrap feature-->
-        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-left'))">
+        <!-- Omit default values for in front of text-->
+        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-left')) and $shape/w10:wrap">
           <xsl:text>0.13in</xsl:text>
         </xsl:when>
 				<xsl:otherwise>
@@ -2712,7 +2860,8 @@
 					<xsl:text>0</xsl:text>
 				</xsl:when>
         <!--Sona Added margin for completing Shape Wrap feature-->
-        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-right'))">
+        <!-- Omit default values for in front of text-->
+        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-right')) and $shape/w10:wrap">
           <xsl:text>0.13in</xsl:text>
         </xsl:when>
 				<xsl:otherwise>
@@ -3091,7 +3240,7 @@
 			</xsl:if>
 			<xsl:if test ="(string-length($dot1-length) != 0)">
 				<xsl:attribute name ="draw:dots1-length">
-					<xsl:value-of select ="concat($dot1-length,'cm')" />
+					<xsl:value-of select ="concat($dot1-length div 0.4,'in')" />
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:if test ="(string-length($dot2) != 0)">
@@ -3101,12 +3250,12 @@
 			</xsl:if>
 			<xsl:if test ="(string-length($dot2-length) != 0)">
 				<xsl:attribute name ="draw:dots2-length">
-					<xsl:value-of select ="concat($dot2-length,'cm')" />
+					<xsl:value-of select ="concat($dot2-length div 0.4,'in')" />
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:if test ="(string-length($distance) != 0)">
 				<xsl:attribute name ="draw:distance">
-					<xsl:value-of select ="concat($distance,'cm')"/>
+					<xsl:value-of select ="concat($distance div 0.4,'in')"/>
 				</xsl:attribute>
 			</xsl:if>
 		</draw:stroke-dash>
@@ -3271,7 +3420,7 @@
 		</xsl:variable>
 
 		<xsl:choose>
-			<xsl:when test="$fitToText='t' or  $fitToText='true' or ($wrapStyle!='' and $wrapStyle='none') or ($shape/@w:wrap and $shape/@w:wrap != 'none')">
+      <xsl:when test="($fitToText='t' and $wrapStyle!='') or  ($fitToText='true' and $wrapStyle!='') or ($shape/@w:wrap and $shape/@w:wrap != 'none')">        
 				<xsl:attribute name="fo:min-width">
 					<xsl:text>0cm</xsl:text>
 				</xsl:attribute>
@@ -3429,29 +3578,92 @@
 				<xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
 			</xsl:call-template>
 		</xsl:variable>
+    <xsl:variable name="currentSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
+    <!-- added by chhavi to calulate top bottom left  and right margin and page height and width  in case of mirror margin-->
+    <xsl:variable name ="pageWidth">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPr =''" >
+          <xsl:value-of select ="($currentSectPr)/w:pgSz/@w:w"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name ="pageHeight">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPr =''" >
+          <xsl:value-of select ="($currentSectPr)/w:pgSz/@w:h"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="marTop">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPr =''" >
+          <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:top"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:top"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="marBottom">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPr =''" >
+          <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:bottom"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:bottom"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="marLeft">
+      <xsl:choose>
+        <xsl:when test ="$currentSectPr =''" >
+          <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:left"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="marRight">
+      <xsl:choose>
+        <xsl:when test ="$currentSectPr =''" >
+          <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:right"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 		<xsl:variable name="HorizontalWidth">
+      <!--end here-->
 			<xsl:choose>
 				
 				<xsl:when test="$relH='margin'">
-					<xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w) - number(ancestor::node()/w:sectPr/w:pgMar/@w:left) - number(ancestor::node()/w:sectPr/w:pgMar/@w:right)"/>
+          <xsl:value-of select="number($pageWidth) - number($marLeft) - number($marRight)"/>
 				</xsl:when>
         <xsl:when test="$relH='right-margin-area' or $relH='inner-margin-area'">
-          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w) - number(ancestor::node()/w:sectPr/w:pgMar/@w:right)"/>
+          <xsl:value-of select="number($pageWidth) - number($marRight)"/>
         </xsl:when>
 
         <xsl:otherwise>
-          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:w)"/>
+          <xsl:value-of select="number($pageWidth)"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="VerticalHeight">
       <xsl:choose>
         <xsl:when test="$relV='bottom-margin-area' or $relV='inner-margin-area'">
-          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:h) - number(ancestor::node()/w:sectPr/w:pgMar/@w:bottom)"/>
+          <xsl:value-of select="number($pageHeight) - number($marBottom)"/>
         </xsl:when>
 
         <xsl:otherwise>
-          <xsl:value-of select="number(ancestor::node()/w:sectPr/w:pgSz/@w:h)"/>
+          <xsl:value-of select="number($pageHeight)"/>
         </xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3472,7 +3684,7 @@
     -->
 		<xsl:if test="name($shape/..)!='v:group'">
       
-      <xsl:variable name="currentSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
+      
       
       <xsl:variable name="posX">
       <xsl:if test="not(contains($shape/@style,'mso-left-percent'))">
@@ -3613,6 +3825,10 @@
                       </xsl:variable>
                       <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
 								</xsl:when>
+                      <!--changed for below of line-->
+                      <xsl:when test="$relV='line'">
+                        <xsl:value-of select="concat(number(substring-before($marginTop,'cm')) * -1,'cm')"/>
+                      </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="$marginTop"></xsl:value-of>
                     </xsl:otherwise>
@@ -3657,6 +3873,10 @@
                   </xsl:variable>
                   <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
                 </xsl:when>
+                  <!--chnaged for below of line-->
+                  <xsl:when test="$relV='line'">
+                    <xsl:value-of select="concat(number(substring-before($marginTop,'cm')) * -1,'cm')"/>
+                  </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="$marginTop"></xsl:value-of>
                 </xsl:otherwise>
@@ -3675,53 +3895,9 @@
       </xsl:if>
 
       
-      <xsl:variable name ="pageWidth">
-        
-        <xsl:choose >
-          <xsl:when test ="$currentSectPr =''" >
-            <xsl:value-of select ="($currentSectPr)/w:pgSz/@w:w"/>
-          </xsl:when>
-          <xsl:otherwise >
-            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      <xsl:variable name ="pageHeight">
-        <xsl:choose >
-          <xsl:when test ="$currentSectPr =''" >
-            <xsl:value-of select ="($currentSectPr)/w:pgSz/@w:h"/>
-          </xsl:when>
-          <xsl:otherwise >
-            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
       
-      <!--<xsl:if test="contains($shape/@style,'mso-left-percent')">-->
-      <xsl:variable name="marTop">
-        <!--<xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:top"/>-->
         
-        <xsl:choose >
-          <xsl:when test ="$currentSectPr =''" >
-            <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:top"/>
-          </xsl:when>
-          <xsl:otherwise >
-            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:top"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      <xsl:variable name="marBottom">
-        <!--<xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:bottom"/>-->
-        
-        <xsl:choose >
-          <xsl:when test ="$currentSectPr =''" >
-            <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:bottom"/>
-          </xsl:when>
-          <xsl:otherwise >
-            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:bottom"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
+       
       <xsl:variable name="relativeHeight">
         <xsl:call-template name="GetShapeProperty">
           <xsl:with-param name="shape" select="$shape"/>
@@ -3767,46 +3943,9 @@
       </xsl:if>
 
 
-      <xsl:variable name="marLeft">
-        <xsl:choose>
-          <xsl:when test ="$currentSectPr =''" >
-            <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:left"/>
-          </xsl:when>
-          <xsl:otherwise >
-            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left"/>
-          </xsl:otherwise>
-        </xsl:choose>
-        <!--<xsl:choose>
-          <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left">
-            --><!--<xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left"/>--><!--
-            <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:left"/>
-          </xsl:when>
-          --><!--<xsl:otherwise>
-          <xsl:value-of select="//w:pgMar/@w:header"/>
-        </xsl:otherwise>--><!--
-        </xsl:choose>-->
-      </xsl:variable>
-      <xsl:variable name="marRight">
-        <xsl:choose>
-        <xsl:when test ="$currentSectPr =''" >
-          <xsl:value-of select ="($currentSectPr)/w:pgMar/@w:right"/>
-        </xsl:when>
-          <xsl:otherwise >
-            <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right"/>
-          </xsl:otherwise>
-        </xsl:choose>
-
+    
         
-        <!--<xsl:choose>
-          <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right">            
-            --><!--<xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right"/>--><!--
-            
-          </xsl:when>
-          --><!--<xsl:otherwise>
-          <xsl:value-of select="//w:pgMar/@w:footer"/>
-        </xsl:otherwise>--><!--
-        </xsl:choose>-->
-      </xsl:variable>
+       
       <xsl:variable name="relativeWidth">
         <xsl:call-template name="GetShapeProperty">
           <xsl:with-param name="shape" select="$shape"/>
@@ -3830,7 +3969,7 @@
               <xsl:value-of select ="(($pageWidth div 1440)-($marRight div 1440)) +($marRight div 1440 * $relativeWidth div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:inner-margin-area')">
-              <xsl:value-of select ="$marLeft div 1440 * ($relativeWidth div 1000) "/>
+              <xsl:value-of select ="(($pageWidth div 1440) -($marRight div 1440)) + $marLeft div 1440 * ($relativeWidth div 1000) "/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:outer-margin-area')">
               <xsl:value-of select ="$marRight div 1440 * ($relativeWidth div 1000)"/>
@@ -3851,7 +3990,7 @@
 			</xsl:if>
       <!--Sona : Rotation Implementation -->
       <xsl:variable name ="shapeTypeId">
-        <xsl:value-of select ="substring-after(@type,'#')"/>
+        <xsl:value-of select ="substring-after($shape/@type,'#')"/>
       </xsl:variable>
       <xsl:variable name ="pathId">
         <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
@@ -4024,7 +4163,11 @@
 						<xsl:text>paragraph</xsl:text>
 					</xsl:when>
           <!-- Sona changed parameter for defect #1844731-->
-					<xsl:when test="(w10:wrap/@anchorx='page' and w10:wrap/@anchory='page') or ($shape/@w:hAnchor='page' and $shape/@w:vAnchor='page')">
+          <!--one more condition added for anchor shape-->
+					<xsl:when test="(w10:wrap/@anchorx='page' and w10:wrap/@anchory='page') 
+          or ($shape/@w:hAnchor='page' and $shape/@w:vAnchor='page')
+          or (contains($shape/@style, 'mso-position-horizontal-relative:char')) 
+          or (contains($shape/@style, 'mso-position-vertical-relative:line'))">
             <xsl:text>char</xsl:text>
 					</xsl:when>
 
@@ -4141,7 +4284,8 @@
 		</xsl:variable>
 
 		<xsl:choose>
-			<xsl:when test="$relativeHeight != ''">
+      <!-- Sona: Change in height code-->
+      <xsl:when test="$relativeHeight != '' and $relativeHeight != 0">
 				<xsl:call-template name="InsertShapeRelativeHeight">
 					<xsl:with-param name="shape" select="$shape"/>
 				</xsl:call-template>
@@ -4168,6 +4312,7 @@
 				<xsl:with-param name="propertyName" select="'mso-height-percent'"/>
 			</xsl:call-template>
 		</xsl:variable>
+    <xsl:variable name="currentSectPrForSize" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
 
 		<xsl:attribute name="style:rel-height">
 			<xsl:value-of select="$relativeHeight div 10"/>
@@ -4179,17 +4324,52 @@
 				<xsl:with-param name="propertyName" select="'mso-height-relative'"/>
 			</xsl:call-template>
 		</xsl:variable>
-    <!-- Chhavi: Implementation of Relative Height-->
+    <!--added to calulate the value of top bottom margin and page width height in case of mirror margin-->
     <xsl:variable name="marTop">
-      <xsl:value-of select="ancestor::node()/w:sectPr//w:pgMar/@w:top"/>
+      <xsl:choose >
+        <xsl:when test ="$currentSectPrForSize =''" >
+          <xsl:value-of select ="($currentSectPrForSize)/w:pgMar/@w:top"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:top"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="marBottom">
-      <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:bottom"/>
+      <xsl:choose >
+        <xsl:when test ="$currentSectPrForSize =''" >
+          <xsl:value-of select ="($currentSectPrForSize)/w:pgMar/@w:bottom"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:bottom"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
+    <xsl:variable name ="pageWidth">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPrForSize =''" >
+          <xsl:value-of select ="($currentSectPrForSize)/w:pgSz/@w:w"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name ="pageHeight">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPrForSize =''" >
+          <xsl:value-of select ="($currentSectPrForSize)/w:pgSz/@w:h"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!--end here-->
     <xsl:variable name ="VarHeight">
       <xsl:choose >
         <xsl:when test ="contains($shape/@style,'mso-height-relative:margin')">
-          <xsl:value-of select ="(ancestor::node()/w:sectPr/w:pgSz/@w:h  - ($marBottom + $marTop)) div 1440 "/>
+          <xsl:value-of select ="($pageHeight  - ($marBottom + $marTop)) div 1440 "/>
         </xsl:when>
         <xsl:when test ="contains($shape/@style,'mso-height-relative:top-margin-area')">
           <xsl:value-of select ="$marTop div 1440 "/>
@@ -4197,14 +4377,16 @@
         <xsl:when test ="contains($shape/@style,'mso-height-relative:bottom-margin-area')">
           <xsl:value-of select ="$marBottom div 1440 "/>
         </xsl:when>
+        <!--changed to calulate relative height in case of inner and outer mar-->
         <xsl:when test ="contains($shape/@style,'mso-height-relative:inner-margin-area')">
           <xsl:value-of select ="$marTop div 1440 "/>
         </xsl:when>
         <xsl:when test ="contains($shape/@style,'mso-height-relative:outer-margin-area')">
-          <xsl:value-of select ="$marBottom div 1440 "/>
+          <xsl:value-of select ="$marTop div 1440 "/>
         </xsl:when>
+        <!--end here-->
         <xsl:otherwise >
-          <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:h div 1440"/>
+          <xsl:value-of select ="$pageHeight div 1440"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -4242,7 +4424,8 @@
 		</xsl:variable>
 
 		<xsl:choose>
-			<xsl:when test="$relativeWidth != ''">
+      <!-- Sona: Change in width code-->
+      <xsl:when test="$relativeWidth != '' and $relativeWidth != 0">
 				<xsl:call-template name="InsertShapeRelativeWidth">
 					<xsl:with-param name="shape" select="$shape"/>
 				</xsl:call-template>
@@ -4284,6 +4467,38 @@
 						</xsl:choose>
 					</xsl:attribute>
 				</xsl:if>
+        <xsl:variable name ="shapeTypeId">
+          <xsl:value-of select ="substring-after($shape/@type,'#')"/>
+        </xsl:variable>
+        <xsl:variable name ="pathId">
+          <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+            <xsl:if test ="position()=1">
+              <xsl:value-of select ="@path"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+        <!-- Sona: wrap and resize-->
+        <xsl:if test ="contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
+                not(contains($shape/@style,'mso-wrap-style:none'))
+                and ($pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox))">
+          <xsl:attribute name="svg:width">
+            <xsl:choose>
+              <xsl:when test="$width = 0 and $shape//@o:hr='t'">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length"
+									  select="following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1]"/>
+                  <xsl:with-param name="unit" select="'cm'"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="ConvertMeasure">
+                  <xsl:with-param name="length" select="$width"/>
+                  <xsl:with-param name="destUnit" select="'cm'"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -4388,6 +4603,7 @@
 				<xsl:with-param name="propertyName" select="'mso-width-percent'"/>
 			</xsl:call-template>
 		</xsl:variable>
+    <xsl:variable name="currentSectPrForWidth" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
 
 		<xsl:attribute name="style:rel-width">
 			<xsl:value-of select="$relativeWidth div 10"/>
@@ -4399,32 +4615,56 @@
 				<xsl:with-param name="propertyName" select="'mso-width-relative'"/>
 			</xsl:call-template>
 		</xsl:variable>
-
-    <!-- Chhavi: Implementation of Relative width-->
+    <!--added to calulate the value of left right margin and page width height in case of mirror margin-->
+    <xsl:variable name ="pageWidth">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPrForWidth =''" >
+          <xsl:value-of select ="($currentSectPrForWidth)/w:pgSz/@w:w"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:w"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name ="pageHeight">
+      <xsl:choose >
+        <xsl:when test ="$currentSectPrForWidth =''" >
+          <xsl:value-of select ="($currentSectPrForWidth)/w:pgSz/@w:h"/>
+        </xsl:when>
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgSz/@w:h"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="marLeft">
       <xsl:choose>
-        <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:left">
-          <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:left"/>
+        <xsl:when test ="$currentSectPrForWidth =''" >
+          <xsl:value-of select ="($currentSectPrForWidth)/w:pgMar/@w:left"/>
         </xsl:when>
-        <!--<xsl:otherwise>
-          <xsl:value-of select="//w:pgMar/@w:header"/>
-        </xsl:otherwise>-->
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:left"/>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="marRight">
       <xsl:choose>
-        <xsl:when test="ancestor::node()/w:sectPr/w:pgMar/@w:right">
-          <xsl:value-of select="ancestor::node()/w:sectPr/w:pgMar/@w:right"/>
+        <xsl:when test ="$currentSectPrForWidth =''" >
+          <xsl:value-of select ="($currentSectPrForWidth)/w:pgMar/@w:right"/>
         </xsl:when>
-        <!--<xsl:otherwise>
-          <xsl:value-of select="//w:pgMar/@w:footer"/>
-        </xsl:otherwise>-->
+        <xsl:otherwise >
+          <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:sectPr/w:pgMar/@w:right"/>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <!--end here-->
+
+
+   
+    
     <xsl:variable name ="VarWidth">
       <xsl:choose >
         <xsl:when test ="contains($shape/@style,'mso-width-relative:margin')">
-          <xsl:value-of select ="(ancestor::node()/w:sectPr/w:pgSz/@w:w  - ($marLeft + $marRight)) div 1440 "/>
+          <xsl:value-of select ="($pageWidth  - ($marLeft + $marRight)) div 1440 "/>
         </xsl:when>
         <xsl:when test ="contains($shape/@style,'mso-width-relative:left-margin-area')">
           <xsl:value-of select ="$marLeft div 1440 "/>
@@ -4432,14 +4672,16 @@
         <xsl:when test ="contains($shape/@style,'mso-width-relative:right-margin-area')">
           <xsl:value-of select ="$marRight div 1440 "/>
         </xsl:when>
+        <!--changed for relative width-->
         <xsl:when test ="contains($shape/@style,'mso-width-relative:inner-margin-area')">
-          <xsl:value-of select ="$marLeft div 1440 "/>
-        </xsl:when>
-        <xsl:when test ="contains($shape/@style,'mso-width-relative:outer-margin-area')">
           <xsl:value-of select ="$marRight div 1440 "/>
         </xsl:when>
+        <xsl:when test ="contains($shape/@style,'mso-width-relative:outer-margin-area')">
+          <xsl:value-of select ="$marLeft div 1440 "/>
+        </xsl:when>
+        <!--end here-->
         <xsl:otherwise >
-          <xsl:value-of select ="ancestor::node()/w:sectPr/w:pgSz/@w:w div 1440"/>
+          <xsl:value-of select ="$pageWidth div 1440"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>

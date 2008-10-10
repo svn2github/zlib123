@@ -962,7 +962,9 @@
 			<!-- document styles -->
 			<office:styles>
 				<!-- Sona: #2014221 and Arrow Feature Continuation-->
-				<xsl:for-each select ="key('Part', 'word/document.xml')/w:document/w:body//v:shape">
+		  <xsl:variable name="vmlElementType" select="v:shape | v:rect | v:line | v:group|v:oval|v:roundrect" />
+		  
+        <xsl:for-each select ="key('Part', 'word/document.xml')/w:document/w:body//node()[name()='v:shape' or name()='v:rect' or name()='v:line' or name()='v:group' or name()='v:oval' or name()='v:roundrect']">
 					<xsl:call-template name="getDashType">
 						<xsl:with-param name="shape" select="." />
 					</xsl:call-template>

@@ -704,14 +704,22 @@
         <xsl:when test="$align = 'absolute' ">
           <xsl:text>from-left</xsl:text>
         </xsl:when>
+        <!--added by chhavi to fix problam related to alignment and absolute position  in case of inner-margin and outer-margin area  -->
+        <xsl:when test ="$relativeFrom='inner-margin-area' and (not($align) or $align ='')   or  $relativeFrom = 'outer-margin-area' and (not($align) or $align ='') ">
+          <xsl:text>from-inside</xsl:text>
+        </xsl:when>
+        <xsl:when test ="$relativeFrom='inner-margin-area' ">
+            <xsl:text>outside</xsl:text>          
+        </xsl:when>
+        <xsl:when test ="$relativeFrom='outer-margin-area' ">
+          <xsl:text>inside</xsl:text>
+        </xsl:when>
+        <!--end here-->
         <xsl:when test="$align and $align != '' ">
           <xsl:value-of select="$align"/>
         </xsl:when>
-        <xsl:when test ="$relativeFrom='inner-margin-area' ">
-            <xsl:text>inside</xsl:text>          
-        </xsl:when>
-        <xsl:when test ="$relativeFrom='outer-margin-area' ">
-          <xsl:text>outside</xsl:text>
+          <xsl:when test ="$relativeFrom='inner-margin-area' or $relativeFrom='outer-margin-area' ">
+            <xsl:text>from-inside</xsl:text>          
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>from-left</xsl:text>
@@ -735,11 +743,11 @@
         <xsl:when test="$relativeFrom ='text'">
           <xsl:text>paragraph</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'left-margin-area' or $relativeFrom = 'outside-margin-area'">
+        <xsl:when test=" $relativeFrom = 'outside-margin-area'">
           <!--<xsl:text>page-start-margin</xsl:text>-->
           <xsl:text>page</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'right-margin-area' or $relativeFrom = 'inside-margin-area'">
+        <xsl:when test=" $relativeFrom = 'inside-margin-area'">
           <!--<xsl:text>page-end-margin</xsl:text>-->
           <xsl:text>page</xsl:text>
         </xsl:when>
@@ -747,22 +755,49 @@
           <xsl:text>char</xsl:text>
         </xsl:when>
         <!-- COMMENT : following values not defined in OOX spec, but used by Word 2007 -->
+        <!--added by chhavi to improve absolute and alignment position-->
         <xsl:when test="$relativeFrom = 'left-margin-area' ">
-          <!--<xsl:text>page-start-margin</xsl:text>-->
+          <xsl:choose>
+            <xsl:when test ="not($hPos) or $hPos =''">
           <xsl:text>page</xsl:text>
+        </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>page-start-margin</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>  
         </xsl:when>
         <xsl:when test="$relativeFrom = 'right-margin-area' ">
-          <!--<xsl:text>page-end-margin</xsl:text>-->
+          <xsl:choose>
+          <xsl:when test ="not($hPos) or $hPos =''">
           <xsl:text>page</xsl:text>
+        </xsl:when>
+            <xsl:otherwise>          
+            <xsl:text>page-end-margin</xsl:text>          
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'inner-margin-area'">
-          <!--<xsl:text>paragraph-end-margin</xsl:text>-->
+          <xsl:choose>
+            <xsl:when test ="not($hPos) or $hPos =''">
           <xsl:text>page</xsl:text>
+        </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>page-end-margin</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+         
         </xsl:when>
         <xsl:when test="$relativeFrom = 'outer-margin-area'">
-          <!--<xsl:text>paragraph-start-margin</xsl:text>-->
+          <xsl:choose>
+            <xsl:when test ="not($hPos) or $hPos =''">
           <xsl:text>page</xsl:text>
         </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>page-start-margin</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <!--end here-->
         <xsl:when test="$relativeFrom=''">
           <!-- 
           if no relation is set, Word uses default values, 
@@ -811,8 +846,9 @@
               <xsl:text>bottom</xsl:text>
             </xsl:when>
             <!--default rules-->
+            <!--changed by chhavi top to from-top-->
             <xsl:when test="$align = 'top' ">
-              <xsl:text>top</xsl:text>
+              <xsl:text>from-top</xsl:text>
             </xsl:when>
             <xsl:when test="$align = 'center' ">
               <xsl:text>middle</xsl:text>
