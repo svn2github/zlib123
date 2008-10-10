@@ -1071,7 +1071,7 @@
     <xsl:choose>
       
       <!-- TOC hyperlink -->
-      <xsl:when test="ancestor::text:index-body and position() = 1">
+      <xsl:when test="name(../..) = 'text:index-body'">
         
         <!--
         makz: new TOC Hyperlink Conversion

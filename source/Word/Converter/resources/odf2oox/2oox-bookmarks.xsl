@@ -253,7 +253,7 @@
                 For normal headers:
                 Try to find the TOC link that matches my outline level and my raw text
                 -->
-                <xsl:variable name="myText" select="string(child::node()[1])" />
+                <xsl:variable name="myText" select="string(.)" />
                 <xsl:variable name="myOutlineLevel" select="number(@text:outline-level)" />
                 <xsl:for-each select="$myToc/text:index-body/text:p">
                   <!--
@@ -285,7 +285,7 @@
                 For list headers:
                 Try to find the TOC link that references my text!
                 -->
-                <xsl:variable name="myText" select="string(text:h/child::node()[1])" />
+                <xsl:variable name="myText" select="string(text:h)" />
                 <xsl:for-each select="$myToc/text:index-body/text:p">
                   <!--
                   Determine the text out of the href
