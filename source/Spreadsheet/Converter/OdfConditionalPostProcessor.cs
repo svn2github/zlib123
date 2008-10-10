@@ -401,6 +401,31 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     strOdfCellRef = "'" + strOdfCellRef.Replace("!", "'!");
                 }                
                 
+
+                if (strOdfCellRef.Contains(":"))
+                {
+                    int intRngSeparator = strOdfCellRef.IndexOf(':');
+                    if (strOdfCellRef.Substring(0, intRngSeparator).Contains("!") && strOdfCellRef.Substring(intRngSeparator).Contains("!"))
+                    { 
+                        string strSheetRefFrm = strOdfCellRef.Substring(0, intRngSeparator);
+                        string strSheetRefTo = strOdfCellRef.Substring(intRngSeparator+1);
+
+                        string strFrmRef = strSheetRefFrm.Substring(strSheetRefFrm.IndexOf('!') + 1);
+                        strSheetRefFrm = strSheetRefFrm.Substring(0, strSheetRefFrm.IndexOf('!') - 1);
+                        string strToRef = strSheetRefTo.Substring(strSheetRefTo.IndexOf('!') + 1);
+                        strSheetRefTo = strSheetRefTo.Substring(0, strSheetRefTo.IndexOf('!'));
+
+                        if(strFrmRef == strToRef)
+                        {
+                            strOdfCellRef = strSheetRefFrm + ":" + strSheetRefTo + "!" + strFrmRef;
+                        }
+                        else
+                        {
+                            strOdfCellRef = strSheetRefFrm + ":" + strSheetRefTo + "!" + strFrmRef + ":" + strToRef;
+                        }
+                    }
+                }
+
                 return strOdfCellRef;
             }
         }
