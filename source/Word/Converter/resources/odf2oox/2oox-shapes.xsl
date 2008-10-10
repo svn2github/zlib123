@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -1455,7 +1455,7 @@
 		<xsl:param name="shapeStyle"/>
 		<xsl:param name="shape" />
 
-		<v:rect>
+		<v:rect id="_x0000_s1026">
 
 			<xsl:call-template name="ConvertShapeProperties">
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -1482,7 +1482,7 @@
 		<xsl:param name="shapeStyle"/>
 		<xsl:param name="shape" />
 
-		<v:roundrect>
+    <v:roundrect id="_x0000_s1032">
 
 			<xsl:call-template name="ConvertShapeProperties">
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -1510,7 +1510,7 @@
 		<xsl:param name="shapeStyle"/>
 		<xsl:param name="shape" />
 
-		<v:oval>
+    <v:oval id="_x0000_s1037">
 
 			<xsl:call-template name="ConvertShapeProperties">
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -1592,7 +1592,7 @@
 			<xsl:variable name="frameW">
 				<xsl:call-template name="point-measure">
           <!-- Sona: Defect #2019374-->
-          <xsl:with-param name="length" select="$shape/@svg:width|$shape/@fo:min-width"/>
+          <xsl:with-param name="length" select="$shape/@svg:width|$shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
@@ -1601,7 +1601,7 @@
 			<xsl:variable name="frameH">
 				<xsl:call-template name="point-measure">
           <!-- Sona: Defect #2019374-->
-          <xsl:with-param name="length" select="$shape/@fo:min-height|$shape/@svg:height"/>
+          <xsl:with-param name="length" select="$shape/child::node()/@fo:min-height|$shape/@svg:height|$shapeStyle/style:graphic-properties/@fo:min-height"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
@@ -1691,10 +1691,20 @@
 	  <xsl:param name="shape"/>
 
 		<xsl:variable name="fillColor">
+      <xsl:choose>
+        <xsl:when test="not($shapeStyle/style:graphic-properties/@draw:fill-color)">
+          <xsl:call-template name="GetDrawnGraphicProperties">
+            <xsl:with-param name="attrib">fo:background-color</xsl:with-param>
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
 			<xsl:call-template name="GetDrawnGraphicProperties">
 				<xsl:with-param name="attrib">draw:fill-color</xsl:with-param>
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 			</xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="fillProperty">
 			<xsl:call-template name="GetGraphicProperties">
@@ -1837,7 +1847,18 @@
 		</xsl:variable>
 		<xsl:variable name="strokeWeight">
 			<xsl:call-template name="GetDrawnGraphicProperties">
-				<xsl:with-param name="attrib">svg:stroke-width</xsl:with-param>
+				<!--code changed by yeswanth.s : to get width of rect & frame-->
+				<!--<xsl:with-param name="attrib">svg:stroke-width</xsl:with-param>-->				
+				<xsl:with-param name="attrib">
+					<xsl:choose>
+						<xsl:when test="name(parent::node()) = 'draw:frame'">
+							<xsl:value-of select="'fo:border'"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'svg:stroke-width'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>				
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 			</xsl:call-template>
 		</xsl:variable>
@@ -1845,7 +1866,18 @@
 		<!-- Sona Bug fix 1835088 -->
 		<xsl:variable name="shapeBorder">
 			<xsl:call-template name="GetDrawnGraphicProperties">
-				<xsl:with-param name="attrib">draw:stroke</xsl:with-param>
+                                <!--changes made by yeswanth.s-->
+				<xsl:with-param name="attrib">
+					<xsl:choose>
+						<xsl:when test="name(parent::node()) = 'draw:frame'">
+							<xsl:value-of select="'fo:border'"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'draw:stroke'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
+                                <!--end-->
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 			</xsl:call-template>
 		</xsl:variable>
@@ -2197,6 +2229,42 @@
 	<xsl:template name="GetLineStroke">
 		<xsl:param name ="shapeStyle"></xsl:param>
 		<v:stroke>
+			<!--code added by yeswanth.s : 'linestyle' in DOCX-->
+			<xsl:variable name="styleBorderLine">
+				<xsl:call-template name="GetGraphicProperties">
+					<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+					<xsl:with-param name="attribName">style:border-line-width</xsl:with-param>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:if test="$styleBorderLine != ''">
+				<xsl:attribute name="linestyle">
+					<xsl:choose>
+						<xsl:when test="$styleBorderLine">
+
+							<xsl:variable name="innerLineWidth">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="substring-before($styleBorderLine,' ' )"/>
+								</xsl:call-template>
+							</xsl:variable>
+
+							<xsl:variable name="outerLineWidth">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length"
+									  select="substring-after(substring-after($styleBorderLine,' ' ),' ' )"/>
+								</xsl:call-template>
+							</xsl:variable>
+
+							<xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
+							<xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
+							<xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+
+						</xsl:when>
+					</xsl:choose>
+				</xsl:attribute>
+			</xsl:if>
+
+			<!--end-->
+			
 			<!--Dash Styles-->
 			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:stroke!='' and $shapeStyle/style:graphic-properties/@draw:stroke!='none'">
 				<xsl:variable name="drawStrokeDash" select="$shapeStyle/style:graphic-properties/@draw:stroke-dash"></xsl:variable>
@@ -2252,7 +2320,8 @@
 
 			<!--Arrow Styles-->
 			<!-- Start Arrow-->
-			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-start">
+      <!-- Sonata: Defect #2151408-->
+			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-start and $shapeStyle/style:graphic-properties/@draw:marker-start !=''">
 				<xsl:variable name ="drawArrowTypeStart" select="$shapeStyle/style:graphic-properties/@draw:marker-start"></xsl:variable>
 				<xsl:variable name ="startArrow" select ="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeStart]"></xsl:variable>
 				<xsl:attribute name ="startarrow">
@@ -2278,7 +2347,8 @@
             </xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
-				<xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-start-width">
+        <!-- Sonata: Defect #2151408-->
+        <xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-start-width and $shapeStyle/style:graphic-properties/@draw:marker-start-width !=''">
 					<xsl:variable name="Unit">
 						<xsl:call-template name="GetUnit">
 							<xsl:with-param name="length" select="$shapeStyle/style:graphic-properties/@draw:marker-start-width"/>
@@ -2291,7 +2361,8 @@
 				</xsl:if>
 			</xsl:if>
 			<!-- End Arrow-->
-			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-end">
+      <!-- Sonata: Defect #2151408-->
+			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:marker-end and $shapeStyle/style:graphic-properties/@draw:marker-end !=''">
 				<xsl:variable name ="drawArrowTypeEnd" select="$shapeStyle/style:graphic-properties/@draw:marker-end"></xsl:variable>
 				<xsl:variable name ="endArrow" select ="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$drawArrowTypeEnd]"></xsl:variable>
 				<xsl:attribute name ="endarrow">
@@ -2317,7 +2388,8 @@
             </xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
-				<xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-end-width">
+        <!-- Sonata: Defect #2151408-->
+				<xsl:if test ="$shapeStyle/style:graphic-properties/@draw:marker-end-width and $shapeStyle/style:graphic-properties/@draw:marker-end-width !=''">
 					<xsl:variable name="Unit">
 						<xsl:call-template name="GetUnit">
 							<xsl:with-param name="length" select="$shapeStyle/style:graphic-properties/@draw:marker-end-width"/>

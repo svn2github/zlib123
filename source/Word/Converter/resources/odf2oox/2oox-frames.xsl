@@ -923,13 +923,32 @@
 
     <!-- wrapping of text (horizontal adjustment) -->
     <!-- Sona: wrap text styles-->
-    <xsl:if test="$frameStyle/style:graphic-properties/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-height or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true' or not($frameStyle/style:graphic-properties/@fo:wrap-option)">
-      <!--
+    <!--<xsl:if test="($frameStyle/style:graphic-properties/@fo:min-width and substring-before($frameStyle/style:graphic-properties/@fo:min-width,$unit) != '0') or 
+            ($frameStyle/style:graphic-properties/@fo:min-height and substring-before($frameStyle/style:graphic-properties/@fo:min-width,$unit1) != '0') or 
+            $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true' or 
+            not($frameStyle/style:graphic-properties/@fo:wrap-option)">
+      --><!--
       makz: was uncommented in r2655 by rebet
       I commented it in for bugfix 1827515
-      -->
+      --><!--            
       <xsl:text>mso-wrap-style:none;</xsl:text>
-    </xsl:if>
+    </xsl:if>-->
+    <xsl:choose>
+      <xsl:when test ="($frameStyle/style:graphic-properties/@fo:min-width and $frameStyle/style:graphic-properties/@fo:min-height) 
+                or ($frameStyle/style:graphic-properties/@fo:min-width and $frame/child::node()/@fo:min-height)                
+                or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'">
+        <xsl:text>mso-wrap-style:none;</xsl:text>
+      </xsl:when>
+      <xsl:when test ="@fo:min-height and parent::draw:frame/@fo:min-width">
+        <xsl:text>mso-wrap-style:none;</xsl:text>
+      </xsl:when>
+      <xsl:when test ="not($frameStyle/style:graphic-properties/@fo:wrap-option) and not(self::node()[name()='draw:frame']) and not(parent::node()[name()='draw:frame'])">
+        <xsl:text>mso-wrap-style:none;</xsl:text>
+      </xsl:when>
+      <xsl:when test ="not($frameStyle/@style:parent-style-name) and (self::node()[name()='draw:frame'] or parent::node()[name()='draw:frame'])">
+      <xsl:text>mso-wrap-style:none;</xsl:text>
+      </xsl:when>
+    </xsl:choose>
 
     <!--text-box spacing/margins -->
     <xsl:variable name="marginL">
@@ -1201,6 +1220,52 @@
   <xsl:template name="FrameToShapeShadow">
     <xsl:param name="frameStyle"/>
     <!-- Sona: Shadow implementation-->
+    <xsl:variable name="shadowForFrame">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="attribName">style:shadow</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$shadowForFrame != ''  and $shadowForFrame != 'none' ">
+        <v:shadow on="t">
+          <xsl:if test="substring-before($shadowForFrame, ' ') != 'none' ">
+            <xsl:attribute name="color">
+              <xsl:value-of select="substring-before($shadowForFrame, ' ')"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:variable name="firstShadow">
+            <xsl:value-of select=" substring-before(substring-after($shadowForFrame, ' '), ' ')"/>
+          </xsl:variable>
+          <xsl:variable name="secondShadow">
+            <xsl:value-of select=" substring-after(substring-after($shadowForFrame, ' '), ' ')"/>
+          </xsl:variable>
+          <xsl:if test="$firstShadow != '' and $secondShadow != '' ">
+            <xsl:attribute name="offset">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="$firstShadow"/>
+              </xsl:call-template>
+              <xsl:text>pt,</xsl:text>
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="$secondShadow"/>
+              </xsl:call-template>
+              <xsl:text>pt</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+          <!--dialogika, clam: bugfix #1826917-->
+          <xsl:variable name="transparency">
+            <xsl:call-template name="GetGraphicProperties">
+              <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+              <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:if test="$transparency = '100%'">
+            <xsl:attribute name="obscured">true</xsl:attribute>
+          </xsl:if>
+        </v:shadow>
+      </xsl:when>
+      <xsl:otherwise>
     <xsl:variable name="shadow">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$frameStyle"/>
@@ -1267,7 +1332,8 @@
         </xsl:if>
       </v:shadow>
     </xsl:if>
-
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 
@@ -1338,8 +1404,8 @@
         makz: generally it's not possible to find a perfect value for a dynamic wrap.
         But I think topAndBottom is in the most cases a better solution than square
         -->
-        <w10:wrap type="topAndBottom"/>
-        <!--<w10:wrap type="square" side="largest"/>-->
+        <!--<w10:wrap type="topAndBottom"/>-->
+        <w10:wrap type="square" side="largest"/>
       </xsl:when>
     </xsl:choose>
 
@@ -1371,15 +1437,17 @@
             <xsl:when test="$frame/@svg:width='0' and $frame/@svg:height='0'">
               <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
             </xsl:when>
-            <xsl:when test="$frameStyle/@style:parent-style-name">
-              <xsl:if test="@fo:min-height or parent::draw:frame/@fo:min-width
+            <!-- @fo:min-height or (@fo:min-height and parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width)
+                  or -->
+            <xsl:when test="$frameStyle/@style:parent-style-name or parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
+              <xsl:if test="@fo:min-height or (@fo:min-height and (parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width))
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
               </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:if test="not(parent::node()='draw:frame') 
+              <xsl:if test="not(parent::node()[name()='draw:frame']) and not(self::node()[name()='draw:frame'])
                 and (not($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
                        and $frameStyle/style:graphic-properties/@draw:auto-grow-width
                 or not($frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">
@@ -1413,6 +1481,9 @@
               >translation.odf2oox.textOrientationInsideTextbox</xsl:message>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:if>
+        <xsl:if test ="not(contains(parent::draw:frame/@draw:transform,'rotate')) and $frameStyle/style:graphic-properties/@style:writing-mode='tb-rl'">
+          <xsl:text>layout-flow:vertical;</xsl:text>
         </xsl:if>
       </xsl:attribute>
 
