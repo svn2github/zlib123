@@ -59,7 +59,8 @@
 						<File Name="$(var.OdfPowerPointAddin.TargetFileName)" Source="$(var.OdfPowerPointAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
 					</Component>
 					<Component Id="OdfPowerPointAddinShim.dll" Guid="C9DB8740-1EF4-4B2E-B2ED-E85D22329667">
-						<File Name="OdfPowerPointAddinShim.dll" Source="..\Presentation\OdfPowerPointAddinShim\$(var.Configuration)\OdfPowerPointAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+						<!--<File Name="OdfPowerPointAddinShim.dll" Source="..\Presentation\OdfPowerPointAddinShim\$(var.Configuration)\OdfPowerPointAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
+						<File Name="OdfPowerPointAddinShim.dll" Source="..\..\lib\OdfPowerPointAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
 							<Class Id="7F459B4C-65F0-4D44-BB27-66C5FD3CA151" Context="InprocServer32" Description="OdfPowerPointAddin.Connect" ThreadingModel="apartment">
 								<ProgId Id="OdfPowerPointAddin.Connect" Description="Connect Class" />
 							</Class>
@@ -70,7 +71,8 @@
 						<File Name="$(var.OdfExcelAddin.TargetFileName)" Source="$(var.OdfExcelAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
 					</Component>
 					<Component Id="OdfExcelAddinShim.dll" Guid="4BD5EA03-B96C-4D82-A850-105D25895C12">
-						<File Name="OdfExcelAddinShim.dll" Source="..\Spreadsheet\OdfExcelAddinShim\$(var.Configuration)\OdfExcelAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+						<!--<File Name="OdfExcelAddinShim.dll" Source="..\Spreadsheet\OdfExcelAddinShim\$(var.Configuration)\OdfExcelAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
+						<File Name="OdfExcelAddinShim.dll" Source="..\..\lib\OdfExcelAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
 							<Class Id="E00C9EBB-F140-4E6F-8C7B-EED19AE33AEA" Context="InprocServer32" Description="OdfExcelAddin.Connect" ThreadingModel="apartment">
 								<ProgId Id="OdfExcelAddin.Connect" Description="Connect Class" />
 							</Class>
@@ -81,7 +83,8 @@
 						<File Name="$(var.OdfWordAddin.TargetFileName)" Source="$(var.OdfWordAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
 					</Component>
 					<Component Id="OdfWordAddinShim.dll" Guid="B21B741D-13DF-48F4-8D18-3A039F3D71E7">
-						<File Name="OdfWordAddinShim.dll" Source="..\Word\OdfWordAddinShim\$(var.Configuration)\OdfWordAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+						<!--<File Name="OdfWordAddinShim.dll" Source="..\Word\OdfWordAddinShim\$(var.Configuration)\OdfWordAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
+						<File Name="OdfWordAddinShim.dll" Source="..\..\lib\OdfWordAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">
 							<Class Id="F474D30D-3450-423E-AE62-BD3307544E86" Context="InprocServer32" Description="OdfWordAddin.Connect" ThreadingModel="apartment">
 								<ProgId Id="OdfWordAddin.Connect" Description="Connect Class" />
 							</Class>
@@ -230,7 +233,6 @@
 
 					<!-- ODF-compatible Templates -->
 					<Directory Id="Templates" Name="Templates">
-						<!-- TODO Localize templates.xml + RegKey -->
 						<Component Id="Templates2007" Guid="58DEE7A9-FDC9-4E8D-B031-B13B3ED18706">
 							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
 							<File Id="templates.xml" Name="templates.xml" Source="$(var.SolutionDir)Word\Templates\templates.xml" DiskId="1" KeyPath="yes" />
@@ -328,12 +330,11 @@
 										  Action="create" File="[#templates.xml]" Value="[#ODFReportBig.png]" Name="source" Node="value" On="install"/>
 						</Component>
 
-
 						<Component Id="RegistryTemplates2007" Guid="7F9FC371-F8EC-4887-9890-261B52235575" DiskId="1">
 							<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
 							<RegistryKey Id="RegTemplates2007"
 										 Root="HKCU"
-										 Key="Software\Microsoft\Office\12.0\Common\Spotlight\Providers\ODF-compatible Templates"
+										 Key="Software\Microsoft\Office\12.0\Common\Spotlight\Providers\!(loc.FeatureNameTemplates)"
 										 Action="createAndRemoveOnUninstall">
 								<RegistryValue Type="string" Name="ServiceURL" Value="[#templates.xml]" KeyPath="yes"/>
 							</RegistryKey>
@@ -344,7 +345,7 @@
 
 			<!--  Word template folder  -->
 			<Directory Id="ODFTEMPLATEFOLDER" Name="Templates">
-				<Directory Id="OdfTemplates" Name="ODF-compatible Templates">
+				<Directory Id="OdfTemplates" Name="!(loc.FeatureNameTemplates)">
 					<Component Id="ODFFax.dotx" Guid="54432E95-2C89-4992-A204-0E8CA8DC47DD">
 						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
 						<File Id="ODFFax.dotx" Name="ODFFax.dotx" Source="$(var.SolutionDir)Word\Templates\ODFFax.dotx" DiskId="1" KeyPath="yes" />
@@ -386,8 +387,7 @@
                  REGISTRY SETTINGS
                  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 			<Component Id="RegistryTemplates" Guid="405AEA6C-4BF0-4269-9DB5-25792EFF406E" DiskId="1">
-				<!-- HKMU means that the key will be created below HKCU 
-					 (Templates are only installed for the current user  -->
+				<!-- Templates will be installed for the current user only -->
 				<RegistryKey Id="RegOptionsTemplatesInstalled"
 							 Root="HKCU"
 							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Word"
@@ -405,7 +405,6 @@
 				  Key="SOFTWARE\Microsoft\Office\Word\Addins\OdfWordAddin.Connect"
 				  Action="createAndRemoveOnUninstall">
 
-					<RegistryValue Id="RegDefaultAddinMachineWord"      Type="string" Value="Default Value"/>
 					<RegistryValue Id="RegLoadBehaviorAddinMachineWord" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
 					<RegistryValue Id="RegFriendlyNameAddinMachineWord" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
 					<RegistryValue Id="RegVersionAddinMachineWord"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
@@ -430,7 +429,6 @@
 				  Key="SOFTWARE\Microsoft\Office\Excel\Addins\OdfExcelAddin.Connect"
 				  Action="createAndRemoveOnUninstall">
 
-					<RegistryValue Id="RegDefaultAddinMachineExcel"      Type="string" Value="Default Value"/>
 					<RegistryValue Id="RegLoadBehaviorAddinMachineExcel" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
 					<RegistryValue Id="RegFriendlyNameAddinMachineExcel" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
 					<RegistryValue Id="RegVersionAddinMachineExcel"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
@@ -455,7 +453,6 @@
 				  Key="SOFTWARE\Microsoft\Office\PowerPoint\Addins\OdfPowerPointAddin.Connect"
 				  Action="createAndRemoveOnUninstall">
 
-					<RegistryValue Id="RegDefaultAddinMachinePowerPoint"      Type="string" Value="Default Value"/>
 					<RegistryValue Id="RegLoadBehaviorAddinMachinePowerPoint" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
 					<RegistryValue Id="RegFriendlyNameAddinMachinePowerPoint" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
 					<RegistryValue Id="RegVersionAddinMachinePowerPoint"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
@@ -471,33 +468,45 @@
 
 			</Component>
 
-			<Component Id="RegistryEntryContextMenuOdt" Guid="4BA5BA24-4F65-4BDF-99EB-CB4B947F31A9" DiskId="1">
-				<RegistryKey Id="RegKeyOdtContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
-							 Key="openDocument.WriterDocument.1\shell\!(loc.OpenWithWord)\Command">
-					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" KeyPath="yes"/>
-				</RegistryKey>
-			</Component>
-
-			<Component Id="RegistryEntryContextMenuOds" Guid="E0193721-BBB3-4358-BA53-EB77C614FC78" DiskId="1">
-				<RegistryKey Id="RegKeyOdsContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
-							 Key="openDocument.CalcDocument.1\shell\!(loc.OpenWithExcel)\Command">
-					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" KeyPath="yes"/>
-				</RegistryKey>
-			</Component>
-
-			<Component Id="RegistryEntryContextMenuOdp" Guid="1A9888DA-AA6E-4DA1-9A7F-1FADB7182262" DiskId="1">
-				<RegistryKey Id="RegKeyOdpContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
-							 Key="openDocument.ImpressDocument.1\shell\!(loc.OpenWithPowerPoint)\Command">
-					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" KeyPath="yes"/>
-				</RegistryKey>
-			</Component>
-
 			<!-- FIX for ALLUSERS setup and KB908002 -->
 			<Component Id="RegistryFixKB908002" Guid="C09D7EB0-EDA2-4DA0-A75D-C93E03B4111C" DiskId="1">
 				<Condition><![CDATA[ ALLUSERS=1 AND (WORD2002INSTALLROOT OR EXCEL2002INSTALLROOT OR POWERPOINT2002INSTALLROOT) ]]></Condition>
 				<RegistryKey Id="RegKeyFixKB908002" Root="HKCR" Action="create"
 							 Key="Interface\{000C0601-0000-0000-C000-000000000046}">
 					<RegistryValue Type="string" Value="IDummyOleComponentManager" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
+
+			<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                 CONTEXT MENU ENTRIES
+                 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+			<Component Id="RegistryEntryContextMenuOdt" Guid="4BA5BA24-4F65-4BDF-99EB-CB4B947F31A9" DiskId="1" KeyPath="yes">
+				<RegistryKey Id="RegKeyOdt" Root="HKCR" Action="create" Key=".odt">
+					<RegistryValue Type="string" Value="openDocument.WriterDocument.1" />
+				</RegistryKey>
+				<RegistryKey Id="RegKeyOdtContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
+							 Key="openDocument.WriterDocument.1\shell\!(loc.OpenWithWord)\Command">
+					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" />
+				</RegistryKey>
+			</Component>
+
+			<Component Id="RegistryEntryContextMenuOds" Guid="E0193721-BBB3-4358-BA53-EB77C614FC78" DiskId="1" KeyPath="yes">
+				<RegistryKey Id="RegKeyOds" Root="HKCR" Action="create" Key=".ods">
+					<RegistryValue Type="string" Value="openDocument.CalcDocument.1" />
+				</RegistryKey>
+				<RegistryKey Id="RegKeyOdsContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
+							 Key="openDocument.CalcDocument.1\shell\!(loc.OpenWithExcel)\Command">
+					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" />
+				</RegistryKey>
+			</Component>
+
+			<Component Id="RegistryEntryContextMenuOdp" Guid="1A9888DA-AA6E-4DA1-9A7F-1FADB7182262" DiskId="1" KeyPath="yes">
+				<RegistryKey Id="RegKeyOdp" Root="HKCR" Action="create" Key=".odp">
+					<RegistryValue Type="string" Value="openDocument.ImpressDocument.1" />
+				</RegistryKey>
+				<RegistryKey Id="RegKeyOdpContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
+							 Key="openDocument.ImpressDocument.1\shell\!(loc.OpenWithPowerPoint)\Command">
+					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" />
 				</RegistryKey>
 			</Component>
 
@@ -530,6 +539,7 @@
 					</Extension>
 				</ProgId>
 			</Component>
+
 		</Directory>
 
 	</Fragment>

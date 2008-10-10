@@ -179,7 +179,7 @@
     <PostBuildEvent>echo $(ProjectDir)..\..\signing\sign.bat $(TargetDir)$(TargetName).en-US$(TargetExt)
 $(ProjectDir)..\..\signing\sign.bat $(TargetDir)$(TargetName).en-US$(TargetExt)
 echo IExpress /N ..\..\..\OdfAddInForOfficeSetup.en-US.sed
-IExpress /N ..\..\..\OdfAddInForOfficeSetup.en-US.sed
+IExpress /Q /N ..\..\..\OdfAddInForOfficeSetup.en-US.sed
 echo $(ProjectDir)..\..\signing\sign.bat $(TargetDir)\OdfAddInForOfficeSetup-en.exe
 $(ProjectDir)..\..\signing\sign.bat $(TargetDir)\OdfAddInForOfficeSetup-en.exe</PostBuildEvent>
   </PropertyGroup>

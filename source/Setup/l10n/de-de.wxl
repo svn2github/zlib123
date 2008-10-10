@@ -43,6 +43,7 @@
 	<String Id="FileTypeOds">OpenDocument Tabellendokument</String>
 	<String Id="FileTypeOdp">OpenDocument Präsentation</String>
 
+	<String Id="TemplateTitle">ODF-kompatible Vorlagen</String>
 	<String Id="TemplateTitleODFFax">ODF-kompatibles Fax</String>
 	<String Id="TemplateTitleODFLetter">ODF-kompatibler Brief</String>
 	<String Id="TemplateTitleODFMemo">ODF-kompatibles Memo</String>

@@ -254,7 +254,7 @@
 	<String Id="ProgressDlgProgressBar" Overridable="yes">Progress done</String>
 	<String Id="ProgressDlgStatusLabel" Overridable="yes">Status:</String>
 
-	<String Id="ResumeDlg_Title" Overridable="yes">[ProductName] Setup</String>
+	<String Id="ResumeDlgTitle" Overridable="yes">[ProductName] Setup</String>
 	<String Id="ResumeDlgInstall" Overridable="yes">&amp;Install</String>
 	<String Id="ResumeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
 	<String Id="ResumeDlgDescription" Overridable="yes">The Setup Wizard will complete the installation of [ProductName] on your computer. Click Install to continue or Cancel to exit the Setup Wizard.</String>

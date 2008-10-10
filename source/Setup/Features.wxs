@@ -91,8 +91,13 @@
 			<ComponentRef Id="zh_CHS_OdfWordAddin.resources.dll"/>
 		</FeatureGroup>
 
-		<Feature Id="WORDADDIN" Title="ODF Add-in for Microsoft Word" Level="1" ConfigurableDirectory="INSTALLDIR"
-				 Description='Installs and registers the ODF Add-in for Microsoft Word.' Display='expand' AllowAdvertise='no'>
+		<Feature Id="WORDADDIN" 
+				 Title="!(loc.FeatureNameWordAddin)" 
+				 Level="1" 
+				 ConfigurableDirectory="INSTALLDIR"
+				 Description='!(loc.FeatureDescriptionWordAddin)' 
+				 Display='expand' 
+				 AllowAdvertise='no'>
 			<FeatureGroupRef Id="Assemblies"/>
 
 			<ComponentRef Id="Readme"/>
@@ -103,8 +108,11 @@
 
 			<ComponentRef Id="RegistryFixKB908002"/>
 
-			<Feature Id="TEMPLATES" Title="ODF-compatible Templates" Level="1" ConfigurableDirectory="ODFTEMPLATEFOLDER"
-					 Description="Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user."
+			<Feature Id="TEMPLATES" 
+					 Title="!(loc.FeatureNameTemplates)" 
+					 Level="1" 
+					 ConfigurableDirectory="ODFTEMPLATEFOLDER"
+					 Description="!(loc.FeatureDescriptionTemplates)"
 					 AllowAdvertise='no' 
 					 TypicalDefault='install' 
 					 InstallDefault='followParent'>
@@ -135,9 +143,11 @@
 			</Feature>
 		</Feature>
 
-		<Feature Id="EXCELADDIN" Title="ODF Add-in for Microsoft Excel"
-				 Level="1" ConfigurableDirectory='INSTALLDIR'
-				 Description='Installs and registers the ODF Add-in for Microsoft Excel.'
+		<Feature Id="EXCELADDIN" 
+				 Title="!(loc.FeatureNameExcelAddin)"
+				 Level="1" 
+				 ConfigurableDirectory='INSTALLDIR'
+				 Description='!(loc.FeatureDescriptionExcelAddin)'
 				 AllowAdvertise='no'
 				 TypicalDefault='install'>
 			<FeatureGroupRef Id="Assemblies"/>
@@ -152,9 +162,11 @@
 
 		</Feature>
 
-		<Feature Id="POWERPOINTADDIN" Title="ODF Add-in for Microsoft PowerPoint"
-				 Level="1" ConfigurableDirectory='INSTALLDIR'
-				 Description='Installs and registers the ODF Add-in for Microsoft PowerPoint.'
+		<Feature Id="POWERPOINTADDIN" 
+				 Title="!(loc.FeatureNamePowerPointAddin)"
+				 Level="1" 
+				 ConfigurableDirectory='INSTALLDIR'
+				 Description='!(loc.FeatureDescriptionPowerPointAddin)'
 				 AllowAdvertise='no'
 				 TypicalDefault='install'>
 			<FeatureGroupRef Id="Assemblies"/>

@@ -43,6 +43,16 @@
 	<String Id="FileTypeOds">OpenDocument Spreadsheet</String>
 	<String Id="FileTypeOdp">OpenDocument Presentation</String>
 
+	<String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
+	<String Id="FeatureNameTemplates">ODF-compatible templates</String>
+	<String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
+	<String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
+	
+	<String Id="FeatureDescriptionWordAddin">Installs and registers the ODF Add-in for Microsoft Word.</String>
+	<String Id="FeatureDescriptionTemplates">Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user.</String>
+	<String Id="FeatureDescriptionExcelAddin">Installs and registers the ODF Add-in for Microsoft Excel.</String>
+	<String Id="FeatureDescriptionPowerPointAddin">Installs and registers the ODF Add-in for Microsoft PowerPoint.</String>
+	
 	<String Id="TemplateTitleODFFax">ODF-compatible fax</String>
 	<String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
 	<String Id="TemplateTitleODFMemo">ODF-compatible memo</String>

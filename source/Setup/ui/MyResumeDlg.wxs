@@ -30,7 +30,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Fragment>
 		<UI>
-			<Dialog Id="MyResumeDlg" Width="370" Height="270" Title="!(loc.ResumeDlg_Title)">
+			<Dialog Id="MyResumeDlg" Width="370" Height="270" Title="!(loc.ResumeDlgTitle)">
 				<Control Id="Install" Type="PushButton" ElevationShield="yes" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.ResumeDlgInstall)" Hidden="yes">
 					<Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg">CostingComplete = 1</Publish>
 					<Publish Event="EndDialog" Value="Return"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
