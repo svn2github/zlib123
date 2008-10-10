@@ -415,6 +415,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         string strToRef = strSheetRefTo.Substring(strSheetRefTo.IndexOf('!') + 1);
                         strSheetRefTo = strSheetRefTo.Substring(0, strSheetRefTo.IndexOf('!'));
 
+                        if (strSheetRefTo.StartsWith("'"))
+                        {
+                            strSheetRefTo = strSheetRefTo.Remove(0, 1);
+                        }
+
                         if(strFrmRef == strToRef)
                         {
                             strOdfCellRef = strSheetRefFrm + ":" + strSheetRefTo + "!" + strFrmRef;
