@@ -1390,7 +1390,7 @@
 									<xsl:when test="./v:textbox">
 										<draw:frame draw:name="Frame1">
 											<xsl:attribute name="draw:style-name">
-												<xsl:value-of select="@id"/>
+												<xsl:value-of select="concat(@id,generate-id(./parent::node()))"/>
 											</xsl:attribute>
 											<xsl:call-template name="InsertAnchorType"/>
 											<xsl:call-template name="InsertShapeWidth"/>
@@ -1408,7 +1408,7 @@
 									<xsl:otherwise>
 								<draw:rect>
 									<xsl:attribute name="draw:style-name">
-										<xsl:value-of select="parent::node()/v:rect/@id"/>
+										<xsl:value-of select="concat(parent::node()/v:rect/@id,generate-id(./parent::node()))"/>
 									</xsl:attribute>
 									<!--TODO-->
 									<!-- Sona Resolved Defect #1989834-->
@@ -1437,7 +1437,7 @@
 							<xsl:when  test ="self::v:oval">
 								<draw:custom-shape text:anchor-type="paragraph" draw:z-index="1">
 									<xsl:attribute name="draw:style-name">
-										<xsl:value-of select="parent::node()/v:oval/@id"/>
+										<xsl:value-of select="concat(parent::node()/v:oval/@id,generate-id(./parent::node()))"/>
 									</xsl:attribute>
 									<!--<xsl:for-each select ="parent::node()/v:oval">-->
 									<xsl:call-template name="InsertAnchorType"/>
@@ -1457,7 +1457,7 @@
 							<xsl:when  test ="self::v:roundrect">
 								<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0">
 									<xsl:attribute name="draw:style-name">
-										<xsl:value-of select="parent::node()/v:roundrect/@id"/>
+										<xsl:value-of select="concat(parent::node()/v:roundrect/@id,generate-id(./parent::node()))"/>
 									</xsl:attribute>
 									<!--<xsl:for-each select ="parent::node()/v:roundrect">-->
 									<xsl:call-template name="InsertAnchorType"/>
@@ -1768,13 +1768,13 @@
             <!--<xsl:value-of  select ="v:shape/@id"/>-->
 					</xsl:when>
 					<xsl:when test ="$vmlElement[1]=v:oval">
-						<xsl:value-of  select ="v:oval/@id"/>
+						<xsl:value-of  select ="concat(v:oval/@id,generate-id())"/>
 					</xsl:when>
 					<xsl:when test ="$vmlElement[1]=v:rect">
-						<xsl:value-of  select ="v:rect/@id"/>
+						<xsl:value-of  select ="concat(v:rect/@id,generate-id())"/>
 					</xsl:when>
 					<xsl:when test ="$vmlElement[1]=v:roundrect">
-						<xsl:value-of  select ="v:roundrect/@id"/>
+						<xsl:value-of  select ="concat(v:roundrect/@id,generate-id())"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="generate-id($vmlElement)"/>
@@ -3658,7 +3658,9 @@
     </xsl:variable>
     <xsl:variable name="VerticalHeight">
       <xsl:choose>
-        <xsl:when test="$relV='bottom-margin-area' or $relV='inner-margin-area'">
+        <!--  or $relV='inner-margin-area'-->
+        <xsl:when test="$relV='bottom-margin-area'">
+         
           <xsl:value-of select="number($pageHeight) - number($marBottom)"/>
         </xsl:when>
 
@@ -3816,7 +3818,8 @@
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:choose>
-                    <xsl:when test ="$relV='bottom-margin-area' or $relV='inner-margin-area'">
+                    <!-- or $relV='inner-margin-area'-->
+                    <xsl:when test ="$relV='bottom-margin-area'">
                       <xsl:variable name ="vertHeight">
                         <xsl:call-template name ="ConvertTwips">
                           <xsl:with-param name="length" select ="$VerticalHeight"></xsl:with-param>
@@ -3864,7 +3867,8 @@
 					</xsl:choose>
 				</xsl:variable>
               <xsl:choose>
-                <xsl:when test ="$relV='bottom-margin-area' or $relV='inner-margin-area'">
+                <!--or $relV='inner-margin-area'-->
+                <xsl:when test ="$relV='bottom-margin-area'">
                   <xsl:variable name ="vertHeight">
                     <xsl:call-template name ="ConvertTwips">
                       <xsl:with-param name="length" select ="$VerticalHeight"></xsl:with-param>
