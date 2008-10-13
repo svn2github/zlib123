@@ -717,7 +717,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
         {
 
             string measureString = "0";
-            Font stringFont = new Font(text.Split('|')[0].ToString(), float.Parse(text.Split('|')[1].ToString()));
+            string fontSize = text.Split('|')[1].ToString();
+            if (fontSize.EndsWith("pt"))
+            {
+                fontSize = fontSize.Substring(0, fontSize.Length - 2);
+            }
+            Font stringFont = new Font(text.Split('|')[0].ToString(), float.Parse(fontSize));
             Form dummyForm = new Form();
             Graphics g = dummyForm.CreateGraphics();
             System.Drawing.SizeF size = g.MeasureString(measureString, stringFont);
