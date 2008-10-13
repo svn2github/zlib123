@@ -1065,7 +1065,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
         {
 
             string measureString = "0";
-            Font stringFont = new Font(text.Split('|')[0].ToString(), float.Parse(text.Split('|')[1].ToString()));
+            string fontSize = text.Split('|')[1].ToString();
+            char[] letters = new char[] { 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g', 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w', 'X', 'x', 'Y', 'y', 'Z', 'z' };
+            float font = float.Parse(fontSize.TrimEnd(letters));
+            Font stringFont = new Font(text.Split('|')[0].ToString(), font);
             Form dummyForm = new Form();
             Graphics g = dummyForm.CreateGraphics();
             System.Drawing.SizeF size = g.MeasureString(measureString, stringFont);
