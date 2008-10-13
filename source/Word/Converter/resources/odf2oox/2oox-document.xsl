@@ -1136,13 +1136,6 @@
             </xsl:call-template>
             -->
 
-            <!--
-            makz: context switch for-each to insert the paragraph properties
-            -->
-            <xsl:for-each select="*[1][self::text:p or self::text:h]">
-              <xsl:call-template name="InsertParagraphProperties" />
-            </xsl:for-each>
-
             <!-- insert number -->
             <xsl:call-template name="InsertNumbering">
               <xsl:with-param name="level" select="$level"/>
@@ -1170,6 +1163,17 @@
 
             <!-- insert page break before table when required -->
             <xsl:call-template name="InsertPageBreakBefore"/>
+
+            <!--
+            makz: context switch for-each to insert the paragraph properties
+            divo: This must be the last properties defined. We ahve to define all overriden properties for lists first
+                because OoxParagraphsPostProcessor only taks the first occurence of a property into account. 
+                Example: List formatting such as indent is defined by the templates above. Template InsertParagraphProperties also sets the list
+                  indent, but this definition will be ignored in the postprocessor. What an awful design. But it wasnt me...
+            -->
+            <xsl:for-each select="*[1][self::text:p or self::text:h]">
+              <xsl:call-template name="InsertParagraphProperties" />
+            </xsl:for-each>
           </w:pPr>
 
           <!--TOC  -->
