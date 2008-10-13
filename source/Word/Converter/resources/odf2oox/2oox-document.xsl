@@ -1141,12 +1141,6 @@
               <xsl:with-param name="level" select="$level"/>
             </xsl:call-template>
 
-            <!-- insert tab stops if paragraph is in a list -->
-            <xsl:call-template name="OverrideNumberingProperty">
-              <xsl:with-param name="level" select="$level"/>
-              <xsl:with-param name="property">tab</xsl:with-param>
-            </xsl:call-template>
-
             <!-- insert bg color in case paragraph is in table-of-content -->
             <xsl:call-template name="InsertTOCBgColor"/>
 
@@ -1174,6 +1168,13 @@
             <xsl:for-each select="*[1][self::text:p or self::text:h]">
               <xsl:call-template name="InsertParagraphProperties" />
             </xsl:for-each>
+
+            <!-- insert tab stops if paragraph is in a list -->
+            <xsl:call-template name="OverrideNumberingProperty">
+              <xsl:with-param name="level" select="$level"/>
+              <xsl:with-param name="property">tab</xsl:with-param>
+            </xsl:call-template>
+
           </w:pPr>
 
           <!--TOC  -->
