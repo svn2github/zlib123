@@ -1040,7 +1040,7 @@
 		<xsl:message terminate="no">progress:w:t</xsl:message>
 		<xsl:call-template name="InsertDropCapText"/>
 		<xsl:choose>
-			<!--check whether string contains  whitespace sequence-->
+			<!--check whether string contains whitespace sequence-->
 			<xsl:when test="not(contains(., '  ') or substring(., 1, 1) = ' ')">
 				<xsl:choose>
 					<xsl:when test="../w:rPr/w:rStyle/@w:val = 'Hyperlink' and ../w:rPr/w:color">
@@ -1350,24 +1350,14 @@
 			<!--... and only if this is the first paragraph in the section ...-->
 			<xsl:if test="not(preceding-sibling::w:p) or preceding-sibling::w:p[1]/w:pPr/w:sectPr">
 
-				<xsl:variable name="mainSectPr" select="key('Part', 'word/document.xml')/w:document/w:body/w:sectPr"/>
-				<xsl:variable name="followingSectPr" select="following-sibling::w:p[w:pPr/w:sectPr]/w:pPr/w:sectPr"/>
+				<xsl:variable name="currentSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
 
-				<xsl:choose>
-					<xsl:when test="$followingSectPr and $followingSectPr/w:pgNumType/@w:start">
-						<!-- there is a sectPr for this paragraph -->
-						<xsl:attribute name="style:page-number">
-							<xsl:value-of select="$followingSectPr/w:pgNumType/@w:start"/>
-						</xsl:attribute>
-					</xsl:when>
-					<xsl:when test="$mainSectPr and $mainSectPr/w:pgNumType/@w:start">
-						<!-- use the main sectPr -->
-						<xsl:attribute name="style:page-number">
-							<xsl:value-of select="$mainSectPr/w:pgNumType/@w:start"/>
-						</xsl:attribute>
-					</xsl:when>
-				</xsl:choose>
-
+				<xsl:if test="$currentSectPr/w:pgNumType/@w:start">
+					<!-- there is a sectPr for this paragraph -->
+					<xsl:attribute name="style:page-number">
+						<xsl:value-of select="$currentSectPr/w:pgNumType/@w:start"/>
+					</xsl:attribute>
+				</xsl:if>
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
