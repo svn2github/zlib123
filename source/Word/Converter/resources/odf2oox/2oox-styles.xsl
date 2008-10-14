@@ -61,8 +61,7 @@
         <!-- Default paragraph properties -->
         <w:pPrDefault>
           <w:pPr>
-            <xsl:apply-templates select="$paragraphDefaultStyle/style:paragraph-properties"
-              mode="pPr"/>
+            <xsl:apply-templates select="$paragraphDefaultStyle/style:paragraph-properties" mode="pPr"/>
           </w:pPr>
         </w:pPrDefault>
       </w:docDefaults>
@@ -282,6 +281,15 @@
     </xsl:if>
 
     <!-- keep with next -->
+    <xsl:choose>
+      <xsl:when test="@fo:keep-with-next='always'">
+        <w:keepNext/>
+      </xsl:when>
+      <xsl:when test="@fo:keep-with-next!='always' and key('styles', ../@style:parent-style-name)/style:paragraph-properties/@fo:keep-with-next='always'">
+        <w:keepNext w:val="off"/>
+      </xsl:when>
+    </xsl:choose>
+    
     <xsl:if test="@fo:keep-with-next='always'">
       <w:keepNext/>
     </xsl:if>

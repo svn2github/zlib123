@@ -1169,6 +1169,7 @@
               <xsl:call-template name="InsertParagraphProperties" />
             </xsl:for-each>
 
+            <!-- 20081014/divo: Tab definitions and must follow last... -->
             <!-- insert tab stops if paragraph is in a list -->
             <xsl:call-template name="OverrideNumberingProperty">
               <xsl:with-param name="level" select="$level"/>

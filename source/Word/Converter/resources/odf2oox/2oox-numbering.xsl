@@ -253,7 +253,6 @@
       xmlns:o12="http://schemas.microsoft.com/office/2004/7/core"
       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
       xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
-      xmlns:v="urn:schemas-microsoft-com:vml"
       xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
       xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
 
