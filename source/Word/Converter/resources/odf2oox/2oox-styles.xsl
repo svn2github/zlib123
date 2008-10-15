@@ -279,6 +279,13 @@
     <xsl:if test="@style:background-image">
       <xsl:message terminate="no">translation.odf2oox.paragraphBgImage</xsl:message>
     </xsl:if>
+    
+    <!-- parent style -->
+    <xsl:if test="../@style:parent-style-name">
+      <xsl:call-template name="InsertParagraphStyle">
+        <xsl:with-param name="styleName" select="../@style:parent-style-name" />
+      </xsl:call-template>
+    </xsl:if>
 
     <!-- keep with next -->
     <xsl:choose>
