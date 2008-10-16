@@ -32,7 +32,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Schema;
 using System.Collections;
-using CleverAge.OdfConverter.OdfZipUtils; 
+using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
 
 namespace Sonata.OdfConverter.Presentation
@@ -58,18 +58,18 @@ namespace Sonata.OdfConverter.Presentation
         private static string OOX_META_CORE_SCHEMA = "ooxschemas/opc-coreProperties.xsd";
         private static string OOX_META_APP_NS = "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties";
         private static string OOX_META_APP_SCHEMA = "ooxschemas/shared-documentPropertiesExtended.xsd";
-         
+
         // OOX special files
         private static string OOX_CONTENT_TYPE_FILE = "[Content_Types].xml";
         private static string OOX_RELATIONSHIP_FILE = "_rels/.rels";
         private static string OOX_SIDEMASTER_RELATIONSHIP_FILE = "ppt/slideMasters";
-        
-        
+
+
         // OOX relationship
         private static string OOX_DOC_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
         private static string OOX_DOCUMENT_RELATIONSHIP_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
         private static string OOX_SIDEMASTER_RELATIONSHIP_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster";
-        
+
         private XmlReaderSettings settings = null; // global settings to open the xml files
         //private Report report;
 
@@ -80,30 +80,30 @@ namespace Sonata.OdfConverter.Presentation
         {
             try
             {
-            this.settings = new XmlReaderSettings();
-            //this.report = report;
+                this.settings = new XmlReaderSettings();
+                //this.report = report;
 
-            // resolver
-            EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetEntryAssembly(),
-                "CleverAge.OdfConverter.CommandLineTool", ".resources.", true);
-            this.settings.XmlResolver = resolver;
+                // resolver
+                EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetEntryAssembly(),
+                    "CleverAge.OdfConverter.CommandLineTool", ".resources.", true);
+                this.settings.XmlResolver = resolver;
 
-            // schemas
-            this.settings.Schemas.XmlResolver = resolver;
-            
-            this.settings.Schemas.Add(OOX_RELATIONSHIP_NS, OOX_RELATIONSHIP_SCHEMA);
-            this.settings.Schemas.Add(OOX_CONTENT_TYPE_NS, OOX_CONTENT_TYPE_SCHEMA);
-            //this.settings.Schemas.Add(OOX_META_CORE_NS, OOX_META_CORE_SCHEMA);
-            this.settings.Schemas.Add(OOX_META_APP_NS, OOX_META_APP_SCHEMA);
-                 
-            
-            this.settings.ValidationType = ValidationType.Schema;
-            this.settings.ValidationEventHandler += new ValidationEventHandler(ValidationHandler);
-        }
-        catch (Exception ex)
-        {
-            Console.Write(ex.Message);
-        }
+                // schemas
+                this.settings.Schemas.XmlResolver = resolver;
+
+                this.settings.Schemas.Add(OOX_RELATIONSHIP_NS, OOX_RELATIONSHIP_SCHEMA);
+                this.settings.Schemas.Add(OOX_CONTENT_TYPE_NS, OOX_CONTENT_TYPE_SCHEMA);
+                //this.settings.Schemas.Add(OOX_META_CORE_NS, OOX_META_CORE_SCHEMA);
+                this.settings.Schemas.Add(OOX_META_APP_NS, OOX_META_APP_SCHEMA);
+
+
+                this.settings.ValidationType = ValidationType.Schema;
+                this.settings.ValidationEventHandler += new ValidationEventHandler(ValidationHandler);
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+            }
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Sonata.OdfConverter.Presentation
         {
 
             // 0. The file must exist and be a valid Zip archive
-            
+
             try
             {
                 reader = ZipFactory.OpenArchive(fileName);
@@ -164,7 +164,7 @@ namespace Sonata.OdfConverter.Presentation
             {
                 //modified by lohith - to display user friendly message
                 throw new NotAnOoxDocumentException("The pptx package must have a a \"/_rels/.rels\" file");
-                
+
                 //throw new PptxValidatorException("The pptx package must have a \"/_rels/.rels\" file");
             }
             this.validateXml(relationShips);
@@ -187,7 +187,7 @@ namespace Sonata.OdfConverter.Presentation
 
                 //throw new PptxValidatorException("openDocument relation not found in \"/_rels/.rels\"");
             }
-        
+
 
             // 4. For each item in _rels/.rels
             relationShips = reader.GetEntry(OOX_RELATIONSHIP_FILE);
@@ -224,17 +224,17 @@ namespace Sonata.OdfConverter.Presentation
             }
 
             Stream partRel = null;
-			String partDir = docTarget.Substring(0, docTarget.IndexOf("/"));
-			String partRelPath = partDir + "/_rels/" + docTarget.Substring(docTarget.IndexOf("/") + 1) + ".rels";
-			bool partRelExists = true;
-			try
-			{
-				partRel = reader.GetEntry(partRelPath);
-			}
-			catch ( Exception )
-			{
-				partRelExists = false;
-			}
+            String partDir = docTarget.Substring(0, docTarget.IndexOf("/"));
+            String partRelPath = partDir + "/_rels/" + docTarget.Substring(docTarget.IndexOf("/") + 1) + ".rels";
+            bool partRelExists = true;
+            try
+            {
+                partRel = reader.GetEntry(partRelPath);
+            }
+            catch (Exception)
+            {
+                partRelExists = false;
+            }
 
             if (partRelExists)
             {
@@ -246,7 +246,7 @@ namespace Sonata.OdfConverter.Presentation
                 ValidateRels(partDir, r);
 
                 //retrieve all ids referenced in the document
-                r.Close(); 
+                r.Close();
                 Stream doc = reader.GetEntry(docTarget);
                 r = XmlReader.Create(doc);
                 ArrayList ids = new ArrayList();
@@ -254,7 +254,7 @@ namespace Sonata.OdfConverter.Presentation
                 {
                     if (r.LocalName == "custShow")
                     {
-                        r.Skip(); 
+                        r.Skip();
                     }
                     else
                     {
@@ -308,15 +308,15 @@ namespace Sonata.OdfConverter.Presentation
                     docTarget = r.GetAttribute("Target");
                     partDir = OOX_SIDEMASTER_RELATIONSHIP_FILE;
                     partRelPath = partDir + "/_rels/" + docTarget.Substring(docTarget.IndexOf("/") + 1) + ".rels";
-                    
+
                     partRel = reader.GetEntry(partRelPath);
                     r = XmlReader.Create(partRel);
                     ValidateRels(partDir, r);
                 }
             }
-            
+
             //7. Validation for SlideLayouts if required will be added here.
- 
+
             //8. For each slide in a presentation, validation needs to be added here
 
             //9. During developement required validations for pptx feature e.g notes master, numbering etc. will be added.
@@ -327,7 +327,7 @@ namespace Sonata.OdfConverter.Presentation
 
 
 
-            
+
         }
 
         // validate xml stream
@@ -341,7 +341,7 @@ namespace Sonata.OdfConverter.Presentation
         private String findContentType(ZipReader reader, String target)
         {
             String extension = null;
-            if (target.IndexOf(".") != -1)  
+            if (target.IndexOf(".") != -1)
             {
                 extension = target.Substring(target.IndexOf(".") + 1);
             }
@@ -374,7 +374,7 @@ namespace Sonata.OdfConverter.Presentation
 
         public void ValidateRels(string partDir, XmlReader r)
         {
-                           
+
             while (r.Read())
             {
                 if (r.NodeType == XmlNodeType.Element && r.LocalName == "Relationship")
@@ -384,23 +384,19 @@ namespace Sonata.OdfConverter.Presentation
                     // Added by lohith - if a file is external no need to have it within package
                     if (!(r.GetAttribute("TargetMode") == "External"))
                     {
-                    // Is the target item exist in the package ?
-                    Stream item = null;
-                    bool fileExists = true;
-                    try
-                    {
-                        item = reader.GetEntry(target);
-                    }
-                    catch (Exception)
-                    {
-                        throw new NotAnOoxDocumentException("The file \"" + target + "\" is described in the \"/ppt/_rels/presentation.xml.rels\" file but does not exist in the package.");
-                        //throw new PptxValidatorException("The file \"" + target + "\" is described in the \"/ppt/_rels/presentation.xml.rels\" file but does not exist in the package.");
-                        fileExists = false;
-                    }
+                        // Is the target item exist in the package ?
+                        Stream item = null;
 
-                    if (fileExists)
-                    {
-                        
+                        try
+                        {
+                            item = reader.GetEntry(target);
+                        }
+                        catch (Exception)
+                        {
+                            throw new NotAnOoxDocumentException("The file \"" + target + "\" is described in the \"/ppt/_rels/presentation.xml.rels\" file but does not exist in the package.");
+                            //throw new PptxValidatorException("The file \"" + target + "\" is described in the \"/ppt/_rels/presentation.xml.rels\" file but does not exist in the package.");
+                        }
+
                         // 5.1. A content type can be found in [Content_Types].xml file
                         if (target.IndexOf("../") == -1)
                         {
@@ -413,14 +409,8 @@ namespace Sonata.OdfConverter.Presentation
                             }
                         }
                     }
-
-                    }
-                    
                 }
-                   
             }
-            
-           
         }
 
         public void ValidationHandler(object sender, ValidationEventArgs args)
