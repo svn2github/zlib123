@@ -628,7 +628,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 }
                 catch (Exception e)
                 {
-                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, ConversionReport.ERROR_LEVEL);
+                    this.report.AddLog(input, "An unexpected exception occurred when trying to validate " + output, ConversionReport.ERROR_LEVEL);
                     this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }
@@ -655,7 +655,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 }
                 catch (Exception e)
                 {
-                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, ConversionReport.ERROR_LEVEL);
+                    this.report.AddLog(input, "An unexpected exception occurred when trying to validate " + output, ConversionReport.ERROR_LEVEL);
                     this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", ConversionReport.DEBUG_LEVEL);
                     return false;
                 }

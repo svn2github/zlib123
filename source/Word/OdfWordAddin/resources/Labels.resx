@@ -315,7 +315,7 @@
   <data name="translation.odf2oox.headerDistance" xml:space="preserve">
     <value>Header dimensions</value>
   </data>
-  <data name="translation.odf2oox.footerDistance " xml:space="preserve">
+  <data name="translation.odf2oox.footerDistance" xml:space="preserve">
     <value>Footer dimensions</value>
   </data>
   <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
@@ -378,7 +378,7 @@
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
     <value>Cell rotation alignment property</value>
   </data>
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+  <data name="translation.odf2oox.tableIllustrationCaptionFormat" xml:space="preserve">
     <value>Table of illustration caption format</value>
   </data>
   <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">

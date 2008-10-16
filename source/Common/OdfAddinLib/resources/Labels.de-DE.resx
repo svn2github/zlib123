@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
+	<!-- 
     Microsoft ResX Schema 
     
     Version 2.0
@@ -59,164 +59,170 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="OdfImportLabel" xml:space="preserve">
     <value>ODF Dateien öffnen</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
+	<data name="OdfImportDescription" xml:space="preserve">
     <value>Dateien im OpenDocument Format (ODF) öffnen.</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
+	<data name="OdfExportLabel" xml:space="preserve">
     <value>Speichern als ODF</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
+	<data name="OdfExportDescription" xml:space="preserve">
     <value>Eine Kopie des Dokumentes im OpenDocument Format (ODF) erstellen.</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
+	<data name="OdfMenuLabel" xml:space="preserve">
     <value>ODF</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
+	<data name="OdfUnexpectedError" xml:space="preserve">
     <value>Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden.</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
+	<data name="AllFileType" xml:space="preserve">
     <value>Alle Dateien</value>
   </data>
-  <data name="OdfFileTypeOdt" xml:space="preserve">
+	<data name="OdfFileTypeOdt" xml:space="preserve">
     <value>OpenDocument Text</value>
   </data>
-  <data name="OdfFileTypeOtt" xml:space="preserve">
+	<data name="OdfFileTypeOtt" xml:space="preserve">
     <value>OpenDocument Textdokumentvorlage</value>
   </data>
-  <data name="OdfFileTypeOds" xml:space="preserve">
+	<data name="OdfFileTypeOds" xml:space="preserve">
     <value>OpenDocument Tabellendokument</value>
   </data>
-  <data name="OdfFileTypeOdp" xml:space="preserve">
+	<data name="OdfFileTypeOdp" xml:space="preserve">
     <value>OpenDocument Präsentation</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
+	<data name="NotImplemented" xml:space="preserve">
     <value>Dieses Feature ist noch nicht implementiert.</value>
   </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
+	<data name="ConversionFormTitle" xml:space="preserve">
     <value>%1 wird übersetzt.</value>
   </data>
-  <data name="FeedbackLabel" xml:space="preserve">
+	<data name="FeedbackLabel" xml:space="preserve">
     <value>Einige Elemente können durch die Übersetzung verloren gegangen sein. Klicken Sie auf "Details", um eine Liste von möglicherweise verlorenen Elementen zu sehen.</value>
   </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
+	<data name="EncryptedDocumentDetail" xml:space="preserve">
     <value>Dieses Feature wird von der aktuellen Version des Add-Ins nicht unterstützt.</value>
   </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
+	<data name="EncryptedDocumentLabel" xml:space="preserve">
     <value>Das Dokument ist mit einem Passwort geschützt.</value>
   </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
+	<data name="NotAnOdfDocumentDetail" xml:space="preserve">
     <value>Falls Sie ein valides ODF Dokument konvertieren wollten, melden Sie bitte den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net).</value>
   </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
+	<data name="NotAnOdfDocumentLabel" xml:space="preserve">
     <value>Das Dokument scheint keine valide OASIS OpenDocument Datei zu sein.</value>
   </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
+	<data name="OdfConverterNotInstalled" xml:space="preserve">
     <value>Der Konverter für das Word 2007 Dateiformat ist nicht installiert. Der ODF Übersetzer benötigt diesen Konverter.</value>
   </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
+	<data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
     <value>Die Übersetzung hat nicht funktioniert; bitte speichern Sie das Dokument zuerst als Word 2007 Datei (.DOCX).</value>
   </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
+	<data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
     <value>Bitte speichern Sie das Dokument, bevor Sie es nach ODF übersetzen.</value>
   </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
+	<data name="OdfConverterTitle" xml:space="preserve">
     <value>ODF Übersetzer</value>
   </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
+	<data name="UnableToCreateOutputDetail" xml:space="preserve">
     <value>Die Datei kann nicht angelegt werden. Überprüfen Sie, ob der Pfad korrekt ist und ob die Datei nicht von einer anderen Anwendung benutzt wird.</value>
   </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
+	<data name="UnableToCreateOutputLabel" xml:space="preserve">
     <value>Die Datei kann nicht angelegt werden.</value>
   </data>
-  <data name="CorruptedInputFileDetail" xml:space="preserve">
+	<data name="CorruptedInputFileDetail" xml:space="preserve">
     <value>Falls Sie ein valides ODF Dokument konvertieren wollten, melden Sie bitte den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net).</value>
   </data>
-  <data name="CorruptedInputFileLabel" xml:space="preserve">
+	<data name="CorruptedInputFileLabel" xml:space="preserve">
     <value>Das Dokument scheint keine valide OASIS OpenDocument Datei zu sein.</value>
   </data>
-  <data name="OdfConversionCanceled" xml:space="preserve">
+	<data name="OdfConversionCanceled" xml:space="preserve">
     <value>Die Konvertierung wurde vom Benutzer abgebrochen.</value>
   </data>
-  <data name="PossiblyEncryptedDocument" xml:space="preserve">
+	<data name="PossiblyEncryptedDocument" xml:space="preserve">
     <value>Das Dokument konnte nicht geöffnet werden. Bitte überprüfen Sie, dass die Datei nicht passwortgeschützt ist.</value>
   </data>
- <data name="ProgressBarExitLabel" xml:space="preserve">
+	<data name="ProgressBarExitLabel" xml:space="preserve">
     <value>Bitte warten Sie, bis die Übersetzung beendet ist.</value>
   </data>
-  <data name="ProgressBarLoadLabel" xml:space="preserve">
+	<data name="ProgressBarLoadLabel" xml:space="preserve">
     <value>Laden der Übersetzungstabellen…</value>
-  </data> 
-  <data name="OdfExcelFileType" xml:space="preserve">
+  </data>
+	<data name="OdfExcelFileType" xml:space="preserve">
     <value>OpenDocument Spreadsheet Dateien</value>
   </data>
-  <data name="OdfPPTFileType" xml:space="preserve">
+	<data name="OdfPPTFileType" xml:space="preserve">
     <value>OpenDocument Präsentation Dateien</value>
   </data>
-  <data name="OdfOptionsDescription" xml:space="preserve">
+	<data name="OdfOptionsDescription" xml:space="preserve">
     <value>Einstellungen für das ODF Add-in vornehmen.</value>
   </data>
-  <data name="OdfOptionsLabel" xml:space="preserve">
+	<data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF Add-in Optionen</value>
+  </data>
+	<data name="OdfNewDocumentDescription" xml:space="preserve">
+    <value>Neues ODF-kompatibles Dokument erzeugen</value>
+  </data>
+  <data name="OdfNewDocumentLabel" xml:space="preserve">
+    <value>Neues Dokument</value>
   </data>
 </root>

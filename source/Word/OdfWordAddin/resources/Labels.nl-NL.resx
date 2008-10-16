@@ -312,7 +312,7 @@
   <data name="translation.odf2oox.headerDistance" xml:space="preserve">
     <value>Koptekstafmetingen</value>
   </data>
-  <data name="translation.odf2oox.footerDistance " xml:space="preserve">
+  <data name="translation.odf2oox.footerDistance" xml:space="preserve">
     <value>Voettekstafmetingen</value>
   </data>
   <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
@@ -375,7 +375,7 @@
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
     <value>Eigenschap uitlijning celdraaiing</value>
   </data>
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+  <data name="translation.odf2oox.tableIllustrationCaptionFormat" xml:space="preserve">
     <value>Bijschriftformaat afbeeldingstabel</value>
   </data>
   <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">

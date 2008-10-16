@@ -312,7 +312,7 @@
   <data name="translation.odf2oox.headerDistance" xml:space="preserve">
     <value>Odstęp nagłówka od tekstu</value>
   </data>
-  <data name="translation.odf2oox.footerDistance " xml:space="preserve">
+  <data name="translation.odf2oox.footerDistance" xml:space="preserve">
     <value>Odstęp stopki od tekstu </value>
   </data>
   <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
@@ -375,14 +375,8 @@
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
     <value>Wyrównanie obróconej komórki</value>
   </data>
-  <data name="translation.odf2oox.tableIllustration.captionFormat" xml:space="preserve">
+  <data name="translation.odf2oox.tableIllustrationCaptionFormat" xml:space="preserve">
     <value>Format podpisu dla obrazów w Indeksie Obrazów nie jest zachowywany</value>
-  </data>
-  <data name="translation.odf2oox.text.lineThrough.width" xml:space="preserve">
-    <value>Grubość przekreślenia tekstu nie jest zachowywana</value>
-  </data>
-  <data name="translation.odf2oox.text.lineThrough.color" xml:space="preserve">
-    <value>Kolor przekreślenia testu nie jest zachowywany</value>
   </data>
   <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve">
     <value>Efekty 3D kształtów nie są zachowywane </value>

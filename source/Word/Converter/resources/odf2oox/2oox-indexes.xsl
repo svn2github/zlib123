@@ -154,7 +154,7 @@
       <w:instrText xml:space="preserve">\a </w:instrText>
     </xsl:if>
     <xsl:if test="parent::text:index-body/preceding-sibling::*/@text:caption-sequence-format = 'category-and-value' ">
-      <xsl:message terminate="no">"translation.odf2oox.TableIllustrationCaptionFormat</xsl:message>
+      <xsl:message terminate="no">"translation.odf2oox.tableIllustrationCaptionFormat</xsl:message>
     </xsl:if>
   </xsl:template>
 

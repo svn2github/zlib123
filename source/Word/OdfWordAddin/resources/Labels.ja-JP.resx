@@ -316,7 +316,7 @@
   <data name="translation.odf2oox.headerDistance" xml:space="preserve">
     <value>ヘッダーの寸法</value>
   </data>
-  <data name="translation.odf2oox.footerDistance " xml:space="preserve">
+  <data name="translation.odf2oox.footerDistance" xml:space="preserve">
     <value>フッターの寸法</value>
   </data>
   <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
@@ -379,7 +379,7 @@
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
     <value>セルの回転配置のプロパティ</value>
   </data>
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+  <data name="translation.odf2oox.tableIllustrationCaptionFormat" xml:space="preserve">
     <value>図表目次の形式</value>
   </data>
   <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">

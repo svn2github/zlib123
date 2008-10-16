@@ -137,7 +137,7 @@
     <value>Excel supports only 256 chars in header/footer strings(with formatting). Any characters above 256 will be lost</value>
   </data>
   <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
-    <value>Hyperlink in textbox cannot be conversed and will be changed to plain text.</value>
+    <value>Hyperlink in textbox cannot be converted and will be changed to plain text.</value>
   </data>
   <data name="translation.odf2oox.hyperlinkTextbox" xml:space="preserve">
     <value>Hyperlink can be applied to individual words in a text box in ODS, but this will be applied to the whole text box when converted to XLSX.
@@ -177,10 +177,10 @@
     <value>Open Office Calc supports only OLEObject implemented as link to file.</value>
   </data>
   <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
-    <value>Some Pivot filters had to be removed because Calc doesn't support them</value>
+    <value>Some Pivot filters had to be removed because ODF doesn't support them</value>
   </data>
   <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
-    <value>Some data filters had to be removed because Calc doesn't support them</value>
+    <value>Some data filters had to be removed because ODF doesn't support them</value>
   </data>
   <data name="translation.oox2odf.RowNumber" xml:space="preserve">
     <value>Open Office Calc supports only 65536 rows. Any rows above 65536 will be lost permanently</value>

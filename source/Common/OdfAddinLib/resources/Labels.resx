@@ -133,7 +133,7 @@
     <value>ODF...</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>An unexpected error occured. Please feel free to fill a bug report on the project web site (http://odf-converter.sourceforge.net) with your file attached.</value>
+    <value>An unexpected error occurred. Please feel free to fill a bug report on the project web site (http://odf-converter.sourceforge.net) with your file attached.</value>
   </data>
   <data name="AllFileType" xml:space="preserve">
     <value>All Files</value>

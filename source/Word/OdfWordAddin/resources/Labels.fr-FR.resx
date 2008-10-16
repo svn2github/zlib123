@@ -378,7 +378,7 @@
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
     <value>Alignement de rotation d'une cellule</value>
   </data>
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+  <data name="translation.odf2oox.tableIllustrationCaptionFormat" xml:space="preserve">
     <value>Affichage des légendes dans une table des illustrations</value>
   </data>
   <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">

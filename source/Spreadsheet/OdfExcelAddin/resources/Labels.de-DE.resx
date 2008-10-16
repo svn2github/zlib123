@@ -169,7 +169,7 @@
     <value>Open Office Calc unterstützt OLEObject nur, wenn dieses als Link in die Datei implementiert ist.</value>
   </data>
   <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
-    <value>Einige Datenfilter mussten entfernt werden, da diese von Calc nicht unterstützt werden.</value>
+    <value>Einige Datenfilter mussten entfernt werden, da diese von ODF nicht unterstützt werden.</value>
   </data>
   <data name="translation.oox2odf.RowNumber" xml:space="preserve">
     <value>Open Office Calc unterstützt nur 65536 Zeilen. Alle Zeilen, die darüberhinausgehen, gehen unwiderruflich verloren.</value>
@@ -177,4 +177,14 @@
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Open Office Calc unterstützt nur 256 Arbeitsblätter. Alle Arbeitsblätter, die darüberhinausgehen, gehen unwiderruflich verloren.</value>
   </data>
+  <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
+    <value>Hyperlinks in Textfeldern werden zu normalem Text.</value>
+  </data>
+  <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
+    <value>Eines der Szenarien is zu groß. Excel unterstützt nur Szenarien mit weniger als 32 veränderlichen Zellen.</value>
+  </data>
+  <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
+    <value>Einige PivotTable-Filter mussten entfernt werden, da sie in ODF nicht unterstützt werden.</value>
+  </data>
+
 </root>

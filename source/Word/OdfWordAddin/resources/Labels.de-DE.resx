@@ -318,7 +318,7 @@
   <data name="translation.odf2oox.headerDistance" xml:space="preserve">
     <value>Abstand des Kopfbereichs</value>
   </data>
-  <data name="translation.odf2oox.footerDistance " xml:space="preserve">
+  <data name="translation.odf2oox.footerDistance" xml:space="preserve">
     <value>Abstand des Fußbereichs</value>
   </data>
   <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve">
@@ -381,7 +381,7 @@
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve">
     <value>Ausrichtung einer Zelldrehung:</value>
   </data>
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve">
+  <data name="translation.odf2oox.tableIllustrationCaptionFormat" xml:space="preserve">
     <value>Format der Beschriftung für Abbildungsverzeichnis bleibt nicht erhalten</value>
   </data>
   <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve">
