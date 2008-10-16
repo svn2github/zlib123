@@ -23,7 +23,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing (signed)|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-    <Cultures>en-US;</Cultures>
+    <Cultures>
+    </Cultures>
     <SuppressAllWarnings>False</SuppressAllWarnings>
     <Pedantic>True</Pedantic>
   </PropertyGroup>

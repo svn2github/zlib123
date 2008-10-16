@@ -206,7 +206,8 @@
 
 		<InstallExecuteSequence>
 			<!-- entry point -->
-			<Custom Action="GetOfficeInfos" After="LaunchConditions" />
+			<!--<Custom Action="GetOfficeInfos" After="LaunchConditions" />-->
+			<Custom Action="GetOfficeInfos" Sequence="1" />
 
 			<!-- call custom actions for Word 2007 -->
 			<Custom Action="ActionWord2007TemplateAssign1" After="GetOfficeInfos">WORD2007INSTALLROOT AND (NOT TEMPLATEPATH) AND WORD2007TEMPLATE1 AND (NOT ODFTEMPLATEFOLDER)</Custom>
