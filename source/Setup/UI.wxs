@@ -80,13 +80,13 @@
 			<Publish Dialog="MyCustomizeDlg" Control="Back" Event="NewDialog" Value="MyInstallScopeDlg" Order="3"><![CDATA[WixUI_InstallMode <> "Change"]]></Publish>
 			<Publish Dialog="MyCustomizeDlg" Control="Next" Event="NewDialog" Value="MyFileAssociationDlg">1</Publish>
 
-			<Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>
+			<!--<Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>
 			<Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
 			<Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">1</Publish>
 			<Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
 			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MyInstallScopeDlg" Order="4"><![CDATA[WIXUI_INSTALLDIR_VALID="1"]]></Publish>
 			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
-			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>-->
 
 			<Publish Dialog="MyFileAssociationDlg" Control="Back" Event="NewDialog" Value="MyCustomizeDlg">1</Publish>
 			<Publish Dialog="MyFileAssociationDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>

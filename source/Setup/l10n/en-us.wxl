@@ -28,53 +28,60 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-	<String Id="lcid">1033</String>
-	<String Id="ApplicationName">ODF Add-in for Microsoft Office</String>
-	<String Id="ReadmePath" Localizable="no">Readme.en-us.html</String>
+  <String Id="lcid" Localizable="no">1033</String>
+  <String Id="ApplicationName">ODF Add-in for Microsoft Office</String>
+  <String Id="ReadmePath" Localizable="no">Readme.en-us.html</String>
 
-	<String Id="Error2000">There is a newer version of this product installed.</String>
-	<String Id="RestartWarning">Please close the following applications for setup to complete:</String>
-	
-	<String Id="OpenWithWord">Open with Microsoft Word</String>
-	<String Id="OpenWithExcel">Open with Microsoft Excel</String>
-	<String Id="OpenWithPowerPoint">Open with Microsoft PowerPoint</String>
+  <String Id="RestartWarning">IMPORTANT NOTE: Please close and restart any running Microsoft Office application (Word, Excel, PowerPoint and Outlook) to complete the installation.</String>
 
-	<String Id="FileTypeOdt">OpenDocument Text</String>
-	<String Id="FileTypeOds">OpenDocument Spreadsheet</String>
-	<String Id="FileTypeOdp">OpenDocument Presentation</String>
+  <String Id="OpenWithWord">Open with Microsoft Word</String>
+  <String Id="OpenWithExcel">Open with Microsoft Excel</String>
+  <String Id="OpenWithPowerPoint">Open with Microsoft PowerPoint</String>
 
-	<String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
-	<String Id="FeatureNameTemplates">ODF-compatible templates</String>
-	<String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
-	<String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
-	
-	<String Id="FeatureDescriptionWordAddin">Installs and registers the ODF Add-in for Microsoft Word.</String>
-	<String Id="FeatureDescriptionTemplates">Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user.</String>
-	<String Id="FeatureDescriptionExcelAddin">Installs and registers the ODF Add-in for Microsoft Excel.</String>
-	<String Id="FeatureDescriptionPowerPointAddin">Installs and registers the ODF Add-in for Microsoft PowerPoint.</String>
-	
-	<String Id="TemplateTitleODFFax">ODF-compatible fax</String>
-	<String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
-	<String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
-	<String Id="TemplateTitleODFReport">ODF-compatible report</String>
-	
-	<String Id="MyDlgTitle" Overridable="yes">[ProductName] Setup</String>
-	<String Id="MyDlgBannerBitmap" Overridable="yes" Localizable="no">WixUI_Bmp_Banner</String>
+  <String Id="FileTypeOdt">OpenDocument Text</String>
+  <String Id="FileTypeOds">OpenDocument Spreadsheet</String>
+  <String Id="FileTypeOdp">OpenDocument Presentation</String>
 
-	<String Id="MyFileAssociationDlgTitle" Overridable="yes">{\WixUI_Font_Title}File Associations</String>
-	<String Id="MyFileAssociationDlgDescription" Overridable="yes">Associate OpenDocument files with Microsoft Office</String>
-	<String Id="MyFileAssociationDlgDetailedDescription" Overridable="yes">Please select the file types that you wish to associate with Microsoft Office:</String>
-	
-	<String Id="MyExitDlgShowReadme">Show Readme</String>
-	   
-    <String Id="MyInstallScopeDlgDescription" Overridable="yes">Choose the installation scope and folder</String>
-	<String Id="MyInstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}Installation Scope</String>
-	<String Id="MyInstallScopeDlgPerUser" Overridable="yes">Install &amp;just for you</String>
-	<String Id="MyInstallScopeDlgPerUserDescription" Overridable="yes">[ProductName] will be installed in a per-user folder and be available just for your user account. You do not need local Administrator privileges.</String>
-	<String Id="MyInstallScopeDlgNoPerUserDescription" Overridable="yes">[ProductName] does not support per-user installation.</String>
-	<String Id="MyInstallScopeDlgPerMachine" Overridable="yes">Install for all users of this &amp;machine</String>
-	<String Id="MyInstallScopeDlgPerMachineDescription" Overridable="yes">[ProductName] will be installed in a per-machine folder by default and be available for all users. You can change the default installation folder. You must have local Administrator privileges.</String>
-	<String Id="MyInstallScopeDlgFolderLabel" Overridable="yes">Installation &amp;folder:</String>
-	<String Id="MyInstallScopeDlgChange" Overridable="yes">&amp;Change...</String>
+  <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
+  <String Id="FeatureNameTemplates">ODF-compatible templates</String>
+  <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
+  <String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
+
+  <String Id="FeatureDescriptionWordAddin">Installs and registers the ODF Add-in for Microsoft Word.</String>
+  <String Id="FeatureDescriptionTemplates">Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user.</String>
+  <String Id="FeatureDescriptionExcelAddin">Installs and registers the ODF Add-in for Microsoft Excel.</String>
+  <String Id="FeatureDescriptionPowerPointAddin">Installs and registers the ODF Add-in for Microsoft PowerPoint.</String>
+
+  <String Id="TemplateTitleODFFax">ODF-compatible fax</String>
+  <String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
+  <String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
+  <String Id="TemplateTitleODFReport">ODF-compatible report</String>
+
+  <String Id="Error2000">There is a newer version of this product installed.</String>
+
+  <!-- DIALOG CONTROLS -->
+  <String Id="MyDlgTitle">[ProductName] Setup</String>
+  <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
+
+  <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}File Associations</String>
+  <String Id="MyFileAssociationDlgDescription">Associate OpenDocument files with Microsoft Office</String>
+  <String Id="MyFileAssociationDlgDetailedDescription">Please select the file types that you wish to associate with Microsoft Office:</String>
+
+  <String Id="MyExitDlgShowReadme">Show Readme</String>
+
+  <String Id="MyInstallScopeDlgDescription">Choose the installation scope and folder</String>
+  <String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}Installation Scope</String>
+  <String Id="MyInstallScopeDlgPerUser">Install &amp;just for you</String>
+  <String Id="MyInstallScopeDlgPerUserDescription">[ProductName] will be installed in a per-user folder and be available just for your user account. You do not need local Administrator privileges.</String>
+  <String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] does not support per-user installation.</String>
+  <String Id="MyInstallScopeDlgPerMachine">Install for all users of this &amp;machine</String>
+  <String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] will be installed in a per-machine folder by default and be available for all users. You can change the default installation folder. You must have local Administrator privileges.</String>
+  <String Id="MyInstallScopeDlgFolderLabel">Installation &amp;folder:</String>
+  <String Id="MyInstallScopeDlgChange">&amp;Change...</String>
+
+  <String Id="msierrXmlConfigFailedRead">There was a failure while configuring XML files.</String>
+  <String Id="msierrXmlConfigFailedOpen">Failed to open XML file [3], system error: [2]</String>
+  <String Id="msierrXmlConfigFailedSelect">Failed to find node: [3] in XML file: [4], system error: [2]</String>
+  <String Id="msierrXmlConfigFailedSave">Failed to save changes to XML file [3], system error: [2]</String>
 
 </WixLocalization>
