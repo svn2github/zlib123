@@ -666,7 +666,11 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
           <a:r>
             <a:rPr lang="en-EN" sz="1200">
               <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
-                <xsl:call-template name="InsertRunProperties"/>
+				  <xsl:call-template name="InsertRunProperties">
+					  <xsl:with-param name ="isChart">
+						  <xsl:value-of select ="'false'"/>
+					  </xsl:with-param>
+				  </xsl:call-template>
               </xsl:for-each>
 
               <!-- default font face -->
@@ -699,7 +703,11 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         <a:r>
           <a:rPr lang="en-EN" sz="1200">
             <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
-              <xsl:call-template name="InsertRunProperties"/>
+				<xsl:call-template name="InsertRunProperties">
+					<xsl:with-param name ="isChart">
+						<xsl:value-of select ="'false'"/>
+					</xsl:with-param>
+				</xsl:call-template>
             </xsl:for-each>
           </a:rPr>
           <a:t>
@@ -717,7 +725,11 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <a:r>
       <a:rPr lang="en-EN" sz="1200">
         <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
-          <xsl:call-template name="InsertRunProperties"/>
+			<xsl:call-template name="InsertRunProperties">
+				<xsl:with-param name ="isChart">
+					<xsl:value-of select ="'false'"/>
+				</xsl:with-param>
+			</xsl:call-template>
         </xsl:for-each>
 
         <!-- default font face -->
@@ -753,13 +765,33 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
 
   <xsl:template name="InsertRunProperties">
     <!-- used by text-boxes and charts -->
-
+	  <xsl:param name ="isChart"/>
     <!-- font-size -->
     <xsl:if test="@fo:font-size">
+		<xsl:choose >
+			<xsl:when test ="$isChart='true'">
+				<xsl:choose>
+					<xsl:when test ="@fo:sonataCustom">
+						<xsl:attribute name="sz">
+							<!-- in charts @fo:font-size can be a fraction so it is rounded -->
+							<xsl:value-of select="number(round((substring-before(@fo:font-size,'pt') * 100) div 1.25))"/>
+						</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
       <xsl:attribute name="sz">
         <!-- in charts @fo:font-size can be a fraction so it is rounded -->
         <xsl:value-of select="number(round(substring-before(@fo:font-size,'pt')) * 100)"/>
       </xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+				
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:attribute name="sz">					
+					<xsl:value-of select="number(round(substring-before(@fo:font-size,'pt')) * 100)"/>
+				</xsl:attribute>				
+			</xsl:otherwise>
+		</xsl:choose>	
     </xsl:if>
 
     <!-- bold -->
@@ -1228,7 +1260,15 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <xsl:param name ="parentStyle" />
     <xsl:param name="chartDirectory"/>
     <xsl:variable name="chartStyleDirectory">
+      <xsl:choose>
+        <xsl:when test="$chartDirectory!=''">
       <xsl:value-of select="concat($chartDirectory,'/styles.xml')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'styles.xml'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </xsl:variable>
     <a:ln>
       <!-- Border width -->
@@ -1282,11 +1322,12 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
       </xsl:if>
       <!-- Dash type-->
       <xsl:choose>
-        <xsl:when test ="(@draw:stroke='dash')">
+        <xsl:when test ="@draw:stroke='dash'">
           <a:prstDash>
             <xsl:attribute name ="val">
               <xsl:call-template name ="getDashType">
                 <xsl:with-param name ="stroke-dash" select ="@draw:stroke-dash" />
+                <xsl:with-param name ="chartStyleDirectory" select ="$chartStyleDirectory" />
               </xsl:call-template>
             </xsl:attribute>
           </a:prstDash>
@@ -1298,6 +1339,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
                 <xsl:attribute name ="val">
                   <xsl:call-template name ="getDashType">
                     <xsl:with-param name ="stroke-dash" select ="@draw:stroke-dash" />
+                    <xsl:with-param name ="chartStyleDirectory" select ="$chartStyleDirectory" />
                   </xsl:call-template>
                 </xsl:attribute>
               </a:prstDash>
@@ -1313,8 +1355,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <xsl:param name ="stroke-dash" />
     <xsl:param name="chartStyleDirectory"/>
     <xsl:if test ="document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
-      <xsl:for-each select="document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
-        <xsl:if test="position()=1">
+      <xsl:for-each select="document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash][1]">
           <xsl:variable name="Unit1">
             <xsl:call-template name="getConvertUnit">
               <xsl:with-param name="length" select="@draw:dots1-length"/>
@@ -1369,15 +1410,15 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
               <xsl:value-of select ="'lgDashDotDot'" />
               <!--</xsl:if>-->
             </xsl:when>
-            <!--<xsl:when test ="($dots1=1) and ($dots2=2)">
-					-->
-            <!--<xsl:if test ="(($dots2-length &lt;= $dot) and ($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash))">-->
-            <!--
+            <xsl:when test ="($dots1=1) and ($dots2=2)">
+					
+            <xsl:if test ="(($dots2-length &lt;= $dot) and ($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash))">
+            
 						<xsl:value-of select ="'lgDashDotDot'" />
-					-->
-            <!--</xsl:if>-->
-            <!--
-				</xsl:when>-->
+					
+            </xsl:if>
+            
+				</xsl:when>
             <xsl:when test ="(($dots1 &gt;= 1) and not($dots2))">
               <xsl:choose>
                 <xsl:when test ="($dots1-length &lt;= $dot)">
@@ -1414,7 +1455,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
               <xsl:value-of select ="'sysDash'" />
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:if>
+     
       </xsl:for-each>
     </xsl:if >
     <xsl:if test ="not(document($chartStyleDirectory)/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash])">
@@ -1426,6 +1467,9 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <xsl:choose>
       <xsl:when test="contains($length,'cm')">
         <xsl:value-of select="'cm'"/>
+      </xsl:when>
+      <xsl:when test="contains($length,'%')">
+        <xsl:value-of select="'%'"/>
       </xsl:when>
       <xsl:when test="contains($length,'pt')">
         <xsl:value-of select="'pt'"/>

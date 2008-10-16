@@ -60,6 +60,7 @@
   <xsl:key name="grouping" match="c:grouping" use="@oox:part"/>
   <xsl:key name="spPr" match="c:spPr" use="@oox:part"/>
   <xsl:key name="error" match="c:errBars" use="@oox:part"/>
+  <xsl:key name="dataLable" match="c:dLbl" use="''"/>
   <!-- Sonata: line style constants-->
   <xsl:variable name ="dot">
     <xsl:value-of select ="'0.07'"/>
@@ -242,7 +243,10 @@
           <xsl:call-template name="InsertChartTitleProperties"/>
           <xsl:call-template name="InsertLegendProperties"/>
           <xsl:call-template name="InsertPlotAreaProperties"/>
-
+          <xsl:for-each select="key('dataLable','')">
+            <!-- Sonata: Number format-->
+            <xsl:apply-templates select="c:numFmt"/>
+          </xsl:for-each>
 
           <xsl:choose>
             <!-- for stock chart type 3 and 4 -->
@@ -268,9 +272,19 @@
               
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:dateAx[2]">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:dateAx[1]">
+                  <!--test number format of the axis text-->
+                  <xsl:variable name="formatcode">
+                    <xsl:if test="c:numFmt">
+                      <xsl:value-of select="c:numFmt/@formatCode"/>
+                    </xsl:if>
+                  </xsl:variable>
+                  <!-- Sonata: Number format-->
+                  <xsl:apply-templates select="c:numFmt"/>
  <!--Edited by Sonata -->
                   <xsl:call-template name="InsertAxisXProperties">
                     <xsl:with-param name="axisYId" select="$axisYId"/>
+                    <xsl:with-param name="numberformat" select="$formatcode"/>
+                    <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                   </xsl:call-template>
                   <!--added by Sonata for bug no 2015014-->
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
@@ -281,9 +295,19 @@
               </xsl:if>
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:catAx[2]">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
+                  <!--test number format of the axis text-->
+                  <xsl:variable name="formatcode">
+                    <xsl:if test="c:numFmt">
+                      <xsl:value-of select="c:numFmt/@formatCode"/>
+                    </xsl:if>
+                  </xsl:variable>
+                  <!-- Sonata: Number format-->
+                  <xsl:apply-templates select="c:numFmt"/>
 <!--Edited by Sonata -->
                   <xsl:call-template name="InsertAxisXProperties">
                     <xsl:with-param name="axisYId" select="$axisYId"/>
+                    <xsl:with-param name="numberformat" select="$formatcode"/>
+                    <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                   </xsl:call-template>
                   <!--added by Sonata for bug no 2015014-->
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
@@ -297,8 +321,18 @@
                 
                 <xsl:choose>
                   <xsl:when test="c:axId/@val = $axisYId">
+                    <!--test number format of the axis text-->
+                    <xsl:variable name="formatcode">
+                      <xsl:if test="c:numFmt">
+                        <xsl:value-of select="c:numFmt/@formatCode"/>
+                      </xsl:if>
+                    </xsl:variable>
+                    <!-- Sonata: Number format-->
+                    <xsl:apply-templates select="c:numFmt"/>
                     <xsl:call-template name="InsertAxisYProperties">
                       <xsl:with-param name="axisXId" select="$axisXId"/>
+                      <xsl:with-param name="numberformat" select="$formatcode"/>
+                      <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                     </xsl:call-template>
                     <xsl:call-template name="InsertAxisYTitleProperties"/>
                     <xsl:call-template name="InsertMinorGridYProperties"/>
@@ -333,11 +367,21 @@
                 </xsl:for-each>
               </xsl:variable>
               <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'b' or c:axPos/@val = 't'][1]">
+                <!--test number format of the axis text-->
+                <xsl:variable name="formatcode">
+                  <xsl:if test="c:numFmt">
+                    <xsl:value-of select="c:numFmt/@formatCode"/>
+                  </xsl:if>
+                </xsl:variable>
+                <!-- Sonata: Number format-->
+                <xsl:apply-templates select="c:numFmt"/>
                 <xsl:call-template name="InsertAxisXProperties">
                   <xsl:with-param name="type">
                     <xsl:text>valAx</xsl:text>
                   </xsl:with-param>
                   <xsl:with-param name="axisYId" select="$axisYId"/>
+                  <xsl:with-param name="numberformat" select="$formatcode"/>
+                  <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisXTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridXProperties"/>
@@ -346,8 +390,18 @@
               </xsl:for-each>
               <xsl:for-each
                 select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[c:axPos/@val = 'l' or c:axPos/@val = 'r'][1]">
+                <!--test number format of the axis text-->
+                <xsl:variable name="formatcode">
+                  <xsl:if test="c:numFmt">
+                    <xsl:value-of select="c:numFmt/@formatCode"/>
+                  </xsl:if>
+                </xsl:variable>
+                <!-- Sonata: Number format-->
+                <xsl:apply-templates select="c:numFmt"/>
                 <xsl:call-template name="InsertAxisYProperties">
                   <xsl:with-param name="axisXId" select="$axisXId"/>
+                  <xsl:with-param name="numberformat" select="$formatcode"/>
+                  <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisYTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridYProperties"/>
@@ -359,7 +413,17 @@
               <!-- stock chart may contain catAx or dateAx as X axis -->
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:catAx">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx">
+                  <!--test number format of the axis text-->
+                  <xsl:variable name="formatcode">
+                    <xsl:if test="c:numFmt">
+                      <xsl:value-of select="c:numFmt/@formatCode"/>
+                    </xsl:if>
+                  </xsl:variable>
+                  <!-- Sonata: Number format-->
+                  <xsl:apply-templates select="c:numFmt"/>
                   <xsl:call-template name="InsertAxisXProperties">
+                    <xsl:with-param name="numberformat" select="$formatcode"/>
+                    <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                   </xsl:call-template>
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
                   <xsl:call-template name="InsertMajorGridXProperties"/>
@@ -368,8 +432,17 @@
               </xsl:if>
               <xsl:if test="key('plotArea', c:chartSpace/@oox:part)/c:dateAx">
                 <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:dateAx">
+                  <!--test number format of the axis text-->
+                  <xsl:variable name="formatcode">
+                    <xsl:if test="c:numFmt">
+                      <xsl:value-of select="c:numFmt/@formatCode"/>
+                    </xsl:if>
+                  </xsl:variable>
+                  <!-- Sonata: Number format-->
+                  <xsl:apply-templates select="c:numFmt"/>
                   <xsl:call-template name="InsertAxisXProperties">
-               
+                    <xsl:with-param name="numberformat" select="$formatcode"/>
+                    <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                   </xsl:call-template>
                   <xsl:call-template name="InsertAxisXTitleProperties"/>
                   <xsl:call-template name="InsertMajorGridXProperties"/>
@@ -377,8 +450,17 @@
                 </xsl:for-each>
               </xsl:if>
               <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
+                <!--test number format of the axis text-->
+                <xsl:variable name="formatcode">
+                  <xsl:if test="c:numFmt">
+                    <xsl:value-of select="c:numFmt/@formatCode"/>
+                  </xsl:if>
+                </xsl:variable>
+                <!-- Sonata: Number format-->
+                <xsl:apply-templates select="c:numFmt"/>
                 <xsl:call-template name="InsertAxisYProperties">
-                
+                  <xsl:with-param name="numberformat" select="$formatcode"/>
+                  <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisYTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridYProperties"/>
@@ -398,11 +480,21 @@
                 </xsl:for-each>
               </xsl:variable>
               <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:catAx[1]">
+                <!--test number format of the axis text-->
+                <xsl:variable name="formatcode">
+                  <xsl:if test="c:numFmt">
+                    <xsl:value-of select="c:numFmt/@formatCode"/>
+                  </xsl:if>
+                </xsl:variable>
+                <!-- Sonata: Number format-->
+                <xsl:apply-templates select="c:numFmt"/>
                 <xsl:call-template name="InsertAxisXProperties">
                   <xsl:with-param name="type">
                     <xsl:text>catAx</xsl:text>
                   </xsl:with-param>
                   <xsl:with-param name="axisYId" select="$axisYId"/>
+                  <xsl:with-param name="numberformat" select="$formatcode"/>
+                  <xsl:with-param name="dataStyleName" select="generate-id(c:numFmt)"/>
                 </xsl:call-template>
                 <xsl:call-template name="InsertAxisXTitleProperties"/>
                 <xsl:call-template name="InsertMajorGridXProperties"/>
@@ -497,7 +589,7 @@
     <xsl:choose>
       <xsl:when test ="($val='sysDot')">
         <xsl:call-template name ="AddDashType">
-          <xsl:with-param name ="name" select ="'sysDot'" />
+          <xsl:with-param name ="name" select ="'Fine_20_Dotted'" />
           <xsl:with-param name ="cap" select ="$cap" />
           <xsl:with-param name ="dot1" select ="'1'" />
           <xsl:with-param name ="dot1-length" select = "$dot" />
@@ -506,25 +598,46 @@
       </xsl:when>
       <xsl:when test ="($val='sysDash')">
         <xsl:call-template name ="AddDashType">
-          <xsl:with-param name ="name" select ="'sysDash'" />
+          <xsl:with-param name ="name" select ="'Dash'" />
           <xsl:with-param name ="cap" select ="$cap" />
           <xsl:with-param name ="dot1" select ="'1'" />
           <xsl:with-param name ="dot1-length" select = "$dot" />
           <xsl:with-param name ="distance" select ="$dot" />
         </xsl:call-template>
       </xsl:when>
+      <xsl:when test ="($val='1 1' and $cap='round')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'Fine_20_Dotted'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="distance" select ="$distance" />
+        </xsl:call-template>
+      </xsl:when>
       <xsl:when test ="($val='dash')">
         <xsl:call-template name ="AddDashType">
-          <xsl:with-param name ="name" select ="'dash'" />
+          <xsl:with-param name ="name" select ="'Ultrafine_20_Dashed'" />
           <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="dot1-length" select = "$dash" />
           <xsl:with-param name ="dot2" select ="'1'" />
           <xsl:with-param name ="dot2-length" select = "$dash" />
           <xsl:with-param name ="distance" select ="$distance" />
         </xsl:call-template>
       </xsl:when>
+      <xsl:when test ="($val='1 1')">
+        <xsl:call-template name ="AddDashType">
+          <xsl:with-param name ="name" select ="'SquareDot'" />
+          <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="dot1-length" select = "$distance" />
+          <xsl:with-param name ="dot2" select ="'1'" />
+          <xsl:with-param name ="dot2-length" select = "$distance" />
+          <xsl:with-param name ="distance" select ="$distance" />
+        </xsl:call-template>
+      </xsl:when>
       <xsl:when test ="($val='dashDot')">
         <xsl:call-template name ="AddDashType">
-          <xsl:with-param name ="name" select ="'dashDot'" />
+          <xsl:with-param name ="name" select ="'_1_Dot_1_Dash'" />
           <xsl:with-param name ="cap" select ="$cap" />
           <xsl:with-param name ="dot1" select ="'1'" />
           <xsl:with-param name ="dot1-length" select = "$dot" />
@@ -535,8 +648,10 @@
       </xsl:when>
       <xsl:when test ="($val='lgDash')">
         <xsl:call-template name ="AddDashType">
-          <xsl:with-param name ="name" select ="'lgDash'" />
+          <xsl:with-param name ="name" select ="'Fine_20_Dashed'" />
           <xsl:with-param name ="cap" select ="$cap" />
+          <xsl:with-param name ="dot1" select ="'1'" />
+          <xsl:with-param name ="dot1-length" select = "$longDash" />
           <xsl:with-param name ="dot2" select ="'1'" />
           <xsl:with-param name ="dot2-length" select = "$longDash" />
           <xsl:with-param name ="distance" select ="$distance" />
@@ -544,7 +659,7 @@
       </xsl:when>
       <xsl:when test ="($val='lgDashDot')">
         <xsl:call-template name ="AddDashType">
-          <xsl:with-param name ="name" select ="'lgDashDot'" />
+          <xsl:with-param name ="name" select ="'_1_Dot_2_Dash'" />
           <xsl:with-param name ="cap" select ="$cap" />
           <xsl:with-param name ="dot1" select ="'1'" />
           <xsl:with-param name ="dot1-length" select = "$dot" />
@@ -555,7 +670,7 @@
       </xsl:when>
       <xsl:when test ="($val='lgDashDotDot')">
         <xsl:call-template name ="AddDashType">
-          <xsl:with-param name ="name" select ="'lgDashDotDot'" />
+          <xsl:with-param name ="name" select ="'_32__20_Dots_20_1_20_Dash'" />
           <xsl:with-param name ="cap" select ="$cap" />
           <xsl:with-param name ="dot1" select ="'2'" />
           <xsl:with-param name ="dot1-length" select = "$dot" />
@@ -1528,7 +1643,7 @@
           
           <!-- scatter chart has two value axes -->
           <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:scatterChart or key('plotArea', c:chartSpace/@oox:part)/c:bubbleChart">
-            <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]/c:axPos">
+            <xsl:for-each select="key('plotArea', c:chartSpace/@oox:part)/c:valAx[1]">
               <xsl:call-template name="InsertXAxis"/>
             </xsl:for-each>
             <xsl:for-each
@@ -1658,12 +1773,12 @@
           </xsl:for-each>
         </style:graphic-properties>
         <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="18pt"
+          style:font-pitch="variable" fo:font-size="21.96pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="18pt" style:font-family-complex="Tahoma"
+          style:font-size-asian="21.96pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="18pt">
+          style:font-size-complex="21.96pt">
 
           <!-- default "bold" font attribute for default title -->
           <xsl:if test="not(c:tx) and not(c:txPr)">
@@ -1678,12 +1793,16 @@
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                 <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                 <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -1754,7 +1873,7 @@
             <xsl:call-template name="InsertChartFillProperties"/>
           </xsl:for-each>
         </style:graphic-properties>
-        <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
+        <style:text-properties fo:font-family="Calibri" fo:font-weight="bold" style:font-family-generic="swiss"
           style:font-pitch="variable" fo:font-size="10pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
@@ -1774,12 +1893,16 @@
                 <xsl:call-template name="TextBoxRunProperties">
                   <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                   <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                  <xsl:with-param name="deftxPr" select="../../../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                  <xsl:with-param name ="isChart" select="'true'"/>
                 </xsl:call-template>
               </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
                 <xsl:call-template name="TextBoxRunProperties">
                   <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                  <xsl:with-param name="defRPr" select="../../../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                  <xsl:with-param name ="isChart" select="'true'"/>
                 </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -1813,7 +1936,13 @@
             <xsl:call-template name="InsertChartFillProperties"/>
           </xsl:for-each>
         </style:graphic-properties>
-        <style:text-properties fo:font-family="Calibri">
+        <style:text-properties fo:font-family="Calibri" fo:font-weight="bold" style:font-family-generic="swiss"
+         style:font-pitch="variable" fo:font-size="10pt"
+         style:font-family-asian="&apos;MS Gothic&apos;"
+         style:font-family-generic-asian="system" style:font-pitch-asian="variable"
+         style:font-size-asian="10pt" style:font-family-complex="Tahoma"
+         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
+         style:font-size-complex="10pt">
 
           <xsl:choose>
             <!-- custom title -->
@@ -1821,12 +1950,15 @@
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                 <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="deftxPr" select="../../../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
               </xsl:call-template>
             </xsl:when>
             <!-- default title -->
          <xsl:otherwise>
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="defRPr" select="../../../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -1905,16 +2037,21 @@
 
           <xsl:choose>
             <!-- custom title -->
-            <xsl:when test="c:tx">
+            <!-- sonata: defect#2154917  -->
+            <xsl:when test="c:legendEntry/c:tx">
               <xsl:call-template name="TextBoxRunProperties">
-                <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
-                <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="rPr" select="c:legendEntry/c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                <xsl:with-param name="defRPr" select="c:legendEntry/c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
               <xsl:call-template name="TextBoxRunProperties">
-                <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="rPr" select="c:legendEntry/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="defRPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -2103,7 +2240,23 @@
 
   <xsl:template name="InsertAxisXProperties">
     <xsl:param name="axisYId"/>
+    <xsl:param name="numberformat"/>
+    <xsl:param name="dataStyleName"/>
     <style:style style:name="axis-x" style:family="chart" style:data-style-name="N0">
+      <!--code added by sonata for bug no:2107205-->
+      <xsl:choose>
+        <xsl:when test="$numberformat!=''">
+          <xsl:attribute name="style:data-style-name">
+            <xsl:value-of select="$dataStyleName"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="style:data-style-name">
+            <xsl:value-of select="N0"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      <!--end-->
       <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
         chart:tick-marks-major-outer="true" chart:tick-marks-minor-inner="false"
         chart:tick-marks-minor-outer="false" chart:logarithmic="false" chart:text-overlap="true"
@@ -2135,12 +2288,16 @@
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
               <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:when>
           <!-- default title -->
           <xsl:otherwise>
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -2186,24 +2343,28 @@
         </xsl:for-each>
       </style:graphic-properties>
       <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-        style:font-pitch="variable" fo:font-size="7pt"
+        style:font-pitch="variable" fo:font-size="8.54pt"
         style:font-family-asian="&apos;MS Gothic&apos;"
         style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-        style:font-size-asian="7pt" style:font-family-complex="Tahoma"
+        style:font-size-asian="8.54pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-        style:font-size-complex="7pt">
+        style:font-size-complex="8.54pt">
         <xsl:choose>
           <!-- custom title -->
           <xsl:when test="c:tx">
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
               <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:when>
           <!-- default title -->
           <xsl:otherwise>
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -2657,24 +2818,28 @@
         </xsl:for-each>
       </style:graphic-properties>
       <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-        style:font-pitch="variable" fo:font-size="7pt"
+        style:font-pitch="variable" fo:font-size="8.54pt"
         style:font-family-asian="&apos;MS Gothic&apos;"
         style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-        style:font-size-asian="7pt" style:font-family-complex="Tahoma"
+        style:font-size-asian="8.54pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-        style:font-size-complex="7pt">
+        style:font-size-complex="8.54pt">
         <xsl:choose>
           <!-- custom title -->
           <xsl:when test="c:tx">
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
               <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:when>
           <!-- default title -->
           <xsl:otherwise>
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -2804,6 +2969,12 @@
                   </xsl:attribute>
                 </xsl:when>
               </xsl:choose>
+              <!-- defect#2155191-->
+              <xsl:if test="contains(c:numFmt/@formatCode,'%') ">
+                <xsl:attribute name="chart:data-label-number">
+                  <xsl:text>percentage</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
               <!-- name -->
               <xsl:if test="c:showCatName/@val = 1 ">
                 <xsl:attribute name="chart:data-label-text">
@@ -2816,6 +2987,56 @@
                   <xsl:text>true</xsl:text>
                 </xsl:attribute>
               </xsl:if>
+              <!-- Sonata:data lable position -->
+              <xsl:choose>
+                
+                <xsl:when test="c:dLblPos[@val='outEnd']">
+                  <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'outside'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:dLblPos[@val='inEnd']">
+                  <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'inside'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:dLblPos[@val='ctr']">
+               <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'center'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:dLblPos[@val='b']">
+                  <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'bottom'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:dLblPos[@val='t']">
+                   <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'top'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:dLblPos[@val='r']">
+                  <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'right'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:dLblPos[@val='l']">
+                  <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'left'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                 <xsl:when test="c:dLblPos[@val='inBase']">
+                  <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'near-origin'"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="c:dLblPos[@val='bestFit']">
+                  <xsl:attribute name="chart:label-position">
+                    <xsl:value-of select="'near-origin'"/>
+                  </xsl:attribute>
+                </xsl:when>
+              </xsl:choose>
+             
             </xsl:if>
           </xsl:for-each>
 
@@ -2960,12 +3181,12 @@
 
         </style:graphic-properties>
         <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="10pt"
+          style:font-pitch="variable" fo:font-size="12.2pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="6pt" style:font-family-complex="Tahoma"
+          style:font-size-asian="7.32pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="6pt">
+          style:font-size-complex="7.32pt">
           <xsl:for-each select="c:dLbls">
             <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
               <xsl:choose>
@@ -2974,12 +3195,16 @@
                   <xsl:call-template name="TextBoxRunProperties">
                     <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                     <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                    <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                    <xsl:with-param name ="isChart" select="'true'"/>
                   </xsl:call-template>
                 </xsl:when>
                 <!-- default title -->
                 <xsl:otherwise>
                   <xsl:call-template name="TextBoxRunProperties">
                     <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                    <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                    <xsl:with-param name ="isChart" select="'true'"/>
                   </xsl:call-template>
                 </xsl:otherwise>
               </xsl:choose>
@@ -3044,7 +3269,32 @@
       </xsl:when>
       <xsl:otherwise>
         <style:style style:name="{concat('data0-',$numPoints - $current)}" style:family="chart">
+          <xsl:choose>
+            <xsl:when test="c:dLbls/c:dLbl[c:idx/@val = $numPoints - $current]">
+              <xsl:for-each select="c:dLbls/c:dLbl[c:idx/@val = $numPoints - $current]">
+                <!--test number format of the axis text-->
+                <xsl:variable name="formatcode">
+                  <xsl:if test="c:numFmt">
+                    <xsl:value-of select="c:numFmt/@formatCode"/>
+                  </xsl:if>
+                </xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="$formatcode!=''">
+                    <xsl:attribute name="style:data-style-name">
+                      <xsl:value-of select="generate-id(c:numFmt)"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="style:data-style-name">
+                      <xsl:value-of select="N0"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
+            </xsl:choose>
           
+          <!--Edited by Sonata -->
           <!-- label -->
           <xsl:for-each select="c:dLbls">
             <!-- if label wasn't deleted from data point -->
@@ -3159,6 +3409,30 @@
 
     <style:style style:name="{concat('data',$seriesNum,'-',$point)}" style:family="chart">
 
+      <xsl:choose>
+        <xsl:when test="c:dLbls/c:dLbl[c:idx/@val =$current]">
+          <xsl:for-each select="c:dLbls/c:dLbl[c:idx/@val =$current]">
+            <!--test number format of the axis text-->
+            <xsl:variable name="formatcode">
+              <xsl:if test="c:numFmt">
+                <xsl:value-of select="c:numFmt/@formatCode"/>
+              </xsl:if>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$formatcode!=''">
+                <xsl:attribute name="style:data-style-name">
+                  <xsl:value-of select="generate-id(c:numFmt)"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="style:data-style-name">
+                  <xsl:value-of select="N0"/>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
       <!-- label -->
       <xsl:for-each select="c:dLbls">
         <!-- if label wasn't deleted from data point -->
@@ -3208,6 +3482,44 @@
         </xsl:for-each>
 
       </style:graphic-properties>
+      <xsl:for-each select="c:dLbls/c:dLbl[c:idx/@val =$current]">
+        <style:text-properties fo:font-family="Calibri" fo:font-weight="bold" style:font-family-generic="swiss"
+        style:font-pitch="variable" fo:font-size="8pt"
+        style:font-family-asian="&apos;MS Gothic&apos;"
+        style:font-family-generic-asian="system" style:font-pitch-asian="variable"
+        style:font-size-asian="8pt" style:font-family-complex="Tahoma"
+        style:font-family-generic-complex="system" style:font-pitch-complex="variable"
+        style:font-size-complex="8pt">
+
+          <!-- default "bold" font attribute for default title -->
+          <xsl:if test="not(c:tx) and not(c:txPr)">
+            <xsl:attribute name="fo:font-weight">
+              <xsl:text>bold</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:choose>
+            <!-- custom title -->
+            <xsl:when test="c:tx">
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
+                <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name ="isChart" select="'true'"/>
+              </xsl:call-template>
+            </xsl:when>
+            <!-- default title -->
+            <xsl:otherwise>
+              <xsl:call-template name="TextBoxRunProperties">
+                <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <xsl:with-param name ="isChart" select="'true'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </style:text-properties>
+      </xsl:for-each>
+
     </style:style>
   </xsl:template>
 

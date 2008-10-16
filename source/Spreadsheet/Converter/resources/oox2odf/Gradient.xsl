@@ -59,28 +59,41 @@
         <xsl:choose>
           <xsl:when test="a:srgbClr/@val">
             <xsl:attribute name="draw:start-color">
-              <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+              <!--<xsl:value-of select="concat('#',a:srgbClr/@val)" />-->
+              <xsl:call-template name="tmpgetColorCode">
+                <xsl:with-param name="color">
+                  <xsl:value-of select="a:srgbClr/@val" />
+                </xsl:with-param>
+                <xsl:with-param name="lumMod">
+                  <xsl:value-of select="a:srgbClr/a:lumMod/@val" />
+                </xsl:with-param>
+                <xsl:with-param name="lumOff">
+                  <xsl:value-of select="a:srgbClr/a:lumOff/@val" />
+                </xsl:with-param>
+                <xsl:with-param name ="shade">
+                  <xsl:for-each select="a:srgbClr/a:shade/@val">
+                    <xsl:value-of select=". div 1000"/>
+                  </xsl:for-each>
+                </xsl:with-param>
+                <xsl:with-param name ="tint">
+                  <xsl:choose>
+                    <xsl:when test="a:srgbClr/a:tint/@val">
+                      <xsl:for-each select="a:srgbClr/a:tint/@val">
+                        <xsl:value-of select=". div 100000"/>
+                      </xsl:for-each>
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:attribute>
           </xsl:when>
           <xsl:when test="a:schemeClr/@val">
             <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
             <xsl:attribute name="draw:start-color">
-              <xsl:call-template name="getColorCode">
+              <xsl:call-template name="tmpgetColorCode">
                 <xsl:with-param name="color">
-                  <!--xsl:choose>
-                    <xsl:when test="$SMName!=''">
-                      <xsl:for-each select="document(concat('ppt/slideMasters/',$SMName))//p:clrMap">
-                        <xsl:call-template name="tmpThemeClr">
-                          <xsl:with-param name="ClrMap" select="$var_schemeClr"/>
-                        </xsl:call-template>
-                      </xsl:for-each>
-                    </xsl:when>
-                    <xsl:otherwise-->
-                      <xsl:value-of select="a:schemeClr/@val" />
-                    <!--/xsl:otherwise>
-                  </xsl:choose-->
-                  <!--<xsl:value-of select="a:schemeClr/@val"/>-->
-                </xsl:with-param>
+                <xsl:value-of select="a:schemeClr/@val" />
+                 </xsl:with-param>
                 <xsl:with-param name="lumMod">
                   <xsl:value-of select="a:schemeClr/a:lumMod/@val" />
                 </xsl:with-param>
@@ -91,6 +104,15 @@
                   <xsl:for-each select="a:schemeClr/a:shade/@val">
                     <xsl:value-of select=". div 1000"/>
                   </xsl:for-each>
+                </xsl:with-param>
+                <xsl:with-param name ="tint">
+                  <xsl:choose>
+                    <xsl:when test="a:schemeClr/a:tint/@val">
+                      <xsl:for-each select="a:schemeClr/a:tint/@val">
+                        <xsl:value-of select=". div 100000"/>
+                      </xsl:for-each>
+                    </xsl:when>
+                  </xsl:choose>
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:attribute>
@@ -101,13 +123,38 @@
         <xsl:choose>
           <xsl:when test="a:srgbClr/@val">
             <xsl:attribute name="draw:end-color">
-              <xsl:value-of select="concat('#',a:srgbClr/@val)" />
+              <!--<xsl:value-of select="concat('#',a:srgbClr/@val)" />-->
+              <xsl:call-template name="tmpgetColorCode">
+                <xsl:with-param name="color">
+                  <xsl:value-of select="a:srgbClr/@val" />
+                </xsl:with-param>
+                <xsl:with-param name="lumMod">
+                  <xsl:value-of select="a:srgbClr/a:lumMod/@val" />
+                </xsl:with-param>
+                <xsl:with-param name="lumOff">
+                  <xsl:value-of select="a:srgbClr/a:lumOff/@val" />
+                </xsl:with-param>
+                <xsl:with-param name ="shade">
+                  <xsl:for-each select="a:srgbClr/a:shade/@val">
+                    <xsl:value-of select=". div 1000"/>
+                  </xsl:for-each>
+                </xsl:with-param>
+                <xsl:with-param name ="tint">
+                  <xsl:choose>
+                    <xsl:when test="a:srgbClr/a:tint/@val">
+                      <xsl:for-each select="a:srgbClr/a:tint/@val">
+                        <xsl:value-of select=". div 100000"/>
+                      </xsl:for-each>
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:attribute>
           </xsl:when>
           <xsl:when test="a:schemeClr/@val">
             <xsl:variable name="var_schemeClr" select="a:schemeClr/@val"/>
             <xsl:attribute name="draw:end-color">
-              <xsl:call-template name="getColorCode">
+              <xsl:call-template name="tmpgetColorCode">
                 <xsl:with-param name="color">
                   <!--<xsl:value-of select="a:schemeClr/@val"/>-->
                   <!--xsl:choose>
@@ -133,6 +180,15 @@
                   <xsl:for-each select="a:schemeClr/a:shade/@val">
                     <xsl:value-of select=". div 1000"/>
                   </xsl:for-each>
+                </xsl:with-param>
+                <xsl:with-param name ="tint">
+                  <xsl:choose>
+                    <xsl:when test="a:schemeClr/a:tint/@val">
+                      <xsl:for-each select="a:schemeClr/a:tint/@val">
+                        <xsl:value-of select=". div 100000"/>
+                      </xsl:for-each>
+                    </xsl:when>
+                  </xsl:choose>
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:attribute>
@@ -253,11 +309,12 @@
     </xsl:for-each>
   </xsl:template>
   
-  <xsl:template name="getColorCode">
+  <xsl:template name="tmpgetColorCode">
     <xsl:param name="color"/>
     <xsl:param name ="lumMod"/>
     <xsl:param name ="lumOff"/>
     <xsl:param  name ="shade"/>
+    <xsl:param name ="tint"/>
     <xsl:message terminate="no">progress:a:p</xsl:message>
     <xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:variable name ="ThemeColor">
@@ -327,6 +384,7 @@
       <xsl:with-param name ="lumMod" select ="$lumMod"/>
       <xsl:with-param name ="lumOff" select ="$lumOff"/>
       <xsl:with-param name ="shade" select ="$shade"/>
+      <xsl:with-param name ="tint" select ="$tint"/>
     </xsl:call-template>
   </xsl:template>
   
@@ -335,6 +393,7 @@
     <xsl:param name ="lumMod"/>
     <xsl:param name ="lumOff"/>
     <xsl:param name ="shade"/>
+    <xsl:param name ="tint"/>
     <xsl:message terminate="no">progress:p:cSld</xsl:message>
     <xsl:variable name ="Red">
       <xsl:call-template name ="HexToDec">
@@ -351,16 +410,24 @@
         <xsl:with-param name ="number" select ="substring($color,5,2)"/>
       </xsl:call-template>
     </xsl:variable>
-    
-    <xsl:if test="$shade!=''">
+    <xsl:choose>
+      <xsl:when test="$shade!='' and $tint=''">
       <xsl:call-template name ="calculateShade">
         <xsl:with-param name ="Red" select ="$Red" />
         <xsl:with-param name ="Green" select ="$Green"/>
         <xsl:with-param name ="Blue" select ="$Blue"/>
         <xsl:with-param name ="shade" select ="$shade"/>
       </xsl:call-template >
-    </xsl:if>
-    <xsl:if test="$shade=''">
+      </xsl:when>
+      <xsl:when test="$tint!='' and $shade=''">
+        <xsl:value-of select="'#'"/>
+        <!--<xsl:value-of select="'#FFFF00'"/>-->
+        <xsl:call-template name="CalculateTintedColor">
+          <xsl:with-param name="color" select="$color"/>
+          <xsl:with-param name="tint" select="$tint"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$tint='' and $shade=''">
       <xsl:choose >
         <xsl:when test ="$lumOff = '' and $lumMod != '' ">
           <xsl:variable name ="NewRed">
@@ -401,8 +468,8 @@
           </xsl:call-template>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
-    
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template name ="calculateShade">
@@ -412,7 +479,6 @@
     <xsl:param name ="shade"/>
     <xsl:value-of select ="concat('shade-tint:',$Red,':',$Green,':',$Blue ,':',$shade )"/>
   </xsl:template>
-  
   <!-- Converts Hexa Decimal Value to Decimal-->
   <xsl:template name="HexToDec">
     <!-- @Description: This is a recurive algorithm converting a hex to decimal -->
