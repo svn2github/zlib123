@@ -905,7 +905,10 @@
           <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'line'">
-          <xsl:text>line</xsl:text>
+          <!--<xsl:text>line</xsl:text>-->
+          <!--changed by chhavi-->
+          <xsl:text>paragraph-content</xsl:text>
+          <!--end here-->
         </xsl:when>
         <xsl:when test="$relativeFrom = 'paragraph'">
           <xsl:text>paragraph-content</xsl:text>

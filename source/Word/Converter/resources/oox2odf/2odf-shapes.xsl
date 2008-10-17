@@ -3631,6 +3631,14 @@
 				<xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
 			</xsl:call-template>
 		</xsl:variable>
+    <!--added by chhavi for vertical top-margin-area-->
+    <xsl:variable name="alignV">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-position-vertical'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!--end here-->
     <xsl:variable name="currentSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
     <!-- added by chhavi to calulate top bottom left  and right margin and page height and width  in case of mirror margin-->
     <xsl:variable name ="pageWidth">
@@ -3871,6 +3879,22 @@
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:choose>
+
+                    <!--added by chhavi for vertical alignment bottom-margin-area-->
+                    <xsl:when test ="$relV='bottom-margin-area' and $marginTop ='0cm'">
+                      <xsl:choose>
+                        <xsl:when test="$alignV = 'top'">
+                          <xsl:value-of select="concat((($pageHeight - $marBottom) div 1440) * 2.54 , 'cm') "/>
+                        </xsl:when>
+                        <xsl:when test="$alignV = 'center'">
+                          <xsl:value-of select="concat((($pageHeight div 1440) - ($marBottom div 2880) - ((number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 144))* 2.54 , 'cm') "/>
+                        </xsl:when>
+                        <xsl:when test="$alignV = 'bottom'">
+                          <xsl:value-of select="concat((($pageHeight div 1440) - ((number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 72)) * 2.54 ,'cm')"/>
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:when>
+                    <!--end here-->
                     <!-- or $relV='inner-margin-area'-->
                     <xsl:when test ="$relV='bottom-margin-area'">
                       <xsl:variable name ="vertHeight">
@@ -3882,9 +3906,25 @@
                       <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
 								</xsl:when>
                       <!--changed for below of line-->
-                      <xsl:when test="$relV='line'">
+                      <!--<xsl:when test="$relV='line'">
                         <xsl:value-of select="concat(number(substring-before($marginTop,'cm')) * -1,'cm')"/>
+                      </xsl:when>-->
+                    <!--added by chhavi for vertical alignment top-margin-area-->
+                    <xsl:when test ="$relV='top-margin-area' and $marginTop ='0cm'" >
+                      <xsl:choose>
+
+                        <xsl:when test="$alignV = 'center'">
+                          <xsl:value-of select="concat(((($marTop div 1440) div 2) - (number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 144)*2.54 ,'cm')"/>
+                        </xsl:when>
+                        <xsl:when test="$alignV = 'bottom'">
+                          <xsl:value-of select="concat(((($marTop div 1440)) - (number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 72)* 2.54 , 'cm')"/>
                       </xsl:when>
+                        
+                      </xsl:choose>
+                    </xsl:when>
+                    <!--end here-->
+                 
+
                     <xsl:otherwise>
                       <xsl:value-of select="$marginTop"></xsl:value-of>
                     </xsl:otherwise>
@@ -3920,6 +3960,22 @@
 					</xsl:choose>
 				</xsl:variable>
               <xsl:choose>
+
+                <!--added by chhavi for vertical alignment bottom-margin-area-->
+                <xsl:when test ="$relV='bottom-margin-area' and $marginTop ='0cm'">
+                  <xsl:choose>
+                    <xsl:when test="$alignV = 'top'">
+                      <xsl:value-of select="concat((($pageHeight - $marBottom) div 1440) * 2.54 , 'cm') "/>
+                    </xsl:when>
+                    <xsl:when test="$alignV = 'center'">
+                      <xsl:value-of select="concat((($pageHeight div 1440) - ($marBottom div 2880) - ((number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 144))* 2.54 , 'cm') "/>
+                    </xsl:when>
+                    <xsl:when test="$alignV = 'bottom'">
+                      <xsl:value-of select="concat((($pageHeight div 1440) - ((number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 72)) * 2.54 ,'cm')"/>
+                    </xsl:when>
+                  </xsl:choose>
+                </xsl:when>
+                <!--end here-->
                 <!--or $relV='inner-margin-area'-->
                 <xsl:when test ="$relV='bottom-margin-area'">
                   <xsl:variable name ="vertHeight">
@@ -3931,9 +3987,22 @@
                   <xsl:value-of select="concat((substring-before($vertHeight,'cm')+substring-before($marginTop,'cm')),'cm')"/>
                 </xsl:when>
                   <!--chnaged for below of line-->
-                  <xsl:when test="$relV='line'">
+                  <!--<xsl:when test="$relV='line'">
                     <xsl:value-of select="concat(number(substring-before($marginTop,'cm')) * -1,'cm')"/>
+                  </xsl:when>-->
+                <!--added by chhavi for vertical alignment top-margin-area-->
+                <xsl:when test ="$relV='top-margin-area' and $marginTop ='0cm'" >
+                  <xsl:choose>
+                    <xsl:when test="$alignV = 'center'">
+                      <xsl:value-of select="concat(((($marTop div 1440) div 2) - (number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 144)*2.54 ,'cm')"/>
+                    </xsl:when>
+                    <xsl:when test="$alignV = 'bottom'">
+                      <xsl:value-of select="concat(((($marTop div 1440)) - (number(substring-before(substring-after(./@style,'height:'),'pt;'))) div 72)* 2.54 , 'cm')"/>
+                    </xsl:when>
+                  </xsl:choose>
                   </xsl:when>
+                <!--end here-->
+               
                 <xsl:otherwise>
                   <xsl:value-of select="$marginTop"></xsl:value-of>
                 </xsl:otherwise>
@@ -4028,8 +4097,9 @@
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:inner-margin-area')">
               <xsl:value-of select ="(($pageWidth div 1440) -($marRight div 1440)) + $marLeft div 1440 * ($relativeWidth div 1000) "/>
             </xsl:when>
+            <!--chnaged by chhavi marright to marleft-->
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:outer-margin-area')">
-              <xsl:value-of select ="$marRight div 1440 * ($relativeWidth div 1000)"/>
+              <xsl:value-of select ="$marLeft div 1440 * ($relativeWidth div 1000)"/>
             </xsl:when>
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:page')">
               <xsl:value-of select ="$pageWidth div 1440 * ($relativeWidth div 1000)"/>
@@ -4227,7 +4297,11 @@
           or (contains($shape/@style, 'mso-position-vertical-relative:line'))">
             <xsl:text>char</xsl:text>
 					</xsl:when>
-
+          <!-- added by chhavi to fix bug realted to vertical position to inside outside margin for office 2003-->
+          <xsl:when test="(w10:wrap/@anchorx='page') and (contains($shape/@style, 'mso-position-vertical-relative:outer-margin-area') or contains($shape/@style, 'mso-position-vertical-relative:inner-margin-area'))">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <!--end here-->
 					<xsl:otherwise>
 						<xsl:text>paragraph</xsl:text>
 					</xsl:otherwise>
