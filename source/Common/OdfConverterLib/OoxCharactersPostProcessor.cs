@@ -1196,6 +1196,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     Double angle;
                     Double x;
                     Double y;
+                    //Sona: Different culture defect fix
+                    string strReturn="";
                     foreach (string str in splitStr)
                     {
                         if (str.StartsWith("rotation"))
@@ -1204,7 +1206,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             rotStr.Trim();
                             //Convert emu to degrees
                             angle = Convert.ToDouble(EvalRotationExpression(rotStr)) / 60000;
-                            text = text.Replace(rotStr, angle.ToString());
+                            //Sona: Different culture defect fix
+                            strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", angle);                            
+                            text = text.Replace(rotStr, strReturn);
+                            
                         }
                         if (str.StartsWith("margin-left"))
                         {
@@ -1212,7 +1217,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             xStr.Trim();
                             //convert emu to points
                             x = (Convert.ToInt32(EvalRotationExpression(xStr)) * 72) / (360000 * 2.54);
-                            text = text.Replace(xStr, x.ToString() + "pt");
+                            //Sona: Different culture defect fix
+                            strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", (int)Math.Round(x));
+                            text = text.Replace(xStr, strReturn + "pt");
                         }
                         if (str.StartsWith("margin-top"))
                         {
@@ -1220,7 +1227,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             yStr.Trim();
                             //convert emu to points
                             y = (Convert.ToInt32(EvalRotationExpression(yStr)) * 72) / (360000 * 2.54);
-                            text = text.Replace(yStr, y.ToString() + "pt");
+                            //Sona: Different culture defect fix
+                            strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", (int)Math.Round(y));
+                            text = text.Replace(yStr, strReturn + "pt");
                         }
                     }
                 }
