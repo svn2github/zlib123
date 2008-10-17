@@ -1945,7 +1945,7 @@
 
 		<!--code changed by yeswanth.s : For Stroke Weight-->
 		<xsl:choose>
-			<xsl:when test ="$shapeBorder='none' or $shapeBorder = ''">
+      <xsl:when test ="$shapeBorder='none' or ($shapeBorder = '' and (name(parent::node()) = 'draw:frame' or self::node()[name()='draw:frame']))">
 				<xsl:attribute name ="stroked">
 					<xsl:value-of select ="'f'"/>
 				</xsl:attribute>
