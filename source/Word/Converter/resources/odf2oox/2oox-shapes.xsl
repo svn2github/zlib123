@@ -1893,7 +1893,16 @@
 
 		<xsl:variable name="strokeColor">
 			<xsl:call-template name="GetDrawnGraphicProperties">
-				<xsl:with-param name="attrib">svg:stroke-color</xsl:with-param>
+				<xsl:with-param name="attrib">
+					<xsl:choose>
+						<xsl:when test="name(parent::node()) = 'draw:frame' and not($shapeStyle/style:graphic-properties/@svg:stroke-color)">
+							<xsl:value-of select="'fo:border'"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'svg:stroke-color'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
 				<xsl:with-param name="shapeStyle" select="$shapeStyle"/>
 			</xsl:call-template>
 		</xsl:variable>
@@ -1903,7 +1912,7 @@
 				<!--<xsl:with-param name="attrib">svg:stroke-width</xsl:with-param>-->				
 				<xsl:with-param name="attrib">
 					<xsl:choose>
-						<xsl:when test="name(parent::node()) = 'draw:frame'">
+						<xsl:when test="name(parent::node()) = 'draw:frame' and not($shapeStyle/style:graphic-properties/@svg:stroke-width)">
 							<xsl:value-of select="'fo:border'"/>
 						</xsl:when>
 						<xsl:otherwise>
@@ -1921,7 +1930,7 @@
                                 <!--changes made by yeswanth.s-->
 				<xsl:with-param name="attrib">
 					<xsl:choose>
-						<xsl:when test="name(parent::node()) = 'draw:frame'">
+						<xsl:when test="name(parent::node()) = 'draw:frame' and not($shapeStyle/style:graphic-properties/@draw:stroke)">
 							<xsl:value-of select="'fo:border'"/>
 						</xsl:when>
 						<xsl:otherwise>
@@ -1934,24 +1943,32 @@
 			</xsl:call-template>
 		</xsl:variable>
 
-		<xsl:if test="$strokeColor != '' ">
+		<!--code changed by yeswanth.s : For Stroke Weight-->
+		<xsl:choose>
+			<xsl:when test ="$shapeBorder='none' or $shapeBorder = ''">
+				<xsl:attribute name ="stroked">
+					<xsl:value-of select ="'f'"/>
+				</xsl:attribute>
+			</xsl:when>		
+			<xsl:otherwise>
+		<xsl:if test="$strokeColor != '' and substring-after($strokeColor,'#')!=''">
 			<xsl:attribute name="strokecolor">
-				<xsl:value-of select="$strokeColor"/>
+				<xsl:value-of select="concat('#',substring-after($strokeColor,'#'))"/>
 			</xsl:attribute>
 		</xsl:if>
 		<xsl:if test="$strokeWeight != '' ">
 			<xsl:attribute name="strokeweight">
 				<xsl:call-template name="point-measure">
 					<xsl:with-param name="length" select="$strokeWeight"/>
+							<!--yeswanth.s added parameter : 14-Oct-08-->
+							<xsl:with-param name="round" select="'false'"/>
 				</xsl:call-template>
 				<xsl:text>pt</xsl:text>
 			</xsl:attribute>
 		</xsl:if>
-		<xsl:if test ="$shapeBorder='none'">
-			<xsl:attribute name ="stroked">
-				<xsl:value-of select ="'f'"/>
-			</xsl:attribute>
-		</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
+		
 
 	</xsl:template>
 
@@ -2321,6 +2338,7 @@
 			<xsl:if test="$shapeStyle/style:graphic-properties/@draw:stroke!='' and $shapeStyle/style:graphic-properties/@draw:stroke!='none'">
 				<xsl:variable name="drawStrokeDash" select="$shapeStyle/style:graphic-properties/@draw:stroke-dash"></xsl:variable>
 				<xsl:variable name ="strokeStyle" select ="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$drawStrokeDash]"></xsl:variable>
+				<xsl:variable name="drawStroke" select="$shapeStyle/style:graphic-properties/@draw:stroke"/>
         <!-- Sona: Arrow feature continuation -->
         <xsl:variable name="Unit1">
           <xsl:call-template name="GetUnit">
@@ -2359,8 +2377,15 @@
 						</xsl:when>
             <!--Sona: Defect #2019464-->
             <xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="$drawStroke = 'dash'">
+									<xsl:value-of select="'dash'"/>
+								</xsl:when>
+								<xsl:otherwise>
               <xsl:value-of select="'solid'"/>
             </xsl:otherwise>
+					</xsl:choose>
+						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:attribute>
         <xsl:if test ="not($strokeStyle/@draw:dots1-length)and not($strokeStyle/@draw:dots2) and $strokeStyle/@draw:dots1">
