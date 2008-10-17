@@ -40,6 +40,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:pcut="urn:cleverage:xmlns:post-processings:pcut" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="w r draw number wp xlink v oox">
 
@@ -972,6 +973,26 @@
 						<xsl:with-param name="shape" select="." />
 					</xsl:call-template>
 				</xsl:for-each>
+
+				<!--code added by yeswanth.s : 17 Oct 08-->
+				<xsl:variable name="typeName">
+					<xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/header'"/>
+				</xsl:variable>				
+				<xsl:for-each select="document('word/_rels/document.xml.rels')//rels:Relationships/rels:Relationship[@Type = $typeName]">
+					<xsl:variable name="headerXML">
+						<xsl:value-of select="./@Target"/>
+					</xsl:variable>
+					<xsl:for-each select="document(concat('word/',$headerXML))//w:pict/node()[name()='v:shape' or name()='v:rect' or name()='v:line' or name()='v:group' or name()='v:oval' or name()='v:roundrect']">
+						<xsl:call-template name="getDashType">
+							<xsl:with-param name="shape" select="." />
+						</xsl:call-template>
+						<xsl:call-template name="InsertArrowStyle">
+							<xsl:with-param name="shape" select="." />
+						</xsl:call-template>
+					</xsl:for-each>
+				</xsl:for-each>
+				<!--end-->
+				
 				<!--gradient fill -->
 				<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//v:fill[@type='gradient']" mode="officestyles" />
 				<!-- Vipul: Picture Fill-->
