@@ -68,6 +68,49 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         }
 
+        //Start of Refno-1
+        protected class Item : IComparable
+        {
+            private int intPossition;
+            public int Possition
+            {
+                get { return intPossition; }
+                set { intPossition = value; }
+            }
+            private string strFunction;
+            public string Function
+            {
+                get { return strFunction; }
+                set { strFunction = value; }
+            }
+            private int intFunction;
+            public int FunctionType
+            {
+                get { return intFunction; }
+                set { intFunction = value; }
+            }
+
+            public Item(int intPos, string strFun, int intFun)
+            {
+                this.intPossition = intPos;
+                this.strFunction = strFun;
+                this.FunctionType = intFun;
+            }
+
+            public Int32 CompareTo(Object objItem)
+            {
+                Item ItemInstance = (Item)objItem;
+                if (this.intPossition > ItemInstance.intPossition)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return -1;
+                }
+            } 
+        }
+        //End of Refno-1
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
             if ("ConditionalCell".Equals(localName))
@@ -338,6 +381,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
             strOdfFormula = strOdfFormula.Replace("&quot;", "\"");
             //to replace parameter seperation operator.
             strOdfFormula = strOdfFormula.Replace(';', ',');
+            //to replace space between keyword and fuction.
+            strOdfFormula = strOdfFormula.Replace(" (", "(");
             //to replace union operator 
             strOdfFormula = strOdfFormula.Replace('!', ' ');
             //replace &apos; with ' operator
@@ -353,17 +398,37 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
             //TODO : chk for the '[' within the string
             //to translate cell reference
-            if (strOdfFormula.Contains("["))
+            if (strOdfFormula.Contains("[") && strOdfFormula.Contains("]"))
             {
-                while (strOdfFormula.Contains("["))
+                while (strOdfFormula.Contains("[") && strOdfFormula.Contains("]"))
                 {
                     int intStart = strOdfFormula.IndexOf('[');
                     int intEnd = strOdfFormula.IndexOf(']');
+                    int intQuot = strOdfFormula.IndexOf('"');
+                    //chk for the '[' within the string
+                    if(intQuot != -1 && (intQuot < intStart || intQuot < intEnd))
+                    {
+                        int intQuotEnd = strOdfFormula.IndexOf('"',intQuot+1);
+                        strFinalFormula = strFinalFormula + strOdfFormula.Substring(0, intQuotEnd+1);
+                        strOdfFormula = strOdfFormula.Substring(intQuotEnd + 1);
+                    }
+                    else
+                    {
+                        if (intEnd > intStart)
+                        {
                     strFinalFormula = strFinalFormula + strOdfFormula.Substring(0, intStart);
                     strExpToTrans = strOdfFormula.Substring(intStart + 1, intEnd - intStart - 1);
                     strOdfFormula = strOdfFormula.Substring(intEnd + 1);
 
                     strFinalFormula = strFinalFormula + TranslateToOoxCellRef(strExpToTrans);
+                        }
+                        else
+                        {
+                            strFinalFormula = strFinalFormula + strOdfFormula.Substring(0,intEnd+1);
+                            strOdfFormula = strOdfFormula.Substring(intEnd+1);
+                        }
+                    }
+                    
                     if (!strOdfFormula.Contains("["))
                     {
                         strFinalFormula = strFinalFormula + strOdfFormula;
@@ -383,6 +448,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
         {
             if (strOdfCellRef.StartsWith("."))
             {
+                if (strOdfCellRef.Contains(":") && !strOdfCellRef.Contains(":."))
+                {
+                    strOdfCellRef = strOdfCellRef.Remove(0, 1);
+                    return strOdfCellRef = strOdfCellRef.Replace('.', '!');
+                }
+                else
                 return strOdfCellRef = strOdfCellRef.Replace(".", ""); 
             }
             else
@@ -392,44 +463,61 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 //return strOdfCellRef = strOdfCellRef.Replace('.', '!');
                 
                 strOdfCellRef = strOdfCellRef.Replace('.', '!');
-                if (strOdfCellRef.Substring(0, strOdfCellRef.IndexOf('!')).StartsWith("$"))
-                {
-                    strOdfCellRef = strOdfCellRef.Replace("$", "");
-                }
-                if (!strOdfCellRef.Substring(0, strOdfCellRef.IndexOf('!')).StartsWith("'"))
-                {
-                    strOdfCellRef = "'" + strOdfCellRef.Replace("!", "'!");
-                }                
-                
-
+                bool blnNotConverted = true;
                 if (strOdfCellRef.Contains(":"))
                 {
                     int intRngSeparator = strOdfCellRef.IndexOf(':');
-                    if (strOdfCellRef.Substring(0, intRngSeparator).Contains("!") && strOdfCellRef.Substring(intRngSeparator).Contains("!"))
+                    if (strOdfCellRef.Substring(0, intRngSeparator).Contains("!") && strOdfCellRef.Substring(intRngSeparator+1).Contains("!"))
                     { 
+                        blnNotConverted = false;
                         string strSheetRefFrm = strOdfCellRef.Substring(0, intRngSeparator);
                         string strSheetRefTo = strOdfCellRef.Substring(intRngSeparator+1);
 
                         string strFrmRef = strSheetRefFrm.Substring(strSheetRefFrm.IndexOf('!') + 1);
-                        strSheetRefFrm = strSheetRefFrm.Substring(0, strSheetRefFrm.IndexOf('!') - 1);
+                        strSheetRefFrm = strSheetRefFrm.Substring(0, strSheetRefFrm.IndexOf('!'));
+                        strSheetRefFrm = strSheetRefFrm.Replace("$", "");
                         string strToRef = strSheetRefTo.Substring(strSheetRefTo.IndexOf('!') + 1);
                         strSheetRefTo = strSheetRefTo.Substring(0, strSheetRefTo.IndexOf('!'));
+                        strSheetRefTo = strSheetRefTo.Replace("$", "");
 
                         if (strSheetRefTo.StartsWith("'"))
                         {
                             strSheetRefTo = strSheetRefTo.Remove(0, 1);
                         }
-
+                        if (strSheetRefTo.EndsWith("'"))
+                        {
+                            strSheetRefTo = strSheetRefTo.Remove(strSheetRefTo.Length - 1, 1);
+                        }
+                        if (strSheetRefFrm.StartsWith("'"))
+                        {
+                            strSheetRefFrm = strSheetRefFrm.Remove(0, 1);
+                        }
+                        if (strSheetRefFrm.EndsWith("'"))
+                        {
+                            strSheetRefFrm = strSheetRefFrm.Remove(strSheetRefFrm.Length - 1, 1);
+                        }
                         if(strFrmRef == strToRef)
                         {
-                            strOdfCellRef = strSheetRefFrm + ":" + strSheetRefTo + "!" + strFrmRef;
+                            strOdfCellRef = "'" + strSheetRefFrm + ":" + strSheetRefTo + "'!" + strFrmRef;
                         }
                         else
                         {
-                            strOdfCellRef = strSheetRefFrm + ":" + strSheetRefTo + "!" + strFrmRef + ":" + strToRef;
+                            strOdfCellRef = "'" + strSheetRefFrm + ":" + strSheetRefTo + "'!" + strFrmRef + ":" + strToRef;
                         }
                     }
                 }
+
+                if(blnNotConverted)
+                {
+                    if (strOdfCellRef.Substring(0, strOdfCellRef.IndexOf('!')).StartsWith("$"))
+                    {
+                        strOdfCellRef = strOdfCellRef.Replace("$", "");
+                    }
+                    if (!strOdfCellRef.Substring(0, strOdfCellRef.IndexOf('!')).StartsWith("'"))
+                    {
+                        strOdfCellRef = "'" + strOdfCellRef.Replace("!", "'!");
+                    }
+                }              
 
                 return strOdfCellRef;
             }
@@ -439,72 +527,94 @@ namespace CleverAge.OdfConverter.Spreadsheet
         {
             string strTransFormula = "";
             string strFormulaToTrans = "";
-            string strExpression = "";
+            
 
             //chking for key word
-            if (strFormula.Contains("ADDRESS(") || strFormula.Contains("CELING(") || strFormula.Contains("FLOOR("))
+            if (strFormula.Contains("ADDRESS(") || strFormula.Contains("CEILING(") || strFormula.Contains("FLOOR(") || strFormula.Contains("ROUND(") || strFormula.Contains("ROUNDDOWN(") || strFormula.Contains("ROUNDUP(") || strFormula.Contains("IF(") || strFormula.ToUpperInvariant().Contains("ACCRINTM(") || strFormula.Contains("INDEX("))
             {
                 while (strFormula != "")
                 {
+                    string strExpression = "";
+
                     //TODO : Include other formulas. need to chk which formula is comming first.
-                    if (strFormula.Contains("ADDRESS(") || strFormula.Contains("CELING(") || strFormula.Contains("FLOOR("))
+                    if (strFormula.Contains("ADDRESS(") || strFormula.Contains("CEILING(") || strFormula.Contains("FLOOR(") || strFormula.Contains("ROUND(") || strFormula.Contains("ROUNDDOWN(") || strFormula.Contains("ROUNDUP(") || strFormula.Contains("IF(") || strFormula.ToUpperInvariant().Contains("ACCRINTM(") || strFormula.Contains("INDEX("))
                     {
-                        int[] arrIndex = new int[3];
+                        ArrayList arrFunctionPos = new ArrayList();
 
                         string strFunction = "";
                         int intFunction = 0;
                         int intIndex = 0;
+                        bool blnFunNotIf = false;
 
-                        arrIndex[0] = strFormula.IndexOf("ADDRESS(");//ADD 4th parm:1
-                        arrIndex[1] = strFormula.IndexOf("CELING(");//remove 3rd parm
-                        arrIndex[2] = strFormula.IndexOf("FLOOR(");//remove 3rd parm
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("ADDRESS("), "ADDRESS(",1));//add 4th parm 1
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("CEILING("), "CEILING(",2));//remove 3rd parm
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("FLOOR("), "FLOOR(",2));//remove 3rd parm
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("ROUND("), "ROUND(", 3));//add 2nd parm 0
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("ROUNDDOWN("), "ROUNDDOWN(", 3));//add 2nd parm 0
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("ROUNDUP("), "ROUNDUP(", 3));//add 2nd parm 0
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("IF("), "IF(", 4));//add 2nd parm TRUE
+                        arrFunctionPos.Add(new Item(strFormula.ToUpperInvariant().IndexOf("ACCRINTM("), "ACCRINTM(", 5));//add 4th parm 1000
+                        arrFunctionPos.Add(new Item(strFormula.IndexOf("INDEX("), "INDEX(", 3));//add 2nd parm 0
 
+                        arrFunctionPos.Sort();
 
-                        if (arrIndex[0] >= 0 && arrIndex[0] > arrIndex[1] && arrIndex[0] > arrIndex[2])
+                        //int[] arrIndex = new int[3];
+
+                        foreach (object obj in arrFunctionPos)
                         {
-                            strFunction = "ADDRESS(";
-                            intFunction = 1;
-                            intIndex = arrIndex[0];
-
-                        }
-                        else if (arrIndex[1] >= 0 && arrIndex[1] > arrIndex[0] && arrIndex[1] > arrIndex[2])
+                            Item objItem = (Item)obj;
+                            if (objItem.Possition >= 0)
                         {
-                            strFunction = "CELING(";
-                            intFunction = 2;
-                            intIndex = arrIndex[1];
+                                strFunction = objItem.Function;
+                                intFunction = objItem.FunctionType;
+                                intIndex = objItem.Possition;
+                                break;
+                            }
                         }
-                        else if (arrIndex[2] >= 0 && arrIndex[2] > arrIndex[1] && arrIndex[2] > arrIndex[0])
+                        if (intFunction == 4)
                         {
-                            strFunction = "FLOOR(";
-                            intFunction = 3;
-                            intIndex = arrIndex[2];
-                        }
-                        //|| strFormula.Contains("CELING(") || strFormula.Contains("FLOOR("))
+                            if (strFormula.Substring(0, intIndex).EndsWith("COUNT") || strFormula.Substring(0, intIndex).EndsWith("SUM"))
+                            {
+                                blnFunNotIf = true;
+                        }                      
+                        }     
 
                         string strConvertedExp = "";
                         strTransFormula = strTransFormula + strFormula.Substring(0, intIndex);
                         strFormulaToTrans = strFormula.Substring(intIndex);
+                        if (blnFunNotIf)
+                        {
+                            strTransFormula = strTransFormula + strFormulaToTrans.Substring(0, strFunction.Length);
+                            strFormula = strFormulaToTrans.Substring(strFunction.Length);
+                        }
+                        else
+                        {
+                            
                         if (strFormulaToTrans.Contains(")"))
                         {
                             strExpression = GetExpression(strFormulaToTrans);
                         }
                         if (strExpression != "")
-                        {
-                            //TODO : if function with one parm and second to be added.
-                            if (strExpression.Contains(","))
-                            {
+                        {                            
                                 if (intFunction == 1)
                                 {
-                                    strConvertedExp = AddRemoveParm(strExpression, 4, true, false, "1");
+                                    strConvertedExp = AddRemoveParm(strExpression, 4, 5, true, false, "1");
                                 }
-                                else
+                                else if (intFunction == 2)
                                 {
-                                    strConvertedExp = AddRemoveParm(strExpression, 3, false, true, "");
+                                    strConvertedExp = AddRemoveParm(strExpression, 3, 4, false, true, "");
                                 }
+                                else if (intFunction == 3)
+                                {
+                                    strConvertedExp = AddRemoveParm(strExpression, 2, 0, true, false, "0");
                             }
-                            else
+                                else if (intFunction == 4)
                             {
-                                strConvertedExp = strExpression;
+                                    strConvertedExp = AddRemoveParm(strExpression, 2, 0, true, false, "TRUE");
+                            }
+                                else if (intFunction == 5)
+                            {
+                                    strConvertedExp = AddRemoveParm(strExpression, 4, 0, true, false, "1000");
                             }
                             //use converted and send remaining for chk
                             strTransFormula = strTransFormula + strConvertedExp;
@@ -514,7 +624,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         {
                             //remove the key word and send remaing for chk
                             strTransFormula = strTransFormula + strFormulaToTrans.Substring(0, strFunction.Length);
-                            strFormula = strFormulaToTrans.Substring(strFormula.Length);
+                                strFormula = strFormulaToTrans.Substring(strFunction.Length);
+                            }
                         }
                     }
                     else
@@ -531,7 +642,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             return strTransFormula;
         }
 
-        protected string AddRemoveParm(string strExpresion, int intPossition, bool blnParmAdd, bool blnParmRemove, string strParmAdd)
+        protected string AddRemoveParm(string strExpresion, int intPossition, int intMaxParm, bool blnParmAdd, bool blnParmRemove, string strParmAdd)
         {
             string strTransFormula = "";
             string strFormulaKeyword = strExpresion.Substring(0, strExpresion.IndexOf('('));
@@ -540,14 +651,15 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
             ArrayList arlParms = GetParms(strExpresion);
 
-            if (arlParms.Count >= intPossition)
-            {
+            //if (intMaxParm > arlParms.Count)
+            //{
                 if (blnParmAdd == true && blnParmRemove == false)
                 {
                     strTransFormula = strFormulaKeyword + "(";
+                    
                     for (int i = 0; i < arlParms.Count; i++)
                     {
-                        if (intPossition == i + 1)
+                        if (intPossition == i + 1 && intMaxParm > arlParms.Count)
                         {
                             strTransFormula = strTransFormula + strParmAdd + "," + arlParms[i].ToString() + ",";
                         }
@@ -555,6 +667,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
                         {
                             strTransFormula = strTransFormula + arlParms[i].ToString() + ",";
                         }
+                    }
+                    if (intPossition == arlParms.Count + 1 && intMaxParm == 0)
+                    {
+                        strTransFormula = strTransFormula + strParmAdd + ",";
                     }
                     strTransFormula = strTransFormula.Substring(0, strTransFormula.Length - 1) + ")";
                 }
@@ -570,11 +686,11 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     }
                     strTransFormula = strTransFormula.Substring(0, strTransFormula.Length - 1) + ")";
                 }
-            }
-            else
-            {
-                strTransFormula = strFormulaKeyword + "(" + strExpresion + ")";
-            }
+            //}
+            //else
+            //{
+            //    strTransFormula = strFormulaKeyword + "(" + strExpresion + ")";
+            //}
             return strTransFormula;
 
         }
@@ -620,9 +736,9 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     {
                         strExpToVald = strExpToVald + "," + strArrParm[i].ToString();
                     }
-                    if (strExpToVald.StartsWith("\""))
+                    if (strExpToVald.StartsWith("\"") && strExpToVald.EndsWith("\""))
                     {
-                        if (IsValidString(strExpToVald))
+                        if (IsValidString(strExpToVald) && IsValidExpression(strExpToVald))
                         {
                             arlParms.Add(strExpToVald);
                             strExpToVald = "";

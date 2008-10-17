@@ -2138,6 +2138,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
                 fo:color="#000000">
                 <xsl:call-template name="TextBoxRunProperties">
                   <xsl:with-param name="rPr" select="."/>
+					<xsl:with-param name ="isChart" select="'false'"/>
                 </xsl:call-template>
               </style:text-properties>
             </style:style>

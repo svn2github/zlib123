@@ -762,7 +762,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             for (int i = 0; i < sheetArrayWithSplChars.Length; i++)
             {
                 int intSepIndex = sheetArrayWithSplChars[i].IndexOf(':');
-                sheetArray[i, 0] = sheetArrayWithSplChars[i].Substring(0,intSepIndex);
+                sheetArray[i, 0] = sheetArrayWithSplChars[i].Substring(0,intSepIndex).Replace("'","''");
                 sheetArray[i, 1] = sheetArrayWithSplChars[i].Substring(intSepIndex+1);
             }
             

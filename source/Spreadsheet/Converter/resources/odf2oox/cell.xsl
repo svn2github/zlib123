@@ -39,6 +39,7 @@ RefNo-5 03-Jun-2008 Sandeep S     1780009   Parts of borders of merged cells are
 RefNo-6 03-Jun-2008 sandeep S     1704269   Changes done to retain the cell style in case of merged cell.
 RefNo-7 04-Jun-2008 Sandeep S     1780009   Changes done to get the correct merged cell style i.e. To deferentiate b/w A3 and AA3
 RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation.
+RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date format in case of formula.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -1663,18 +1664,33 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
                     level="any"/>
                 </xsl:variable>
          <!-- Code Added By Sateesh Reddy Date:01-Feb-2008  -->
-                <xsl:if test="($cellFormats + $cellStyles + $hyperlinkId - 1)">
+                <!--Start of RefNo-9-->
+                <!--<xsl:if test="($numCellFormats + $multilines + $numStyles + $hyperlinkId - 1)">
             <xsl:attribute name="s">
-                    <xsl:value-of select="$cellFormats + $cellStyles + $hyperlinkId - 1"/>
+                          <xsl:value-of select="$numCellFormats + $multilines + $numStyles + $hyperlinkId - 1"/>
+                  </xsl:attribute>
+                </xsl:if>-->
+                <xsl:if test="($CountStyleTableCell + $styleFontsCount + $multilines + $hyperlinkId)!=''">
+            <xsl:attribute name="s">
+                          <!--<xsl:value-of select="$cellFormats + $cellStyles + $hyperlinkId - 1"/>-->
+                    <xsl:value-of select="$CountStyleTableCell + $styleFontsCount + $multilines + $hyperlinkId"/>
             </xsl:attribute>
             </xsl:if>
+                <!--End of RefNo-9-->
           </xsl:when>
               <xsl:otherwise>
-                <xsl:if test="($cellFormats + $cellStyles + $multilineNumber + count(ancestor::table:table/descendant::text:a[not(ancestor::office:annotation)])- 1) != ''">
+                <!--Start of RefNo-9-->
+                <!--<xsl:if test="($cellFormats + $cellStyles + $multilineNumber + count(ancestor::table:table/descendant::text:a[not(ancestor::office:annotation)])- 1) != ''">
             <xsl:attribute name="s">
                     <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber + count(ancestor::table:table/descendant::text:a[not(ancestor::office:annotation)]) - 1"/>
             </xsl:attribute>
+                </xsl:if>-->
+                <xsl:if test="($CountStyleTableCell + $styleFontsCount + $multilineNumber) != ''">
+                  <xsl:attribute name="s">
+                    <xsl:value-of select="$CountStyleTableCell + $styleFontsCount + $multilineNumber"/>
+                  </xsl:attribute>
             </xsl:if>
+                <!--End of RefNo-9-->
               </xsl:otherwise>
             </xsl:choose>
             <!--End of RefNo-3-->
@@ -1818,6 +1834,34 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
                   <xsl:value-of select="$columnCellStyle"/>
                 </xsl:attribute>
               </xsl:when>
+              <!--Start of RefNo-9-->
+              <xsl:when test="@table:formula">                
+                <xsl:variable name="hyperlinkCnt">
+                  <xsl:value-of select="count(/descendant::text:a[not(ancestor::office:annotation)])" />
+                </xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="@office:value-type='date'">
+                    <xsl:choose>
+                      <xsl:when test="contains(@office:date-value,'T')">
+                        <xsl:attribute name="s">
+                          <xsl:value-of select="$CountStyleTableCell + $styleFontsCount + $multilines + $hyperlinkCnt + 3"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:attribute name="s">
+                          <xsl:value-of select="$CountStyleTableCell + $styleFontsCount + $multilines + $hyperlinkCnt + 1"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:when>
+                  <xsl:when test="@office:value-type = 'time'">
+                    <xsl:attribute name="s">
+                      <xsl:value-of select="$CountStyleTableCell + $styleFontsCount + $multilines + $hyperlinkCnt + 2"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:when>
+              <!--End of RefNo-9-->
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
@@ -2400,7 +2444,7 @@ RefNo-8 08-sep-2008 sandeep s     New feature Changes for formula implementation
                     or (contains(@table:formula,'B(') and not(contains(@table:formula,'DB(')) and not(contains(@table:formula,'DDB(')) and not(contains(@table:formula,'PROB(')))
                     or (contains(@table:formula,'COMBINA('))
                     or (contains(@table:formula,'CURRENT(')) 
-                    or (contains(@table:formula,'DAYS('))
+                    or (contains(@table:formula,'DAYS(') and not(contains(@table:formula,'Networkdays(')))
                     or (contains(@table:formula,'getDaysInMonth(')) 
                     or (contains(@table:formula,'getDaysInYear(')) 
                     or (contains(@table:formula,'DDE('))

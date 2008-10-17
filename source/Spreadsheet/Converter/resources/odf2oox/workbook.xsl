@@ -323,6 +323,10 @@
 										</xsl:when>
 									</xsl:choose>
 								</xsl:variable>
+								<!--
+									Defect : 2165767
+									Desc:    Name ranges not retained as the input file had no proper representtaion
+								-->
 								<xsl:choose>
 									<xsl:when test ="contains($part1,'#') or contains($part1,'file:///')">
 										<xsl:text>"</xsl:text>
@@ -330,7 +334,17 @@
 										<xsl:text>"</xsl:text>
 									</xsl:when>
 									<xsl:when test ="not(contains($range,'#') or contains($part1,'file:///'))">
+										<xsl:choose>
+											<xsl:when test ="substring-before($part1,'!')!=''">
 										<xsl:value-of select ="concat($part1,':',$part2)"/>
+									</xsl:when>
+											<xsl:otherwise>
+												<xsl:variable name ="baseSheet">
+													<xsl:value-of select ="translate(substring-before(@table:base-cell-address,'.'),'$','')"/>
+												</xsl:variable>
+												<xsl:value-of select ="concat($baseSheet,$part1,':',$part2)"/>
+											</xsl:otherwise>
+										</xsl:choose>
 									</xsl:when>
 								</xsl:choose>
 							</xsl:when>

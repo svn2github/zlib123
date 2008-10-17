@@ -381,7 +381,7 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 				  </xsl:if>
 			  </xsl:for-each>
 		  </table:named-expressions>-->
-		  <table:named-expressions>
+		
 			  <xsl:for-each select="key('Part', 'xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
 				  <xsl:if test ="not(contains(@name,'_xlnm.Print_Area')) and not(contains(@name, '_xlnm.Print_Titles'))">
 					  <xsl:if test ="not(contains(.,'#REF')) and not(contains(.,'OFFSET'))">
@@ -447,14 +447,16 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 						  </xsl:variable>
 						  <xsl:variable name ="correctName">
 							  <xsl:choose>
-								  <xsl:when test="starts-with($sheetName,$apos)">
+								  <xsl:when test="starts-with($sheetName,$apos) and $checkedName!=''">
 									  <xsl:value-of select="concat($apos,$checkedName,$apos)"/>
 								  </xsl:when>
-								  <xsl:otherwise>
+								  <xsl:when test="not(starts-with($sheetName,$apos)) and $checkedName!=''>
 									  <xsl:value-of select="$checkedName"/>
-								  </xsl:otherwise>
+								  </xsl:when>
 							  </xsl:choose>
 						  </xsl:variable>
+						  <xsl:if test ="$correctName != ''">
+							  <table:named-expressions>
 						  <xsl:choose>
 							  <xsl:when test="$isFunction='false'">
 								  <xsl:variable name ="baseAddress">
@@ -498,10 +500,13 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 								  </table:named-expression>
 							  </xsl:when>
 						  </xsl:choose>
+							  </table:named-expressions>
+						  </xsl:if>
+						 
 					  </xsl:if>
 				  </xsl:if>
 			  </xsl:for-each>
-		  </table:named-expressions>
+		 
 		  <!-- end of code for the feature 'Named Ranges'-->
 
         <!--xsl:variable name="pivotTables"-->

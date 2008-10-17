@@ -1773,12 +1773,12 @@
           </xsl:for-each>
         </style:graphic-properties>
         <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="21.96pt"
+          style:font-pitch="variable" fo:font-size="18pt" fo:font-weight="bold"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="21.96pt" style:font-family-complex="Tahoma"
+          style:font-size-asian="18pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="21.96pt">
+          style:font-size-complex="18pt">
 
           <!-- default "bold" font attribute for default title -->
           <xsl:if test="not(c:tx) and not(c:txPr)">
@@ -2275,13 +2275,13 @@
           <xsl:call-template name="InsertLineStyle"/>
         </xsl:for-each>
       </style:graphic-properties>
-      <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-        style:font-pitch="variable" fo:font-size="7pt"
+      <style:text-properties fo:font-family="Calibri"  style:font-family-generic="swiss"
+         style:font-pitch="variable" fo:font-size="10pt"
         style:font-family-asian="&apos;MS Gothic&apos;"
         style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-        style:font-size-asian="7pt" style:font-family-complex="Tahoma"
+         style:font-size-asian="10pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-        style:font-size-complex="7pt">
+         style:font-size-complex="10pt">
         <xsl:choose>
           <!-- custom title -->
           <xsl:when test="c:tx">
@@ -2342,13 +2342,13 @@
           <xsl:call-template name="InsertLineStyle"/>
         </xsl:for-each>
       </style:graphic-properties>
-      <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-        style:font-pitch="variable" fo:font-size="8.54pt"
+      <style:text-properties fo:font-family="Calibri"  style:font-family-generic="swiss"
+        style:font-pitch="variable" fo:font-size="10pt"
         style:font-family-asian="&apos;MS Gothic&apos;"
         style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-        style:font-size-asian="8.54pt" style:font-family-complex="Tahoma"
+        style:font-size-asian="10pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-        style:font-size-complex="8.54pt">
+        style:font-size-complex="10pt">
         <xsl:choose>
           <!-- custom title -->
           <xsl:when test="c:tx">
@@ -2817,13 +2817,13 @@
           <xsl:call-template name="InsertLineStyle"/>
         </xsl:for-each>
       </style:graphic-properties>
-      <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
-        style:font-pitch="variable" fo:font-size="8.54pt"
+      <style:text-properties fo:font-family="Calibri"  style:font-family-generic="swiss"
+         style:font-pitch="variable" fo:font-size="10pt"
         style:font-family-asian="&apos;MS Gothic&apos;"
         style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-        style:font-size-asian="8.54pt" style:font-family-complex="Tahoma"
+         style:font-size-asian="10pt" style:font-family-complex="Tahoma"
         style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-        style:font-size-complex="8.54pt">
+         style:font-size-complex="10pt">
         <xsl:choose>
           <!-- custom title -->
           <xsl:when test="c:tx">
@@ -3181,12 +3181,12 @@
 
         </style:graphic-properties>
         <style:text-properties fo:font-family="Calibri" style:font-family-generic="swiss"
-          style:font-pitch="variable" fo:font-size="12.2pt"
+          style:font-pitch="variable" fo:font-size="10pt"
           style:font-family-asian="&apos;MS Gothic&apos;"
           style:font-family-generic-asian="system" style:font-pitch-asian="variable"
-          style:font-size-asian="7.32pt" style:font-family-complex="Tahoma"
+          style:font-size-asian="10pt" style:font-family-complex="Tahoma"
           style:font-family-generic-complex="system" style:font-pitch-complex="variable"
-          style:font-size-complex="7.32pt">
+          style:font-size-complex="10pt">
           <xsl:for-each select="c:dLbls">
             <xsl:if test="not(c:dLbls/c:delete/@val = 1)">
               <xsl:choose>
@@ -3483,7 +3483,7 @@
 
       </style:graphic-properties>
       <xsl:for-each select="c:dLbls/c:dLbl[c:idx/@val =$current]">
-        <style:text-properties fo:font-family="Calibri" fo:font-weight="bold" style:font-family-generic="swiss"
+        <style:text-properties fo:font-family="Calibri"  style:font-family-generic="swiss"
         style:font-pitch="variable" fo:font-size="8pt"
         style:font-family-asian="&apos;MS Gothic&apos;"
         style:font-family-generic-asian="system" style:font-pitch-asian="variable"

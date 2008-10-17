@@ -32,6 +32,7 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 RefNo-1 20-Dec-2007 Sandeep S     1805556   Changes done to consider all the hyperlink (hyperlink within rowgroup) in the sheet.
 RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
+RefNo-3 14-Oct-2008 Sandeep s     2149116  Changes done to retain Time&Date format in case of formula.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -655,9 +656,11 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 					</xsl:with-param>
 				</xsl:apply-templates>
 
-				<!-- add cell formats for hyperlinks-->
+        <!-- add cell formats for multiline cells, which must have wrap property -->
 
+				<xsl:call-template name="InsertMultilineCellFormats"/>
 
+        <!-- add cell formats for hyperlinks-->
 				<xsl:call-template name="InsertHyperlinksStyleProperties">
 					<xsl:with-param name="numStyleCount" select="$numStyleCount"/>
 					<xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
@@ -675,10 +678,11 @@ RefNo-2 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text co
 						<xsl:text>true</xsl:text>
 					</xsl:with-param>
 				</xsl:call-template>
-
-				<!-- add cell formats for multiline cells, which must have wrap property -->
-				<!--RefNo-2:Changed the order of calling the template-->
-				<xsl:call-template name="InsertMultilineCellFormats"/>
+        <!--Start of RefNo-3-->
+        <xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0"/>
+        <xf numFmtId="18" fontId="0" fillId="0" borderId="0" xfId="0"/>
+        <xf numFmtId="22" fontId="0" fillId="0" borderId="0" xfId="0"/>
+        <!--End of RefNo-3-->
 			</cellXfs>
 
 		</xsl:for-each>

@@ -1168,6 +1168,18 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
       </xsl:if>
     </c:scaling>
 
+	  <xsl:variable name="direction">
+		  <xsl:variable name="chartstyle" select="key('chart',chart:axis[@chart:dimension='y']/@chart:style-name)"/>
+		  <xsl:choose>
+			  <xsl:when test="key('style',$chartstyle)/style:chart-properties/@chart:reverse-direction='true'">
+				  <xsl:text>true</xsl:text>
+			  </xsl:when>
+			  <xsl:otherwise>
+				  <xsl:text>false</xsl:text>
+			  </xsl:otherwise>
+		  </xsl:choose>
+	  </xsl:variable>
+	  
     <!-- axis position -->
     <!-- key('chart','')[1] is the office:chart element,  key('chart','')[2] is the chart:chart element -->
     <xsl:for-each select="key('chart','')[2]">
@@ -1177,19 +1189,32 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 				  test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'true' ">
           <xsl:choose>
             <xsl:when test="$priority = 'primary'">
+				<xsl:choose>
+					<xsl:when test="$direction='true'">
+						<c:axPos val="r"/>	
+					</xsl:when>
+					<xsl:otherwise>
               <c:axPos val="l"/>
+					</xsl:otherwise>
+				</xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <c:axPos val="r"/>
             </xsl:otherwise>
           </xsl:choose>
-
-        </xsl:when>
+ </xsl:when>
        <!-- Edited by Sonata:for bar charts -->
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="$priority = 'primary'">
+				<xsl:choose>
+					<xsl:when test="$direction='true'">
+						<c:axPos val="t"/>
+					</xsl:when>
+					<xsl:otherwise>
               <c:axPos val="b"/>
+					</xsl:otherwise>
+				</xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <c:axPos val="t"/>
@@ -1485,6 +1510,17 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
         </xsl:for-each>
       </c:scaling>
 
+		<xsl:variable name="direction">
+			<xsl:variable name="chartstyle" select="key('chart',chart:axis[@chart:dimension='x']/@chart:style-name)"/>
+			<xsl:choose>
+				<xsl:when test="key('style',$chartstyle)/style:chart-properties/@chart:reverse-direction='true'">
+					<xsl:text>true</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>false</xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 
       <xsl:for-each select="key('chart','')[2]">
         <xsl:choose>
@@ -1493,7 +1529,14 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
 					  test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'true' ">
             <xsl:choose>
               <xsl:when test="$priority = 'primary'">
+					  <xsl:choose>
+						  <xsl:when test="$direction='true'">
+							  <c:axPos val="t"/>
+						  </xsl:when>
+						  <xsl:otherwise>
                 <c:axPos val="b"/>
+						  </xsl:otherwise>
+					  </xsl:choose>
               </xsl:when>
               <xsl:otherwise>
                 <c:axPos val="t"/>
@@ -1503,7 +1546,14 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
           <xsl:otherwise>
       <xsl:choose>
         <xsl:when test="$priority = 'primary'">
+			<xsl:choose>
+				<xsl:when test="$direction='true'">
+					<c:axPos val="r"/>
+				</xsl:when>
+				<xsl:otherwise>
           <c:axPos val="l"/>
+				</xsl:otherwise>
+			</xsl:choose>
         </xsl:when>
         <xsl:otherwise>
           <c:axPos val="r"/>
@@ -2095,9 +2145,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
                     <xsl:when test="@chart:label-position='left'">
                       <c:dLblPos val="l"/>
                     </xsl:when>
-                    <xsl:when test="@chart:label-position='near-origin'">
+                    <!--<xsl:when test="@chart:label-position='near-origin'">
                       <c:dLblPos val="inBase"/>
-                    </xsl:when>
+                    </xsl:when>-->
                   </xsl:choose>
             </xsl:for-each>
 
@@ -3013,9 +3063,9 @@ RefNo-2 02-Jan-2008 Sandeep S     1797015   Changes done to fix the secondary y-
               <xsl:when test="@chart:label-position='left'">
                 <c:dLblPos val="l"/>
               </xsl:when>
-              <xsl:when test="@chart:label-position='near-origin'">
+              <!--<xsl:when test="@chart:label-position='near-origin'">
                 <c:dLblPos val="inBase"/>
-              </xsl:when>
+              </xsl:when>-->
             </xsl:choose>
           </xsl:for-each>
         </xsl:for-each>
