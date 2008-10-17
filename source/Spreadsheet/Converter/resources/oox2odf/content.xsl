@@ -450,8 +450,8 @@ RefNo-4 24-sep-2008 Sandeep s     Added some more invalid special charecters to 
 								  <xsl:when test="starts-with($sheetName,$apos) and $checkedName!=''">
 									  <xsl:value-of select="concat($apos,$checkedName,$apos)"/>
 								  </xsl:when>
-								  <xsl:when test="not(starts-with($sheetName,$apos)) and $checkedName!=''>
-									  <xsl:value-of select="$checkedName"/>
+								  <xsl:when test="not(starts-with($sheetName,$apos)) and $checkedName!=''">
+										  <xsl:value-of select="$checkedName"/>
 								  </xsl:when>
 							  </xsl:choose>
 						  </xsl:variable>
