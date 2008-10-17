@@ -1590,22 +1590,53 @@
 
 			<!-- width: -->
 			<xsl:variable name="frameW">
-				<xsl:call-template name="point-measure">
+				
           <!-- Sona: Defect #2019374-->
-          <xsl:with-param name="length" select="$shape/@svg:width|$shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width"/>
+        <xsl:choose>
+          <xsl:when test="$shape/@svg:width">
+            <!-- Sona: Defect #2166160-->
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="$shape/@svg:width"/>
 				</xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- Sona: Defect #2166160-->
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="$shape/@fo:min-width|$shapeStyle/style:graphic-properties/@fo:min-width"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
 			</xsl:variable>
 			<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
 
 			<!-- height: -->
 			<xsl:variable name="frameH">
+        <xsl:choose>
+          <xsl:when test ="$shape/@svg:height">
+            <!-- Sona: Defect #2166160-->
 				<xsl:call-template name="point-measure">
           <!-- Sona: Defect #2019374-->
-          <xsl:with-param name="length" select="$shape/child::node()/@fo:min-height|$shape/@svg:height|$shapeStyle/style:graphic-properties/@fo:min-height"/>
+              <xsl:with-param name="length" select="$shape/@svg:height"/>
 				</xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="point-measure">
+            <!-- Sona: Defect #2166160-->
+            <xsl:with-param name="length" select="$shape/child::node()/@fo:min-height|$shapeStyle/style:graphic-properties/@fo:min-height"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
 			</xsl:variable>
 			<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 
+      <!--code added by Chhavi for relative size in Frame - Defect #2166036-->
+      <xsl:if test="(parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']) and $shape/@style:rel-width">
+        <xsl:value-of select="concat('mso-width-percent:',substring-before(./parent::node()/@style:rel-width,'%') * 10,';')"/>        
+      </xsl:if>
+      <xsl:if test="(parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']) and $shape/@style:rel-height">
+        <xsl:value-of select="concat('mso-height-percent:',substring-before(./parent::node()/@style:rel-height,'%') * 10,';')"/>
+      </xsl:if>
+      
       <!-- z-Index-->
       <xsl:call-template name="InsertShapeZIndex">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -1770,7 +1801,7 @@
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="stretch">
-              <xsl:value-of select="@style:repeat"/>
+              <xsl:value-of select="$shapeStyle/style:graphic-properties/@style:repeat"/>
             </xsl:variable>
 
             <xsl:for-each select="document('styles.xml')//draw:fill-image[@draw:name = $BitmapName]">
@@ -1818,6 +1849,27 @@
 							</xsl:if>
 						</xsl:for-each>
 					</xsl:when>
+          <!-- Sona: Picture fill for frame-->
+          <xsl:when test ="$fillProperty = '' and (parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame'])">
+            <xsl:if test ="$shapeStyle/style:graphic-properties/style:background-image">
+            <xsl:variable name="stretch">
+              <xsl:value-of select="$shapeStyle/style:graphic-properties/style:background-image/@style:repeat"/>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$stretch='stretch'">
+                <xsl:attribute name="type">frame</xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="type">tile</xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>          
+        <!--<xsl:attribute name="recolor">t</xsl:attribute>-->
+        <xsl:attribute name="color2">black</xsl:attribute>
+        <xsl:attribute name="r:id">
+          <xsl:value-of select="concat('Bitmap_',generate-id($shape))"/>
+        </xsl:attribute>
+            </xsl:if>
+          </xsl:when>
 				</xsl:choose>
 			</v:fill>
 		</xsl:if>

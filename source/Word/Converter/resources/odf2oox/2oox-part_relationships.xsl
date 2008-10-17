@@ -77,7 +77,8 @@
                                              | document('content.xml')/office:document-content/office:body//draw:ellipse 
                                              | document('content.xml')/office:document-content/office:body//draw:rect 
                                              | document('content.xml')/office:document-content/office:body//draw:line 
-                                             | document('content.xml')/office:document-content/office:body//draw:connector "/>
+                                             | document('content.xml')/office:document-content/office:body//draw:connector
+                                             | document('content.xml')/office:document-content/office:body//draw:frame"/>
       
       <xsl:call-template name="InsertOleObjectsRelationships">
         <xsl:with-param name="oleObjects" select="$allOLEs"/>
@@ -131,6 +132,27 @@
       <xsl:variable name="styleName" select="@draw:style-name"/>
       <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
       <xsl:variable name="shapeStyle" select="$automaticStyle"/>
+      <!-- Sona: Picture fill for a frame-->
+      <xsl:choose>
+        <xsl:when test ="($shapeStyle/@style:parent-style-name) and (self::node()[name()='draw:frame'] or parent::node()[name()='draw:frame'])">
+          <xsl:for-each select="$shapeStyle/style:graphic-properties/style:background-image">
+            <xsl:if test="@xlink:href !=''">
+              <Relationship  Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                                  xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                <xsl:attribute name="Id">
+                  <xsl:value-of select="concat('Bitmap_',$shapeRelId)"/>
+                </xsl:attribute>
+                <xsl:attribute name="Target">
+                  <xsl:value-of select="concat('media',substring-after(@xlink:href,'Pictures'))"/>
+                </xsl:attribute>
+              </Relationship>
+              <pzip:copy   pzip:source="{@xlink:href}"
+                           pzip:target="{concat('word/media',substring-after(@xlink:href,'Pictures'))}" />
+
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
       <xsl:for-each select="$shapeStyle/style:graphic-properties[@draw:fill='bitmap']">
         <xsl:variable name="BitmapName" select="@draw:fill-image-name"/>
         <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name = $BitmapName]">
@@ -150,6 +172,8 @@
           </xsl:if>
         </xsl:for-each>
       </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
   </xsl:template>  
 

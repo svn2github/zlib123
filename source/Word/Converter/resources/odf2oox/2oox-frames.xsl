@@ -1440,7 +1440,7 @@
             <!-- @fo:min-height or (@fo:min-height and parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width)
                   or -->
             <xsl:when test="$frameStyle/@style:parent-style-name or parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
-              <xsl:if test="@fo:min-height or (@fo:min-height and (parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width))
+              <xsl:if test="(@fo:min-height or $frameStyle/style:graphic-properties/@fo:min-height) or ((@fo:min-height  or $frameStyle/style:graphic-properties/@fo:min-height) and (parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width))
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
