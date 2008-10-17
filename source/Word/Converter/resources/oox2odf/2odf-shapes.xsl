@@ -1948,6 +1948,46 @@
 			<xsl:call-template name="InsertTexboxTextDirection"/>
 			<xsl:call-template name="InsertTextBoxPadding"/>
 		</xsl:for-each>
+    <!-- Sona: Gradient for Frame-->
+    <xsl:variable name ="shapeTypeId">
+      <xsl:value-of select ="substring-after($shape/@type,'#')"/>
+    </xsl:variable>
+    <xsl:variable name ="pathId">
+      <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+        <xsl:if test ="position()=1">
+          <xsl:value-of select ="@path"/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:if test ="($pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox)) and ($shape/v:fill/@type='tile' or $shape/v:fill/@type='pattern' or $shape/v:fill/@type='frame')">
+      <xsl:call-template name ="InsertGradientFillForFrame">
+        <xsl:with-param name ="shape" select ="$shape"></xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+	</xsl:template>
+  
+  <!-- Sona: Template for gradient fill for frame-->
+  <xsl:template name ="InsertGradientFillForFrame">
+    <xsl:param name ="shape"></xsl:param>          
+      <xsl:variable name="PicrelId" select="$shape/v:fill/@r:id" />
+      <xsl:variable name="PicfileSource">
+        <xsl:for-each select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id=$PicrelId]/@Target">
+          <xsl:value-of select="."/>
+        </xsl:for-each>
+      </xsl:variable>    
+      <style:background-image  xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+        <xsl:attribute name="xlink:href">
+          <xsl:value-of select="concat('Pictures',substring-after($PicfileSource,'media'))"/>
+        </xsl:attribute>
+        <xsl:if test="$shape/v:fill[@type='frame']">
+          <xsl:attribute name="style:repeat">
+            <xsl:value-of select ="'stretch'"/>
+          </xsl:attribute>
+        </xsl:if>
+      </style:background-image>
+      <pzip:copy   pzip:source="{concat('word/',$PicfileSource)}"
+                         pzip:target="{concat('Pictures',substring-after($PicfileSource,'media'))}" />
+    
 	</xsl:template>
 
 	<!-- Sona Template for Arrow Styles-->
@@ -2417,6 +2457,18 @@
     </xsl:if>
     <!--end here-->
  <!--Edited by Sona to implement Picture fill-->
+    <xsl:variable name ="shapeTypeId">
+      <xsl:value-of select ="substring-after($shape/@type,'#')"/>
+    </xsl:variable>
+    <xsl:variable name ="pathId">
+      <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+        <xsl:if test ="position()=1">
+          <xsl:value-of select ="@path"/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <!-- Sona: Gradient fill for frames-->
+    <xsl:if test ="($pathId!='m,l,21600r21600,l21600,xe' and not($shape[name()='v:rect'] and $shape/v:textbox))">
 <xsl:choose>
       <xsl:when test="$shape/v:fill[@type='tile' or @type='frame' or @type='pattern']">
         <xsl:attribute name="draw:fill">
@@ -2482,6 +2534,7 @@
 			</xsl:attribute>
       </xsl:when>
     </xsl:choose>
+    </xsl:if>
     <!-- If the shape has a gradient fill -->
 
     <xsl:if test="$shape/v:fill/@opacity">
