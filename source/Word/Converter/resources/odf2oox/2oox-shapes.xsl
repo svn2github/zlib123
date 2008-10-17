@@ -1851,7 +1851,7 @@
 					</xsl:when>
           <!-- Sona: Picture fill for frame-->
           <xsl:when test ="$fillProperty = '' and (parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame'])">
-            <xsl:if test ="$shapeStyle/style:graphic-properties/style:background-image">
+            <xsl:if test ="$shapeStyle/style:graphic-properties/style:background-image/@*">
             <xsl:variable name="stretch">
               <xsl:value-of select="$shapeStyle/style:graphic-properties/style:background-image/@style:repeat"/>
             </xsl:variable>
