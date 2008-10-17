@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -3092,32 +3092,115 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
+				<!--code added by yeswanth.s : For defect# 1836547-->
+				<xsl:variable name="bWNoUnit">
+					<xsl:value-of select="number(substring-before($borderWeight,'cm'))"/>
+				</xsl:variable>
+
+				<xsl:variable name="mappedBorderWeight">
+					<xsl:choose>
+						<xsl:when test="$lineStyle">
+							<xsl:value-of select="$borderWeight"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:if test="($bWNoUnit &gt;= 0) and ($bWNoUnit &lt;= 0.0165805556)">
+								<xsl:value-of select="'0.00176388889cm'"/>
+							</xsl:if>
+							<xsl:if test="($bWNoUnit &gt; 0.0165805556) and ($bWNoUnit &lt;= 0.0342194444)">
+								<xsl:value-of select="'0.0176388889cm'"/>
+							</xsl:if>
+							<xsl:if test="($bWNoUnit &gt; 0.0342194444) and ($bWNoUnit &lt;= 0.0871361111)">
+								<xsl:value-of select="'0.0352777778cm'"/>
+							</xsl:if>
+							<xsl:if test="($bWNoUnit &gt; 0.0871361111) and ($bWNoUnit &lt;= 0.140052778)">
+								<xsl:value-of select="'0.0881944444cm'"/>
+							</xsl:if>
+							<xsl:if test="($bWNoUnit &gt; 0.140052778) and ($bWNoUnit &lt;= 0.175330556)">
+								<xsl:value-of select="'0.141111111cm'"/>
+							</xsl:if>
+							<xsl:if test="($bWNoUnit &gt; 0.175330556)">
+							<!--<xsl:if test="($bWNoUnit &gt; 0.141111111) and ($bWNoUnit &lt;= 0.176388889)">-->
+								<xsl:value-of select="'0.176388889cm'"/>
+							</xsl:if>
+							<!--<xsl:if test="($bWNoUnit &gt; 0.176388889)">
+								<xsl:value-of select="'0.176388889cm'"/>
+							</xsl:if>-->
+							<xsl:if test="($bWNoUnit &lt; 0)">
+								<xsl:value-of select="'0cm'"/>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<!--end-->
 
 				<!-- write attributes -->
 				<xsl:attribute name="fo:border">
-					<xsl:value-of select="concat($borderWeight,' ',$borderStyle,' ',$borderColor)"/>
+					<xsl:value-of select="concat($mappedBorderWeight,' ',$borderStyle,' ',$borderColor)"/>
 				</xsl:attribute>
 
 				<xsl:attribute name="svg:stroke-color">
 					<xsl:value-of select="$borderColor"/>
 				</xsl:attribute>
 
+				<!--code changed by yeswanth.s : For defect# 1836547-->
 				<!-- the border is double -->
 				<xsl:if test="$lineStyle">
 					<xsl:attribute name="style:border-line-width">
 						<xsl:choose>
-							<xsl:when test="$lineStyle='thinThin' or $lineStyle='thickBetweenThin'">
-								<xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"/>
+							<xsl:when test="$lineStyle='thinThin'">
+								<xsl:if test="($bWNoUnit &gt;= 0) and ($bWNoUnit &lt;= 0.104775)">
+									<xsl:value-of select="'0.002032cm 0.035052cm 0.002032cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.104775) and ($bWNoUnit &lt;= 0.237066667)">
+									<xsl:value-of select="'0.002032cm 0.087884cm 0.002032cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.237066667) and ($bWNoUnit &lt;= 0.316441667)">
+									<xsl:value-of select="'0.035052cm 0.035052cm 0.035052cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.316441667)">
+									<xsl:value-of select="'0.087884cm 0.087884cm 0.087884cm'"/>
+								</xsl:if>
 							</xsl:when>
 							<xsl:when test="$lineStyle='thinThick'">
-								<xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"/>
+								<xsl:if test="($bWNoUnit &gt;= 0) and ($bWNoUnit &lt;= 0.240594444)">
+									<xsl:value-of select="'0.087884cm 0.035052cm 0.035052cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.240594444)">
+									<xsl:value-of select="'0.14097cm 0.087884cm 0.087884cm'"/>
+								</xsl:if>
 							</xsl:when>
 							<xsl:when test="$lineStyle='thickThin'">
-								<xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"/>
+								<xsl:if test="($bWNoUnit &gt;= 0) and ($bWNoUnit &lt;= 0.1524)">
+									<xsl:value-of select="'0.002032cm 0.087884cm 0.035052cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.1524) and ($bWNoUnit &lt;= 0.205316667)">
+									<xsl:value-of select="'0.002032cm 0.087884cm 0.087884cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.205316667) and ($bWNoUnit &lt;= 0.291747222)">
+									<xsl:value-of select="'0.002032cm 0.087884cm 0.14097cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.291747222)">
+									<xsl:value-of select="'0.087884cm 0.087884cm 0.14097cm'"/>
+								</xsl:if>
+							</xsl:when>
+							<xsl:when test="$lineStyle='thickBetweenThin'">
+								<xsl:if test="($bWNoUnit &gt;= 0) and ($bWNoUnit &lt;= 0.0800805556)">
+									<xsl:value-of select="'0.002032cm 0.035052cm 0.002032cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.0800805556) and ($bWNoUnit &lt;= 0.185913889)">
+									<xsl:value-of select="'0.035052cm 0.035052cm 0.035052cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.185913889) and ($bWNoUnit &lt;= 0.291747222)">
+									<xsl:value-of select="'0.087884cm 0.087884cm 0.087884cm'"/>
+								</xsl:if>
+								<xsl:if test="($bWNoUnit &gt; 0.291747222)">
+									<xsl:value-of select="'0.087884cm 0.087884cm 0.14097cm'"/>
+								</xsl:if>
 							</xsl:when>
 						</xsl:choose>
 					</xsl:attribute>
 				</xsl:if>
+				<!--end-->
 
 				<!-- the border is dashed -->
         <!-- Sona: Defect #2019374 contd-->
@@ -3174,10 +3257,10 @@
 		<xsl:variable name="cap">
 			<xsl:choose>
 				<xsl:when test="$shape/v:stroke/@endcap">
-					<xsl:value-of select ="round"/>
+					<xsl:value-of select ="'round'"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="rect"/>
+					<xsl:value-of select="'rect'"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -3186,8 +3269,9 @@
 				<xsl:call-template name ="AddDashType">
 					<xsl:with-param name ="name" select ="'Fine_20_Dotted'" />
 					<xsl:with-param name ="cap" select ="$cap" />
-					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="distance" select ="$distance" />
+					<xsl:with-param name ="dot2" select ="'1'" />
+					<xsl:with-param name ="dot2-length" select = "'0.0114in'" />
+					<xsl:with-param name ="distance" select ="'0.0228in'" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='dash')">
@@ -3195,10 +3279,10 @@
 					<xsl:with-param name ="name" select ="'Ultrafine_20_Dashed'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="dot1-length" select = "$dash" />
+					<xsl:with-param name ="dot1-length" select = "'0.0681in'" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "$dash" />
-					<xsl:with-param name ="distance" select ="$distance" />
+					<xsl:with-param name ="dot2-length" select = "'0.0681in'" />
+					<xsl:with-param name ="distance" select ="'0.0453in'" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='1 1')">
@@ -3206,10 +3290,10 @@
 					<xsl:with-param name ="name" select ="'SquareDot'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="dot1-length" select = "$distance" />
+					<xsl:with-param name ="dot1-length" select = "'0.0228in'" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "$distance" />
-					<xsl:with-param name ="distance" select ="$distance" />
+					<xsl:with-param name ="dot2-length" select = "'0.0228in'" />
+					<xsl:with-param name ="distance" select ="'0.0228in'" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='dashDot')">
@@ -3218,8 +3302,8 @@
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "$dash" />
-					<xsl:with-param name ="distance" select ="$distance" />
+					<xsl:with-param name ="dot2-length" select = "'0.0681in'" />
+					<xsl:with-param name ="distance" select ="'0.0453in'" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='longDash')">
@@ -3227,10 +3311,10 @@
 					<xsl:with-param name ="name" select ="'Fine_20_Dashed'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="dot1-length" select = "$longDash" />
+					<xsl:with-param name ="dot1-length" select = "'0.1362in'" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "$longDash" />
-					<xsl:with-param name ="distance" select ="$distance" />
+					<xsl:with-param name ="dot2-length" select = "'0.1362in'" />
+					<xsl:with-param name ="distance" select ="'0.0567in'" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='longDashDot')">
@@ -3239,8 +3323,8 @@
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "$longDash" />
-					<xsl:with-param name ="distance" select ="$distance" />
+					<xsl:with-param name ="dot2-length" select = "'0.1362in'" />
+					<xsl:with-param name ="distance" select ="'0.0453in'" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='longDashDotDot')">
@@ -3250,8 +3334,8 @@
 					<xsl:with-param name ="dot1" select ="'2'" />
 					<!--<xsl:with-param name ="dot1-length" select = "$dot" />-->
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "$longDash" />
-					<xsl:with-param name ="distance" select ="$distance" />
+					<xsl:with-param name ="dot2-length" select = "'0.1362in'" />
+					<xsl:with-param name ="distance" select ="'0.0453in'" />
 				</xsl:call-template>
 			</xsl:when>
 
@@ -3267,22 +3351,24 @@
 		<xsl:param name ="distance" />
 
 		<draw:stroke-dash>
-			<xsl:if test ="$cap='rnd'">
+			<xsl:choose>
+				<xsl:when test ="$cap='round'">
 				<xsl:attribute name ="draw:name">
 					<xsl:value-of select ="concat($name,'Round')"/>
 				</xsl:attribute>
 				<xsl:attribute name ="draw:style">
 					<xsl:value-of select ="'round'"/>
 				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="not($cap) or ($cap!='rnd')">
+				</xsl:when>
+				<xsl:otherwise>
 				<xsl:attribute name ="draw:name">
 					<xsl:value-of select ="$name"/>
 				</xsl:attribute>
 				<xsl:attribute name ="draw:style">
 					<xsl:value-of select ="'rect'"/>
 				</xsl:attribute>
-			</xsl:if>
+				</xsl:otherwise>	
+			</xsl:choose>			
 			<xsl:attribute name ="draw:display-name">
 				<xsl:value-of select ="$name"/>
 			</xsl:attribute>
@@ -3293,7 +3379,7 @@
 			</xsl:if>
 			<xsl:if test ="(string-length($dot1-length) != 0)">
 				<xsl:attribute name ="draw:dots1-length">
-					<xsl:value-of select ="concat($dot1-length div 0.4,'in')" />
+					<xsl:value-of select ="$dot1-length" />
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:if test ="(string-length($dot2) != 0)">
@@ -3303,12 +3389,12 @@
 			</xsl:if>
 			<xsl:if test ="(string-length($dot2-length) != 0)">
 				<xsl:attribute name ="draw:dots2-length">
-					<xsl:value-of select ="concat($dot2-length div 0.4,'in')" />
+					<xsl:value-of select ="$dot2-length" />
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:if test ="(string-length($distance) != 0)">
 				<xsl:attribute name ="draw:distance">
-					<xsl:value-of select ="concat($distance div 0.4,'in')"/>
+					<xsl:value-of select ="$distance"/>
 				</xsl:attribute>
 			</xsl:if>
 		</draw:stroke-dash>
