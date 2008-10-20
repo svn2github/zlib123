@@ -160,12 +160,12 @@
                 }
             }
         }
-        "Release to Manufacturing (signed)"
+        "SignedRelease
         {
-        "DisplayName" = "8:Release to Manufacturing (signed)"
+        "DisplayName" = "8:SignedRelease
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Release to Manufacturing (signed)\\OdfAddInForPPTSetup-nl.msi"
+        "OutputFilename" = "8:SignedReleaseAddInForPPTSetup-nl.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -1640,7 +1640,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1D855CA28AC645DF972751EEED3BDD06"
             {
-            "SourcePath" = "8:..\\..\\OdfPowerPointAddinShim\\Release to Manufacturing (signed)\\OdfPowerPointAddinShim.dll"
+            "SourcePath" = "8:..\\..\\OdfPowerPointAddinShim\\SignedReleasewerPointAddinShim.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"
@@ -1668,7 +1668,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_230367ECB5E74ED6A177DAD730BEC28C"
             {
-            "SourcePath" = "8:..\\..\\..\\Shell\\OdfConverterLauncher\\obj\\Release to Manufacturing (signed)\\OdfConverterLauncher.exe"
+            "SourcePath" = "8:..\\..\\..\\Shell\\OdfConverterLauncher\\obj\\SignedReleaseLauncher.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"

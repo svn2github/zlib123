@@ -20,7 +20,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing (signed)|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SignedRelease|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <Cultures>
@@ -28,11 +28,11 @@
     <SuppressAllWarnings>False</SuppressAllWarnings>
     <Pedantic>True</Pedantic>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing (signed)|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SignedRelease|AnyCPU' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release to Manufacturing (signed)|Any CPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SignedRelease|Any CPU' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
@@ -173,15 +173,15 @@
 	</Target> 
 	-->
   <Target Name="AfterBuild">
-    <GenerateBootstrapper ApplicationFile="$(TargetFileName)" Culture="en-US" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(OutputPath)en-US" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetFileName)" Culture="de-DE" ApplicationName="ODF Add-in für Microsoft Office" OutputPath="$(OutputPath)de-DE" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetDir)de-DE\$(TargetName)$(TargetExt)" Culture="de-DE" ApplicationName="ODF Add-in für Microsoft Office" OutputPath="$(OutputPath)de-DE" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetDir)en-US\$(TargetName)$(TargetExt)" Culture="en-US" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(OutputPath)en-US" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetDir)fr-FR\$(TargetName)$(TargetExt)" Culture="fr-FR" ApplicationName="Add-in ODF pour Microsoft Office" OutputPath="$(OutputPath)fr-FR" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetDir)ja-JP\$(TargetName)$(TargetExt)" Culture="ja-JP" ApplicationName="Microsoft Office 用 ODF アドイン" OutputPath="$(OutputPath)ja-JP" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetDir)nl-NL\$(TargetName)$(TargetExt)" Culture="nl-NL" ApplicationName="ODF Add-in voor Microsoft Office" OutputPath="$(OutputPath)nl-NL" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetDir)pl-PL\$(TargetName)$(TargetExt)" Culture="pl-PL" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(OutputPath)pl-PL" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
+    <GenerateBootstrapper ApplicationFile="$(TargetDir)zh-CHS\$(TargetName)$(TargetExt)" Culture="zh-CHS" ApplicationName="ODF Microsoft Office 加载项" OutputPath="$(OutputPath)zh-CHS" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>echo $(ProjectDir)..\..\signing\sign.bat $(TargetDir)$(TargetName).en-US$(TargetExt)
-$(ProjectDir)..\..\signing\sign.bat $(TargetDir)$(TargetName).en-US$(TargetExt)
-echo IExpress /N ..\..\..\OdfAddInForOfficeSetup.en-US.sed
-IExpress /Q /N ..\..\..\OdfAddInForOfficeSetup.en-US.sed
-echo $(ProjectDir)..\..\signing\sign.bat $(TargetDir)\OdfAddInForOfficeSetup-en.exe
-$(ProjectDir)..\..\signing\sign.bat $(TargetDir)\OdfAddInForOfficeSetup-en.exe</PostBuildEvent>
+    <PostBuildEvent>..\..\scripts\postBuild.bat $(TargetDir) $(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
 </Project>

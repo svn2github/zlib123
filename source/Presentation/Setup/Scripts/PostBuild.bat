@@ -1,7 +1,7 @@
 :: called with the following parameters:
 ::     %1 - path to project folder
 ::     %2 - BuiltOutputPath, e.g. .\Release\OdfAddInForWordSetup.msi
-::     %3 - Configuration, e.g. "Release", "Release to Manufacturing (signed)"
+::     %3 - Configuration, e.g. "Release", "SignedRelease
 
 :: add custom install actions
 ECHO Adding custom actions
@@ -17,10 +17,10 @@ cscript.exe %1..\Scripts\patchForVista.vbs %2
 ::cscript.exe %1..\Scripts\AddProperty.vbs %2
 
 ::sign the MSI file
-if %3 == "Release to Manufacturing (signed)" CALL ..\..\..\..\..\signing\sign.bat %2
+if %3 == "SignedRelease CALL ..\..\..\..\..\signing\sign.bat %2
 
 ::build self-extracting installer
 CALL %1..\Scripts\MakeSetupExe.bat %1%3 ..\OdfAddInForWordSetup.sed
 
 ::sign the self-extracting installer
-if %3 == "Release to Manufacturing (signed)" CALL ..\..\..\..\..\signing\sign.bat *.exe
+if %3 == "SignedRelease CALL ..\..\..\..\..\signing\sign.bat *.exe

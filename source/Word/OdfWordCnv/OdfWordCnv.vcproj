@@ -176,7 +176,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release to Manufacturing (signed)|Win32"
+			Name="SignedRelease|Win32"
 			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"

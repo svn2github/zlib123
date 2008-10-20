@@ -26,8 +26,8 @@
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release to Manufacturing %28signed%29' ">
-    <OutputPath>bin\Release to Manufacturing %28signed%29\</OutputPath>
+  <PropertyGroup Condition=" '$(Configuration)' == 'SignedRelease' ">
+    <OutputPath>bin\SignedRelease</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>

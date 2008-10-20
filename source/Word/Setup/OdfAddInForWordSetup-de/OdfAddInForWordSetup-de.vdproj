@@ -358,12 +358,12 @@
                 }
             }
         }
-        "Release to Manufacturing (signed)"
+        "SignedRelease
         {
-        "DisplayName" = "8:Release to Manufacturing (signed)"
+        "DisplayName" = "8:SignedRelease
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Release to Manufacturing (signed)\\OdfAddInForWordSetup-de.msi"
+        "OutputFilename" = "8:SignedReleaseAddInForWordSetup-de.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -2023,7 +2023,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2E0797CE4878448BB051BD6F9AFC74FA"
             {
-            "SourcePath" = "8:..\\..\\OdfWordAddinShim\\Release to Manufacturing (signed)\\OdfWordAddinShim.dll"
+            "SourcePath" = "8:..\\..\\OdfWordAddinShim\\SignedReleaseWordAddinShim.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"
@@ -2079,7 +2079,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7C769FE39E2E40CB96396345017C619D"
             {
-            "SourcePath" = "8:..\\..\\..\\Shell\\OdfConverterLauncher\\obj\\Release to Manufacturing (signed)\\OdfConverterLauncher.exe"
+            "SourcePath" = "8:..\\..\\..\\Shell\\OdfConverterLauncher\\obj\\SignedReleaseLauncher.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"
@@ -2107,7 +2107,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_96D081B6A1724BE7A3045A7964C46E79"
             {
-            "SourcePath" = "8:..\\..\\OdfWordAddin\\obj\\Release to Manufacturing (signed)\\OdfWordAddin.dll"
+            "SourcePath" = "8:..\\..\\OdfWordAddin\\obj\\SignedReleaseWordAddin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CD0ED01B934245FB8765114EE1CE5573"

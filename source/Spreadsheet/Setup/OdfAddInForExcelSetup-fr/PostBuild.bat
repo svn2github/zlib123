@@ -1,7 +1,7 @@
 :: called with the following parameters:
 ::     %1 - path to project folder
 ::     %2 - BuiltOutputPath, e.g. .\Release\OdfAddInForWordSetup.msi
-::     %3 - Configuration, e.g. "Release", "Release to Manufacturing (signed)"
+::     %3 - Configuration, e.g. "Release", "SignedRelease
 
 :: add custom install actions
 ECHO "Adding custom actions"
