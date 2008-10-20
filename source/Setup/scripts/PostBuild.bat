@@ -1,15 +1,39 @@
-if not exist "$(TargetDir)de-DE" md "$(TargetDir)de-DE"   
-copy "$(TargetDir)$(TargetName).de-de.msi" "$(TargetDir)de-DE\$(TargetName).de-de.msi"
-cd
-cd "$(TargetDir)de-DE"
-cd
-echo IExpress /N "..\..\..\OdfAddInForOfficeSetup.de-DE.sed"
-rem IExpress /N ..\..\..\OdfAddInForOfficeSetup.de-DE.sed
-cd "$(TargetDir)"
-    
-copy "$(TargetDir)$(TargetName).en-us.msi" "$(TargetPath)"
+rem %1 - $(TargetDir)
+rem %2 - $(TargetFileName) = OdfAddinForOfficeSetup.msi
 
-"C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\msitran.exe" -g "$(TargetPath)" "$(TargetDir)$(TargetName).de-de.msi" "$(TargetDir)de.mst"
-cscript "C:\Program Files\Microsoft Platform SDK\Samples\SysMgmt\Msi\Scripts\wisubstg.vbs" "$(TargetName).msi" de.mst 1031
 
-cscript "C:\Program Files\Microsoft Platform SDK\Samples\SysMgmt\Msi\Scripts\WiSumInf.vbs" OdfAddinForOfficeSetup.msi Template = Intel;1033,1031
+echo Signing MSI files
+call %1..\..\..\..\signing\sign.bat "%1de-DE\%2"
+call %1..\..\..\..\signing\sign.bat "%1en-US\%2"
+call %1..\..\..\..\signing\sign.bat "%1fr-FR\%2"
+call %1..\..\..\..\signing\sign.bat "%1ja-JP\%2"
+call %1..\..\..\..\signing\sign.bat "%1nl-NL\%2"
+call %1..\..\..\..\signing\sign.bat "%1pl-PL\%2"
+call %1..\..\..\..\signing\sign.bat "%1zh-CHS\%2"
+
+
+echo Building self-extracting installer
+echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.de-DE.sed
+IExpress /Q /N ..\..\OdfAddInForOfficeSetup.de-DE.sed
+echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.en-US.sed
+IExpress /Q /N ..\..\OdfAddInForOfficeSetup.en-US.sed
+echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.fr-FR.sed
+IExpress /Q /N ..\..\OdfAddInForOfficeSetup.fr-FR.sed
+echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.ja-JP.sed
+IExpress /Q /N ..\..\OdfAddInForOfficeSetup.ja-JP.sed
+echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.nl-NL.sed
+IExpress /Q /N ..\..\OdfAddInForOfficeSetup.nl-NL.sed
+echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.pl-PL.sed
+IExpress /Q /N ..\..\OdfAddInForOfficeSetup.pl-PL.sed
+echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.zh-CHS.sed
+IExpress /Q /N ..\..\OdfAddInForOfficeSetup.zh-CHS.sed
+
+
+rem Signing self-extracting installer
+call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-de.exe"
+call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-en.exe"
+call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-fr.exe"
+call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-ja.exe"
+call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-nl.exe"
+call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-pl.exe"
+call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-chs.exe"

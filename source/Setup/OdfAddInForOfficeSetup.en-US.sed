@@ -37,9 +37,9 @@ FILE3="lockbackRegKey.msi"
 FILE4="office2003-kb907417sfxcab-ENU.exe"
 FILE5="SetupPrepare.bat"
 [SourceFiles]
-SourceFiles0=
-SourceFiles1=KB908002\
-SourceFiles2=..\..\..\scripts\
+SourceFiles0=en-US
+SourceFiles1=..\..\..\..\packages\KB908002\
+SourceFiles2=..\..\scripts\
 [SourceFiles0]
 %FILE0%=
 %FILE1%=

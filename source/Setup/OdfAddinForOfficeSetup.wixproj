@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">SignedRelease</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.0</ProductVersion>
     <ProjectGuid>{bd7fecd4-854a-4d4b-99f5-477d313a8bd1}</ProjectGuid>
@@ -10,21 +10,17 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.0\Wix.targets</WixTargetsPath>
     <Name>OdfAddinForOfficeSetup</Name>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <Cultures>en-US</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SignedRelease|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <Cultures>
     </Cultures>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <SuppressAllWarnings>False</SuppressAllWarnings>
     <Pedantic>True</Pedantic>
   </PropertyGroup>
@@ -33,6 +29,19 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SignedRelease|Any CPU' ">
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <Cultures>en-US</Cultures>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Any CPU' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
@@ -56,20 +65,6 @@
     <Compile Include="ui\MyWelcomeDlg.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperFile Include="Microsoft.Net.Framework.2.0">
-      <ProductName>.NET Framework 2.0</ProductName>
-    </BootstrapperFile>
-    <BootstrapperFile Include="Microsoft.CompatibilityPack">
-      <ProductName>Compatibility Pack for the 2007 Office system</ProductName>
-    </BootstrapperFile>
-    <BootstrapperFile Include="Microsoft.OtkLoader.2.0">
-      <ProductName>Shared Add-in Support Update for Microsoft .NET Framework 2.0 (KB908002)</ProductName>
-    </BootstrapperFile>
-    <BootstrapperFile Include="Microsoft.Windows.Installer.3.1">
-      <ProductName>Windows Installer 3.1</ProductName>
-    </BootstrapperFile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Common\OdfAddinLib\OdfAddinLib.csproj">
       <Name>OdfAddinLib</Name>
       <Project>{599773ff-1e86-4ac2-8b24-34bbac707370}</Project>
@@ -88,11 +83,6 @@
     <ProjectReference Include="..\Presentation\Converter\Converter.csproj">
       <Name>Converter (Presentation\Converter)</Name>
       <Project>{d6e88e6e-b1b4-46b0-bc93-ddd4785865df}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Presentation\OdfPowerPointAddinShim\OdfPowerPointAddinShim.vcproj">
-      <Name>OdfPowerPointAddinShim</Name>
-      <Project>{fed3cfb2-ed96-4027-86de-f490cd65cd3d}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\Presentation\OdfPowerPointAddin\OdfPowerPointAddin.csproj">
@@ -115,11 +105,6 @@
       <Project>{e7055581-7c0c-429f-8134-99d3413c5756}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Spreadsheet\OdfExcelAddinShim\OdfExcelAddinShim.vcproj">
-      <Name>OdfExcelAddinShim</Name>
-      <Project>{6293d7da-2382-43d2-892c-48c3d45adf71}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Spreadsheet\OdfExcelAddin\OdfExcelAddin.csproj">
       <Name>OdfExcelAddin</Name>
       <Project>{294ac077-14e0-4630-b689-b440f3887550}</Project>
@@ -128,11 +113,6 @@
     <ProjectReference Include="..\Word\Converter\Converter.csproj">
       <Name>Converter (Word\Converter)</Name>
       <Project>{f9071930-348e-4a30-a0f6-a1a3df3a587b}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Word\OdfWordAddinShim\OdfWordAddinShim.vcproj">
-      <Name>OdfWordAddinShim</Name>
-      <Project>{0926b47f-86b3-4aab-9f1c-a558a58e939b}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\Word\OdfWordAddin\OdfWordAddin.csproj">
@@ -172,16 +152,8 @@
 	<Target Name="BeforeBuild">
 	</Target> 
 	-->
-  <Target Name="AfterBuild">
-    <GenerateBootstrapper ApplicationFile="$(TargetDir)de-DE\$(TargetName)$(TargetExt)" Culture="de-DE" ApplicationName="ODF Add-in für Microsoft Office" OutputPath="$(OutputPath)de-DE" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetDir)en-US\$(TargetName)$(TargetExt)" Culture="en-US" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(OutputPath)en-US" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetDir)fr-FR\$(TargetName)$(TargetExt)" Culture="fr-FR" ApplicationName="Add-in ODF pour Microsoft Office" OutputPath="$(OutputPath)fr-FR" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetDir)ja-JP\$(TargetName)$(TargetExt)" Culture="ja-JP" ApplicationName="Microsoft Office 用 ODF アドイン" OutputPath="$(OutputPath)ja-JP" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetDir)nl-NL\$(TargetName)$(TargetExt)" Culture="nl-NL" ApplicationName="ODF Add-in voor Microsoft Office" OutputPath="$(OutputPath)nl-NL" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetDir)pl-PL\$(TargetName)$(TargetExt)" Culture="pl-PL" ApplicationName="ODF Add-in for Microsoft Office" OutputPath="$(OutputPath)pl-PL" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-    <GenerateBootstrapper ApplicationFile="$(TargetDir)zh-CHS\$(TargetName)$(TargetExt)" Culture="zh-CHS" ApplicationName="ODF Microsoft Office 加载项" OutputPath="$(OutputPath)zh-CHS" BootstrapperItems="@(BootstrapperFile)" Path="C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\BootStrapper\" />
-  </Target>
   <PropertyGroup>
-    <PostBuildEvent>..\..\scripts\postBuild.bat $(TargetDir) $(TargetFileName)</PostBuildEvent>
+    <PostBuildEvent>$(MSBuildBinPath)\msbuild.exe /property:OutDir="\Projects\OdfConverter\trunk\source\Setup\bin\$(Configuration)" ..\..\scripts\GenerateBootstrapper.msbuild
+..\..\scripts\postBuild.bat $(TargetDir) $(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
 </Project>

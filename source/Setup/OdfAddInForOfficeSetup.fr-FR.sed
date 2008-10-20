@@ -24,10 +24,10 @@ SourceFiles=SourceFiles
 InstallPrompt=
 DisplayLicense=
 FinishMessage=
-TargetName=OdfAddInForOfficeSetup-de.exe
-FriendlyName=ODF Add-In für Microsoft Office
+TargetName=OdfAddInForOfficeSetup-fr.exe
+FriendlyName=Add-in ODF pour Microsoft Office
 AppLaunched=CMD /C SetupPrepare.bat
-PostInstallCmd=CMD
+PostInstallCmd=CMD /C ECHO FINISHED
 AdminQuietInstCmd=
 UserQuietInstCmd=
 FILE0="setup.exe"
@@ -37,7 +37,7 @@ FILE3="lockbackRegKey.msi"
 FILE4="office2003-kb907417sfxcab-ENU.exe"
 FILE5="SetupPrepare.bat"
 [SourceFiles]
-SourceFiles0=de-DE
+SourceFiles0=fr-FR
 SourceFiles1=..\..\..\..\packages\KB908002\
 SourceFiles2=..\..\scripts\
 [SourceFiles0]
