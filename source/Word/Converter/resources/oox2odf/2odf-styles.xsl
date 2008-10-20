@@ -1000,7 +1000,7 @@
 
 				<!--heading numbering style, insert outline numbering style only if heading style is linked to level in Word (numId and outlineLvl are in styles.xml Heading style defintion) -->
 				<xsl:if test="key('Part', 'word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
-					<xsl:call-template name="InsertOutlineListStyle"/>
+					 <xsl:call-template name="InsertOutlineListStyle"/>
 				</xsl:if>
 				<!-- document styles -->
 				<xsl:call-template name="InsertDefaultStyles"/>
@@ -5770,11 +5770,11 @@
                Somes files are crashing with Open Office 2.2, not with older version 2.0
                 Value in the otherwise condition is the same than the positioning of normal text...
           -->
-				<!--xsl:otherwise>
+        <xsl:otherwise>
           <xsl:attribute name="style:text-position">
-            <xsl:value-of select="concat(number($percentValue),' 100')"/>
+            <xsl:value-of select="concat(number($percentValue),'% 100%')"/>
           </xsl:attribute>
-        </xsl:otherwise-->
+        </xsl:otherwise>
 
 			</xsl:choose>
 		</xsl:if>
