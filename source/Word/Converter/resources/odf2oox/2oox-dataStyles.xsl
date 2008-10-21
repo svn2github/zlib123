@@ -117,6 +117,7 @@
     <xsl:choose>
       <xsl:when test="@text:fixed='true'">
         <w:r>
+          <xsl:call-template name="InsertRunProperties"/>
           <w:t>
             <xsl:value-of select="text()"/>
           </w:t>
