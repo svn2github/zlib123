@@ -379,15 +379,16 @@
     </xsl:choose>
 
     <!-- Background color -->
-    <xsl:if test="@fo:background-color and (@fo:background-color != 'transparent')">
-      <w:shd>
-        <xsl:attribute name="w:val">clear</xsl:attribute>
-        <xsl:attribute name="w:color">auto</xsl:attribute>
-        <xsl:attribute name="w:fill">
-          <xsl:value-of
-            select="substring(@fo:background-color, 2, string-length(@fo:background-color) -1)"/>
-        </xsl:attribute>
-      </w:shd>
+    <xsl:if test="@fo:background-color">
+      <xsl:choose>
+        <xsl:when test="@fo:background-color='transparent'">
+          <w:shd w:val="clear" w:color="auto" w:fill="auto"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- cut leading '#' from fill color value -->
+          <w:shd w:val="clear" w:color="auto" w:fill="{substring(@fo:background-color, 2, string-length(@fo:background-color) -1)}" />
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
 
     <!-- Tabs -->
