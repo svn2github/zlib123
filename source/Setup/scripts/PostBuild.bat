@@ -13,20 +13,20 @@ call %1..\..\..\..\signing\sign.bat "%1zh-CHS\%2"
 
 
 echo Building self-extracting installer
-echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.de-DE.sed
-IExpress /Q /N ..\..\OdfAddInForOfficeSetup.de-DE.sed
-echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.en-US.sed
-IExpress /Q /N ..\..\OdfAddInForOfficeSetup.en-US.sed
-echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.fr-FR.sed
-IExpress /Q /N ..\..\OdfAddInForOfficeSetup.fr-FR.sed
-echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.ja-JP.sed
-IExpress /Q /N ..\..\OdfAddInForOfficeSetup.ja-JP.sed
-echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.nl-NL.sed
-IExpress /Q /N ..\..\OdfAddInForOfficeSetup.nl-NL.sed
-echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.pl-PL.sed
-IExpress /Q /N ..\..\OdfAddInForOfficeSetup.pl-PL.sed
-echo IExpress /Q /N ..\..\OdfAddInForOfficeSetup.zh-CHS.sed
-IExpress /Q /N ..\..\OdfAddInForOfficeSetup.zh-CHS.sed
+echo IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.de-DE.sed
+IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.de-DE.sed
+echo IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.en-US.sed
+IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.en-US.sed
+echo IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.fr-FR.sed
+IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.fr-FR.sed
+echo IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.ja-JP.sed
+IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.ja-JP.sed
+echo IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.nl-NL.sed
+IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.nl-NL.sed
+echo IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.pl-PL.sed
+IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.pl-PL.sed
+echo IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.zh-CHS.sed
+IExpress /Q /N ..\..\l10n\OdfAddInForOfficeSetup.zh-CHS.sed
 
 
 rem Signing self-extracting installer
