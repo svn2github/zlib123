@@ -256,6 +256,8 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:apply-templates mode="shapes"/>
+            <!-- 2008-10-22/divo following line added to fix #2163354 ODT: Wrap around - tabs are lost-->
+            <xsl:apply-templates mode="paragraph"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -1222,9 +1224,10 @@
   <!-- dealing with text next to shapes -->
 
   <xsl:template match="text()|text:s" mode="shapes">
-    <xsl:if test="not(ancestor::draw:frame)">
+    <!-- 2008-10-22/divo do nothing here to fix #2163354 ODT: Wrap around - tabs are lost-->
+    <!--<xsl:if test="not(ancestor::draw:frame)">
       <xsl:apply-templates select="." mode="paragraph"/>
-    </xsl:if>
+    </xsl:if>-->
   </xsl:template>
 
   <!-- text and spaces -->
