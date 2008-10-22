@@ -321,7 +321,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    parameters.AddParam("generator", "", "OpenXML/ODF Translator HUTZLI");
+                    parameters.AddParam("generator", "", "OpenXML/ODF Translator v2.5");
                     XmlWriter finalWriter;
                     if (this.packaging)
                     {
