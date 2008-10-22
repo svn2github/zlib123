@@ -40,7 +40,7 @@
 		<!--  IMPORTANT NOTE:
 			  When creating a new release, 
 				- set the value of Product/@Id to a new GUID (without curly brackets, letters all upper-case)
-				- (no longer needed)- increase Product/@Version (Note that MSI only checks the first three groups, i.e. 2.5.4802)
+				- increase Product/@Version (Note that MSI only checks the first three groups, i.e. 2.5.4802)
 				//(no longer needed)- set UpgradeVersion/@Minimum and UpgradeVersion/@Maximum below to the new version number 
 				- set the value of Package/@Id to a new GUID
 				- leave Product/@UpgradeCode the same
