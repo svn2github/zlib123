@@ -23,6 +23,7 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <SuppressAllWarnings>False</SuppressAllWarnings>
     <Pedantic>True</Pedantic>
+    <SuppressPdbOutput>True</SuppressPdbOutput>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SignedRelease|AnyCPU' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
@@ -154,6 +155,6 @@
 	-->
   <PropertyGroup>
     <PostBuildEvent>$(MSBuildBinPath)\msbuild.exe /property:OutDir="\Projects\OdfConverter\trunk\source\Setup\bin\$(Configuration)" ..\..\scripts\GenerateBootstrapper.msbuild
-..\..\scripts\postBuild.bat $(TargetDir) $(TargetFileName)</PostBuildEvent>
+..\..\scripts\postBuild.bat $(TargetDir)\ $(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
 </Project>

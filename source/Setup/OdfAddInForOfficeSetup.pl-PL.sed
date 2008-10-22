@@ -38,7 +38,7 @@ FILE4="office2003-kb907417sfxcab-ENU.exe"
 FILE5="SetupPrepare.bat"
 [SourceFiles]
 SourceFiles0=pl-PL
-SourceFiles1=..\..\..\..\packages\KB908002\
+SourceFiles1=pl-PL\KB908002\
 SourceFiles2=..\..\scripts\
 [SourceFiles0]
 %FILE0%=

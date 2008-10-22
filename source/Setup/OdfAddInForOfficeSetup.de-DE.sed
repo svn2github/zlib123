@@ -27,7 +27,7 @@ FinishMessage=
 TargetName=OdfAddInForOfficeSetup-de.exe
 FriendlyName=ODF Add-In für Microsoft Office
 AppLaunched=CMD /C SetupPrepare.bat
-PostInstallCmd=CMD
+PostInstallCmd=CMD /C ECHO FINISHED
 AdminQuietInstCmd=
 UserQuietInstCmd=
 FILE0="setup.exe"
@@ -38,7 +38,7 @@ FILE4="office2003-kb907417sfxcab-ENU.exe"
 FILE5="SetupPrepare.bat"
 [SourceFiles]
 SourceFiles0=de-DE
-SourceFiles1=..\..\..\..\packages\KB908002\
+SourceFiles1=de-DE\KB908002\
 SourceFiles2=..\..\scripts\
 [SourceFiles0]
 %FILE0%=
