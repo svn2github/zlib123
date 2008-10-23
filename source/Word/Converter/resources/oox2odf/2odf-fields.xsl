@@ -300,7 +300,7 @@
       <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
       <xsl:when test="contains($fieldType, 'DATE')">
         <xsl:call-template name="InsertDateStyle">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
+          <xsl:with-param name="dateText" select="string(w:r/w:t)"/>
         </xsl:call-template>
       </xsl:when>
       <!-- possible time types: TIME, EDITTIME-->
@@ -431,6 +431,7 @@
     <xsl:call-template name="InsertDateType">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
       <xsl:with-param name="fieldType" select="$fieldType"/>
+      <xsl:with-param name="fieldText" select="string(w:r/w:t)" />
     </xsl:call-template>
   </xsl:template>
 
@@ -476,7 +477,8 @@
   <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime')
     or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')]" mode="automaticstyles">
     <xsl:call-template name="InsertDateStyle">
-      <xsl:with-param name="dateText" select="@w:instr"/>
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+      <xsl:with-param name="dateText" select="string(w:r/w:t)"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -560,27 +562,29 @@
   <xsl:template name="InsertDateType">
     <xsl:param name="fieldCode"/>
     <xsl:param name="fieldType"/>
+    <xsl:param name="fieldText"/>
+    
     <xsl:choose>
       <xsl:when test="$fieldType = 'DATE'">
         <xsl:call-template name="InsertDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
+          <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when
         test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate') or contains($fieldCode, 'CreateTime')">
         <xsl:call-template name="InsertCreationDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
+          <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$fieldType = 'PRINTDATE' or contains($fieldCode, 'PrintDate')">
         <xsl:call-template name="InsertPrintDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
+          <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when
         test="$fieldType = 'SAVEDATE' or contains($fieldCode,'LastSavedTime') or contains($fieldCode, 'SaveDate')">
         <xsl:call-template name="InsertModificationDate">
-          <xsl:with-param name="dateText" select="$fieldCode"/>
+          <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -615,6 +619,7 @@
 
   <xsl:template name="InsertDateContent">
     <xsl:param name="dateText"/>
+    
     <xsl:attribute name="style:data-style-name">
       <xsl:value-of select="generate-id(.)"/>
     </xsl:attribute>
@@ -1262,19 +1267,19 @@
   </xsl:template>
 
   <xsl:template name="InsertDateStyle">
+    <xsl:param name="fieldCode"/>
     <xsl:param name="dateText"/>
+    
     <xsl:variable name="FormatDate">
-      <xsl:value-of
-        select="substring-before(substring-after($dateText, '&quot;'), '&quot;')"/>
+      <xsl:value-of select="substring-before(substring-after($dateText, '&quot;'), '&quot;')"/>
     </xsl:variable>
     <!-- some of the DOCPROPERTY date field types have constant date format, 
       which is not saved in fieldCode so it need to be given directly in these cases-->
     <xsl:choose>
-      <xsl:when test="contains($dateText, 'CreateTime') or contains($dateText,'LastSavedTime')">
+      <xsl:when test="contains($fieldCode, 'CreateTime') or contains($fieldCode,'LastSavedTime')">
         <xsl:call-template name="InsertDocprTimeStyle"/>
       </xsl:when>
-      <xsl:when
-        test="contains($dateText,'CreateDate') or contains($dateText, 'SaveDate') or contains($dateText, 'PrintDate')">
+      <xsl:when test="contains($fieldCode, 'CreateDate') or contains($fieldCode, 'SaveDate') or contains($fieldCode, 'PrintDate')">
         <xsl:call-template name="InsertDocprLongDateStyle"/>
       </xsl:when>
       <!--default scenario-->
