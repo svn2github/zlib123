@@ -946,7 +946,9 @@
       <xsl:when test ="@fo:min-height and parent::draw:frame/@fo:min-width">
         <xsl:text>mso-wrap-style:none;</xsl:text>
       </xsl:when>
-      <xsl:when test ="not($frameStyle/style:graphic-properties/@fo:wrap-option) and not(self::node()[name()='draw:frame']) and not(parent::node()[name()='draw:frame'])">
+      <xsl:when test ="(not($frameStyle/style:graphic-properties/@fo:wrap-option) or $frameStyle/style:graphic-properties/@fo:wrap-option='wrap')
+                and not(self::node()[name()='draw:frame']) 
+                and not(parent::node()[name()='draw:frame'])">
         <xsl:text>mso-wrap-style:none;</xsl:text>
       </xsl:when>
       <xsl:when test ="not($frameStyle/@style:parent-style-name) and (self::node()[name()='draw:frame'] or parent::node()[name()='draw:frame'])">

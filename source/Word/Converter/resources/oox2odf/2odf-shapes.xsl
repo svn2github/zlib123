@@ -2905,7 +2905,7 @@
 				</xsl:when>
         <!--Sona Added margin for completing Shape Wrap feature-->
         <!-- Omit default values for in front of text-->
-        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-left')) and $shape/w10:wrap">
+        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-left')) and $shape/w10:wrap/@type">
           <xsl:text>0.13in</xsl:text>
         </xsl:when>
 				<xsl:otherwise>
@@ -2923,7 +2923,11 @@
 				<xsl:with-param name="margin" select="$margin-left"/>
 			</xsl:call-template>
 		</xsl:if>
-
+    <xsl:if test="$margin-left=''">
+      <xsl:attribute name ="fo:margin-left">
+        <xsl:text>0</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
 		<xsl:variable name="margin-right">
 			<xsl:choose>
 				<xsl:when test="$horizontalRelative='page' and $horizontalPosition='right'">
@@ -2931,7 +2935,7 @@
 				</xsl:when>
         <!--Sona Added margin for completing Shape Wrap feature-->
         <!-- Omit default values for in front of text-->
-        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-right')) and $shape/w10:wrap">
+        <xsl:when test="not(contains($shape/@style,'mso-wrap-distance-right')) and $shape/w10:wrap/@type">
           <xsl:text>0.13in</xsl:text>
         </xsl:when>
 				<xsl:otherwise>
@@ -2949,6 +2953,11 @@
 				<xsl:with-param name="margin" select="$margin-right"/>
 			</xsl:call-template>
 		</xsl:if>
+    <xsl:if test="$margin-right=''">
+      <xsl:attribute name ="fo:margin-right">
+        <xsl:text>0</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
 	</xsl:template>
 
 	<xsl:template name="InsertShapeMargin">
@@ -4525,7 +4534,9 @@
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:if test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) or $shape/@w:h">
+				<xsl:if test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) or $shape/@w:h or
+                (contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
+                not(contains($shape/@style,'mso-wrap-style:none')))">
 					<xsl:attribute name="svg:height">
 						<xsl:call-template name="ConvertMeasure">
 							<xsl:with-param name="length" select="$height"/>
@@ -4682,39 +4693,9 @@
 				</xsl:variable>
 
 				<!-- Don't insert the width if the textbox is set to auto-width -->
-				<xsl:if test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t'))">
-					<xsl:attribute name="svg:width">
-						<xsl:choose>
-							<xsl:when test="$width = 0 and $shape//@o:hr='t'">
-								<xsl:call-template name="ConvertTwips">
-									<xsl:with-param name="length"
-									  select="following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1]"/>
-									<xsl:with-param name="unit" select="'cm'"/>
-								</xsl:call-template>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:call-template name="ConvertMeasure">
-									<xsl:with-param name="length" select="$width"/>
-									<xsl:with-param name="destUnit" select="'cm'"/>
-								</xsl:call-template>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:attribute>
-				</xsl:if>
-        <xsl:variable name ="shapeTypeId">
-          <xsl:value-of select ="substring-after($shape/@type,'#')"/>
-        </xsl:variable>
-        <xsl:variable name ="pathId">
-          <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
-            <xsl:if test ="position()=1">
-              <xsl:value-of select ="@path"/>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:variable>
-        <!-- Sona: wrap and resize-->
-        <xsl:if test ="contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
-                not(contains($shape/@style,'mso-wrap-style:none'))
-                and ($pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox))">
+        <xsl:if test ="(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
+                not(contains($shape/@style,'mso-wrap-style:none'))) or
+                    not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) ">
           <xsl:attribute name="svg:width">
             <xsl:choose>
               <xsl:when test="$width = 0 and $shape//@o:hr='t'">
