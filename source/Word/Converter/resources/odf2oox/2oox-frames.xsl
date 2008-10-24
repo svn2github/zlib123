@@ -508,6 +508,10 @@
       <xsl:otherwise>
         <xsl:choose>
           <!-- page-content -->
+          <!--added by chhavi to fix bug   2174308 -->
+          <xsl:when test="contains($horizontalRel, 'paragraph-end-margin')">mso-position-horizontal-relative:text;</xsl:when>
+          <xsl:when test="contains($horizontalRel, 'page-end-margin')">mso-position-horizontal-relative:right-margin-area;</xsl:when>
+          <!--end here-->
           <xsl:when test="$horizontalRel='page-content' ">mso-position-horizontal-relative:margin;</xsl:when>
           <!-- page, page-start-margin, page-end-margin -->
           <xsl:when test="contains($horizontalRel, 'page')">mso-position-horizontal-relative:page;</xsl:when>
