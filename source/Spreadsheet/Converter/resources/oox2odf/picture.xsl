@@ -1253,7 +1253,24 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
 
           </xsl:if>
         </xsl:if>
-
+        <!--changed by sonata for bug no:2163376-->
+        <xsl:if test="a:solidFill/a:sysClr/@lastClr">
+          <xsl:attribute name="draw:fill-color">
+            <!--<xsl:value-of select="concat('#',a:solidFill/a:sysClr/@lastClr)"/>-->
+            <xsl:call-template name="tmpgetColorCode">
+              <xsl:with-param name="color">
+                <xsl:value-of select="a:solidFill/a:sysClr/@lastClr"/>
+              </xsl:with-param>
+              <xsl:with-param name="lumMod">
+                <xsl:value-of select="a:solidFill/a:sysClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name="lumOff">
+                <xsl:value-of select="a:solidFill/a:sysClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <!--end-->
         <!--Theme color-->
         <xsl:if test="a:solidFill/a:schemeClr/@val">
 
@@ -2138,8 +2155,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
                 fo:color="#000000">
                 <xsl:call-template name="TextBoxRunProperties">
                   <xsl:with-param name="rPr" select="."/>
-					<xsl:with-param name ="isChart" select="'false'"/>
-                </xsl:call-template>
+	   </xsl:call-template>
               </style:text-properties>
             </style:style>
           </xsl:for-each>
@@ -2317,7 +2333,6 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     <xsl:param name="defRPr" select="."/>
     <xsl:param name="rPr" select="."/>
     <xsl:param name="deftxPr" select="."/>
- <xsl:param name ="isChart"/>
     <!-- font name -->
     <xsl:choose>
       <xsl:when test ="$rPr/a:latin/@typeface or
@@ -2347,22 +2362,6 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     <!-- font size -->
     <xsl:choose>
       <xsl:when test="$rPr/@sz">
-        <xsl:choose >
-          <xsl:when test ="$isChart='true'">
-            <xsl:attribute name="fo:font-size">
-              <xsl:value-of select="concat(($rPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:font-size-asian">
-              <xsl:value-of select="concat(($rPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:font-size-complex">
-              <xsl:value-of select="concat(($rPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="fo:sonataCustom">
-              <xsl:value-of select="concat(($rPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
       <xsl:attribute name="fo:font-size">
           <xsl:value-of select="concat(format-number($rPr/@sz div 100,'0.##'), 'pt')"/>
       </xsl:attribute>
@@ -2372,27 +2371,9 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
             <xsl:attribute name="style:font-size-complex">
               <xsl:value-of select="concat(format-number($rPr/@sz div 100,'0.##'), 'pt')"/>
             </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
       </xsl:when>
       <xsl:when test="$defRPr/@sz">
-        <xsl:choose >
-          <xsl:when test ="$isChart='true'">
-        <xsl:attribute name="fo:font-size">
-              <xsl:value-of select="concat(($defRPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:font-size-asian">
-              <xsl:value-of select="concat(($defRPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:font-size-complex">
-              <xsl:value-of select="concat(($defRPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="fo:sonataCustom">
-              <xsl:value-of select="concat(($defRPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="fo:font-size">
+         <xsl:attribute name="fo:font-size">
               <xsl:value-of select="concat(format-number($defRPr/@sz div 100,'0.##'), 'pt')"/>
             </xsl:attribute>
             <xsl:attribute name="style:font-size-asian">
@@ -2401,27 +2382,9 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
             <xsl:attribute name="style:font-size-complex">
           <xsl:value-of select="concat(format-number($defRPr/@sz div 100,'0.##'), 'pt')"/>
         </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
       </xsl:when>
       <xsl:when test="$deftxPr/@sz">
-        <xsl:choose >
-          <xsl:when test ="$isChart='true'">
-            <xsl:attribute name="fo:font-size">
-              <xsl:value-of select="concat(($deftxPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:font-size-asian">
-              <xsl:value-of select="concat(($deftxPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:font-size-complex">
-              <xsl:value-of select="concat(($deftxPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-            <xsl:attribute name="fo:sonataCustom">
-              <xsl:value-of select="concat(($deftxPr/@sz*1.25) div 100, 'pt')"/>
-            </xsl:attribute>
-      </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="fo:font-size">
+         <xsl:attribute name="fo:font-size">
               <xsl:value-of select="concat(format-number($deftxPr/@sz div 100,'0.##'), 'pt')"/>
             </xsl:attribute>
             <xsl:attribute name="style:font-size-asian">
@@ -2430,10 +2393,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
             <xsl:attribute name="style:font-size-complex">
               <xsl:value-of select="concat(format-number($deftxPr/@sz div 100,'0.##'), 'pt')"/>
             </xsl:attribute>
-          </xsl:otherwise>
-    </xsl:choose>
-
-      </xsl:when>
+     </xsl:when>
     </xsl:choose>
     <xsl:choose>
       <xsl:when test="$rPr/@b = 1">
@@ -2635,6 +2595,8 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
     </xsl:choose>
     <!-- strike-through -->
     <xsl:choose>
+      <!--Sonata: Defect:2183805 -->
+      <xsl:when test="$rPr[@strike = 'noStrike'] "/>
       <xsl:when test="$rPr[@strike != 'noStrike'] ">
         <xsl:attribute name="style:text-line-through-style">
           <xsl:text>solid</xsl:text>
@@ -2652,6 +2614,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
           </xsl:when>
         </xsl:choose>
         </xsl:when>
+      <xsl:when test="$defRPr[@strike = 'noStrike'] "/>
       <xsl:when test="$defRPr[@strike != 'noStrike'] ">
           <xsl:attribute name="style:text-line-through-style">
             <xsl:text>solid</xsl:text>
@@ -2669,6 +2632,7 @@ RefNo-1	1-Feb-2008 Sandeep s           1835598   Changes done to fix bug:XLSX: T
             </xsl:when>
           </xsl:choose>
         </xsl:when>
+      <xsl:when test="$deftxPr[@strike = 'noStrike'] "/>
       <xsl:when test="$deftxPr[@strike != 'noStrike'] ">
         <xsl:attribute name="style:text-line-through-style">
           <xsl:text>solid</xsl:text>

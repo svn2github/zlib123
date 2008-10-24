@@ -33,6 +33,7 @@ LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                        
 RefNo-1 08-Feb-2008 Sandeep S     1738259  Changes done to Bug:Hyperlink text color is not retained after conversion
 RefNo-2 19-May-2008 Sandeep S     1777584   Changes done to implement Freeze Pane
 RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected error occurred after round trip conversion(auto filter)	
+RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect(Configuraion details retrived using name, insted of possition) 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -81,6 +82,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
     <xsl:param name="cellFormats"/>
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
+    <!--RefNo-4:Added parm strSheetName-->
+    <xsl:param name="strSheetName"/>
 
     <xsl:variable name="ConditionalCellStyle">
       <xsl:for-each select="/office:document-content/office:automatic-styles/style:style[style:map]">
@@ -103,6 +106,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 					<xsl:with-param name="cellStyles" select="$cellStyles"/>
 					<xsl:with-param name="CheckIfConditional" select="$CheckIfConditional"/>
 					<xsl:with-param name="ConditionalCellStyle" select="$ConditionalCellStyle"/>
+          <!--RefNo-4:Added parm strSheetName-->
+          <xsl:with-param name="strSheetName" select ="$strSheetName"/>
         </xsl:call-template>
       </pzip:entry>
     </xsl:if>
@@ -125,6 +130,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 			<xsl:with-param name="cellFormats" select="$cellFormats"/>
 			<xsl:with-param name="cellStyles" select="$cellStyles"/>
 			<xsl:with-param name="CheckIfConditional" select="$CheckIfConditional"/>
+      <!--RefNo-4:Added parm strSheetName-->
+      <xsl:with-param name="strSheetName" select ="following-sibling::table:table[1]/@table:name"/>
     </xsl:apply-templates>
 
   </xsl:template>
@@ -142,6 +149,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
     <xsl:param name="cellStyles"/>
     <xsl:param name="CheckIfConditional"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <!--RefNo-4:Added parm strSheetName-->
+    <xsl:param name="strSheetName"/>
 
     <worksheet>
       
@@ -227,6 +236,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
         <xsl:with-param name="sheetId" select="$sheetId"/>
 				<xsl:with-param name="MergeCell" select="$MergeCell"/>					
 				<xsl:with-param name="MergeCellStyle" select="$MergeCellStyle"/>
+        <!--RefNo-4:Added parm strSheetName-->
+        <xsl:with-param name="strSheetName" select ="$strSheetName"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertSheetContent">
@@ -458,6 +469,8 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
     <xsl:param name="sheetId"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
+    <!--RefNo-4:Added parm strSheetName-->
+    <xsl:param name="strSheetName"/>
 
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -581,12 +594,14 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
         <!--Start of RefNo-2-->
         <xsl:variable name="HSplit">
           <xsl:choose>
+            <!--Start of RefNo-4:Changed config:config-item-map-entry[position() = $sheetId] To config:config-item-map-entry[@config:name = $strSheetName]-->
             <xsl:when
-              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitMode']">
+              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='HorizontalSplitMode']">
               <xsl:value-of
-                select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitMode']"
+                select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='HorizontalSplitMode']"
                     />
             </xsl:when>
+            <!--End of RefNo-4-->
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
@@ -595,12 +610,14 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 
         <xsl:variable name="VSplit">
           <xsl:choose>
+            <!--Start of RefNo-4:Changed config:config-item-map-entry[position() = $sheetId] To config:config-item-map-entry[@config:name = $strSheetName]-->
             <xsl:when
-              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitMode']">
+              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='VerticalSplitMode']">
               <xsl:value-of
-                select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitMode']"
+                select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='VerticalSplitMode']"
                     />
             </xsl:when>
+            <!--End of RefNo-4-->
             <xsl:otherwise>
               <xsl:text>0</xsl:text>
             </xsl:otherwise>
@@ -611,12 +628,14 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
         <xsl:if test="$HSplit = 2 or $VSplit = 2">
           <xsl:variable name="VSPosition">
             <xsl:choose>
+              <!--Start of RefNo-4:Changed config:config-item-map-entry[position() = $sheetId] To config:config-item-map-entry[@config:name = $strSheetName]-->
               <xsl:when
-                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitPosition']">
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='VerticalSplitPosition']">
                 <xsl:value-of
-                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='VerticalSplitPosition']"
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='VerticalSplitPosition']"
                     />
               </xsl:when>
+              <!--End of RefNo-4-->
               <xsl:otherwise>
                 <xsl:text>0</xsl:text>
               </xsl:otherwise>
@@ -625,12 +644,14 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
 
           <xsl:variable name="HSPosition">
             <xsl:choose>
+              <!--Start of RefNo-4:Changed config:config-item-map-entry[position() = $sheetId] To config:config-item-map-entry[@config:name = $strSheetName]-->
               <xsl:when
-                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitPosition']">
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='HorizontalSplitPosition']">
                 <xsl:value-of
-                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='HorizontalSplitPosition']"
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='HorizontalSplitPosition']"
                     />
               </xsl:when>
+              <!--End of RefNo-4-->
               <xsl:otherwise>
                 <xsl:text>0</xsl:text>
               </xsl:otherwise>
@@ -681,12 +702,14 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
             <xsl:call-template name="NumbersToChars">
               <xsl:with-param name="num">
                 <xsl:choose>
+                  <!--Start of RefNo-4:Changed config:config-item-map-entry[position() = $sheetId] To config:config-item-map-entry[@config:name = $strSheetName]-->
                   <xsl:when
-                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']">
+                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='CursorPositionX']">
                     <xsl:value-of
-                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"
+                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='CursorPositionX']"
                     />
                   </xsl:when>
+                  <!--End of RefNo-4-->
                   <xsl:otherwise>
                     <xsl:text>1</xsl:text>
                   </xsl:otherwise>
@@ -696,12 +719,14 @@ RefNo-3	27-Jun-2008	Sandeep S	  1992864	changes done to fix Excel-Unexpected err
           </xsl:variable>
           <xsl:variable name="row">
             <xsl:choose>
+              <!--Start of RefNo-4:Changed config:config-item-map-entry[position() = $sheetId] To config:config-item-map-entry[@config:name = $strSheetName]-->
               <xsl:when
-                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']">
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='CursorPositionY']">
                 <xsl:value-of
-                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[@config:name = $strSheetName]/config:config-item[@config:name='CursorPositionY']"
                 />
               </xsl:when>
+              <!--End of RefNo-4-->
               <xsl:otherwise>
                 <xsl:text>1</xsl:text>
               </xsl:otherwise>

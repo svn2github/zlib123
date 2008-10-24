@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect(Configuraion details retrived using name, insted of possition)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -617,6 +624,8 @@
 		<xsl:with-param name="cellFormats" select ="$cellFormats"/>
 		<xsl:with-param name="cellStyles" select ="$cellStyles"/>
 		<xsl:with-param name="CheckIfConditional" select ="$CheckIfConditional"/>
+      <!--RefNo-1:Added parm strSheetName-->
+    <xsl:with-param name="strSheetName" select ="office:document-content/office:body/office:spreadsheet/table:table[1]/@table:name"/>
     </xsl:apply-templates>
 	  </xsl:for-each>
   </xsl:template>

@@ -666,11 +666,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
           <a:r>
             <a:rPr lang="en-EN" sz="1200">
               <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
-				  <xsl:call-template name="InsertRunProperties">
-					  <xsl:with-param name ="isChart">
-						  <xsl:value-of select ="'false'"/>
-					  </xsl:with-param>
-				  </xsl:call-template>
+				  <xsl:call-template name="InsertRunProperties"/>
               </xsl:for-each>
 
               <!-- default font face -->
@@ -703,11 +699,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
         <a:r>
           <a:rPr lang="en-EN" sz="1200">
             <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
-				<xsl:call-template name="InsertRunProperties">
-					<xsl:with-param name ="isChart">
-						<xsl:value-of select ="'false'"/>
-					</xsl:with-param>
-				</xsl:call-template>
+				<xsl:call-template name="InsertRunProperties"/>
             </xsl:for-each>
           </a:rPr>
           <a:t>
@@ -725,11 +717,7 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
     <a:r>
       <a:rPr lang="en-EN" sz="1200">
         <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
-			<xsl:call-template name="InsertRunProperties">
-				<xsl:with-param name ="isChart">
-					<xsl:value-of select ="'false'"/>
-				</xsl:with-param>
-			</xsl:call-template>
+			<xsl:call-template name="InsertRunProperties"/>
         </xsl:for-each>
 
         <!-- default font face -->
@@ -764,35 +752,12 @@ RefNo-1	28-Feb-2008 Sandeep s           1877279 XLSX:Roundtrip failure on open (
   </xsl:template>
 
   <xsl:template name="InsertRunProperties">
-    <!-- used by text-boxes and charts -->
-	  <xsl:param name ="isChart"/>
-    <!-- font-size -->
+   <!-- font-size -->
     <xsl:if test="@fo:font-size">
-		<xsl:choose >
-			<xsl:when test ="$isChart='true'">
-				<xsl:choose>
-					<xsl:when test ="@fo:sonataCustom">
-						<xsl:attribute name="sz">
-							<!-- in charts @fo:font-size can be a fraction so it is rounded -->
-							<xsl:value-of select="number(round((substring-before(@fo:font-size,'pt') * 100) div 1.25))"/>
-						</xsl:attribute>
-					</xsl:when>
-					<xsl:otherwise>
-      <xsl:attribute name="sz">
-        <!-- in charts @fo:font-size can be a fraction so it is rounded -->
-        <xsl:value-of select="number(round(substring-before(@fo:font-size,'pt')) * 100)"/>
-      </xsl:attribute>
-					</xsl:otherwise>
-				</xsl:choose>
-				
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:attribute name="sz">					
+	<xsl:attribute name="sz">					
 					<xsl:value-of select="number(round(substring-before(@fo:font-size,'pt')) * 100)"/>
 				</xsl:attribute>				
-			</xsl:otherwise>
-		</xsl:choose>	
-    </xsl:if>
+ </xsl:if>
 
     <!-- bold -->
     <xsl:if test="@fo:font-weight = 'bold' ">

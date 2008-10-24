@@ -857,7 +857,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             ////double columnWidthPx = System.Math.Truncate(((256 * columnWidth) + System.Math.Truncate(128 / maxDigWidth) / 256) * maxDigWidth);
             //double columnWidthInch = (columnWidthPx / 96.21212);
             double columnWidthPoints = columnWidthPx / 96.21212 * 72;
-            return columnWidthPoints.ToString();
+            return columnWidthPoints.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
         }
     }

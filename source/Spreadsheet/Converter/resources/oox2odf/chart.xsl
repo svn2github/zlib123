@@ -61,6 +61,7 @@
   <xsl:key name="spPr" match="c:spPr" use="@oox:part"/>
   <xsl:key name="error" match="c:errBars" use="@oox:part"/>
   <xsl:key name="dataLable" match="c:dLbl" use="''"/>
+  <xsl:key name="dataLables" match="c:dLbls" use="''"/>
   <!-- Sonata: line style constants-->
   <xsl:variable name ="dot">
     <xsl:value-of select ="'0.07'"/>
@@ -243,8 +244,13 @@
           <xsl:call-template name="InsertChartTitleProperties"/>
           <xsl:call-template name="InsertLegendProperties"/>
           <xsl:call-template name="InsertPlotAreaProperties"/>
+
+          <xsl:for-each select="key('dataLables','')">
+            <!-- Sonata: Series- default Number format-->
+            <xsl:apply-templates select="c:numFmt"/>
+          </xsl:for-each>
           <xsl:for-each select="key('dataLable','')">
-            <!-- Sonata: Number format-->
+            <!-- Sonata: Data lableNumber format-->
             <xsl:apply-templates select="c:numFmt"/>
           </xsl:for-each>
 
@@ -1199,8 +1205,20 @@
                   <xsl:value-of select="$categoryNumber + 1"/>
                 </xsl:when>
                 <xsl:when test="$count &lt; $categories">
+                  <!--changed by sonata for bug no:2152759-->
+                  <xsl:choose>
+                    <xsl:when test="key('plotArea', c:chartSpace/@oox:part)/c:barChart/c:barDir/@ val='bar' or key('plotArea', c:chartSpace/@oox:part)/c:bar3DChart">
+                      <xsl:value-of
+                                        select="key('categories', c:chartSpace/@oox:part)/descendant::c:pt[@idx= $count]"/>
+                    </xsl:when>
+                    <xsl:otherwise>
                   <xsl:value-of
                     select="key('categories', c:chartSpace/@oox:part)/descendant::c:pt[@idx= $categoryNumber]"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <!--end-->
+
+
                 </xsl:when>
               </xsl:choose>
             </text:p>
@@ -1213,6 +1231,17 @@
                 <xsl:when test="c:xVal">
                   <table:table-cell office:value-type="float"
                     office:value="{c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v}">
+                    <!--Sonata: fix for defect 2168527 XLSX-roundtrip: Data contend of all charts lost-->
+                    <xsl:attribute name="office:value-type">
+                      <xsl:choose>
+                        <xsl:when test="c:xVal/c:strRef">
+                          <xsl:value-of select="'string'"/>
+                        </xsl:when>
+                        <xsl:when test="c:xVal/c:numRef">
+                          <xsl:value-of select="'float'"/>
+                        </xsl:when>
+                      </xsl:choose>
+                    </xsl:attribute>
                     <text:p>
                       <xsl:value-of select="c:xVal/descendant::c:pt[@idx = $categoryNumber]/c:v"/>
                     </text:p>
@@ -1350,8 +1379,9 @@
       </xsl:when>
 
       <!-- one series chart default title is first series name -->
+      <!--changed by sonata for bug no:2174314-->
       <xsl:when
-        test="c:chartSpace/c:chart/c:title and count(key('dataSeries', c:chartSpace/@oox:part)) = 1 and key('dataSeries','')/c:tx/descendant::c:v[1]">
+        test="c:chartSpace/c:chart/c:title and count(key('dataSeries', c:chartSpace/@oox:part)) = 1">
         <xsl:for-each select="key('dataSeries', c:chartSpace/@oox:part)/c:tx/descendant::c:v[1]">
           <chart:title svg:x="3.834cm" svg:y="0.184cm" chart:style-name="chart_title">
             <text:p>
@@ -1531,19 +1561,24 @@
           </chart:title>
         </xsl:when>
       </xsl:choose>
-
+      <!--Sonata:2016097-Gridlines for secondary axis is not supported in calc-->
+      <xsl:if test="$primaryOrSecondary != 'secondary-y'">
       <xsl:if test="c:majorGridlines">
         <chart:grid chart:style-name="majorGridY" chart:class="major"/>
       </xsl:if>
+      </xsl:if>
+      
 
       <!--test number format of the axis text-->
       <xsl:if test="c:numFmt">
         <xsl:variable name="formatcode" select="@formatCode"/>
       </xsl:if>
+      <!--Sonata:2016097-Gridlines for secondary axis is not supported in calc-->
+      <xsl:if test="$primaryOrSecondary != 'secondary-y'">
       <xsl:if test="c:minorGridlines">
         <chart:grid chart:style-name="minorGridY" chart:class="minor"/>
       </xsl:if>
-
+      </xsl:if>
     </chart:axis>
 
   </xsl:template>
@@ -1765,7 +1800,23 @@
   <xsl:template name="InsertChartTitleProperties">
     <xsl:for-each select="c:chartSpace/c:chart/c:title">
       <style:style style:name="chart_title" style:family="chart">
-        <style:chart-properties style:direction="ltr"/>
+        <!--changed by sonata for bug no:2163376-->
+        <style:chart-properties style:direction="ltr">
+          <xsl:choose>
+            <!-- custom title -->
+            <xsl:when test="c:tx">
+              <xsl:for-each select="c:tx/c:rich/a:bodyPr">
+                <xsl:call-template name="TextRotation"/>
+              </xsl:for-each>
+            </xsl:when>
+            <!-- default title -->
+            <xsl:otherwise>
+              <xsl:for-each select="c:txPr/a:bodyPr">
+                <xsl:call-template name="TextRotation"/>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </style:chart-properties>
         <style:graphic-properties draw:stroke="none" draw:fill="none">
           <!-- Sonata: chart Title fill properties-->
           <xsl:for-each select="c:spPr">
@@ -1794,7 +1845,6 @@
                 <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                 <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                 <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
             <!-- default title -->
@@ -1802,7 +1852,6 @@
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -1866,7 +1915,23 @@
   <xsl:template name="InsertAxisXTitleProperties">
     <xsl:for-each select="c:title">
       <style:style style:name="axis-x_title" style:family="chart">
-        <style:chart-properties style:direction="ltr"/>
+        <!--changed by sonata for bug no:2163376-->
+        <style:chart-properties style:direction="ltr">
+          <xsl:choose>
+            <!-- custom title -->
+            <xsl:when test="c:tx">
+              <xsl:for-each select="c:tx/c:rich/a:bodyPr">
+                <xsl:call-template name="TextRotation"/>
+              </xsl:for-each>
+            </xsl:when>
+            <!-- default title -->
+            <xsl:otherwise>
+              <xsl:for-each select="c:txPr/a:bodyPr">
+                <xsl:call-template name="TextRotation"/>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </style:chart-properties>
         <style:graphic-properties draw:stroke="none" draw:fill="none">
           <!-- Sonata: chart X Axis Title fill properties-->
           <xsl:for-each select="c:spPr">
@@ -1894,7 +1959,6 @@
                   <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                   <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
                   <xsl:with-param name="deftxPr" select="../../../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                  <xsl:with-param name ="isChart" select="'true'"/>
                 </xsl:call-template>
               </xsl:when>
             <!-- default title -->
@@ -1902,7 +1966,6 @@
                 <xsl:call-template name="TextBoxRunProperties">
                   <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
                   <xsl:with-param name="defRPr" select="../../../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                  <xsl:with-param name ="isChart" select="'true'"/>
                 </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -1958,7 +2021,6 @@
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="defRPr" select="../../../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -2043,15 +2105,14 @@
                 <xsl:with-param name="rPr" select="c:legendEntry/c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                 <xsl:with-param name="defRPr" select="c:legendEntry/c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
             <!-- default title -->
             <xsl:otherwise>
               <xsl:call-template name="TextBoxRunProperties">
-                <xsl:with-param name="rPr" select="c:legendEntry/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
+                <!-- Soanta: [ 2181962 ] XLSX-Legend-Font Style is lost-->
+                <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="defRPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -2289,16 +2350,14 @@
               <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
               <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
               <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name ="isChart" select="'true'"/>
-            </xsl:call-template>
+           </xsl:call-template>
           </xsl:when>
           <!-- default title -->
           <xsl:otherwise>
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
               <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name ="isChart" select="'true'"/>
-            </xsl:call-template>
+             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       
@@ -2356,15 +2415,13 @@
               <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
               <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
               <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name ="isChart" select="'true'"/>
-            </xsl:call-template>
+           </xsl:call-template>
           </xsl:when>
           <!-- default title -->
           <xsl:otherwise>
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
               <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -2831,7 +2888,6 @@
               <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
               <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
               <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:when>
           <!-- default title -->
@@ -2839,7 +2895,6 @@
             <xsl:call-template name="TextBoxRunProperties">
               <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
               <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-              <xsl:with-param name ="isChart" select="'true'"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -2885,6 +2940,28 @@
 
       <style:style style:name="{concat('series',$seriesNumber)}" style:family="chart">
 
+            <xsl:for-each select="c:dLbls[1]">
+              <!--test number format of the axis text-->
+              <xsl:variable name="formatcode">
+                <xsl:if test="c:numFmt">
+                  <xsl:value-of select="c:numFmt/@formatCode"/>
+                </xsl:if>
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="$formatcode!=''">
+                  <xsl:attribute name="style:data-style-name">
+                    <xsl:value-of select="generate-id(c:numFmt)"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="style:data-style-name">
+                    <xsl:value-of select="N0"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+        
+      
         <style:chart-properties>
           <!-- symbols -->
           <xsl:choose>
@@ -3196,7 +3273,6 @@
                     <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                     <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
                     <xsl:with-param name="deftxPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                    <xsl:with-param name ="isChart" select="'true'"/>
                   </xsl:call-template>
                 </xsl:when>
                 <!-- default title -->
@@ -3204,8 +3280,7 @@
                   <xsl:call-template name="TextBoxRunProperties">
                     <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
                     <xsl:with-param name="defRPr" select="ancestor::c:chartSpace/c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                    <xsl:with-param name ="isChart" select="'true'"/>
-                  </xsl:call-template>
+                 </xsl:call-template>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>
@@ -3504,7 +3579,6 @@
                 <xsl:with-param name="rPr" select="c:tx/c:rich/a:p[1]/a:r[1]/a:rPr"/>
                 <xsl:with-param name="defRPr" select="c:tx/c:rich/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:when>
             <!-- default title -->
@@ -3512,7 +3586,6 @@
               <xsl:call-template name="TextBoxRunProperties">
                 <xsl:with-param name="rPr" select="c:txPr/a:p[1]/a:pPr/a:defRPr"/>
                 <xsl:with-param name="deftxPr" select="../../c:txPr/a:p[1]/a:pPr/a:defRPr"/>
-                <xsl:with-param name ="isChart" select="'true'"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>

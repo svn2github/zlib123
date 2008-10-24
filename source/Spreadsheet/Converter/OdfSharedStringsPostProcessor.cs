@@ -472,7 +472,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
                     char chrLast = strVal[strVal.Length - 1];
                     int intCharFirst = (int)chrFirst;
 
-                    if (strVal.Length <= 12 && (char.IsLetter(strVal, 0) || strVal[0] == '$') && char.IsNumber(strVal, strVal.Length - 1) && (strVal.ToUpperInvariant() != "IMLOG10" || strVal.ToUpperInvariant() != "IMLOG2"))
+                    if (strVal.Length <= 12 && (char.IsLetter(strVal, 0) || strVal[0] == '$') && char.IsNumber(strVal, strVal.Length - 1) && (strVal.ToUpperInvariant() != "IMLOG10" || strVal.ToUpperInvariant() != "IMLOG2" || strVal.ToUpperInvariant() != "SUMX2MY2" || strVal.ToUpperInvariant() != "SUMX2PY2" || strVal.ToUpperInvariant() != "SUMXMY2"))
                     {
                         arlCellRef.Add(strVal);
                     }
@@ -1089,7 +1089,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
             //double columnWidthPx = System.Math.Truncate(((256 * columnWidth) + System.Math.Truncate(128 / maxDigWidth) / 256) * maxDigWidth);
             double columnWidthInch = (columnWidthPx / 96.21212);
             double columnWidthCM = columnWidthInch * 2.54;
-            return string.Concat(System.Math.Round(columnWidthCM,3).ToString(),"cm");
+            return string.Concat(System.Math.Round(columnWidthCM, 3).ToString(System.Globalization.CultureInfo.InvariantCulture), "cm");
 
         }
 

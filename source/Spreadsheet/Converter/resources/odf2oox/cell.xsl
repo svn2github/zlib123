@@ -53,6 +53,7 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:pxsi="urn:cleverage:xmlns:post-processings:pivotTable"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table r">
 
   <!--<xsl:import href="measures.xsl"/>-->
@@ -582,7 +583,13 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
       <!--RefNo-1-->
       <!--RefNo-2: Changed count(following-sibling::table:table-row) &lt;= 1 to (count(following-sibling::table:table-row) &lt;= 1  and parent::table:table)-->
-      <xsl:if test="descendant::office:annotation or not((count(following-sibling::table:table-row) &lt;= 1  and parent::table:table) and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))">
+     <!--  Commented by Vipul to fix defect <xsl:if test="descendant::office:annotation or not((count(following-sibling::table:table-row) &lt;= 1  and parent::table:table) and (count(child::table:table-cell/child::text:p) = 0  and (not(child::table:table-cell/attribute::table:style-name))  and not(following-sibling::table:table-row/table:table-cell/child::text:p)))"> -->
+<xsl:if test="descendant::office:annotation or descendant::draw:frame or
+      not(
+        (count(following-sibling::table:table-row) &lt;= 1  and parent::table:table) 
+        and (count(child::table:table-cell/child::text:p) = 0  and 
+          (not(child::table:table-cell/attribute::table:style-name))
+        and not(following-sibling::table:table-row/table:table-cell/child::text:p) or following-sibling::table:table-row/descendant::draw:frame))">
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -967,9 +974,19 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
     <xsl:param name="pivotCells"/>
 
     <!-- first 'or' is for empty cells with formatting, e.g. background -->
+  <!--  Commented by Vipul to fix defect <xsl:if
+      test="(@table:number-rows-repeated and @table:style-name) or table:table-cell/text:p or table:table-cell/@table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group"> -->
     <xsl:if
-      test="(@table:number-rows-repeated and @table:style-name) or table:table-cell/text:p or table:table-cell/@table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
-
+      test="(@table:number-rows-repeated and @table:style-name) or 
+            table:table-cell/text:p or 
+            count(table:table-cell/child) > 0 or
+            table:table-cell/@table:style-name or 
+            @table:visibility='collapse' or  
+            @table:visibility='filter' or 
+            ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) 
+            or contains($CheckIfDefaultBorder, 'true') 
+            and @table:table-row[@table:number-rows-repeated] 
+            or parent::table:table-row-group">
       <xsl:choose>
         <xsl:when test="$numberRowsRepeated &gt; 1">
           <!--RefNo-1-->
@@ -2414,20 +2431,10 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
     </xsl:variable>      
     <xsl:variable name="tblRef">
       <xsl:text>&apos;)</xsl:text>
-    </xsl:variable>
-    <xsl:variable name="blnFormulaWNamedRan">
-      <xsl:variable name="formula" select="@table:formula"/>
-      <xsl:for-each select="//table:named-expressions/table:named-range">
-        <xsl:if test="contains($formula,@table:name)">
-          <xsl:value-of select="'true'"/>
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
-    <!--or (contains($blnFormulaWNamedRan,'true'))-->
+    </xsl:variable>    
     <xsl:choose>
       <xsl:when test="not(
-                        (contains(@table:formula,$extLink))
-                    or (contains($blnFormulaWNamedRan,'true'))
+                        (contains(@table:formula,$extLink))                   
                     or (contains(@table:formula,'ARABIC(')) 
                     or (contains(@table:formula,'DDE('))
                     or (contains(@table:formula,'JIS('))
@@ -2469,8 +2476,7 @@ RefNo-9 14-oct-2008 sandeep s     2149116  Changes done to retain Time&Date form
                     or (contains(@table:formula,'TABLE('))                    
                     or (contains(@table:formula,$tblRef))                    
                     or (contains(@office:string-value,'#NAME?'))
-                    or (contains(@office:string-value,'#N/A'))                    
-                    or (text:p='Err:518')
+                    or (contains(@office:string-value,'#N/A'))                                        
                     or (text:p='Err:511')
                     or (text:p='#VALUE!')
                     or (text:p='Err:504')
