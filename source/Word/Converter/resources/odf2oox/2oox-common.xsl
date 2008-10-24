@@ -147,6 +147,7 @@
     <xsl:param name="borderLineWidth"/>
 
     <xsl:choose>
+      <xsl:when test="$borderLineWidth = 0">none</xsl:when>
       <xsl:when test="contains($borderStr, 'solid')">single</xsl:when>
       <xsl:when test="contains($borderStr, 'double')">
         <xsl:choose>

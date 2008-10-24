@@ -1068,26 +1068,189 @@
 
   </xsl:template>
 
-  <!-- Inserts the cell borders -->
+  <!-- 
+  Summary: Inserts a single cell border
+  Author:  makz (DIaLOGIKa)
+  Date:    23.10.2008
+  -->
+  <xsl:template name="InsertCellBorder">
+    <xsl:param name="border" />
+    <xsl:param name="borderLineWidth" />
+    <xsl:param name="side" />
+
+    <xsl:variable name="width">
+      <xsl:choose>
+        <xsl:when test="contains($border, 'double')">
+          <xsl:value-of select="number(substring-before($border, 'cm')) div 2" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="number(substring-before($border, 'cm'))" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="color" select="string(substring-after($border, '#'))" />
+    
+    <xsl:variable name="style">
+      <xsl:choose>
+        <xsl:when test="contains($border, 'double')">
+          <xsl:choose>
+            <xsl:when test="$borderLineWidth">
+              <!-- it is a double border with different line thickness -->
+              <xsl:variable name="thickness1" select="number(substring-before($borderLineWidth, 'cm'))" />
+              <xsl:variable name="thickness2" select="number(substring-before(substring-after($borderLineWidth, ' '), 'cm'))" />
+              <xsl:variable name="thickness3" select="number(substring-before(substring-after(substring-after($borderLineWidth, ' '), ' '), 'cm'))" />
+              <xsl:choose>
+                <xsl:when test="$thickness1 &gt; $thickness3">
+                  <xsl:value-of select="'thickThinMediumGap'"/>
+                </xsl:when>
+                <xsl:when test="$thickness3 &gt; $thickness1">
+                  <xsl:value-of select="'thinThickMediumGap'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'double'"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- it is a double border with equal line thickness -->
+              <xsl:value-of select="'double'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- it is a single border -->
+          <xsl:value-of select="'single'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:if test="$width &gt; 0">
+      <xsl:element name="{concat('w:', $side)}">
+
+        <xsl:attribute name="w:val">
+          <xsl:value-of select="$style" />
+        </xsl:attribute>
+
+        <xsl:attribute name="w:sz">
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="concat($width, 'cm')" />
+            <xsl:with-param name="unit" select="'eightspoint'"/>
+          </xsl:call-template>
+        </xsl:attribute>
+
+        <xsl:attribute name="w:color">
+          <xsl:value-of select="$color"/>
+        </xsl:attribute>
+
+      </xsl:element>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- 
+  Summary: Inserts the cell borders 
+  Author:  makz (DIaLOGIKa)
+  Date:    23.10.2008
+  Params:  cellProp: The <style:table-cell-properties> element
+  -->
   <xsl:template name="InsertCellBorders">
-    <xsl:param name="cellProp"/>
+    <xsl:param name="cellProp" />
     <xsl:variable name="colsNumber" select="count(parent::table:table-row/*)"/>
+    
     <w:tcBorders>
       <xsl:choose>
-        <!-- if subCell, do not put border on the outer cells of the subtable it belongs -->
+        <xsl:when test="$cellProp/@fo:border">
+          
+          <!-- insert the all-around-border to each side -->
+
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="border" select="$cellProp/@fo:border" />
+            <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
+            <xsl:with-param name="side" select="string('left')" />
+          </xsl:call-template>
+
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="border" select="$cellProp/@fo:border" />
+            <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
+            <xsl:with-param name="side" select="string('top')" />
+          </xsl:call-template>
+
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="border" select="$cellProp/@fo:border" />
+            <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
+            <xsl:with-param name="side" select="string('right')" />
+          </xsl:call-template>
+
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="border" select="$cellProp/@fo:border" />
+            <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
+            <xsl:with-param name="side" select="string('bottom')" />
+          </xsl:call-template>
+          
+        </xsl:when>
+        <xsl:otherwise>
+          
+          <!-- insert the single borders -->
+          
+          <xsl:if test="$cellProp/@fo:border-left">
+            <xsl:call-template name="InsertCellBorder">
+              <xsl:with-param name="border" select="$cellProp/@fo:border-left" />
+              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-left" />
+              <xsl:with-param name="side" select="string('left')" />
+            </xsl:call-template>
+          </xsl:if>
+
+          <xsl:if test="$cellProp/@fo:border-top">
+            <xsl:call-template name="InsertCellBorder">
+              <xsl:with-param name="border" select="$cellProp/@fo:border-top" />
+              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-top" />
+              <xsl:with-param name="side" select="string('top')" />
+            </xsl:call-template>
+          </xsl:if>
+
+          <xsl:if test="$cellProp/@fo:border-right">
+            <xsl:call-template name="InsertCellBorder">
+              <xsl:with-param name="border" select="$cellProp/@fo:border-right" />
+              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-right" />
+              <xsl:with-param name="side" select="string('right')" />
+            </xsl:call-template>
+          </xsl:if>
+
+          <xsl:if test="$cellProp/@fo:border-bottom">
+            <xsl:call-template name="InsertCellBorder">
+              <xsl:with-param name="border" select="$cellProp/@fo:border-bottom" />
+              <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width-bottom" />
+              <xsl:with-param name="side" select="string('bottom')" />
+            </xsl:call-template>
+          </xsl:if>
+
+        </xsl:otherwise>
+
+      </xsl:choose>
+      
+      <!--
+      makz: old clever age stuff
+      <xsl:choose>
+        -->
+      <!-- if subCell, do not put border on the outer cells of the subtable it belongs -->
+      <!--
         <xsl:when test="ancestor::table:table[@table:is-sub-table='true']">
           <xsl:call-template name="GetSubCellBorders">
             <xsl:with-param name="colsNumber" select="$colsNumber"/>
             <xsl:with-param name="cellProp" select="$cellProp"/>
           </xsl:call-template>
         </xsl:when>
-        <!-- if subtable, get the border from subcells -->
+        -->
+      <!-- if subtable, get the border from subcells -->
+      <!--
         <xsl:when test="table:table[@table:is-sub-table='true']">
           <xsl:call-template name="GetBordersFromSubCells">
             <xsl:with-param name="colsNumber" select="$colsNumber"/>
           </xsl:call-template>
         </xsl:when>
-        <!-- other cases : compute borders -->
+        -->
+      <!-- other cases : compute borders -->
+      <!--
         <xsl:when test="$cellProp[@fo:border and @fo:border!='none' ]">
           <xsl:call-template name="InsertBorders">
             <xsl:with-param name="allSides">true</xsl:with-param>
@@ -1109,7 +1272,8 @@
       </xsl:choose>
       <xsl:call-template name="InsertCellDiagonals">
         <xsl:with-param name="cellProp" select="$cellProp"/>
-      </xsl:call-template>
+      </xsl:call-template>-->
+      
     </w:tcBorders>
   </xsl:template>
 
