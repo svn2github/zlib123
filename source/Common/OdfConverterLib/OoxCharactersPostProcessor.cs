@@ -1194,8 +1194,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     string xStr = "";
                     string yStr = "";
                     Double angle;
-                    Double x;
-                    Double y;
+                    Double x=0.0;
+                    Double y=0.0;
                     //Sona: Different culture defect fix
                     string strReturn="";
                     foreach (string str in splitStr)
@@ -1215,21 +1215,31 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         {
                             xStr = str.Replace("margin-left:", "");
                             xStr.Trim();
+                            //Sona: Defect #1830350
+                            if (xStr != "" && xStr !="0")
+                            {
                             //convert emu to points
                             x = (Convert.ToInt32(EvalRotationExpression(xStr)) * 72) / (360000 * 2.54);
                             //Sona: Different culture defect fix
                             strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", (int)Math.Round(x));
                             text = text.Replace(xStr, strReturn + "pt");
                         }
+                            
+                        }
                         if (str.StartsWith("margin-top"))
                         {
                             yStr = str.Replace("margin-top:", "");
                             yStr.Trim();
+                            //Sona: Defect #1830350
+                            if (yStr != "" && yStr !="0")
+                            {
                             //convert emu to points
                             y = (Convert.ToInt32(EvalRotationExpression(yStr)) * 72) / (360000 * 2.54);
                             //Sona: Different culture defect fix
                             strReturn = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0}", (int)Math.Round(y));
                             text = text.Replace(yStr, strReturn + "pt");
+                        }
+                           
                         }
                     }
                 }
