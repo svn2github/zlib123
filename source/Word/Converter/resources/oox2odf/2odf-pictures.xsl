@@ -468,8 +468,9 @@
     <xsl:variable name="layoutInCell" select="wp:inline/@layoutInCell | wp:anchor/@layoutInCell"/>
     <xsl:attribute name="draw:flow-with-text">
       <xsl:choose>
-        <xsl:when test="ancestor::w:hdr or ancestor::w:ftr">
-          <xsl:text>false</xsl:text>
+        <!--If the pic is inside the table-->
+        <xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and (./ancestor::w:tc)">
+           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:when test="$layoutInCell = 1">
           <xsl:text>true</xsl:text>

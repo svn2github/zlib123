@@ -2594,15 +2594,32 @@
 				<xsl:when test="$layouitInCell = 'f' ">
 					<xsl:text>false</xsl:text>
 				</xsl:when>
-				<!-- if ancestor if header or footer and frame is in background -->
+				<!--if ancestor is header or footer and frame is in background -->
+        <!--If the shape is inside the Table-->
 				<xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and not(w10:wrap/@type)">
+          <xsl:choose>
+            <xsl:when test="$shape/ancestor::w:tc">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
 					<xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
 				</xsl:when>
+        <!--Checking condition for shape position-->
         <xsl:when test="$verticalRelative='page' or $horizontalRelative='page'">
+          <xsl:choose>
+            <!--If the shape is inside the Table-->
+            <xsl:when test="$shape/ancestor::w:tc">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
 					<xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:text>true</xsl:text>
+          <xsl:text>false</xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
