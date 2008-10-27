@@ -1276,11 +1276,12 @@
           makz: Add the parent style of the automatic style as style ref 
           -->
           <xsl:if test="key('automatic-styles', $styleName)/@style:parent-style-name">
-            <xsl:call-template name="InsertParagraphStyle">
+            <w:rStyle w:val="{key('automatic-styles', $styleName)/@style:parent-style-name}" />
+            <!--<xsl:call-template name="InsertParagraphStyle">
               <xsl:with-param name="styleName">
                 <xsl:value-of select="key('automatic-styles', $styleName)/@style:parent-style-name"/>
               </xsl:with-param>
-            </xsl:call-template>
+            </xsl:call-template>-->
           </xsl:if>
           
           <!-- 
