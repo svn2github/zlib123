@@ -601,40 +601,7 @@
 					</xsl:if>
 				</text:p>
 			</xsl:when>
-      <xsl:when test="not(.//w:t)">
-        <text:p>
-          <!--style name-->
-          <!--<xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
-            <xsl:attribute name="text:style-name">
-              <xsl:value-of select="generate-id(self::node())"/>
-            </xsl:attribute>
-          </xsl:if>-->
-          <!--header outline level -->
-            <!-- unnumbered heading is list header  -->
-            <!--<xsl:call-template name="InsertHeadingAsListHeader"/>-->
-          <!--change track end-->
-          <xsl:if test="key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:ins and $numId!=''">
-            <text:change-end>
-              <xsl:attribute name="text:change-id">
-                <xsl:value-of select="generate-id(key('p', number(@oox:id)-1))"/>
-              </xsl:attribute>
-            </text:change-end>
-          </xsl:if>
-          <xsl:apply-templates/>
-          <xsl:if test="w:pPr/w:rPr/w:del">
-            <!--      if this following paragraph is attached to this one in track changes mode-->
-            <xsl:call-template name="InsertDeletedParagraph"/>
-          </xsl:if>
-          <xsl:if test="w:pPr/w:rPr/w:ins">
-            <text:change-start>
-              <xsl:attribute name="text:change-id">
-                <xsl:value-of select="generate-id(self::node())"/>
-              </xsl:attribute>
-            </text:change-start>
-          </xsl:if>
-        </text:p>
-      </xsl:when>
-			<xsl:otherwise>
+     	<xsl:otherwise>
 				<text:h>
 					<!--style name-->
 					<xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
