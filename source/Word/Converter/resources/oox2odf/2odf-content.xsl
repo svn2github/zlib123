@@ -900,40 +900,41 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<!-- hyperlinks - w:hyperlink and fieldchar types-->
-	<xsl:template name="InsertHyperlink">
-		<text:a xlink:type="simple">
-			<xsl:attribute name="xlink:href">
-				<!-- document hyperlink -->
-				<xsl:if test="@w:anchor">
-					<xsl:value-of select="concat('#',@w:anchor)"/>
-				</xsl:if>
-				<!-- file or web page hyperlink with relationship id -->
-				<xsl:if test="@r:id">
-					<xsl:variable name="relationshipId">
-						<xsl:value-of select="@r:id"/>
-					</xsl:variable>
-					<xsl:variable name="document">
-						<xsl:call-template name="GetDocumentName" />
-					</xsl:variable>
-					<xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
-						<xsl:if test="./@Id=$relationshipId">
-							<xsl:call-template name="GetLinkPath">
-								<xsl:with-param name="linkHref" select="@Target"/>
-							</xsl:call-template>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:if>
-			</xsl:attribute>
-
-			<!--hyperlink text-->
-			<xsl:apply-templates/>
-		</text:a>
-	</xsl:template>
-
 	<!-- hyperlinks -->
 	<xsl:template match="w:hyperlink">
-		<xsl:call-template name="InsertHyperlink"/>
+
+    <text:a xlink:type="simple">
+      
+      <xsl:attribute name="xlink:href">
+        <!-- document hyperlink -->
+        <xsl:if test="@w:anchor">
+          <xsl:value-of select="concat('#',@w:anchor)"/>
+        </xsl:if>
+        <!-- file or web page hyperlink with relationship id -->
+        <xsl:if test="@r:id">
+          <xsl:variable name="relationshipId">
+            <xsl:value-of select="@r:id"/>
+          </xsl:variable>
+          <xsl:variable name="document">
+            <xsl:call-template name="GetDocumentName" />
+          </xsl:variable>
+          <xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
+            <xsl:if test="./@Id=$relationshipId">
+              <xsl:call-template name="GetLinkPath">
+                <xsl:with-param name="linkHref" select="@Target"/>
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:if>
+      </xsl:attribute>
+
+      <!--hyperlink text-->
+      <xsl:apply-templates select="w:r">
+        <xsl:with-param name="ignoreFieldFlag" select="'true'" />
+      </xsl:apply-templates>
+
+    </text:a>
+    
 	</xsl:template>
 
 	<!--  text bookmark-Start  -->

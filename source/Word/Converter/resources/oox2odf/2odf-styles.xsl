@@ -5173,7 +5173,7 @@
 
 				<!-- write border attribute -->
 				<xsl:attribute name="{concat('fo:border-', $sideName)}">
-					<xsl:value-of select="concat($width,' ',$style,' #',$color)"/>
+					<xsl:value-of select="concat('0', $width,' ',$style,' #',$color)"/>
 				</xsl:attribute>
 
 				<!-- write border padding attribute -->
@@ -5259,7 +5259,7 @@
 		<xsl:param name="emulateOpenOfficeTableBorders" select="'false'" />
 
 		<xsl:choose>
-			<xsl:when test="$emulateOpenOfficeTableBorders = 'true'">solid</xsl:when>
+			<!--<xsl:when test="$emulateOpenOfficeTableBorders = 'true'">solid</xsl:when>-->
 			<xsl:when test="$style='basicBlackDashes'">dashed</xsl:when>
 			<xsl:when test="$style='basicBlackDots'">dotted</xsl:when>
 			<xsl:when test="$style='basicThinLines'">double</xsl:when>
@@ -5389,7 +5389,7 @@
 			</xsl:call-template>
 		</xsl:variable>
 
-		<xsl:value-of select="concat($inner,' ',$middle,' ',$outer)"/>
+		<xsl:value-of select="concat('0', $inner, ' 0', $middle, ' 0', $outer)"/>
 	</xsl:template>
 
 	<!-- Handle tab stops -->

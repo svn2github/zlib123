@@ -117,12 +117,15 @@
   
   <!-- paragraph in index-->
   <xsl:template match="w:p" mode="index">
+    
     <text:p text:style-name="{generate-id()}">
-      <xsl:apply-templates mode="index"/>
+      <xsl:apply-templates />
     </text:p>
+    
     <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text() and (not(w:r/w:fldChar) or w:r[w:fldChar]/preceding-sibling::w:r[w:t])]">
       <xsl:apply-templates select="following-sibling::w:p[1]" mode="index"/>
     </xsl:if>
+    
   </xsl:template>
   
   <!-- template to create string containing styles include in TOC with appropriate levels -->
@@ -1427,7 +1430,11 @@
   <!-- handle text in table-of content -->
   <xsl:template match="text()" mode="entry"/>
   
-<!-- handle runs -->
+
+
+  <!--
+  makz: There is no need for a special handling for runs in TOCs
+  
   <xsl:template match="w:r" mode="index">
     <xsl:choose>
       <xsl:when test="parent::w:hyperlink">
@@ -1438,7 +1445,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
   <xsl:template match="w:r" mode="indexa">
     <xsl:choose>
       <xsl:when test="parent::w:hyperlink">
@@ -1449,35 +1455,36 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  <!-- Insert TOC text -->
+
+  --><!-- Insert TOC text --><!--
   <xsl:template name="InsertTOCText">
     <xsl:choose>
-      <!--  ignore text when we are in field-->
+      --><!--  ignore text when we are in field--><!--
       <xsl:when test="w:fldChar or w:instrText"/>
-      <!--attach style-->
+      --><!--attach style--><!--
       <xsl:when test="w:rPr">
         <text:span text:style-name="{generate-id(self::node())}">
           <xsl:apply-templates/>
         </text:span>
       </xsl:when>
-      <!--default scenario-->
+      --><!--default scenario--><!--
       <xsl:otherwise>
         <xsl:apply-templates />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
- <!-- Insert TOC Hyperlinks -->
+ --><!-- Insert TOC Hyperlinks --><!--
   <xsl:template name="InsertTOCHyperlink">    
     <text:a xlink:type="simple">
       <xsl:attribute name="xlink:href">
         <xsl:value-of select="concat('#',parent::w:hyperlink/@w:anchor)"/>
       </xsl:attribute>
-      <!--TOC hyperlink text-->
+      --><!--TOC hyperlink text--><!--
       <xsl:call-template name="InsertTOCText"/>
     </text:a>
   </xsl:template>
+  -->
 
   <!-- template to search TOC level in paragraph parent style -->
   <xsl:template match="w:p" mode="toclevel">
