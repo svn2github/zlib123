@@ -3,9 +3,10 @@ using OdfConverter.Transforms;
 
 namespace OdfConverter.Transforms.Test {
     public class OoxShape {
-        static double Scale = 10.0;
-        static int DeltaX = 0;
-        static int DeltaY = 0;
+        // unused
+        //static double Scale = 10.0;
+        //static int DeltaX = 0;
+        //static int DeltaY = 0;
 
      
         OoxTransform _transform;
