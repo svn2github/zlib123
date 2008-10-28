@@ -119,7 +119,9 @@
   <xsl:template match="w:p" mode="index">
     
     <text:p text:style-name="{generate-id()}">
-      <xsl:apply-templates />
+      <xsl:apply-templates>
+        <xsl:with-param name="ignoreFieldFlag" select="'true'" />
+      </xsl:apply-templates>
     </text:p>
     
     <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text() and (not(w:r/w:fldChar) or w:r[w:fldChar]/preceding-sibling::w:r[w:t])]">
