@@ -4488,13 +4488,24 @@
 
 	<xsl:template name="InsertShapeStyleName">
 		<xsl:param name="shape" select="ancestor::w:pict | ancestor::w:object"/>
-		<xsl:attribute name="draw:style-name">
-			<xsl:value-of select="./@id"/>
-		</xsl:attribute>
+		<xsl:choose>
+			<xsl:when test="self::v:shape">
+				<xsl:attribute name="draw:style-name">
+					<xsl:value-of select="./@id"/>
+				</xsl:attribute>
+			</xsl:when>
+			<xsl:when test="self::o:OLEObject">
+				<xsl:attribute name="draw:style-name">
+					<xsl:value-of select="generate-id(../v:shape)"/>
+					<!--<xsl:value-of select="./@id"/>-->
+				</xsl:attribute>
+			</xsl:when>
+		</xsl:choose>
 		<!--TODO-->
 		<xsl:attribute name="draw:name">
 			<xsl:text>Frame1</xsl:text>
 		</xsl:attribute>
+
 	</xsl:template>
 
 	<xsl:template name="InsertShapeHeight">
