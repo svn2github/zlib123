@@ -57,7 +57,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
 
         protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\ODF Add-in for Presentation";
         protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Presentation";
-        
+
         /// <summary>
         /// Class name for PowerPoint12 documents
         /// </summary>
@@ -73,13 +73,12 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
         ///		Place your initialization code within this method.
         /// </summary>
         public Connect()
-
         {
             this._addinLib = new OdfAddinLib(this, new Sonata.OdfConverter.Presentation.Converter());
             this._addinLib.OverrideResourceManager = new System.Resources.ResourceManager("OdfPowerPointAddin.resources.Labels", Assembly.GetExecutingAssembly());
         }
 
-                
+
         /// <summary>
         /// Initializes Word12Format field
         /// </summary>
@@ -130,7 +129,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
 
                 default:
                     doc = this._application.Invoke("Presentations").
-                    Invoke("Open", fileName,Type.Missing,Type.Missing,Type.Missing);
+                    Invoke("Open", fileName, Type.Missing, Type.Missing, Type.Missing);
                     break;
             }
             return doc;
@@ -148,7 +147,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
 
                 default:
                     doc = this._application.Invoke("Presentations").
-                    Invoke("Open", fileName,MsoTriState.msoFalse,MsoTriState.msoTrue,MsoTriState.msoFalse);
+                    Invoke("Open", fileName, MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoFalse);
                     break;
             }
             return doc;
@@ -177,15 +176,15 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
             {
                 default:
                     doc.Invoke("SaveCopyAs",
-                        fileName, PpSaveAsFileType.ppSaveAsTemplate,MsoTriState.msoTrue);
+                        fileName, PpSaveAsFileType.ppSaveAsTemplate, MsoTriState.msoTrue);
                     break;
             }
             return doc;
         }
-        
+
         protected override void InitializeAddin()
         {
-            this._word12SaveFormat = FindWord12SaveFormat();                        
+            this._word12SaveFormat = FindWord12SaveFormat();
         }
 
         /// <summary>
@@ -194,7 +193,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
         protected override void importOdf()
         {
             foreach (string odfFile in getOpenFileNames())
-        	{
+            {
                 // create a temporary file
                 string fileName = this._addinLib.GetTempFileName(odfFile, ".pptx");
 
@@ -208,12 +207,12 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                     bool addToRecentFiles = false;
                     bool isVisible = true;
                     bool openAndRepair = false;
-                    
+
                     // conversion may have been cancelled and file deleted.
                     if (File.Exists((string)fileName))
                     {
                         LateBindingObject doc = OpenDocument(fileName, confirmConversions, readOnly, addToRecentFiles, isVisible, openAndRepair);
-                                              
+
                     }
                 }
                 catch (Exception ex)
@@ -246,7 +245,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
             else
             {
                 System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
-                
+
                 sfd.AddExtension = true;
                 sfd.DefaultExt = "odp";
                 sfd.Filter = this._addinLib.GetString(this.OdfFileType) + this.ExportOdfFileFilter
@@ -259,99 +258,98 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                 {
-                        // name of the file to create
-                        string odfFileName = sfd.FileName;
-                        // multi dotted extensions support
-                        if (!odfFileName.EndsWith(ext))
+                    // name of the file to create
+                    string odfFileName = sfd.FileName;
+                    // multi dotted extensions support
+                    if (!odfFileName.EndsWith(ext))
+                    {
+                        odfFileName += ext;
+                    }
+                    // name of the document to convert
+                    string sourceFileName = doc.GetString("FullName");
+
+                    object tmpFileName = null;
+
+                    if (!Path.GetExtension(doc.GetString("FullName")).Equals(".pptx"))
+                    {
+                        string officeVersion = _officeVersion.ToString();
+
+
+                        // open the duplicated file
+                        object confirmConversions = false;
+                        object readOnly = false;
+                        object addToRecentFiles = false;
+                        object isVisible = false;
+
+                        if (officeVersion == "OfficeXP")
                         {
-                            odfFileName += ext;
-                        }
-                        // name of the document to convert
-                        string sourceFileName = doc.GetString("FullName");
-                        // name of the temporary Word12 file created if current file is not already a Word12 document
-                        string tempDocxName = null;
-                        object tmpFileName = null;
-
-                        if (!Path.GetExtension(doc.GetString("FullName")).Equals(".pptx"))
-                        {
-                            string officeVersion = _officeVersion.ToString();
-
-
-                            // open the duplicated file
-                            object confirmConversions = false;
-                            object readOnly = false;
-                            object addToRecentFiles = false;
-                            object isVisible = false;
-                            
-                            if (officeVersion == "OfficeXP")
+                            string path = Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\Powerpoint.Show.12\Shell\Save As\Command", null, null) as string;
+                            if (string.IsNullOrEmpty(path))
                             {
-                                string path = Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\Powerpoint.Show.12\Shell\Save As\Command", null, null) as string;
-                                if (string.IsNullOrEmpty(path))
-                                {
-                                    System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfConverterNotInstalled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                                    //System.Windows.Forms.MessageBox.Show("Microsoft Office 2007 Compatibility Pack not installed or obsolete");
-                                }
-                                else
-                                {
-                                    tmpFileName = this._addinLib.GetTempFileName((string)sourceFileName, ".pptx");
-                                    path = path.ToLower();
-                                    int start = path.IndexOf("moc.exe");
-                                    path = path.Substring(0, start) + "ppcnvcom.exe";
-                                    string parms = "-oice \"" + doc.GetString("FullName") + "\" \"" + tmpFileName + "\"";
-                                    Process p = Process.Start(path, parms);
-                                    p.WaitForExit();
-                                    sourceFileName = (string)tmpFileName;
-                                }
+                                System.Windows.Forms.MessageBox.Show(_addinLib.GetString("OdfConverterNotInstalled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                                //System.Windows.Forms.MessageBox.Show("Microsoft Office 2007 Compatibility Pack not installed or obsolete");
                             }
-                            if (officeVersion == "Office2003")
+                            else
                             {
-                                
-                                // setting defaultformat value in registry
-                                int oldFormat = SetPPTXasDefault();
-
-                                tmpFileName = this._addinLib.GetTempFileName((string)sourceFileName, ".ppt");
-
-                                SaveCopyAs(doc, (string)tmpFileName);
-
-                                LateBindingObject newDoc1 = OpenPresentation((string)tmpFileName, confirmConversions, readOnly, addToRecentFiles);
-
-                                SaveDocumentAs(newDoc1, (string)tmpFileName);
-
+                                tmpFileName = this._addinLib.GetTempFileName((string)sourceFileName, ".pptx");
+                                path = path.ToLower();
+                                int start = path.IndexOf("moc.exe");
+                                path = path.Substring(0, start) + "ppcnvcom.exe";
+                                string parms = "-oice \"" + doc.GetString("FullName") + "\" \"" + tmpFileName + "\"";
+                                Process p = Process.Start(path, parms);
+                                p.WaitForExit();
                                 sourceFileName = (string)tmpFileName;
-
-                                // removing defaultformat value in registry
-                                RestoreDefault(oldFormat);
                             }
-
-                            if (officeVersion == "Office2007")
-                            {
-
-                                // duplicate the file
-                                object newName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
-                                File.Copy((string)sourceFileName, (string)newName);
-
-                                LateBindingObject newDoc1 = OpenPresentation((string)newName, confirmConversions, readOnly, addToRecentFiles);
-
-                                // generate openxml file from the duplicated file (under a temporary file)
-                                tmpFileName = this._addinLib.GetTempPath((string)sourceFileName, ".pptx");
-
-                                SaveDocumentAs(newDoc1, (string)tmpFileName);
-
-                                sourceFileName = (string)tmpFileName;
-
-                            }
-
                         }
-
-                        this._addinLib.OoxToOdf(sourceFileName, odfFileName, true);
-                       
-
-                        if (tmpFileName != null && File.Exists((string)tmpFileName))
+                        if (officeVersion == "Office2003")
                         {
-                            this._addinLib.DeleteTempPath((string)tmpFileName);
+
+                            // setting defaultformat value in registry
+                            int oldFormat = SetPPTXasDefault();
+
+                            tmpFileName = this._addinLib.GetTempFileName((string)sourceFileName, ".ppt");
+
+                            SaveCopyAs(doc, (string)tmpFileName);
+
+                            LateBindingObject newDoc1 = OpenPresentation((string)tmpFileName, confirmConversions, readOnly, addToRecentFiles);
+
+                            SaveDocumentAs(newDoc1, (string)tmpFileName);
+
+                            sourceFileName = (string)tmpFileName;
+
+                            // removing defaultformat value in registry
+                            RestoreDefault(oldFormat);
                         }
+
+                        if (officeVersion == "Office2007")
+                        {
+
+                            // duplicate the file
+                            object newName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
+                            File.Copy((string)sourceFileName, (string)newName);
+
+                            LateBindingObject newDoc1 = OpenPresentation((string)newName, confirmConversions, readOnly, addToRecentFiles);
+
+                            // generate openxml file from the duplicated file (under a temporary file)
+                            tmpFileName = this._addinLib.GetTempPath((string)sourceFileName, ".pptx");
+
+                            SaveDocumentAs(newDoc1, (string)tmpFileName);
+
+                            sourceFileName = (string)tmpFileName;
+
+                        }
+
+                    }
+
+                    this._addinLib.OoxToOdf(sourceFileName, odfFileName, true);
+
+
+                    if (tmpFileName != null && File.Exists((string)tmpFileName))
+                    {
+                        this._addinLib.DeleteTempPath((string)tmpFileName);
+                    }
                 }
-                
+
             }
         }
 
