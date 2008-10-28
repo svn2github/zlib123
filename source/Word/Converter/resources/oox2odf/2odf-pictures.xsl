@@ -475,6 +475,8 @@
            <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:when test="$layoutInCell = 1">
+			<!--only set to true of actually inside a table. @draw:flow-with-text has an effect 
+				in OOo even when the shape is not inside a table -->
           <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:otherwise>
