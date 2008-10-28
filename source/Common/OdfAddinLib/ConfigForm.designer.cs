@@ -114,6 +114,7 @@ namespace OdfConverter.OdfConverterLib
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "ConfigForm";
+            this.ShowIcon = false;
             this.grpbxConfig.ResumeLayout(false);
             this.grpbxConfig.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);

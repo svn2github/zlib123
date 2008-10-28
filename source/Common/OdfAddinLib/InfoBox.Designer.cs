@@ -100,7 +100,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "InfoBox";
-            this.ShowInTaskbar = false;
+            this.ShowIcon = false;
             this.Load += new System.EventHandler(this.InfoBox_Load);
             this.grpDetails.ResumeLayout(false);
             this.grpDetails.PerformLayout();
