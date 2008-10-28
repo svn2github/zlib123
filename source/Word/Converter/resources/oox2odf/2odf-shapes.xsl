@@ -4487,7 +4487,7 @@
 	</xsl:template>
 
 	<xsl:template name="InsertShapeStyleName">
-		<xsl:param name="shape" select="ancestor::w:pict | ancestor::w:object"/>
+		<!--<xsl:param name="shape" select="ancestor::w:pict | ancestor::w:object"/>-->
 		<xsl:choose>
 			<xsl:when test="self::v:shape">
 				<xsl:attribute name="draw:style-name">

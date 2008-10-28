@@ -460,12 +460,14 @@
       <xsl:with-param name="wpAnchor" select="$drawing/wp:anchor" />
     </xsl:call-template>
     <xsl:call-template name="InsertImageMargins"/>
-    <xsl:call-template name="InsertImageFlowWithtText"/>
+    <xsl:call-template name="InsertImageFlowWithText"/>
     <xsl:call-template name="InsertImageBorder"/>
   </xsl:template>
 
-  <xsl:template name="InsertImageFlowWithtText">
-    <xsl:variable name="layoutInCell" select="wp:inline/@layoutInCell | wp:anchor/@layoutInCell"/>
+  <xsl:template name="InsertImageFlowWithText">
+	  <!-- @layoutInCell: Specifies how this DrawingML object shall behave when its anchor is located in a table
+			cell; and its specified position would cause it to intersect with a table cell displayed in the document.-->
+    <xsl:variable name="layoutInCell" select="(wp:inline/@layoutInCell | wp:anchor/@layoutInCell) and ./ancestor::w:tc"/>
     <xsl:attribute name="draw:flow-with-text">
       <xsl:choose>
         <!--If the pic is inside the table-->
