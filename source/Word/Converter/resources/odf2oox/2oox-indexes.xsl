@@ -83,11 +83,26 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <!-- inserts field code end in last index element -->
+    <!-- inserts field code end in last index element
     <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
       <xsl:call-template name="InsertIndexFieldCodeEnd"/>
     </xsl:if>
-
+    
+    makz: 
+    Inserting the TOC end in the last paragraph of the TOC produces a docx file that 
+    can be displayed by Word but it causes problems on a roundtrip.
+    The converter awaits the TOC end in the first paragraph AFTER the TOC!!!! 
+    This is the default behavior of Word.
+    
+    Thus the TOC end will only be inserted if there is NO following paragraph.
+    Else the paragraph conversion insetrs the TOC end.
+    -->
+    <xsl:if test="
+            count(following-sibling::text:p) = 0 and 
+            parent::text:index-body and 
+            not(../following::text:p or ../following::text:h)">
+      <xsl:call-template name="InsertIndexFieldCodeEnd"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- end field -->
