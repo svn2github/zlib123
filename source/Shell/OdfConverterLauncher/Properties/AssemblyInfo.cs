@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OdfConverterLauncher")]
+[assembly: AssemblyTitle("ODF Add-in for Microsoft Office")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("OdfConverterLauncher")]
-[assembly: AssemblyCopyright("Copyright ©  2006")]
+[assembly: AssemblyProduct("ODF Add-in for Microsoft Office")]
+[assembly: AssemblyCopyright("Copyright ©  2006-2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
