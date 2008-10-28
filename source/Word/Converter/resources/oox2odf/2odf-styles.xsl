@@ -4083,6 +4083,7 @@
 
 		<!-- insert attributes using template -->
 		<xsl:call-template name="InsertParagraphBreakBefore"/>
+    
 		<xsl:call-template name="InsertParagraphAutoSpace"/>
 
 		<!--math, dialogika: changed for correct indentation calculation BEGIN -->
@@ -4290,31 +4291,40 @@
 			</xsl:when>
 			<xsl:otherwise>
 
-				<!-- 20080715/divo performance optimization -->
-				<!--xsl:variable name="precSectPr" select="preceding::w:p[1]/w:pPr/w:sectPr" />
-        <xsl:variable name="followingSectPr" select="following::w:sectPr[1]" /-->
+        <xsl:if test="w:pageBreakBefore">
+          
+          <!-- 20080715/divo performance optimization -->
+          <!--
+          <xsl:variable name="precSectPr" select="preceding::w:p[1]/w:pPr/w:sectPr" />
+          <xsl:variable name="followingSectPr" select="following::w:sectPr[1]" />
+          -->
+          <!--
+          <xsl:variable name="precSectPr" select="key('p', number(ancestor-or-self::node()/@oox:id) - 1)/w:pPr/w:sectPr" />
+				  <xsl:variable name="followingSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
+          -->
 
-				<xsl:variable name="precSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s) - 1)" />
-				<xsl:variable name="followingSectPr" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
+          <!--
+          makz/divo:  we don't know if this test is really necessary.
+                      It avoids that a pagebreak is written if it is the first paragraph in a section and the section has also a break before
+          
+          <xsl:if
+            test="($precSectPr/w:pgSz/@w:w = $followingSectPr/w:pgSz/@w:w
+            and $precSectPr/w:pgSz/@w:h = $followingSectPr/w:pgSz/@w:h
+            and ($precSectPr/w:pgSz/@w:orient = $followingSectPr/w:pgSz/@w:orient
+            or (not($precSectPr/w:pgSz/@w:orient) and not($followingSectPr/w:pgSz/@w:orient)))
+            and $precSectPr/w:pgMar/@w:top = $followingSectPr/w:pgMar/@w:top
+            and $precSectPr/w:pgMar/@w:left = $followingSectPr/w:pgMar/@w:left
+            and $precSectPr/w:pgMar/@w:right = $followingSectPr/w:pgMar/@w:right
+            and $precSectPr/w:pgMar/@w:bottom = $followingSectPr/w:pgMar/@w:bottom
+            and $precSectPr/w:pgMar/@w:header = $followingSectPr/w:pgMar/@w:header
+            and $precSectPr/w:pgMar/@w:footer = $followingSectPr/w:pgMar/@w:footer
+            and (not($precSectPr/w:headerReference) or not($followingSectPr/w:headerReference))
+            and (not($precSectPr/w:footerReference) or not($followingSectPr/w:footerReference)))
+            or not($precSectPr)">
+          -->
 
-				<xsl:if
-				  test="($precSectPr/w:pgSz/@w:w = $followingSectPr/w:pgSz/@w:w
-          and $precSectPr/w:pgSz/@w:h = $followingSectPr/w:pgSz/@w:h
-          and ($precSectPr/w:pgSz/@w:orient = $followingSectPr/w:pgSz/@w:orient
-          or (not($precSectPr/w:pgSz/@w:orient) and not($followingSectPr/w:pgSz/@w:orient)))
-          and $precSectPr/w:pgMar/@w:top = $followingSectPr/w:pgMar/@w:top
-          and $precSectPr/w:pgMar/@w:left = $followingSectPr/w:pgMar/@w:left
-          and $precSectPr/w:pgMar/@w:right = $followingSectPr/w:pgMar/@w:right
-          and $precSectPr/w:pgMar/@w:bottom = $followingSectPr/w:pgMar/@w:bottom
-          and $precSectPr/w:pgMar/@w:header = $followingSectPr/w:pgMar/@w:header
-          and $precSectPr/w:pgMar/@w:footer = $followingSectPr/w:pgMar/@w:footer
-          and (not($precSectPr/w:headerReference) or not($followingSectPr/w:headerReference))
-          and (not($precSectPr/w:footerReference) or not($followingSectPr/w:footerReference)))
-          or not($precSectPr)">
-					<xsl:if test="w:pageBreakBefore">
-						<!-- if this is a break page-->
-						<xsl:if
-						  test="w:pageBreakBefore/@w:val!='off' and w:pageBreakBefore/@w:val!='false' and w:pageBreakBefore/@w:val!=0">
+            <!-- if this is a break page-->
+						<xsl:if test="w:pageBreakBefore/@w:val!='off' and w:pageBreakBefore/@w:val!='false' and w:pageBreakBefore/@w:val!=0">
 							<xsl:call-template name="InsertFlagTextBeforeBreakPage3"/>
 						</xsl:if>
 						<xsl:attribute name="fo:break-before">
@@ -4333,7 +4343,7 @@
 							</xsl:choose>
 						</xsl:attribute>
 					</xsl:if>
-				</xsl:if>
+				<!--</xsl:if>-->
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
