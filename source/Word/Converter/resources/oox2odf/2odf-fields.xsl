@@ -1273,15 +1273,19 @@
     <xsl:variable name="FormatDate">
       <xsl:value-of select="substring-before(substring-after($dateText, '&quot;'), '&quot;')"/>
     </xsl:variable>
+    
     <!-- some of the DOCPROPERTY date field types have constant date format, 
       which is not saved in fieldCode so it need to be given directly in these cases-->
     <xsl:choose>
-      <xsl:when test="contains($fieldCode, 'CreateTime') or contains($fieldCode,'LastSavedTime')">
+      
+      <xsl:when test="contains($fieldCode, 'CREATETIME') or contains($fieldCode,'LASTESAVEDTIME')">
         <xsl:call-template name="InsertDocprTimeStyle"/>
       </xsl:when>
-      <xsl:when test="contains($fieldCode, 'CreateDate') or contains($fieldCode, 'SaveDate') or contains($fieldCode, 'PrintDate')">
-        <xsl:call-template name="InsertDocprLongDateStyle"/>
+      
+      <xsl:when test="contains($fieldCode, 'CREATEDATE') or contains($fieldCode, 'SAVEDATE') or contains($fieldCode, 'PRINTDATE')">
+        <xsl:call-template name="InsertCreationDateFormat"/>
       </xsl:when>
+      
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:call-template name="InsertDateFormat">
@@ -1294,6 +1298,16 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertCreationDateFormat">
+    <number:date-style style:name="{generate-id()}">
+      <number:day/>
+      <number:text xml:space="preserve"> </number:text>
+      <number:month number:style="long" number:textual="true"/>
+      <number:text xml:space="preserve"> </number:text>
+      <number:year number:style="long"/>
+    </number:date-style>
   </xsl:template>
 
   <!--DOCPROPERTY CreateDate, SaveDate, PrintDate default format-->
