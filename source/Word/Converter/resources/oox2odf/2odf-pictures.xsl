@@ -362,7 +362,7 @@
           <xsl:variable name="pgH">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
-                <xsl:value-of select="//w:document/w:body/w:sectPr/w:pgSz/@w:h"/>
+                <xsl:value-of select="/w:document/w:body/w:sectPr/w:pgSz/@w:h"/>
               </xsl:with-param>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
@@ -370,7 +370,7 @@
           <xsl:variable name="botMar">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
-                <xsl:value-of select="//w:document/w:body/w:sectPr/w:pgMar/@w:bottom"/>
+                <xsl:value-of select="/w:document/w:body/w:sectPr/w:pgMar/@w:bottom"/>
               </xsl:with-param>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
