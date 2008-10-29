@@ -340,45 +340,46 @@
 							</RegistryKey>
 						</Component>
 					</Directory>
-				</Directory>
-			</Directory>
 
-			<!--  Word template folder  -->
-			<Directory Id="ODFTEMPLATEFOLDER" Name="Templates">
-				<Directory Id="OdfTemplates" Name="!(loc.FeatureNameTemplates)">
-					<Component Id="ODFFax.dotx" Guid="54432E95-2C89-4992-A204-0E8CA8DC47DD">
-						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
-						<File Id="ODFFax.dotx" Name="ODFFax.dotx" Source="$(var.SolutionDir)Word\Templates\ODFFax.dotx" DiskId="1" KeyPath="yes" />
-					</Component>
-					<Component Id="ODFLetter.dotx" Guid="55F02E94-17A7-4CC6-8FEE-51A70BE2FE30">
-						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
-						<File Id="ODFLetter.dotx" Name="ODFLetter.dotx" Source="$(var.SolutionDir)Word\Templates\ODFLetter.dotx" DiskId="1" KeyPath="yes" />
-					</Component>
-					<Component Id="ODFMemo.dotx" Guid="1B2E9F6E-0AF9-47EF-A3B5-076A2A6A8A61">
-						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
-						<File Id="ODFMemo.dotx" Name="ODFMemo.dotx" Source="$(var.SolutionDir)Word\Templates\ODFMemo.dotx" DiskId="1" KeyPath="yes" />
-					</Component>
-					<Component Id="ODFReport.dotx" Guid="EA4ACAFC-A527-4432-9722-6249B4A12CFD">
-						<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
-						<File Id="ODFReport.dotx" Name="ODFReport.dotx" Source="$(var.SolutionDir)Word\Templates\ODFReport.dotx" DiskId="1" KeyPath="yes" />
-					</Component>
 
-					<Component Id="ODFFax.dot" Guid="97FB4E1B-0D0E-4985-A525-0DEA832A0262">
-						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
-						<File Id="ODFFax.dot" Name="ODFFax.dot" Source="$(var.SolutionDir)Word\Templates\ODFFax.dot" DiskId="1" KeyPath="yes" />
-					</Component>
-					<Component Id="ODFLetter.dot" Guid="48F28B4B-F04F-44B1-989A-D0D35404DE10">
-						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
-						<File Id="ODFLetter.dot" Name="ODFLetter.dot" Source="$(var.SolutionDir)Word\Templates\ODFLetter.dot" DiskId="1" KeyPath="yes" />
-					</Component>
-					<Component Id="ODFMemo.dot" Guid="9C094794-8755-461D-8AEC-1F22CE614A7D">
-						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
-						<File Id="ODFMemo.dot" Name="ODFMemo.dot" Source="$(var.SolutionDir)Word\Templates\ODFMemo.dot" DiskId="1" KeyPath="yes" />
-					</Component>
-					<Component Id="ODFReport.dot" Guid="A91AA668-373F-4964-BBB4-2726FE461E4D">
-						<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
-						<File Id="ODFReport.dot" Name="ODFReport.dot" Source="$(var.SolutionDir)Word\Templates\ODFReport.dot" DiskId="1" KeyPath="yes" />
-					</Component>
+					<!--  Word template folder  -->
+					<Directory Id="ODFTEMPLATEFOLDER" Name="Templates">
+						<Directory Id="OdfTemplates" Name="!(loc.FeatureNameTemplates)">
+							<Component Id="ODFFax.dotx" Guid="54432E95-2C89-4992-A204-0E8CA8DC47DD">
+								<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+								<File Id="ODFFax.dotx" Name="ODFFax.dotx" Source="$(var.SolutionDir)Word\Templates\ODFFax.dotx" DiskId="1" KeyPath="yes" />
+							</Component>
+							<Component Id="ODFLetter.dotx" Guid="55F02E94-17A7-4CC6-8FEE-51A70BE2FE30">
+								<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+								<File Id="ODFLetter.dotx" Name="ODFLetter.dotx" Source="$(var.SolutionDir)Word\Templates\ODFLetter.dotx" DiskId="1" KeyPath="yes" />
+							</Component>
+							<Component Id="ODFMemo.dotx" Guid="1B2E9F6E-0AF9-47EF-A3B5-076A2A6A8A61">
+								<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+								<File Id="ODFMemo.dotx" Name="ODFMemo.dotx" Source="$(var.SolutionDir)Word\Templates\ODFMemo.dotx" DiskId="1" KeyPath="yes" />
+							</Component>
+							<Component Id="ODFReport.dotx" Guid="EA4ACAFC-A527-4432-9722-6249B4A12CFD">
+								<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
+								<File Id="ODFReport.dotx" Name="ODFReport.dotx" Source="$(var.SolutionDir)Word\Templates\ODFReport.dotx" DiskId="1" KeyPath="yes" />
+							</Component>
+
+							<Component Id="ODFFax.dot" Guid="97FB4E1B-0D0E-4985-A525-0DEA832A0262">
+								<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+								<File Id="ODFFax.dot" Name="ODFFax.dot" Source="$(var.SolutionDir)Word\Templates\ODFFax.dot" DiskId="1" KeyPath="yes" />
+							</Component>
+							<Component Id="ODFLetter.dot" Guid="48F28B4B-F04F-44B1-989A-D0D35404DE10">
+								<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+								<File Id="ODFLetter.dot" Name="ODFLetter.dot" Source="$(var.SolutionDir)Word\Templates\ODFLetter.dot" DiskId="1" KeyPath="yes" />
+							</Component>
+							<Component Id="ODFMemo.dot" Guid="9C094794-8755-461D-8AEC-1F22CE614A7D">
+								<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+								<File Id="ODFMemo.dot" Name="ODFMemo.dot" Source="$(var.SolutionDir)Word\Templates\ODFMemo.dot" DiskId="1" KeyPath="yes" />
+							</Component>
+							<Component Id="ODFReport.dot" Guid="A91AA668-373F-4964-BBB4-2726FE461E4D">
+								<Condition><![CDATA[ WORD2000INSTALLROOT OR WORD2002INSTALLROOT OR WORD2003INSTALLROOT ]]></Condition>
+								<File Id="ODFReport.dot" Name="ODFReport.dot" Source="$(var.SolutionDir)Word\Templates\ODFReport.dot" DiskId="1" KeyPath="yes" />
+							</Component>
+						</Directory>
+					</Directory>
 				</Directory>
 			</Directory>
 
@@ -486,7 +487,7 @@
 				</RegistryKey>
 				<RegistryKey Id="RegKeyOdtContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
 							 Key="openDocument.WriterDocument.1\shell\!(loc.OpenWithWord)\Command">
-					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" />
+					<RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
 				</RegistryKey>
 			</Component>
 
@@ -496,7 +497,7 @@
 				</RegistryKey>
 				<RegistryKey Id="RegKeyOdsContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
 							 Key="openDocument.CalcDocument.1\shell\!(loc.OpenWithExcel)\Command">
-					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" />
+					<RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
 				</RegistryKey>
 			</Component>
 
@@ -506,7 +507,7 @@
 				</RegistryKey>
 				<RegistryKey Id="RegKeyOdpContextMenu" Root="HKCR" Action="createAndRemoveOnUninstall"
 							 Key="openDocument.ImpressDocument.1\shell\!(loc.OpenWithPowerPoint)\Command">
-					<RegistryValue Type="string" Value="[#OdfConverterLauncher.exe] %1" />
+					<RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
 				</RegistryKey>
 			</Component>
 

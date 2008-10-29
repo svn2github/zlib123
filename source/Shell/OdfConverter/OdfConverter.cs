@@ -204,14 +204,14 @@ namespace CleverAge.OdfConverter.CommandLineTool
         //private bool validate = false;                   // validate the result of the transformations
         //private bool open = false;                       // try to open the result of the transformations
         //private bool recursiveMode = false;              // go in subfolders ?
-        //private bool replace = false;					 // override existing files ?
+        //private bool replace = false;					   // override existing files ?
         //private string reportPath = null;                // file to save report
         //private int reportLevel = ConversionReport.INFO_LEVEL;     // file to save report
         //private string xslPath = null;                   // Path to an external stylesheet
         //private ArrayList skippedPostProcessors = null;  // Post processors to skip (identified by their names)
         //private bool packaging = true;                   // Build the zip archive after conversion
 
-	   	private Direction transformDirection = Direction.OdtToDocx; // direction of conversion
+	   	//private Direction transformDirection = Direction.OdtToDocx; // direction of conversion
 		private bool transformDirectionOverride = false; // whether conversion direction has been specified
         private ConversionReport report = null;
         private Word word = null;
@@ -277,7 +277,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception raised when running test : " + ex.Message);
+                Console.WriteLine("Exception raised when running conversion: " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
         }
@@ -310,13 +310,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     break;
                 default:  // no batch mode
                     // instanciate Word if needed
-                    if (this.transformDirection == Direction.OdtToDocx && this.Options.Open)
+                    if (this.Options.TransformDirection == Direction.OdtToDocx && this.Options.Open)
                     {
                         word = new Word();
                         word.Visible = false;
                     }
 
-                    this.ProceedSingleFile(this.Options.InputPath, this.Options.OutputPath, this.transformDirection);
+                    this.ProceedSingleFile(this.Options.InputPath, this.Options.OutputPath, this.Options.TransformDirection);
 
                     // close word if needed
                     if (this.Options.Open)
@@ -831,31 +831,31 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         OoxValidator.test();
                         break;
                    	case "/DOCX2ODT":
-						this.transformDirection = Direction.DocxToOdt;
+                        this.Options.TransformDirection = Direction.DocxToOdt;
 						this.transformDirectionOverride = true;
 						// System.Console.WriteLine("Override to odt\n");
 						break;
 					case "/ODT2DOCX":
-						this.transformDirection = Direction.OdtToDocx;
+                        this.Options.TransformDirection = Direction.OdtToDocx;
 						this.transformDirectionOverride = true;
 						// System.Console.WriteLine("Override to docx\n");
 						break;
                     case "/XLSX2ODS":
-                        this.transformDirection = Direction.XlsxToOds;
+                        this.Options.TransformDirection = Direction.XlsxToOds;
                         this.transformDirectionOverride = true;
                         // System.Console.WriteLine("Override to odt\n");
                         break;
                     case "/ODS2XLSX":
-                        this.transformDirection = Direction.OdsToXlsx;
+                        this.Options.TransformDirection = Direction.OdsToXlsx;
                         this.transformDirectionOverride = true;
                         // System.Console.WriteLine("Override to docx\n");
                         break;
                     case "/PPTX2ODP":
-                        this.transformDirection = Direction.PptxToOdp;
+                        this.Options.TransformDirection = Direction.PptxToOdp;
                         this.transformDirectionOverride = true;
                         break;
                     case "/ODP2PPTX":
-                        this.transformDirection = Direction.OdpToPptx;
+                        this.Options.TransformDirection = Direction.OdpToPptx;
                         this.transformDirectionOverride = true;
                         break;
 					case "/F":
@@ -925,7 +925,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             string extension = null;
             if (transformDirectionOverride)
             {
-                switch (this.transformDirection) 
+                switch (this.Options.TransformDirection) 
                 {
                     case Direction.DocxToOdt:
                         extension = ".odt";
@@ -949,6 +949,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             else
             {
+                // auto-detect transform direction based on file extension
                 extension = ".docx";
                 string inputExtension = Path.GetExtension(this.Options.InputPath).ToLowerInvariant();
                 string outputExtension = "";
@@ -963,7 +964,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case ".ott":
                         if (outputExtension.Equals(".docx") || outputExtension.Equals(""))
                         {
-                            this.transformDirection = Direction.OdtToDocx;
+                            this.Options.TransformDirection = Direction.OdtToDocx;
                             extension = ".docx";
                         }
                         else
@@ -977,12 +978,12 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case ".dotm":
                         if (outputExtension.Equals(".odt") || outputExtension.Equals(""))
                         {
-                            this.transformDirection = Direction.DocxToOdt;
+                            this.Options.TransformDirection = Direction.DocxToOdt;
                             extension = ".odt";
                         }
                         else if (outputExtension.Equals(".ott"))
                         {
-                            this.transformDirection = Direction.DocxToOdt;
+                            this.Options.TransformDirection = Direction.DocxToOdt;
                             extension = ".ott";
                         }
                         else
@@ -993,7 +994,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case ".odp":
                         if (outputExtension.Equals(".pptx") || outputExtension.Equals(""))
                         {
-                            this.transformDirection = Direction.OdpToPptx;
+                            this.Options.TransformDirection = Direction.OdpToPptx;
                             extension = ".pptx";
                         }
                         else
@@ -1004,7 +1005,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case ".pptx":
                         if (outputExtension.Equals(".odp") || outputExtension.Equals(""))
                         {
-                            this.transformDirection = Direction.PptxToOdp;
+                            this.Options.TransformDirection = Direction.PptxToOdp;
                             extension = ".odp";
                         }
                         else
@@ -1015,7 +1016,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case ".ods":
                         if (outputExtension.Equals(".xlsx") || outputExtension.Equals(""))
                         {
-                            this.transformDirection = Direction.OdsToXlsx;
+                            this.Options.TransformDirection = Direction.OdsToXlsx;
                             extension = ".xlsx";
                         }
                         else
@@ -1026,7 +1027,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case ".xlsx":
                         if (outputExtension.Equals(".ods") || outputExtension.Equals(""))
                         {
-                            this.transformDirection = Direction.XlsxToOds;
+                            this.Options.TransformDirection = Direction.XlsxToOds;
                             extension = ".ods";
                         }
                         else

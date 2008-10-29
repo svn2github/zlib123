@@ -65,7 +65,7 @@
 
 			<Publish Dialog="MyLicenseAgreementDlg" Control="Back" Event="NewDialog" Value="MyWelcomeDlg">1</Publish>
 			<Publish Dialog="MyLicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MyInstallScopeDlg">LicenseAccepted = "1"</Publish>
-			
+						
 			<!--different setup options (Complete, Custom) have been removed because they were creating too much confusion -->
 			<Publish Dialog="MySetupTypeDlg" Control="Back" Event="NewDialog" Value="MyLicenseAgreementDlg">1</Publish>
 			<!--<Publish Dialog="MySetupTypeDlg" Control="TypicalButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>-->

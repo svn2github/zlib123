@@ -33,7 +33,7 @@
 	<Product Id="CC3609E8-C660-45DB-928A-F7DA36CB23D3"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-			 Version="2.5.4840.0"
+			 Version="2.5.4900.0"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
@@ -50,7 +50,7 @@
 			  Note that GUID values should be all upper-case and without brackets 
 		-->
 
-		<Package Id="BE64BEB5-713E-4F61-8BA1-2CA2C0699D6D" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
+		<Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
 		<Media Id="1" Cabinet="OdfAddinforOfficeSetup.cab" EmbedCab="yes" />
 
 		<!-- remove previous versions of previous Word add-in -->
@@ -71,6 +71,11 @@
 			<UpgradeVersion Property="NEWAPPFOUND" IncludeMinimum="no" Minimum="!(wix.VersionNumber)"  OnlyDetect="yes"/>
 		</Upgrade>
 
+		<WixVariable Id='VersionNumber' Value='2.5.4900.0'/>
+		<WixVariable Id='VersionInfo' Value='Version !(wix.VersionNumber)'/>
+		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
+		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
+
 		<PropertyRef Id="NETFRAMEWORK20"/>
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 		<Property Id="ApplicationFolderName" Value="OpenXML-ODF Translator" />
@@ -84,14 +89,9 @@
 		<Property Id="FILE_ASSOCIATION_ODS" />
 		<Property Id="FILE_ASSOCIATION_ODP" />
 
-		<Property Id='ARPCOMMENTS' Value='Build 4840' />
+		<Property Id='ARPCOMMENTS' Value='Version !(wix.VersionNumber)' />
 		<Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata Software Ltd' />
 		<Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
-
-		<WixVariable Id='VersionNumber' Value='2.5.4840.0'/>
-		<WixVariable Id='VersionInfo' Value='Version 2.5 (Build 4840)'/>
-		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
-		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
 
 		<Property Id="WixShellExecTarget" Value="[#Readme]" />
 
