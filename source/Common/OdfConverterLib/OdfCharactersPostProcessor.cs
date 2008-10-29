@@ -202,20 +202,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             else
             {
-                //added by clam for bug 1785583
+                //2008-10-28/divo: Fix no longer needed, spaces are correctly translated in XSL
+                //          The bug fix below was not nice because <text:s> nodes were created everywhere, 
+                //          not only for text in the content, header/footer etc of the document
+                //
+                //added by clam for bug 1785583 (a leading blank was lost)
                 //Start
-                if (text.StartsWith(" ") && text.Trim().Length > 0)
-                {
-                    try
-                    {
-                        this.nextWriter.WriteStartElement("text", "s", ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)this.currentNode.Peek()).Ns);
-                        this.nextWriter.WriteEndElement();
-                        text = text.Substring(1);
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
+                //if (text.StartsWith(" ") && text.Trim().Length > 0)
+                //{
+                //    try
+                //    {
+                //        this.nextWriter.WriteStartElement("text", "s", ((CleverAge.OdfConverter.OdfConverterLib.AbstractPostProcessor.Element)this.currentNode.Peek()).Ns);
+                //        this.nextWriter.WriteEndElement();
+                //        text = text.Substring(1);
+                //    }
+                //    catch (Exception)
+                //    {
+                //    }
+                //}
                 //End
 
                 this.nextWriter.WriteString(text);
