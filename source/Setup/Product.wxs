@@ -89,10 +89,12 @@
 		<Property Id="FILE_ASSOCIATION_ODS" />
 		<Property Id="FILE_ASSOCIATION_ODP" />
 
+		<!-- information for Add/Remove Programs -->
 		<Property Id='ARPCOMMENTS' Value='Version !(wix.VersionNumber)' />
 		<Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata Software Ltd' />
 		<Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
-
+		<Property Id='ARPHELPLINK' Value='http://odf-converter.sourceforge.net/documentation/installguide.php' />
+		
 		<Property Id="WixShellExecTarget" Value="[#Readme]" />
 
 		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -103,9 +105,9 @@
 		<UI>
 			<Error Id="2000">!(loc.Error2000)</Error>
 		</UI>
-		
+
 		<!-- icon to be displayed under Add/Remove Programs -->
-		<Icon Id="InstallIcon" SourceFile="images\Icon.ico"/>
+		<Icon Id="InstallIcon" SourceFile="images\Icon.ico" />
 		<Property Id="ARPPRODUCTICON" Value="InstallIcon" />
 
 
@@ -141,8 +143,12 @@
 		</Property>
 
 		<CustomAction Id="CloseOutlook" VBScriptCall="Main" Property="CloseOutlookProgram" Execute="immediate" Return="check"/>
-		
-		
+
+		<CustomAction Id="SetARPPRODUCTICON" Property="ARPPRODUCTICON" Value="[#OdfConverterLauncher.exe]" />
+		<CustomAction Id="SetARPREADME" Property="ARPREADME" Value="[#Readme]" />
+		<CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
+
+
 		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  FEATURES
              ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
@@ -163,6 +169,11 @@
 		<InstallExecuteSequence>
 			<Custom Action="NewerVersionDetected" After="FindRelatedProducts">NEWAPPFOUND</Custom>
 			<Custom Action="FileAssociationOdtAssign" After="LaunchConditions">?FileAssociationOdt</Custom>
+
+			<Custom Action="SetARPPRODUCTICON" After="InstallValidate"></Custom>
+			<Custom Action="SetARPREADME" After="InstallValidate"></Custom>
+			<Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
+			
 			<RemoveExistingProducts After="InstallValidate" />
 
 			<!-- action removed because the message is always displayed on Win2k -->
