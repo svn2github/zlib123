@@ -30,10 +30,10 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-	<Product Id="CC3609E8-C660-45DB-928A-F7DA36CB23D3"
+	<Product Id="DC8BE00C-38B6-4DB8-AF4B-E8A49C1304E1"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-			 Version="2.5.4900.0"
+			 Version="2.5.4901.0"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
@@ -50,7 +50,7 @@
 			  Note that GUID values should be all upper-case and without brackets 
 		-->
 
-		<Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
+		<Package Id="FF153572-1795-474C-AFE0-650BBB732619" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
 		<Media Id="1" Cabinet="OdfAddinforOfficeSetup.cab" EmbedCab="yes" />
 
 		<!-- remove previous versions of previous Word add-in -->
@@ -71,7 +71,7 @@
 			<UpgradeVersion Property="NEWAPPFOUND" IncludeMinimum="no" Minimum="!(wix.VersionNumber)"  OnlyDetect="yes"/>
 		</Upgrade>
 
-		<WixVariable Id='VersionNumber' Value='2.5.4900.0'/>
+		<WixVariable Id='VersionNumber' Value='2.5.4901.0'/>
 		<WixVariable Id='VersionInfo' Value='Version !(wix.VersionNumber)'/>
 		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
