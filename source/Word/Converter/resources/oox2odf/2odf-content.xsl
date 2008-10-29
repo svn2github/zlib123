@@ -113,8 +113,7 @@
 
 		<!-- when w:pict is child of a cell-->
 		<xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
-			<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document//w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict"
-			  mode="automaticpict"/>
+			<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict" mode="automaticpict"/>
 		</xsl:if>
 	</xsl:template>
 
