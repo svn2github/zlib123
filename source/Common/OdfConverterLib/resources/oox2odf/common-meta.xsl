@@ -28,8 +28,7 @@
       <office:meta>
         <!-- generator -->
         <meta:generator>
-          <xsl:value-of select="$generator"/>
-          <xsl:value-of select="concat(' ', $app-version)"/>
+          <xsl:value-of select="$generator"/><xsl:value-of select="concat(' ', $app-version)"/>
         </meta:generator>
         <!-- title -->
         <xsl:apply-templates
@@ -136,9 +135,9 @@
     <!-- @Context: Any &lt;dcterms:created&gt; element -->
     <!-- @Private -->
 
-    <meta:creation-date>
-      <xsl:value-of select="."/>
-    </meta:creation-date>
+	  <meta:creation-date>
+		  <xsl:value-of select="."/>
+	  </meta:creation-date>
   </xsl:template>
 
 
@@ -146,7 +145,7 @@
     <!-- @Description: Generates the &lt;dc:creator&gt; element (last modification date) -->
     <!-- @Context: Any &lt;cp:lastModifiedBy&gt; element -->
     <!-- @Private -->
-
+	
     <dc:creator>
       <xsl:value-of select="."/>
     </dc:creator>

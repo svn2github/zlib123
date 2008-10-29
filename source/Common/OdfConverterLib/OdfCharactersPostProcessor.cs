@@ -37,6 +37,7 @@ using System.Data;
 using System.Text;
 using OdfConverter.Transforms;
 using OdfConverter.Transforms.Test;
+using System.Globalization;
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
 
@@ -199,6 +200,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else if (text.Contains("Callout-Adj"))
             {
                 this.nextWriter.WriteString(EvalCalloutAdjustment(text));
+            }
+            else if (IsDate())
+            {
+                try
+                {
+                    DateTime dateTime = DateTime.Parse(text, CultureInfo.InvariantCulture);
+                    this.nextWriter.WriteString(dateTime.ToLocalTime().ToString("s", CultureInfo.InvariantCulture));
+                }
+                catch (FormatException)
+                {
+                }
             }
             else
             {
@@ -1460,6 +1472,33 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private void EndStoreAttribute()
         {
             this.store.Pop();
+        }
+
+        /// <summary>
+        /// Returns true if the current node contains a date.
+        /// This is needed for special post-processing of XSD date time values into an ODF-compliant format
+        /// (ODF only accepts the format YYYY-MM-DDThh:mm:ss without trailing TZD).
+        /// 
+        /// Additionaly, OOo interpretes times as local times -> we convert from UTC to local time 
+        /// (Of course this only gives the correct value if the document is converted in the same time zone 
+        /// for which the time value has been written, but it is better than nothing). This allows to keep e.g. the 
+        /// correct value for CREATIONDATE fields when not moving within time zones
+        /// </summary>
+        /// <returns></returns>
+        private bool IsDate()
+        {
+            if (this.currentNode.Count > 0)
+            {
+                Element element = this.currentNode.Peek() as Element;
+
+                if (element != null 
+                    && (element.Prefix.Equals("meta") && (element.Name.Equals("creation-date") || element.Name.Equals("print-date"))
+                        || element.Prefix.Equals("dc") && element.Name.Equals("date")))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool IsSpan()

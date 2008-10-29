@@ -88,7 +88,8 @@
       <xsl:when test="$dateIsValid != 'false' ">
         <dcterms:created xmlns:dcterms="http://purl.org/dc/terms/"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
-          <xsl:value-of select="$dateIsValid"/>
+			<!--<xsl:value-of select="$dateIsValid"/>-->
+			<xsl:value-of select="."/>
         </dcterms:created>
       </xsl:when>
       <xsl:otherwise>
@@ -178,12 +179,12 @@
       <xsl:when test="$dateIsValid != 'false' ">
         <dcterms:modified xmlns:dcterms="http://purl.org/dc/terms/"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
-          <xsl:value-of select="$dateIsValid"/>
+			<!--<xsl:value-of select="$dateIsValid"/>-->
+			<xsl:value-of select="."/>
         </dcterms:modified>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:message terminate="no"
-                >translation.odf2oox.documentModificationDate</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.documentModificationDate</xsl:message>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -490,6 +491,9 @@
           <xsl:when test="contains($time_h_m, '+')">
             <xsl:value-of select="substring-before($time_h_m, '+')"/>
           </xsl:when>
+		  <xsl:when test="contains($time_h_m, '-')">
+			<xsl:value-of select="substring-before($time_h_m, '-')"/>
+		  </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$time_h_m"/>
           </xsl:otherwise>
@@ -511,13 +515,12 @@
       <xsl:when test="$D != '' and number($D) &gt; 31">false</xsl:when>
       <xsl:when test="$D != '' and number($D) &lt; 1">false</xsl:when>
       <xsl:when test="$h != '' and number($h) &gt; 24">false</xsl:when>
-      <xsl:when test="$h != '' and number($h) &lt; 1">false</xsl:when>
+      <xsl:when test="$h != '' and number($h) &lt; 0">false</xsl:when>
       <xsl:when test="$m != '' and number($m) &gt; 60">false</xsl:when>
-      <xsl:when test="$m != '' and number($m) &lt; 1">false</xsl:when>
-      <xsl:when test="$s != '' and number($s) &gt; 61">false</xsl:when>
-      <xsl:when test="$s != '' and number($s) &lt; 1">false</xsl:when>
-      <xsl:when
-          test="contains($date, 'T') and not(contains($date, 'Z') or contains($date, '+'))">
+      <xsl:when test="$m != '' and number($m) &lt; 0">false</xsl:when>
+      <xsl:when test="$s != '' and number($s) &gt; 60">false</xsl:when>
+      <xsl:when test="$s != '' and number($s) &lt; 0">false</xsl:when>
+      <xsl:when test="contains($date, 'T') and not(contains($date, 'Z') or contains($date, '+'))">
         <xsl:value-of select="concat($date, 'Z')"/>
       </xsl:when>
       <xsl:otherwise>

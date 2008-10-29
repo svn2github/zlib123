@@ -30,6 +30,7 @@ using System.Xml;
 using System.Collections;
 using System;
 using System.IO;
+using System.Globalization;
 
 
 namespace CleverAge.OdfConverter.OdfConverterLib
@@ -200,6 +201,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else if (text.Contains("Callout-DirectAdj") || text.Contains("Callout-DirectLine"))
             {
                 this.nextWriter.WriteString(EvalCalloutAdjsExpn(text));
+            }
+            else if (IsDate())
+            {
+                try
+                {
+                    DateTime dateTime = DateTime.Parse(text, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal);
+                    this.nextWriter.WriteString(dateTime.ToUniversalTime().ToString("s") + "Z");
+                }
+                catch (FormatException)
+                {
+                }
             }
             else
             {
@@ -1538,6 +1550,33 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return substring;
         }
 
+        /// <summary>
+        /// Returns true if the current node contains a date.
+        /// 
+        /// This is needed to undo the special post-processing done for XSD times in DOCX->ODT conversion
+        /// (ODF only accepts the format YYYY-MM-DDThh:mm:ss without trailing TZD, see OdfCharactersPostProcessor).
+        /// 
+        /// Additionaly, OOo interpretes times as local times -> we convert from UTC to local time 
+        /// (Of course this only gives the correct value if the document is converted in the same time zone 
+        /// for which the time value has been written, but it is better than nothing). This allows to keep e.g. the 
+        /// correct value for CREATIONDATE fields when not moving within time zones
+        /// </summary>
+        /// <returns></returns>
+        private bool IsDate()
+        {
+            if (this.currentNode.Count > 0)
+            {
+                Element element = this.currentNode.Peek() as Element;
+
+                if (element != null
+                    && (element.Prefix.Equals("dcterms") && (element.Name.Equals("created") || element.Name.Equals("modified"))
+                        || element.Prefix.Equals("cp") && element.Name.Equals("lastPrinted")))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private bool IsRun()
         {
