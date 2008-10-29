@@ -213,11 +213,6 @@
       <xsl:when test="parent::text:index-body">
         <xsl:call-template name="InsertIndexItem"/>
       </xsl:when>
-      
-      <!-- this is the first paragraph after the TOC, insert the TOC end -->
-      <xsl:when test="preceding-sibling::text:table-of-content[1]">
-        <xsl:call-template name="InsertIndexFieldCodeEnd"/>
-      </xsl:when>
 
       <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box because word doesn't support it -->
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
@@ -268,6 +263,12 @@
       </xsl:when>
 
       <xsl:otherwise>
+
+        <!-- this is the first paragraph after the TOC, insert the TOC end -->
+        <xsl:if test="preceding-sibling::text:table-of-content[1]">
+          <xsl:call-template name="InsertIndexFieldCodeEnd"/>
+        </xsl:if>
+        
         <xsl:apply-templates mode="paragraph"/>
       </xsl:otherwise>
 
