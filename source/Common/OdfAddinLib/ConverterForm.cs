@@ -232,6 +232,5 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 converting = false;
             }
         }
-
     }
 }

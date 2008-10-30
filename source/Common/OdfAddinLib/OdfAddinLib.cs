@@ -319,31 +319,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             // Get the \Temp path
             string tempPath = Path.GetTempPath().ToString();
 
-            // Build the output file name
-            string root = null;
+            string fileNameWithoutExtention = Path.GetFileNameWithoutExtension(input);
 
-            int lastSlash = input.LastIndexOf('\\');
-            if (lastSlash > 0)
-            {
-                root = input.Substring(lastSlash + 1);
-            }
-            else
-            {
-                root = input;
-            }
-
-            int index = root.LastIndexOf('.');
-            if (index > 0)
-            {
-                root = root.Substring(0, index);
-            }
-
-            string output = tempPath + root + "_tmp" + extension;
+            string output = tempPath + fileNameWithoutExtention + "_tmp" + extension;
             int i = 1;
 
             while (File.Exists(output) || Directory.Exists(output))
             {
-                output = tempPath + root + "_tmp" + i + extension;
+                output = tempPath + fileNameWithoutExtention + "_tmp" + i + extension;
                 i++;
             }
             return output;

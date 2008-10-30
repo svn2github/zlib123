@@ -89,6 +89,7 @@
         <dcterms:created xmlns:dcterms="http://purl.org/dc/terms/"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
 			<!--<xsl:value-of select="$dateIsValid"/>-->
+			<!-- date is parsed again in post-processor -->
 			<xsl:value-of select="."/>
         </dcterms:created>
       </xsl:when>
@@ -180,6 +181,7 @@
         <dcterms:modified xmlns:dcterms="http://purl.org/dc/terms/"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
 			<!--<xsl:value-of select="$dateIsValid"/>-->
+			<!-- date is parsed again in post-processor -->
 			<xsl:value-of select="."/>
         </dcterms:modified>
       </xsl:when>
