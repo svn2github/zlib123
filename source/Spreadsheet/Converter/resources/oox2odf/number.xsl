@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
   * Copyright (c) 2006, Clever Age
   * All rights reserved.
@@ -788,6 +788,12 @@
     <xsl:param name="isFraction"/>
     <!-- (bool) check if it's a fraction format -->
 
+    <!--changed by sonata for bug no:2207240-->
+    <xsl:variable name="generalformatcode" select="$formatCode"/>
+    <!--end-->
+    
+    
+
     <xsl:variable name="formatCodeWithoutComma">
       <xsl:choose>
         <xsl:when test="contains($realFormatCode,'.')">
@@ -833,6 +839,14 @@
                 <xsl:with-param name="value">0</xsl:with-param>
               </xsl:call-template>
             </xsl:when>
+            
+            <!--changed by sonata for bug no:2207240-->
+            <xsl:when test="$generalformatcode='General' and contains(./parent::node()[name()='c:valAx']/c:scaling/c:min/@val,'.')">
+              <xsl:value-of select="1"/>
+              
+            </xsl:when>
+            <!--end-->
+            
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
