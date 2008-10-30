@@ -26,6 +26,13 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!--
+Modification Log
+LogNo. |Date       |ModifiedBy   |BugNo.   |Modification                                                      |
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+RefNo-1 28-Oct-2008 Sandeep S     1796999   Changes done to fix Negative value is shown positive(avoiding duplicate format code).
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -327,7 +334,16 @@
             </xsl:variable>
             <xsl:choose>
               <xsl:when test="@style:name = $styleName">
+                <!--Start of RefNo-1:avoiding duplicate format code-->
+                <xsl:choose>
+                  <xsl:when test="substring-before($format,';') = $thisFormat">
+                    <xsl:value-of select="$thisFormat"/>                    
+                  </xsl:when>
+                  <xsl:otherwise>
                 <xsl:value-of select="concat($format,$thisFormat)"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+                <!--End of RefNo-1-->
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$thisFormat"/>
@@ -373,7 +389,17 @@
               <xsl:with-param name="format">
                 <xsl:choose>
                   <xsl:when test="@style:name=substring($styleName,1,string-length($styleName)-2)">
+                    <!--Start of RefNo-1:avoiding duplicate format code-->
+                    <xsl:choose>
+                      <xsl:when test="substring-before($format,';') = $thisFormat">
+                        <xsl:value-of select="concat($thisFormat,';')"/>
+                      </xsl:when>
+                      <xsl:otherwise>
                     <xsl:value-of select="concat($format,$thisFormat,';')"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                    <!--End of RefNo-1-->
+                    <!--<xsl:value-of select="concat($format,$thisFormat,';')"/>-->
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="concat($thisFormat,';')"/>
