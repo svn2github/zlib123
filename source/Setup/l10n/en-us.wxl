@@ -42,6 +42,8 @@
   <String Id="FileTypeOds">OpenDocument Spreadsheet</String>
   <String Id="FileTypeOdp">OpenDocument Presentation</String>
 
+  <String Id="FolderNameTemplates">ODF-compatible Templates</String>
+
   <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
   <String Id="FeatureNameTemplates">ODF-compatible Templates</String>
   <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
@@ -78,6 +80,8 @@
   <String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] will be installed in a per-machine folder by default and be available for all users. You can change the default installation folder. You must have local Administrator privileges.</String>
   <String Id="MyInstallScopeDlgFolderLabel">Installation &amp;folder:</String>
   <String Id="MyInstallScopeDlgChange">&amp;Change...</String>
+
+  <String Id="MyCustomizeDlgTree">Tree of selections</String>
 
   <String Id="msierrXmlConfigFailedRead">There was a failure while configuring XML files.</String>
   <String Id="msierrXmlConfigFailedOpen">Failed to open XML file [3], system error: [2]</String>

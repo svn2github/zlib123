@@ -30,58 +30,75 @@
 <WixLocalization Culture="fr-FR" xmlns="http://schemas.microsoft.com/wix/2006/localization">
 	<String Id="lcid" Localizable="no">1036</String>
 	<String Id="ApplicationName">Add-in ODF pour Microsoft Office</String>
-	<String Id="ReadmePath" Localizable="no">Readme.fr-FR.html</String>
 
-  <String Id="RestartWarning">IMPORTANT NOTE: Please close and restart any running Microsoft Office application (Word, Excel, PowerPoint and Outlook) to complete the installation.</String>
+  <String Id="ReadmePath" Localizable="no">Readme.fr-FR.html</String>
+
+  <String Id="RestartWarning">REMARQUE IMPORTANTE : Fermez et redémarrez toute application Microsoft Office en cours d'exécution (Word, Excel, PowerPoint et Outlook) pour terminer l'installation.</String>
 
   <String Id="OpenWithWord">Ouvrir avec Microsoft Word</String>
-	<String Id="OpenWithExcel">Ouvrir avec Microsoft Excel</String>
-	<String Id="OpenWithPowerPoint">Ouvrir avec Microsoft PowerPoint</String>
+  <String Id="OpenWithExcel">Ouvrir avec Microsoft Excel</String>
+  <String Id="OpenWithPowerPoint">Ouvrir avec Microsoft PowerPoint</String>
 
-	<String Id="FileTypeOdt">Texte OpenDocument</String>
-	<String Id="FileTypeOds">Classeur OpenDocument</String>
-	<String Id="FileTypeOdp">Présentation OpenDocument</String>
+  <String Id="FileTypeOdt">Texte OpenDocument</String>
+  <String Id="FileTypeOds">Classeur OpenDocument</String>
+  <String Id="FileTypeOdp">Présentation OpenDocument</String>
+
+  <String Id="FolderNameTemplates">Modèles compatibles avec le format ODF</String>
 
   <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
-  <String Id="FeatureNameTemplates">ODF-compatible Templates</String>
+  <String Id="FeatureNameTemplates">Modèles compatibles avec le format ODF</String>
   <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
   <String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
 
-  <String Id="FeatureDescriptionWordAddin">Installs and registers the ODF Add-in for Microsoft Word.</String>
-  <String Id="FeatureDescriptionTemplates">Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user.</String>
-  <String Id="FeatureDescriptionExcelAddin">Installs and registers the ODF Add-in for Microsoft Excel.</String>
-  <String Id="FeatureDescriptionPowerPointAddin">Installs and registers the ODF Add-in for Microsoft PowerPoint.</String>
+  <String Id="FeatureDescriptionWordAddin">Installe et enregistre le complément ODF Add-in for Microsoft Word.</String>
+  <String Id="FeatureDescriptionTemplates">Installe une série de modèles Word spécialement conçus pour une interopérabilité avec le format ODF pour l'utilisateur actuel.</String>
+  <String Id="FeatureDescriptionExcelAddin">Installe et enregistre le complément ODF Add-in for Microsoft Excel.</String>
+  <String Id="FeatureDescriptionPowerPointAddin">Installe et enregistre le complément ODF Add-in for Microsoft Powerpoint.</String>
 
-  <String Id="TemplateTitleODFFax">ODF-compatible fax</String>
-  <String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
-  <String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
-  <String Id="TemplateTitleODFReport">ODF-compatible report</String>
+  <String Id="TemplateTitleODFFax">Fax compatible avec le format ODF</String>
+  <String Id="TemplateTitleODFLetter">Lettre compatible avec le format ODF</String>
+  <String Id="TemplateTitleODFMemo">Lettre compatible avec le format ODF</String>
+  <String Id="TemplateTitleODFReport">Rapport compatible avec le format ODF</String>
 
-  <String Id="Error2000">There is a newer version of this product installed.</String>
+  <String Id="Error2000">Une nouvelle version de ce produit est installée.</String>
 
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">Installation de [ProductName]</String>
-	<String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
+  <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
 
-	<String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}File Associations</String>
-	<String Id="MyFileAssociationDlgDescription">Associate OpenDocument files with Microsoft Office</String>
-	<String Id="MyFileAssociationDlgDetailedDescription">Please select the file types that you wish to associate with Microsoft Office:</String>
+  <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}Associations de fichiers</String>
+  <String Id="MyFileAssociationDlgDescription">Associer des fichiers OpenDocument à Microsoft Office</String>
+  <String Id="MyFileAssociationDlgDetailedDescription">Sélectionnez les types de fichiers que vous souhaitez associer à Microsoft Office :</String>
 
-	<String Id="MyExitDlgShowReadme">Show Readme</String>
+  <String Id="MyExitDlgShowReadme">Afficher Lisez-moi</String>
 
-	<String Id="MyInstallScopeDlgDescription">Choisissez le type d'installation ainsi que le dossier de destination.</String>
-	<String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}Type d'installation</String>
-	<String Id="MyInstallScopeDlgPerUser">Installer &amp;pour le compte utilisateur</String>
-	<String Id="MyInstallScopeDlgPerUserDescription">[ProductName] ne sera disponible que pour votre compte utilisateur. Vous ne devez pas disposer des privilèges d'administrateur local.</String>
-	<String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] ne prend pas en charge l'installation par utilisateur.</String>
-	<String Id="MyInstallScopeDlgPerMachine">Installer pour tous les utilisateurs de &amp;cet ordinateur</String>
-	<String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] sera installé dans un dossier par utilisateur par défaut et sera disponible pour tous les utilisateurs. Vous pouvez modifier le dossier de destination. Vous devez disposer des privilèges d'administrateur local.</String>
-	<String Id="MyInstallScopeDlgFolderLabel">&amp;Dossier d'installation :</String>
-	<String Id="MyInstallScopeDlgChange">&amp;Modifier...</String>
+  <String Id="MyInstallScopeDlgDescription">Choisissez le type d'installation ainsi que le dossier de destination.</String>
+  <String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}Type d'installation</String>
+  <String Id="MyInstallScopeDlgPerUser">Installer &amp;pour le compte utilisateur</String>
+  <String Id="MyInstallScopeDlgPerUserDescription">[ProductName] ne sera disponible que pour votre compte utilisateur. Vous ne devez pas disposer des privilèges d'administrateur local.</String>
+  <String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] ne prend pas en charge l'installation par utilisateur.</String>
+  <String Id="MyInstallScopeDlgPerMachine">Installer pour tous les utilisateurs de &amp;cet ordinateur</String>
+  <String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] sera installé dans un dossier par utilisateur par défaut et sera disponible pour tous les utilisateurs. Vous pouvez modifier le dossier de destination. Vous devez disposer des privilèges d'administrateur local.</String>
+  <String Id="MyInstallScopeDlgFolderLabel">&amp;Dossier d'installation :</String>
+  <String Id="MyInstallScopeDlgChange">&amp;Modifier...</String>
 
-	<String Id="msierrXmlConfigFailedRead">There was a failure while configuring XML files.</String>
-	<String Id="msierrXmlConfigFailedOpen">Failed to open XML file [3], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSelect">Failed to find node: [3] in XML file: [4], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSave">Failed to save changes to XML file [3], system error: [2]</String>
-	
+  <String Id="msierrXmlConfigFailedOpen">L'ouverture du fichier XML [3] a échoué, erreur système : [2]</String>
+  <String Id="msierrXmlConfigFailedRead">Une erreur est survenue lors de la configuration des fichiers XLM.</String>
+  <String Id="msierrXmlConfigFailedSave">La sauvegarde des modifications dans le fichier XML a échoué [3], erreur système : [2]</String>
+  <String Id="msierrXmlConfigFailedSelect">Le noeud n'a pas été trouvé : [3] dans le fichier XML : [4], erreur système : [2]</String>
+
+  <String Id="BrowseDlgWixUI_Bmp_UpTooltip">Plus un niveau</String>
+
+  <String Id="CustomizeDlgLocationLabel">Emplacement :</String>
+  <String Id="MyCustomizeDlgTree">Arborescence des sélections</String>
+
+  <String Id="ErrorDlgErrorIconTooltip">Icône d'informations</String>
+  <String Id="ErrorDlgErrorText">Texte d'informations</String>
+
+  <String Id="InvalidDirDlgIconTooltip">Icône d'information</String>
+  <String Id="InvalidDirDlgText">Le répertoire d'installation doit être situé sur un disque dur local.</String>
+
+  <String Id="MaintenanceTypeDlgRemoveDisabledText">[ProductName] ne peut être supprimé.</String>
+  <String Id="MaintenanceTypeDlgRepairDisabledText">[ProductName] ne peut être réparé.</String>
+  
 </WixLocalization>

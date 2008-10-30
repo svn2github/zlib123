@@ -32,7 +32,7 @@
 	<String Id="ApplicationName">ODF Add-in voor Microsoft Office</String>
 	<String Id="ReadmePath" Localizable="no">Readme.nl-NL.html</String>
 
-  <String Id="RestartWarning">IMPORTANT NOTE: Please close and restart any running Microsoft Office application (Word, Excel, PowerPoint and Outlook) to complete the installation.</String>
+  <String Id="RestartWarning">BELANGRIJKE OPMERKING: Sluit elke Microsoft Office-toepassing (Word, Excel, PowerPoint en Outlook) en start deze opnieuw om de installatie te voltooien.</String>
 
   <String Id="OpenWithWord">Openen met Microsoft Word</String>
   <String Id="OpenWithExcel">Openen met Microsoft Excel</String>
@@ -42,59 +42,66 @@
   <String Id="FileTypeOds">OpenDocument-werkblad</String>
   <String Id="FileTypeOdp">OpenDocument-presentatie</String>
 
-  <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
-  <String Id="FeatureNameTemplates">ODF-compatible Templates</String>
-  <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
-  <String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
+  <String Id="FolderNameTemplates">Sjablonen die compatibel zijn met ODF</String>
 
-  <String Id="FeatureDescriptionWordAddin">Installs and registers the ODF Add-in for Microsoft Word.</String>
-  <String Id="FeatureDescriptionTemplates">Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user.</String>
-  <String Id="FeatureDescriptionExcelAddin">Installs and registers the ODF Add-in for Microsoft Excel.</String>
-  <String Id="FeatureDescriptionPowerPointAddin">Installs and registers the ODF Add-in for Microsoft PowerPoint.</String>
+  <String Id="FeatureNameWordAddin">ODF Add-in voor Microsoft Word</String>
+  <String Id="FeatureNameTemplates">Sjablonen die compatibel zijn met ODF</String>
+  <String Id="FeatureNameExcelAddin">ODF Add-in voor Microsoft Excel</String>
+  <String Id="FeatureNamePowerPointAddin">ODF Add-in voor Microsoft PowerPoint</String>
 
-  <String Id="TemplateTitleODFFax">ODF-compatible fax</String>
-  <String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
-  <String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
-  <String Id="TemplateTitleODFReport">ODF-compatible report</String>
+  <String Id="FeatureDescriptionWordAddin">Hiermee wordt de ODF Add-in voor Microsoft Word geïnstalleerd en geregistreerd.</String>
+  <String Id="FeatureDescriptionTemplates">Hiermee wordt een reeks Word-sjablonen geïnstalleerd die speciaal zijn ontworpen voor interoperabiliteit met de ODF-indeling (OpenDocument Format) voor de huidige gebruiker.</String>
+  <String Id="FeatureDescriptionExcelAddin">Hiermee wordt de ODF Add-in voor Microsoft Excel geïnstalleerd en geregistreerd.</String>
+  <String Id="FeatureDescriptionPowerPointAddin">Hiermee wordt de ODF Add-in voor Microsoft PowerPoint geïnstalleerd en geregistreerd.</String>
 
-  <String Id="Error2000">There is a newer version of this product installed.</String>
+  <String Id="TemplateTitleODFFax">Fax die compatibel is met ODF</String>
+  <String Id="TemplateTitleODFLetter">Brief die compatibel is met ODF</String>
+  <String Id="TemplateTitleODFMemo">Memo dat compatibel is met ODF</String>
+  <String Id="TemplateTitleODFReport">Rapport dat compatibel is met ODF</String>
+
+  <String Id="Error2000">Er is een nieuwere versie van dit product geïnstalleerd.</String>
 
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] Setup</String>
-	<String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
+  <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
 
-	<String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}File Associations</String>
-	<String Id="MyFileAssociationDlgDescription">Associate OpenDocument files with Microsoft Office</String>
-	<String Id="MyFileAssociationDlgDetailedDescription">Please select the file types that you wish to associate with Microsoft Office:</String>
+  <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}Bestandskoppelingen</String>
+  <String Id="MyFileAssociationDlgDescription">OpenDocument-bestanden koppelen aan Microsoft Office</String>
+  <String Id="MyFileAssociationDlgDetailedDescription">Selecteer de bestandstypen die u wilt koppelen aan Microsoft Office:</String>
 
-	<String Id="MyExitDlgShowReadme">Show Readme</String>
+  <String Id="MyExitDlgShowReadme">Leesmij weergeven</String>
 
-	<String Id="MyInstallScopeDlgDescription">Choose the installation scope and folder</String>
-	<String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}Installation Scope</String>
-	<String Id="MyInstallScopeDlgPerUser">Install &amp;just for you</String>
-	<String Id="MyInstallScopeDlgPerUserDescription">[ProductName] will be installed in a per-user folder and be available just for your user account. You do not need local Administrator privileges.</String>
-	<String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] does not support per-user installation.</String>
-	<String Id="MyInstallScopeDlgPerMachine">Install for all users of this &amp;machine</String>
-	<String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] will be installed in a per-machine folder by default and be available for all users. You can change the default installation folder. You must have local Administrator privileges.</String>
-	<String Id="MyInstallScopeDlgFolderLabel">Installation &amp;folder:</String>
-	<String Id="MyInstallScopeDlgChange">&amp;Change...</String>
+  <String Id="MyInstallScopeDlgChange">&amp;Wijzigen...</String>
+  <String Id="MyInstallScopeDlgDescription">Kies het installatiebereik en de installatiemap</String>
+  <String Id="MyInstallScopeDlgFolderLabel">Installatie&amp;map:</String>
+  <String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] ondersteunt geen installatie per gebruiker.</String>
+  <String Id="MyInstallScopeDlgPerMachine">Installeren voor alle gebruikers van deze co&amp;mputer</String>
+  <String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] wordt standaard in een computerspecifieke map geïnstalleerd en wordt beschikbaar gesteld aan alle gebruikers. U kunt de standaardinstallatiemap wijzigen. Hiertoe moet u over lokale beheerdersrechten (Administrator) beschikken.</String>
+  <String Id="MyInstallScopeDlgPerUser">Al&amp;leen voor u installeren</String>
+  <String Id="MyInstallScopeDlgPerUserDescription">[ProductName] wordt in een gebruikersspecifieke map geïnstalleerd en wordt alleen beschikbaar gesteld aan uw gebruikersaccount. Hiervoor hebt u geen lokale beheerdersrechten (Administrator) nodig.</String>
+  <String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}Installatiebereik</String>
 
-	<String Id="MaintenanceTypeDlgRemoveDisabledText">[ProductName] cannot be removed.</String>
-	<String Id="MaintenanceTypeDlgRepairDisabledText">[ProductName] cannot be repaired.</String>
+  <String Id="UITextNewFolder">Map|Nieuwe map</String>
 
-	<String Id="UITextNewFolder">Folder|New Folder</String>
-
-	<String Id="InvalidDirDlg_Title">[ProductName] Setup</String>
-	<String Id="InvalidDirDlgText">Installation directory must be on a local hard drive.</String>
-	<String Id="InvalidDirDlgIcon">WixUI_Ico_Info</String>
-	<String Id="InvalidDirDlgIconTooltip">Information icon</String>
-
-	<String Id="msierrXmlConfigFailedRead">There was a failure while configuring XML files.</String>
-	<String Id="msierrXmlConfigFailedOpen">Failed to open XML file [3], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSelect">Failed to find node: [3] in XML file: [4], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSave">Failed to save changes to XML file [3], system error: [2]</String>
+  <String Id="InvalidDirDlg_Title">[ProductName] Setup</String>
+  <String Id="InvalidDirDlgIcon">WixUI_Ico_Info</String>
+  <String Id="InvalidDirDlgIconTooltip">Informatiepictogram</String>
+  <String Id="InvalidDirDlgText">De installatiemap moet zich op een lokale vaste schijf bevinden.</String>
+  
+  <String Id="msierrXmlConfigFailedOpen">Openen van XML-bestand [3] is mislukt. Systeemfout: [2]</String>
+  <String Id="msierrXmlConfigFailedRead">Er is een storing opgetreden tijdens het configureren van XML-bestanden.</String>
+  <String Id="msierrXmlConfigFailedSave">Opslaan van wijzigingen in XML-bestand [3] is mislukt. Systeemfout: [2]</String>
+  <String Id="msierrXmlConfigFailedSelect">Knooppunt  [3] niet gevonden in XML-bestand [4]. Systeemfout: [2]</String>
 
   <String Id="Advanced_Font_Bigger_Size">12</String>
   <String Id="Advanced_Font_Emphasized_Size">8</String>
+
+  <String Id="MaintenanceTypeDlgRemoveDisabledText">[ProductName] kan niet worden verwijderd.</String>
+  <String Id="MaintenanceTypeDlgRepairDisabledText">[ProductName] kan niet worden gerepareerd.</String>
+
+  <!-- not localized in WixUIExtension, but Overridable attribute is not set so that we cannot specify our own localization -->
+  <!--<String Id="WelcomeEulaDlgInstall">&amp;Installeren</String>-->
+  <String Id="MyCustomizeDlgTree">Boomstructuur met selecties</String>
+
 
 </WixLocalization>

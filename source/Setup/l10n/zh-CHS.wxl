@@ -32,7 +32,7 @@
 	<String Id="ApplicationName">ODF Microsoft Office 加载项</String>
 	<String Id="ReadmePath" Localizable="no">Readme.zh-CHS.html</String>
 
-  <String Id="RestartWarning">IMPORTANT NOTE: Please close and restart any running Microsoft Office application (Word, Excel, PowerPoint and Outlook) to complete the installation.</String>
+  <String Id="RestartWarning">重要注意事项: 请关闭然后重新启动任何已运行的 Microsoft Office 应用程序 (Word、Excel、PowerPoint 和 Outlook) 以完成安装。</String>
 
   <String Id="OpenWithWord">用微软Word打开</String>
 	<String Id="OpenWithExcel">用微软Excel打开</String>
@@ -42,44 +42,46 @@
 	<String Id="FileTypeOds">OpenDocument 电子表格</String>
 	<String Id="FileTypeOdp">OpenDocument 演示文稿</String>
 
-  <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
-  <String Id="FeatureNameTemplates">ODF-compatible Templates</String>
-  <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
-  <String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
+  <String Id="FolderNameTemplates">ODF Templates</String>
 
-  <String Id="FeatureDescriptionWordAddin">Installs and registers the ODF Add-in for Microsoft Word.</String>
-  <String Id="FeatureDescriptionTemplates">Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user.</String>
-  <String Id="FeatureDescriptionExcelAddin">Installs and registers the ODF Add-in for Microsoft Excel.</String>
-  <String Id="FeatureDescriptionPowerPointAddin">Installs and registers the ODF Add-in for Microsoft PowerPoint.</String>
+  <String Id="FeatureNameWordAddin">适用于 Microsoft Word 的 ODF 加载项</String>
+  <String Id="FeatureNameTemplates">ODF 兼容模板</String>
+  <String Id="FeatureNameExcelAddin">适用于 Microsoft Excel 的 ODF 加载项</String>
+  <String Id="FeatureNamePowerPointAddin">适用于 Microsoft PowerPoint 的 ODF 加载项</String>
 
-  <String Id="TemplateTitleODFFax">ODF-compatible fax</String>
-  <String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
-  <String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
-  <String Id="TemplateTitleODFReport">ODF-compatible report</String>
+  <String Id="FeatureDescriptionWordAddin">安装和注册适用于 Microsoft Word 的 ODF 加载项。</String>
+  <String Id="FeatureDescriptionTemplates">安装一套 Word 模板，该套模板是为使当前用户可与 OpenDocument 格式之间交互操作而特别设计的。</String>
+  <String Id="FeatureDescriptionExcelAddin">安装和注册适用于 Microsoft Excel 的 ODF 加载项。</String>
+  <String Id="FeatureDescriptionPowerPointAddin">安装和注册适用于 Microsoft PowerPoint 的 ODF 加载项。</String>
 
-  <String Id="Error2000">There is a newer version of this product installed.</String>
-  
+  <String Id="TemplateTitleODFFax">ODF 兼容传真</String>
+  <String Id="TemplateTitleODFLetter">ODF 兼容信函</String>
+  <String Id="TemplateTitleODFMemo">ODF 兼容备忘录</String>
+  <String Id="TemplateTitleODFReport">ODF 兼容报告</String>
+
+  <String Id="Error2000">存在已安装的此产品的更新版本。</String>
+
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] Setup</String>
 	<String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
 
-	<String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}File Associations</String>
-	<String Id="MyFileAssociationDlgDescription">Associate OpenDocument files with Microsoft Office</String>
-	<String Id="MyFileAssociationDlgDetailedDescription">Please select the file types that you wish to associate with Microsoft Office:</String>
+  <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}文件关联</String>
+  <String Id="MyFileAssociationDlgDescription">将 OpenDocument 文件与 Microsoft Office 相关联</String>
+  <String Id="MyFileAssociationDlgDetailedDescription">请选择您要与 Microsoft Office 相关联的文件类型:</String>
 
-	<String Id="MyExitDlgShowReadme">Show Readme</String>
-	
-	<String Id="MyInstallScopeDlgDescription">Choose the installation scope and folder</String>
-	<String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}Installation Scope</String>
-	<String Id="MyInstallScopeDlgPerUser">Install &amp;just for you</String>
-	<String Id="MyInstallScopeDlgPerUserDescription">[ProductName] will be installed in a per-user folder and be available just for your user account. You do not need local Administrator privileges.</String>
-	<String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] does not support per-user installation.</String>
-	<String Id="MyInstallScopeDlgPerMachine">Install for all users of this &amp;machine</String>
-	<String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] will be installed in a per-machine folder by default and be available for all users. You can change the default installation folder. You must have local Administrator privileges.</String>
-	<String Id="MyInstallScopeDlgFolderLabel">Installation &amp;folder:</String>
-	<String Id="MyInstallScopeDlgChange">&amp;Change...</String>
+  <String Id="MyExitDlgShowReadme">显示自述文件</String>
 
-	<String Id="BrowseDlg_Title">[ProductName] 安装程序</String>
+  <String Id="MyInstallScopeDlgChange">更改(&amp;C)...</String>
+  <String Id="MyInstallScopeDlgDescription">选择安装范围和文件夹</String>
+  <String Id="MyInstallScopeDlgFolderLabel">安装文件夹(&amp;F):</String>
+  <String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] 不支持每用户安装。</String>
+  <String Id="MyInstallScopeDlgPerMachine">为此计算机的所有用户安装(&amp;M)</String>
+  <String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] 在默认情况下将安装在每计算机文件夹中，且对所有用户都可用。您可以更改默认的安装文件夹。您必须拥有本地管理员权限。</String>
+  <String Id="MyInstallScopeDlgPerUser">仅为您安装(&amp;J)</String>
+  <String Id="MyInstallScopeDlgPerUserDescription">[ProductName] 将安装在每用户文件夹中，且仅对您的用户帐户可用。您不需要具备本地管理员权限。</String>
+  <String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}安装范围</String>
+
+  <String Id="BrowseDlg_Title">[ProductName] 安装程序</String>
   <String Id="BrowseDlgBannerBitmap">WixUI_Bmp_Banner</String>
   <String Id="BrowseDlgComboLabel">查找范围(&amp;L):</String>
   <String Id="BrowseDlgDescription">浏览到目标文件夹</String>
@@ -89,12 +91,15 @@
   <String Id="BrowseDlgTitle">{\WixUI_Font_Title}更改目标文件夹</String>
 
   <String Id="BrowseDlgWixUI_Bmp_Up">WixUI_Bmp_Up</String>
-  <String Id="BrowseDlgWixUI_Bmp_UpTooltip">Up one level</String>
+  <String Id="BrowseDlgWixUI_Bmp_UpTooltip">返回上一级</String>
 
   <String Id="CancelDlg_Title">[ProductName] 安装程序</String>
   <String Id="CancelDlgIcon">WixUI_Ico_Info</String>
   <String Id="CancelDlgIconTooltip">信息图标</String>
   <String Id="CancelDlgText">确实要取消 [ProductName] 安装吗?</String>
+
+
+
 
   <String Id="CustomizeDlg_Title">[ProductName] 安装程序</String>
   <String Id="CustomizeDlgBannerBitmap">WixUI_Bmp_Banner</String>
@@ -104,11 +109,11 @@
   <String Id="CustomizeDlgReset">重置(&amp;S)</String>
   <String Id="CustomizeDlgText">单击下面树中的图标以更改功能安装方式。</String>
   <String Id="CustomizeDlgTitle">{\WixUI_Font_Title}自定义安装</String>
-  <String Id="CustomizeDlgTree">选择树</String>
+  <String Id="MyCustomizeDlgTree">选择树</String>
   <String Id="CustomizeDlgItemDescription">CustomizeDlgItemDescription-CustomizeDlgItemDescription</String>
   <String Id="CustomizeDlgItemSize">CustomizeDlgItemSize-CustomizeDlgItemSize</String>
   <String Id="CustomizeDlgLocation">CustomizeDlgLocation-CustomizeDlgLocation</String>
-  <String Id="CustomizeDlgLocationLabel">Location:</String>
+  <String Id="CustomizeDlgLocationLabel">位置:</String>
   
   <String Id="DiskCostDlg_Title">[ProductName] 安装程序</String>
   <String Id="DiskCostDlgBannerBitmap">WixUI_Bmp_Banner</String>
@@ -116,11 +121,11 @@
   <String Id="DiskCostDlgText">突出显示的卷没有可用于所选功能的足够磁盘空间。您可以从突出显示的卷中删除某些文件、安装较少的功能或选择其他目标驱动器。</String>
   <String Id="DiskCostDlgTitle">{\WixUI_Font_Title}磁盘空间需求</String>
   <String Id="DiskCostDlgVolumeList">{120}{70}{70}{70}{70}</String>
-  
+
   <String Id="ErrorDlg_Title">[ProductName] 安装程序</String>
-	<String Id="ErrorDlgErrorText">Information text</String>
-	<String Id="ErrorDlgErrorIcon">WixUI_Ico_Info</String>
-	<String Id="ErrorDlgErrorIconTooltip">Information icon</String>
+  <String Id="ErrorDlgErrorText">信息文本</String>
+  <String Id="ErrorDlgErrorIcon">WixUI_Ico_Info</String>
+  <String Id="ErrorDlgErrorIconTooltip">信息图标</String>
 
   <String Id="ExitDialog_Title">[ProductName] 安装程序</String>
   <String Id="ExitDialogBitmap">WixUI_Bmp_Dialog</String>
@@ -152,10 +157,10 @@
 	<String Id="InstallScopeDlgFolderLabel">Installation &amp;folder:</String>
 	<String Id="InstallScopeDlgChange">&amp;Change...</String>
 
-	<String Id="InvalidDirDlg_Title">[ProductName] 安装程序</String>
-	<String Id="InvalidDirDlgText">Installation directory must be on a local hard drive.</String>
-	<String Id="InvalidDirDlgIcon">WixUI_Ico_Info</String>
-	<String Id="InvalidDirDlgIconTooltip">Information icon</String>
+  <String Id="InvalidDirDlg_Title">[ProductName] 安装程序</String>
+  <String Id="InvalidDirDlgText">安装目录必须位于本地硬盘驱动器上。</String>
+  <String Id="InvalidDirDlgIcon">WixUI_Ico_Info</String>
+  <String Id="InvalidDirDlgIconTooltip">信息图标</String>
 
   <String Id="LicenseAgreementDlg_Title">[ProductName] 安装程序</String>
   <String Id="LicenseAgreementDlgBannerBitmap">WixUI_Bmp_Banner</String>
@@ -173,11 +178,11 @@
   <String Id="MaintenanceTypeDlgRemoveButton">删除(&amp;R)</String>
   <String Id="MaintenanceTypeDlgRemoveButtonTooltip">删除安装</String>
   <String Id="MaintenanceTypeDlgRemoveText">将 [ProductName] 从您的计算机中删除。</String>
-  <String Id="MaintenanceTypeDlgRemoveDisabledText">[ProductName] cannot be removed.</String>
+  <String Id="MaintenanceTypeDlgRemoveDisabledText">[ProductName] 无法删除。</String>
   <String Id="MaintenanceTypeDlgRepairButton">修复(&amp;P)</String>
   <String Id="MaintenanceTypeDlgRepairButtonTooltip">修复安装</String>
   <String Id="MaintenanceTypeDlgRepairText">通过修复丢失和损坏的文件、快捷方式和注册表项，修复最新安装中的错误。</String>
-  <String Id="MaintenanceTypeDlgRepairDisabledText">[ProductName] cannot be repaired.</String>
+  <String Id="MaintenanceTypeDlgRepairDisabledText">[ProductName] 无法修复。</String>
   <String Id="MaintenanceTypeDlgTitle">{\WixUI_Font_Title}更改、修复或删除安装</String>
 
   <String Id="MaintenanceWelcomeDlg_Title">[ProductName] 安装程序</String>
@@ -620,9 +625,9 @@
   <String Id="UITextVolumeCostRequired">需要</String>
   <String Id="UITextVolumeCostSize">磁盘空间</String>
   <String Id="UITextVolumeCostVolume">卷</String>
-  <String Id="UITextNewFolder">Folder|New Folder</String>
-  
-	<String Id="WixUIBack">上一步(&amp;B)</String>
+  <String Id="UITextNewFolder">文件夹|新建文件夹</String>
+
+  <String Id="WixUIBack">上一步(&amp;B)</String>
   <String Id="WixUICancel">取消</String>
   <String Id="WixUIFinish">完成(&amp;F)</String>
   <String Id="WixUIIgnore">忽略(&amp;I)</String>
@@ -632,11 +637,11 @@
   <String Id="WixUIPrint">打印(&amp;P)</String>
   <String Id="WixUIRetry">重试(&amp;R)</String>
   <String Id="WixUIYes">是(&amp;Y)</String>
-  
-	<String Id="msierrXmlConfigFailedRead">There was a failure while configuring XML files.</String>
-	<String Id="msierrXmlConfigFailedOpen">Failed to open XML file [3], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSelect">Failed to find node: [3] in XML file: [4], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSave">Failed to save changes to XML file [3], system error: [2]</String>
+
+  <String Id="msierrXmlConfigFailedOpen">无法打开 XML 文件 [3]，系统错误: [2]</String>
+  <String Id="msierrXmlConfigFailedRead">配置 XML 文件时出现错误。</String>
+  <String Id="msierrXmlConfigFailedSave">无法将更改保存至 XML 文件 [3]，系统错误: [2]</String>
+  <String Id="msierrXmlConfigFailedSelect">找不到节点: [3] (在 XML 文件[4] 中)，系统错误: [2]</String>
 
   <String Id="Advanced_Font_Bigger_Size">12</String>
   <String Id="Advanced_Font_Emphasized_Size">8</String>

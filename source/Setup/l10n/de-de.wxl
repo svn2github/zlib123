@@ -42,6 +42,8 @@
 	<String Id="FileTypeOds">OpenDocument Tabellendokument</String>
 	<String Id="FileTypeOdp">OpenDocument Präsentation</String>
 
+  <String Id="FolderNameTemplates">ODF-kompatible Vorlagen</String>
+  
   <String Id="FeatureNameWordAddin">ODF Add-in für Microsoft Word</String>
   <String Id="FeatureNameTemplates">ODF-kompatible Vorlagen</String>
   <String Id="FeatureNameExcelAddin">ODF Add-in für Microsoft Excel</String>
@@ -78,6 +80,8 @@
 	<String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] wird standardmäßig in einem Einzelbenutzerordner installiert und ist für alle Benutzer verfügbar. Der Zielordner kann geändert werden. Dafür benötigen Sie lokale Administratorberechtigungen.</String>
 	<String Id="MyInstallScopeDlgFolderLabel">Installations&amp;ordner:</String>
 	<String Id="MyInstallScopeDlgChange">&amp;Ändern...</String>
+
+  <String Id="MyCustomizeDlgTree">Auswahlstruktur</String>
 
 	<String Id="msierrXmlConfigFailedRead">Ein Fehler beim Konfigurieren von XML-Dateien ist aufgetreten.</String>
 	<String Id="msierrXmlConfigFailedOpen">XML Datei [3] konnte nicht geöffnet werden, Systemfehler: [2]</String>

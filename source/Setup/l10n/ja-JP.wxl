@@ -29,59 +29,123 @@
 -->
 <WixLocalization Culture="ja-JP" xmlns="http://schemas.microsoft.com/wix/2006/localization">
 	<String Id="lcid" Localizable="no">1041</String>
-	<String Id="ApplicationName">Microsoft Office 用 ODF アドイン</String>
-	<String Id="ReadmePath" Localizable="no">Readme.ja-JP.html</String>
+  <String Id="ApplicationName">Microsoft Office 用 ODF アドイン</String>
+  <String Id="ReadmePath" Localizable="no">Readme.ja-JP.html</String>
 
-  <String Id="RestartWarning">IMPORTANT NOTE: Please close and restart any running Microsoft Office application (Word, Excel, PowerPoint and Outlook) to complete the installation.</String>
+  <String Id="RestartWarning">重要な注意事項:インストールを完了するには、実行中の Microsoft Office アプリケーション (Word、Excel、PowerPoint および Outlook) をすべて終了して、再起動してください。</String>
 
   <String Id="OpenWithWord">オープンは、 Microsoft Word</String>
-	<String Id="OpenWithExcel">オープンは、 Microsoft Excel</String>
-	<String Id="OpenWithPowerPoint">オープンは、 Microsoft PowerPoint</String>
+  <String Id="OpenWithExcel">オープンは、 Microsoft Excel</String>
+  <String Id="OpenWithPowerPoint">オープンは、 Microsoft PowerPoint</String>
 
-	<String Id="FileTypeOdt">OpenDocument テキスト</String>
-	<String Id="FileTypeOds">OpenDocument 表計算</String>
-	<String Id="FileTypeOdp">OpenDocument プレゼンテーション</String>
+  <String Id="FileTypeOdt">OpenDocument テキスト</String>
+  <String Id="FileTypeOds">OpenDocument 表計算</String>
+  <String Id="FileTypeOdp">OpenDocument プレゼンテーション</String>
 
-  <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
-  <String Id="FeatureNameTemplates">ODF-compatible Templates</String>
-  <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
-  <String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
+  <String Id="FolderNameTemplates">ODF Templates</String>
 
-  <String Id="FeatureDescriptionWordAddin">Installs and registers the ODF Add-in for Microsoft Word.</String>
-  <String Id="FeatureDescriptionTemplates">Installs a set of Word templates especially designed for interoperability with the OpenDocument Format for the current user.</String>
-  <String Id="FeatureDescriptionExcelAddin">Installs and registers the ODF Add-in for Microsoft Excel.</String>
-  <String Id="FeatureDescriptionPowerPointAddin">Installs and registers the ODF Add-in for Microsoft PowerPoint.</String>
+  <String Id="FeatureNameWordAddin">Microsoft Word 用 ODF アドイン</String>
+  <String Id="FeatureNameTemplates">ODF 互換テンプレート</String>
+  <String Id="FeatureNameExcelAddin">Microsoft Excel 用 ODF アドイン</String>
+  <String Id="FeatureNamePowerPointAddin">Microsoft PowerPoint 用 ODF アドイン</String>
 
-  <String Id="TemplateTitleODFFax">ODF-compatible fax</String>
-  <String Id="TemplateTitleODFLetter">ODF-compatible letter</String>
-  <String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
-  <String Id="TemplateTitleODFReport">ODF-compatible report</String>
+  <String Id="FeatureDescriptionWordAddin">Microsoft Word 用の ODF アドインをインストールして登録します。</String>
+  <String Id="FeatureDescriptionTemplates">現在のユーザーの ODF との相互運用性のために専用に設計された Word テンプレートのセットをインストールします。</String>
+  <String Id="FeatureDescriptionExcelAddin">Microsoft Excel 用の ODF アドインをインストールして登録します。</String>
+  <String Id="FeatureDescriptionPowerPointAddin">Microsoft PowerPoint 用の ODF アドインをインストールして登録します。</String>
 
-  <String Id="Error2000">There is a newer version of this product installed.</String>
+  <String Id="TemplateTitleODFFax">ODF 互換ファックス</String>
+  <String Id="TemplateTitleODFLetter">ODF 互換レター</String>
+  <String Id="TemplateTitleODFMemo">ODF 互換メモ</String>
+  <String Id="TemplateTitleODFReport">ODF 互換レポート</String>
+
+  <String Id="Error2000">インストールされているこの製品の新しいバージョンがあります。</String>
 
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] のセットアップ</String>
-	<String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
+  <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
 
-	<String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}File Associations</String>
-	<String Id="MyFileAssociationDlgDescription">Associate OpenDocument files with Microsoft Office</String>
-	<String Id="MyFileAssociationDlgDetailedDescription">Please select the file types that you wish to associate with Microsoft Office:</String>
+  <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}ファイルの関連</String>
+  <String Id="MyFileAssociationDlgDescription">OpenDocument ファイルを Microsoft Office に関連付ける</String>
+  <String Id="MyFileAssociationDlgDetailedDescription">Microsoft Office と関連付けるファイルの種類を選択してください:</String>
 
-	<String Id="MyExitDlgShowReadme">Show Readme</String>
+  <String Id="MyExitDlgShowReadme">Readme を表示</String>
 
-	<String Id="MyInstallScopeDlgDescription">インストールの種類とインストール先フォルダを選択してください。</String>
-	<String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}インストールの種類</String>
-	<String Id="MyInstallScopeDlgPerUser">ユーザー アカウント にインストール(&amp;F)</String>
-	<String Id="MyInstallScopeDlgPerUserDescription">[ProductName] はあなたのユーザー アカウントでのみ利用可能となります。ローカル管理者特権は必要ありません。</String>
-	<String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] はユーザーごとのインストールをサポートしていません。</String>
-	<String Id="MyInstallScopeDlgPerMachine">このコンピュータのすべてのユーザーにインストール(&amp;C)</String>
-	<String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] は既定でユーザーごとのフォルダにインストールされ、すべてのユーザーが利用可能です。インストール先フォルダを変更できます。ローカル管理者特権が必要です。</String>
-	<String Id="MyInstallScopeDlgFolderLabel">インストール フォルダ(&amp;F):</String>
-	<String Id="MyInstallScopeDlgChange">変更(&amp;C)...</String>
+  <String Id="MyInstallScopeDlgDescription">インストールの種類とインストール先フォルダを選択してください。</String>
+  <String Id="MyInstallScopeDlgTitle">{\WixUI_Font_Title}インストールの種類</String>
+  <String Id="MyInstallScopeDlgPerUser">ユーザー アカウント にインストール(&amp;F)</String>
+  <String Id="MyInstallScopeDlgPerUserDescription">[ProductName] はあなたのユーザー アカウントでのみ利用可能となります。ローカル管理者特権は必要ありません。</String>
+  <String Id="MyInstallScopeDlgNoPerUserDescription">[ProductName] はユーザーごとのインストールをサポートしていません。</String>
+  <String Id="MyInstallScopeDlgPerMachine">このコンピュータのすべてのユーザーにインストール(&amp;C)</String>
+  <String Id="MyInstallScopeDlgPerMachineDescription">[ProductName] は既定でユーザーごとのフォルダにインストールされ、すべてのユーザーが利用可能です。インストール先フォルダを変更できます。ローカル管理者特権が必要です。</String>
+  <String Id="MyInstallScopeDlgFolderLabel">インストール フォルダ(&amp;F):</String>
+  <String Id="MyInstallScopeDlgChange">変更(&amp;C)...</String>
 
-	<String Id="msierrXmlConfigFailedRead">There was a failure while configuring XML files.</String>
-	<String Id="msierrXmlConfigFailedOpen">Failed to open XML file [3], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSelect">Failed to find node: [3] in XML file: [4], system error: [2]</String>
-	<String Id="msierrXmlConfigFailedSave">Failed to save changes to XML file [3], system error: [2]</String>
-	
+  <String Id="msierrXmlConfigFailedOpen">XML ファイル[3]を開けませんでした、システム エラー: [2]</String>
+  <String Id="msierrXmlConfigFailedRead">XML ファイルの構成中にエラーが発生しました。</String>
+  <String Id="msierrXmlConfigFailedSave">XML ファイル[3]への変更を保存できませんでした、システム エラー: [2]</String>
+  <String Id="msierrXmlConfigFailedSelect">ノードが見つかりませんでした: [3] XML ファイル内: [4]、システム エラー: [2]</String>
+
+  <String Id="BrowseDlgWixUI_Bmp_UpTooltip">1 つ上のフォルダへ移動</String>
+
+  <String Id="CustomizeDlgLocationLabel">場所:</String>
+  <String Id="MyCustomizeDlgTree">選択項目のツリー</String>
+
+  <String Id="ErrorDlgErrorIconTooltip">情報アイコン</String>
+  <String Id="ErrorDlgErrorText">情報テキスト</String>
+
+  <String Id="InvalidDirDlgIconTooltip">情報アイコン</String>
+  <String Id="InvalidDirDlgText">インストール ディレクトリの場所は、ローカルのハードディスクを指定してください。</String>
+
+  <String Id="MaintenanceTypeDlgRemoveDisabledText">[ProductName] は削除できません。</String>
+  <String Id="MaintenanceTypeDlgRepairDisabledText">[ProductName] は修復できません。</String>
+
+  <String Id="ProgressTextAllocateRegistrySpaceTemplate">空き容量: [1]</String>
+  <String Id="ProgressTextAppSearchTemplate">プロパティ:[1]、署名: [2]</String>
+  <String Id="ProgressTextBindImageTemplate">ファイル: [1]</String>
+  <String Id="ProgressTextCreateFoldersTemplate">フォルダ: [1]</String>
+  <String Id="ProgressTextCreateShortcutsTemplate">ショートカット: [1]</String>
+  <String Id="ProgressTextDeleteServicesTemplate">サービス: [1]</String>
+  <String Id="ProgressTextFindRelatedProductsTemplate">検出されたアプリケーション: [1]</String>
+  <String Id="ProgressTextInstallAdminPackageTemplate">ファイル:[1]、ディレクトリ:[9]、サイズ: [6]</String>
+  <String Id="ProgressTextInstallServicesTemplate">サービス: [2]</String>
+  <String Id="ProgressTextMigrateFeatureStatesTemplate">アプリケーション: [1]</String>
+  <String Id="ProgressTextPatchFilesTemplate">ファイル:[1]、ディレクトリ:[2]、サイズ: [3]</String>
+  <String Id="ProgressTextPublishComponentsTemplate">コンポーネント ID:[1]、修飾名: [2]</String>
+  <String Id="ProgressTextPublishFeaturesTemplate">機能: [1]</String>
+  <String Id="ProgressTextRegisterClassInfoTemplate">クラス ID: [1]</String>
+  <String Id="ProgressTextRegisterComPlusTemplate">AppId:[1]{{、AppType:[2]、 ユーザー:[3]、RSN: [4]}}</String>
+  <String Id="ProgressTextRegisterExtensionInfoTemplate">拡張子: [1]</String>
+  <String Id="ProgressTextRegisterFontsTemplate">フォント: [1]</String>
+  <String Id="ProgressTextRegisterMIMEInfoTemplate">MIME コンテンツの種類:[1]、拡張子: [2]</String>
+  <String Id="ProgressTextRegisterProgIdInfoTemplate">ProgID: [1]</String>
+  <String Id="ProgressTextRegisterTypeLibrariesTemplate">LibID: [1]</String>
+  <String Id="ProgressTextRemoveDuplicateFilesTemplate">ファイル:[1]、ディレクトリ: [9]</String>
+  <String Id="ProgressTextRemoveEnvironmentStringsTemplate">名前:[1]、値:[2]、操作 [3]</String>
+  <String Id="ProgressTextRemoveExistingProductsTemplate">アプリケーション:[1]、コマンド ライン: [2]</String>
+  <String Id="ProgressTextRemoveFilesTemplate">ファイル:[1]、ディレクトリ: [9]</String>
+  <String Id="ProgressTextRemoveFoldersTemplate">フォルダ: [1]</String>
+  <String Id="ProgressTextRemoveIniValuesTemplate">ファイル:[1]、セクション:[2]、キー:[3]、値: [4]</String>
+  <String Id="ProgressTextRemoveRegistryValuesTemplate">キー:[1]、名前: [2]</String>
+  <String Id="ProgressTextRemoveShortcutsTemplate">ショートカット: [1]</String>
+  <String Id="ProgressTextRollbackCleanupTemplate">ファイル: [1]</String>
+  <String Id="ProgressTextSelfRegModulesTemplate">ファイル:[1]、フォルダ: [2]</String>
+  <String Id="ProgressTextSelfUnregModulesTemplate">ファイル:[1]、フォルダ: [2]</String>
+  <String Id="ProgressTextStartServicesTemplate">サービス: [1]</String>
+  <String Id="ProgressTextStopServicesTemplate">サービス: [1]</String>
+  <String Id="ProgressTextUnmoveFilesTemplate">ファイル:[1]、ディレクトリ: [9]</String>
+  <String Id="ProgressTextUnpublishComponentsTemplate">コンポーネント ID:[1]、修飾名: [2]</String>
+  <String Id="ProgressTextUnpublishFeaturesTemplate">機能: [1]</String>
+  <String Id="ProgressTextUnregisterClassInfoTemplate">クラス ID: [1]</String>
+  <String Id="ProgressTextUnregisterComPlusTemplate">AppId:[1]{{、AppType: [2]}}</String>
+  <String Id="ProgressTextUnregisterExtensionInfoTemplate">拡張子: [1]</String>
+  <String Id="ProgressTextUnregisterFontsTemplate">フォント: [1]</String>
+  <String Id="ProgressTextUnregisterMIMEInfoTemplate">MIME コンテンツの種類:[1]、拡張子: [2]</String>
+  <String Id="ProgressTextUnregisterProgIdInfoTemplate">ProgID: [1]</String>
+  <String Id="ProgressTextWriteEnvironmentStringsTemplate">名前:[1]、値:[2]、操作 [3]</String>
+  <String Id="ProgressTextWriteRegistryValuesTemplate">キー:[1]、名前:[2]、値: [3]</String>
+
+  <String Id="UITextNewFolder">Folder|新規フォルダ</String>
+  <String Id="WelcomeEulaDlgInstall">インストール(&amp;I)</String>
+
 </WixLocalization>
