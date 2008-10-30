@@ -265,7 +265,7 @@
       <xsl:otherwise>
 
         <!-- this is the first paragraph after the TOC, insert the TOC end -->
-        <xsl:if test="preceding-sibling::text:table-of-content[1]">
+        <xsl:if test="preceding-sibling::node()[1][name() = 'text:table-of-content']">
           <xsl:call-template name="InsertIndexFieldCodeEnd"/>
         </xsl:if>
         
