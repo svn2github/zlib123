@@ -706,20 +706,27 @@
 
     <xsl:attribute name="style:horizontal-pos">
       <xsl:choose>
-        <xsl:when test="$align = 'absolute' ">
-          <xsl:text>from-left</xsl:text>
-        </xsl:when>
         <!--added by chhavi to fix problam related to alignment and absolute position  in case of inner-margin and outer-margin area  -->
-        <xsl:when test ="$relativeFrom='inner-margin-area' and (not($align) or $align ='')   or  $relativeFrom = 'outer-margin-area' and (not($align) or $align ='') ">
+        <!-- Sona: #2149141 changes because mirror margins was lost-->
+        <xsl:when test ="$relativeFrom='inner-margin-area' and (not($align) or $align ='' or $align = 'absolute')   or  $relativeFrom = 'outer-margin-area' and (not($align) or $align ='' or $align = 'absolute') ">
           <xsl:text>from-inside</xsl:text>
         </xsl:when>
-        <xsl:when test ="$relativeFrom='inner-margin-area' ">
-            <xsl:text>outside</xsl:text>          
-        </xsl:when>
-        <xsl:when test ="$relativeFrom='outer-margin-area' ">
+        <xsl:when test ="$relativeFrom='inner-margin-area' or $relativeFrom='outer-margin-area'">
+          <xsl:if test ="$align='left'">
           <xsl:text>inside</xsl:text>
+          </xsl:if>
+          <xsl:if test ="$align='right'">
+            <xsl:text>outside</xsl:text>
+          </xsl:if>
+          <xsl:if test ="$align='center'">
+            <xsl:text>middle</xsl:text>
+          </xsl:if>
         </xsl:when>
         <!--end here-->
+        <!-- Sona: #2149141 changes because mirror margins was lost-->
+        <xsl:when test="$align = 'absolute' ">
+          <xsl:text>from-left</xsl:text>
+        </xsl:when>        
         <xsl:when test="$align and $align != '' ">
           <xsl:value-of select="$align"/>
         </xsl:when>
@@ -759,47 +766,14 @@
         </xsl:when>
         <!-- COMMENT : following values not defined in OOX spec, but used by Word 2007 -->
         <!--added by chhavi to improve absolute and alignment position-->
-        <xsl:when test="$relativeFrom = 'left-margin-area' ">
-          <xsl:choose>
-            <xsl:when test ="not($hPos) or $hPos =''">
-          <xsl:text>page</xsl:text>
+        <xsl:when test="$relativeFrom = 'left-margin-area' or $relativeFrom = 'outer-margin-area'">
+          <!-- Sona: #2149141 changes because mirror margins was lost-->          
+              <xsl:text>page-start-margin</xsl:text> 
         </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>page-start-margin</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>  
-        </xsl:when>
-        <xsl:when test="$relativeFrom = 'right-margin-area' ">
-          <xsl:choose>
-          <xsl:when test ="not($hPos) or $hPos =''">
-          <xsl:text>page</xsl:text>
-        </xsl:when>
-            <xsl:otherwise>          
+        <xsl:when test="$relativeFrom = 'right-margin-area' or $relativeFrom = 'inner-margin-area'">               
             <xsl:text>page-end-margin</xsl:text>          
-            </xsl:otherwise>
-          </xsl:choose>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'inner-margin-area'">
-          <xsl:choose>
-            <xsl:when test ="not($hPos) or $hPos =''">
-          <xsl:text>page</xsl:text>
-        </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>page-end-margin</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-         
-        </xsl:when>
-        <xsl:when test="$relativeFrom = 'outer-margin-area'">
-          <xsl:choose>
-            <xsl:when test ="not($hPos) or $hPos =''">
-          <xsl:text>page</xsl:text>
-        </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>page-start-margin</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
+
         <!--end here-->
         <xsl:when test="$relativeFrom=''">
           <!-- 

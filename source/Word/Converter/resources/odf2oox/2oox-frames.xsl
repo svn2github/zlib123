@@ -491,7 +491,13 @@
         </xsl:call-template>
       </xsl:if>
     </xsl:variable>
-
+    <!-- Sona: #2149141 changes because mirror margins was lost-->
+    <xsl:variable name="horizontalPos">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$frameStyle"/>
+        <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:choose>
       <!-- inline image -->
       <xsl:when test="$wrappedPara = 1">mso-position-horizontal-relative:char;</xsl:when>
@@ -507,10 +513,18 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
+          <!-- Sona: #2149141 changes because mirror margins was lost-->
+          <xsl:when test ="contains($horizontalRel, 'page-end-margin') and ($horizontalPos='inside' or $horizontalPos='outside' or $horizontalPos='from-inside')">
+            mso-position-horizontal-relative:inner-margin-area;
+          </xsl:when>
+          <xsl:when test ="contains($horizontalRel, 'page-start-margin') and ($horizontalPos='inside' or $horizontalPos='outside' or $horizontalPos='from-inside')">
+            mso-position-horizontal-relative:outer-margin-area;
+          </xsl:when>                    
           <!-- page-content -->
           <!--added by chhavi to fix bug   2174308 -->
           <xsl:when test="contains($horizontalRel, 'paragraph-end-margin')">mso-position-horizontal-relative:text;</xsl:when>
           <xsl:when test="contains($horizontalRel, 'page-end-margin')">mso-position-horizontal-relative:right-margin-area;</xsl:when>
+          <xsl:when test="contains($horizontalRel, 'page-start-margin')">mso-position-horizontal-relative:left-margin-area;</xsl:when>
           <!--end here-->
           <xsl:when test="$horizontalRel='page-content' ">mso-position-horizontal-relative:margin;</xsl:when>
           <!-- page, page-start-margin, page-end-margin -->
@@ -864,6 +878,19 @@
       </xsl:if>
       <!-- horizontal position (overrides margin-left) -->
       <xsl:choose>
+        <!-- Sona: #2149141 changes because mirror margins was lost-->
+        <xsl:when test ="contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin')">
+          <xsl:if test ="$horizontalPos='inside' or $horizontalPos='left'">
+            <xsl:value-of select="concat('mso-position-horizontal:', 'left', ';')"/>
+          </xsl:if>
+          <xsl:if test ="$horizontalPos='outside' or $horizontalPos='right'">
+            <xsl:value-of select="concat('mso-position-horizontal:', 'right', ';')"/>
+          </xsl:if>
+          <xsl:if test ="$horizontalPos='middle' or $horizontalPos='center'">
+            <xsl:value-of select="concat('mso-position-horizontal:', 'center', ';')"/>
+          </xsl:if>
+        </xsl:when>
+        
         <!-- centered position -->
         <xsl:when test="$horizontalPos='center' 
                   and not(contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin'))">
@@ -940,10 +967,11 @@
     <xsl:choose>
       <xsl:when test ="($frameStyle/style:graphic-properties/@fo:min-width and $frameStyle/style:graphic-properties/@fo:min-height) 
                 or ($frameStyle/style:graphic-properties/@fo:min-width and $frame/child::node()/@fo:min-height)                
-                or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'">
+                or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
+                or $frameStyle/style:graphic-properties/@fo:min-width">
         <xsl:text>mso-wrap-style:none;</xsl:text>
       </xsl:when>
-      <xsl:when test ="@fo:min-height and parent::draw:frame/@fo:min-width">
+      <xsl:when test ="(@fo:min-height and parent::draw:frame/@fo:min-width) or parent::draw:frame/@fo:min-width">
         <xsl:text>mso-wrap-style:none;</xsl:text>
       </xsl:when>
       <xsl:when test ="(not($frameStyle/style:graphic-properties/@fo:wrap-option) or $frameStyle/style:graphic-properties/@fo:wrap-option='wrap')
@@ -1445,8 +1473,9 @@
             </xsl:when>
             <!-- @fo:min-height or (@fo:min-height and parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width)
                   or -->
-            <xsl:when test="$frameStyle/@style:parent-style-name or parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
-              <xsl:if test="(@fo:min-height or $frameStyle/style:graphic-properties/@fo:min-height) or ((@fo:min-height  or $frameStyle/style:graphic-properties/@fo:min-height) and (parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width))
+            <xsl:when test="$frameStyle/@style:parent-style-name and (parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame'])">
+              <xsl:if test="((@fo:min-height  or $frameStyle/style:graphic-properties/@fo:min-height) and (parent::draw:frame/@fo:min-width or $frameStyle/style:graphic-properties/@fo:min-width))                  
+                  or (@fo:min-height or $frameStyle/style:graphic-properties/@fo:min-height)                    
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                   or $frameStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
                 <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
@@ -1454,6 +1483,12 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:if test="not(parent::node()[name()='draw:frame']) and not(self::node()[name()='draw:frame'])
+                and (not($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
+                       and $frameStyle/style:graphic-properties/@draw:auto-grow-width
+                or not($frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">
+                <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
+              </xsl:if>
+              <xsl:if test="((parent::node()[name()='draw:frame']) or (self::node()[name()='draw:frame']))
                 and (not($frameStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
                        and $frameStyle/style:graphic-properties/@draw:auto-grow-width
                 or not($frameStyle/style:graphic-properties/@draw:auto-grow-height = 'false'))">

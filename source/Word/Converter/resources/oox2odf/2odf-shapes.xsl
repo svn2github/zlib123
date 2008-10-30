@@ -3585,7 +3585,9 @@
 		</xsl:variable>
 
 		<xsl:choose>
-      <xsl:when test="($fitToText='t' and $wrapStyle!='') or  ($fitToText='true' and $wrapStyle!='') or ($shape/@w:wrap and $shape/@w:wrap != 'none')">        
+      <xsl:when test="($fitToText='t' and $wrapStyle!='') or  ($fitToText='true' and $wrapStyle!='') 
+                or ($fitToText!='t' and $wrapStyle!='') or  ($fitToText!='true' and $wrapStyle!='')
+                or ($shape/@w:wrap and $shape/@w:wrap != 'none')">
 				<xsl:attribute name="fo:min-width">
 					<xsl:text>0cm</xsl:text>
 				</xsl:attribute>
@@ -3893,14 +3895,16 @@
 				</xsl:variable>
 				
 					<xsl:choose>
-                    <xsl:when test ="$relH='right-margin-area' or $relH='inner-margin-area'">
+                      <!-- Sona: #2149141 changes because mirror margins was lost-->
+                      <xsl:when test ="$relH='right-margin-area'">
                       <xsl:variable name ="horWidth">
                         <xsl:call-template name ="ConvertTwips">
                           <xsl:with-param name="length" select ="$HorizontalWidth"></xsl:with-param>
                           <xsl:with-param name ="unit" select="'cm'"></xsl:with-param>
 							</xsl:call-template>
                       </xsl:variable>
-                      <xsl:value-of select="concat((substring-before($horWidth,'cm')+substring-before($marginLeft,'cm')),'cm')"/>
+                        <!-- concat((substring-before($horWidth,'cm')+substring-before($marginLeft,'cm')),'cm')-->
+                        <xsl:value-of select="$marginLeft"/>
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="$marginLeft"></xsl:value-of>
@@ -3938,14 +3942,15 @@
 
 			
 					<xsl:choose>
-                <xsl:when test ="$relH='right-margin-area' or $relH='inner-margin-area'">
+                  <!-- Sona: #2149141 changes because mirror margins was lost-->
+                  <xsl:when test ="$relH='right-margin-area'">
                   <xsl:variable name ="horWidth">
 								<xsl:call-template name="ConvertTwips">
                       <xsl:with-param name="length" select ="$HorizontalWidth"></xsl:with-param>
                       <xsl:with-param name ="unit" select="'cm'"></xsl:with-param>
 								</xsl:call-template>
 							</xsl:variable>
-                  <xsl:value-of select="concat((substring-before($horWidth,'cm')+substring-before($marginLeft,'cm')),'cm')"/>
+                    <xsl:value-of select="$marginLeft"/>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="$marginLeft"></xsl:value-of>
@@ -4204,10 +4209,11 @@
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:right-margin')">
               <!--<xsl:value-of select ="((//w:pgSz/@w:w div 1440)-($marRight div 1440))) -(($marRight div 1440) * ($relativeWidth div 1000))"/>-->
              
-              <xsl:value-of select ="(($pageWidth div 1440)-($marRight div 1440)) +($marRight div 1440 * $relativeWidth div 1000)"/>
+              <xsl:value-of select ="($marRight div 1440 * $relativeWidth div 1000)"/>
             </xsl:when>
+            <!-- Sona: #2149141 changes because mirror margins was lost-->
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:inner-margin-area')">
-              <xsl:value-of select ="(($pageWidth div 1440) -($marRight div 1440)) + $marLeft div 1440 * ($relativeWidth div 1000) "/>
+              <xsl:value-of select ="$marLeft div 1440 * ($relativeWidth div 1000) "/>
             </xsl:when>
             <!--chnaged by chhavi marright to marleft-->
             <xsl:when test ="contains($shape/@style,'mso-position-horizontal-relative:outer-margin-area')">
@@ -4702,11 +4708,25 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
+        <xsl:variable name ="shapeTypeId">
+          <xsl:value-of select ="substring-after($shape/@type,'#')"/>
+        </xsl:variable>
+        <xsl:variable name ="pathId">
+          <xsl:for-each select ="//v:shapetype[@id=$shapeTypeId]">
+            <xsl:if test ="position()=1">
+              <xsl:value-of select ="@path"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
 
 				<!-- Don't insert the width if the textbox is set to auto-width -->
         <xsl:if test ="(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t') and 
                 not(contains($shape/@style,'mso-wrap-style:none'))) or
-                    not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) ">
+                    (not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) 
+                and not(contains($shape/@style,'mso-wrap-style:none')) and 
+                ($pathId='m,l,21600r21600,l21600,xe' or ($shape[name()='v:rect'] and $shape/v:textbox))) or
+                (not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) and ($pathId!='m,l,21600r21600,l21600,xe' 
+                and not($shape[name()='v:rect'] and $shape/v:textbox)))">
           <xsl:attribute name="svg:width">
             <xsl:choose>
               <xsl:when test="$width = 0 and $shape//@o:hr='t'">
