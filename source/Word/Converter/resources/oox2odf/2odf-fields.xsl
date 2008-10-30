@@ -192,6 +192,7 @@
           <xsl:call-template name="InsertDateType">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="fieldType" select="$fieldType"/>
+            <xsl:with-param name="fieldText" select="string(../following-sibling::w:r/w:t)" />
           </xsl:call-template>
         </xsl:when>
         <!--page-count NUMPAGE, DOCPROPERTY Pages-->
@@ -300,7 +301,8 @@
       <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
       <xsl:when test="contains($fieldType, 'DATE')">
         <xsl:call-template name="InsertDateStyle">
-          <xsl:with-param name="dateText" select="string(w:r/w:t)"/>
+          <xsl:with-param name="fieldCode" select="$fieldCode" />
+          <xsl:with-param name="dateText" select="string(../following-sibling::w:r/w:t)"/>
         </xsl:call-template>
       </xsl:when>
       <!-- possible time types: TIME, EDITTIME-->
