@@ -344,7 +344,8 @@
 
 					<!--  Word template folder  -->
 					<Directory Id="ODFTEMPLATEFOLDER" Name="Templates">
-						<Directory Id="OdfTemplates" Name="!(loc.FeatureNameTemplates)">
+            <Directory Id="OdfTemplates" Name="!(loc.FolderNameTemplates)">
+            <!--<Directory Id="OdfTemplates" Name="ODF">-->
 							<Component Id="ODFFax.dotx" Guid="54432E95-2C89-4992-A204-0E8CA8DC47DD">
 								<Condition><![CDATA[ WORD2007INSTALLROOT ]]></Condition>
 								<File Id="ODFFax.dotx" Name="ODFFax.dotx" Source="$(var.SolutionDir)Word\Templates\ODFFax.dotx" DiskId="1" KeyPath="yes" />
