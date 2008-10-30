@@ -177,4 +177,13 @@
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Open Office Calc 仅支持 256 张数据表。任何超出 256 张表者都将永久丢失</value>
   </data>
+  <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
+    <value>无法转换文本框中的超链接，超链接将更改为纯文本。</value>
+  </data>
+  <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
+    <value>其中一个脚本容量过大。Excel 只支持具有不超过 32 个可变单元格的脚本。</value>
+  </data>
+  <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
+    <value>由于 ODF 不支持某些 Pivot 过滤器，因此不得不删除了这些过滤器。</value>
+  </data>
 </root>

@@ -177,4 +177,13 @@
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>La Calculatrice Open Office ne prend en charge que 256 feuilles. Toute feuille au-delà de la limite de 256 feuilles sera définitivement perdue.</value>
   </data>
+  <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
+    <value>Le lien hypertexte dans la zone de texte ne peut être converti et sera changé en texte brut.</value>
+  </data>
+  <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
+    <value>L'un des scénarios est trop volumineux. Excel prend en charge uniquement les scénarios de maximum 32 cellules.</value>
+  </data>
+  <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
+    <value>Certains filtres dynamiques ont été supprimés car ODF ne les prend pas en charge</value>
+  </data>
 </root>

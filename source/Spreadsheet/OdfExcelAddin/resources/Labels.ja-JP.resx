@@ -177,4 +177,13 @@
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Open Office Calc は、256 シートしかサポートしていません。256 シートを超えた場合、超過したシートは失われます。</value>
   </data>
+  <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
+    <value>テキストボックスのハイパーリンクを変換できず、プレーン テキストに変更できません。</value>
+  </data>
+  <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
+    <value>シナリオの 1 つが大きすぎます。Excel でサポートされるのは、32 以下の変更セルのみです。</value>
+  </data>
+  <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
+    <value>ODF でサポートされていない一部のピボット フィルタを削除する必要があります</value>
+  </data>
 </root>

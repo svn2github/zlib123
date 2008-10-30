@@ -450,4 +450,10 @@
   <data name="translation.oox2odf.fields.styleref" xml:space="preserve">
     <value>Field of type STYLEREF</value>
   </data>
+  <data name="translation.odf2oox.embeddedObject" xml:space="preserve">
+    <value>内嵌式对象</value>
+  </data>
+  <data name="translation.odf2oox.odfolelost" xml:space="preserve">
+    <value>内嵌式 ODF 对象</value>
+  </data>
 </root>

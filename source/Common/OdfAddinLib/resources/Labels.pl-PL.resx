@@ -219,4 +219,10 @@
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>Opcje ODF</value>
   </data>
+  <data name="OdfNewDocumentDescription" xml:space="preserve">
+    <value>Utwórz nowy dokument zgodny z formatem ODF</value>
+  </data>
+  <data name="OdfNewDocumentLabel" xml:space="preserve">
+    <value>Nowy dokument</value>
+  </data>
 </root>

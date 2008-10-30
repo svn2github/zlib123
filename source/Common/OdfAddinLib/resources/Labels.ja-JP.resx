@@ -219,4 +219,10 @@
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODFオプション</value>
   </data>
+  <data name="OdfNewDocumentDescription" xml:space="preserve">
+    <value>ODF 互換文書の新規作成</value>
+  </data>
+  <data name="OdfNewDocumentLabel" xml:space="preserve">
+    <value>新規文書</value>
+  </data>
 </root>

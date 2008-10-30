@@ -177,4 +177,13 @@
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Program Open Office Calc obsługuje tylko 256 arkuszy. Wszelkie arkusze ponad 256 zostaną trwale utracone.permanently</value>
   </data>
+  <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
+    <value>Hiperłącza w polu tekstowym nie mogą zostać przekonwertowane i zostaną zamienione na zwykły tekst.</value>
+  </data>
+  <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
+    <value>Jeden ze scenariuszy jest zbyt duży. W programie Excel obsługiwane są tylko scenariusze, dla których zmianie podlegają nie więcej niż 32 komórki.</value>
+  </data>
+  <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
+    <value>Niektóre filtry przestawne musiały zostać usunięte, ponieważ nie są obsługiwane w formacie ODF.</value>
+  </data>
 </root>

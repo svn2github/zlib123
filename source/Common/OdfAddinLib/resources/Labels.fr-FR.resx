@@ -202,7 +202,7 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="OdfConversionCanceled" xml:space="preserve">
     <value>La conversion a été annulée par l’utilisateur</value>
   </data>
-<data name="ProgressBarExitLabel" xml:space="preserve">
+  <data name="ProgressBarExitLabel" xml:space="preserve">
     <value>Veuillez patienter pendant que la conversion complète</value>
   </data>
   <data name="ProgressBarLoadLabel" xml:space="preserve">
@@ -220,4 +220,10 @@ pas en cours d'utilisation par une autre application.</value>
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>Options ODF</value>
   </data>
-  </root>
+  <data name="OdfNewDocumentDescription" xml:space="preserve">
+    <value>Créez un document compatible avec le format ODF</value>
+  </data>
+  <data name="OdfNewDocumentLabel" xml:space="preserve">
+    <value>Nouveau document</value>
+  </data>
+</root>

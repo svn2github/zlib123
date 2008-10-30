@@ -454,4 +454,7 @@
   <data name="translation.oox2odf.fields.styleref" xml:space="preserve">
     <value>Field of type STYLEREF</value>
   </data>
+  <data name="translation.odf2oox.odfolelost" xml:space="preserve">
+    <value>埋め込み ODF オブジェクト</value>
+  </data>
 </root>

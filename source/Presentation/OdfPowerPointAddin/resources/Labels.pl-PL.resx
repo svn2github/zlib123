@@ -236,4 +236,7 @@ Orientacja strony materiałów informacyjnych nie jest odwzorowana.</value>
   <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
     <value>Łącza do aplikacji działają jedynie wówczas, gdy aplikacje znajdują się w standardowych folderach, np. WINDOWS lub w folderze prezentacji.</value>
   </data>
+  <data name="translation.oox2odf.shapesTypeOuterShadow" xml:space="preserve">
+    <value>Właściwości Rozmycie i Rozmiar nie są obsługiwane w formacie ODP.</value>
+  </data>
 </root>

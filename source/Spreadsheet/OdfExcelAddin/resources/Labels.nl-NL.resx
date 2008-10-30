@@ -177,4 +177,13 @@
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Open Office Calc ondersteunt slechts 256 bladen. Alleen de eerste 256 bladen worden bewaard.</value>
   </data>
+  <data name="translation.odf2oox.hyperlinkInTextbox" xml:space="preserve">
+    <value>Hyperlink in tekstvak kan niet worden geconverteerd en wordt omgezet in tekst zonder opmaak.</value>
+  </data>
+  <data name="translation.odf2oox.scenarioTooBig" xml:space="preserve">
+    <value>Een van de scenario's is te groot. Excel ondersteunt alleen scenario's met niet meer dan 32 veranderende cellen.</value>
+  </data>
+  <data name="translation.oox2odf.PivotFilter" xml:space="preserve">
+    <value>Sommige Pivot-filters moesten worden verwijderd omdat deze niet door ODF worden ondersteund</value>
+  </data>
 </root>

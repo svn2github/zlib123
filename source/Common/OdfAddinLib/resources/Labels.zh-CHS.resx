@@ -219,4 +219,10 @@
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF选项</value>
   </data>
+  <data name="OdfNewDocumentDescription" xml:space="preserve">
+    <value>创建新 ODF 兼容文档</value>
+  </data>
+  <data name="OdfNewDocumentLabel" xml:space="preserve">
+    <value>新建文档</value>
+  </data>
 </root>

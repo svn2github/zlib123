@@ -236,4 +236,7 @@ Oriëntatie handoutpagina niet gemapt.</value>
   <data name="translation.oox2odf.hyperlinkTypeRelativePath" xml:space="preserve">
     <value>Koppelingen naar toepassingen werken alleen als de toepassingen zich bevinden in standaardmappen, bijv. WINDOWS, of in dezelfde map als de presentatie.</value>
   </data>
+  <data name="translation.oox2odf.shapesTypeOuterShadow" xml:space="preserve">
+    <value>Eigenschappen Blur en Size worden niet ondersteund in ODP.</value>
+  </data>
 </root>

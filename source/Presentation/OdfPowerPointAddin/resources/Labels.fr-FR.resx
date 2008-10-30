@@ -237,4 +237,7 @@ Orientation de page de document non mappée.</value>
     <value>Les liens vers des applications ne fonctionnent que pour les applications résidant dans des dossiers standard, comme WINDOWS, ou dans  
 le même dossier que la présentation.</value>
   </data>
+  <data name="translation.oox2odf.shapesTypeOuterShadow" xml:space="preserve">
+    <value>ODP ne prend pas en charge les propriétés floues et de taille.</value>
+  </data>
 </root>
