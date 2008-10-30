@@ -4575,12 +4575,15 @@
 						  select="key('abstractNumId', $IndirectAbstractNumId)/w:lvl[@w:ilvl=$IndirectIlvl][1]"/>
 
 
-						<xsl:variable name ="Suffix">
-							<xsl:choose>
+            <!--math: bugfix #2142500 : Use IndirectListLevelDefinition only if no direct list level definition is present.
+            If direct list level definition is present and no w:suff is defined there, the standard ('tab') is used in Word, anyway.
+            (not the value of w:suff of the indirect list level definition).-->
+            <xsl:variable name ="Suffix">
+							<xsl:choose>                
 								<xsl:when test="$DirectListLevelDefinition/w:suff/@w:val">
 									<xsl:value-of select="$DirectListLevelDefinition/w:suff/@w:val" />
 								</xsl:when>
-								<xsl:when test="$IndirectListLevelDefinition/w:suff/@w:val">
+								<xsl:when test="not($DirectListLevelDefinition) and $IndirectListLevelDefinition/w:suff/@w:val">
 									<xsl:value-of select="$IndirectListLevelDefinition/w:suff/@w:val" />
 								</xsl:when>
 								<xsl:otherwise>'tab'</xsl:otherwise>
@@ -4728,7 +4731,7 @@
 									<xsl:variable name="MinRelevantCustomTab">
 										<xsl:choose>
 											<xsl:when test="$Hanging != '0'">
-												<!--hanging -> get min custom tab that is between start of first line and start of paragrah text-->
+												<!--hanging -> get min custom tab that is between start of first line and start of paragraph text-->
 												<xsl:call-template name="GetMinVal">
 													<xsl:with-param name="values" select="$tabs/w:tab[@w:pos &gt; ( $Left - $Hanging + $MinTabOffset) and @w:pos &lt; $Left ]/@w:pos" />
 												</xsl:call-template>
