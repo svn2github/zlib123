@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -255,7 +255,8 @@
             <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates mode="shapes"/>
+            <!-- Sona: 30-10-08- Commented the unwanted template call for defect #2207037-Single shape replaced with two shapes -->
+            <!--<xsl:apply-templates mode="shapes"/>-->
             <!-- 2008-10-22/divo following line added to fix #2163354 ODT: Wrap around - tabs are lost-->
             <xsl:apply-templates mode="paragraph"/>
           </xsl:otherwise>
