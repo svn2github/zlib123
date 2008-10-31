@@ -847,22 +847,7 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
       </xsl:choose>
     </xsl:variable>
 
-    <!-- compute default column width -->
-    <!--<xsl:variable name="defaultColWidth">
-      <xsl:choose>
-        <xsl:when test="$CheckCollHidden != 'true' ">
-          <xsl:call-template name="ConvertToCharacters">
-            <xsl:with-param name="width">
-              --><!--<xsl:value-of select="concat('0.8925','in')"/>--><!--
-            </xsl:with-param>
-            <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>-->
+    <!-- compute default column width -->   
 	  <xsl:variable name="defaultFontStyle">
 		  <xsl:for-each select="document('styles.xml')">
 			  <xsl:choose>
@@ -888,14 +873,18 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 				  <xsl:otherwise>10</xsl:otherwise>
 			  </xsl:choose>
 		  </xsl:for-each>
-	  </xsl:variable>
-	  <!--<xsl:variable name ="defaultFontStyle">
-		  <xsl:value-of select ="'Lucida Handwriting'"/>
-	  </xsl:variable>-->
+	  </xsl:variable>	  
 		<!-- Attributes written inline as per XSLT best practices-->	
 		<sheetFormatPr  defaultRowHeight="{$defaultRowHeight}">
 			<xsl:attribute name ="defaultColWidth">
-				<xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyle,'|',$defaultFontSize1)"/>
+				<xsl:choose>
+					<xsl:when test="$CheckCollHidden != 'true' ">
+						<xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyle,'|',$defaultFontSize1)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>0</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:attribute>
 			<xsl:attribute name="customHeight">
 				<xsl:text>true</xsl:text>
@@ -906,16 +895,13 @@ RefNo-4 21-Oct-2008 Sandeep s     2171834   Changes done to fix frezpane deffect
 				</xsl:attribute>
 			</xsl:if>
     </sheetFormatPr>
-
     <xsl:if test="descendant::table:table-column[1]">
       <cols>
-
         <!-- insert first column -->
         <xsl:apply-templates select="descendant::table:table-column[1]" mode="sheet">
           <xsl:with-param name="colNumber">1</xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
-
       </cols>
     </xsl:if>
     <sheetData>

@@ -167,124 +167,75 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
         <xsl:value-of select="concat(@id,';')"/>
       </xsl:for-each>
     </xsl:variable>
-
+	  <xsl:variable name="defaultFontSize">
+		  <xsl:for-each select="key('Part', 'xl/styles.xml')">
+			  <xsl:choose>
+				  <xsl:when test="e:styleSheet/e:fonts/e:font">
+					  <xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+				  </xsl:when>
+				  <xsl:otherwise>
+					  <xsl:text>11</xsl:text>
+				  </xsl:otherwise>
+			  </xsl:choose>
+		  </xsl:for-each>
+	  </xsl:variable>
+	  <xsl:variable name="defaultFontStyle">
+		  <xsl:for-each select="key('Part', 'xl/styles.xml')">
+			  <xsl:choose>
+				  <xsl:when test="e:styleSheet/e:fonts/e:font">
+					  <xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+				  </xsl:when>
+				  <xsl:otherwise>
+					  <xsl:text>11</xsl:text>
+				  </xsl:otherwise>
+			  </xsl:choose>
+		  </xsl:for-each>
+	  </xsl:variable>
     <xsl:if test="key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks">
       <style:style
         style:name="{generate-id(key('Part', concat('xl/',$sheet))/e:worksheet/e:colBreaks)}"
         style:family="table-column">
         <style:table-column-properties fo:break-before="page">
-          <xsl:attribute name="style:column-width">
-            <xsl:choose>
-              <xsl:when
-                test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-                <xsl:call-template name="ConvertFromCharacters">
-                  <xsl:with-param name="value">
-                    <xsl:value-of
-                      select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
-                    />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- Excel application default-->
-<!--<xsl:call-template name="ConvertFromCharacters">
-                  <xsl:with-param name="value" select="'8.43'"/>
-                </xsl:call-template>-->
-					<!-- Here To calculate the def col width formula used is 
-				         width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
-					     Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})
-					-->
-					<xsl:variable name="defaultFontSize">
-						<xsl:for-each select="key('Part', 'xl/styles.xml')">
-							<xsl:choose>
-								<xsl:when test="e:styleSheet/e:fonts/e:font">
-									<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:text>11</xsl:text>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:for-each>
-					</xsl:variable>
-					<xsl:variable name="defaultFontStyle">
-						<xsl:for-each select="key('Part', 'xl/styles.xml')">
-							<xsl:choose>
-								<xsl:when test="e:styleSheet/e:fonts/e:font">
-									<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:text>11</xsl:text>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:for-each>
-					</xsl:variable>
-					<!--<xsl:value-of select="concat('sonataColumnWidth:','Lucida Handwriting|12')"/>-->
-					<xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyle,'|',$defaultFontSize)"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </style:table-column-properties>
-      </style:style>
-    </xsl:if>
-
-    <style:style
-      style:name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
+			<xsl:attribute name="style:column-width">
+				<xsl:choose>
+					<xsl:when
+					  test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+						<xsl:value-of select="concat('sonataColumnWidth:','True|',$defaultFontStyle,'|',$defaultFontSize,key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- Here To calculate the def col width formula used is 
+						     width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+							 Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})-->
+						<xsl:value-of select="concat('sonataColumnWidth:','False|',$defaultFontStyle,'|',$defaultFontSize)"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+		</style:table-column-properties>
+	</style:style>
+</xsl:if>
+<style:style
+  style:name="{concat('co', key('Part', concat('xl/',$sheet))/e:worksheet/@oox:part)}"
       style:family="table-column">
       <style:table-column-properties fo:break-before="auto">
-        <xsl:attribute name="style:column-width">
-          <xsl:choose>
-            <xsl:when
-              test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-              <xsl:call-template name="ConvertFromCharacters">
-                <xsl:with-param name="value">
-                  <xsl:value-of
-                    select="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
-                  />
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- Excel application default-->
-<!--<xsl:call-template name="ConvertFromCharacters">
-                  <xsl:with-param name="value" select="'8.43'"/>
-                </xsl:call-template>-->
-				<!-- Here To calculate the def col width formula used is 
-				width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
-                Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})
-				-->
-				<xsl:variable name="defaultFontSize">
-					<xsl:for-each select="key('Part', 'xl/styles.xml')">
-						<xsl:choose>
-							<xsl:when test="e:styleSheet/e:fonts/e:font">
-								<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:text>11</xsl:text>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:for-each>
-				</xsl:variable>
-				<xsl:variable name="defaultFontStyle">
-					<xsl:for-each select="key('Part', 'xl/styles.xml')">
-						<xsl:choose>
-							<xsl:when test="e:styleSheet/e:fonts/e:font">
-								<xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:text>11</xsl:text>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:for-each>
-				</xsl:variable>
-				<!--<xsl:value-of select="concat('sonataColumnWidth:','Lucida Handwriting|12')"/>-->
-				<xsl:value-of select="concat('sonataColumnWidth:',$defaultFontStyle,'|',$defaultFontSize)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </style:table-column-properties>
-    </style:style>
+		  <xsl:attribute name="style:column-width">
+			  <xsl:choose>
+				  <xsl:when
+					test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+					  <xsl:value-of select="concat('sonataColumnWidth:','True|',$defaultFontStyle,'|',$defaultFontSize,'|',key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth)"/>
+				  </xsl:when>
+				  <xsl:otherwise>
+					  <!-- Excel application default-->
+					  <!-- Here To calculate the def col width formula used is 
+				           width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+                           Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})-->
+					  <xsl:value-of select="concat('sonataColumnWidth:','False|',$defaultFontStyle,'|',$defaultFontSize)"/>
+				  </xsl:otherwise>
+			  </xsl:choose>
+		  </xsl:attribute>
+	  </style:table-column-properties>
+  </style:style>
 
-    <xsl:apply-templates select="key('Part', concat('xl/',$sheet))/e:worksheet/e:cols/e:col[1]"
+  <xsl:apply-templates select="key('Part', concat('xl/',$sheet))/e:worksheet/e:cols/e:col[1]"
       mode="automaticstyles">
       <xsl:with-param name="manualBreakes" select="$ManualColBreaks"/>
     </xsl:apply-templates>

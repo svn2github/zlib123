@@ -831,34 +831,74 @@ namespace CleverAge.OdfConverter.Spreadsheet
 
         protected string GetColumnWidth(string text)
         {
+            // default width in ODS for Arial 10 is 0.8925in or  80.925px            
 
-            string measureString = "0";
-            string fontSize = text.Split('|')[1].ToString();
-            char [] letters=new char[] {'A','a','B','b','C','c','D','d','E','e','F','f','G','g','H','h','I','i','J','j','K','k','L','l','M','m','N','n','O','P','p','Q','q','R','r','S','s','T','t','U','u','V','v','W','w','X','x','Y','y','Z','z'};
-            float font =float .Parse( fontSize.TrimEnd(letters));           
-            Font stringFont = new Font(text.Split('|')[0].ToString(), font);
-            Form dummyForm = new Form();
-            Graphics g = dummyForm.CreateGraphics();
-            System.Drawing.SizeF size = g.MeasureString(measureString, stringFont);
-            //RectangleF layoutRect = new RectangleF(0, 0, size.Width, size.Height);
-            RectangleF layoutRect = new RectangleF(50.0F, 50.0F, size.Width, size.Height);
-            // Set string format.
-            CharacterRange[] characterRanges = { new CharacterRange(0, 1) };
-            StringFormat stringFormat = new StringFormat();
-            stringFormat.SetMeasurableCharacterRanges(characterRanges);
-            Region[] result = g.MeasureCharacterRanges(measureString, stringFont, layoutRect, stringFormat);
-            //charWidth is nothing but  
-            double maxDigWidth = result[0].GetBounds(g).Width - 2; // minus 2 bound borders
-            //width=Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
-            //Column Width =Truncate(((256 * {width} + Truncate(128/{Maximum Digit Width}))/256)*{Maximum Digit Width})
-            dummyForm.Close();
-            double columnWidth = System.Math.Truncate((((8 * maxDigWidth) + 5) / maxDigWidth) * 256) / 256;
-            double columnWidthPx = System.Math.Truncate((((256 * columnWidth) + (System.Math.Truncate(128 / maxDigWidth))) / 256) * maxDigWidth);
-            ////double columnWidthPx = System.Math.Truncate(((256 * columnWidth) + System.Math.Truncate(128 / maxDigWidth) / 256) * maxDigWidth);
-            //double columnWidthInch = (columnWidthPx / 96.21212);
-            double columnWidthPoints = columnWidthPx / 96.21212 * 72;
-            return columnWidthPoints.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            string fontName = text.Split('|')[0].ToString(System.Globalization.CultureInfo.InvariantCulture);
+            string fontSize = text.Split('|')[1].ToString(System.Globalization.CultureInfo.InvariantCulture);
+            char[] letters = new char[] { 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g', 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w', 'X', 'x', 'Y', 'y', 'Z', 'z' };
+            double dblFontSizePt = Convert.ToDouble(fontSize.TrimEnd(letters), System.Globalization.CultureInfo.InvariantCulture);
+            double dblPixelWidth = 80.925;
+            double dblMaxDigitWidth = MaxDigitWidth(fontName, dblFontSizePt);
+            double dblCharWidth = Math.Floor((dblPixelWidth - 5) / dblMaxDigitWidth * 100 + 0.5) / 100.0;
+            // formula from OpenXml spec §3.3.1.12:
+            //
+            // To translate from pixels to character width, use this calculation:
+            // =Truncate(({pixels}-5)/{Maximum Digit Width} * 100+0.5)/100
 
+            //double dblCharWidth = ((dblPixelWidth - 5) / dblMaxDigitWidth * 100 + 0.5) / 100.0;
+
+            // formula from OpenXml spec §3.3.1.12:
+            //
+            // width = Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel 
+            //                       padding}]/{Maximum Digit Width}*256)/256
+
+            double columnWidth = Math.Floor((dblCharWidth * dblMaxDigitWidth + 5) / dblMaxDigitWidth * 256) / 256.0;
+            return columnWidth.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        protected double MaxDigitWidth(string fontName, double dblSizePt)
+        {
+            double dblMaxDigitWidth = 0.0;
+
+            // Excel does not use the specified font size, 
+            // instead, font size is rounded to an integral pixel size
+            // check if this works on non-Windows platforms, otherwise 96dpi could do fine here
+            Graphics g = System.Drawing.Graphics.FromHwnd(new IntPtr());
+            float fSizePxl = (float)Math.Round(g.DpiX * dblSizePt / 72);
+            float fSizePt = (72 * fSizePxl / g.DpiX);
+            FontStyle fontStyle;
+            if (fontName == "Monotype Corsiva")
+                fontStyle = FontStyle.Italic;
+            else
+                fontStyle = FontStyle.Regular;
+            Font font = new Font(fontName, fSizePt, fontStyle, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+
+            for (int i = 0; i < 10; i++)
+            {
+                // use a Label on a .NET 2.0 Form to measure the width of a digit
+                Form f = new Form();
+                Label l = new Label();
+                l.UseCompatibleTextRendering = false;
+                l.Font = font;
+                l.AutoSize = true;
+                f.Controls.Add(l);
+                l.Text = Convert.ToString(i) + Convert.ToString(i);
+                f.ResumeLayout(false);
+                f.PerformLayout();
+                int iWidth2 = l.Width;
+
+                l.Text = Convert.ToString(i);
+                f.PerformLayout();
+
+                // we measure twice so we can remove the padding
+                int iWidth1 = l.Width;
+
+                if (iWidth2 - iWidth1 > dblMaxDigitWidth)
+                {
+                    dblMaxDigitWidth = iWidth2 - iWidth1;
+                }
+            }
+            return dblMaxDigitWidth;
         }
     }
 }
