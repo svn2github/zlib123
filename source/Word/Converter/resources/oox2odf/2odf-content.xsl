@@ -106,15 +106,17 @@
 	<!--  generates automatic styles for frames -->
 	<xsl:template name="InsertFrameStyles">
 		<!-- when w:pict is child of paragraph-->
-		<xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
+		<!--<xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
 			<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/w:p/w:r/w:pict"
 			  mode="automaticpict"/>
-		</xsl:if>
+		</xsl:if>-->
 
 		<!-- when w:pict is child of a cell-->
-		<xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
+		<!--<xsl:if test="key('Part', 'word/document.xml')/w:document/w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict">
 			<xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body/w:tbl/w:tr/w:tc/w:p/w:r/w:pict" mode="automaticpict"/>
-		</xsl:if>
+		</xsl:if>-->
+    <!-- 2008-10-31/divo: Generate a style for every w:pict, not only the ones in tables and paragraphs -->
+    <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body//w:pict" mode="automaticpict"/>
 	</xsl:template>
 
 	<!--
