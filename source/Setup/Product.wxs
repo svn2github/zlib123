@@ -30,100 +30,100 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-	<Product Id="C3EF3083-DCEE-45D8-A8D9-81BBBBF5AB42"
+  <Product Id="0CEDE8BC-4857-4FE6-8A8C-6552DF9D6892"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-			 Version="2.5.4915.0"
+       Version="2.5.4924.0"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
-		<!--  IMPORTANT NOTE:
+    <Package Id="F49D448E-3D20-40FE-92FE-C05F67FF775D" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"
+             Languages="!(loc.lcid)" SummaryCodepage="!(loc.CodePage)" />
+    <WixVariable Id='VersionNumber' Value='2.5.4924.0'/>
+
+    <!--  IMPORTANT NOTE:
 			  When creating a new release, 
 				- set the value of Product/@Id to a new GUID (without curly brackets, letters all upper-case)
 				- increase Product/@Version (Note that MSI only checks the first three groups, i.e. 2.5.4802)
-				//(no longer needed)- set UpgradeVersion/@Minimum and UpgradeVersion/@Maximum below to the new version number 
+				- set the WixVariable 'VersionNumber' to the new version number
 				- set the value of Package/@Id to a new GUID
 				- leave Product/@UpgradeCode the same
-				
-				- update VersionNumber, VersionInfo and ARPCOMMENTS to the correct revision
 							
 			  Note that GUID values should be all upper-case and without brackets 
 		-->
 
-		<Package Id="6C0BC47D-8B22-4CED-A01F-B8ED43E974A8" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" />
-		<Media Id="1" Cabinet="OdfAddinforOfficeSetup.cab" EmbedCab="yes" />
+    <Media Id="1" Cabinet="OdfAddinforOfficeSetup.cab" EmbedCab="yes" />
 
-		<!-- remove previous versions of previous Word add-in -->
-		<Upgrade Id="429EF697-737F-49D5-A58E-8C8C81FCD580">
-			<UpgradeVersion Property="OLDAPPFOUND_WORD" OnlyDetect="no" IncludeMinimum="yes" Minimum="1.0.0" IncludeMaximum="no" Maximum="2.5.0" />
-		</Upgrade>
-		<!--remove previous versions of previous Excel add-in-->
-		<Upgrade Id="C47FE3B9-1A0A-45AB-87FF-DC30E8FD4A63">
-			<UpgradeVersion Property="OLDAPPFOUND_EXCEL" IncludeMinimum="yes" Minimum="0.0.0" IncludeMaximum="no" Maximum="2.5.0.0"/>
-		</Upgrade>
-		<!--remove previous versions of previous PowerPoint add-in-->
-		<Upgrade Id="46A70465-F809-4983-BD96-017A447B9A03">
-			<UpgradeVersion Property="OLDAPPFOUND_POWERPOINT" IncludeMinimum="yes" Minimum="0.0.0.0" IncludeMaximum="no" Maximum="2.5.0.0"/>
-		</Upgrade>
-		<!--remove previous versions of this product-->
-		<Upgrade Id="7650D566-0CE2-4D71-8799-CF86735C15CC">
-			<UpgradeVersion Property="OLDAPPFOUND" IncludeMinimum="yes" Minimum="0.0.0.0" IncludeMaximum="no" Maximum="!(wix.VersionNumber)"/>
-			<UpgradeVersion Property="NEWAPPFOUND" IncludeMinimum="no" Minimum="!(wix.VersionNumber)"  OnlyDetect="yes"/>
-		</Upgrade>
+    <!-- remove previous versions of previous Word add-in -->
+    <Upgrade Id="429EF697-737F-49D5-A58E-8C8C81FCD580">
+      <UpgradeVersion Property="OLDAPPFOUND_WORD" OnlyDetect="no" IncludeMinimum="yes" Minimum="1.0.0" IncludeMaximum="no" Maximum="2.5.0" />
+    </Upgrade>
+    <!--remove previous versions of previous Excel add-in-->
+    <Upgrade Id="C47FE3B9-1A0A-45AB-87FF-DC30E8FD4A63">
+      <UpgradeVersion Property="OLDAPPFOUND_EXCEL" IncludeMinimum="yes" Minimum="0.0.0" IncludeMaximum="no" Maximum="2.5.0.0"/>
+    </Upgrade>
+    <!--remove previous versions of previous PowerPoint add-in-->
+    <Upgrade Id="46A70465-F809-4983-BD96-017A447B9A03">
+      <UpgradeVersion Property="OLDAPPFOUND_POWERPOINT" IncludeMinimum="yes" Minimum="0.0.0.0" IncludeMaximum="no" Maximum="2.5.0.0"/>
+    </Upgrade>
+    <!--remove previous versions of this product-->
+    <Upgrade Id="7650D566-0CE2-4D71-8799-CF86735C15CC">
+      <UpgradeVersion Property="OLDAPPFOUND" IncludeMinimum="yes" Minimum="0.0.0.0" IncludeMaximum="no" Maximum="!(wix.VersionNumber)"/>
+      <UpgradeVersion Property="NEWAPPFOUND" IncludeMinimum="no" Minimum="!(wix.VersionNumber)"  OnlyDetect="yes"/>
+    </Upgrade>
 
-		<WixVariable Id='VersionNumber' Value='2.5.4915.0'/>
-		<WixVariable Id='VersionInfo' Value='Version !(wix.VersionNumber)'/>
-		<WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
-		<WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
+    <WixVariable Id='VersionInfo' Value='Version !(wix.VersionNumber)'/>
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
 
-		<PropertyRef Id="NETFRAMEWORK20"/>
-		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-		<Property Id="ApplicationFolderName" Value="OpenXML-ODF Translator" />
-		<Property Id='ALLUSERS' Secure='yes'/>
-		<Property Id='SHOW_README' Value='1' />
+    <PropertyRef Id="NETFRAMEWORK20"/>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Property Id="ApplicationFolderName" Value="OpenXML-ODF Translator" />
+    <Property Id='ALLUSERS' Secure='yes'/>
+    <Property Id='SHOW_README' Value='1' />
 
-		<Property Id="TEMPLATEPATH" Secure="yes" />
+    <Property Id="TEMPLATEPATH" Secure="yes" />
 
-		<!-- set to 1 to create file associations for ODF documents -->
-		<Property Id="FILE_ASSOCIATION_ODT" />
-		<Property Id="FILE_ASSOCIATION_ODS" />
-		<Property Id="FILE_ASSOCIATION_ODP" />
+    <!-- set to 1 to create file associations for ODF documents -->
+    <Property Id="FILE_ASSOCIATION_ODT" />
+    <Property Id="FILE_ASSOCIATION_ODS" />
+    <Property Id="FILE_ASSOCIATION_ODP" />
 
-		<!-- information for Add/Remove Programs -->
-		<Property Id='ARPCOMMENTS' Value='Version !(wix.VersionNumber)' />
-		<Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata Software Ltd' />
-		<Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
-		<Property Id='ARPHELPLINK' Value='http://odf-converter.sourceforge.net/documentation/installguide.php' />
-		
-		<Property Id="WixShellExecTarget" Value="[#Readme]" />
+    <!-- information for Add/Remove Programs -->
+    <Property Id='ARPCOMMENTS' Value='Version !(wix.VersionNumber)' />
+    <Property Id='ARPCONTACT' Value='Clever Age, DIaLOGIKa, Sonata Software Ltd' />
+    <Property Id='ARPURLINFOABOUT' Value='http://odf-converter.sourceforge.net/' />
+    <Property Id='ARPHELPLINK' Value='http://odf-converter.sourceforge.net/documentation/installguide.php' />
 
-		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    <Property Id="WixShellExecTarget" Value="[#Readme]" />
+
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  USER INTERFACE
              ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-		<UIRef Id="UI" />
-		<UIRef Id="WixUI_ErrorProgressText" />
-		<UI>
-			<Error Id="2000">!(loc.Error2000)</Error>
-		</UI>
+    <UIRef Id="UI" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+    <UI>
+      <Error Id="2000">!(loc.Error2000)</Error>
+    </UI>
 
-		<!-- icon to be displayed under Add/Remove Programs -->
-		<Icon Id="InstallIcon" SourceFile="images\Icon.ico" />
-		<Property Id="ARPPRODUCTICON" Value="InstallIcon" />
+    <!-- icon to be displayed under Add/Remove Programs -->
+    <Icon Id="InstallIcon" SourceFile="images\Icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="InstallIcon" />
 
 
-		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  CUSTOM ACTIONS
              ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-		<CustomAction Id="ShowReadme" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-		<CustomActionRef Id="GetOfficeInfos"/>
-		<CustomAction Id="NewerVersionDetected" Error="2000"/>
-		<CustomAction Id="FileAssociationOdtAssign" Property="FILE_ASSOCIATION_ODT" Value="1" />
+    <CustomAction Id="ShowReadme" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+    <CustomActionRef Id="GetOfficeInfos"/>
+    <CustomAction Id="NewerVersionDetected" Error="2000"/>
+    <CustomAction Id="FileAssociationOdtAssign" Property="FILE_ASSOCIATION_ODT" Value="1" />
 
-		<CustomAction Id="SetMsgBoxTitle" Property="MsgBoxTitle" Value="!(loc.MyDlgTitle)" />
-		<CustomAction Id="SetMsgBoxText" Property="MsgBoxText" Value="!(loc.RestartWarning)"/>
+    <CustomAction Id="SetMsgBoxTitle" Property="MsgBoxTitle" Value="!(loc.MyDlgTitle)" />
+    <CustomAction Id="SetMsgBoxText" Property="MsgBoxText" Value="!(loc.RestartWarning)"/>
 
-		<Property Id="CloseOutlookProgram">
-			<![CDATA[
+    <Property Id="CloseOutlookProgram">
+      <![CDATA[
 				Function Main()
 					on error resume next
 					set outlook = GetObject(, "Outlook.Application")
@@ -140,53 +140,53 @@
 					
 		      End Function
 			]]>
-		</Property>
+    </Property>
 
-		<CustomAction Id="CloseOutlook" VBScriptCall="Main" Property="CloseOutlookProgram" Execute="immediate" Return="check"/>
+    <CustomAction Id="CloseOutlook" VBScriptCall="Main" Property="CloseOutlookProgram" Execute="immediate" Return="check"/>
 
-		<CustomAction Id="SetARPPRODUCTICON" Property="ARPPRODUCTICON" Value="[#OdfConverterLauncher.exe]" />
-		<CustomAction Id="SetARPREADME" Property="ARPREADME" Value="[#Readme]" />
-		<CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
+    <CustomAction Id="SetARPPRODUCTICON" Property="ARPPRODUCTICON" Value="[#OdfConverterLauncher.exe]" />
+    <CustomAction Id="SetARPREADME" Property="ARPREADME" Value="[#Readme]" />
+    <CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
 
 
-		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  FEATURES
              ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-		<FeatureRef Id="WORDADDIN"/>
-		<FeatureRef Id="EXCELADDIN"/>
-		<FeatureRef Id="POWERPOINTADDIN"/>
+    <FeatureRef Id="WORDADDIN"/>
+    <FeatureRef Id="EXCELADDIN"/>
+    <FeatureRef Id="POWERPOINTADDIN"/>
 
-		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  LAUNCH CONDITIONS
              ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
-		<!--<Condition Message="This application requires .NET Framework 2.0 SP1. Please install the .NET Framework including Service Pack 1 then run this installer again.">
+    <!--<Condition Message="This application requires .NET Framework 2.0 SP1. Please install the .NET Framework including Service Pack 1 then run this installer again.">
 			<![CDATA[Installed OR (NETFRAMEWORK20_SP_LEVEL and NOT NETFRAMEWORK20_SP_LEVEL = "#0")]]>
 		</Condition>
 		<Condition Message="Microsoft Word konnte nicht gefunden werden!">WORD2007INSTALLROOT OR WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Condition>
         <Condition Message="Zur Installation des Produkts mÃ¼ssen Sie als administrative Rechte besitzen!">Privileged</Condition>
 		-->
-		
-		<InstallExecuteSequence>
-			<Custom Action="NewerVersionDetected" After="FindRelatedProducts">NEWAPPFOUND</Custom>
-			<Custom Action="FileAssociationOdtAssign" After="LaunchConditions">?FileAssociationOdt</Custom>
 
-			<Custom Action="SetARPPRODUCTICON" After="InstallValidate"></Custom>
-			<Custom Action="SetARPREADME" After="InstallValidate"></Custom>
-			<Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
-			
-			<RemoveExistingProducts After="InstallValidate" />
+    <InstallExecuteSequence>
+      <Custom Action="NewerVersionDetected" After="FindRelatedProducts">NEWAPPFOUND</Custom>
+      <Custom Action="FileAssociationOdtAssign" After="LaunchConditions">?FileAssociationOdt</Custom>
 
-			<!-- action removed because the message is always displayed on Win2k -->
-			<!--<Custom Action="SetMsgBoxTitle" Before="CloseOutlook"></Custom>
+      <Custom Action="SetARPPRODUCTICON" After="InstallValidate"></Custom>
+      <Custom Action="SetARPREADME" After="InstallValidate"></Custom>
+      <Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
+
+      <RemoveExistingProducts After="InstallValidate" />
+
+      <!-- action removed because the message is always displayed on Win2k -->
+      <!--<Custom Action="SetMsgBoxTitle" Before="CloseOutlook"></Custom>
 			<Custom Action="SetMsgBoxText" Before="CloseOutlook"></Custom>-->
-			<!-- Outlook < 2007 uses Word as editor. If Outlook is running, then the addin will only be visible after Outlook has been restarted (see #2025782) -->
-			<!--<Custom Action="CloseOutlook" Before="LaunchConditions">WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Custom>-->
-			
+      <!-- Outlook < 2007 uses Word as editor. If Outlook is running, then the addin will only be visible after Outlook has been restarted (see #2025782) -->
+      <!--<Custom Action="CloseOutlook" Before="LaunchConditions">WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Custom>-->
 
-			<!-- closing applications is buggy, maybe in the future an own custom action could be implemented to handle #2025782 -->
-			<!--<Custom Action="WixCloseApplications" After="InstallInitialize" >NOT Installed</Custom>-->
 
-		</InstallExecuteSequence>
+      <!-- closing applications is buggy, maybe in the future an own custom action could be implemented to handle #2025782 -->
+      <!--<Custom Action="WixCloseApplications" After="InstallInitialize" >NOT Installed</Custom>-->
 
-	</Product>
+    </InstallExecuteSequence>
+
+  </Product>
 </Wix>

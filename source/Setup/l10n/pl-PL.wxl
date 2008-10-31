@@ -27,8 +27,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<WixLocalization Culture="pl-PL" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-	<String Id="lcid" Localizable="no">1045</String>
+<WixLocalization Culture="pl-PL" Codepage="1252" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="lcid" Localizable="no">1045</String>
+  <String Id="CodePage" Localizable="no">1252</String>
+  
   <String Id="ApplicationName">Dodatek ODF dla pakietu Microsoft Office</String>
   <String Id="ReadmePath" Localizable="no">Readme.pl-PL.html</String>
 
@@ -87,5 +89,7 @@
   <String Id="msierrXmlConfigFailedRead">Podczas konfigurowania plików XML wystąpił błąd.</String>
   <String Id="msierrXmlConfigFailedSave">Nie można zapisać zmian w pliku XML [3], błąd systemu: [2]</String>
   <String Id="msierrXmlConfigFailedSelect">Nie można znaleźć węzła: [3] w pliku XML: [4], błąd systemu: [2]</String>
+
+  <String Id="FontFace">Tahoma</String>
   
 </WixLocalization>

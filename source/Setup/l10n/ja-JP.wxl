@@ -27,8 +27,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<WixLocalization Culture="ja-JP" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="ja-JP" Codepage="932" xmlns="http://schemas.microsoft.com/wix/2006/localization">
 	<String Id="lcid" Localizable="no">1041</String>
+  <String Id="CodePage" Localizable="no">932</String>
+  
   <String Id="ApplicationName">Microsoft Office 用 ODF アドイン</String>
   <String Id="ReadmePath" Localizable="no">Readme.ja-JP.html</String>
 
@@ -148,4 +150,5 @@
   <String Id="UITextNewFolder">Folder|新規フォルダ</String>
   <String Id="WelcomeEulaDlgInstall">インストール(&amp;I)</String>
 
+  <String Id="FontFace">MS Sans Serif</String>
 </WixLocalization>

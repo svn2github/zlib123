@@ -30,9 +30,9 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Fragment>
 		<UI Id="UI">
-			<TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
-			<TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
-			<TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+			<TextStyle Id="WixUI_Font_Normal" FaceName="!(loc.FontFace)" Size="8" />
+			<TextStyle Id="WixUI_Font_Bigger" FaceName="!(loc.FontFace)" Size="12" />
+			<TextStyle Id="WixUI_Font_Title" FaceName="!(loc.FontFace)" Size="9" Bold="yes" />
 
 			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
 			<Property Id="WixUI_Mode" Value="InstallDir" />
