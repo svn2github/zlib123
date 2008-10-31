@@ -286,7 +286,7 @@
 
   <xsl:template name="SetSize">
     <xsl:choose>
-      <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln">
+      <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln and not(a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:noFill)">
         <xsl:variable name="border">
           <xsl:call-template name="ConvertEmu3">
             <xsl:with-param name="length">
@@ -308,14 +308,10 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:attribute name="svg:height">
-          <xsl:value-of
-            select="concat(substring-before($height,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"
-          />
+          <xsl:value-of select="concat(substring-before($height,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')" />
         </xsl:attribute>
         <xsl:attribute name="svg:width">
-          <xsl:value-of
-            select="concat(substring-before($width,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"
-          />
+          <xsl:value-of select="concat(substring-before($width,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')" />
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
