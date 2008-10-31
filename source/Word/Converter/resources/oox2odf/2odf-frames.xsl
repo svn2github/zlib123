@@ -453,7 +453,7 @@
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:text>0.32cm</xsl:text>
+          <xsl:text>0cm</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -463,7 +463,7 @@
       <xsl:choose>
         <xsl:when test="$framePr/@w:hSpace">
           <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length" select="$framePr/@w:vSpace" />
+            <xsl:with-param name="length" select="$framePr/@w:hSpace" />
             <xsl:with-param name="unit" select="'cm'" />
           </xsl:call-template>
         </xsl:when>
@@ -712,17 +712,17 @@
 
     <xsl:attribute name="style:wrap">
       <xsl:choose>
-        <xsl:when test="not($wrap) or $wrap ='none'">
-          <xsl:text>none</xsl:text>
+        <xsl:when test="$wrap ='around'">
+          <xsl:text>parallel</xsl:text>
         </xsl:when>
         <xsl:when test="$wrap ='auto'">
           <xsl:text>parallel</xsl:text>
         </xsl:when>
-        <xsl:when test="$wrap ='around'">
-          <xsl:text>parallel</xsl:text>
+        <xsl:when test="$wrap ='none'">
+          <xsl:text>run-through</xsl:text>
         </xsl:when>
         <xsl:when test="$wrap ='notBeside'">
-          <xsl:text>parallel</xsl:text>
+          <xsl:text>none</xsl:text>
         </xsl:when>
         <xsl:when test="$wrap ='through'">
           <xsl:text>parallel</xsl:text>
@@ -730,6 +730,10 @@
         <xsl:when test="$wrap ='tight'">
           <xsl:text>parallel</xsl:text>
         </xsl:when>
+        <xsl:otherwise>
+          <!-- not specified -->
+          <xsl:text>parallel</xsl:text>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>

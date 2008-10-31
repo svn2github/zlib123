@@ -970,22 +970,22 @@
                 or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                 or $frameStyle/style:graphic-properties/@fo:min-width">
         <!-- Sona: The above condition valid only for frames-->
-        <xsl:if test ="parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
+        <xsl:if test="parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
         <xsl:text>mso-wrap-style:none;</xsl:text>
         </xsl:if>
       </xsl:when>
-      <xsl:when test ="(@fo:min-height and parent::draw:frame/@fo:min-width) or parent::draw:frame/@fo:min-width">
+      <xsl:when test="(@fo:min-height and parent::draw:frame/@fo:min-width) or parent::draw:frame/@fo:min-width">
         <!-- Sona: The above condition valid only for frames-->
         <xsl:if test ="parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
         <xsl:text>mso-wrap-style:none;</xsl:text>
         </xsl:if>
       </xsl:when>
-      <xsl:when test ="(not($frameStyle/style:graphic-properties/@fo:wrap-option) or $frameStyle/style:graphic-properties/@fo:wrap-option='wrap')
+      <xsl:when test="(not($frameStyle/style:graphic-properties/@fo:wrap-option) or $frameStyle/style:graphic-properties/@fo:wrap-option='wrap')
                 and not(self::node()[name()='draw:frame']) 
                 and not(parent::node()[name()='draw:frame'])">
         <xsl:text>mso-wrap-style:none;</xsl:text>
       </xsl:when>
-      <xsl:when test ="not($frameStyle/@style:parent-style-name) and (self::node()[name()='draw:frame'] or parent::node()[name()='draw:frame'])">
+      <xsl:when test="not($frameStyle/@style:parent-style-name) and (self::node()[name()='draw:frame'] or parent::node()[name()='draw:frame'])">
       <xsl:text>mso-wrap-style:none;</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -1408,6 +1408,9 @@
         <xsl:message terminate="no">translation.odf2oox.shapeTopBottomWrapping</xsl:message>
         <w10:wrap type="topAndBottom"/>
       </xsl:when>
+      <xsl:when test="$frameWrap='run-through'">
+        <!-- No wrapping. Frame/Shape is in front of text. -->
+      </xsl:when>
       <xsl:when test="$frameWrap='parallel'">
         <xsl:variable name="wrappedPara">
           <xsl:call-template name="GetGraphicProperties">
@@ -1430,7 +1433,7 @@
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when test ="$contour='true'">
-            <w10:wrap type="tight"/>
+                <w10:wrap type="tight"/>
               </xsl:when>
               <xsl:otherwise>
                 <w10:wrap type="square"/>
