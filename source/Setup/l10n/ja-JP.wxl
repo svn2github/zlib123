@@ -150,5 +150,5 @@
   <String Id="UITextNewFolder">Folder|新規フォルダ</String>
   <String Id="WelcomeEulaDlgInstall">インストール(&amp;I)</String>
 
-  <String Id="FontFace">MS Sans Serif</String>
+  <String Id="FontFace">Tahoma</String>
 </WixLocalization>
