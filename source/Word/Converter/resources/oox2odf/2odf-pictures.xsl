@@ -842,6 +842,10 @@
             <xsl:when test="$align = 'from-top' ">
               <xsl:text>from-top</xsl:text>
             </xsl:when>
+            <xsl:otherwise>
+              <!-- Sona: change if the "mso-position-vertical" value is absolute-->
+              <xsl:text>from-top</xsl:text>
+            </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>

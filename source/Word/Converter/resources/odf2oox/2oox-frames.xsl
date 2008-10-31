@@ -969,10 +969,16 @@
                 or ($frameStyle/style:graphic-properties/@fo:min-width and $frame/child::node()/@fo:min-height)                
                 or $frameStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
                 or $frameStyle/style:graphic-properties/@fo:min-width">
+        <!-- Sona: The above condition valid only for frames-->
+        <xsl:if test ="parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
         <xsl:text>mso-wrap-style:none;</xsl:text>
+        </xsl:if>
       </xsl:when>
       <xsl:when test ="(@fo:min-height and parent::draw:frame/@fo:min-width) or parent::draw:frame/@fo:min-width">
+        <!-- Sona: The above condition valid only for frames-->
+        <xsl:if test ="parent::node()[name()='draw:frame'] or self::node()[name()='draw:frame']">
         <xsl:text>mso-wrap-style:none;</xsl:text>
+        </xsl:if>
       </xsl:when>
       <xsl:when test ="(not($frameStyle/style:graphic-properties/@fo:wrap-option) or $frameStyle/style:graphic-properties/@fo:wrap-option='wrap')
                 and not(self::node()[name()='draw:frame']) 
