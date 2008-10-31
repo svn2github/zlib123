@@ -56,43 +56,54 @@
     
     <xsl:param name="length"/> <!-- (number) The length (in twips) to convert -->
     <xsl:param name="unit"/>   <!-- (string) The unit to convert to -->
-    
+
+    <xsl:variable name="result">
+      <xsl:choose>
+        <xsl:when test="$length='0' or $length=''">
+          <xsl:value-of select="concat(0, $unit)"/>
+        </xsl:when>
+        <xsl:when test="$unit = 'cm'">
+          <xsl:value-of select="concat(format-number($length * 2.54 div 1440,'#.###'),'cm')"/>
+        </xsl:when>
+        <xsl:when test="$unit = 'mm'">
+          <xsl:value-of select="concat(format-number($length * 25.4 div 1440,'#.###'),'mm')"/>
+        </xsl:when>
+        <xsl:when test="$unit= 'in'">
+          <xsl:value-of select="concat(format-number($length div 1440,'#.###'),'in')"/>
+        </xsl:when>
+        <xsl:when test="$unit = 'pt'">
+          <xsl:value-of select="concat(format-number($length div 20,'#.###'),'pt')"/>
+        </xsl:when>
+        <xsl:when test="$unit = 'twip'">
+          <xsl:value-of select="concat($length,'twip')"/>
+        </xsl:when>
+        <xsl:when test="$unit = 'pica'">
+          <xsl:value-of select="concat(format-number($length div 240,'#.###'),'pica')"/>
+        </xsl:when>
+        <xsl:when test="$unit = 'dpt'">
+          <xsl:value-of select="concat(format-number($length div 20,'#.###'),'dpt')"/>
+        </xsl:when>
+        <xsl:when test="$unit = 'px'">
+          <xsl:value-of select="concat(format-number($length * 96.19 div 1440,'#.###'),'px')"/>
+        </xsl:when>
+        <xsl:when test="$unit='pct'">
+          <xsl:value-of select="concat(format-number($length div 50, '#.###'), '%')"/>
+        </xsl:when>
+        <xsl:when test="not($length)">
+          <xsl:value-of select="concat(0,'cm')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$length"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:choose>
-      <xsl:when test="$length='0' or $length=''">
-        <xsl:value-of select="concat(0, $unit)"/>
-      </xsl:when>
-      <xsl:when test="$unit = 'cm'">
-        <xsl:value-of select="concat(format-number($length * 2.54 div 1440,'#.###'),'cm')"/>
-      </xsl:when>
-      <xsl:when test="$unit = 'mm'">
-        <xsl:value-of select="concat(format-number($length * 25.4 div 1440,'#.###'),'mm')"/>
-      </xsl:when>
-      <xsl:when test="$unit= 'in'">
-        <xsl:value-of select="concat(format-number($length div 1440,'#.###'),'in')"/>
-      </xsl:when>
-      <xsl:when test="$unit = 'pt'">
-        <xsl:value-of select="concat(format-number($length div 20,'#.###'),'pt')"/>
-      </xsl:when>
-      <xsl:when test="$unit = 'twip'">
-        <xsl:value-of select="concat($length,'twip')"/>
-      </xsl:when>
-      <xsl:when test="$unit = 'pica'">
-        <xsl:value-of select="concat(format-number($length div 240,'#.###'),'pica')"/>
-      </xsl:when>
-      <xsl:when test="$unit = 'dpt'">
-        <xsl:value-of select="concat(format-number($length div 20,'#.###'),'dpt')"/>
-      </xsl:when>
-      <xsl:when test="$unit = 'px'">
-        <xsl:value-of select="concat(format-number($length * 96.19 div 1440,'#.###'),'px')"/>
-      </xsl:when>
-      <xsl:when test="$unit='pct'">
-        <xsl:value-of select="concat(format-number($length div 50, '#.###'), '%')"/>
-      </xsl:when>
-      <xsl:when test="not($length)">
-        <xsl:value-of select="concat(0,'cm')"/>
+      <xsl:when test="contains($result,'NaN')">
+        <xsl:value-of select="concat('0', $unit)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$length"/>
+        <xsl:value-of select="$result"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -248,7 +259,7 @@
         <xsl:value-of select="concat(0,'cm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'cm'">
-        <xsl:value-of select="concat(format-number($length div 360000, '#.##'), 'cm')"/>
+        <xsl:value-of select="concat(format-number($length div 360000, '0.##'), 'cm')"/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -266,7 +277,7 @@
         <xsl:value-of select="concat(0,'cm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'cm'">
-        <xsl:value-of select="concat(format-number($length div 360000, '#.###'), 'cm')"/>
+        <xsl:value-of select="concat(format-number($length div 360000, '0.###'), 'cm')"/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
