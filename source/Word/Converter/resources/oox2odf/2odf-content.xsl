@@ -805,7 +805,9 @@
 	<!-- Detect if there is text before a break page in a paragraph -->
 	<!-- BUG 1583404 - Page breaks not correct converted - 17/07/2007-->
 	<xsl:template match="w:r[w:br[@w:type='page']]">
-		<xsl:if test="preceding-sibling::w:r/w:t[1]">
+    <!--2008-10-31/divo: Fix for #2124338 
+        fo:break-before="page" has no effect for the first paragraph in an ODT document, therefore we need to create an extra paragraph -->
+		<xsl:if test="preceding-sibling::w:r/w:t[1] or not(../preceding-sibling::node())">
 			<pcut:paragraph_to_cut/>
 		</xsl:if>
 		<xsl:apply-templates select="w:t"/>

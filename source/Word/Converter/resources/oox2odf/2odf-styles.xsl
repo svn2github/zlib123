@@ -4351,7 +4351,10 @@
 	<!-- Detect if there is text before a break page in a paragraph -->
 	<!-- BUG 1583404 - Page breaks not correct converted - 09/07/2007-->
 	<xsl:template name="InsertFlagTextBeforeBreakPage1">
-		<xsl:if test="preceding-sibling::w:r/w:t[1]">
+    <!--2008-10-31/divo: Fix for #2124338 
+        fo:break-before="page" has no effect for the first paragraph in an ODT document, therefore we need to create an extra paragraph
+        This more than ugly implementation done in the previous fix for #1583404 show how f****d up this whole XSLT thing really is... -->
+    <xsl:if test="preceding-sibling::w:r/w:t[1] or not(../preceding-sibling::node())">
 			<xsl:attribute name="pcut:cut">
 				<xsl:value-of select="'1'"/>
 			</xsl:attribute>
@@ -4359,7 +4362,10 @@
 	</xsl:template>
 
 	<xsl:template name="InsertFlagTextBeforeBreakPage2">
-		<xsl:if test="parent::w:p/w:r[w:br[@w:type='page']]/preceding-sibling::w:r/w:t[1]">
+    <!--2008-10-31/divo: Fix for #2124338 
+        fo:break-before="page" has no effect for the first paragraph in an ODT document, therefore we need to create an extra paragraph
+        This more than ugly implementation done in the previous fix for #1583404 show how f****d up this whole XSLT thing really is... -->
+    <xsl:if test="parent::w:p/w:r[w:br[@w:type='page']]/preceding-sibling::w:r/w:t[1] or not(../preceding-sibling::node())">
 			<xsl:attribute name="pcut:cut">
 				<xsl:value-of select="'1'"/>
 			</xsl:attribute>
