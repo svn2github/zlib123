@@ -874,7 +874,7 @@
 				</xsl:when>
 			</xsl:choose>
 
-			<xsl:variable name="followingParagraphId">
+			<xsl:variable name="followingBlockEltId">
 				<xsl:call-template name="GetNextItemOnIlvl">
 					<xsl:with-param name="node" select="."/>
 					<xsl:with-param name="ilvl" select="$listLevel"/>
@@ -882,11 +882,11 @@
 				</xsl:call-template>
 			</xsl:variable>
 
-			<xsl:if test="$followingParagraphId != ''">
-				<xsl:variable name="followingParagraphOnLevel" select="following-sibling::w:p[generate-id() = $followingParagraphId]"/>
+			<xsl:if test="$followingBlockEltId != ''">
+				<xsl:variable name="followingBlockEltOnLevel" select="following-sibling::node()[generate-id() = $followingBlockEltId]"/>
 
 				<xsl:call-template name="InsertListLevel">
-					<xsl:with-param name="node" select="$followingParagraphOnLevel"/>
+					<xsl:with-param name="node" select="$followingBlockEltOnLevel"/>
 					<xsl:with-param name="ilvl" select="$listLevel"/>
 					<xsl:with-param name="numId" select="$numId"/>
 					<xsl:with-param name="listLevel" select="$listLevel"/>
@@ -908,7 +908,7 @@
 
 			<xsl:otherwise>
 
-				<xsl:variable name="followingParagraph" select="$node/following-sibling::w:p[1]"/>
+				<xsl:variable name="followingBlockElt" select="$node/following-sibling::node()[1]"/>
 
 				<xsl:choose>
 					<xsl:when test="$listLevel = $ilvl">
@@ -934,22 +934,22 @@
 
 				<xsl:variable name="followingNumId">
 					<xsl:call-template name="GetListProperty">
-						<xsl:with-param name="node" select="$followingParagraph"/>
+						<xsl:with-param name="node" select="$followingBlockElt"/>
 						<xsl:with-param name="property">w:numId</xsl:with-param>
 					</xsl:call-template>
 				</xsl:variable>
 
 				<xsl:variable name="followingIlvl">
 					<xsl:call-template name="GetListProperty">
-						<xsl:with-param name="node" select="$followingParagraph"/>
+						<xsl:with-param name="node" select="$followingBlockElt"/>
 						<xsl:with-param name="property">w:ilvl</xsl:with-param>
 					</xsl:call-template>
 				</xsl:variable>
 
-				<xsl:for-each select="$followingParagraph">
+				<xsl:for-each select="$followingBlockElt">
 					<xsl:choose>
 						<xsl:when test="$followingIlvl &gt; $listLevel and $numId = $followingNumId">
-							<xsl:apply-templates select="$followingParagraph" mode="list">
+							<xsl:apply-templates select="$followingBlockElt" mode="list">
 								<xsl:with-param name="numId" select="$followingNumId"/>
 								<xsl:with-param name="ilvl" select="$followingIlvl"/>
 								<xsl:with-param name="listLevel" select="$listLevel"/>
@@ -957,7 +957,7 @@
 						</xsl:when>
 						<xsl:when test="$followingIlvl = $listLevel and $numId = $followingNumId">
 							<xsl:call-template name="InsertListLevel">
-								<xsl:with-param name="node" select="$followingParagraph"/>
+								<xsl:with-param name="node" select="$followingBlockElt"/>
 								<xsl:with-param name="ilvl" select="$followingIlvl"/>
 								<xsl:with-param name="numId" select="$followingNumId"/>
 								<xsl:with-param name="listLevel" select="$listLevel"/>
@@ -1005,11 +1005,11 @@
 		<xsl:param name="ilvl"/>
 		<xsl:param name="numId"/>
 
-		<xsl:variable name="followingParagraph" select="$node/following-sibling::w:p[1]"/>
+		<xsl:variable name="followingBlockElt" select="$node/following-sibling::node()[1]"/>
 
 		<xsl:variable name="followingNumId">
 			<xsl:call-template name="GetListProperty">
-				<xsl:with-param name="node" select="$followingParagraph"/>
+				<xsl:with-param name="node" select="$followingBlockElt"/>
 				<xsl:with-param name="property">w:numId</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
@@ -1018,19 +1018,19 @@
 			<!-- the list is continued -->
 			<xsl:variable name="followingLevel">
 				<xsl:call-template name="GetListProperty">
-					<xsl:with-param name="node" select="$followingParagraph"/>
+					<xsl:with-param name="node" select="$followingBlockElt"/>
 					<xsl:with-param name="property">w:ilvl</xsl:with-param>
 				</xsl:call-template>
 			</xsl:variable>
 
 			<xsl:choose>
 				<xsl:when test="$followingLevel = $ilvl">
-					<xsl:value-of select="generate-id($followingParagraph)"/>
+					<xsl:value-of select="generate-id($followingBlockElt)"/>
 				</xsl:when>
 
 				<xsl:when test="$followingLevel &gt; $ilvl">
 					<xsl:call-template name="GetNextItemOnIlvl">
-						<xsl:with-param name="node" select="$followingParagraph"/>
+						<xsl:with-param name="node" select="$followingBlockElt"/>
 						<xsl:with-param name="ilvl" select="$ilvl"/>
 						<xsl:with-param name="numId" select="$numId"/>
 					</xsl:call-template>
