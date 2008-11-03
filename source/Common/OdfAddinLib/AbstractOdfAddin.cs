@@ -53,8 +53,8 @@ namespace OdfConverter.OdfConverterLib
         /// </summary>
         protected enum OfficeVersion
         {
-            Office2000 =  9,
-            OfficeXP   = 10,
+            Office2000 = 9,
+            OfficeXP = 10,
             Office2003 = 11,
             Office2007 = 12
         }
@@ -157,17 +157,15 @@ namespace OdfConverter.OdfConverterLib
             }
             if (culture == 0 && _application != null)
             {
-                culture = _application.Invoke("LanguageSettings")
-                    .Invoke("LanguageID", MsoAppLanguageID.msoLanguageIDUI).ToInt32();
+                culture = _application.Invoke("LanguageSettings").Invoke("LanguageID", MsoAppLanguageID.msoLanguageIDUI).ToInt32();
             }
 
             if (culture != 0)
             {
-                System.Threading.Thread.CurrentThread.CurrentUICulture =
-                    new System.Globalization.CultureInfo(culture);
+                System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(culture);
             }
         }
-        
+
         /// <summary>
         ///      Implements the OnConnection method of the IDTExtensibility2 interface.
         ///      Receives notification that the Add-in is being loaded.
@@ -190,11 +188,11 @@ namespace OdfConverter.OdfConverterLib
             int version;
             using (new UILanguageHelper())
             {
-            int.TryParse(_application.GetString("Version"),
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out version);
-            _officeVersion = (OfficeVersion)version;
+                int.TryParse(_application.GetString("Version"),
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out version);
+                _officeVersion = (OfficeVersion)version;
             }
 
             Application.EnableVisualStyles();
@@ -432,7 +430,7 @@ namespace OdfConverter.OdfConverterLib
 
         protected virtual void odfOptions()
         {
-            using (ConfigForm cfgForm = 
+            using (ConfigForm cfgForm =
                 new ConfigForm(this, new System.Resources.ResourceManager("OdfAddinLib.resources.Labels", Assembly.GetExecutingAssembly())))
             {
                 cfgForm.ShowDialog();
@@ -610,5 +608,5 @@ namespace OdfConverter.OdfConverterLib
         }
 
         #endregion
-    } 
+    }
 }
