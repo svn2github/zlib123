@@ -74,6 +74,9 @@
                 <xsl:with-param name="framePr" select="w:pPr/w:framePr" />
               </xsl:call-template>
             </xsl:when>
+            <xsl:when test=".//w:commentReference or .//w:footnoteReference or .//w:endnoteReference or .//w:fldChar or .//w:fldSimple">
+              <xsl:call-template name="InsertParagraphToFrame"/>
+            </xsl:when>
             <xsl:otherwise>
               <text:p>
                 <xsl:attribute name="text:style-name">
