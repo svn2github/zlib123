@@ -30,16 +30,16 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="117D8782-37AF-46E4-8034-0CBE09BB3FD2"
+  <Product Id="A56BA21C-C053-4F0B-9FA1-4732538574C5"
 			 Name="!(loc.ApplicationName)"
 			 Language="!(loc.lcid)"
-       Version="2.5.4938.0"
+       Version="2.5.4955.0"
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
-    <Package Id="E3441847-6FD8-45DD-91C6-E1AC86A14C5F" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"
+    <Package Id="C6C62541-E707-44E3-9D6F-6BF539B64A41" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"
              Languages="!(loc.lcid)" SummaryCodepage="!(loc.CodePage)" />
-    <WixVariable Id='VersionNumber' Value='2.5.4938.0'/>
+    <WixVariable Id='VersionNumber' Value='2.5.4955.0'/>
 
     <!--  IMPORTANT NOTE:
 			  When creating a new release, 
@@ -72,7 +72,6 @@
       <UpgradeVersion Property="NEWAPPFOUND" IncludeMinimum="no" Minimum="!(wix.VersionNumber)"  OnlyDetect="yes"/>
     </Upgrade>
 
-    <WixVariable Id='VersionInfo' Value='Version !(wix.VersionNumber)'/>
     <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)images\bannrbmp.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)images\dlgbmp.bmp" />
 
