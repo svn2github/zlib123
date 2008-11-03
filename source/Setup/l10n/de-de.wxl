@@ -67,6 +67,8 @@
   <String Id="MyDlgTitle">[ProductName] Setup</String>
 	<String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
 
+  <String Id="WelcomeDlgDescription">Setup installiert [ProductName] auf Ihrem Computer. Klicken Sie auf "Weiter", um fortzufahren, oder auf "Abbrechen", um das Setup zu beenden.</String>
+
 	<String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}Dateiverknüpfungen</String>
 	<String Id="MyFileAssociationDlgDescription">OpenDocument-Dateien mit Microsoft Office verknüpfen</String>
 	<String Id="MyFileAssociationDlgDetailedDescription">Bitte wählen Sie die Dateitypen aus, die Sie mit Microsoft Office verknüpfen möchten:</String>
@@ -94,4 +96,6 @@
 	<String Id="msierrXmlConfigFailedSave">Änderungen in XML-Datei [3] konnten nicht gespeichert werden, Systemfehler: [2]</String>
 
   <String Id="FontFace">Tahoma</String>
+
+  <String Id="WixUIRetry" Overridable="yes">&amp;Wiederholen</String>
 </WixLocalization>

@@ -47,15 +47,15 @@
 
   <String Id="FolderNameTemplates">Modèles compatibles avec le format ODF</String>
 
-  <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
+  <String Id="FeatureNameWordAddin">Add-in ODF pour Microsoft Word</String>
   <String Id="FeatureNameTemplates">Modèles compatibles avec le format ODF</String>
-  <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
-  <String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
+  <String Id="FeatureNameExcelAddin">Add-in ODF pour Microsoft Excel</String>
+  <String Id="FeatureNamePowerPointAddin">Add-in ODF pour Microsoft PowerPoint</String>
 
-  <String Id="FeatureDescriptionWordAddin">Installe et enregistre le complément ODF Add-in for Microsoft Word.</String>
+  <String Id="FeatureDescriptionWordAddin">Installe et enregistre le complément ODF Add-in pour Microsoft Word.</String>
   <String Id="FeatureDescriptionTemplates">Installe une série de modèles Word spécialement conçus pour une interopérabilité avec le format ODF pour l'utilisateur actuel.</String>
-  <String Id="FeatureDescriptionExcelAddin">Installe et enregistre le complément ODF Add-in for Microsoft Excel.</String>
-  <String Id="FeatureDescriptionPowerPointAddin">Installe et enregistre le complément ODF Add-in for Microsoft Powerpoint.</String>
+  <String Id="FeatureDescriptionExcelAddin">Installe et enregistre le complément ODF Add-in pour Microsoft Excel.</String>
+  <String Id="FeatureDescriptionPowerPointAddin">Installe et enregistre le complément ODF Add-in pour Microsoft Powerpoint.</String>
 
   <String Id="TemplateTitleODFFax">Fax compatible avec le format ODF</String>
   <String Id="TemplateTitleODFLetter">Lettre compatible avec le format ODF</String>
