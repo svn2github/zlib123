@@ -37,7 +37,7 @@
 			 Manufacturer="OpenXML/ODF Translator Team"
 			 UpgradeCode="7650D566-0CE2-4D71-8799-CF86735C15CC">
 
-    <Package Id="" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"
+    <Package Id="E3441847-6FD8-45DD-91C6-E1AC86A14C5F" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated"
              Languages="!(loc.lcid)" SummaryCodepage="!(loc.CodePage)" />
     <WixVariable Id='VersionNumber' Value='2.5.4938.0'/>
 
