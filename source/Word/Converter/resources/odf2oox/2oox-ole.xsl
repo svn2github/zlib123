@@ -79,7 +79,7 @@
           Insert linked object but not embedded ODF object.
           (embedded ODF objects are also draw:object elements)
           -->
-          <xsl:when test="draw:object and substring-after(draw:object/@xlink:href, './')=''">
+          <xsl:when test="draw:object and not(starts-with(draw:object/@xlink:href, './'))">
             <xsl:call-template name="InsertExternalObject">
               <xsl:with-param name="shapeId" select="$shapeId" />
               <xsl:with-param name="object" select="draw:object" />
