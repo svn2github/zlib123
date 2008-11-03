@@ -59,7 +59,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         protected const string EXPORT_ODF_FILE_FILTER_OTT = " (*.ott)|*.ott|";
 
         protected const string HKCU_KEY = @"HKEY_CURRENT_USER\Software\OpenXML-ODF Translator\ODF Add-in for Word";
-        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML - ODF Translator\ODF Add-in for Word";
+        protected const string HKLM_KEY = @"HKEY_LOCAL_MACHINE\SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Word";
 
         /// <summary>
         /// Class name for Word12 documents
