@@ -43,25 +43,51 @@
   MATCHING TEMPLATES
   *************************************************************************
   -->
-  
+
   <!--
-  Summary: Handles the conversion of inline tables.
+  Summary: Handles the conversion of inline and floating tables.
   -->
-  <xsl:template match="w:tbl[not(w:tblPr/w:tblpPr)]">
-    <table:table>
-      <xsl:attribute name="table:style-name">
-        <xsl:value-of select="generate-id(self::w:tbl)"/>
-      </xsl:attribute>
-      <!--TODO: @table:style-name -->
-      <xsl:apply-templates select="w:tblGrid"/>
-      <xsl:apply-templates select="w:tr"/>
-    </table:table>
+  <xsl:template match="w:tbl">
+    <xsl:choose>
+      <xsl:when test="not(w:tblPr/w:tblpPr)">
+        <!-- convert inline table -->
+        <xsl:call-template name="InsertTable" />
+      </xsl:when>
+      <xsl:when test=".//w:commentReference or .//w:footnoteReference or .//w:endnoteReference or .//w:fldChar or .//w:fldSimple">
+        <!--Floating tables with notes, comments and fields do not open in OOo. 
+            They also do not open in Word after a roundtrip because they will be placed within a shape -->
+        <xsl:call-template name="InsertTable" />
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- position floating tables using a frame -->
+        <text:p text:style-name="http://www.dialogika.de/stylename/hiddenParagraph">
+          <draw:frame>
+            <xsl:attribute name="draw:style-name">
+              <xsl:value-of select="generate-id(w:tblPr/w:tblpPr)"/>
+            </xsl:attribute>
+            <xsl:attribute name="draw:name">
+              <xsl:value-of select="concat('Frame', generate-id(w:tblPr/w:tblpPr))"/>
+            </xsl:attribute>
+            <xsl:call-template name="InsertTableFramePosition">
+              <xsl:with-param name="tblPr" select="w:tblPr" />
+            </xsl:call-template>
+            <xsl:call-template name="InsertTableFrameWidth">
+              <xsl:with-param name="tblPr" select="w:tblPr" />
+            </xsl:call-template>
+            <draw:text-box>
+              <xsl:call-template name="InsertTable" />
+            </draw:text-box>
+          </draw:frame>
+        </text:p>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
   <!--
   Summary: Handles the conversion of positioned tables.
   -->
-  <xsl:template match="w:tbl[w:tblPr/w:tblpPr]">
+  <!--<xsl:template match="w:tbl[w:tblPr/w:tblpPr]">
     <text:p text:style-name="http://www.dialogika.de/stylename/hiddenParagraph">
       <draw:frame>
         <xsl:attribute name="draw:style-name">
@@ -81,18 +107,18 @@
             <xsl:attribute name="table:style-name">
               <xsl:value-of select="generate-id(self::w:tbl)"/>
             </xsl:attribute>
-            <!--TODO: @table:style-name -->
+            --><!--TODO: @table:style-name --><!--
             <xsl:apply-templates select="w:tblGrid"/>
             <xsl:apply-templates select="w:tr"/>
           </table:table>
         </draw:text-box>
       </draw:frame>
     </text:p>
-  </xsl:template>
+  </xsl:template>-->
 
   <xsl:template match="w:tblPr" mode="automaticstyles">
     <xsl:apply-templates select="w:tblpPr" mode="automaticstyles" />
-    
+
     <style:style style:name="{generate-id(parent::w:tbl)}" style:family="table">
       <xsl:if test="w:tblStyle">
         <xsl:attribute name="style:parent-style-name">
@@ -207,7 +233,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <xsl:template match="w:trPr" mode="automaticstyles">
     <style:style style:name="{generate-id(parent::w:tr)}" style:family="table-row">
       <style:table-row-properties>
@@ -216,7 +242,7 @@
     </style:style>
   </xsl:template>
 
-  
+
   <xsl:template match="w:tc">
     <xsl:choose>
       <!-- for w:vMerge="continuous" cells, create a table:covered-table-cell element -->
@@ -273,7 +299,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <xsl:template match="w:tcPr" mode="automaticstyles">
     <style:style style:name="{generate-id(parent::w:tc)}" style:family="table-cell">
       <xsl:if test="w:tcStyle">
@@ -290,12 +316,28 @@
     </style:style>
   </xsl:template>
 
-  
+
   <!-- 
   *************************************************************************
   CALLED TEMPLATES
   *************************************************************************
   -->
+
+  <!--
+  Summary:  Converts inline and floating tables
+  Author:   divo (DIaLOGIKa)
+  Params:   none
+  -->
+  <xsl:template name="InsertTable">
+    <table:table>
+      <xsl:attribute name="table:style-name">
+        <xsl:value-of select="generate-id(self::w:tbl)"/>
+      </xsl:attribute>
+      <!--TODO: @table:style-name -->
+      <xsl:apply-templates select="w:tblGrid"/>
+      <xsl:apply-templates select="w:tr"/>
+    </table:table>
+  </xsl:template>
 
   <!--
   Summary:  Converts the width of a positioned Word table to draw:frame properties
@@ -330,8 +372,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
+
+
   <!--
   Summary:  Converts the positioning properties of a Word table to draw:frame properties
   Author:   makz (DIaLOGIKa)
@@ -392,7 +434,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>
-    
+
     <xsl:attribute name="style:vertical-pos">
       <xsl:choose>
         <xsl:when test="$tblpPr/@w:tblpYSpec = 'top'">
@@ -409,7 +451,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>
-    
+
     <xsl:attribute name="style:horizontal-rel">
       <xsl:choose>
         <xsl:when test="$tblpPr/@w:horzAnchor='page'">
@@ -423,7 +465,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>
-    
+
     <xsl:attribute name="style:horizontal-pos">
       <xsl:choose>
         <xsl:when test="$tblpPr/@w:tblpXSpec = 'left'">
@@ -441,8 +483,8 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-                
-                
+
+
   <!--
   Summary:  Inserts a certain amount of empty cells into a row
   Author:   makz (DIaLOGIKa)
@@ -457,14 +499,14 @@
       <table:table-cell>
         <text:p/>
       </table:table-cell>
-           
+
       <xsl:call-template name="InsertEmptyCells">
         <xsl:with-param name="iterator" select ="$iterator + 1" />
         <xsl:with-param name="count" select ="$count" />
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
+
   <!-- compute the number of rows that are spanned by context cell -->
   <xsl:template name="ComputeNumberRowsSpanned">
     <xsl:param name="cellPosition"/>
@@ -497,20 +539,20 @@
         <xsl:choose>
           <!-- go to the following row -->
           <xsl:when test="w:tcPr/w:vMerge and not(w:tcPr/w:vMerge/@w:val = 'restart')">
-             <xsl:choose>
-               <xsl:when test="not(parent::w:tr/following-sibling::w:tr[1]/w:tc[1])">
-                 <!-- Bug #1694962 -->
-                 <xsl:value-of select="$rowCount +2"/>
-               </xsl:when>
-               <xsl:otherwise>
-                 <xsl:for-each select="parent::w:tr/following-sibling::w:tr[1]/w:tc[1]">
-                   <xsl:call-template name="ComputeNumberRowsSpannedUsingCells">
-                     <xsl:with-param name="cellPosition" select="$cellPosition"/>
-                     <xsl:with-param name="rowCount" select="$rowCount+1"/>
-                   </xsl:call-template>
-                 </xsl:for-each>
-               </xsl:otherwise>
-             </xsl:choose>
+            <xsl:choose>
+              <xsl:when test="not(parent::w:tr/following-sibling::w:tr[1]/w:tc[1])">
+                <!-- Bug #1694962 -->
+                <xsl:value-of select="$rowCount +2"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:for-each select="parent::w:tr/following-sibling::w:tr[1]/w:tc[1]">
+                  <xsl:call-template name="ComputeNumberRowsSpannedUsingCells">
+                    <xsl:with-param name="cellPosition" select="$cellPosition"/>
+                    <xsl:with-param name="rowCount" select="$rowCount+1"/>
+                  </xsl:call-template>
+                </xsl:for-each>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$rowCount"/>
@@ -562,7 +604,7 @@
   <!--  insert table properties: width, align, indent-->
   <xsl:template name="InsertTableProperties">
     <xsl:param name="Default"/>
-    
+
     <xsl:choose>
       <xsl:when test="w:tblW/@w:type='pct'">
         <xsl:attribute name="style:rel-width">
@@ -681,8 +723,8 @@
     <xsl:param name="gridWidth" />
     <xsl:param name="tblW" />
 
-      <xsl:choose>
-        <xsl:when test="$tblW/@w:type='pct'">
+    <xsl:choose>
+      <xsl:when test="$tblW/@w:type='pct'">
         <!-- table and cell width are relative values -->
         <xsl:attribute name="style:rel-column-width">
           <xsl:value-of select="concat(($gridCol/@w:w * 10000) div $gridWidth, '*')" />
@@ -701,7 +743,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
 
   <!--
   Summary:  Inserts the indent of a table.
@@ -724,18 +766,18 @@
         <xsl:with-param name="styleName" select="$tblPr/w:tblStyle/@w:val" />
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:attribute name="fo:margin-left">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$tableIndent - $cellMargin"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+          <xsl:value-of select="$tableIndent - $cellMargin"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
     </xsl:attribute>
   </xsl:template>
-  
-  
+
+
   <!--
   Summary:  Insert cells properties: vertical align, margins, borders  
   Author:   Clever Age
@@ -754,7 +796,7 @@
     <xsl:variable name="mstyleId">
       <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId=$mstyleId or @w:styleId=concat('CONTENT_',$mstyleId)]">
         <xsl:variable name="mstyle" select="key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
@@ -823,7 +865,7 @@
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
-    
+
     <!-- borders -->
     <xsl:call-template name="InsertLeftCellBorder" />
     <xsl:call-template name="InsertRightCellBorder" />
@@ -928,8 +970,8 @@
     </xsl:choose>
 
   </xsl:template>
-  
-  
+
+
   <!--
   Summary:  Inserts the left border of the cell
   Author:   makz (DIaLOGIKa)
@@ -943,105 +985,105 @@
     <xsl:param name="tcBorders" select="w:tcBorders"/>
     <xsl:param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
     <xsl:param name="contextCell" select="parent::w:tc"/>
-    
-      <xsl:choose>
-        <xsl:when test="$contextCell/preceding-sibling::w:tc">
-          <!-- the cell is somewhere in the table -->
-          <xsl:choose>
-            <xsl:when test="$tcBorders/w:left">
-              <!-- use the left border of the cell definition -->
-              <xsl:call-template name="InsertBorderSide">
-                <xsl:with-param name="side" select="$tcBorders/w:left"/>
-                <xsl:with-param name="sideName" select="'left'"/>
-                <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="$tblBorders/w:insideV">
-              <!-- use the inside vertical border of the table definition -->
-              <xsl:call-template name="InsertBorderSide">
-                <xsl:with-param name="side" select="$tblBorders/w:insideV"/>
-                <xsl:with-param name="sideName" select="'left'"/>
-                <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="$styleId = 'TableGrid'">
-              <!-- use the default border -->
-              <xsl:call-template name="InsertDefaultCellBorder">
-                <xsl:with-param name="sideName" select="'left'" />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
-              <!-- use the style -->
-              <xsl:choose>
-                <xsl:when test="key('StyleId', $styleId)">
-                  <xsl:call-template name="InsertLeftCellBorder">
-                    <xsl:with-param name="contextCell" select="$contextCell"/>
-                    <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
-                    <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
-                    <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
-                  <xsl:call-template name="InsertLeftCellBorder">
-                    <xsl:with-param name="contextCell" select="$contextCell"/>
-                    <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
-                    <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
-                    <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
-                  </xsl:call-template>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <!-- the cell is at the left border -->
-          <xsl:choose>
-            <xsl:when test="$tcBorders/w:left">
-              <!-- use the left border of the cell definition -->
-              <xsl:call-template name="InsertBorderSide">
-                <xsl:with-param name="side" select="$tcBorders/w:left"/>
-                <xsl:with-param name="sideName" select="'left'"/>
-                <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="$tblBorders/w:left">
-              <!-- use the left border of the table definition -->
-              <xsl:call-template name="InsertBorderSide">
-                <xsl:with-param name="side" select="$tblBorders/w:left"/>
-                <xsl:with-param name="sideName" select="'left'"/>
-                <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="$styleId = 'TableGrid'">
-              <!-- use the default border -->
-              <xsl:call-template name="InsertDefaultCellBorder">
-                <xsl:with-param name="sideName" select="'left'" />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
-              <!-- use the style -->
-              <xsl:choose>
-                <xsl:when test="key('StyleId', $styleId)">
-                  <xsl:call-template name="InsertLeftCellBorder">
-                    <xsl:with-param name="contextCell" select="$contextCell"/>
-                    <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
-                    <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
-                    <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
-                  <xsl:call-template name="InsertLeftCellBorder">
-                    <xsl:with-param name="contextCell" select="$contextCell"/>
-                    <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
-                    <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
-                    <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
-                  </xsl:call-template>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
+
+    <xsl:choose>
+      <xsl:when test="$contextCell/preceding-sibling::w:tc">
+        <!-- the cell is somewhere in the table -->
+        <xsl:choose>
+          <xsl:when test="$tcBorders/w:left">
+            <!-- use the left border of the cell definition -->
+            <xsl:call-template name="InsertBorderSide">
+              <xsl:with-param name="side" select="$tcBorders/w:left"/>
+              <xsl:with-param name="sideName" select="'left'"/>
+              <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$tblBorders/w:insideV">
+            <!-- use the inside vertical border of the table definition -->
+            <xsl:call-template name="InsertBorderSide">
+              <xsl:with-param name="side" select="$tblBorders/w:insideV"/>
+              <xsl:with-param name="sideName" select="'left'"/>
+              <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'left'" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
+            <!-- use the style -->
+            <xsl:choose>
+              <xsl:when test="key('StyleId', $styleId)">
+                <xsl:call-template name="InsertLeftCellBorder">
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
+                  <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
+                  <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
+                  <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
+                <xsl:call-template name="InsertLeftCellBorder">
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
+                  <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
+                  <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
+                  <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- the cell is at the left border -->
+        <xsl:choose>
+          <xsl:when test="$tcBorders/w:left">
+            <!-- use the left border of the cell definition -->
+            <xsl:call-template name="InsertBorderSide">
+              <xsl:with-param name="side" select="$tcBorders/w:left"/>
+              <xsl:with-param name="sideName" select="'left'"/>
+              <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$tblBorders/w:left">
+            <!-- use the left border of the table definition -->
+            <xsl:call-template name="InsertBorderSide">
+              <xsl:with-param name="side" select="$tblBorders/w:left"/>
+              <xsl:with-param name="sideName" select="'left'"/>
+              <xsl:with-param name="emulateOpenOfficeTableBorders" select="'true'" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$styleId = 'TableGrid'">
+            <!-- use the default border -->
+            <xsl:call-template name="InsertDefaultCellBorder">
+              <xsl:with-param name="sideName" select="'left'" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="key('StyleId', $styleId) or key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
+            <!-- use the style -->
+            <xsl:choose>
+              <xsl:when test="key('StyleId', $styleId)">
+                <xsl:call-template name="InsertLeftCellBorder">
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
+                  <xsl:with-param name="styleId" select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
+                  <xsl:with-param name="tcBorders" select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
+                  <xsl:with-param name="tblBorders" select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
+                <xsl:call-template name="InsertLeftCellBorder">
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
+                  <xsl:with-param name="styleId" select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
+                  <xsl:with-param name="tcBorders" select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
+                  <xsl:with-param name="tblBorders" select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 
@@ -1300,7 +1342,7 @@
 
     <xsl:variable name="cellPos" select="count($contextCell/preceding-sibling::*) + 1"  />
     <xsl:variable name="isMerged" select="$contextRow/following-sibling::w:tr[1]/w:tc[$cellPos]/w:tcPr/w:vMerge"/>
-    
+
     <xsl:choose>
       <xsl:when test="$contextRow/following-sibling::w:tr and not($isMerged)">
         <!-- the cell is somewhere in the table -->
@@ -1418,7 +1460,7 @@
       <xsl:text>0.002cm solid #000000</xsl:text>
     </xsl:attribute>
   </xsl:template>
-  
+
 
   <!--  insert row properties: height-->
   <xsl:template name="InsertRowProperties">
@@ -1491,7 +1533,7 @@
   <xsl:template name="GetLeftCellMargin">
     <xsl:param name="tblPr" />
     <xsl:param name="styleName" />
-    
+
     <xsl:choose>
       <xsl:when test="$tblPr/w:tblCellMar/w:left and $tblPr/w:tblCellMar/w:left/@w:type='dxa'">
         <!-- Direct Formatting -->
@@ -1556,5 +1598,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
