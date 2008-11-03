@@ -35,13 +35,19 @@
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLDIR" Name="OpenXML-ODF Translator">
 					<Component Id="OdfAddinLib.dll" Guid="782239E9-5D48-411E-B58C-54B6622CA1DC">
-						<File Name="$(var.OdfAddinLib.TargetFileName)" Source="$(var.OdfAddinLib.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="$(var.OdfAddinLib.TargetFileName)" Source="$(var.OdfAddinLib.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_OdfAddinLib.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="OdfConverterLib.dll" Guid="6A4DF956-833E-45FD-875D-7B3A51B6B0FD">
-						<File Name="$(var.OdfConverterLib.TargetFileName)" Source="$(var.OdfConverterLib.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="$(var.OdfConverterLib.TargetFileName)" Source="$(var.OdfConverterLib.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_OdfConverterLib.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="OdfZipUtils.dll" Guid="3CAF0C15-1ED7-4626-AE2C-E614E03CCC50">
-						<File Name="$(var.OdfZipUtils.TargetFileName)" Source="$(var.OdfZipUtils.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="$(var.OdfZipUtils.TargetFileName)" Source="$(var.OdfZipUtils.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_OdfZipUtils.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 
 					<Component Id="OdfConverterLauncher.exe" Guid="C07275F3-7D22-435E-A216-D92C15D341FC">
@@ -56,7 +62,9 @@
 					</Component>
 
 					<Component Id="OdfPowerPointAddin.dll" Guid="6DD1293B-6213-42F3-B3A0-014BE22BE114">
-						<File Name="$(var.OdfPowerPointAddin.TargetFileName)" Source="$(var.OdfPowerPointAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="$(var.OdfPowerPointAddin.TargetFileName)" Source="$(var.OdfPowerPointAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_OdfPowerPointAddin.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="OdfPowerPointAddinShim.dll" Guid="C9DB8740-1EF4-4B2E-B2ED-E85D22329667">
 						<!--<File Name="OdfPowerPointAddinShim.dll" Source="..\Presentation\OdfPowerPointAddinShim\$(var.Configuration)\OdfPowerPointAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
@@ -68,7 +76,9 @@
 					</Component>
 
 					<Component Id="OdfExcelAddin.dll" Guid="942084FA-171C-4258-8663-6520F610D585">
-						<File Name="$(var.OdfExcelAddin.TargetFileName)" Source="$(var.OdfExcelAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="$(var.OdfExcelAddin.TargetFileName)" Source="$(var.OdfExcelAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_OdfExcelAddin.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="OdfExcelAddinShim.dll" Guid="4BD5EA03-B96C-4D82-A850-105D25895C12">
 						<!--<File Name="OdfExcelAddinShim.dll" Source="..\Spreadsheet\OdfExcelAddinShim\$(var.Configuration)\OdfExcelAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
@@ -80,7 +90,9 @@
 					</Component>
 
 					<Component Id="OdfWordAddin.dll" Guid="BB244339-58C5-4649-A670-F53063E28009">
-						<File Name="$(var.OdfWordAddin.TargetFileName)" Source="$(var.OdfWordAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="$(var.OdfWordAddin.TargetFileName)" Source="$(var.OdfWordAddin.TargetPath)" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_OdfWordAddin.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="OdfWordAddinShim.dll" Guid="B21B741D-13DF-48F4-8D18-3A039F3D71E7">
 						<!--<File Name="OdfWordAddinShim.dll" Source="..\Word\OdfWordAddinShim\$(var.Configuration)\OdfWordAddinShim.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
@@ -92,7 +104,9 @@
 					</Component>
 
 					<Component Id="PresentationConverter.dll" Guid="5B2F786B-AFFA-4557-BE2F-9072DA9B6681">
-						<File Name="PresentationConverter.dll" Source="..\Presentation\Converter\bin\$(var.Configuration)\PresentationConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="PresentationConverter.dll" Source="..\Presentation\Converter\bin\$(var.Configuration)\PresentationConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_PresentationConverter.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="PresentationConverter2Odf.dll" Guid="E56B29F7-CF92-4A1E-9454-76DC3747F275">
 						<File Name="PresentationConverter2Odf.dll" Source="..\Presentation\Converter\bin\PresentationConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
@@ -106,7 +120,9 @@
 					</Component>
 
 					<Component Id="SpreadsheetConverter.dll" Guid="55AC6AB5-BC9F-493B-A51C-1A15F2B39CDF">
-						<File Name="SpreadsheetConverter.dll" Source="..\Spreadsheet\Converter\bin\$(var.Configuration)\SpreadsheetConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="SpreadsheetConverter.dll" Source="..\Spreadsheet\Converter\bin\$(var.Configuration)\SpreadsheetConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_SpreadsheetConverter.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="SpreadsheetConverter2Odf.dll" Guid="DFC1801C-EA21-417C-BF8C-07CEA7CD70C1">
 						<File Name="SpreadsheetConverter2Odf.dll" Source="..\Spreadsheet\Converter\bin\SpreadsheetConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
@@ -120,7 +136,9 @@
 					</Component>
 
 					<Component Id="WordprocessingConverter.dll" Guid="422002BF-1AD8-47EF-8387-9A8846645502">
-						<File Name="WordprocessingConverter.dll" Source="..\Word\Converter\bin\$(var.Configuration)\WordprocessingConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+            <File Name="WordprocessingConverter.dll" Source="..\Word\Converter\bin\$(var.Configuration)\WordprocessingConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+              <netfx:NativeImage Id="ngen_WordprocessingConverter.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
+            </File>
 					</Component>
 					<Component Id="WordprocessingConverter2Odf.dll" Guid="9D787C83-5F8D-4CD5-A38B-04E122184A78">
 						<File Name="WordprocessingConverter2Odf.dll" Source="..\Word\Converter\bin\WordprocessingConverter2Odf.dll" DiskId="1" KeyPath="yes" Checksum="yes">
@@ -154,76 +172,76 @@
 
 					<Directory Id="fr_FR" Name="fr-FR">
 						<Component Id="fr_FR_OdfAddinLib.resources.dll" Guid="963813CC-1D3E-480B-90A4-2C73D295F324">
-							<File Id="fr_FR_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="fr_FR_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\fr-FR\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="fr_FR_OdfPowerPointAddin.resources.dll" Guid="440BAAC6-0650-4586-B6A8-8A5C9806B028">
-							<File Id="fr_FR_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="fr_FR_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\fr-FR\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="fr_FR_OdfExcelAddin.resources.dll" Guid="F7507E29-DF34-48E3-A589-B3934693A4F7">
-							<File Id="fr_FR_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="fr_FR_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\fr-FR\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="fr_FR_OdfWordAddin.resources.dll" Guid="6A2E932F-C038-4C11-9B9C-5AA3773E22B8">
-							<File Id="fr_FR_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="fr_FR_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\fr-FR\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 					</Directory>
 
 					<Directory Id="ja_JP" Name="ja-JP">
 						<Component Id="ja_JP_OdfAddinLib.resources.dll" Guid="35E43FE4-AD52-4A66-BCFF-0D7DA0C81E44">
-							<File Id="ja_JP_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="ja_JP_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\ja-JP\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="ja_JP_OdfPowerPointAddin.resources.dll" Guid="9478074C-6EC8-4208-8F2B-F1A31B0D2079">
-							<File Id="ja_JP_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="ja_JP_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\ja-JP\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="ja_JP_OdfExcelAddin.resources.dll" Guid="55400510-D1EC-4C79-85B9-3FEDBBA269D3">
-							<File Id="ja_JP_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="ja_JP_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\ja-JP\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="ja_JP_OdfWordAddin.resources.dll" Guid="E56DF382-3B1F-4EA5-BFE0-4C2165D29B36">
-							<File Id="ja_JP_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="ja_JP_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\ja-JP\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 					</Directory>
 
 					<Directory Id="nl_NL" Name="nl-NL">
 						<Component Id="nl_NL_OdfAddinLib.resources.dll" Guid="596400D6-77F9-47CF-B31E-288EEB3A343D">
-							<File Id="nl_NL_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="nl_NL_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\nl-NL\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="nl_NL_OdfPowerPointAddin.resources.dll" Guid="2E20B760-2F96-4EA8-B0EE-F401C8DC8776">
-							<File Id="nl_NL_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="nl_NL_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\nl-NL\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="nl_NL_OdfExcelAddin.resources.dll" Guid="6EF4350D-2BB7-4F08-B915-F96C7AEE761B">
-							<File Id="nl_NL_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="nl_NL_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\nl-NL\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="nl_NL_OdfWordAddin.resources.dll" Guid="6A994306-3656-4524-B3B7-7B5673D332DF">
-							<File Id="nl_NL_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="nl_NL_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\nl-NL\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 					</Directory>
 
 					<Directory Id="pl_PL" Name="pl-PL">
 						<Component Id="pl_PL_OdfAddinLib.resources.dll" Guid="E51D9B36-69ED-4958-8DA1-77A0DE12D81B">
-							<File Id="pl_PL_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="pl_PL_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\pl-PL\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="pl_PL_OdfPowerPointAddin.resources.dll" Guid="67C50D1B-4826-4988-9010-64EAC91B3322">
-							<File Id="pl_PL_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="pl_PL_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\pl-PL\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="pl_PL_OdfExcelAddin.resources.dll" Guid="516A94E2-FC38-4A0B-9753-341A53BD0E60">
-							<File Id="pl_PL_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="pl_PL_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\pl-PL\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="pl_PL_OdfWordAddin.resources.dll" Guid="70767388-0A5C-4CB0-A59E-8B7680D796CA">
-							<File Id="pl_PL_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="pl_PL_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\pl-PL\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 					</Directory>
 
 					<Directory Id="zh_CHS" Name="zh-CHS">
 						<Component Id="zh_CHS_OdfAddinLib.resources.dll" Guid="E3628CEC-A858-4A7E-BF55-0D4EA752C002">
-							<File Id="zh_CHS_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\de-DE\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="zh_CHS_OdfAddinLib.resources.dll" Name="OdfAddinLib.resources.dll" Source="$(var.OdfAddinLib.TargetDir)\zh-CHS\OdfAddinLib.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="zh_CHS_OdfPowerPointAddin.resources.dll" Guid="5810E638-3BC2-4C4C-9F31-F74F7B34EB7A">
-							<File Id="zh_CHS_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\de-DE\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="zh_CHS_OdfPowerPointAddin.resources.dll" Name="OdfPowerPointAddin.resources.dll" Source="$(var.OdfPowerPointAddin.TargetDir)\zh-CHS\OdfPowerPointAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="zh_CHS_OdfExcelAddin.resources.dll" Guid="2C0D3068-41E0-4262-81CB-27F8DA0573A5">
-							<File Id="zh_CHS_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\de-DE\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="zh_CHS_OdfExcelAddin.resources.dll" Name="OdfExcelAddin.resources.dll" Source="$(var.OdfExcelAddin.TargetDir)\zh-CHS\OdfExcelAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 						<Component Id="zh_CHS_OdfWordAddin.resources.dll" Guid="846779A3-93F9-42C6-B2FA-EAC89E40D7E7">
-							<File Id="zh_CHS_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\de-DE\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
+							<File Id="zh_CHS_OdfWordAddin.resources.dll" Name="OdfWordAddin.resources.dll" Source="$(var.OdfWordAddin.TargetDir)\zh-CHS\OdfWordAddin.resources.dll" DiskId="1" KeyPath="yes" Checksum="yes"/>
 						</Component>
 					</Directory>
 
@@ -409,7 +427,7 @@
 
 					<RegistryValue Id="RegLoadBehaviorAddinMachineWord" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
 					<RegistryValue Id="RegFriendlyNameAddinMachineWord" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
-					<RegistryValue Id="RegVersionAddinMachineWord"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
+					<RegistryValue Id="RegVersionAddinMachineWord"      Type="string" Name="Description" Value="Version !(wix.VersionNumber)"/>
 				</RegistryKey>
 
 				<!-- ADDIN OPTIONS -->
@@ -433,7 +451,7 @@
 
 					<RegistryValue Id="RegLoadBehaviorAddinMachineExcel" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
 					<RegistryValue Id="RegFriendlyNameAddinMachineExcel" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
-					<RegistryValue Id="RegVersionAddinMachineExcel"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
+					<RegistryValue Id="RegVersionAddinMachineExcel"      Type="string" Name="Description" Value="Version !(wix.VersionNumber)"/>
 				</RegistryKey>
 
 				<!-- ADDIN OPTIONS -->
@@ -457,7 +475,7 @@
 
 					<RegistryValue Id="RegLoadBehaviorAddinMachinePowerPoint" Type="integer" Name="LoadBehavior" Value="3" KeyPath="yes"/>
 					<RegistryValue Id="RegFriendlyNameAddinMachinePowerPoint" Type="string" Name="FriendlyName" Value="!(loc.ApplicationName)"/>
-					<RegistryValue Id="RegVersionAddinMachinePowerPoint"      Type="string" Name="Description" Value="!(wix.VersionInfo)"/>
+					<RegistryValue Id="RegVersionAddinMachinePowerPoint"      Type="string" Name="Description" Value="Version !(wix.VersionNumber)"/>
 				</RegistryKey>
 
 				<!-- ADDIN OPTIONS -->
