@@ -5006,8 +5006,8 @@
 	<!-- widow and orphan-->
 	<xsl:template name="InsertParagraphWidowControl">
 		<xsl:choose>
-			<xsl:when
-			  test="w:widowControl/@w:val='0' or w:widowControl/@w:val='false' or w:widowControl/@w:val='off' or not(w:widowControl) ">
+      <!-- Note that in Word a missing w:widowControl element means that widow control is enabled -->
+			<xsl:when test="w:widowControl/@w:val='0' or w:widowControl/@w:val='false' or w:widowControl/@w:val='off' ">
 				<xsl:attribute name="fo:widows">0</xsl:attribute>
 				<xsl:attribute name="fo:orphans">0</xsl:attribute>
 			</xsl:when>
