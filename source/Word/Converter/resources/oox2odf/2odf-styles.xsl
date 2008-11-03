@@ -867,7 +867,14 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- font weigth -->
+  <!-- shading on runs -->
+  <xsl:template match="w:shd" mode="rPrChildren">
+    <xsl:attribute name="fo:background-color">
+      <xsl:call-template name="ComputeShading"/>
+    </xsl:attribute>
+  </xsl:template>
+
+	<!-- font weight -->
 	<xsl:template match="w:b" mode="rPrChildren">
 		<xsl:attribute name="fo:font-weight">
 			<xsl:choose>
