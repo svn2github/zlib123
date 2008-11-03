@@ -34,12 +34,12 @@ using System.Resources;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("ODF Translator Command Line Tool")]
+[assembly: AssemblyTitle("OpenXML/ODF Translator Command Line Tool")]
 [assembly: AssemblyDescription("Converts files from the command line.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Clever Age")]
-[assembly: AssemblyProduct("CleverAge.OdfConverter.CommandLineTool.Properties")]
-[assembly: AssemblyCopyright("Copyright © Clever Age 2006")]
+[assembly: AssemblyCompany("OpenXML/ODF Translator Team")]
+[assembly: AssemblyProduct("OpenXML/ODF Translator Command Line Tool")]
+[assembly: AssemblyCopyright("Copyright © OpenXML/ODF Translator Team 2006-2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

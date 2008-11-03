@@ -36,9 +36,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ODF Add-in Library")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Clever Age")]
+[assembly: AssemblyCompany("OpenXML/ODF Translator Team")]
 [assembly: AssemblyProduct("OdfAddinLib")]
-[assembly: AssemblyCopyright("Copyright © Clever Age 2006")]
+[assembly: AssemblyCopyright("Copyright © OpenXML/ODF Translator Team 2006-2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

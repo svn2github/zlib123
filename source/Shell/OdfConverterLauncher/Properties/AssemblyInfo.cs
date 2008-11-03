@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ODF Add-in for Microsoft Office")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Launches the ODF Add-in for Microsoft Office")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("OpenXML/ODF Translator Team")]
 [assembly: AssemblyProduct("ODF Add-in for Microsoft Office")]
 [assembly: AssemblyCopyright("Copyright ©  2006-2008")]
 [assembly: AssemblyTrademark("")]

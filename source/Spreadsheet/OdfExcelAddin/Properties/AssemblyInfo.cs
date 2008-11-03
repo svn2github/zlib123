@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OdfExcelAddin")]
 [assembly: AssemblyDescription("ODF Add-in for Microsoft Excel")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Clever Age")]
+[assembly: AssemblyCompany("OpenXML/ODF Translator Team")]
 [assembly: AssemblyProduct("ODF Add-in for Microsoft Excel")]
 [assembly: AssemblyCopyright("Copyright © Sonata Software Limited 2008")]
 [assembly: AssemblyTrademark("")]
