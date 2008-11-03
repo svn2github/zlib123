@@ -43,12 +43,12 @@
 				<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.MyInstallScopeDlgTitle)" />
 				<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="20" Transparent="yes" NoPrefix="yes" Text="!(loc.MyInstallScopeDlgDescription)" />
 
-				<Control Id="BothScopes" Type="RadioButtonGroup" X="25" Y="55" Width="330" Height="120" Property="WixAppFolder" Hidden="yes">
+				<Control Id="BothScopes" Type="RadioButtonGroup" X="25" Y="55" Width="330" Height="120" Property="WixAppFolder" Hidden="no">
 					<RadioButtonGroup Property="WixAppFolder">
 						<RadioButton Value="PerUser" X="0" Y="0" Width="295" Height="16" Text="!(loc.MyInstallScopeDlgPerUser)" />
 						<RadioButton Value="PerMachine" X="0" Y="60" Width="295" Height="16" Text="!(loc.MyInstallScopeDlgPerMachine)" />
 					</RadioButtonGroup>
-					<Condition Action="show">Privileged AND (!(wix.WixUISupportPerUser) AND !(wix.WixUISupportPerMachine))</Condition>
+					<Condition Action="enable">Privileged AND (!(wix.WixUISupportPerUser) AND !(wix.WixUISupportPerMachine))</Condition>
 				</Control>
 				<Control Id="PerUserDescription" Type="Text" X="37" Y="70" Width="300" Height="36" Hidden="yes" NoPrefix="yes" Text="!(loc.MyInstallScopeDlgPerUserDescription)">
 					<Condition Action="show">!(wix.WixUISupportPerUser)</Condition>
@@ -63,7 +63,7 @@
 				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
 					<Publish Property="ALLUSERS" Value="{}">WixAppFolder = "PerUser"</Publish>
-					<Publish Property="TEMPLATES" Value="{}">WixAppFolder = "PerMachine"</Publish>
+          <Publish Property="TEMPLATES" Value="{}">WixAppFolder = "PerMachine"</Publish>
 					<Publish Property="ALLUSERS" Value="1">WixAppFolder = "PerMachine"</Publish>
 				</Control>
 				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
