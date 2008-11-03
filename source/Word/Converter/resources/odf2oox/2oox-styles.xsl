@@ -1152,22 +1152,24 @@
     </xsl:if>
 
     <xsl:if test="@fo:background-color">
-      <w:highlight>
-        <xsl:attribute name="w:val">
-          <!-- Value must be a string (no RGB value authorized). -->
+      <xsl:variable name="stringColor">
+        <!-- try to convert to one of the 16 built-in highlight colors of Word -->
+        <xsl:call-template name="StringType-color">
+          <xsl:with-param name="RGBcolor" select="@fo:background-color"/>
+        </xsl:call-template>
+      </xsl:variable>
           <xsl:choose>
-            <xsl:when test="@fo:background-color = 'transparent' ">none</xsl:when>
-            <xsl:when test="not(substring(@fo:background-color, 1,1) = '#' )">
-              <xsl:value-of select="@fo:background-color"/>
+            <xsl:when test="@fo:background-color = 'transparent' ">
+              <w:highlight w:val="none" />
+            </xsl:when>
+            <xsl:when test="$stringColor != ''">
+              <w:highlight w:val="{$stringColor}" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:call-template name="StringType-color">
-                <xsl:with-param name="RGBcolor" select="@fo:background-color"/>
-              </xsl:call-template>
+              <!-- no built-in highlight color, thus use shading instead of highlight -->
+              <w:shd w:val="clear" w:color="auto" w:fill="{translate(@fo:background-color, 'abcdef#', 'ABCDEF')}" />
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:attribute>
-      </w:highlight>
     </xsl:if>
 
     <xsl:if test="@style:text-underline-style">

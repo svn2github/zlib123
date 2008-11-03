@@ -101,18 +101,9 @@
 	-->
   <xsl:template name="StringType-color">
     <xsl:param name="RGBcolor"/>
-    <xsl:variable name="code">
-      <xsl:choose>
-        <xsl:when test="substring($RGBcolor, 1,1) = '#'">
-          <xsl:value-of
-            select="translate(translate(substring($RGBcolor, 2, string-length($RGBcolor)-1),'f','F'),'c','C')"
-          />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="translate(translate($RGBcolor,'f','F'),'c','C')"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <!-- make uppercase and remove leading '#' -->
+    <xsl:variable name="code" select="translate($RGBcolor, 'abcdef#', 'ABCDEF')" />
+      
     <xsl:choose>
       <xsl:when test="$code='000000'">black</xsl:when>
       <xsl:when test="$code='0000FF'">blue</xsl:when>
@@ -131,8 +122,9 @@
       <xsl:when test="$code='FFFFFF'">white</xsl:when>
       <xsl:when test="$code='FFFF00'">yellow</xsl:when>
       <xsl:otherwise>
-        <xsl:message terminate="no">translation.odf2oox.textBgColor</xsl:message>
-        <xsl:text>yellow</xsl:text>
+        <!-- do not return a color otherwise -> w:shd will be created instead of w:highlight -->
+        <!--<xsl:message terminate="no">translation.odf2oox.textBgColor</xsl:message>
+        <xsl:text>yellow</xsl:text>-->
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
