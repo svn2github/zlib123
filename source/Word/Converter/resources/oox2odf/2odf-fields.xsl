@@ -705,21 +705,21 @@
         </xsl:call-template>
       </xsl:when>
       <!-- if next run with instrText, before end of field -->
-      <xsl:when test="$instrText/parent::w:r/following-sibling::w:r/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
+      <xsl:when test="$instrText/parent::w:r/following-sibling::w:r[1]/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
         <xsl:call-template name="BuildFieldCode">
           <!-- we know now that first run having instrText is before end of field -->
           <xsl:with-param name="instrText"
-            select="$instrText/parent::w:r/following-sibling::w:r[w:instrText][1]/w:instrText[1]"/>
+            select="$instrText/parent::w:r/following-sibling::w:r[1]/w:instrText[1]"/>
           <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
         </xsl:call-template>
       </xsl:when>
       <!-- if next paragraph with instrText, before end of field :
         Find first paragraph having instrText before end of field, and then first run having instrText before end of field -->
-      <xsl:when test="$instrText/ancestor::w:p/following-sibling::w:p/w:r[w:instrText or w:fldChar[@w:fldCharType = 'end']][1]/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
+      <xsl:when test="$instrText/ancestor::w:p/following-sibling::w:p/w:r[1][w:instrText or w:fldChar[@w:fldCharType = 'end']][1]/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
         <!-- check first is field does not end in context paragraph -->
         <xsl:choose>
           <xsl:when
-            test="not($instrText/parent::w:r/following-sibling::w:r/w:fldChar[@w:fldCharType = 'end'])">
+            test="not($instrText/parent::w:r/following-sibling::w:r[1]/w:fldChar[@w:fldCharType = 'end'])">
             <xsl:call-template name="BuildFieldCode">
               <!-- we know now that first run having instrText is before end of field -->
               <xsl:with-param name="instrText"
