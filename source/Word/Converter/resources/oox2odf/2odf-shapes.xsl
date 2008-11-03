@@ -4497,7 +4497,8 @@
 		<xsl:choose>
 			<xsl:when test="self::v:shape">
 				<xsl:attribute name="draw:style-name">
-					<xsl:value-of select="./@id"/>
+					<!--Code changed by yeswanth.s : bug #2207550-->
+					<xsl:value-of select="concat(./@id,generate-id(parent::node()))"/>
 				</xsl:attribute>
 			</xsl:when>
 			<xsl:when test="self::o:OLEObject">
