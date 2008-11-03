@@ -66,10 +66,11 @@
 				</Control>
 
 				<!-- navigation buttons -->
-				<Control Id="DiskCost" Type="PushButton" X="111" Y="243" Width="56" Height="17" Text="!(loc.CustomizeDlgDiskCost)">
+        <!-- Button removed because localized text does not fit in all cases -->
+				<!--Control Id="DiskCost" Type="PushButton" X="111" Y="243" Width="56" Height="17" Text="!(loc.CustomizeDlgDiskCost)">
 					<Publish Event="SpawnDialog" Value="DiskCostDlg">1</Publish>
 					<Subscribe Event="SelectionNoItems" Attribute="Enabled" />
-				</Control>
+				</Control-->
 				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
 					<Subscribe Event="SelectionNoItems" Attribute="Enabled" />
