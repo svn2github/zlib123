@@ -101,6 +101,7 @@
 			<FeatureGroupRef Id="Assemblies"/>
 
 			<ComponentRef Id="Readme"/>
+      <ComponentRef Id="License"/>
 
 			<ComponentRef Id="RegistryEntriesWord"/>
 			<ComponentRef Id="FileAssociationOdt"/>
@@ -140,19 +141,21 @@
 				<ComponentRef Id="ODFLetter.dot"/>
 				<ComponentRef Id="ODFMemo.dot"/>
 				<ComponentRef Id="ODFReport.dot"/>
-			</Feature>
-		</Feature>
+        <ComponentRef Id="License"/>
+      </Feature>
+    </Feature>
 
-		<Feature Id="EXCELADDIN" 
+    <Feature Id="EXCELADDIN"
 				 Title="!(loc.FeatureNameExcelAddin)"
-				 Level="1" 
+				 Level="1"
 				 ConfigurableDirectory='INSTALLDIR'
 				 Description='!(loc.FeatureDescriptionExcelAddin)'
 				 AllowAdvertise='no'
 				 TypicalDefault='install'>
-			<FeatureGroupRef Id="Assemblies"/>
+      <FeatureGroupRef Id="Assemblies"/>
 
-			<ComponentRef Id="Readme"/>
+      <ComponentRef Id="Readme"/>
+      <ComponentRef Id="License"/>
 			<ComponentRef Id="RegistryEntriesExcel"/>
 			
 			<ComponentRef Id="FileAssociationOds"/>
@@ -172,6 +175,7 @@
 			<FeatureGroupRef Id="Assemblies"/>
 
 			<ComponentRef Id="Readme"/>
+      <ComponentRef Id="License"/>
 			<ComponentRef Id="RegistryEntriesPowerPoint"/>
 			
 			<ComponentRef Id="FileAssociationOdp"/>
