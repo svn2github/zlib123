@@ -65,6 +65,7 @@
 					<Publish Property="ALLUSERS" Value="{}">WixAppFolder = "PerUser"</Publish>
           <Publish Property="TEMPLATES" Value="{}">WixAppFolder = "PerMachine"</Publish>
 					<Publish Property="ALLUSERS" Value="1">WixAppFolder = "PerMachine"</Publish>
+          <Publish Event="DoAction" Value="FindRelatedProducts">1</Publish>
 				</Control>
 				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
 					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>

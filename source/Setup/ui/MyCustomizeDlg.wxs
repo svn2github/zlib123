@@ -71,7 +71,7 @@
 					<Publish Event="SpawnDialog" Value="DiskCostDlg">1</Publish>
 					<Subscribe Event="SelectionNoItems" Attribute="Enabled" />
 				</Control-->
-				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" Disabled="yes" />
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
 					<Subscribe Event="SelectionNoItems" Attribute="Enabled" />
 				</Control>

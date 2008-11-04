@@ -79,6 +79,7 @@
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="ApplicationFolderName" Value="OpenXML-ODF Translator" />
     <Property Id='ALLUSERS' Secure='yes'/>
+    <Property Id='REINSTALLMODE' Value='amus' />
     <Property Id='SHOW_README' Value='1' />
 
     <Property Id="TEMPLATEPATH" Secure="yes" />
@@ -164,8 +165,12 @@
 		<Condition Message="Microsoft Word konnte nicht gefunden werden!">WORD2007INSTALLROOT OR WORD2003INSTALLROOT OR WORD2002INSTALLROOT OR WORD2000INSTALLROOT</Condition>
         <Condition Message="Zur Installation des Produkts mÃ¼ssen Sie als administrative Rechte besitzen!">Privileged</Condition>
 		-->
+    <InstallUISequence>
+      <FindRelatedProducts Suppress="yes" />
+    </InstallUISequence>
 
     <InstallExecuteSequence>
+      <FindRelatedProducts After="LaunchConditions" />
       <Custom Action="NewerVersionDetected" After="FindRelatedProducts">NEWAPPFOUND</Custom>
       <Custom Action="FileAssociationOdtAssign" After="LaunchConditions">?FileAssociationOdt</Custom>
 
