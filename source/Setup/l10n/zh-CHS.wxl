@@ -28,7 +28,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <WixLocalization Culture="zh-CHS" Codepage="936" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-	<String Id="lcid" Localizable="no">1033</String>
+	<String Id="lcid" Localizable="no">2052</String>
   <String Id="CodePage" Localizable="no">936</String>
   
   <String Id="ApplicationName">ODF Microsoft Office 加载项</String>
