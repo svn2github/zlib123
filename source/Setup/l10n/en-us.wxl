@@ -48,6 +48,8 @@
 
   <String Id="FeatureNameWordAddin">ODF Add-in for Microsoft Word</String>
   <String Id="FeatureNameTemplates">ODF-compatible Templates</String>
+  <!-- short version with max 31 characters -->
+  <String Id="FeatureNameTemplatesRegistry">ODF-compatible Templates</String>
   <String Id="FeatureNameExcelAddin">ODF Add-in for Microsoft Excel</String>
   <String Id="FeatureNamePowerPointAddin">ODF Add-in for Microsoft PowerPoint</String>
 

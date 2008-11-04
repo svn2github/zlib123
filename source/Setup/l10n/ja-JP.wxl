@@ -48,6 +48,8 @@
 
   <String Id="FeatureNameWordAddin">Microsoft Word 用 ODF アドイン</String>
   <String Id="FeatureNameTemplates">ODF 互換テンプレート</String>
+  <!-- short version with max 31 characters -->
+  <String Id="FeatureNameTemplatesRegistry">ODF 互換テンプレート</String>
   <String Id="FeatureNameExcelAddin">Microsoft Excel 用 ODF アドイン</String>
   <String Id="FeatureNamePowerPointAddin">Microsoft PowerPoint 用 ODF アドイン</String>
 

@@ -48,6 +48,8 @@
 
   <String Id="FeatureNameWordAddin">ODF Add-in voor Microsoft Word</String>
   <String Id="FeatureNameTemplates">Sjablonen die compatibel zijn met ODF</String>
+  <!-- short version with max 31 characters -->
+  <String Id="FeatureNameTemplatesRegistry">Sjablonen compatibel met ODF</String>
   <String Id="FeatureNameExcelAddin">ODF Add-in voor Microsoft Excel</String>
   <String Id="FeatureNamePowerPointAddin">ODF Add-in voor Microsoft PowerPoint</String>
 

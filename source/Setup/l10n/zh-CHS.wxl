@@ -48,6 +48,8 @@
 
   <String Id="FeatureNameWordAddin">适用于 Microsoft Word 的 ODF 加载项</String>
   <String Id="FeatureNameTemplates">ODF 兼容模板</String>
+  <!-- short version with max 31 characters -->
+  <String Id="FeatureNameTemplatesRegistry">ODF 兼容模板</String>
   <String Id="FeatureNameExcelAddin">适用于 Microsoft Excel 的 ODF 加载项</String>
   <String Id="FeatureNamePowerPointAddin">适用于 Microsoft PowerPoint 的 ODF 加载项</String>
 
