@@ -130,7 +130,7 @@
     <value>Een kopie van het document met Open Document Format (ODF) opslaan.</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+    <value>ODF</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
     <value>Een onverwachte fout is opgetreden. Als u wilt, kunt u een bugrapport invullen op de projectwebsite (http://odf-converter.sourceforge.net). Vergeet niet uw bestand als bijlage mee te sturen.</value>
@@ -214,13 +214,13 @@
     <value>OpenDocument presentatie bestanden</value>
   </data>
   <data name="OdfOptionsDescription" xml:space="preserve">
-    <value>Activeren / deactiveren FidelityMessage dialoogvenster</value>
+    <value>Activeren / deactiveren FidelityMessage dialoogvenster.</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF Opties</value>
   </data>
   <data name="OdfNewDocumentDescription" xml:space="preserve">
-    <value>Een nieuw document maken dat compatibel is met ODF</value>
+    <value>Een nieuw document maken dat compatibel is met ODF.</value>
   </data>
   <data name="OdfNewDocumentLabel" xml:space="preserve">
     <value>Nieuw document</value>

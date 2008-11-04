@@ -220,7 +220,7 @@
     <value>ODF Add-in Optionen</value>
   </data>
 	<data name="OdfNewDocumentDescription" xml:space="preserve">
-    <value>Neues ODF-kompatibles Dokument erzeugen</value>
+    <value>Neues ODF-kompatibles Dokument erzeugen.</value>
   </data>
   <data name="OdfNewDocumentLabel" xml:space="preserve">
     <value>Neues Dokument</value>

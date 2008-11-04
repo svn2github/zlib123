@@ -130,7 +130,7 @@
     <value>Zapisz kopię dokumentu w formacie ODF.</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+    <value>ODF</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
     <value>Pojawił się niespodziewany błąd. Prosimy o wypełnienie raportu dotyczącego błędu na stronie projektu (http://odf-converter.sourceforge.net) załączając wadliwy plik.</value>
@@ -214,13 +214,13 @@
     <value>OpenDocument prezentacji pliki</value>
   </data>
   <data name="OdfOptionsDescription" xml:space="preserve">
-    <value>Włącz / Wyłącz FidelityMessage Okno dialogowe</value>
+    <value>Włącz / Wyłącz FidelityMessage Okno dialogowe.</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>Opcje ODF</value>
   </data>
   <data name="OdfNewDocumentDescription" xml:space="preserve">
-    <value>Utwórz nowy dokument zgodny z formatem ODF</value>
+    <value>Utwórz nowy dokument zgodny z formatem ODF.</value>
   </data>
   <data name="OdfNewDocumentLabel" xml:space="preserve">
     <value>Nowy dokument</value>

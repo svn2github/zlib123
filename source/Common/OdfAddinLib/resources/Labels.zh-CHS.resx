@@ -130,7 +130,7 @@
     <value>用开放文档格式（ODF）保存该文档的副本。</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+    <value>ODF</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
     <value>遇到意外错误。过项目网站（http://odf-converter.sourceforge.net）提交错误报告（可附加文件）。</value>
@@ -214,13 +214,13 @@
     <value>OpenDocument的演示文件</value>
   </data>
   <data name="OdfOptionsDescription" xml:space="preserve">
-    <value>启用/禁用fidelitymessage对话框</value>
+    <value>启用/禁用fidelitymessage对话框。</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF选项</value>
   </data>
   <data name="OdfNewDocumentDescription" xml:space="preserve">
-    <value>创建新 ODF 兼容文档</value>
+    <value>创建新 ODF 兼容文档。</value>
   </data>
   <data name="OdfNewDocumentLabel" xml:space="preserve">
     <value>新建文档</value>

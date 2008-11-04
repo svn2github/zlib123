@@ -130,7 +130,7 @@
     <value>ドキュメントのコピーを OpenDocument 形式 (ODF) で保存します。</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+    <value>ODF</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
     <value>予期しないエラーが発生しました。プロジェクト Web サイト (http://odf-converter.sourceforge.net) のバグ レポートに必要事項を入力し、ファイルを添付してください。</value>
@@ -214,13 +214,13 @@
     <value>プレゼンテーションファイルのopenDocument</value>
   </data>
   <data name="OdfOptionsDescription" xml:space="preserve">
-    <value>有効化/無効化]ダイアログボックスでfidelitymessage</value>
+    <value>有効化/無効化]ダイアログボックスでfidelitymessage。</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODFオプション</value>
   </data>
   <data name="OdfNewDocumentDescription" xml:space="preserve">
-    <value>ODF 互換文書の新規作成</value>
+    <value>ODF 互換文書の新規作成。</value>
   </data>
   <data name="OdfNewDocumentLabel" xml:space="preserve">
     <value>新規文書</value>

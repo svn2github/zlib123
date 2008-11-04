@@ -130,7 +130,7 @@
     <value>Save a copy of the document with Open Document Format (ODF).</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+    <value>ODF</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
     <value>An unexpected error occurred. Please feel free to fill a bug report on the project web site (http://odf-converter.sourceforge.net) with your file attached.</value>
@@ -214,13 +214,13 @@
     <value>OpenDocument Presentation files </value>
   </data>
   <data name="OdfOptionsDescription" xml:space="preserve">
-    <value>Enable/Disable FidelityMessage Dialog Box</value>
+    <value>Configure ODF Add-in for Microsoft Office.</value>
   </data>
   <data name="OdfOptionsLabel" xml:space="preserve">
     <value>ODF Options</value>
   </data>
   <data name="OdfNewDocumentDescription" xml:space="preserve">
-    <value>Create a new ODF-compatible document</value>
+    <value>Create a new ODF-compatible document.</value>
   </data>
   <data name="OdfNewDocumentLabel" xml:space="preserve">
     <value>New document</value>
