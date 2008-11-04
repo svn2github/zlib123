@@ -481,7 +481,7 @@
 				<!-- ADDIN OPTIONS -->
 				<RegistryKey Id="RegOptionsPowerPoint"
 							 Root="HKMU"
-							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for PowerPoint"
+							 Key="SOFTWARE\OpenXML-ODF Translator\ODF Add-in for Presentation"
 							 Action="createAndRemoveOnUninstall">
 					<RegistryValue Type="string" Name="language" Value="!(loc.lcid)"/>
 				</RegistryKey>
