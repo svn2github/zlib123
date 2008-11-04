@@ -1,5 +1,6 @@
 rem %1 - $(TargetDir)
 rem %2 - $(TargetFileName) = OdfAddinForOfficeSetup.msi
+rem %3 - $(ConfigurationName)
 
 
 echo Signing MSI files
@@ -37,3 +38,6 @@ call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-ja.exe"
 call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-nl.exe"
 call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-pl.exe"
 call %1..\..\..\..\signing\sign.bat "%1OdfAddInForOfficeSetup-chs.exe"
+
+rem Package command line tool
+call %1..\..\scripts\PackageCommandLineTool.bat %1 %3
