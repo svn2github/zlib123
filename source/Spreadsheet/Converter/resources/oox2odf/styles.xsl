@@ -200,7 +200,7 @@ RefNo-4 12-Nov-2007 Sandeep S     1790019   Modification done to get the default
 				<xsl:choose>
 					<xsl:when
 					  test="key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-						<xsl:value-of select="concat('sonataColumnWidth:','True|',$defaultFontStyle,'|',$defaultFontSize,key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth)"/>
+						<xsl:value-of select="concat('sonataColumnWidth:','True|',$defaultFontStyle,'|',$defaultFontSize,'|',key('Part', concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth)"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- Here To calculate the def col width formula used is 
