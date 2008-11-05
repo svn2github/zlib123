@@ -68,7 +68,8 @@
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] Setup</String>
   <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
-
+  <String Id="MyWelcomeDlgContributors">Funded by Microsoft the OpenXML/ODF Translator has been developed by Clever Age, Aztecsoft, Sonata and DIaLOGIKa.</String>
+  
   <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}File Associations</String>
   <String Id="MyFileAssociationDlgDescription">Associate OpenDocument files with Microsoft Office</String>
   <String Id="MyFileAssociationDlgDetailedDescription">Please select the file types that you wish to associate with Microsoft Office:</String>

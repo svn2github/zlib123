@@ -68,6 +68,7 @@
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] Setup</String>
   <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
+  <String Id="MyWelcomeDlgContributors">De OpenXML/ODF Translator, die wordt gesponsord door Microsoft, is ontwikkeld door Clever Age, Aztecsoft, Sonata en DIaLOGIKa.</String>
 
   <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}Bestandskoppelingen</String>
   <String Id="MyFileAssociationDlgDescription">OpenDocument-bestanden koppelen aan Microsoft Office</String>

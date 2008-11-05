@@ -68,6 +68,7 @@
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] のセットアップ</String>
   <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
+  <String Id="MyWelcomeDlgContributors">マイクロソフトが資金を提供する OpenXML/ODF Translator は、Clever Age、Aztecsoft、Sonata および DIaLOGIKa によって開発されました。</String>
 
   <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}ファイルの関連</String>
   <String Id="MyFileAssociationDlgDescription">OpenDocument ファイルを Microsoft Office に関連付ける</String>

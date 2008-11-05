@@ -68,7 +68,8 @@
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] Setup</String>
 	<String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
-
+  <String Id="MyWelcomeDlgContributors">Der OpenXML/ODF Translator wird von Microsoft finanziell unterstützt und von Clever Age, Aztecsoft, Sonata und DIaLOGIKa  entwickelt.</String>
+  
   <String Id="WelcomeDlgDescription">Setup installiert [ProductName] auf Ihrem Computer. Klicken Sie auf "Weiter", um fortzufahren, oder auf "Abbrechen", um das Setup zu beenden.</String>
 
 	<String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}Dateiverknüpfungen</String>

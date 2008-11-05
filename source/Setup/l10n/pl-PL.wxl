@@ -68,6 +68,7 @@
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">Instalator programu [ProductName]</String>
   <String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
+  <String Id="MyWelcomeDlgContributors">Dodatek OpenXML/ODF Translator został opracowany na zlecenie firmy Microsoft przez firmy Clever Age, Aztecsoft, Sonata oraz DIaLOGIKa.</String>
 
   <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}Skojarzenia plików</String>
   <String Id="MyFileAssociationDlgDescription">Skojarz pliki w formacie OpenDocument z pakietem Microsoft Office</String>

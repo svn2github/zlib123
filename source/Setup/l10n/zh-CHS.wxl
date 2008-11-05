@@ -68,7 +68,9 @@
   <!-- DIALOG CONTROLS -->
   <String Id="MyDlgTitle">[ProductName] Setup</String>
 	<String Id="MyDlgBannerBitmap" Localizable="no">WixUI_Bmp_Banner</String>
-
+  
+  <String Id="MyWelcomeDlgContributors">OpenXML/ODF 变换器由 Microsoft 出资，由 Clever Age、Aztecsoft、Sonata 和 DIaLOGIKa 负责开发。</String>
+  
   <String Id="MyFileAssociationDlgTitle">{\WixUI_Font_Title}文件关联</String>
   <String Id="MyFileAssociationDlgDescription">将 OpenDocument 文件与 Microsoft Office 相关联</String>
   <String Id="MyFileAssociationDlgDetailedDescription">请选择您要与 Microsoft Office 相关联的文件类型:</String>
