@@ -44,7 +44,7 @@
 	<String Id="FileTypeOds">OpenDocument 电子表格</String>
 	<String Id="FileTypeOdp">OpenDocument 演示文稿</String>
 
-  <String Id="FolderNameTemplates">ODF Templates</String>
+  <String Id="FolderNameTemplates">ODF 兼容模板</String>
 
   <String Id="FeatureNameWordAddin">适用于 Microsoft Word 的 ODF 加载项</String>
   <String Id="FeatureNameTemplates">ODF 兼容模板</String>
