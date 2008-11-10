@@ -5753,14 +5753,14 @@
 							<xsl:when test="w:sz/@w:val != 0">
 								<xsl:value-of select="round(w:position/@w:val * 100 div w:sz/@w:val)"/>
 							</xsl:when>
-							<xsl:otherwise>
-								<xsl:variable name="defaultFontSize">
-									<xsl:value-of
-									  select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val"
-                  />
-								</xsl:variable>
+							<xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val">
+								<xsl:variable name="defaultFontSize" select="key('Part', 'word/styles.xml')/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val" />
 								<xsl:value-of select="round(w:position/@w:val * 100 div number($defaultFontSize))"/>
-							</xsl:otherwise>
+							</xsl:when>
+              <xsl:otherwise>
+                <!-- if no font size is specified use 10pt = 20 as the default-->
+                <xsl:value-of select="round(w:position/@w:val * 100 div 20)"/>
+              </xsl:otherwise>
 						</xsl:choose>
 					</xsl:when>
 					<xsl:otherwise>0</xsl:otherwise>
@@ -5796,11 +5796,11 @@
                Somes files are crashing with Open Office 2.2, not with older version 2.0
                 Value in the otherwise condition is the same than the positioning of normal text...
           -->
-        <xsl:otherwise>
+        <xsl:when test="number($percentValue) != 'NaN'">
           <xsl:attribute name="style:text-position">
             <xsl:value-of select="concat(number($percentValue),'% 100%')"/>
           </xsl:attribute>
-        </xsl:otherwise>
+        </xsl:when>
 
 			</xsl:choose>
 		</xsl:if>
