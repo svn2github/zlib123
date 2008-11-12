@@ -407,6 +407,28 @@
         </Directory>
       </Directory>
 
+      <!-- Start menu entries -->
+      <Directory Id="ProgramMenuFolder" SourceName="Blah" LongSource="Blah">
+        <!-- ProgramMenuFolder is a special folder, Windows installer will generate the correct dir names -->
+        <Directory Id="Dir_StartmenuSubDir" Name="!(loc.ApplicationName)">
+          <!-- WiX needs a dummy component here :-( -->
+          <Component Id='StartMenuEntry' Guid='0801F67B-D9E0-4CF0-8906-8E1E60FEE666'>
+            <RemoveFolder Id='Dir_StartmenuSubDir' On='uninstall' />
+            <util:InternetShortcut Id='Shortcut_Homepage' Directory='Dir_StartmenuSubDir' 
+                                   Name='!(loc.StartMenuHomepage)' Target='http://odf-converter.sourceforge.net/' Type='url' />
+            <Shortcut Id="Shortcut_Readme" Directory="Dir_StartmenuSubDir"
+                      Name="!(loc.StartMenuReadme)" Target="[#Readme]"
+                      Show="normal" WorkingDirectory="TARGETDIR" />
+            <Shortcut Id="Shortcut_License" Directory="Dir_StartmenuSubDir"
+                      Name="!(loc.StartMenuLicense)" Target="[#License]"
+                      Show="normal" WorkingDirectory="TARGETDIR" />
+            <util:InternetShortcut Id='Shortcut_Troubleshooting' Directory='Dir_StartmenuSubDir'
+                                   Name='!(loc.StartMenuTroubleshooting)' Target='http://odf-converter.sourceforge.net/documentation/installguide.php' Type='url' />
+            <RegistryValue Root="HKCU" Key="SOFTWARE\OpenXML-ODF Translator" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+          </Component>
+        </Directory>
+      </Directory>
+    
 
       <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                  REGISTRY SETTINGS
@@ -513,6 +535,11 @@
 							 Key="openDocument.WriterDocument.1\shell\!(loc.OpenWithWord)\Command">
           <RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
         </RegistryKey>
+        <!--<RegistryKey Id="SystemFileAssociationsOdt" Root="HKCR" Action="create" Key="SystemFileAssociations\.odt">
+          <RegistryKey Id="RegKeyOdtContextMenu" Action="createAndRemoveOnUninstall" Key="shell\!(loc.OpenWithWord)\Command">
+            <RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
+          </RegistryKey>
+        </RegistryKey>-->
       </Component>
 
       <Component Id="RegistryEntryContextMenuOds" Guid="E0193721-BBB3-4358-BA53-EB77C614FC78" DiskId="1" KeyPath="yes">
@@ -523,6 +550,11 @@
 							 Key="openDocument.CalcDocument.1\shell\!(loc.OpenWithExcel)\Command">
           <RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
         </RegistryKey>
+        <!--<RegistryKey Id="SystemFileAssociationsOds" Root="HKCR" Action="create" Key="SystemFileAssociations\.ods">
+          <RegistryKey Id="RegKeyOdsContextMenu" Action="createAndRemoveOnUninstall" Key="shell\!(loc.OpenWithExcel)\Command">
+            <RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
+          </RegistryKey>
+        </RegistryKey>-->
       </Component>
 
       <Component Id="RegistryEntryContextMenuOdp" Guid="1A9888DA-AA6E-4DA1-9A7F-1FADB7182262" DiskId="1" KeyPath="yes">
@@ -533,6 +565,11 @@
 							 Key="openDocument.ImpressDocument.1\shell\!(loc.OpenWithPowerPoint)\Command">
           <RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
         </RegistryKey>
+        <!--<RegistryKey Id="SystemFileAssociationsOdp" Root="HKCR" Action="create" Key="SystemFileAssociations\.odp">
+          <RegistryKey Id="RegKeyOdpContextMenu" Action="createAndRemoveOnUninstall" Key="shell\!(loc.OpenWithPowerPoint)\Command">
+            <RegistryValue Type="string" Value='"[#OdfConverterLauncher.exe]" "%1"' />
+          </RegistryKey>
+        </RegistryKey>-->
       </Component>
 
       <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -32,7 +32,8 @@
   <String Id="CodePage" Localizable="no">936</String>
   
   <String Id="ApplicationName">ODF Microsoft Office 加载项</String>
-	<String Id="ReadmePath" Localizable="no">Readme.zh-CHS.html</String>
+  <String Id="ProjectName">适用于 Microsoft Office 的 OpenXML/ODF 变换器加载项</String>
+  <String Id="ReadmePath" Localizable="no">Readme.zh-CHS.html</String>
 
   <String Id="RestartWarning">重要注意事项: 请关闭然后重新启动任何已运行的 Microsoft Office 应用程序 (Word、Excel、PowerPoint 和 Outlook) 以完成安装。</String>
 
@@ -62,6 +63,11 @@
   <String Id="TemplateTitleODFLetter">ODF 兼容信函</String>
   <String Id="TemplateTitleODFMemo">ODF 兼容备忘录</String>
   <String Id="TemplateTitleODFReport">ODF 兼容报告</String>
+
+  <String Id="StartMenuHomepage">首页</String>
+  <String Id="StartMenuReadme">自述文件</String>
+  <String Id="StartMenuLicense">许可协议</String>
+  <String Id="StartMenuTroubleshooting">故障排除</String>
 
   <String Id="Error2000">存在已安装的此产品的更新版本。</String>
 

@@ -32,7 +32,8 @@
   <String Id="CodePage" Localizable="no">1252</String>
   
 	<String Id="ApplicationName">ODF Add-in voor Microsoft Office</String>
-	<String Id="ReadmePath" Localizable="no">Readme.nl-NL.html</String>
+  <String Id="ProjectName">OpenXML/ODF Translator Add-in voor Microsoft Office</String>
+  <String Id="ReadmePath" Localizable="no">Readme.nl-NL.html</String>
 
   <String Id="RestartWarning">BELANGRIJKE OPMERKING: Sluit elke Microsoft Office-toepassing (Word, Excel, PowerPoint en Outlook) en start deze opnieuw om de installatie te voltooien.</String>
 
@@ -63,6 +64,11 @@
   <String Id="TemplateTitleODFMemo">Memo dat compatibel is met ODF</String>
   <String Id="TemplateTitleODFReport">Rapport dat compatibel is met ODF</String>
 
+  <String Id="StartMenuHomepage">Homepage</String>
+  <String Id="StartMenuReadme">Leesmij</String>
+  <String Id="StartMenuLicense">Licentieovereenkomst</String>
+  <String Id="StartMenuTroubleshooting">Problemen oplossen</String>
+  
   <String Id="Error2000">Er is een nieuwere versie van dit product geïnstalleerd.</String>
 
   <!-- DIALOG CONTROLS -->

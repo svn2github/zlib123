@@ -103,6 +103,8 @@
 			<ComponentRef Id="Readme"/>
       <ComponentRef Id="License"/>
 
+      <ComponentRef Id="StartMenuEntry"/>
+
 			<ComponentRef Id="RegistryEntriesWord"/>
 			<ComponentRef Id="FileAssociationOdt"/>
 			<ComponentRef Id="RegistryEntryContextMenuOdt"/>
@@ -156,6 +158,9 @@
 
       <ComponentRef Id="Readme"/>
       <ComponentRef Id="License"/>
+      
+      <ComponentRef Id="StartMenuEntry"/>
+      
 			<ComponentRef Id="RegistryEntriesExcel"/>
 			
 			<ComponentRef Id="FileAssociationOds"/>
@@ -176,6 +181,9 @@
 
 			<ComponentRef Id="Readme"/>
       <ComponentRef Id="License"/>
+
+      <ComponentRef Id="StartMenuEntry"/>
+      
 			<ComponentRef Id="RegistryEntriesPowerPoint"/>
 			
 			<ComponentRef Id="FileAssociationOdp"/>

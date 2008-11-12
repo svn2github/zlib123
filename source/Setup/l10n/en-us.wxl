@@ -32,6 +32,7 @@
   <String Id="CodePage" Localizable="no">1252</String>
   
   <String Id="ApplicationName">ODF Add-in for Microsoft Office</String>
+  <String Id="ProjectName">OpenXML/ODF Translator Add-In for Microsoft Office</String>
   <String Id="ReadmePath" Localizable="no">Readme.en-us.html</String>
 
   <String Id="RestartWarning">IMPORTANT NOTE: Please close and restart any running Microsoft Office application (Word, Excel, PowerPoint and Outlook) to complete the installation.</String>
@@ -63,6 +64,11 @@
   <String Id="TemplateTitleODFMemo">ODF-compatible memo</String>
   <String Id="TemplateTitleODFReport">ODF-compatible report</String>
 
+  <String Id="StartMenuHomepage">Homepage</String>
+  <String Id="StartMenuReadme">Readme</String>
+  <String Id="StartMenuLicense">License Agreement</String>
+  <String Id="StartMenuTroubleshooting">Installation and Troubleshooting Guide</String>
+  
   <String Id="Error2000">There is a newer version of this product installed.</String>
 
   <!-- DIALOG CONTROLS -->

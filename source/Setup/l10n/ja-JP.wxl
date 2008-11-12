@@ -32,6 +32,7 @@
   <String Id="CodePage" Localizable="no">932</String>
   
   <String Id="ApplicationName">Microsoft Office 用 ODF アドイン</String>
+  <String Id="ProjectName">Microsoft Office 用 OpenXML/ODF Translator アドイン</String>
   <String Id="ReadmePath" Localizable="no">Readme.ja-JP.html</String>
 
   <String Id="RestartWarning">重要な注意事項:インストールを完了するには、実行中の Microsoft Office アプリケーション (Word、Excel、PowerPoint および Outlook) をすべて終了して、再起動してください。</String>
@@ -63,6 +64,11 @@
   <String Id="TemplateTitleODFMemo">ODF 互換メモ</String>
   <String Id="TemplateTitleODFReport">ODF 互換レポート</String>
 
+  <String Id="StartMenuHomepage">ホームページ</String>
+  <String Id="StartMenuReadme">Readme</String>
+  <String Id="StartMenuLicense">使用許諾契約 </String>
+  <String Id="StartMenuTroubleshooting">トラブルシューティング</String>
+  
   <String Id="Error2000">インストールされているこの製品の新しいバージョンがあります。</String>
 
   <!-- DIALOG CONTROLS -->

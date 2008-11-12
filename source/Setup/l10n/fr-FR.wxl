@@ -32,7 +32,7 @@
   <String Id="CodePage" Localizable="no">1252</String>
   
 	<String Id="ApplicationName">Add-in ODF pour Microsoft Office</String>
-
+  <String Id="ProjectName">Complément OpenXML/ODF Translator pour Microsoft Office</String>
   <String Id="ReadmePath" Localizable="no">Readme.fr-FR.html</String>
 
   <String Id="RestartWarning">REMARQUE IMPORTANTE : Fermez et redémarrez toute application Microsoft Office en cours d'exécution (Word, Excel, PowerPoint et Outlook) pour terminer l'installation.</String>
@@ -63,6 +63,11 @@
   <String Id="TemplateTitleODFLetter">Lettre compatible avec le format ODF</String>
   <String Id="TemplateTitleODFMemo">Lettre compatible avec le format ODF</String>
   <String Id="TemplateTitleODFReport">Rapport compatible avec le format ODF</String>
+
+  <String Id="StartMenuHomepage">Page Web</String>
+  <String Id="StartMenuReadme">Lisez-moi</String>
+  <String Id="StartMenuLicense">Contrat de Licence</String>
+  <String Id="StartMenuTroubleshooting">Guide d'Installation et Dépannage</String>
 
   <String Id="Error2000">Une nouvelle version de ce produit est installée.</String>
 
