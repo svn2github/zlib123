@@ -416,15 +416,15 @@
       </xsl:attribute>
       <xsl:attribute name="w:w">
         <xsl:for-each select="ancestor::table:table-cell[1]">
-          
+
           <!--<xsl:call-template name="GetCellWidth"/>-->
-          
+
           <xsl:call-template name="GetTotalCellWidth">
             <xsl:with-param name="colPos" select="1" />
             <xsl:with-param name="colEndPos" select="1 + @table:number-columns-spanned" />
             <xsl:with-param name="columns" select="ancestor::table:table/table:table-column" />
           </xsl:call-template>
-          
+
         </xsl:for-each>
       </xsl:attribute>
     </w:tblW>
@@ -636,7 +636,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <!--
   Summary:  Inserts the properties of a w:tc
   Author:   CleverAge
@@ -649,7 +649,7 @@
     <xsl:param name="cellStyleName" />
     <xsl:param name="rowStyleName" />
     <xsl:param name="tableStyleName"/>
-    
+
     <xsl:variable name="cellProp" select="key('automatic-styles', $cellStyleName)/style:table-cell-properties" />
     <xsl:variable name="rowProp" select="key('automatic-styles', $rowStyleName)/style:table-row-properties" />
     <xsl:variable name="tableProp" select="key('automatic-styles', $tableStyleName)/style:table-properties" />
@@ -690,33 +690,33 @@
     </xsl:call-template>
 
     <xsl:call-template name="InsertCellSpan" />
-    
+
     <xsl:call-template name="InsertCellBorders">
       <xsl:with-param name="cellProp" select="$cellProp"/>
     </xsl:call-template>
-    
+
     <xsl:call-template name="InsertCellBgColor">
       <xsl:with-param name="cellProp" select="$cellProp"/>
       <xsl:with-param name="rowProp" select="$rowProp"/>
       <xsl:with-param name="tableProp" select="$tableProp"/>
     </xsl:call-template>
-    
+
     <w:tcMar>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="cellProp" select="$cellProp"/>
       </xsl:call-template>
     </w:tcMar>
-    
+
     <xsl:call-template name="InsertCellWritingMode">
       <xsl:with-param name="cellProp" select="$cellProp"/>
       <xsl:with-param name="tableProp" select="$tableProp"/>
     </xsl:call-template>
-    
+
     <xsl:call-template name="InsertCellValign">
       <xsl:with-param name="cellProp" select="$cellProp"/>
     </xsl:call-template>
   </xsl:template>
-  
+
 
   <!--
   Summary:
@@ -772,7 +772,7 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
-      
+
       <xsl:attribute name="w:type">
         <xsl:choose>
           <xsl:when test="$isRelTable='true'">
@@ -784,7 +784,7 @@
         </xsl:choose>
       </xsl:attribute>
 
-      
+
       <xsl:attribute name="w:w">
         <xsl:value-of select="$cellWidth" />
       </xsl:attribute>
@@ -842,7 +842,7 @@
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <!-- add the next width -->
         <xsl:call-template name="GetTotalCellWidth">
           <xsl:with-param name="colPos" select="$colPos + 1" />
@@ -857,7 +857,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <!-- return the value -->
         <xsl:choose>
@@ -871,8 +871,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
+
+
   <!--
   Summary:  This template adds the colspan of the cells to get the theoretical index of the column
   Author:   makz (DIaLOGIKa)
@@ -884,10 +884,10 @@
     <xsl:param name="cells" />
     <xsl:param name="index">1</xsl:param>
     <xsl:param name="iterator">1</xsl:param>
-    
+
     <xsl:choose>
       <xsl:when test="$iterator &lt; $cellPos">
-        
+
         <!-- get the colspan of the current cell-->
         <xsl:variable name="colSpan">
           <xsl:choose>
@@ -897,7 +897,7 @@
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <!-- add this colspan to the current colPos -->
         <xsl:call-template name="GetColIndex">
           <xsl:with-param name="cells" select="$cells" />
@@ -912,8 +912,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
+
+
   <!--
   Summary:  This templates get the position of the column to which the given cell belongs
   Author:   makz (DIaLOGIKa)
@@ -956,7 +956,7 @@
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:call-template name="GetColPos">
           <xsl:with-param name="cellPos" select="$cellPos" />
           <xsl:with-param name="cells" select="$cells" />
@@ -969,7 +969,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <!-- 
   Summary: Inserts the cell span 
   Author: makz (DIaLOGIKa)
@@ -992,7 +992,7 @@
       <xsl:when test="@table:number-columns-spanned">
         <w:gridSpan w:val="{@table:number-columns-spanned}" />
       </xsl:when>
-      
+
       <!-- covered table cells can also have a colspan if the parent vMerge node has a colspan -->
       <xsl:when test="name(.)='table:covered-table-cell'">
 
@@ -1078,28 +1078,34 @@
     <xsl:param name="borderLineWidth" />
     <xsl:param name="side" />
 
+    <xsl:variable name="widthUnit">
+      <xsl:call-template name="GetUnit">
+        <xsl:with-param name="length" select="substring-before($border, ' ')" />
+      </xsl:call-template>
+    </xsl:variable>
+
     <xsl:variable name="width">
       <xsl:choose>
         <xsl:when test="contains($border, 'double')">
-          <xsl:value-of select="number(substring-before($border, 'cm')) div 2" />
+          <xsl:value-of select="number(substring-before($border, $widthUnit)) div 2" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="number(substring-before($border, 'cm'))" />
+          <xsl:value-of select="number(substring-before($border, $widthUnit))" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="color" select="string(substring-after($border, '#'))" />
-    
+
     <xsl:variable name="style">
       <xsl:choose>
         <xsl:when test="contains($border, 'double')">
           <xsl:choose>
             <xsl:when test="$borderLineWidth">
               <!-- it is a double border with different line thickness -->
-              <xsl:variable name="thickness1" select="number(substring-before($borderLineWidth, 'cm'))" />
-              <xsl:variable name="thickness2" select="number(substring-before(substring-after($borderLineWidth, ' '), 'cm'))" />
-              <xsl:variable name="thickness3" select="number(substring-before(substring-after(substring-after($borderLineWidth, ' '), ' '), 'cm'))" />
+              <xsl:variable name="thickness1" select="number(substring-before($borderLineWidth, $widthUnit))" />
+              <xsl:variable name="thickness2" select="number(substring-before(substring-after($borderLineWidth, ' '), $widthUnit))" />
+              <xsl:variable name="thickness3" select="number(substring-before(substring-after(substring-after($borderLineWidth, ' '), ' '), $widthUnit))" />
               <xsl:choose>
                 <xsl:when test="$thickness1 &gt; $thickness3">
                   <xsl:value-of select="'thickThinMediumGap'"/>
@@ -1124,7 +1130,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:if test="$width &gt; 0">
       <xsl:element name="{concat('w:', $side)}">
 
@@ -1132,11 +1138,22 @@
           <xsl:value-of select="$style" />
         </xsl:attribute>
 
-        <xsl:attribute name="w:sz">
+        <xsl:variable name="widthEigthPoint">
           <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length" select="concat($width, 'cm')" />
+            <xsl:with-param name="length" select="concat($width, $widthUnit)" />
             <xsl:with-param name="unit" select="'eightspoint'"/>
           </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:attribute name="w:sz">
+          <!-- border with has a min of 2 and max of 96 in OpenXML -->
+          <xsl:choose>
+            <xsl:when test="$widthEigthPoint &lt; 2">2</xsl:when>
+            <xsl:when test="$widthEigthPoint &gt; 96">96</xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$widthEigthPoint"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
 
         <xsl:attribute name="w:color">
@@ -1146,7 +1163,7 @@
       </xsl:element>
     </xsl:if>
   </xsl:template>
-  
+
   <!-- 
   Summary: Inserts the cell borders 
   Author:  makz (DIaLOGIKa)
@@ -1156,11 +1173,11 @@
   <xsl:template name="InsertCellBorders">
     <xsl:param name="cellProp" />
     <xsl:variable name="colsNumber" select="count(parent::table:table-row/*)"/>
-    
+
     <w:tcBorders>
       <xsl:choose>
         <xsl:when test="$cellProp/@fo:border">
-          
+
           <!-- insert the all-around-border to each side -->
 
           <xsl:call-template name="InsertCellBorder">
@@ -1186,12 +1203,12 @@
             <xsl:with-param name="borderLineWidth" select="$cellProp/@style:border-line-width" />
             <xsl:with-param name="side" select="string('bottom')" />
           </xsl:call-template>
-          
+
         </xsl:when>
         <xsl:otherwise>
-          
+
           <!-- insert the single borders -->
-          
+
           <xsl:if test="$cellProp/@fo:border-left">
             <xsl:call-template name="InsertCellBorder">
               <xsl:with-param name="border" select="$cellProp/@fo:border-left" />
@@ -1227,7 +1244,7 @@
         </xsl:otherwise>
 
       </xsl:choose>
-      
+
       <!--
       makz: old clever age stuff
       <xsl:choose>
@@ -1273,7 +1290,7 @@
       <xsl:call-template name="InsertCellDiagonals">
         <xsl:with-param name="cellProp" select="$cellProp"/>
       </xsl:call-template>-->
-      
+
     </w:tcBorders>
   </xsl:template>
 

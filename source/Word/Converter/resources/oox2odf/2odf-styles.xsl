@@ -5199,7 +5199,7 @@
 
 				<!-- write border attribute -->
 				<xsl:attribute name="{concat('fo:border-', $sideName)}">
-					<xsl:value-of select="concat('0', $width,' ',$style,' #',$color)"/>
+					<xsl:value-of select="concat($width,' ',$style,' #',$color)"/>
 				</xsl:attribute>
 
 				<!-- write border padding attribute -->
