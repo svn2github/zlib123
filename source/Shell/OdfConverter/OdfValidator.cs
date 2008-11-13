@@ -44,13 +44,8 @@ using Tenuto.Verifier;
 #endif
 
 
-namespace CleverAge.OdfConverter.CommandLineTool
+namespace OdfConverter.CommandLineTool
 {
-	/// <summary>Exception thrown when the file is not valid</summary>
-	public class OdfValidatorException : Exception
-	{
-		public OdfValidatorException(String msg) : base (msg) {}
-	}
 	
 #if MONO
 	// Dummy validation class
@@ -66,9 +61,9 @@ namespace CleverAge.OdfConverter.CommandLineTool
 	}
 #else 
 	// Not Mono
-	
-	/// <summary>Check the validity of a odf file. Throw an OdfValidatorException if errors occurs</summary>
-	public class OdfValidator
+
+    /// <summary>Check the validity of an ODF file. Throws a ValidationException if an errors occurs</summary>
+    public class OdfValidator : IValidator
 	{
         private const string RESOURCES_LOCATION = ".resources.";
 		
@@ -96,7 +91,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (Exception e)
             {
-                throw new OdfValidatorException("Problem parsing grammar file : " + e.Message);
+                throw new ValidationException("Problem parsing grammar file : " + e.Message);
             }
         }
 		
@@ -115,7 +110,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (Exception e)
             {
-                throw new OdfValidatorException("Problem opening the odt file : " + e.Message);
+                throw new ValidationException("Problem opening ODF file : " + e.Message);
             }
             try
             {
@@ -126,11 +121,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipEntryNotFoundException e)
             {
-                throw new OdfValidatorException("Entry not found in ODT file [content.xml]: " + e.Message);
+                throw new ValidationException("Entry not found in ODF file [content.xml]: " + e.Message);
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [content.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(fileName, "Problem validating ODF file [content.xml]: " + e.Message);
             }
             try
             {
@@ -141,11 +136,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipEntryNotFoundException)
             {
-                this.report.AddLog(fileName, "Entry not found: styles.xml", ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(fileName, "Entry not found: styles.xml");
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [styles.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(fileName, "Problem validating ODF file [styles.xml]: " + e.Message);
             }
             try
             {
@@ -156,11 +151,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipEntryNotFoundException)
             {
-                this.report.AddLog(fileName, "Entry not found: meta.xml", ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(fileName, "Entry not found: meta.xml");
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [meta.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(fileName, "Problem validating ODF file [meta.xml]: " + e.Message);
             }
             try
             {
@@ -171,15 +166,15 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (ZipEntryNotFoundException)
             {
-                this.report.AddLog(fileName, "Entry not found: settings.xml", ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(fileName, "Entry not found: settings.xml");
             }
             catch (Exception e)
             {
-                this.report.AddLog(fileName, "Problem validating ODT file [settings.xml]: " + e.Message, ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(fileName, "Problem validating ODF file [settings.xml]: " + e.Message);
             }
             if (!isValid)
             {
-                throw new OdfValidatorException("File is not valid");
+                throw new ValidationException("File is not valid");
             }
         }
 
@@ -196,7 +191,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
             public void Error(string msg)
             {
-                this.report.AddLog(this.filename, msg, ConversionReport.DEBUG_LEVEL);
+                this.report.LogDebug(this.filename, msg);
             }
 
         }

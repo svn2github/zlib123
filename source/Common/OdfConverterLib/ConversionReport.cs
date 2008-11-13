@@ -32,22 +32,25 @@ using System.IO;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
+    public enum LogLevel
+    {
+        Debug = 1,
+        Info = 2,
+        Warning = 3,
+        Error = 4
+    }  
+
     public class ConversionReport
     {
-        public const int DEBUG_LEVEL = 1;
-        public const int INFO_LEVEL = 2;
-        public const int WARNING_LEVEL = 3;
-        public const int ERROR_LEVEL = 4;
+        private StreamWriter _writer = null;
+        private LogLevel _level = LogLevel.Info;
 
-        private StreamWriter writer = null;
-        private int level = INFO_LEVEL;
-
-        public ConversionReport(string filename, int level)
+        public ConversionReport(string filename, LogLevel level)
         {
-            this.level = level;
+            this._level = level;
             if (filename != null)
             {
-                this.writer = new StreamWriter(new FileStream(filename, FileMode.Create, FileAccess.Write));
+                this._writer = new StreamWriter(new FileStream(filename, FileMode.Create, FileAccess.Write));
                 Console.WriteLine("Using report file: " + filename);
             }
         }
@@ -56,28 +59,48 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             string text = "*** " + message;
 
-            if (this.writer != null)
+            if (this._writer != null)
             {
-                this.writer.WriteLine(text);
-                this.writer.Flush();
+                this._writer.WriteLine(text);
+                this._writer.Flush();
             }
             Console.WriteLine(text);
         }
 
-        public void AddLog(string filename, string message, int level)
+        public void LogError(string filename, string message, params object[] args)
         {
-            if (level >= this.level)
+            addLog(filename, string.Format(message, args), LogLevel.Error);
+        }
+
+        public void LogWarning(string filename, string message, params object[] args)
+        {
+            addLog(filename, string.Format(message, args), LogLevel.Warning);
+        }
+
+        public void LogInfo(string filename, string message, params object[] args)
+        {
+            addLog(filename, string.Format(message, args), LogLevel.Info);
+        }
+
+        public void LogDebug(string filename, string message, params object[] args)
+        {
+            addLog(filename, string.Format(message, args), LogLevel.Debug);
+        }
+
+        private void addLog(string filename, string message, LogLevel level)
+        {
+            if (level >= this._level)
             {
                 string label = null;
                 switch (level)
                 {
-                    case 4:
+                    case LogLevel.Error:
                         label = "ERROR";
                         break;
-                    case 3:
+                    case LogLevel.Warning:
                         label = "WARNING";
                         break;
-                    case 2:
+                    case LogLevel.Info:
                         label = "INFO";
                         break;
                     default:
@@ -86,10 +109,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 string text = "[" + label + "]" + "[" + filename + "] " + message;
 
-                if (this.writer != null)
+                if (this._writer != null)
                 {
-                    this.writer.WriteLine(text);
-                    this.writer.Flush();
+                    this._writer.WriteLine(text);
+                    this._writer.Flush();
                 }
                 Console.WriteLine(text);
             }
@@ -97,10 +120,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public void Close()
         {
-            if (this.writer != null)
+            if (this._writer != null)
             {
-                this.writer.Close();
-                this.writer = null;
+                this._writer.Close();
+                this._writer = null;
             }
         }
 

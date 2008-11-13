@@ -85,7 +85,7 @@ namespace Sonata.OdfConverter.Presentation
 
                 // resolver
                 EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetEntryAssembly(),
-                    "CleverAge.OdfConverter.CommandLineTool", ".resources.", true);
+                    "OdfConverter.CommandLineTool", ".resources.", true);
                 this.settings.XmlResolver = resolver;
 
                 // schemas
@@ -433,7 +433,10 @@ namespace Sonata.OdfConverter.Presentation
                 if (r.NodeType == XmlNodeType.Element && r.LocalName == "Override")
                 {
 
-                    if (r.GetAttribute("ContentType").Equals("application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"))   //Contains(".presentationml."))
+                    if (r.GetAttribute("ContentType").Equals("application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml")
+                        || r.GetAttribute("ContentType").Equals("application/vnd.openxmlformats-officedocument.presentationml.template.main+xml")
+                        || r.GetAttribute("ContentType").Equals("application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml")
+                        || r.GetAttribute("ContentType").Equals("application/vnd.ms-powerpoint.template.macroEnabled.main+xml"))   
                     {
                         return true;
                     }

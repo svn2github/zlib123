@@ -18,11 +18,18 @@ Please make sure all recommended Windows updates are installed. Especially the i
 Usage
 -----
 
-OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX] [/XSLT Path] [/NOPACKAGING] [/SKIP Name] [/REPORT Filename] [/LEVEL Level]
+Usage: OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [/<OPTIONS>]
+
   Where options are:
      /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)
      /O PathOrFilename  Name of the output file (or output folder)
-     /F                 Replace existing file
+     /F                 Overwrite existing file(s)
+     /V                 Validate the result of the transformation against the schemas
+     /P                 Show conversion progress on the command line
+     /REPORT Filename   Name of the report file that should be generated (existing files will be replaced)
+     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR
+     
+  Batch options (use one of the /BATCH-<format> options at a time):
      /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (Note: use /F to replace existing files)
      /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (Note: use /F to replace existing files)
      /BATCH-ODP         Do a batch conversion over every ODP file in the input folder (Note: use /F to replace existing files)
@@ -30,17 +37,19 @@ OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX
      /BATCH-ODS         Do a batch conversion over every ODS file in the input folder (Note: use /F to replace existing files)
      /BATCH-XLSX        Do a batch conversion over every XLSX file in the input folder (Note: use /F to replace existing files)
      /R                 Process subfolders recursively during batch conversion
-     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)
-     /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)
-     /SKIP Name         Skip a post-processing (provide the post-processor's name)
-     /REPORT Filename   Name of the report file that must be generated (existing files will be replaced)
-     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR
+     
+  Converion direction options (to disable automatic file type detection):
      /ODT2DOCX          Force conversion to DOCX regardless of input file extension
      /DOCX2ODT          Force conversion to ODT regardless of input file extension
      /ODS2XLSX          Force conversion to XLSX regardless of input file extension
      /XLSX2ODS          Force conversion to ODS regardless of input file extension
      /ODP2PPTX          Force conversion to PPTX regardless of input file extension
      /PPTX2ODP          Force conversion to ODP regardless of input file extension
+     
+  Developer options:
+     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)
+     /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)
+     /SKIP Name         Skip a post-processing (provide the post-processor's name)
 
 
 Features Not Supported / Incompatibilities

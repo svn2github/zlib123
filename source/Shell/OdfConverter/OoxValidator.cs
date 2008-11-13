@@ -36,16 +36,21 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
 
-namespace CleverAge.OdfConverter.CommandLineTool 
+namespace OdfConverter.CommandLineTool 
 {
+    interface IValidator 
+    {
+        void validate(string fileName);
+    }
+
 	/// <summary>Exception thrown when the file is not valid</summary>
-	public class OoxValidatorException : Exception
+	public class ValidationException : Exception
 	{
-		public OoxValidatorException(String msg) : base (msg) {}
+		public ValidationException(String msg) : base (msg) {}
 	}
 	
 	/// <summary>Check the validity of a docx file. Throw an OoxValidatorException if errors occurs</summary>
-	public class OoxValidator
+	public class OoxValidator : IValidator
 	{
         private const string RESOURCES_LOCATION = "resources";
 
@@ -107,51 +112,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
 		}
 	
 		/// <summary>
-		/// Test the validator with a set of file.
-		/// </summary>
-		public static void test()
-		{
-            ConversionReport report = new ConversionReport(null, ConversionReport.DEBUG_LEVEL);
-			// the validator
-            OoxValidator v = new OoxValidator(report);
-			
-			// valid package
-			v.validate("tests/valid.docx");
-			
-			// invalid packages
-			Hashtable files = new Hashtable();
-			files.Add("invalid_0.docx",   "Has accepted a bad zip package.");
-			files.Add("invalid_1_1.docx", "Has accepted a package without '[Content_Types].xml'");
-			files.Add("invalid_1_2.docx", "Has accepted a package with no valid '[Content_Types].xml'");
-			files.Add("invalid_2_1.docx", "Has accepted a package without '_rels/.rels'");
-			files.Add("invalid_2_2.docx", "Has accepted a package with no valid '_rels/.rels'");
-			files.Add("invalid_3.docx",   "Has accepted a package without an 'officeDocument' relationship in '_rels/.rels'");
-			files.Add("invalid_4_1.docx", "Has accepted a package without a part defined in the '_rels/.rels'");
-			files.Add("invalid_4_2.docx", "Has accepted a package with a part not valid.");
-			files.Add("invalid_5.docx",   "Has accepted a package with an unknown content type for a part.");
-			files.Add("invalid_6_1.docx", "Has accepted a package which references ids but has no part relationship file.");
-			files.Add("invalid_6_2.docx", "Has accepted a package with an id which has no reference in the part relationship file.");
-			foreach (DictionaryEntry entry in files)
-			{
-				try
-				{
-					v.validate("tests/" + entry.Key);
-					throw new Exception((string)entry.Value);
-				}
-				catch (OoxValidatorException) {}
-			}
-			report.AddLog("test", "All tests succeed", ConversionReport.INFO_LEVEL);
-		}
-		
-	    /// <summary>
 	    /// Check the validity of an Office Open XML file.
 	    /// </summary>
 	    /// <param name="fileName">The path of the docx file.</param>
-		public void validate(String fileName)
+		public void validate(string fileName)
 		{
-			
-			
-			
 			// 0. The file must exist and be a valid Zip archive
 			ZipReader reader = null;
 			try
@@ -160,7 +125,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 			}
 			catch (Exception e)
 			{
-				throw new OoxValidatorException("Problem opening the docx file : " + e.Message);
+				throw new ValidationException("Problem opening the docx file : " + e.Message);
 			}
 			
 			// 1. [Content_Types].xml must be present and valid
@@ -171,7 +136,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 			}
 			catch (Exception)
 			{
-				throw new OoxValidatorException("The docx package must have a \"/[Content_Types].xml\" file");
+				throw new ValidationException("The docx package must have a \"/[Content_Types].xml\" file");
 			}
 			this.validateXml(contentTypes);
 
@@ -183,7 +148,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 			}
 			catch (Exception)
 			{
-				throw new OoxValidatorException("The docx package must have a \"/_rels/.rels\" file");
+				throw new ValidationException("The docx package must have a \"/_rels/.rels\" file");
 			}
 			this.validateXml(relationShips);
 			
@@ -200,7 +165,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 			}
 			if (docTarget == null)
 			{
-				throw new OoxValidatorException("openDocument relation not found in \"/_rels/.rels\"");
+				throw new ValidationException("openDocument relation not found in \"/_rels/.rels\"");
 			}
 			
 			// 4. For each item in _rels/.rels
@@ -222,7 +187,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 					}
 					catch (Exception)
 					{
-						throw new OoxValidatorException("The file \"" + target + "\" is described in the \"/_rels/.rels\" file but does not exist in the package.");
+						throw new ValidationException("The file \"" + target + "\" is described in the \"/_rels/.rels\" file but does not exist in the package.");
 					}
 					
 					// 4.2. A content type can be found in [Content_Types].xml file
@@ -291,7 +256,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 				}
 			}
 			
-			// 6. are all referenced relationships exist in the part relationship file
+			// 6. do all referenced relationships exist in the part relationship file
 			
 			// retrieve all ids referenced in the document
 			
@@ -312,7 +277,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 			{
 				if (!partRelExists)
 				{
-					throw new OoxValidatorException("Referenced id exist but no part relationship file found");
+					throw new ValidationException("Referenced id exist but no part relationship file found");
 				}
 				relationShips = reader.GetEntry(partRelPath);
 				r = XmlReader.Create(relationShips);
@@ -328,7 +293,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 				}
 				if (ids.Count != 0)
 				{
-					throw new OoxValidatorException("One or more relationship id have not been found in the partRelationship file : " + ids[0]);
+					throw new ValidationException("One or more relationship id have not been found in the partRelationship file : " + ids[0]);
 				}
 			}
 		}
@@ -368,14 +333,14 @@ namespace CleverAge.OdfConverter.CommandLineTool
 			}
 			if ( contentType == null )
 			{
-				throw new OoxValidatorException("Content type not found for " + target);
+				throw new ValidationException("Content type not found for " + target);
 			}
 			return contentType;
 		}
 		
         public void ValidationHandler(object sender, ValidationEventArgs args)
       	{
-        	throw new OoxValidatorException("XML Schema Validation error : " + args.Message);
+        	throw new ValidationException("XML Schema Validation error : " + args.Message);
       	}
 	}
 }

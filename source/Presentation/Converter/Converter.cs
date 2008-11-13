@@ -38,7 +38,8 @@ namespace Sonata.OdfConverter.Presentation
 {
     public class Converter : AbstractConverter
     {
-        private readonly string ODF_TEXT_MIME = "application/vnd.oasis.opendocument.presentation";
+        private const string ODF_MIME_TYPE_PRESENTATION = "application/vnd.oasis.opendocument.presentation";
+        private const string ODF_MIME_TYPE_PRESENTATION_TEMPLATE = "application/vnd.oasis.opendocument.presentation-template";
 
         public Converter() : base(Assembly.GetExecutingAssembly()) { }
 
@@ -112,8 +113,7 @@ namespace Sonata.OdfConverter.Presentation
                 string svgNameSpace = docContent.DocumentElement.Attributes["xmlns:svg"].Value.ToString();
                 if (svgNameSpace == "http://www.w3.org/2000/svg")
                 {
-                    throw new NotAnOdfDocumentException("Could not convert " + fileName
-                                                   + ". Invalid OASIS OpenDocument file");
+                    throw new NotAnOdfDocumentException("Could not convert " + fileName + ". Invalid OASIS OpenDocument file");
                 }
 
             }
@@ -132,12 +132,12 @@ namespace Sonata.OdfConverter.Presentation
             XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
             nsmgr.AddNamespace("manifest", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
 
-            XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='"
-                                                + ODF_TEXT_MIME + "']", nsmgr);
+            XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='" 
+                                                    + ODF_MIME_TYPE_PRESENTATION + "' or @manifest:media-type='"
+                                                    + ODF_MIME_TYPE_PRESENTATION_TEMPLATE + "']", nsmgr);
             if (node == null)
             {
-                throw new NotAnOdfDocumentException("Could not convert " + fileName
-                                                    + ". Invalid OASIS OpenDocument file");
+                throw new NotAnOdfDocumentException("Could not convert " + fileName + ". Invalid OASIS OpenDocument file");
             }
 
         }

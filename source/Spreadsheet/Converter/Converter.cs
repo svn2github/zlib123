@@ -12,8 +12,12 @@ namespace CleverAge.OdfConverter.Spreadsheet
     public class Converter : AbstractConverter
     {
 
-        private const string ODF_TEXT_MIME = "application/vnd.oasis.opendocument.spreadsheet";
-        private const string OOX_TEXT_CONTENTTYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml";
+        private const string ODF_MIME_TYPE_SPREADSHEET  = "application/vnd.oasis.opendocument.spreadsheet";
+        private const string ODF_MIME_TYPE_SPREADSHEET_TEMPLATE = "application/vnd.oasis.opendocument.spreadsheet-template";
+        private const string OOX_MIME_TYPE_SPREADSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml";
+        private const string OOX_MIME_TYPE_SPREADSHEET_TEMPLATE = "application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml";
+        private const string OOX_MIME_TYPE_SPREADSHEET_MACRO = "application/vnd.ms-excel.sheet.macroEnabled.main+xml";
+        private const string OOX_MIME_TYPE_SPREADSHEET_TEMPLATE_MACRO = "application/vnd.ms-excel.template.macroEnabled.main+xml";
 
 
         public Converter()
@@ -109,8 +113,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
             XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
             nsmgr.AddNamespace("manifest", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
 
-            XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='"
-                                                + ODF_TEXT_MIME + "']", nsmgr);
+            XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry["
+                                                    + "@manifest:media-type='"+ ODF_MIME_TYPE_SPREADSHEET + "'"
+                                                    + "or @manifest:media-type='" + ODF_MIME_TYPE_SPREADSHEET_TEMPLATE + "']", nsmgr);
+            
             if (node == null)
             {
                 throw new NotAnOdfDocumentException("Could not convert " + fileName
@@ -141,7 +147,10 @@ namespace CleverAge.OdfConverter.Spreadsheet
             {
                 throw e;
             }
-            XmlNodeList nodelist = doc.SelectNodes("//node()[@ContentType='" + OOX_TEXT_CONTENTTYPE + "']");
+            XmlNodeList nodelist = doc.SelectNodes("//node()[@ContentType='" + OOX_MIME_TYPE_SPREADSHEET + "'"
+                                                    + " or @ContentType='" + OOX_MIME_TYPE_SPREADSHEET_TEMPLATE + "'"
+                                                    + " or @ContentType='" + OOX_MIME_TYPE_SPREADSHEET_MACRO + "'"
+                                                    + " or @ContentType='" + OOX_MIME_TYPE_SPREADSHEET_TEMPLATE_MACRO + "']");
             if (nodelist.Count == 0)
             {
                 throw new NotAnOoxDocumentException("not a valid oox file");
