@@ -592,10 +592,10 @@
           <xsl:text>middle</xsl:text>
         </xsl:when>
         <xsl:when test="$xAlign='inside'">
-          <xsl:text>left</xsl:text>
+          <xsl:text>inside</xsl:text>
         </xsl:when>
         <xsl:when test="$xAlign='outside'">
-          <xsl:text>right</xsl:text>
+          <xsl:text>outside</xsl:text>
         </xsl:when>
         <xsl:when test="$xAlign='left'">
           <xsl:text>left</xsl:text>
