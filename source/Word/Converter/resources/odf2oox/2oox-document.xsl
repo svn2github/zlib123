@@ -1089,7 +1089,7 @@
         makz: new TOC Hyperlink Conversion
         -->
         <xsl:variable name="linkNr" select="count(../preceding-sibling::text:p) + 1"/>
-        <w:hyperlink w:history="1">
+        <w:hyperlink w:history="1" w:tooltip="{@office:title}">
           <xsl:attribute name="w:anchor">
             <xsl:value-of select="concat('Toc_', generate-id(ancestor::text:table-of-content), '_', $linkNr)"/>
           </xsl:attribute>
@@ -1100,7 +1100,7 @@
 
       <!--text body link-->
       <xsl:otherwise>
-        <w:hyperlink r:id="{generate-id()}" w:history="1">
+        <w:hyperlink r:id="{generate-id()}" w:history="1" w:tooltip="{@office:title}">
           <!-- warn loss of hyperlink properties -->
           <xsl:if test="@office:name">
             <xsl:message terminate="no">translation.odf2oox.hyperlinkName</xsl:message>

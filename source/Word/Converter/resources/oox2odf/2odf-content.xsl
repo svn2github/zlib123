@@ -906,7 +906,7 @@
 	<!-- hyperlinks -->
 	<xsl:template match="w:hyperlink">
 
-    <text:a xlink:type="simple">
+    <text:a xlink:type="simple" office:title="{@w:tooltip}">
       
       <xsl:attribute name="xlink:href">
         <!-- document hyperlink -->
