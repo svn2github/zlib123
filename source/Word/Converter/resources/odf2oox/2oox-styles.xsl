@@ -1039,13 +1039,16 @@
       </xsl:choose>
     </xsl:if>
 
-    <xsl:if test="@fo:color">
-      <w:color>
-        <xsl:attribute name="w:val">
-          <xsl:value-of select="substring(@fo:color, 2, string-length(@fo:color) -1)"/>
-        </xsl:attribute>
-      </w:color>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@fo:color">
+        <w:color w:val="{substring(@fo:color, 2, string-length(@fo:color) -1)}" />
+      </xsl:when>
+      <xsl:when test="@style:use-window-font-color = 'true'">
+        <w:color w:val="auto" />
+      </xsl:when>
+    </xsl:choose>
+
+
 
     <xsl:if test="@fo:letter-spacing">
       <w:spacing>
