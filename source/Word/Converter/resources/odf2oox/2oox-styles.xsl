@@ -1165,7 +1165,8 @@
             <xsl:when test="@fo:background-color = 'transparent' ">
               <w:highlight w:val="none" />
             </xsl:when>
-            <xsl:when test="$stringColor != ''">
+            <xsl:when test="$stringColor != '' and $stringColor != 'white' and not(ancestor::office:styles)">
+              <!-- create highlight only for automatic styles -->
               <w:highlight w:val="{$stringColor}" />
             </xsl:when>
             <xsl:otherwise>
