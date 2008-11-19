@@ -1769,7 +1769,7 @@
 			</xsl:choose>
 		</xsl:variable>
 
-		<xsl:if test="$fillColor != '' ">
+		<xsl:if test="$fillColor != '' and $fillColor != 'transparent'">
 			<xsl:attribute name="fillcolor">
 				<xsl:value-of select="$fillColor"/>
 			</xsl:attribute>
