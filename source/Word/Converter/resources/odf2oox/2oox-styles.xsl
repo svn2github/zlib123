@@ -297,10 +297,6 @@
       </xsl:when>
     </xsl:choose>
     
-    <xsl:if test="@fo:keep-with-next='always'">
-      <w:keepNext/>
-    </xsl:if>
-
     <!-- keep together -->
     <xsl:if test="@fo:keep-together='always'">
       <w:keepLines/>
