@@ -57,6 +57,7 @@
   <!-- a string containing detailed information on environment and
        converter version to be added to the document's meta data -->
   <xsl:param name="generator"/>
+  <xsl:param name="documentType" />
   
   <xsl:output method="xml" encoding="UTF-8"/>
 
@@ -111,7 +112,7 @@
             <xsl:attribute name="manifest:media-type">
               <xsl:choose>
 				  <!-- TODO: fix this. the name we have here is of the form abc.tmp only -->
-                <xsl:when test="substring($outputFile, string-length($outputFile) - 3) = 'ott'">
+                <xsl:when test="$documentType = 'Template'">
                   <xsl:value-of select="'application/vnd.oasis.opendocument.text-template'"/>
                 </xsl:when>
                 <xsl:otherwise>
