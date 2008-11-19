@@ -35,6 +35,8 @@
 
   <!-- content types -->
   <xsl:template name="contentTypes">
+    <xsl:param name="documentType" />
+    
     <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
       <Default Extension="jpeg" ContentType="image/jpeg"/>
       <Default Extension="jpg" ContentType="image/jpeg"/>
@@ -45,11 +47,18 @@
       <Default Extension="tif" ContentType="image/tiff"/>
       <Default Extension="tiff" ContentType="image/tiff"/>
       <Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.oleObject"/>
-      <Default Extension="rels"
-        ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+      <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
       <Default Extension="xml" ContentType="application/xml"/>
-      <Override PartName="/word/document.xml"
-        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+
+      <xsl:choose>
+        <xsl:when test="$documentType = 'Template'">
+          <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml" />
+        </xsl:when>
+        <xsl:otherwise>
+          <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" />
+        </xsl:otherwise>
+      </xsl:choose>
+      
       <Override PartName="/word/numbering.xml"
         ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
       <Override PartName="/docProps/core.xml"

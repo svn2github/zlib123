@@ -64,6 +64,7 @@
   <!-- a string containing detailed information on environment and
        converter version to be added to the document's meta data -->
   <xsl:param name="generator"/>
+  <xsl:param name="documentType" />
   
   <xsl:output method="xml" encoding="UTF-8"/>
 
@@ -175,7 +176,9 @@
 
       <!-- content types -->
       <pzip:entry pzip:target="[Content_Types].xml">
-        <xsl:call-template name="contentTypes"/>
+        <xsl:call-template name="contentTypes">
+          <xsl:with-param name="documentType" select="$documentType" />
+        </xsl:call-template>
       </pzip:entry>
 
       <!-- package relationship item -->
