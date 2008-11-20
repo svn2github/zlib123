@@ -885,6 +885,9 @@
           <xsl:choose>
             <xsl:when test="@fo:font-weight != 'bold' and number(@fo:font-weight)">
               <xsl:message terminate="no">translation.odf2oox.fontWeight</xsl:message>
+              <xsl:if test="number(@fo:font-weight) &gt;= 600">
+                <w:b w:val="on"/>
+              </xsl:if>
             </xsl:when>
             <xsl:otherwise>
               <w:b w:val="on"/>
