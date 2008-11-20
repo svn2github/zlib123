@@ -306,25 +306,23 @@ namespace OdfConverter.CommandLineTool
 		}
 		
 		// find the content type of a part in the package
-		private String findContentType(ZipReader reader, String target)
+		private string findContentType(ZipReader reader, string target)
 		{
-			String extension = null;
-			if (target.IndexOf(".") != -1)
-			{
-				extension = target.Substring(target.IndexOf(".") + 1);
-			}
+            // get extension without leading '.'
+			string extension = Path.GetExtension(target).Substring(1);
 			Stream contentTypes = reader.GetEntry(OOX_CONTENT_TYPE_FILE);
 			XmlReader r = XmlReader.Create(contentTypes);
 			bool overrided = false;
-			String contentType = null;
+			string contentType = null;
 			while (r.Read())
 			{
 				if (r.NodeType == XmlNodeType.Element)
 				{
-					if (r.LocalName == "Default" && extension != null && r.GetAttribute("Extension") == extension && !overrided)
+					if (r.LocalName.Equals("Default") && r.GetAttribute("Extension").Equals(extension) && !overrided)
 					{
 						contentType = r.GetAttribute("ContentType");
-					} else if (r.LocalName == "Override" && r.GetAttribute("PartName") == target)
+					} 
+                    else if (r.LocalName.Equals("Override") && r.GetAttribute("PartName").Equals(target))
 					{
 						overrided = true;
 						contentType = r.GetAttribute("ContentType");
