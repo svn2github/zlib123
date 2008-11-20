@@ -344,7 +344,7 @@ namespace OdfConverter.CommandLineTool
                     this._computeSize = false;
                 }
                 
-                converter.Transform(input, output);
+                converter.Transform(input, output, options);
 
                 if (options.ShowProgress)
                 {
@@ -519,7 +519,7 @@ namespace OdfConverter.CommandLineTool
             Console.WriteLine("     /BATCH-XLSX        Do a batch conversion over every XLSX file in the input folder (Note: use /F to replace existing files)");
             Console.WriteLine("     /R                 Process subfolders recursively during batch conversion");
             Console.WriteLine(); 
-            Console.WriteLine("  Converion direction options (to disable automatic file type detection):");
+            Console.WriteLine("  Conversion direction options (to disable automatic file type detection):");
             Console.WriteLine("     /ODT2DOCX          Force conversion to DOCX regardless of input file extension");
             Console.WriteLine("     /DOCX2ODT          Force conversion to ODT regardless of input file extension");
             Console.WriteLine("     /ODS2XLSX          Force conversion to XLSX regardless of input file extension");
