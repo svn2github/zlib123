@@ -292,7 +292,7 @@
       <xsl:when test="@fo:keep-with-next='always'">
         <w:keepNext/>
       </xsl:when>
-      <xsl:when test="@fo:keep-with-next!='always' and key('styles', ../@style:parent-style-name)/style:paragraph-properties/@fo:keep-with-next='always'">
+      <xsl:when test="@fo:keep-with-next='auto'">
         <w:keepNext w:val="off"/>
       </xsl:when>
     </xsl:choose>
