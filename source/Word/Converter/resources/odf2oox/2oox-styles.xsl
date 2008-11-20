@@ -67,7 +67,7 @@
       </w:docDefaults>
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
         mode="styles"/>
-      
+
       <!--
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles"
@@ -76,7 +76,7 @@
         select="document('styles.xml')/office:document-styles/office:automatic-styles" 
         mode="styles"/>
       -->
-      
+
       <!-- styles to ensure that hyperlinks will be matched and followed. -->
       <xsl:call-template name="InsertHyperlinkStyles"/>
       <!-- styles to ensure that indexes keep the same style when updated -->
@@ -178,16 +178,6 @@
         </xsl:otherwise>
       </xsl:choose>
 
-		<xsl:choose>
-			<xsl:when test="$prefixedStyleName = 'X3AS7TOCHyperlink' or $prefixedStyleName = 'X3AS7TABSTYLE' or $prefixedStyleName = 'BulletSymbol' or $prefixedStyleName = 'http://www.dialogika.de/stylename/hiddenParagraph'">
-				<w:semiHidden />
-			</xsl:when>
-			<xsl:when test="starts-with($prefixedStyleName, 'ID0')">
-				<!-- on roundtrip hide styles which were generated during DOCX -> ODT conversion -->
-				<w:hidden />
-			</xsl:when>
-		</xsl:choose>
-		
       <!-- Parent style name -->
       <xsl:choose>
         <!--xsl:when test="@style:parent-style-name = 'Addressee' ">
@@ -226,11 +216,20 @@
         <w:next w:val="{@style:next-style-name}"/>
       </xsl:if>
 
-      <!-- Hide automatic-styles -->
-      <xsl:if test="key('automatic-styles', @style:name)">
-        <w:hidden/>
-      </xsl:if>
-
+      <xsl:choose>
+        <xsl:when test="$prefixedStyleName = 'X3AS7TOCHyperlink' or $prefixedStyleName = 'X3AS7TABSTYLE' or $prefixedStyleName = 'BulletSymbol' or $prefixedStyleName = 'http://www.dialogika.de/stylename/hiddenParagraph'">
+          <w:semiHidden />
+        </xsl:when>
+        <!-- Hide automatic-styles -->
+        <xsl:when test="key('automatic-styles', @style:name)">
+          <w:hidden/>
+        </xsl:when>
+        <xsl:when test="starts-with($prefixedStyleName, 'ID0')">
+          <!-- on roundtrip hide styles which were generated during DOCX -> ODT conversion -->
+          <w:hidden />
+        </xsl:when>
+      </xsl:choose>
+      
       <!-- QuickFormat style -->
       <w:qFormat/>
 
@@ -279,7 +278,7 @@
     <xsl:if test="@style:background-image">
       <xsl:message terminate="no">translation.odf2oox.paragraphBgImage</xsl:message>
     </xsl:if>
-    
+
     <!-- parent style -->
     <xsl:if test="../@style:parent-style-name">
       <xsl:call-template name="InsertParagraphStyle">
@@ -296,7 +295,7 @@
         <w:keepNext w:val="off"/>
       </xsl:when>
     </xsl:choose>
-    
+
     <!-- keep together -->
     <xsl:if test="@fo:keep-together='always'">
       <w:keepLines/>
@@ -421,7 +420,7 @@
     <xsl:if test="contains(@style:writing-mode, 'rl')">
       <w:bidi/>
     </xsl:if>
-    
+
     <!-- Spacing -->
     <xsl:if
       test="@style:line-height-at-least or @fo:line-height or @fo:margin-bottom or @fo:margin-top or @style:line-spacing">
@@ -463,9 +462,9 @@
 
     <!-- outline level for numbering -->
     <xsl:choose>
-    <xsl:when test="parent::style:style/@style:default-outline-level">
-      <w:outlineLvl w:val="{number(parent::style:style/@style:default-outline-level) - 1}"/>
-    </xsl:when>
+      <xsl:when test="parent::style:style/@style:default-outline-level">
+        <w:outlineLvl w:val="{number(parent::style:style/@style:default-outline-level) - 1}"/>
+      </xsl:when>
       <xsl:otherwise>
         <!-- avoid putting TOC heading into TOC (bug #1760863) -->
         <xsl:if test="parent::style:style[@style:name='Contents_20_Heading']">
@@ -486,12 +485,12 @@
       <!-- outline level for numbering -->
       <xsl:choose>
         <xsl:when test="@style:default-outline-level">
-        <w:outlineLvl w:val="{number(@style:default-outline-level) - 1}"/>
+          <w:outlineLvl w:val="{number(@style:default-outline-level) - 1}"/>
         </xsl:when>
         <xsl:otherwise>
           <w:outlineLvl w:val="9"/>
         </xsl:otherwise>
-        </xsl:choose>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
@@ -502,17 +501,17 @@
       <xsl:when test="ancestor-or-self::style:style/@style:default-outline-level" >
 
         <!--math bugfix #1778336: Only write a reference to numId 1 if outline exists-->
-        <xsl:if test="document('styles.xml')/office:document-styles/office:styles/text:outline-style" >        
-        <w:numPr>
-          <w:numId w:val="1"/>
-          <!--math, dialogika: Added for bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" BEGIN-->
-          <!--Following the specification, the list level definition is not necessary here.
-              However, Word seems to need the list level definition anyway-->                   
+        <xsl:if test="document('styles.xml')/office:document-styles/office:styles/text:outline-style" >
+          <w:numPr>
+            <w:numId w:val="1"/>
+            <!--math, dialogika: Added for bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" BEGIN-->
+            <!--Following the specification, the list level definition is not necessary here.
+              However, Word seems to need the list level definition anyway-->
             <w:ilvl w:val="{ancestor-or-self::style:style/@style:default-outline-level - 1}"/>
-          <!--math, dialogika: Added for bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" END-->
-        </w:numPr>
-      </xsl:if>
-    </xsl:when>
+            <!--math, dialogika: Added for bug fix "[ 1804139 ] ODT: heading level 2-9 not numbered" END-->
+          </w:numPr>
+        </xsl:if>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:if
           test="ancestor::office:styles and key('styles', ancestor-or-self::style:style/@style:parent-style-name)/@style:default-outline-level">
@@ -732,7 +731,7 @@
         <xsl:with-param name="styleName" select="parent::style:style/@style:name"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <!-- left indent -->
     <xsl:variable name="leftInd">
       <xsl:call-template name="ComputeAdditionalIndent">
@@ -753,7 +752,7 @@
         <xsl:with-param name="style" select="parent::style:style|parent::style:default-style" />
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
         <xsl:call-template name="OverrideNumberingProperty">
@@ -761,19 +760,19 @@
           <xsl:with-param name="property">indent</xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-     
+
       <xsl:otherwise>
-        
+
         <w:ind>
-         
+
           <xsl:attribute name="w:left">
             <xsl:value-of select="$leftInd"/>
           </xsl:attribute>
-          
+
           <xsl:attribute name="w:right">
             <xsl:value-of select="$rightInd"/>
           </xsl:attribute>
-          
+
           <xsl:choose>
             <xsl:when test="$firstLineIndent != 0">
               <xsl:choose>
@@ -1157,19 +1156,19 @@
           <xsl:with-param name="RGBcolor" select="@fo:background-color"/>
         </xsl:call-template>
       </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="@fo:background-color = 'transparent' ">
-              <w:highlight w:val="none" />
-            </xsl:when>
-            <xsl:when test="$stringColor != '' and $stringColor != 'white' and not(ancestor::office:styles)">
-              <!-- create highlight only for automatic styles -->
-              <w:highlight w:val="{$stringColor}" />
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- no built-in highlight color, thus use shading instead of highlight -->
-              <w:shd w:val="clear" w:color="auto" w:fill="{translate(@fo:background-color, 'abcdef#', 'ABCDEF')}" />
-            </xsl:otherwise>
-          </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="@fo:background-color = 'transparent' ">
+          <w:highlight w:val="none" />
+        </xsl:when>
+        <xsl:when test="$stringColor != '' and $stringColor != 'white' and not(ancestor::office:styles)">
+          <!-- create highlight only for automatic styles -->
+          <w:highlight w:val="{$stringColor}" />
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- no built-in highlight color, thus use shading instead of highlight -->
+          <w:shd w:val="clear" w:color="auto" w:fill="{translate(@fo:background-color, 'abcdef#', 'ABCDEF')}" />
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
 
     <xsl:if test="@style:text-underline-style">
@@ -1266,7 +1265,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-    
+
     <xsl:if test="@style:text-emphasize">
       <w:em>
         <xsl:attribute name="w:val">
@@ -1491,7 +1490,7 @@
     <xsl:param name="Context"></xsl:param>
     <xsl:for-each select="$Context">
       <xsl:variable name="NextContext" select="preceding::*[self::text:p |self::text:h][1]" />
-      
+
       <xsl:choose>
         <xsl:when test="not($NextContext)"></xsl:when>
         <xsl:when test="key('automatic-styles',$NextContext/@text:style-name)/@style:master-page-name">
@@ -1501,12 +1500,12 @@
           <xsl:call-template name="DetermineMasterPageName">
             <xsl:with-param name="Context" select="$NextContext" />
           </xsl:call-template>
-        </xsl:otherwise>            
+        </xsl:otherwise>
       </xsl:choose>
-    </xsl:for-each>  
+    </xsl:for-each>
   </xsl:template>
   <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation END-->
-  
+
 
   <!-- Single tab-stop processing -->
   <xsl:template name="tabStop">
@@ -1541,8 +1540,8 @@
           </xsl:call-template>
         </xsl:variable>
 
-        <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation BEGIN-->        
-        
+        <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation BEGIN-->
+
         <xsl:variable name="MasterPageName">
           <xsl:call-template name="DetermineMasterPageName">
             <xsl:with-param name="Context" select="." />
@@ -1561,7 +1560,7 @@
         </xsl:variable>
 
         <!--math, dialogika: bugfix #1831938, wrong master-page-style was used for caluclation END-->
-        
+
         <xsl:variable name="position">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
@@ -1580,7 +1579,7 @@
                         />-->
                         <xsl:with-param name="length"
                           select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:page-width"
-                        />                        
+                        />
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:variable name="pageMarginL">
@@ -1590,7 +1589,7 @@
                         />-->
                         <xsl:with-param name="length"
                           select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-left"
-                        />                        
+                        />
                       </xsl:call-template>
                     </xsl:variable>
                     <xsl:variable name="pageMarginR">
@@ -1600,7 +1599,7 @@
                         />-->
                         <xsl:with-param name="length"
                           select="key('page-layouts', $MasterPageLayoutName)[1]/style:page-layout-properties/@fo:margin-right"
-                        />                        
+                        />
                       </xsl:call-template>
                     </xsl:variable>
 
@@ -1808,12 +1807,12 @@
   <xsl:template name="InsertPageLayoutProperties">
     <xsl:param name="hasFooter"/>
     <xsl:param name="hasHeader"/>
-    
+
     <!-- background color lost if it is not main layout -->
     <xsl:if test="@fo:background-color != 'transparent' and parent::style:page-layout/@style:name != $default-master-style/@style:page-layout-name">
       <xsl:message terminate="no">translation.odf2oox.pageBgColor</xsl:message>
     </xsl:if>
-    
+
     <!-- page type -->
     <!-- TODO : review. This entails a page jump on an even or odd page with a potential unwanted blank page in between... -->
     <!--xsl:if test="parent::style:page-layout/@style:page-usage">
@@ -1826,7 +1825,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:if-->
-    
+
     <!-- page size -->
     <xsl:choose>
       <xsl:when
@@ -1982,7 +1981,7 @@
   <xsl:template name="ComputePageMargins">
     <xsl:param name="hasFooter" />
     <xsl:param name="hasHeader" />
-    
+
     <!-- report loss of header/footer properties -->
     <xsl:variable name="header-properties" select="parent::style:page-layout/style:header-style/style:header-footer-properties"/>
     <xsl:variable name="footer-properties" select="parent::style:page-layout/style:footer-style/style:header-footer-properties"/>
@@ -2921,20 +2920,20 @@
 
   <!-- ignored -->
   <xsl:template match="text()" mode="styles"/>
-  
-  
+
+
   <!-- Climb style hierarchy for a property -->
   <xsl:template name="FindPropertyInStyleHierarchy">
     <xsl:param name="style-name"/>
     <xsl:param name="property-name"/>
     <xsl:param name="context">content.xml</xsl:param>
-    
+
     <xsl:variable name="style-name-exists">
       <xsl:for-each select="document($context)">
         <xsl:value-of select="boolean(key('styles', $style-name))"/>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="$style-name-exists = 'true' ">
         <xsl:for-each select="document($context)">
@@ -2966,6 +2965,6 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
 
 </xsl:stylesheet>

@@ -47,36 +47,31 @@
 	<xsl:template name="InsertSettings">
 		<w:settings>
 
-			<!--clam, dialogika: bugfix 1945545-->
-			<w:stylePaneFormatFilter w:val="1021" />
-
-			<!-- view layout -->
-			<xsl:variable name="view-settings"
-			  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:view-settings']"/>
-			<w:view>
-				<xsl:attribute name="w:val">
-					<xsl:choose>
-						<xsl:when
+      <!-- view layout -->
+      <xsl:variable name="view-settings" select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:view-settings']"/>
+      <w:view>
+        <xsl:attribute name="w:val">
+          <xsl:choose>
+            <xsl:when
 						  test="$view-settings/config:config-item[@config:name='InBrowseMode' and @config:type='boolean'] = 'true' "
               >web</xsl:when>
-						<xsl:otherwise>print</xsl:otherwise>
-					</xsl:choose>
-				</xsl:attribute>
-			</w:view>
-
-			<xsl:for-each select="document('styles.xml')">
-				<xsl:if
-				  test="key('page-layouts', $default-master-style/@style:page-layout-name)/style:page-layout-properties/@fo:background-color">
+            <xsl:otherwise>print</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </w:view>
+      
+      <xsl:for-each select="document('styles.xml')">
+				<xsl:if test="key('page-layouts', $default-master-style/@style:page-layout-name)/style:page-layout-properties/@fo:background-color">
 					<w:displayBackgroundShape/>
 				</xsl:if>
 			</xsl:for-each>
 
-			<!-- track changes -->
-			<xsl:if
-			  test="document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes">
-				<w:trackRevisions
-				  w:val="{document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes}"
-        />
+      <!--clam, dialogika: bugfix 1945545-->
+      <w:stylePaneFormatFilter w:val="1021" />
+
+      <!-- track changes -->
+			<xsl:if test="document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes">
+				<w:trackRevisions w:val="{document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes}" />
 			</xsl:if>
 
 			<!-- document protection -->
@@ -84,14 +79,11 @@
 				<w:documentProtection w:edit="readOnly" w:enforcement="1"/>
 			</xsl:if>
 
-			<xsl:if
-			  test="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance">
+			<xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance">
 				<w:defaultTabStop>
 					<xsl:attribute name="w:val">
 						<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length"
-							  select="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance"
-              />
+							<xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance" />
 						</xsl:call-template>
 					</xsl:attribute>
 				</w:defaultTabStop>
@@ -112,16 +104,12 @@
       </xsl:if-->
 
 			<!-- Footnotes document wide properties -->
-			<xsl:apply-templates
-			  select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
-			  mode="note">
+			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note">
 				<xsl:with-param name="wide">yes</xsl:with-param>
 			</xsl:apply-templates>
 
 			<!-- Endnotes document wide properties -->
-			<xsl:apply-templates
-			  select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
-			  mode="note">
+			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note">
 				<xsl:with-param name="wide">yes</xsl:with-param>
 			</xsl:apply-templates>
 
@@ -142,7 +130,14 @@
 						</xsl:choose>
 					</xsl:attribute>
 				</w:suppressTopSpacing>
-				<w:doNotUseHTMLParagraphAutoSpacing>
+
+        <!--divo, dialogika: retain Use Printer Metrics compatibility setting BEGIN -->
+        <xsl:if test="$configuration-settings/config:config-item[@config:name='PrinterIndependentLayout']/text()='disabled'">
+          <w:usePrinterMetrics/>
+        </xsl:if>
+        <!--divo, dialogika: retain Use Printer Metrics compatibility setting END -->
+
+        <w:doNotUseHTMLParagraphAutoSpacing>
 					<xsl:attribute name="w:val">
 						<xsl:choose>
 							<xsl:when test="$configuration-settings/config:config-item[@config:name='AddParaTableSpacing']/text()='false'">
@@ -154,13 +149,7 @@
 						</xsl:choose>
 					</xsl:attribute>
 				</w:doNotUseHTMLParagraphAutoSpacing>
-
-				<!--divo, dialogika: retain Use Printer Metrics compatibility setting BEGIN -->
-				<xsl:if test="$configuration-settings/config:config-item[@config:name='PrinterIndependentLayout']/text()='disabled'">
-					<w:usePrinterMetrics/>
-				</xsl:if>
-				<!--divo, dialogika: retain Use Printer Metrics compatibility setting END -->
-
+				
 			</w:compat>
 		</w:settings>
 	</xsl:template>
