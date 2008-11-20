@@ -253,11 +253,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Transform(inputFile, null);
         }
 
+        public void Transform(string inputFile, string outputFile)
+        {
+            Transform(inputFile, outputFile, null);
+        }
+
         /// <summary>
         /// bug #1644285 Zlib crashes on non-ascii file names.
         /// TODO : temp folders
         /// </summary>
-        public void Transform(string inputFile, string outputFile)
+        public void Transform(string inputFile, string outputFile, ConversionOptions options)
         {
             string tempInputFile = Path.GetTempFileName();
             string tempOutputFile = outputFile == null ? null : Path.GetTempFileName();
@@ -268,7 +273,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 //Added by sonata -15/11/2007              
                 inputTempFileName = tempInputFile;
                 //End
-                _Transform(tempInputFile, tempOutputFile);
+                _Transform(tempInputFile, tempOutputFile, options);
 
                 if (outputFile != null)
                 {
@@ -300,7 +305,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
         
-        protected virtual void _Transform(string inputFile, string outputFile)
+        protected virtual void _Transform(string inputFile, string outputFile, ConversionOptions options)
         {
             // this throws an exception in the the following cases:
             // - input file is not a valid file
@@ -321,7 +326,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    parameters.AddParam("generator", "", "OpenXML/ODF Translator v2.5");
+                    if (options != null)
+                    {
+                        parameters.AddParam("documentType", "", options.DocumentType.ToString());
+                        parameters.AddParam("generator", "", options.Generator);
+                    }
+                    else
+                    {
+                        parameters.AddParam("generator", "", "OpenXML/ODF Translator v2.5");
+                    }
                     XmlWriter finalWriter;
                     if (this.packaging)
                     {
