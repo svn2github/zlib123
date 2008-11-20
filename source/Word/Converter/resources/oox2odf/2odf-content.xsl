@@ -802,16 +802,17 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<!-- Detect if there is text before a break page in a paragraph -->
+	<!-- 2008-11-20/divo: moved inside template match="w:r" to fix #1963856 (no span was generated in this template) -->
+  <!-- Detect if there is text before a break page in a paragraph -->
 	<!-- BUG 1583404 - Page breaks not correct converted - 17/07/2007-->
-	<xsl:template match="w:r[w:br[@w:type='page']]">
-    <!--2008-10-31/divo: Fix for #2124338 
-        fo:break-before="page" has no effect for the first paragraph in an ODT document, therefore we need to create an extra paragraph -->
+	<!--<xsl:template match="w:r[w:br[@w:type='page']]">
+    --><!--2008-10-31/divo: Fix for #2124338 
+        fo:break-before="page" has no effect for the first paragraph in an ODT document, therefore we need to create an extra paragraph --><!--
 		<xsl:if test="preceding-sibling::w:r/w:t[1] or not(../preceding-sibling::node())">
 			<pcut:paragraph_to_cut/>
 		</xsl:if>
 		<xsl:apply-templates select="w:t"/>
-	</xsl:template>
+	</xsl:template>-->
 
 	<!--tabs-->
 	<xsl:template match="w:tab[not(parent::w:tabs)]">
@@ -844,8 +845,17 @@
 	<xsl:template match="w:r">
 		<xsl:param name="ignoreFieldFlag" />
 
-		<xsl:message terminate="no">progress:w:r</xsl:message>
-		<xsl:choose>
+    <xsl:message terminate="no">progress:w:r</xsl:message>
+
+    <!-- Detect if there is text before a break page in a paragraph, in that case the current paragraph must be split in two -->
+    <!-- BUG 1583404 - Page breaks not correct converted - 17/07/2007-->
+    <!-- 2008-10-31/divo: Fix for #2124338 
+      fo:break-before="page" has no effect for the first paragraph in an ODT document, therefore we need to create an extra paragraph -->
+    <xsl:if test="w:br[@w:type='page'] and (preceding-sibling::w:r/w:t[1] or not(../preceding-sibling::node()))">
+      <pcut:paragraph_to_cut/>
+    </xsl:if>
+      
+    <xsl:choose>
 
 			<!--fields-->
 			<!--xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate']"-->
