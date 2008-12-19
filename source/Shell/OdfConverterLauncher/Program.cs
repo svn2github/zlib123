@@ -291,10 +291,14 @@ namespace OdfConverterLauncher
                         app = new Word();
                         output = addin.AddinLib.GetTempFileName(input, ".docx");
                     }
-
-
+                    //Code Added by Achougle@Xandros.com on 12 Nov 2008
+                    string inputFile;
+                    FileInfo file = new FileInfo(input);
+                    inputFile = file.FullName;
+                    //Code Added by Achougle@Xandros.com on 12 Nov 2008
                     addin.SetUICulture();
-                    addin.AddinLib.OdfToOox(input, output, showUserInterface);
+                    addin.AddinLib.OdfToOox(inputFile, output, showUserInterface);
+                    //Code Changed by Achougle@Xandros.com on 12 Nov 2008
                     if (File.Exists((string)output))
                     {
                         app.Visible = true;
