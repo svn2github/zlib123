@@ -190,7 +190,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        protected override void importOdf()
+        public override void importOdf()
         {
             foreach (string odfFile in getOpenFileNames())
             {
@@ -227,7 +227,7 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        protected override void exportOdf()
+        public override void exportOdf()
         {
             LateBindingObject doc = _application.Invoke("ActivePresentation");
 

@@ -191,7 +191,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        protected override void importOdf()
+        public override void importOdf()
         {
             foreach (string odfFile in getOpenFileNames())
             {
@@ -237,7 +237,7 @@ namespace OdfConverter.Wordprocessing.OdfWordAddin
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        protected override void exportOdf()
+        public override void exportOdf()
         {
             // check if Word12 converter is installed
             if (_word12SaveFormat == -1)

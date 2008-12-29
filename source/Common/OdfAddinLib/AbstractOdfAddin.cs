@@ -35,6 +35,7 @@ using System.IO;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace OdfConverter.OdfConverterLib
 {
@@ -42,7 +43,7 @@ namespace OdfConverter.OdfConverterLib
     /// An abstract base class for the Office add-ins
     /// </summary>
     /// <seealso class='IDTExtensibility2' />
-    public abstract class AbstractOdfAddin : Object, OdfConverter.Extensibility.IDTExtensibility2, IRibbonExtensibility
+    public abstract class AbstractOdfAddin : StandardOleMarshalObject, OdfConverter.Extensibility.IDTExtensibility2, IRibbonExtensibility
     {
         /// <summary>
         /// The Office version number: 
@@ -200,6 +201,9 @@ namespace OdfConverter.OdfConverterLib
             this.SetUICulture();
 
             this.DialogBoxTitle = _addinLib.GetString("OdfConverterTitle");
+
+            LateBindingObject addInInstance = new LateBindingObject(addInInst);
+            addInInstance.Set("Object", (object)this);
 
             if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)
             {
@@ -375,7 +379,7 @@ namespace OdfConverter.OdfConverterLib
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        protected abstract void importOdf();
+        public abstract void importOdf();
 
         /// <summary>
         /// Event handler for Office 2007
@@ -403,7 +407,7 @@ namespace OdfConverter.OdfConverterLib
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        protected abstract void exportOdf();
+        public abstract void exportOdf();
 
         /// <summary>
         /// Event handler for Office 2007

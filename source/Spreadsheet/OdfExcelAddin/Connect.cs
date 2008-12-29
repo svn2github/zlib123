@@ -184,7 +184,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         /// <summary>
         /// Read an ODF file.
         /// </summary>
-        protected override void importOdf()
+        public override void importOdf()
         {
             foreach (string odfFile in getOpenFileNames())
             {
@@ -230,7 +230,7 @@ namespace OdfConverter.Spreadsheet.OdfExcelAddin
         /// <summary>
         /// Save as ODF.
         /// </summary>
-        protected override void exportOdf()
+        public override void exportOdf()
         {
             System.Globalization.CultureInfo ci;
             ci = System.Threading.Thread.CurrentThread.CurrentCulture;

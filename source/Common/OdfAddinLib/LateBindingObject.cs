@@ -88,12 +88,12 @@ namespace OdfConverter.OdfConverterLib
         }
 
 #region Methods to access properties
-        protected object Get(string propertyName)
+        public object Get(string propertyName)
         {
             return _obj.GetType().InvokeMember(propertyName, BindingFlags.GetProperty, null, _obj, null);
         }
 
-        protected void Set(string propertyName, object value)
+        public void Set(string propertyName, object value)
         {
             _obj.GetType().InvokeMember(propertyName, BindingFlags.SetProperty, null, _obj, new object[] { value });
         }
