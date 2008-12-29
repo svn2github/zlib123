@@ -269,17 +269,19 @@ namespace OdfConverterLauncher
 
                 bool showUserInterface = true;
 
-                string input = args[0];
+                // args[0] might be a short DOS name but we want the full path name
+                FileInfo fi = new FileInfo(args[0]);
+                string input = fi.FullName;
 
                 try
                 {
-                    if (input.ToUpper().EndsWith(".ODP"))
+                    if (input.ToUpper().EndsWith(".ODP") || input.ToUpper().EndsWith(".OTP"))
                     {
                         addin = new OdfConverter.Presentation.OdfPowerPointAddin.Connect();
                         app = new Presentation();
                         output = addin.AddinLib.GetTempFileName(input, ".pptx");
                     }
-                    else if (input.ToUpper().EndsWith(".ODS"))
+                    else if (input.ToUpper().EndsWith(".ODS") || input.ToUpper().EndsWith(".OTS"))
                     {
                         addin = new OdfConverter.Spreadsheet.OdfExcelAddin.Connect();
                         app = new Excel();
@@ -291,14 +293,9 @@ namespace OdfConverterLauncher
                         app = new Word();
                         output = addin.AddinLib.GetTempFileName(input, ".docx");
                     }
-                    //Code Added by Achougle@Xandros.com on 12 Nov 2008
-                    string inputFile;
-                    FileInfo file = new FileInfo(input);
-                    inputFile = file.FullName;
-                    //Code Added by Achougle@Xandros.com on 12 Nov 2008
                     addin.SetUICulture();
-                    addin.AddinLib.OdfToOox(inputFile, output, showUserInterface);
-                    //Code Changed by Achougle@Xandros.com on 12 Nov 2008
+                    addin.AddinLib.OdfToOox(input, output, showUserInterface);
+                    
                     if (File.Exists((string)output))
                     {
                         app.Visible = true;
