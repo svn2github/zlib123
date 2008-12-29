@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9,00"
 	Name="OdfPowerPointAddinShim"
 	ProjectGUID="{FED3CFB2-ED96-4027-86DE-F490CD65CD3D}"
 	RootNamespace="OdfPowerPointAddinShim"
 	Keyword="AtlProj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -83,6 +84,8 @@
 				ModuleDefinitionFile=".\OdfPowerPointAddinShim.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/OdfPowerPointAddinShim.lib"
 				TargetMachine="1"
 			/>
@@ -103,9 +106,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -182,6 +182,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/OdfPowerPointAddinShim.lib"
 				TargetMachine="1"
 			/>
@@ -202,9 +204,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -281,6 +280,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/OdfPowerPointAddinShim.lib"
 				TargetMachine="1"
 			/>
@@ -303,12 +304,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing post-build tasks"
-				CommandLine="echo $(SolutionDir)..\signing\sign.bat &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)..\signing\sign.bat &quot;$(TargetPath)&quot;&#x0D;&#x0A;&#x0D;&#x0A;::&quot;$(FrameworkSDKDir)bin\signtool.exe&quot; sign /d &quot;OpenXML/ODF Translator for Office&quot; /du &quot;http://odf-converter.sourceforge.net&quot; /t &quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot; /f %CERTFILE% /p %CERTPASS% /v &quot;$(TargetPath)&quot;"
+				CommandLine="echo $(SolutionDir)..\signing\sign.bat &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)..\signing\sign.bat &quot;$(TargetPath)&quot;&#x0D;&#x0A;&#x0D;&#x0A;::&quot;$(FrameworkSDKDir)bin\signtool.exe&quot; sign /d &quot;OpenXML/ODF Translator for Office&quot; /du &quot;http://odf-converter.sourceforge.net&quot; /t &quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot; /f %CERTFILE% /p %CERTPASS% /v &quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 				ExcludedFromBuild="false"
 			/>
 		</Configuration>
