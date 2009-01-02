@@ -170,7 +170,31 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             else
             {
-                xslDoc = new XPathDocument(this.ExternalResources + "/" + xslLocation);
+                string xsltFile = this.ExternalResources;
+
+                if (!File.Exists(xsltFile))
+                {
+                    // try several subfolders within the project directory tree
+                    xsltFile = Path.Combine(this.ExternalResources, xslLocation);
+                    
+                    if (!File.Exists(xsltFile))
+                    {
+                        xslLocation = Path.Combine(this.DirectTransform ? "odf2oox" : "oox2odf", xslLocation);
+                        xsltFile = Path.Combine(this.ExternalResources, xslLocation);
+
+                        if (!File.Exists(xsltFile))
+                        {
+                            xslLocation = Path.Combine("resources", xslLocation);
+                            xsltFile = Path.Combine(this.ExternalResources, xslLocation);
+
+                            if (!File.Exists(xsltFile))
+                            {
+                                throw new FileNotFoundException("No external XSLT file could be found at the specified location.", this.ExternalResources);
+                            }
+                        }
+                    }
+                }
+                xslDoc = new XPathDocument(xsltFile);
             }
 
             if (!this.compiledProcessors.ContainsKey(xslLocation))
