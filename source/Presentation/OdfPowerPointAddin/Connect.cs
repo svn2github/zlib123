@@ -307,7 +307,10 @@ namespace OdfConverter.Presentation.OdfPowerPointAddin
                             // setting defaultformat value in registry
                             int oldFormat = SetPPTXasDefault();
 
-                            tmpFileName = this._addinLib.GetTempFileName((string)sourceFileName, ".ppt");
+				   //Code added by Achougle@Xandros on 2 Jan 09
+                           tmpFileName = this._addinLib.GetTempPath((string)sourceFileName, ".ppt");
+                         //tmpFileName = this._addinLib.GetTempFileName((string)sourceFileName, ".ppt");
+                           //Code added by Achougle@Xandros on 2 Jan 09
 
                             SaveCopyAs(doc, (string)tmpFileName);
 
