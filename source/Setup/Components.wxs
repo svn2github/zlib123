@@ -104,7 +104,7 @@
           </Component>
 
           <Component Id="PresentationConverter.dll" Guid="5B2F786B-AFFA-4557-BE2F-9072DA9B6681">
-            <File Name="PresentationConverter.dll" Source="..\Presentation\Converter\bin\$(var.Configuration)\PresentationConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+            <File Name="PresentationConverter.dll" Source="..\Presentation\Converter\bin\SignedRelease\PresentationConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
               <netfx:NativeImage Id="ngen_PresentationConverter.exe" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
             </File>
           </Component>
@@ -120,7 +120,8 @@
           </Component>
 
           <Component Id="SpreadsheetConverter.dll" Guid="55AC6AB5-BC9F-493B-A51C-1A15F2B39CDF">
-            <File Name="SpreadsheetConverter.dll" Source="..\Spreadsheet\Converter\bin\$(var.Configuration)\SpreadsheetConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+            <!--<File Name="SpreadsheetConverter.dll" Source="..\Spreadsheet\Converter\bin\$(var.Configuration)\SpreadsheetConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
+            <File Name="SpreadsheetConverter.dll" Source="..\Spreadsheet\Converter\bin\SignedRelease\SpreadsheetConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
               <netfx:NativeImage Id="ngen_SpreadsheetConverter.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
             </File>
           </Component>
@@ -136,7 +137,8 @@
           </Component>
 
           <Component Id="WordprocessingConverter.dll" Guid="422002BF-1AD8-47EF-8387-9A8846645502">
-            <File Name="WordprocessingConverter.dll" Source="..\Word\Converter\bin\$(var.Configuration)\WordprocessingConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
+            <!--<File Name="WordprocessingConverter.dll" Source="..\Word\Converter\bin\$(var.Configuration)\WordprocessingConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">-->
+            <File Name="WordprocessingConverter.dll" Source="..\Word\Converter\bin\SignedRelease\WordprocessingConverter.dll" DiskId="1" KeyPath="yes" Checksum="yes">
               <netfx:NativeImage Id="ngen_WordprocessingConverter.dll" Platform="32bit" Priority="1" AppBaseDirectory='INSTALLDIR'/>
             </File>
           </Component>
