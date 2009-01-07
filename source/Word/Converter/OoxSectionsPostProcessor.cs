@@ -57,6 +57,8 @@ namespace OdfConverter.Wordprocessing
         private bool nextIsEndSection = false;
         private bool nextIsMasterPage = false;
         private bool nextIsSoftPageBreak = false;
+        private bool PPrWritten = false;
+
         private Element odfSectPr;
         private Element cont;
         private Element titlePg;
@@ -142,6 +144,7 @@ namespace OdfConverter.Wordprocessing
             else if (IsParagraphOrTable())
             {
                 StartParagraphOrTable();
+                PPrWritten = false;
             }
             else if (IsEvenAndOddHeaders())
             {
@@ -174,6 +177,11 @@ namespace OdfConverter.Wordprocessing
             else if (IsEvenAndOddHeaders())
             {
                 EndEvenAndOddHeaders();
+            }
+            else if (IsPPr())
+            {
+                PPrWritten = true;
+                this.nextWriter.WriteEndElement();
             }
             else
             {
@@ -260,6 +268,12 @@ namespace OdfConverter.Wordprocessing
             this.nextWriter.WriteStartAttribute("w", "id", W_NAMESPACE);
             this.nextWriter.WriteString(this.currentPermId.ToString());
             this.nextWriter.WriteEndAttribute();
+        }
+
+        private bool IsPPr()
+        {
+            Element e = (Element)this.currentNode.Peek();
+            return  ("pPr".Equals(e.Name) && W_NAMESPACE.Equals(e.Ns));
         }
 
         /**
@@ -649,6 +663,12 @@ namespace OdfConverter.Wordprocessing
                     // w:pPr are written here instead of 2oox-sections.xsl
                     if (this.nextIsSoftPageBreak)
                     {
+                        if (PPrWritten)
+                        {
+                          nextWriter.WriteEndElement(); // end p
+                          nextWriter.WriteStartElement("w", "p", W_NAMESPACE);
+                        }
+
                         nextWriter.WriteStartElement("w", "pPr", W_NAMESPACE);
                     }
                     // math & clam, dialogika: bugfix #1838832 END
