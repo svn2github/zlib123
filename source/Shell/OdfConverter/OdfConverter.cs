@@ -252,7 +252,7 @@ namespace OdfConverter.CommandLineTool
                 }
             }
 
-            this._report.AddComment("Results: " + nbConverted + " of " + nbFiles + " file(s) were converted successfully.");
+            this._report.AddComment("Result: " + nbConverted + " of " + nbFiles + " file(s) were converted successfully.");
 
             if (batchOptions.Validate)
             {
