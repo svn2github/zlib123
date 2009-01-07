@@ -217,7 +217,7 @@
       </xsl:if>
 
       <xsl:choose>
-        <xsl:when test="$prefixedStyleName = 'X3AS7TOCHyperlink' or $prefixedStyleName = 'X3AS7TABSTYLE' or $prefixedStyleName = 'BulletSymbol' or $prefixedStyleName = 'http://www.dialogika.de/stylename/hiddenParagraph'">
+        <xsl:when test="$prefixedStyleName = 'X3AS7TOCHyperlink' or $prefixedStyleName = 'X3AS7TABSTYLE' or $prefixedStyleName = 'BulletSymbol' or $prefixedStyleName = 'HiddenParagraph'">
           <w:semiHidden />
         </xsl:when>
         <!-- Hide automatic-styles -->

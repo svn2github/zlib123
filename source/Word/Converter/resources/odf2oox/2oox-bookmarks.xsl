@@ -391,7 +391,7 @@
     <xsl:param name="linkNr"/>
     <xsl:param name="tocId"/>
     
-    <w:bookmarkStart w:id="{concat('http://www.dialogika.de/replace/bookmarkid/', $tocId, $linkNr)}"
+    <w:bookmarkStart w:id="{concat('urn:odf-converter:replace:bookmarkid:', $tocId, $linkNr)}"
                      w:name="{concat('Toc_', $tocId, '_', $linkNr)}" />
   </xsl:template>
 
@@ -400,7 +400,7 @@
     <xsl:param name="linkNr"/>
     <xsl:param name="tocId"/>
 
-    <w:bookmarkEnd w:id="{concat('http://www.dialogika.de/replace/bookmarkid/', $tocId, $linkNr)}" />
+    <w:bookmarkEnd w:id="{concat('urn:odf-converter:replace:bookmarkid:', $tocId, $linkNr)}" />
   </xsl:template>
 
   <!-- checks if element has style or element used to generate TOC -->
