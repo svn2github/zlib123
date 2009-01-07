@@ -657,6 +657,9 @@ namespace OdfConverter.CommandLineTool
                     case "-P":
                         options.ShowProgress = true;
                         break;
+                    case "-DUMP":
+                        // do nothing here
+                        break;
                     default:
                         if (args[i].ToUpperInvariant().Replace('/', '-').Replace('_', '-').StartsWith("-"))
                         {
