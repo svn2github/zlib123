@@ -1560,8 +1560,13 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			<xsl:choose>
+     	<xsl:choose>
 				<xsl:when test="$headerIdEven != ''">
+          <xsl:if test="$headerId = ''">
+            <style:header>
+              <text:p/>
+            </style:header>
+          </xsl:if>
 					<style:header-left>
 						<xsl:variable name="headerXmlDocument" select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)" />
 						<!-- change context to get header content -->
@@ -1615,8 +1620,13 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			<xsl:choose>
+      <xsl:choose>
 				<xsl:when test="$footerIdEven != ''">
+          <xsl:if test="$footerId = ''">
+            <style:footer>
+              <text:p/>
+            </style:footer>
+          </xsl:if>
 					<style:footer-left>
 						<xsl:variable name="footerXmlDocument"
 						  select="concat('word/',key('Part', 'word/_rels/document.xml.rels')/descendant::node()[@Id=$footerIdEven]/@Target)"/>
