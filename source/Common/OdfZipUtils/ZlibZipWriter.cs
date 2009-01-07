@@ -56,8 +56,13 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
             this.entryOpened = false;
 		}
-	    
-	    public override void AddEntry(string relativePath)
+
+        public override void AddEntry(string relativePath)
+        {
+            AddEntry(relativePath, CompressionMethod.Deflated);
+        }
+
+        public override void AddEntry(string relativePath, CompressionMethod compressionMethod)
         {
             string resolvedPath = ZipLib.ResolvePath(relativePath);
             ZipFileEntryInfo info;
@@ -69,7 +74,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 this.entryOpened = false;
             }
 
-            int result = ZipLib.zipOpenNewFileInZip(this.handle, resolvedPath, out info, null, 0, null, 0, String.Empty, (int)CompressionMethod.Deflated, (int)CompressionLevel.Default);
+            int result = ZipLib.zipOpenNewFileInZip(this.handle, resolvedPath, out info, null, 0, null, 0, String.Empty, (int)compressionMethod, (int)CompressionLevel.Default);
             if (result < 0)
             {
                 throw new ZipException("Error while opening entry for writing: " + relativePath + " - Errorcode: " + result);

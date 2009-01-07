@@ -47,5 +47,13 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 	    /// <param name="relativePath">The relative path of the entry in the ZIP
 	    /// file.</param>
 	    public abstract void AddEntry(string relativePath);
+
+        /// <summary>
+        /// Adds an entry to the ZIP file (only writes the header, to write
+        /// the content use Stream methods).
+        /// </summary>
+        /// <param name="relativePath">The relative path of the entry in the ZIP file.</param>
+        /// <param name="compressionMethod">The method used to compress. Supported methods are DEFLATE and no compression</param>
+        public abstract void AddEntry(string relativePath, CompressionMethod compressionMethod);
 	}
 }

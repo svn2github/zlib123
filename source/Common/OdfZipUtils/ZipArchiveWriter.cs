@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2006, Clever Age
+ * Copyright (c) 2006-2009, Clever Age, DIaLOGIKa
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ using System.Text;
 using System.Drawing;
 using System.Diagnostics;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace CleverAge.OdfConverter.OdfZipUtils
 {
@@ -75,44 +76,57 @@ namespace CleverAge.OdfConverter.OdfZipUtils
     /// </summary>
     public class ZipArchiveWriter : XmlWriter
     {
-        private const string ZIP_POST_PROCESS_NAMESPACE = "urn:cleverage:xmlns:post-processings:zip";
-        private const string PART_ELEMENT = "entry";
-        private const string ARCHIVE_ELEMENT = "archive";
-        private const string COPY_ELEMENT = "copy";
-        //Added by Sonata
-        private const string EXTRACT_ELEMENT = "extract";
-        private const string IMPORT_ELEMENT = "import";
+        private class PZIP
+        {
+            public const string Namespace = "urn:cleverage:xmlns:post-processings:zip";
+            public const string Prefix = "pzip";
+
+            public const string EntryElement = "entry";
+            public const string ArchiveElement = "archive";
+            public const string CopyElement = "copy";
+            public const string ExtractElement = "extract";
+            public const string ImportElement = "import";
+
+            public const string SourceAttr = "source";
+            public const string TargetAttr = "target";
+            public const string ContentTypeAttr = "content-type";
+            public const string ContentAttr = "content";
+            public const string CompressionAttr = "compression";
+        }
 
         /// <summary>
         /// The zip archive
         /// </summary>
-        private ZipWriter zipOutputStream;
-        private ProcessingState processingState = ProcessingState.None;
-        private Stack elements;
-        private Stack attributes;
+        private ZipWriter _zipOutputStream;
+        private ProcessingState _processingState = ProcessingState.None;
+        private Stack<Element> _elements;
+
+        private Element _currentPzipElement;
+        private Node _currentPzipAttribute;
+
         /// <summary>
         /// A delegate <c>XmlWriter</c> that actually feeds the zip output stream. 
         /// </summary>
-        private XmlWriter delegateWriter = null;
+        private XmlWriter _delegateWriter = null;
         /// <summary>
         /// The delegate settings
         /// </summary>
-        private XmlWriterSettings delegateSettings = null;
-        private XmlResolver resolver;
+        private XmlWriterSettings _delegateSettings = null;
+        private XmlResolver _resolver;
         /// <summary>
         /// Source attribute of the currently processed binary file
         /// </summary>
-        private string binarySource;
+        private string _binarySource;
         /// <summary>
         /// Target attribute of the currently processed binary file
         /// </summary>
-        private string binaryTarget;
+        private string _binaryTarget;
         /// <summary>
         /// Table of binary files to be added to the package
         /// </summary>
-        private Hashtable binaries;
+        private Hashtable _binaries;
 
-        private string outputFile;
+        private string _outputFile;
 
         private struct ImageValue
         {
@@ -122,7 +136,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             public float HorizontalResolution;
         }
 
-        private System.Collections.Generic.Dictionary<string,ImageValue> ImageValues = new System.Collections.Generic.Dictionary<string,ImageValue>();
+        private Dictionary<string, ImageValue> _imageValues = new System.Collections.Generic.Dictionary<string, ImageValue>();
 
         #region New Coding for Import and Extract sound files
 
@@ -133,9 +147,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// archiveFileSource - input pptx zip archive source
         /// externalFileDestionation - external path to extraxct the media(.wav) files
         /// </summary>
-        private Hashtable extractFileList;
-        private string archiveFileSource;
-        private string externalFileDestionation;
+        private Hashtable _extractFileList;
+        private string _archiveFileSource;
+        private string _externalFileDestination;
 
         //Import
         //Added  by sonata
@@ -144,61 +158,43 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// externalFileSource - physical directory path for the file to be copied
         /// archiveFileDestination - pptx zip archive destination        
         /// </summary>
-        private Hashtable importFileList;
-        private string externalFileSource;
-        private string archiveFileDestination;
+        private Hashtable _importFileList;
+        private string _externalFileSource;
+        private string _archiveFileDestination;
 
         #endregion
 
+        
         /// <summary>
         /// Constructor
         /// </summary>
-        public ZipArchiveWriter(XmlResolver res)
+        public ZipArchiveWriter(XmlResolver xmlResolver)
         {
-            elements = new Stack();
-            attributes = new Stack();
+            _elements = new Stack<Element>();
+            
+            _delegateSettings = new XmlWriterSettings();
+            _delegateSettings.OmitXmlDeclaration = false;
+            _delegateSettings.CloseOutput = false;
+            _delegateSettings.Encoding = Encoding.UTF8;
+            _delegateSettings.Indent = false;
+            // We have to use a new delegate per entry in the archive, 
+            // so that XML conformance will be checked at the document level.
+            //
+            // It is not possible to check XML conformance at the document level with a single delegate 
+            // that writes all the entries. We would have to use ConformanceLevel.Fragment then 
+            // which would lead to a missing XML declaration.
+            _delegateSettings.ConformanceLevel = ConformanceLevel.Document;
 
-            delegateSettings = new XmlWriterSettings();
-            delegateSettings.OmitXmlDeclaration = false;
-            delegateSettings.CloseOutput = false;
-            delegateSettings.Encoding = Encoding.UTF8;
-            delegateSettings.Indent = false;
-            // If we use a new delegate per entry in the archive, 
-            // XML conformance will be checked at the document level.
-            // It is not possible to check XML conformance at the docuement level
-            // with a single delegate that writes all the entries.
-            // We must then use ConformanceLevel.Fragment and the xml declaration will be missing.
-            delegateSettings.ConformanceLevel = ConformanceLevel.Document;
-
-            resolver = res;
-
-            //Debug.Listeners.Add(new TextWriterTraceListener("debug.txt"));
+            _resolver = xmlResolver;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ZipArchiveWriter(XmlResolver res, string outputFile)
+        public ZipArchiveWriter(XmlResolver xmlResolver, string outputFile)
+            : this(xmlResolver)
         {
-            elements = new Stack();
-            attributes = new Stack();
-
-            delegateSettings = new XmlWriterSettings();
-            delegateSettings.OmitXmlDeclaration = false;
-            delegateSettings.CloseOutput = false;
-            delegateSettings.Encoding = Encoding.UTF8;
-            delegateSettings.Indent = false;
-            // If we use a new delegate per entry in the archive, 
-            // XML conformance will be checked at the document level.
-            // It is not possible to check XML conformance at the docuement level
-            // with a single delegate that writes all the entries.
-            // We must then use ConformanceLevel.Fragment and the xml declaration will be missing.
-            delegateSettings.ConformanceLevel = ConformanceLevel.Document;
-
-            resolver = res;
-            this.outputFile = outputFile;
-
-            //Debug.Listeners.Add(new TextWriterTraceListener("debug.txt"));
+            this._outputFile = outputFile;
         }
 
         protected override void Dispose(bool disposing)
@@ -206,14 +202,152 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             if (disposing)
             {
                 // Dispose managed resources
-                if (delegateWriter != null)
-                    delegateWriter.Close();
-                if (zipOutputStream != null)
-                    zipOutputStream.Dispose();
+                if (_delegateWriter != null)
+                {
+                    _delegateWriter.Close();
+                }
+                if (_zipOutputStream != null)
+                {
+                    _zipOutputStream.Dispose();
+                }
             }
             base.Dispose(disposing);
-
         }
+
+        private void processPackageInstructions(Element element)
+        {
+            switch (_currentPzipElement.Name)
+            {
+                case PZIP.ArchiveElement:
+                    // Prevent nested archive creation
+                    if (_processingState == ProcessingState.None)
+                    {
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
+                        {
+                            Debug.WriteLine("Creating archive : " + _currentPzipElement.Attributes[PZIP.TargetAttr].Value);
+                            _zipOutputStream = ZipFactory.CreateArchive(_currentPzipElement.Attributes[PZIP.TargetAttr].Value);
+                            _processingState = ProcessingState.EntryWaiting;
+
+                            _binaries = new Hashtable();
+                            _extractFileList = new Hashtable();
+                            _importFileList = new Hashtable();
+                        }
+                        else
+                        {
+                            //TODO throw exception
+                        }
+                    }
+                    //else
+                    //{
+                    //    if (_zipOutputStream != null)
+                    //    {
+                    //        // Copy binaries before closing the archive
+                    //        CopyBinaries();
+                    //        //Added by Sonata - Copy Audio files before closing archive
+                    //        ExtractFiles();
+                    //        ImportFiles();
+                    //        Debug.WriteLine("[closing archive]");
+                    //        _zipOutputStream.Close();
+                    //        _zipOutputStream = null;
+                    //    }
+                    //    // going back to initial state
+                    //    _processingState = ProcessingState.None;
+                    //}
+                    break;
+                case PZIP.EntryElement:
+                    // Prevent nested entry creation
+                    if (_processingState == ProcessingState.EntryWaiting)
+                    {
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
+                        {
+                            Debug.WriteLine("creating new part : " + _currentPzipElement.Attributes[PZIP.TargetAttr].Value);
+                            CompressionMethod compressionMethod = CompressionMethod.Deflated;
+                            if (_currentPzipElement.Attributes.ContainsKey(PZIP.CompressionAttr) && _currentPzipElement.Attributes[PZIP.CompressionAttr].Value.Equals("none"))
+                            {
+                                compressionMethod = CompressionMethod.Stored;
+                            }
+                            _zipOutputStream.AddEntry(_currentPzipElement.Attributes["target"].Value, compressionMethod);
+
+                            if (_currentPzipElement.Attributes.ContainsKey(PZIP.ContentTypeAttr) && _currentPzipElement.Attributes[PZIP.ContentTypeAttr].Value.Equals("text/plain")
+                                && _currentPzipElement.Attributes.ContainsKey(PZIP.ContentAttr))
+                            {
+                                Encoding enc = new System.Text.ASCIIEncoding();
+                                byte[] buffer = enc.GetBytes(_currentPzipElement.Attributes[PZIP.ContentAttr].Value);
+                                _zipOutputStream.Write(buffer, 0, buffer.Length);
+                            }
+                            else
+                            {
+                                _delegateWriter = XmlWriter.Create(_zipOutputStream, _delegateSettings);
+                                _delegateWriter.WriteStartDocument();
+
+                                _processingState = ProcessingState.EntryStarted;
+                            }
+                        }
+                    }
+                    //else if (_processingState == ProcessingState.EntryStarted)
+                    //{
+                    //    if (_delegateWriter != null)
+                    //    {
+                    //        Debug.WriteLine("[end part]");
+                    //        _delegateWriter.WriteEndDocument();
+                    //        _delegateWriter.Flush();
+                    //        _delegateWriter.Close();
+                    //        _delegateWriter = null;
+                    //    }
+                    //    if (_processingState == ProcessingState.EntryStarted)
+                    //    {
+                    //        _processingState = ProcessingState.EntryWaiting;
+                    //    }
+                    //}
+                    break;
+                case PZIP.CopyElement:
+                    if (_processingState != ProcessingState.None)
+                    {
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr))
+                        {
+                            _binarySource += _currentPzipElement.Attributes[PZIP.SourceAttr];
+                            Debug.WriteLine("copy source=" + _binarySource);
+                        }
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
+                        {
+                            _binaryTarget += _currentPzipElement.Attributes[PZIP.TargetAttr].Value;
+                            Debug.WriteLine("copy target=" + _binaryTarget);
+                        }
+                    }
+                    break;
+                case PZIP.ExtractElement:
+                    if (_processingState != ProcessingState.None)
+                    {
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr))
+                        {
+                            _archiveFileSource += _currentPzipElement.Attributes[PZIP.SourceAttr].Value;
+                            Debug.WriteLine("copy source=" + _archiveFileSource);
+                        }
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
+                        {
+                            _externalFileDestination += _currentPzipElement.Attributes[PZIP.TargetAttr].Value;
+                            Debug.WriteLine("copy target=" + _externalFileDestination);
+                        }
+                    }
+                    break;
+                case PZIP.ImportElement:
+                    if (_processingState != ProcessingState.None)
+                    {
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr))
+                        {
+                            _externalFileSource += _currentPzipElement.Attributes[PZIP.SourceAttr];
+                            Debug.WriteLine("copy source=" + _externalFileSource);
+                        }
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
+                        {
+                            _archiveFileDestination += _currentPzipElement.Attributes[PZIP.TargetAttr];
+                            Debug.WriteLine("copy target=" + _archiveFileDestination);
+                        }
+                    }
+                    break;
+            }
+        }
+
         /// <summary>
         /// Delegates <c>WriteStartElement</c> calls when the element's prefix does not 
         /// match a zip command.  
@@ -223,21 +357,34 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// <param name="ns"></param>
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
+            // check for pending pzip instructions
+            if (_currentPzipElement != null && PZIP.Namespace.Equals(_currentPzipElement.Namespace))
+            {
+                processPackageInstructions(_currentPzipElement);
+                _currentPzipElement = null;
+            }
+
             Debug.WriteLine("[startElement] prefix=" + prefix + " localName=" + localName + " ns=" + ns);
-            elements.Push(new Node(prefix, localName, ns));
+            Element newElement = new Element(prefix, localName, ns);
+            _elements.Push(newElement);
 
             // not a zip processing instruction
-            if (!ZIP_POST_PROCESS_NAMESPACE.Equals(ns))
+            if (!PZIP.Namespace.Equals(ns))
             {
-                if (delegateWriter != null)
+                if (_delegateWriter != null)
                 {
                     Debug.WriteLine("{WriteStartElement=" + localName + "} delegate");
-                    delegateWriter.WriteStartElement(prefix, localName, ns);
+                    _delegateWriter.WriteStartElement(prefix, localName, ns);
                 }
                 else
                 {
                     Debug.WriteLine("[WriteStartElement=" + localName + " } delegate is null");
                 }
+            }
+            else
+            {
+                // remember the current pzip node
+                _currentPzipElement = newElement;
             }
         }
 
@@ -248,126 +395,128 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// </summary>
         public override void WriteEndElement()
         {
-            Node elt = (Node)elements.Pop();
+            // check for pending pzip instructions
+            if (_currentPzipElement != null && PZIP.Namespace.Equals(_currentPzipElement.Namespace))
+            {
+                processPackageInstructions(_currentPzipElement);
+                _currentPzipElement = null;
+            }
 
-            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
+            Node elt = _elements.Pop();
+
+            if (!elt.Namespace.Equals(PZIP.Namespace))
             {
                 Debug.WriteLine("delegate - </" + elt.Name + ">");
-                if (delegateWriter != null)
+                if (_delegateWriter != null)
                 {
-                    delegateWriter.WriteEndElement();
+                    _delegateWriter.WriteEndElement();
                 }
             }
             else
             {
                 switch (elt.Name)
                 {
-                    case ARCHIVE_ELEMENT:
-                        if (zipOutputStream != null)
+                    case PZIP.ArchiveElement:
+                        if (_processingState == ProcessingState.EntryWaiting)
                         {
-                            // Copy binaries before closing the archive
-                            CopyBinaries();
-                            //Added by Sonata - Copy Audio files before closing archive
-                            ExtractFiles();
-                            ImportFiles();
-                            Debug.WriteLine("[closing archive]");
-                            zipOutputStream.Close();
-                            zipOutputStream = null;
-                        }
-                        if (processingState == ProcessingState.EntryWaiting)
-                        {
-                            processingState = ProcessingState.None;
-                        }
-                        break;
-                    case PART_ELEMENT:
-                        if (delegateWriter != null)
-                        {
-                            Debug.WriteLine("[end part]");
-                            delegateWriter.WriteEndDocument();
-                            delegateWriter.Flush();
-                            delegateWriter.Close();
-                            delegateWriter = null;
-                        }
-                        if (processingState == ProcessingState.EntryStarted)
-                        {
-                            processingState = ProcessingState.EntryWaiting;
+                            if (_zipOutputStream != null)
+                            {
+                                // Copy binaries before closing the archive
+                                CopyBinaries();
+                                //Added by Sonata - Copy Audio files before closing archive
+                                ExtractFiles();
+                                ImportFiles();
+                                Debug.WriteLine("[closing archive]");
+                                _zipOutputStream.Close();
+                                _zipOutputStream = null;
+                            }
+                            _processingState = ProcessingState.None;
                         }
                         break;
-                    case COPY_ELEMENT:
-                        if (binarySource != null && binaryTarget != null)
+                    case PZIP.EntryElement:
+                        if (_processingState == ProcessingState.EntryStarted)
                         {
-                            if (binaries != null && !binaries.ContainsKey(binaryTarget))
+                            if (_delegateWriter != null)
+                            {
+                                Debug.WriteLine("[end part]");
+                                _delegateWriter.WriteEndDocument();
+                                _delegateWriter.Flush();
+                                _delegateWriter.Close();
+                                _delegateWriter = null;
+                            }
+                            _processingState = ProcessingState.EntryWaiting;
+                        }
+                        break;
+                    case PZIP.CopyElement:
+                        if (_binarySource != null && _binaryTarget != null)
+                        {
+                            if (_binaries != null && !_binaries.ContainsKey(_binaryTarget))
                             {
                                 //Target is the key because there is a case where one file has to be
-                                //coppied twice to different locations
-                                binaries.Add(binaryTarget, binarySource);
+                                //copied twice to different locations
+                                _binaries.Add(_binaryTarget, _binarySource);
                             }
-                            binarySource = null;
-                            binaryTarget = null;
+                            _binarySource = null;
+                            _binaryTarget = null;
                         }
                         break;
-                    case EXTRACT_ELEMENT:
-                        if (archiveFileSource != null && externalFileDestionation != null)
+                    case PZIP.ExtractElement:
+                        if (_archiveFileSource != null && _externalFileDestination != null)
                         {
-                            if (extractFileList != null && !extractFileList.ContainsKey(externalFileDestionation))
+                            if (_extractFileList != null && !_extractFileList.ContainsKey(_externalFileDestination))
                             {
-                                extractFileList.Add(externalFileDestionation,archiveFileSource);
+                                _extractFileList.Add(_externalFileDestination, _archiveFileSource);
                             }
-                            archiveFileSource = null;
-                            externalFileDestionation = null;
+                            _archiveFileSource = null;
+                            _externalFileDestination = null;
                         }
                         break;
-                    case IMPORT_ELEMENT:
-                        if (externalFileSource != null && archiveFileDestination != null)
+                    case PZIP.ImportElement:
+                        if (_externalFileSource != null && _archiveFileDestination != null)
                         {
-                            if (importFileList != null && !importFileList.ContainsKey(archiveFileDestination))
+                            if (_importFileList != null && !_importFileList.ContainsKey(_archiveFileDestination))
                             {
-                                importFileList.Add(archiveFileDestination, externalFileSource);
+                                _importFileList.Add(_archiveFileDestination, _externalFileSource);
                             }
-                            externalFileSource = null;
-                            archiveFileDestination = null;
+                            _externalFileSource = null;
+                            _archiveFileDestination = null;
                         }
                         break;
-
                 }
-
             }
         }
 
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
-            Node elt = (Node)elements.Peek();
+            Element elt = _elements.Peek();
             Debug.WriteLine("[WriteStartAttribute] prefix=" + prefix + " localName=" + localName + " ns=" + ns + " element=" + elt.Name);
 
-            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
+            if (!elt.Namespace.Equals(PZIP.Namespace))
             {
-                if (delegateWriter != null)
+                if (_delegateWriter != null)
                 {
-                    delegateWriter.WriteStartAttribute(prefix, localName, ns);
+                    _delegateWriter.WriteStartAttribute(prefix, localName, ns);
                 }
             }
-            else
+            else if (ns.Equals(PZIP.Namespace))
             {
-                // we only store attributes of tied to zip processing instructions
-                attributes.Push(new Node(prefix, localName, ns));
+                // we only store attributes tied to zip processing instructions
+                _currentPzipAttribute = new Node(prefix, localName, ns);
+                elt.Attributes.Add(localName, _currentPzipAttribute);
             }
         }
 
         public override void WriteEndAttribute()
         {
-            Node elt = (Node)elements.Peek();
+            Node elt = _elements.Peek();
             Debug.WriteLine("[WriteEndAttribute] element=" + elt.Name);
 
-            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
+            if (!elt.Namespace.Equals(PZIP.Namespace))
             {
-                if (delegateWriter != null)
+                if (_delegateWriter != null)
                 {
-                    delegateWriter.WriteEndAttribute();
+                    _delegateWriter.WriteEndAttribute();
                 }
-            }
-            else
-            {
-                Node attribute = (Node)attributes.Pop();
             }
         }
 
@@ -378,7 +527,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             //clam: compute correct cropping size
             try
             {
-                if (text.Contains("COMPUTEOOXCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "srcRect"))
+                if (text.StartsWith("COMPUTEOOXCROPPING[") && _elements.Peek().Name == "srcRect")
                 {
                     char[] sep = { ',', ']', '[' };
                     string[] arrValues = text.Split(sep);
@@ -399,9 +548,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     if (value != 0)
                     {
                         ImageValue iv;
-                        if (ImageValues.ContainsKey(filename))
+                        if (_imageValues.ContainsKey(filename))
                         {
-                            iv = ImageValues[filename];
+                            iv = _imageValues[filename];
                         }
                         else
                         {
@@ -414,7 +563,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                             iv.HorizontalResolution = im.HorizontalResolution;
                             iv.VerticalResolution = im.VerticalResolution;
 
-                            ImageValues.Add(filename, iv);
+                            _imageValues.Add(filename, iv);
                         }
 
                         try
@@ -455,15 +604,15 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     }
 
                 }
-                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makeWordPath#"))
+                else if (text.StartsWith("urn:odf-converter:makeWordPath#"))
                 {
                     text = MakeWordPath(text);
                 }
-                else if (text.StartsWith("http://www.dialogika.de/odf-converter/makeOdfPath#"))
+                else if (text.StartsWith("urn:odf-converter:makeOdfPath#"))
                 {
                     text = MakeOdfPath(text);
                 }
-                else if (text.Contains("COMPUTEODFCROPPING[") && (((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter.Node)((CleverAge.OdfConverter.OdfZipUtils.ZipArchiveWriter)this).elements.Peek()).Name == "graphic-properties"))
+                else if (text.StartsWith("COMPUTEODFCROPPING[") && _elements.Peek().Name == "graphic-properties")
                 {
 
                     string strDefault = "0cm 0cm 0cm 0cm";
@@ -477,7 +626,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         string[] arrValues = text.Split(sep);
                         string filename = arrValues[5];
                         strDefault = arrValues[6];
-                        
+
                         double r = Double.Parse(arrValues[1]);
                         double l = Double.Parse(arrValues[2]);
                         double t = Double.Parse(arrValues[3]);
@@ -485,9 +634,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         double r2, l2, t2, b2;
 
                         ImageValue iv;
-                        if (ImageValues.ContainsKey(filename))
+                        if (_imageValues.ContainsKey(filename))
                         {
-                            iv = ImageValues[filename];
+                            iv = _imageValues[filename];
                         }
                         else
                         {
@@ -500,7 +649,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                             iv.HorizontalResolution = im.HorizontalResolution;
                             iv.VerticalResolution = im.VerticalResolution;
 
-                            ImageValues.Add(filename, iv);
+                            _imageValues.Add(filename, iv);
                         }
 
                         r2 = r * 2.54 * iv.Width / iv.HorizontalResolution / 1000 / 100;
@@ -519,7 +668,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     {
                         System.Threading.Thread.CurrentThread.CurrentCulture = c;
                     }
-                    
+
                 }
             }
             catch (Exception)
@@ -527,106 +676,31 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 text = strDefaultValue;
             }
 
-            Node elt = (Node)elements.Peek();
+            Element elt = _elements.Peek();
 
-            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
+            if (!elt.Namespace.Equals(PZIP.Namespace))
             {
-                if (delegateWriter != null)
+                if (_delegateWriter != null)
                 {
-                    delegateWriter.WriteString(text);
+                    _delegateWriter.WriteString(text);
                 }
             }
             else
             {
-                // Pick up the target attribute 
-                if (attributes.Count > 0)
+                if (_currentPzipAttribute != null)
                 {
-                    Node attr = (Node)attributes.Peek();
-                    if (attr.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
-                    {
-                        switch (elt.Name)
-                        {
-                            case ARCHIVE_ELEMENT:
-                                // Prevent nested archive creation
-                                if (processingState == ProcessingState.None && attr.Name.Equals("target"))
-                                {
-                                    Debug.WriteLine("creating archive : " + text);
-                                    zipOutputStream = ZipFactory.CreateArchive(text);
-                                    processingState = ProcessingState.EntryWaiting;
-                                    binaries = new Hashtable();
-
-                                    //Added by sonata
-                                    extractFileList = new Hashtable();
-                                    importFileList = new Hashtable();
-                                }
-                                break;
-                            case PART_ELEMENT:
-                                // Prevent nested entry creation
-                                if (processingState == ProcessingState.EntryWaiting && attr.Name.Equals("target"))
-                                {
-                                    Debug.WriteLine("creating new part : " + text);
-                                    zipOutputStream.AddEntry(text);
-                                    delegateWriter = XmlWriter.Create(zipOutputStream, delegateSettings);
-                                    processingState = ProcessingState.EntryStarted;
-                                    delegateWriter.WriteStartDocument();
-                                }
-                                break;
-                            case COPY_ELEMENT:
-                                if (processingState != ProcessingState.None)
-                                {
-                                    if (attr.Name.Equals("source"))
-                                    {
-                                        binarySource += text;
-                                        Debug.WriteLine("copy source=" + binarySource);
-                                    }
-                                    if (attr.Name.Equals("target"))
-                                    {
-                                        binaryTarget += text;
-                                        Debug.WriteLine("copy target=" + binaryTarget);
-                                    }
-                                }
-                                break;
-                            case EXTRACT_ELEMENT:
-                                if (processingState != ProcessingState.None)
-                                {
-                                    if (attr.Name.Equals("source"))
-                                    {
-                                        archiveFileSource += text;
-                                        Debug.WriteLine("copy source=" + archiveFileSource);
-                                    }
-                                    if (attr.Name.Equals("target"))
-                                    {
-                                        externalFileDestionation += text;
-                                        Debug.WriteLine("copy target=" + externalFileDestionation);
-                                    }
-                                }
-                                break;
-                            case IMPORT_ELEMENT:
-                                if (processingState != ProcessingState.None)
-                                {
-                                    if (attr.Name.Equals("source"))
-                                    {
-                                        externalFileSource += text;
-                                        Debug.WriteLine("copy source=" + externalFileSource);
-                                    }
-                                    if (attr.Name.Equals("target"))
-                                    {
-                                        archiveFileDestination += text;
-                                        Debug.WriteLine("copy target=" + archiveFileDestination);
-                                    }
-                                }
-                                break;
-                        }
-                    }
+                    // store attribute value
+                    _currentPzipAttribute.Value = text;
+                    _currentPzipAttribute = null;
                 }
             }
         }
 
         private string MakeWordPath(string text)
         {
-            int pos = "http://www.dialogika.de/odf-converter/makeWordPath#".Length;
+            int pos = "urn:odf-converter:makeWordPath#".Length;
             string relativePath = text.Remove(0, pos);
-            DirectoryInfo outputPath = new DirectoryInfo(this.outputFile);
+            DirectoryInfo outputPath = new DirectoryInfo(this._outputFile);
 
             string absolutePath = Path.GetFullPath(outputPath.FullName + relativePath).Replace(" ", "%20");
             return "file:///" + absolutePath;
@@ -634,9 +708,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         private string MakeOdfPath(string text)
         {
-            int pos = "http://www.dialogika.de/odf-converter/makeOdfPath#".Length;
+            int pos = "urn:odf-converter:makeOdfPath#".Length;
             string wordPath = text.Remove(0, pos);
-            DirectoryInfo outputPath = new DirectoryInfo(this.outputFile);
+            DirectoryInfo outputPath = new DirectoryInfo(this._outputFile);
 
             if (wordPath.StartsWith("\\\\"))
             {
@@ -649,7 +723,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     string relativePath = MakeWinPathRelative(outputPath.FullName, wordPath);
                     return relativePath.Replace("\\", "/");
                 }
-                else 
+                else
                 {
                     return wordPath;
                 }
@@ -660,7 +734,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 //transform it into the ODF format
                 string odfPath = "/" + wordPath.Replace("\\", "/");
                 return odfPath;
-            }           
+            }
         }
 
         private string MakeWinPathRelative(string absolutePath, string relativeTo)
@@ -729,89 +803,89 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         public override void WriteCData(string s)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteCData(s);
+                _delegateWriter.WriteCData(s);
             }
         }
 
         public override void WriteComment(string s)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteComment(s);
+                _delegateWriter.WriteComment(s);
             }
         }
 
         public override void WriteProcessingInstruction(string name, string text)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteProcessingInstruction(name, text);
+                _delegateWriter.WriteProcessingInstruction(name, text);
             }
         }
 
         public override void WriteEntityRef(String name)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteEntityRef(name);
+                _delegateWriter.WriteEntityRef(name);
             }
         }
 
         public override void WriteCharEntity(char c)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteCharEntity(c);
+                _delegateWriter.WriteCharEntity(c);
             }
         }
 
         public override void WriteWhitespace(string s)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteWhitespace(s);
+                _delegateWriter.WriteWhitespace(s);
             }
         }
 
         public override void WriteSurrogateCharEntity(char lowChar, char highChar)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteSurrogateCharEntity(lowChar, highChar);
+                _delegateWriter.WriteSurrogateCharEntity(lowChar, highChar);
             }
         }
 
         public override void WriteChars(char[] buffer, int index, int count)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteChars(buffer, index, count);
+                _delegateWriter.WriteChars(buffer, index, count);
             }
         }
 
         public override void WriteRaw(char[] buffer, int index, int count)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteRaw(buffer, index, count);
+                _delegateWriter.WriteRaw(buffer, index, count);
             }
         }
 
         public override void WriteRaw(string data)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteRaw(data);
+                _delegateWriter.WriteRaw(data);
             }
         }
 
         public override void WriteBase64(byte[] buffer, int index, int count)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.WriteBase64(buffer, index, count);
+                _delegateWriter.WriteBase64(buffer, index, count);
             }
         }
 
@@ -819,9 +893,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         {
             get
             {
-                if (delegateWriter != null)
+                if (_delegateWriter != null)
                 {
-                    return delegateWriter.WriteState;
+                    return _delegateWriter.WriteState;
                 }
                 else
                 {
@@ -833,15 +907,15 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         public override void Close()
         {
             // zipStream and delegate are closed elsewhere.... if everything else is fine
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                delegateWriter.Close();
-                delegateWriter = null;
+                _delegateWriter.Close();
+                _delegateWriter = null;
             }
-            if (zipOutputStream != null)
+            if (_zipOutputStream != null)
             {
-                zipOutputStream.Close();
-                zipOutputStream = null;
+                _zipOutputStream.Close();
+                _zipOutputStream = null;
             }
 
         }
@@ -853,9 +927,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         public override string LookupPrefix(String ns)
         {
-            if (delegateWriter != null)
+            if (_delegateWriter != null)
             {
-                return delegateWriter.LookupPrefix(ns);
+                return _delegateWriter.LookupPrefix(ns);
             }
             else
             {
@@ -865,9 +939,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         private void CopyBinaries()
         {
-            foreach (string s in binaries.Keys)
+            foreach (string s in _binaries.Keys)
             {
-                CopyBinary((string)binaries[s], s);
+                CopyBinary((string)_binaries[s], s);
             }
         }
 
@@ -884,11 +958,11 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         {
             Stream sourceStream = GetStream(source);
 
-            if (sourceStream != null && zipOutputStream != null)
+            if (sourceStream != null && _zipOutputStream != null)
             {
                 // New file entry
-                zipOutputStream.AddEntry(target);
-                int bytesCopied = StreamCopy(sourceStream, zipOutputStream);
+                _zipOutputStream.AddEntry(target);
+                int bytesCopied = StreamCopy(sourceStream, _zipOutputStream);
                 Debug.WriteLine("CopyBinary : " + source + " --> " + target + ", bytes copied = " + bytesCopied);
             }
         }
@@ -898,9 +972,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         //Added by Sonata
         private void ExtractFiles()
         {
-            foreach (string strfile in extractFileList.Keys)
+            foreach (string strfile in _extractFileList.Keys)
             {
-                ExtractFile(strfile, (string)extractFileList[strfile]);
+                ExtractFile(strfile, (string)_extractFileList[strfile]);
             }
         }
 
@@ -947,9 +1021,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         private void ImportFiles()
         {
-            foreach (string strfile in importFileList.Keys)
+            foreach (string strfile in _importFileList.Keys)
             {
-                ImportFile(strfile, (string)importFileList[strfile]);
+                ImportFile(strfile, (string)_importFileList[strfile]);
             }
         }
 
@@ -977,14 +1051,14 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             try
             {
                 //Copy referd audio fiels from external directory to ppt/media
-                if (zipOutputStream != null)
+                if (_zipOutputStream != null)
                 {
                     if (File.Exists(inputFilePath))
                     {
-                        zipOutputStream.AddEntry(destination);
+                        _zipOutputStream.AddEntry(destination);
                         FileStream fsSourceFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read);
 
-                        int bytesCopied = StreamCopy(fsSourceFile, zipOutputStream);
+                        int bytesCopied = StreamCopy(fsSourceFile, _zipOutputStream);
                         Debug.WriteLine("CopyBinary : " + inputFilePath + " --> " + destination + ", bytes copied = " + bytesCopied);
                     }
                 }
@@ -1028,6 +1102,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// <returns>Physical path of the output file </returns>
         private string GetOutputFilePath()
         {
+            // TODO: refactor this terribly ugly part of code. It doesn't work anyway.       
             string returnOutputFilePath = "";
             string tempOutputFilePath = "";
 
@@ -1067,9 +1142,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
                 Assembly exeAssem = Assembly.GetExecutingAssembly();
                 string targetAssemPath = Path.GetDirectoryName(exeAssem.GetModules()[0].FullyQualifiedName);
-		if (targetAssemPath != "")
-		    targetAssemPath += Path.DirectorySeparatorChar;
-		targetAssemPath +=  source.Substring(pos1, pos2 - pos1 -1);
+                if (targetAssemPath != "")
+                    targetAssemPath += Path.DirectorySeparatorChar;
+                targetAssemPath += source.Substring(pos1, pos2 - pos1 - 1);
 #if STATIC
 		if (targetAssemPath.EndsWith(".dll"))
 		    targetAssemPath = targetAssemPath.Substring (0, targetAssemPath.Length - 4) + "Static.dll";
@@ -1082,8 +1157,8 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             //get stream to file in zip
             else
             {
-                Uri absoluteUri = resolver.ResolveUri(null, source);
-                return (Stream)resolver.GetEntity(absoluteUri, null, Type.GetType("System.IO.Stream"));
+                Uri absoluteUri = _resolver.ResolveUri(null, source);
+                return (Stream)_resolver.GetEntity(absoluteUri, null, Type.GetType("System.IO.Stream"));
             }
         }
 
@@ -1121,30 +1196,60 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// </summary>
         private class Node
         {
+            private string _name;
+            private string _prefix;
+            private string _namespace;
+            private string _value;
 
-            private string name;
             public string Name
             {
-                get { return name; }
+                get { return _name; }
             }
 
-            private string prefix;
             public string Prefix
             {
-                get { return prefix; }
+                get { return _prefix; }
             }
 
-            private string ns;
-            public string Ns
+            public string Namespace
             {
-                get { return ns; }
+                get { return _namespace; }
+            }
+
+            public string Value
+            {
+                get { return _value; }
+                set { _value = value; }
             }
 
             public Node(string prefix, string name, string ns)
             {
-                this.prefix = prefix;
-                this.name = name;
-                this.ns = ns;
+                this._prefix = prefix;
+                this._name = name;
+                this._namespace = ns;
+            }
+        }
+
+        private class Element : Node
+        {
+            private Dictionary<string, Node> _attributes;
+
+            public Element(string prefix, string name, string ns)
+                : base(prefix, name, ns)
+            {
+            }
+
+            public Dictionary<string, Node> Attributes
+            {
+                get
+                {
+                    // lazy initialization
+                    if (_attributes == null)
+                    {
+                        _attributes = new Dictionary<string, Node>();
+                    }
+                    return _attributes;
+                }
             }
         }
 
