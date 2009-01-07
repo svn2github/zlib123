@@ -1368,7 +1368,15 @@
             <xsl:if test="$styleType = 'left'">
               <xsl:attribute name="style:position">
                 <xsl:variable name="position">
-                  <xsl:value-of select="@w:pos"/>
+                  <xsl:choose>
+                    <xsl:when test="../../w:ind/@w:left">
+                      <xsl:value-of select="@w:pos - ../../w:ind/@w:left"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="@w:pos"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  
                 </xsl:variable>
                 <xsl:call-template name="ConvertTwips">
                   <xsl:with-param name="length" select="$position"/>
