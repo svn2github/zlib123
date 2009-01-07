@@ -1345,8 +1345,8 @@
     <xsl:variable name="styleType">
       <xsl:choose>
         <xsl:when test="@w:val='num'">left</xsl:when>
-        <!-- clam, DIaLOGIKa: the 8800 should be replaced by a computed value. It is used to distinguish 'real' right tabs (pointing to the line end) from other ones -->
-        <xsl:when test="@w:val='right' and @w:pos and number(@w:pos) &lt; 8800">left</xsl:when>
+        <!-- clam, DIaLOGIKa: the 8600 should be replaced by a computed value. It is used to distinguish 'real' right tabs (pointing to the line end) from other ones -->
+        <xsl:when test="@w:val='right' and @w:pos and number(@w:pos) &lt; 8600">left</xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="@w:val"/>          
         </xsl:otherwise>
