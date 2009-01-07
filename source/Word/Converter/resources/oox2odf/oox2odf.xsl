@@ -33,77 +33,79 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  exclude-result-prefixes="oox rels">
+  exclude-result-prefixes="oox rels r v w">
 
-  <xsl:import href="measures.xsl"/>
-  <xsl:import href="common-meta.xsl"/>
-  <xsl:import href="utils.xsl"/>
-  <xsl:import href="2odf-common.xsl"/>
-  <xsl:import href="2odf-content.xsl"/>
-  <xsl:import href="2odf-pictures.xsl"/>
-  <xsl:import href="2odf-styles.xsl"/>
-  <xsl:import href="2odf-frames.xsl"/>
-  <xsl:import href="2odf-shapes.xsl"/>
-  <xsl:import href="2odf-ole.xsl"/>
-  <xsl:import href="2odf-settings.xsl"/>
-  <xsl:import href="2odf-relationships.xsl"/>
-  <xsl:import href="2odf-footnotes.xsl"/>
-  <xsl:import href="2odf-sections.xsl"/>
-  <xsl:import href="2odf-comments.xsl"/>
-  <xsl:import href="2odf-track.xsl"/>
+  <xsl:import href="measures.xsl" />
+  <xsl:import href="common-meta.xsl" />
+  <xsl:import href="utils.xsl" />
+  <xsl:import href="2odf-common.xsl" />
+  <xsl:import href="2odf-content.xsl" />
+  <xsl:import href="2odf-pictures.xsl" />
+  <xsl:import href="2odf-styles.xsl" />
+  <xsl:import href="2odf-frames.xsl" />
+  <xsl:import href="2odf-shapes.xsl" />
+  <xsl:import href="2odf-ole.xsl" />
+  <xsl:import href="2odf-settings.xsl" />
+  <xsl:import href="2odf-relationships.xsl" />
+  <xsl:import href="2odf-footnotes.xsl" />
+  <xsl:import href="2odf-sections.xsl" />
+  <xsl:import href="2odf-comments.xsl" />
+  <xsl:import href="2odf-track.xsl" />
 
-  <xsl:param name="outputFile"/>
+  <xsl:param name="outputFile" />
 
   <!-- a string containing detailed information on environment and
        converter version to be added to the document's meta data -->
-  <xsl:param name="generator"/>
+  <xsl:param name="generator" />
   <xsl:param name="documentType" />
-  
-  <xsl:output method="xml" encoding="UTF-8"/>
 
-  <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name"/>
-  
+  <xsl:output method="xml" encoding="UTF-8" />
+
+  <xsl:key name="Part" match="/oox:package/oox:part" use="@oox:name" />
+
   <!-- packages relationships -->
   <!--
-  <xsl:variable name="package-rels" select="/oox:package/oox:part[@oox:name='_rels/.rels']"/>
+  <xsl:variable name="package-rels" select="/oox:package/oox:part[@oox:name='_rels/.rels']" />
   <xsl:variable name="officeDocument"
-    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument']/@Target)"/>
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument']/@Target)" />
   <xsl:variable name="core-properties"
-    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties']/@Target)"/>
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties']/@Target)" />
   <xsl:variable name="extended-properties"
-    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties']/@Target)"/>
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties']/@Target)" />
   <xsl:variable name="custom-properties"
-    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties']/@Target)"/>
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties']/@Target)" />
   
-  <xsl:variable name="document-path" select="concat(substring-before($officeDocument, '/'), '/')"/>
+  <xsl:variable name="document-path" select="concat(substring-before($officeDocument, '/'), '/')" />
     -->
   <!-- part relationships -->
   <!-- TODO multilevel /.../.../ -->
   <!--
   <xsl:variable name="part-relationships"
-    select="concat(concat($document-path, '_rels/'), concat(substring-after($officeDocument, '/'), '.rels'))"/>
+    select="concat(concat($document-path, '_rels/'), concat(substring-after($officeDocument, '/'), '.rels'))" />
   <xsl:variable name="numbering"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering']/@Target)" />
   <xsl:variable name="styles"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles']/@Target)" />
   <xsl:variable name="fontTable"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable']/@Target)" />
   <xsl:variable name="settings"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings']/@Target)" />
   <xsl:variable name="footnotes"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes']/@Target)" />
   <xsl:variable name="endnotes"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes']/@Target)" />
   <xsl:variable name="comments"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments']/@Target)" />
   -->
 
   <!-- App version number -->
   <xsl:variable name="app-version">2.0.0</xsl:variable>
-  
+
   <xsl:template match="/oox:package">
 
     <pzip:archive pzip:target="{$outputFile}">
+
+      <pzip:entry pzip:target="mimetype" pzip:compression="none" pzip:content-type="text/plain" pzip:content="application/vnd.oasis.opendocument.text" />
 
       <!-- Manifest -->
       <pzip:entry pzip:target="META-INF/manifest.xml">
@@ -111,43 +113,42 @@
           <manifest:file-entry manifest:full-path="/">
             <xsl:attribute name="manifest:media-type">
               <xsl:choose>
-				  <!-- TODO: fix this. the name we have here is of the form abc.tmp only -->
                 <xsl:when test="$documentType = 'Template'">
-                  <xsl:value-of select="'application/vnd.oasis.opendocument.text-template'"/>
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.text-template'" />
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="'application/vnd.oasis.opendocument.text'"/>
+                  <xsl:value-of select="'application/vnd.oasis.opendocument.text'" />
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
           </manifest:file-entry>
-          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml"/>
-          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="styles.xml"/>
-          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
-          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
-          
+          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml" />
+          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="styles.xml" />
+          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml" />
+          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml" />
+
           <!-- copy relationships from document -->
           <xsl:for-each select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
-            <xsl:call-template name="InsertManifestFileEntry"/>
+            <xsl:call-template name="InsertManifestFileEntry" />
           </xsl:for-each>
           <!-- divo TODO: does this work for more than one footer/header (i.e. if we have footer2.xml.rel etc) ??? -->
           <xsl:for-each select="key('Part', 'word/_rels/footer1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
-            <xsl:call-template name="InsertManifestFileEntry"/>
+            <xsl:call-template name="InsertManifestFileEntry" />
           </xsl:for-each>
           <xsl:for-each select="key('Part', 'word/_rels/header1.xml.rels')/rels:Relationships/rels:Relationship[substring-before(@Target,'/')='media' or substring-before(@Target,'/')='embeddings']">
-            <xsl:call-template name="InsertManifestFileEntry"/>
+            <xsl:call-template name="InsertManifestFileEntry" />
           </xsl:for-each>
         </manifest:manifest>
       </pzip:entry>
 
       <!-- main content -->
       <pzip:entry pzip:target="content.xml">
-        <xsl:call-template name="content"/>
+        <xsl:call-template name="content" />
       </pzip:entry>
 
       <!-- styles -->
       <pzip:entry pzip:target="styles.xml">
-        <xsl:call-template name="styles"/>
+        <xsl:call-template name="styles" />
       </pzip:entry>
 
       <!-- meta -->
@@ -160,13 +161,13 @@
 
       <!-- settings -->
       <pzip:entry pzip:target="settings.xml">
-        <xsl:call-template name="settings"/>
+        <xsl:call-template name="settings" />
       </pzip:entry>
 
     </pzip:archive>
   </xsl:template>
 
-  
+
   <!--
   Summary: Inserts the manifest entry for a single reference
   Author: Clever Age
@@ -177,8 +178,7 @@
     <manifest:file-entry>
 
       <xsl:variable name="thisId" select="@Id" />
-      <xsl:variable name="suffix" select="translate(substring-after(@Target,'.'), 
-                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+      <xsl:variable name="suffix" select="translate(substring-after(@Target,'.'), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
 
       <!-- write the media type -->
       <xsl:choose>
@@ -231,7 +231,7 @@
         <!-- the ref is a ole -->
         <xsl:when test="@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject'">
           <xsl:attribute name="manifest:full-path">
-            <xsl:value-of select="substring-before(substring-after(@Target,'/'), '.')"/>
+            <xsl:value-of select="substring-before(substring-after(@Target,'/'), '.')" />
           </xsl:attribute>
         </xsl:when>
         <!-- the ref is ole picture -->
@@ -250,7 +250,7 @@
         <xsl:otherwise>
           <xsl:attribute name="manifest:full-path">
             <xsl:text>Pictures/</xsl:text>
-            <xsl:value-of select="substring-after(@Target,'/')"/>
+            <xsl:value-of select="substring-after(@Target,'/')" />
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>

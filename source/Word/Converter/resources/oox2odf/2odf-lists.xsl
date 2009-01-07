@@ -234,7 +234,10 @@
 						  dialogika, makz: bugfix #1827565; changed that it works dynamically for more than 2 levels
 						  -->
 						<xsl:when test="starts-with(w:lvlText/@w:val, concat('%',$lvl))">
-							<xsl:attribute name="style:num-letter-sync">true</xsl:attribute>
+              <xsl:if test="w:numFmt/@w:val = 'lowerLetter' or w:numFmt/@w:val = 'upperLetter'">
+                <!-- this attribute is only valid when num-format is 'a' or 'A' -->
+							  <xsl:attribute name="style:num-letter-sync">true</xsl:attribute>
+              </xsl:if>
 							<xsl:choose>
 								<xsl:when test="w:start and w:start/@w:val > 1">
 									<xsl:attribute name="text:start-value">

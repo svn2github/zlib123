@@ -241,20 +241,18 @@
     <xsl:param name="framePr" />
 
     <xsl:attribute name="svg:x">
-      <xsl:call-template name="ConvertMeasure">
+      <xsl:call-template name="ConvertToCentimeters">
         <xsl:with-param name="length">
           <xsl:value-of select="$framePr/@w:x"/>
         </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:attribute>
 
     <xsl:attribute name="svg:y">
-      <xsl:call-template name="ConvertMeasure">
+      <xsl:call-template name="ConvertToCentimeters">
         <xsl:with-param name="length">
           <xsl:value-of select="$framePr/@w:y"/>
         </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:attribute>
   </xsl:template>

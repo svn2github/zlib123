@@ -32,50 +32,48 @@
 
   <xsl:template match="/oox:package">
     <xsl:call-template name="VisitPart">
-      <xsl:with-param name="content-type" select="'main+xml'"/>
+      <xsl:with-param name="content-type" select="'main+xml'" />
     </xsl:call-template>
     <xsl:call-template name="VisitPart">
-      <xsl:with-param name="content-type" select="'styles+xml'"/>
+      <xsl:with-param name="content-type" select="'styles+xml'" />
     </xsl:call-template>
     <xsl:call-template name="VisitPart">
-      <xsl:with-param name="content-type" select="'header+xml'"/>
+      <xsl:with-param name="content-type" select="'header+xml'" />
     </xsl:call-template>
     <xsl:call-template name="VisitPart">
-      <xsl:with-param name="content-type" select="'footer+xml'"/>
+      <xsl:with-param name="content-type" select="'footer+xml'" />
     </xsl:call-template>
     <xsl:call-template name="VisitPart">
-      <xsl:with-param name="content-type" select="'footnotes+xml'"/>
+      <xsl:with-param name="content-type" select="'footnotes+xml'" />
     </xsl:call-template>
     <xsl:call-template name="VisitPart">
-      <xsl:with-param name="content-type" select="'endnotes+xml'"/>
+      <xsl:with-param name="content-type" select="'endnotes+xml'" />
     </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="VisitPart">
-    <xsl:param name="content-type"/>
-    
-    <xsl:for-each
-      select="/oox:package/oox:part[@oox:name='[Content_Types].xml']/ct:Types/ct:Override[contains(@ContentType, $content-type)]">
-      
-      <xsl:variable name="path" select="substring-after(@PartName, '/')"/>
+    <xsl:param name="content-type" />
+
+    <xsl:for-each select="/oox:package/oox:part[@oox:name='[Content_Types].xml']/ct:Types/ct:Override[contains(@ContentType, $content-type)]">
+      <xsl:variable name="path" select="substring-after(@PartName, '/')" />
       <xsl:for-each select="/oox:package/oox:part[@oox:name=$path]">
-        <xsl:apply-templates/>
+        <xsl:apply-templates />
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="w:body">
-    <xsl:apply-templates/>
+    <xsl:apply-templates />
   </xsl:template>
 
   <xsl:template match="w:p">
     <xsl:message terminate="no">progress:w:p</xsl:message>
-    <xsl:apply-templates/>
+    <xsl:apply-templates />
   </xsl:template>
 
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
-    <xsl:apply-templates/>
+    <xsl:apply-templates />
   </xsl:template>
 
   <xsl:template match="w:pPr">

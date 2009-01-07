@@ -60,7 +60,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- position floating tables using a frame -->
-        <text:p text:style-name="http://www.dialogika.de/stylename/hiddenParagraph">
+        <text:p text:style-name="HiddenParagraph">
           <draw:frame>
             <xsl:attribute name="draw:style-name">
               <xsl:value-of select="generate-id(w:tblPr/w:tblpPr)"/>
@@ -88,7 +88,7 @@
   Summary: Handles the conversion of positioned tables.
   -->
   <!--<xsl:template match="w:tbl[w:tblPr/w:tblpPr]">
-    <text:p text:style-name="http://www.dialogika.de/stylename/hiddenParagraph">
+    <text:p text:style-name="HiddenParagraph">
       <draw:frame>
         <xsl:attribute name="draw:style-name">
           <xsl:value-of select="generate-id(w:tblPr/w:tblpPr)"/>
@@ -107,7 +107,8 @@
             <xsl:attribute name="table:style-name">
               <xsl:value-of select="generate-id(self::w:tbl)"/>
             </xsl:attribute>
-            --><!--TODO: @table:style-name --><!--
+            -->
+  <!--TODO: @table:style-name --><!--
             <xsl:apply-templates select="w:tblGrid"/>
             <xsl:apply-templates select="w:tr"/>
           </table:table>
@@ -126,11 +127,9 @@
         </xsl:attribute>
       </xsl:if>
       <xsl:call-template name="MasterPageName"/>
-      <style:table-properties table:border-model="collapsing">
-        <xsl:call-template name="InsertTableProperties">
-          <xsl:with-param name="Default">StyleTableProperties</xsl:with-param>
-        </xsl:call-template>
-      </style:table-properties>
+      <xsl:call-template name="InsertTableProperties">
+        <xsl:with-param name="Default">StyleTableProperties</xsl:with-param>
+      </xsl:call-template>
     </style:style>
   </xsl:template>
 
@@ -605,98 +604,101 @@
   <xsl:template name="InsertTableProperties">
     <xsl:param name="Default"/>
 
-    <xsl:choose>
-      <xsl:when test="w:tblW/@w:type='pct'">
-        <xsl:attribute name="style:rel-width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:tblW/@w:w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">pct</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="table:align">
-          <xsl:call-template name="InsertTableAlign"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="w:tblW/@w:type='dxa'">
-        <xsl:attribute name="style:width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:tblW/@w:w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="table:align">
-          <xsl:call-template name="InsertTableAlign"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="w:tblW/@w:type='auto'">
-        <xsl:attribute name="style:width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="sum(ancestor::w:tbl[1]/w:tblGrid/w:gridCol/@w:w)"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-        <xsl:attribute name="table:align">
-          <xsl:call-template name="InsertTableAlign"/>
-        </xsl:attribute>
-      </xsl:when>
-    </xsl:choose>
-
-    <xsl:call-template name="InsertTableIndent">
-      <xsl:with-param name="tblPr" select="." />
-    </xsl:call-template>
-
-    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and 
-      not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
+    <style:table-properties table:border-model="collapsing">
       <xsl:choose>
-        <xsl:when test="not(parent::w:tbl/preceding::w:p[1]/w:pPr/w:sectPr)">
-          <xsl:attribute name="fo:break-before">
-            <xsl:text>page</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:variable name="precSectPr" select="preceding::w:p[1]/w:pPr/w:sectPr"/>
-          <xsl:variable name="followingSectPr" select="following::w:sectPr"/>
-          <xsl:if
-            test="($precSectPr/w:pgSz/@w:w = $followingSectPr/w:pgSz/@w:w
-            and $precSectPr/w:pgSz/@w:h = $followingSectPr/w:pgSz/@w:h
-            and $precSectPr/w:pgSz/@w:orient = $followingSectPr/w:pgSz/@w:orient
-            and $precSectPr/w:pgMar/@w:top = $followingSectPr/w:pgMar/@w:top
-            and $precSectPr/w:pgMar/@w:left = $followingSectPr/w:pgMar/@w:left
-            and $precSectPr/w:pgMar/@w:right = $followingSectPr/w:pgMar/@w:right
-            and $precSectPr/w:pgMar/@w:bottom = $followingSectPr/w:pgMar/@w:bottom
-            and $precSectPr/w:pgMar/@w:header = $followingSectPr/w:pgMar/@w:header
-            and $precSectPr/w:pgMar/@w:footer = $followingSectPr/w:pgMar/@w:footer)">
-            <xsl:attribute name="fo:break-before">
-              <xsl:text>page</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-
-    <xsl:if test="$Default='StyleTableProperties'">
-      <xsl:choose>
-        <xsl:when test="w:tblpPr/@w:bottomFromText">
-          <xsl:attribute name="fo:margin-bottom">
+        <xsl:when test="w:tblW/@w:type='pct'">
+          <xsl:attribute name="style:rel-width">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
-                <xsl:value-of select="w:tblpPr/@w:bottomFromText"/>
+                <xsl:value-of select="w:tblW/@w:w"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">pct</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="table:align">
+            <xsl:call-template name="InsertTableAlign"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="w:tblW/@w:type='dxa'">
+          <xsl:attribute name="style:width">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:tblW/@w:w"/>
               </xsl:with-param>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
+          <xsl:attribute name="table:align">
+            <xsl:call-template name="InsertTableAlign"/>
+          </xsl:attribute>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
-        </xsl:otherwise>
+        <xsl:when test="w:tblW/@w:type='auto'">
+          <xsl:attribute name="style:width">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="sum(ancestor::w:tbl[1]/w:tblGrid/w:gridCol/@w:w)"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="table:align">
+            <xsl:call-template name="InsertTableAlign"/>
+          </xsl:attribute>
+        </xsl:when>
       </xsl:choose>
-    </xsl:if>
+
+      <xsl:call-template name="InsertTableIndent">
+        <xsl:with-param name="tblPr" select="." />
+      </xsl:call-template>
+
+      <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and 
+        not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
+        <xsl:choose>
+          <xsl:when test="not(parent::w:tbl/preceding::w:p[1]/w:pPr/w:sectPr)">
+            <xsl:attribute name="fo:break-before">
+              <xsl:text>page</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="precSectPr" select="preceding::w:p[1]/w:pPr/w:sectPr"/>
+            <xsl:variable name="followingSectPr" select="following::w:sectPr"/>
+            <xsl:if
+              test="($precSectPr/w:pgSz/@w:w = $followingSectPr/w:pgSz/@w:w
+              and $precSectPr/w:pgSz/@w:h = $followingSectPr/w:pgSz/@w:h
+              and $precSectPr/w:pgSz/@w:orient = $followingSectPr/w:pgSz/@w:orient
+              and $precSectPr/w:pgMar/@w:top = $followingSectPr/w:pgMar/@w:top
+              and $precSectPr/w:pgMar/@w:left = $followingSectPr/w:pgMar/@w:left
+              and $precSectPr/w:pgMar/@w:right = $followingSectPr/w:pgMar/@w:right
+              and $precSectPr/w:pgMar/@w:bottom = $followingSectPr/w:pgMar/@w:bottom
+              and $precSectPr/w:pgMar/@w:header = $followingSectPr/w:pgMar/@w:header
+              and $precSectPr/w:pgMar/@w:footer = $followingSectPr/w:pgMar/@w:footer)">
+              <xsl:attribute name="fo:break-before">
+                <xsl:text>page</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+
+      <xsl:if test="$Default='StyleTableProperties'">
+        <xsl:choose>
+          <xsl:when test="w:tblpPr/@w:bottomFromText">
+            <xsl:attribute name="fo:margin-bottom">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:tblpPr/@w:bottomFromText"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+
+    </style:table-properties>
   </xsl:template>
 
   <xsl:template name="InsertTableAlign">

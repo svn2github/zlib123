@@ -40,9 +40,9 @@
   <xsl:template match="w:font">
     <style:font-face>
       <xsl:attribute name="style:name">
-        <xsl:value-of select="@w:name"/>
+        <xsl:value-of select="@w:name" />
       </xsl:attribute>
-  
+
       <xsl:if test="w:charset/@w:val='02'">
         <xsl:attribute name="style:font-charset">
           <xsl:text>x-symbol</xsl:text>
@@ -50,25 +50,24 @@
       </xsl:if>
 
       <xsl:attribute name="svg:font-family">
-        <xsl:value-of select="@w:name"/>
+        <xsl:value-of select="@w:name" />
       </xsl:attribute>
 
       <xsl:if test="w:family/@w:val != 'auto' ">
         <xsl:attribute name="style:font-family-generic">
-          <xsl:value-of select="w:family/@w:val"/>
+          <xsl:value-of select="w:family/@w:val" />
         </xsl:attribute>
       </xsl:if>
 
       <xsl:if test="w:family/@w:val = 'auto' ">
         <xsl:attribute name="style:font-family-generic">system</xsl:attribute>
       </xsl:if>
-      
-        <xsl:if test="w:pitch/@w:val != 'default' ">
+
+      <xsl:if test="w:pitch/@w:val != 'default' ">
         <xsl:attribute name="style:font-pitch">
-          <xsl:value-of select="w:pitch/@w:val"/>
+          <xsl:value-of select="w:pitch/@w:val" />
         </xsl:attribute>
       </xsl:if>
-
     </style:font-face>
   </xsl:template>
 </xsl:stylesheet>

@@ -14,54 +14,52 @@
   xmlns:oox="urn:oox"
   exclude-result-prefixes="w r xlink number wp oox">
 
-  <xsl:key name="track-changes" match="w:ins|w:del|w:pPrChange|w:rPrChange" use="''"/>
+  <xsl:key name="track-changes" match="w:ins|w:del|w:pPrChange|w:rPrChange" use="''" />
 
   <xsl:template match="w:r" mode="trackchanges">
     <xsl:choose>
       <xsl:when test="parent::w:del">
         <xsl:choose>
-          <xsl:when
-            test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
-          <xsl:when
-            test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
+          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del" />
+          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />
           <xsl:otherwise>
             <text:changed-region>
               <xsl:attribute name="text:id">
-                <xsl:value-of select="generate-id(.)"/>
+                <xsl:value-of select="generate-id(.)" />
               </xsl:attribute>
               <text:deletion>
                 <office:change-info>
                   <dc:creator>
-                    <xsl:value-of select="parent::w:del/@w:author"/>
+                    <xsl:value-of select="parent::w:del/@w:author" />
                   </dc:creator>
                   <dc:date>
                     <xsl:choose>
                       <xsl:when test="contains(parent::w:del/@w:date,'Z')">
-                        <xsl:value-of select="substring-before(parent::w:del/@w:date,'Z')"/>
+                        <xsl:value-of select="substring-before(parent::w:del/@w:date,'Z')" />
                       </xsl:when>
                       <xsl:otherwise>
-                        <xsl:value-of select="parent::w:del/@w:date"/>
+                        <xsl:value-of select="parent::w:del/@w:date" />
                       </xsl:otherwise>
                     </xsl:choose>
                   </dc:date>
                 </office:change-info>
                 <text:p>
                   <xsl:attribute name="text:style-name">
-                    <xsl:value-of select="generate-id(ancestor::w:p)"/>
+                    <xsl:value-of select="generate-id(ancestor::w:p)" />
                   </xsl:attribute>
                   <xsl:choose>
                     <!--check whether string contains  whitespace sequence-->
                     <xsl:when test="not(contains(w:delText,'  '))">
-                      <xsl:value-of select="w:delText"/>
+                      <xsl:value-of select="w:delText" />
                       <xsl:if test="w:delInstrText">
-                        <xsl:value-of select="w:delInstrText"/>
+                        <xsl:value-of select="w:delInstrText" />
                       </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
                       <!--converts whitespaces sequence to text:s-->
                       <xsl:call-template name="InsertWhiteSpaces">
                         <xsl:with-param name="string">
-                          <xsl:value-of select="w:delText"/>
+                          <xsl:value-of select="w:delText" />
                         </xsl:with-param>
                       </xsl:call-template>
                     </xsl:otherwise>
@@ -75,20 +73,20 @@
       <xsl:when test="parent::w:ins">
         <text:changed-region>
           <xsl:attribute name="text:id">
-            <xsl:value-of select="generate-id(.)"/>
+            <xsl:value-of select="generate-id(.)" />
           </xsl:attribute>
           <text:insertion>
             <office:change-info>
               <dc:creator>
-                <xsl:value-of select="parent::w:ins/@w:author"/>
+                <xsl:value-of select="parent::w:ins/@w:author" />
               </dc:creator>
               <dc:date>
                 <xsl:choose>
                   <xsl:when test="contains(parent::w:ins/@w:date,'Z')">
-                    <xsl:value-of select="substring-before(parent::w:ins/@w:date,'Z')"/>
+                    <xsl:value-of select="substring-before(parent::w:ins/@w:date,'Z')" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="parent::w:ins/@w:date"/>
+                    <xsl:value-of select="parent::w:ins/@w:date" />
                   </xsl:otherwise>
                 </xsl:choose>
               </dc:date>
@@ -99,20 +97,20 @@
       <xsl:when test="descendant::w:rPrChange">
         <text:changed-region>
           <xsl:attribute name="text:id">
-            <xsl:value-of select="generate-id(.)"/>
+            <xsl:value-of select="generate-id(.)" />
           </xsl:attribute>
           <text:format-change>
             <office:change-info>
               <dc:creator>
-                <xsl:value-of select="descendant::w:rPrChange/@w:author"/>
+                <xsl:value-of select="descendant::w:rPrChange/@w:author" />
               </dc:creator>
               <dc:date>
                 <xsl:choose>
                   <xsl:when test="contains(descendant::w:rPrChange/@w:date,'Z')">
-                    <xsl:value-of select="substring-before(descendant::w:rPrChange/@w:date,'Z')"/>
+                    <xsl:value-of select="substring-before(descendant::w:rPrChange/@w:date,'Z')" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="descendant::w:rPrChange/@w:date"/>
+                    <xsl:value-of select="descendant::w:rPrChange/@w:date" />
                   </xsl:otherwise>
                 </xsl:choose>
               </dc:date>
@@ -121,7 +119,7 @@
         </text:changed-region>
       </xsl:when>
     </xsl:choose>
-    <xsl:apply-templates mode="trackchanges"/>
+    <xsl:apply-templates mode="trackchanges" />
   </xsl:template>
 
   <xsl:template match="w:rPr[parent::w:pPr]" mode="trackchanges">
@@ -129,46 +127,45 @@
       <xsl:when test="w:del">
         <text:changed-region>
           <xsl:attribute name="text:id">
-            <xsl:value-of select="generate-id(.)"/>
+            <xsl:value-of select="generate-id(.)" />
           </xsl:attribute>
           <text:deletion>
             <office:change-info>
               <dc:creator>
-                <xsl:value-of select="w:del/@w:author"/>
+                <xsl:value-of select="w:del/@w:author" />
               </dc:creator>
               <dc:date>
                 <xsl:choose>
                   <xsl:when test="contains(w:del/@w:date,'Z')">
-                    <xsl:value-of select="substring-before(w:del/@w:date,'Z')"/>
+                    <xsl:value-of select="substring-before(w:del/@w:date,'Z')" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="w:del/@w:date"/>
+                    <xsl:value-of select="w:del/@w:date" />
                   </xsl:otherwise>
                 </xsl:choose>
               </dc:date>
             </office:change-info>
             <text:p>
               <xsl:attribute name="text:style-name">
-                <xsl:value-of select="generate-id(ancestor::w:p)"/>
+                <xsl:value-of select="generate-id(ancestor::w:p)" />
               </xsl:attribute>
               <xsl:if test="ancestor::w:p/descendant::w:r[last()]/parent::w:del">
-                <xsl:value-of select="ancestor::w:p/descendant::w:r[last()]"/>
+                <xsl:value-of select="ancestor::w:p/descendant::w:r[last()]" />
               </xsl:if>
             </text:p>
             <text:p>
               <xsl:attribute name="text:style-name">
                 <xsl:choose>
                   <xsl:when test="key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle">
-                    <xsl:value-of select="key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val"
-                    />
+                    <xsl:value-of select="key('p', @oox:id+1)/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="generate-id(key('p', @oox:id+1))"/>
+                    <xsl:value-of select="generate-id(key('p', @oox:id+1))" />
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
               <xsl:if test="key('p', @oox:id+1)/descendant::w:r[1]/parent::w:del">
-                <xsl:value-of select="key('p', @oox:id+1)/descendant::w:r[1]"/>
+                <xsl:value-of select="key('p', @oox:id+1)/descendant::w:r[1]" />
               </xsl:if>
             </text:p>
           </text:deletion>
@@ -177,20 +174,20 @@
       <xsl:when test="w:ins">
         <text:changed-region>
           <xsl:attribute name="text:id">
-            <xsl:value-of select="generate-id(ancestor::w:p)"/>
+            <xsl:value-of select="generate-id(ancestor::w:p)" />
           </xsl:attribute>
           <text:insertion>
             <office:change-info>
               <dc:creator>
-                <xsl:value-of select="w:ins/@w:author"/>
+                <xsl:value-of select="w:ins/@w:author" />
               </dc:creator>
               <dc:date>
                 <xsl:choose>
                   <xsl:when test="contains(w:ins/@w:date,'Z')">
-                    <xsl:value-of select="substring-before(w:ins/@w:date,'Z')"/>
+                    <xsl:value-of select="substring-before(w:ins/@w:date,'Z')" />
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="w:ins/@w:date"/>
+                    <xsl:value-of select="w:ins/@w:date" />
                   </xsl:otherwise>
                 </xsl:choose>
               </dc:date>
@@ -206,10 +203,9 @@
       <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body">
         <xsl:if test="key('track-changes', '')">true</xsl:if>
       </xsl:for-each>
-      <xsl:for-each
-        select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
+      <xsl:for-each select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
         <xsl:variable name="file">
-          <xsl:value-of select="."/>
+          <xsl:value-of select="." />
         </xsl:variable>
         <xsl:for-each select="key('Part', concat('word/',$file))">
           <xsl:if test="key('track-changes', '')">true</xsl:if>
@@ -220,18 +216,17 @@
       <text:tracked-changes>
         <xsl:for-each select="key('Part', 'word/document.xml')/w:document/w:body">
           <xsl:if test="key('track-changes', '')">
-            <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body"
-              mode="trackchanges"/>
+            <xsl:apply-templates select="key('Part', 'word/document.xml')/w:document/w:body" mode="trackchanges" />
           </xsl:if>
         </xsl:for-each>
         <xsl:for-each
           select="key('Part', 'word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
           <xsl:variable name="file">
-            <xsl:value-of select="."/>
+            <xsl:value-of select="." />
           </xsl:variable>
           <xsl:for-each select="key('Part', concat('word/',$file))">
             <xsl:if test="key('track-changes', '')">
-              <xsl:apply-templates select="key('Part', concat('word/',$file))" mode="trackchanges"/>
+              <xsl:apply-templates select="key('Part', concat('word/',$file))" mode="trackchanges" />
             </xsl:if>
           </xsl:for-each>
         </xsl:for-each>
@@ -242,32 +237,30 @@
   <xsl:template name="TrackChangesInsertMade">
     <text:change-start>
       <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)"/>
+        <xsl:value-of select="generate-id(.)" />
       </xsl:attribute>
     </text:change-start>
     <text:span>
       <xsl:attribute name="text:style-name">
-        <xsl:value-of select="generate-id(.)"/>
+        <xsl:value-of select="generate-id(.)" />
       </xsl:attribute>
-      <xsl:apply-templates/>
+      <xsl:apply-templates />
     </text:span>
     <text:change-end>
       <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)"/>
+        <xsl:value-of select="generate-id(.)" />
       </xsl:attribute>
     </text:change-end>
   </xsl:template>
 
   <xsl:template name="TrackChangesDeleteMade">
     <xsl:choose>
-      <xsl:when
-        test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
-      <xsl:when
-        test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del"/>
+      <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del" />
+      <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and key('p', number(@oox:id)-1)/w:pPr/w:rPr/w:del" />
       <xsl:otherwise>
         <text:change>
           <xsl:attribute name="text:change-id">
-            <xsl:value-of select="generate-id(.)"/>
+            <xsl:value-of select="generate-id(.)" />
           </xsl:attribute>
         </text:change>
       </xsl:otherwise>
@@ -277,30 +270,30 @@
   <xsl:template name="TrackChangesChangesMade">
     <text:change-start>
       <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)"/>
+        <xsl:value-of select="generate-id(.)" />
       </xsl:attribute>
     </text:change-start>
     <text:span>
       <xsl:attribute name="text:style-name">
-        <xsl:value-of select="generate-id(.)"/>
+        <xsl:value-of select="generate-id(.)" />
       </xsl:attribute>
-      <xsl:value-of select="descendant::text()"/>
+      <xsl:value-of select="descendant::text()" />
     </text:span>
     <text:change-end>
       <xsl:attribute name="text:change-id">
-        <xsl:value-of select="generate-id(.)"/>
+        <xsl:value-of select="generate-id(.)" />
       </xsl:attribute>
     </text:change-end>
   </xsl:template>
 
-  <xsl:template match="w:t" mode="trackchanges"/>
+  <xsl:template match="w:t" mode="trackchanges" />
 
-  <xsl:template match="w:delText" mode="trackchanges"/>
+  <xsl:template match="w:delText" mode="trackchanges" />
 
-  <xsl:template match="w:delInstrText" mode="trackchanges"/>
+  <xsl:template match="w:delInstrText" mode="trackchanges" />
 
-  <xsl:template match="w:instrText" mode="trackchanges"/>
+  <xsl:template match="w:instrText" mode="trackchanges" />
 
-  <xsl:template match="wp:posOffset" mode="trackchanges"/>
+  <xsl:template match="wp:posOffset" mode="trackchanges" />
 
 </xsl:stylesheet>

@@ -89,7 +89,7 @@
 				<!--
 					makz: paragraph style for additional paragraph that should not be visible
 				-->
-				<style:style style:name="http://www.dialogika.de/stylename/hiddenParagraph" style:family="paragraph" style:parent-style-name="Standard">
+				<style:style style:name="HiddenParagraph" style:family="paragraph" style:parent-style-name="Standard">
 					<style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
 				</style:style>
 			</office:automatic-styles>
@@ -1220,6 +1220,7 @@
 
 	<!--ignore text in automatic styles mode-->
 	<xsl:template match="text()" mode="automaticstyles"/>
+  <xsl:template match="text()" mode="automaticpict"/>
 
 	<!-- insert a master page name when required -->
 	<xsl:template name="MasterPageName">

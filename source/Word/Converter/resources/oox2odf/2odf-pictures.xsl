@@ -379,9 +379,7 @@
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          <xsl:value-of
-            select="substring-before($pgH,'cm') -substring-before($botMar,'cm') + substring-before($Pos,'cm')"/>
-          <xsl:text>cm</xsl:text>
+          <xsl:value-of select="substring-before($pgH,'cm') -substring-before($botMar,'cm') + substring-before($Pos,'cm')"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="ConvertEmu">
