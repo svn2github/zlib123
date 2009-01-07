@@ -80,6 +80,7 @@
     <xsl:choose>
       <xsl:when test="$master-page/style:header">
         <xsl:variable name="headerReferenceID" select="generate-id($master-page/style:header)"></xsl:variable>
+        <xsl:variable name="headerLeftReferenceID" select="generate-id($master-page/style:header-left)"></xsl:variable>
         <xsl:variable name="nextStyleDefined" select="$master-page/@style:next-style-name"></xsl:variable>
         <xsl:variable name="nextStyle" select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name=$master-page/@style:next-style-name]"></xsl:variable>
         <xsl:variable name="nextStyleHasheader" select="$nextStyle/style:header"></xsl:variable>
@@ -101,7 +102,14 @@
                   <xsl:otherwise>
                     <w:headerReference w:type="default" r:id="{generate-id($nextStyle/style:header)}"/>
                     <xsl:if test="$evenElementFound">
-                      <w:headerReference w:type="even" r:id="{generate-id($nextStyle/style:header)}"/>
+                      <xsl:choose>
+                        <xsl:when test="$nextStyle/style:header-left">
+                          <w:headerReference w:type="even" r:id="{generate-id($nextStyle/style:header-left)}"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <w:headerReference w:type="even" r:id="{generate-id($nextStyle/style:header)}"/>
+                        </xsl:otherwise>
+                      </xsl:choose>                      
                     </xsl:if>
                   </xsl:otherwise>
                 </xsl:choose>                
@@ -115,7 +123,7 @@
             <xsl:choose>
               <xsl:when test="$master-page/style:header-left">
                 <w:headerReference w:type="default" r:id="{$headerReferenceID}"/>
-                <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
+                <w:headerReference w:type="even" r:id="{$headerLeftReferenceID}"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:choose>
@@ -158,7 +166,14 @@
                   <xsl:otherwise>
                     <w:footerReference w:type="default" r:id="{generate-id($nextStyle/style:footer)}"/>
                     <xsl:if test="$evenElementFound">
-                      <w:footerReference w:type="even" r:id="{generate-id($nextStyle/style:footer)}"/>
+                      <xsl:choose>
+                        <xsl:when test="$nextStyle/style:footer-left">
+                          <w:footerReference w:type="even" r:id="{generate-id($nextStyle/style:footer-left)}"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <w:footerReference w:type="even" r:id="{generate-id($nextStyle/style:footer)}"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:if>
                   </xsl:otherwise>
                 </xsl:choose>
