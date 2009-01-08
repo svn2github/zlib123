@@ -113,19 +113,22 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// </summary>
         private XmlWriterSettings _delegateSettings = null;
         private XmlResolver _resolver;
+        
         /// <summary>
-        /// Source attribute of the currently processed binary file
+        /// Table of binary files to be copied from the source to the target package
         /// </summary>
-        private string _binarySource;
-        /// <summary>
-        /// Target attribute of the currently processed binary file
-        /// </summary>
-        private string _binaryTarget;
-        /// <summary>
-        /// Table of binary files to be added to the package
-        /// </summary>
-        private Hashtable _binaries;
+        private Dictionary<string, string> _binaries;
 
+        /// <summary>
+        /// A list of files to be extracted from the source package
+        /// </summary>
+        private Dictionary<string, string> _extractFileList;
+
+        /// <summary>
+        /// A list of files to be imported from teh file system to the target package
+        /// </summary>
+        private Dictionary<string, string> _importFileList;
+        
         private string _outputFile;
 
         private struct ImageValue
@@ -137,32 +140,6 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         }
 
         private Dictionary<string, ImageValue> _imageValues = new System.Collections.Generic.Dictionary<string, ImageValue>();
-
-        #region New Coding for Import and Extract sound files
-
-        //Extract
-        //Added  by sonata
-        /// <summary>
-        /// extractFileList - list of files to be extracted from pptx zip archive
-        /// archiveFileSource - input pptx zip archive source
-        /// externalFileDestionation - external path to extraxct the media(.wav) files
-        /// </summary>
-        private Hashtable _extractFileList;
-        private string _archiveFileSource;
-        private string _externalFileDestination;
-
-        //Import
-        //Added  by sonata
-        /// <summary>
-        /// importFileList - list of files to be imported from physical directory to PPTX zip archive
-        /// externalFileSource - physical directory path for the file to be copied
-        /// archiveFileDestination - pptx zip archive destination        
-        /// </summary>
-        private Hashtable _importFileList;
-        private string _externalFileSource;
-        private string _archiveFileDestination;
-
-        #endregion
 
         
         /// <summary>
@@ -228,31 +205,15 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                             _zipOutputStream = ZipFactory.CreateArchive(_currentPzipElement.Attributes[PZIP.TargetAttr].Value);
                             _processingState = ProcessingState.EntryWaiting;
 
-                            _binaries = new Hashtable();
-                            _extractFileList = new Hashtable();
-                            _importFileList = new Hashtable();
+                            _binaries = new Dictionary<string, string>();
+                            _extractFileList = new Dictionary<string, string>();
+                            _importFileList = new Dictionary<string, string>();
                         }
                         else
                         {
                             //TODO throw exception
                         }
                     }
-                    //else
-                    //{
-                    //    if (_zipOutputStream != null)
-                    //    {
-                    //        // Copy binaries before closing the archive
-                    //        CopyBinaries();
-                    //        //Added by Sonata - Copy Audio files before closing archive
-                    //        ExtractFiles();
-                    //        ImportFiles();
-                    //        Debug.WriteLine("[closing archive]");
-                    //        _zipOutputStream.Close();
-                    //        _zipOutputStream = null;
-                    //    }
-                    //    // going back to initial state
-                    //    _processingState = ProcessingState.None;
-                    //}
                     break;
                 case PZIP.EntryElement:
                     // Prevent nested entry creation
@@ -284,65 +245,65 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                             }
                         }
                     }
-                    //else if (_processingState == ProcessingState.EntryStarted)
-                    //{
-                    //    if (_delegateWriter != null)
-                    //    {
-                    //        Debug.WriteLine("[end part]");
-                    //        _delegateWriter.WriteEndDocument();
-                    //        _delegateWriter.Flush();
-                    //        _delegateWriter.Close();
-                    //        _delegateWriter = null;
-                    //    }
-                    //    if (_processingState == ProcessingState.EntryStarted)
-                    //    {
-                    //        _processingState = ProcessingState.EntryWaiting;
-                    //    }
-                    //}
                     break;
                 case PZIP.CopyElement:
                     if (_processingState != ProcessingState.None)
                     {
-                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr))
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr)
+                            && _currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
                         {
-                            _binarySource += _currentPzipElement.Attributes[PZIP.SourceAttr].Value;
-                            Debug.WriteLine("copy source=" + _binarySource);
-                        }
-                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
-                        {
-                            _binaryTarget += _currentPzipElement.Attributes[PZIP.TargetAttr].Value;
-                            Debug.WriteLine("copy target=" + _binaryTarget);
+                            string source = _currentPzipElement.Attributes[PZIP.SourceAttr].Value;
+                            string target = _currentPzipElement.Attributes[PZIP.TargetAttr].Value;
+
+                            Debug.WriteLine(string.Format("copy source={0} target={1}", source, target));
+
+                            if (_binaries != null && !_binaries.ContainsKey(target))
+                            {
+                                //target is the key because there are cases where one file has to be
+                                //copied twice to different locations
+                                _binaries.Add(target, source);
+                            }
                         }
                     }
                     break;
                 case PZIP.ExtractElement:
                     if (_processingState != ProcessingState.None)
                     {
-                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr))
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr)
+                            && _currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
                         {
-                            _archiveFileSource += _currentPzipElement.Attributes[PZIP.SourceAttr].Value;
-                            Debug.WriteLine("copy source=" + _archiveFileSource);
-                        }
-                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
-                        {
-                            _externalFileDestination += _currentPzipElement.Attributes[PZIP.TargetAttr].Value;
-                            Debug.WriteLine("copy target=" + _externalFileDestination);
+                            string source = _currentPzipElement.Attributes[PZIP.SourceAttr].Value;
+                            string target = _currentPzipElement.Attributes[PZIP.TargetAttr].Value;
+
+                            Debug.WriteLine(string.Format("copy source={0} target={1}", source, target));
+
+                            if (_extractFileList != null && !_extractFileList.ContainsKey(target))
+                            {
+                                //target is the key because there are cases where one file has to be
+                                //copied twice to different locations
+                                _extractFileList.Add(target, source);
+                            }
                         }
                     }
                     break;
                 case PZIP.ImportElement:
                     if (_processingState != ProcessingState.None)
                     {
-                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr))
+                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr)
+                            && _currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
                         {
-                            _externalFileSource += _currentPzipElement.Attributes[PZIP.SourceAttr];
-                            Debug.WriteLine("copy source=" + _externalFileSource);
-                        }
-                        if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))
-                        {
-                            _archiveFileDestination += _currentPzipElement.Attributes[PZIP.TargetAttr];
-                            Debug.WriteLine("copy target=" + _archiveFileDestination);
-                        }
+                            string source = _currentPzipElement.Attributes[PZIP.SourceAttr].Value;
+                            string target = _currentPzipElement.Attributes[PZIP.TargetAttr].Value;
+
+                            Debug.WriteLine(string.Format("copy source={0} target={1}", source, target));
+
+                            if (_importFileList != null && !_importFileList.ContainsKey(target))
+                            {
+                                //target is the key because there are cases where one file has to be
+                                //copied twice to different locations
+                                _importFileList.Add(target, source);
+                            }
+                        } 
                     }
                     break;
             }
@@ -422,10 +383,10 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                             if (_zipOutputStream != null)
                             {
                                 // Copy binaries before closing the archive
-                                CopyBinaries();
+                                copyBinaries();
                                 //Added by Sonata - Copy Audio files before closing archive
-                                ExtractFiles();
-                                ImportFiles();
+                                extractFiles();
+                                importFiles();
                                 Debug.WriteLine("[closing archive]");
                                 _zipOutputStream.Close();
                                 _zipOutputStream = null;
@@ -448,39 +409,10 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         }
                         break;
                     case PZIP.CopyElement:
-                        if (_binarySource != null && _binaryTarget != null)
-                        {
-                            if (_binaries != null && !_binaries.ContainsKey(_binaryTarget))
-                            {
-                                //Target is the key because there is a case where one file has to be
-                                //copied twice to different locations
-                                _binaries.Add(_binaryTarget, _binarySource);
-                            }
-                            _binarySource = null;
-                            _binaryTarget = null;
-                        }
                         break;
                     case PZIP.ExtractElement:
-                        if (_archiveFileSource != null && _externalFileDestination != null)
-                        {
-                            if (_extractFileList != null && !_extractFileList.ContainsKey(_externalFileDestination))
-                            {
-                                _extractFileList.Add(_externalFileDestination, _archiveFileSource);
-                            }
-                            _archiveFileSource = null;
-                            _externalFileDestination = null;
-                        }
                         break;
                     case PZIP.ImportElement:
-                        if (_externalFileSource != null && _archiveFileDestination != null)
-                        {
-                            if (_importFileList != null && !_importFileList.ContainsKey(_archiveFileDestination))
-                            {
-                                _importFileList.Add(_archiveFileDestination, _externalFileSource);
-                            }
-                            _externalFileSource = null;
-                            _archiveFileDestination = null;
-                        }
                         break;
                 }
             }
@@ -554,7 +486,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         }
                         else
                         {
-                            Stream sourceStream = GetStream(filename);
+                            Stream sourceStream = getStream(filename);
                             System.Drawing.Bitmap im = new System.Drawing.Bitmap(sourceStream);
 
                             iv = new ImageValue();
@@ -640,7 +572,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         }
                         else
                         {
-                            Stream sourceStream = GetStream(filename);
+                            Stream sourceStream = getStream(filename);
                             System.Drawing.Bitmap im = new System.Drawing.Bitmap(sourceStream);
 
                             iv = new ImageValue();
@@ -937,44 +869,36 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
         }
 
-        private void CopyBinaries()
+        /// <summary>
+        /// Transfer binary files between two zip archives. 
+        /// </summary>
+        private void copyBinaries()
         {
-            foreach (string s in _binaries.Keys)
+            foreach (string target in _binaries.Keys)
             {
-                CopyBinary((string)_binaries[s], s);
+                string source = _binaries[target];
+
+                Stream sourceStream = getStream(source);
+
+                if (sourceStream != null && _zipOutputStream != null)
+                {
+                    _zipOutputStream.AddEntry(target);
+                    int bytesCopied = streamCopy(sourceStream, _zipOutputStream);
+                    Debug.WriteLine("CopyBinary : " + source + " --> " + target + ", bytes copied = " + bytesCopied);
+                }
             }
         }
 
         private const int BUFFER_SIZE = 4096;
 
-        /// <summary>
-        /// Transfer a binary file between two zip archives. 
-        /// The source archive is handled by the resolver, while the destination archive 
-        /// corresponds to our zipOutputStream.  
-        /// </summary>
-        /// <param name="source">Relative path inside the source archive</param>
-        /// <param name="target">Relative path inside the destination archive</param>
-        private void CopyBinary(String source, String target)
-        {
-            Stream sourceStream = GetStream(source);
-
-            if (sourceStream != null && _zipOutputStream != null)
-            {
-                // New file entry
-                _zipOutputStream.AddEntry(target);
-                int bytesCopied = StreamCopy(sourceStream, _zipOutputStream);
-                Debug.WriteLine("CopyBinary : " + source + " --> " + target + ", bytes copied = " + bytesCopied);
-            }
-        }
-
         #region new code for Extract and Import
 
         //Added by Sonata
-        private void ExtractFiles()
+        private void extractFiles()
         {
-            foreach (string strfile in _extractFileList.Keys)
+            foreach (string target in _extractFileList.Keys)
             {
-                ExtractFile(strfile, (string)_extractFileList[strfile]);
+                extractFile(target, _extractFileList[target]);
             }
         }
 
@@ -984,20 +908,20 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// </summary>
         /// <param name="source">Relative path inside the source archive</param>
         /// <param name="destination">Destination folder name and file name seperated by '|' character</param>
-        private void ExtractFile(string destination, string source)
+        private void extractFile(string destination, string source)
         {
             // Retrive the Target folder name and Filename
             string targetFolderName = destination.Substring(0, destination.IndexOf('|'));
             string targetFileName = destination.Substring(destination.IndexOf('|') + 1);
 
             //GetOutputFilepath - gets the path where the output ODP file will be copied
-            string strCurrentDirectory = GetOutputFilePath();
+            string strCurrentDirectory = getOutputFilePath();
             string strDestinationFilePath = strCurrentDirectory.Replace("\\", "//") + "//" + targetFolderName;
 
             //get the zipArchive stream
             try
             {
-                Stream inputStream = GetStream(source);
+                Stream inputStream = getStream(source);
                 if (inputStream != null)
                 {
                     Directory.CreateDirectory(strDestinationFilePath);
@@ -1005,7 +929,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     if (!File.Exists(strDestinationFilePath))
                     {
                         FileStream fsFile = new FileStream(strDestinationFilePath, FileMode.Create);
-                        StreamCopy(inputStream, fsFile);
+                        streamCopy(inputStream, fsFile);
                         fsFile.Close();
                     }
                 }
@@ -1019,11 +943,11 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         }
 
 
-        private void ImportFiles()
+        private void importFiles()
         {
-            foreach (string strfile in _importFileList.Keys)
+            foreach (string target in _importFileList.Keys)
             {
-                ImportFile(strfile, (string)_importFileList[strfile]);
+                importFile(target, _importFileList[target]);
             }
         }
 
@@ -1034,14 +958,14 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// </summary>
         /// <param name="source">Source file pysical path - Relative/absolute </param>
         /// <param name="destination">Destination path inside zip archive</param>        
-        private void ImportFile(string destination, string source)
+        private void importFile(string destination, string source)
         {
             string inputFilePath = "";
 
             //Resolve relative path
             if (source.StartsWith("../"))
             {
-                inputFilePath = Path.GetFullPath(Path.Combine(GetInputFilePath(), source.Remove(0, 3))).Replace("/", "//").Replace("%20", " ");
+                inputFilePath = Path.GetFullPath(Path.Combine(getInputFilePath(), source.Remove(0, 3))).Replace("/", "//").Replace("%20", " ");
             }
             else
             {
@@ -1058,7 +982,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         _zipOutputStream.AddEntry(destination);
                         FileStream fsSourceFile = new FileStream(inputFilePath, FileMode.Open, FileAccess.Read);
 
-                        int bytesCopied = StreamCopy(fsSourceFile, _zipOutputStream);
+                        int bytesCopied = streamCopy(fsSourceFile, _zipOutputStream);
                         Debug.WriteLine("CopyBinary : " + inputFilePath + " --> " + destination + ", bytes copied = " + bytesCopied);
                     }
                 }
@@ -1075,7 +999,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// Get the physical directory path of the input file (PPTX or ODP) to transformed        /// 
         /// </summary>
         /// <returns>Physical path of the input file </returns>
-        private string GetInputFilePath()
+        private string getInputFilePath()
         {
             string returnInputFilePath = "";
 
@@ -1100,7 +1024,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// Get the physical directory path of the output file
         /// </summary>
         /// <returns>Physical path of the output file </returns>
-        private string GetOutputFilePath()
+        private string getOutputFilePath()
         {
             // TODO: refactor this terribly ugly part of code. It doesn't work anyway.       
             string returnOutputFilePath = "";
@@ -1131,7 +1055,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         #endregion
 
-        private Stream GetStream(string source)
+        private Stream getStream(string source)
         {
             //get stream to embedded resource
             if (source.StartsWith("#CER#") && source.EndsWith("#"))
@@ -1162,7 +1086,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
         }
 
-        private int StreamCopy(Stream source, Stream destination)
+        private int streamCopy(Stream source, Stream destination)
         {
             if (source != null && destination != null)
             {
@@ -1262,7 +1186,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// <param name="source">Relative path inside the source archive</param>
         public string ImageCopyBinary(String source)
         {
-            Stream sourceStream = GetStream(source);
+            Stream sourceStream = getStream(source);
 
             System.Drawing.Image img;
             img = System.Drawing.Image.FromStream(sourceStream);
