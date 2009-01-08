@@ -33,7 +33,8 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  exclude-result-prefixes="oox rels r v w">
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  exclude-result-prefixes="oox o rels r v w">
 
   <xsl:import href="measures.xsl" />
   <xsl:import href="common-meta.xsl" />
@@ -235,7 +236,7 @@
           </xsl:attribute>
         </xsl:when>
         <!-- the ref is ole picture -->
-        <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//v:shape/v:imagedata[./@r:id=$thisId]">
+        <xsl:when test="key('Part', 'word/document.xml')/w:document/w:body//v:shape/v:imagedata[@r:id=$thisId and ../../o:OLEObject]">
           <xsl:attribute name="manifest:full-path">
 
             <xsl:text>ObjectReplacements/</xsl:text>

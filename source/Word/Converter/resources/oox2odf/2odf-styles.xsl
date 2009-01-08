@@ -35,6 +35,7 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -42,7 +43,7 @@
   xmlns:oox="urn:oox"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
-  exclude-result-prefixes="w r draw number wp xlink v oox">
+  exclude-result-prefixes="w r wp xlink v oox rels">
 
   <xsl:import href="2odf-footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
@@ -1022,7 +1023,7 @@
 
         <!--clam: special style for tabs in footer (bug #1803097)-->
         <xsl:if test="not(key('Part', 'word/styles.xml')/w:styles/w:style[@w:styleId='X3AS7TABSTYLE'])">
-          <style:style style:name="X3AS7TABSTYLE" style:family="paragraph" style:parent-style-name="Footer" xmlns:pchar="urn:cleverage:xmlns:post-processings:characters" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns="http://schemas.openxmlformats.org/package/2006/relationships" xmlns:v="urn:schemas-microsoft-com:vml">
+          <style:style style:name="X3AS7TABSTYLE" style:family="paragraph" style:parent-style-name="Footer">
             <style:paragraph-properties>
               <style:tab-stops>
                 <style:tab-stop style:type="right" style:position="25cm" />

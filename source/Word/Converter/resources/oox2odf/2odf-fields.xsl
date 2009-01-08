@@ -572,8 +572,7 @@
           <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when
-        test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate') or contains($fieldCode, 'CreateTime')">
+      <xsl:when test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate') or contains($fieldCode, 'CreateTime')">
         <xsl:call-template name="InsertCreationDate">
           <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
@@ -583,8 +582,7 @@
           <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when
-        test="$fieldType = 'SAVEDATE' or contains($fieldCode,'LastSavedTime') or contains($fieldCode, 'SaveDate')">
+      <xsl:when test="$fieldType = 'SAVEDATE' or contains($fieldCode,'LastSavedTime') or contains($fieldCode, 'SaveDate')">
         <xsl:call-template name="InsertModificationDate">
           <xsl:with-param name="dateText" select="$fieldText"/>
         </xsl:call-template>
@@ -625,9 +623,9 @@
     <xsl:attribute name="style:data-style-name">
       <xsl:value-of select="generate-id(.)"/>
     </xsl:attribute>
-    <xsl:attribute name="text:date-value">
+    <!--<xsl:attribute name="text:date-value">
       <xsl:value-of select="$dateText"/>
-    </xsl:attribute>
+    </xsl:attribute>-->
     <xsl:value-of select="$dateText"/>
   </xsl:template>
 
@@ -663,9 +661,10 @@
       <xsl:attribute name="style:data-style-name">
         <xsl:value-of select="generate-id(.)"/>
       </xsl:attribute>
-      <xsl:attribute name="text:time-value">
+      <!--<xsl:attribute name="text:time-value">
         <xsl:value-of select="$timeText"/>
-      </xsl:attribute>
+      </xsl:attribute>-->
+      <xsl:value-of select="$timeText"/>
     </text:creation-time>
   </xsl:template>
 
@@ -675,9 +674,10 @@
       <xsl:attribute name="style:data-style-name">
         <xsl:value-of select="generate-id(.)"/>
       </xsl:attribute>
-      <xsl:attribute name="text:time-value">
+      <!--<xsl:attribute name="text:time-value">
         <xsl:value-of select="$timeText"/>
-      </xsl:attribute>
+      </xsl:attribute>-->
+      <xsl:value-of select="$timeText"/>
     </text:time>
   </xsl:template>
 
@@ -1305,9 +1305,13 @@
   <xsl:template name="InsertCreationDateFormat">
     <number:date-style style:name="{generate-id()}">
       <number:day/>
-      <number:text> </number:text>
+      <number:text>
+        <xsl:text> </xsl:text>
+      </number:text>
       <number:month number:style="long" number:textual="true"/>
-      <number:text> </number:text>
+      <number:text>
+        <xsl:text> </xsl:text>
+      </number:text>
       <number:year number:style="long"/>
     </number:date-style>
   </xsl:template>

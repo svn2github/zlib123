@@ -11,7 +11,7 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="office text  fo style dc meta pzip xlink w oox">
+  exclude-result-prefixes="office text fo style dc meta pzip xlink w oox">
 
   
   <xsl:template name="InsertComment">

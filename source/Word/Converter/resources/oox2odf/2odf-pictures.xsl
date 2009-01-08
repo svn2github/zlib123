@@ -46,7 +46,7 @@
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:oox="urn:oox"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w uri draw a pic r rels wp w xlink oox rels">
+  exclude-result-prefixes="w uri a pic r rels o wp w xlink oox rels">
 
   <!--
   *************************************************************************

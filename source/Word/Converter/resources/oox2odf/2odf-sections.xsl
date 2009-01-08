@@ -5,7 +5,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="oox">
+  exclude-result-prefixes="w oox">
 
   <xsl:key name="elementsByOoxSectionId" match="w:body/*" use="@oox:s"/>
 

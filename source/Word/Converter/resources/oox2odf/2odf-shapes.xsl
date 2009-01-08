@@ -45,7 +45,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:oox="urn:oox"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w r draw number wp xlink v w10 o oox pic a rels">
+  exclude-result-prefixes="w r wp xlink v w10 o oox pic a rels">
 
   <!--
   *************************************************************************
@@ -262,9 +262,9 @@
           </xsl:attribute>
           <!--<xsl:for-each select="parent::node()/v:shape">-->
           <xsl:call-template name="InsertAnchorType"/>
-          <xsl:call-template name="InsertShapeWidth"/>
-          <xsl:call-template name="InsertShapeHeight"/>
-          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <!--<xsl:call-template name="InsertShapeWidth"/>-->
+          <!--<xsl:call-template name="InsertShapeHeight"/>-->
+          <!--<xsl:call-template name="InsertshapeAbsolutePos"/>-->
           <xsl:call-template name="InsertShapeZindex"/>
           <xsl:call-template name="AltText"/>
           <xsl:call-template name="GetLineCoordinates"/>
@@ -282,9 +282,9 @@
           </xsl:attribute>
           <!--<xsl:for-each select="parent::node()/v:shape">-->
           <xsl:call-template name="InsertAnchorType"/>
-          <xsl:call-template name="InsertShapeWidth"/>
-          <xsl:call-template name="InsertShapeHeight"/>
-          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <!--<xsl:call-template name="InsertShapeWidth"/>-->
+          <!--<xsl:call-template name="InsertShapeHeight"/>-->
+          <!--<xsl:call-template name="InsertshapeAbsolutePos"/>-->
           <xsl:call-template name="InsertShapeZindex"/>
           <xsl:call-template name="AltText"/>
           <xsl:call-template name="GetLineCoordinates"/>
@@ -4548,9 +4548,10 @@
     </xsl:variable>
     <xsl:variable name="currentSectPrForSize" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
 
-    <xsl:attribute name="style:rel-height">
+    <!-- the attribute style:rel-height is not valid in this context -->
+    <!--<xsl:attribute name="style:rel-height">
       <xsl:value-of select="$relativeHeight div 10"/>
-    </xsl:attribute>
+    </xsl:attribute>-->
 
     <xsl:variable name="relativeTo">
       <xsl:call-template name="GetShapeProperty">
@@ -4823,9 +4824,10 @@
     </xsl:variable>
     <xsl:variable name="currentSectPrForWidth" select="key('sectPr', number(ancestor-or-self::node()/@oox:s))" />
 
-    <xsl:attribute name="style:rel-width">
+    <!-- the attribute style:rel-width is not valid in this context -->
+    <!--<xsl:attribute name="style:rel-width">
       <xsl:value-of select="$relativeWidth div 10"/>
-    </xsl:attribute>
+    </xsl:attribute>-->
 
     <xsl:variable name="relativeTo">
       <xsl:call-template name="GetShapeProperty">

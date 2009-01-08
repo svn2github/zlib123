@@ -12,7 +12,7 @@
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w oox">
+  exclude-result-prefixes="w r oox">
 
   <xsl:key name="footnotes" match="w:footnoteReference" use="''"/>
   <xsl:key name="endnotes" match="w:endnoteReference" use="''"/>

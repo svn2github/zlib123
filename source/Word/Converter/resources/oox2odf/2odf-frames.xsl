@@ -18,7 +18,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:oox="urn:oox"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w r draw number wp xlink v w10 o oox">
+  exclude-result-prefixes="w r wp xlink v w10 o oox">
 
   <!-- 
   *************************************************************************
@@ -206,18 +206,16 @@
         <!-- If a size is specifed, use the width attribute -->
         <xsl:attribute name="svg:width">
           <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length">
-              <xsl:value-of select="$framePr/@w:w"/>
-            </xsl:with-param>
+            <xsl:with-param name="length" select="$framePr/@w:w" />
             <xsl:with-param name="destUnit" select="'cm'"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
         <!-- If no width is specified, the frame is autosized, so use the min-width attribute -->
-        <xsl:attribute name="fo:min-width">
+        <!--<xsl:attribute name="fo:min-width">
           <xsl:text>0cm</xsl:text>
-        </xsl:attribute>
+        </xsl:attribute>-->
       </xsl:otherwise>
     </xsl:choose>
 

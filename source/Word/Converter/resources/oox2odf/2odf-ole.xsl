@@ -9,7 +9,7 @@
                 xmlns:v="urn:schemas-microsoft-com:vml"
                 xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
                 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-                exclude-result-prefixes="xlink draw oox"
+                exclude-result-prefixes="xlink o r rels oox"
                 xmlns:oox="urn:oox">
 
   <!-- 

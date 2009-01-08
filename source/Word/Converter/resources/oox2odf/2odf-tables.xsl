@@ -36,7 +36,7 @@
   xmlns:oox="urn:oox"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  exclude-result-prefixes="w table oox">
+  exclude-result-prefixes="w oox">
 
   <!-- 
   *************************************************************************
@@ -208,18 +208,24 @@
       <xsl:when test="child::w:trPr/w:tblHeader">
         <table:table-header-rows>
           <table:table-row>
-            <xsl:attribute name="table:style-name">
-              <xsl:value-of select="generate-id(self::w:tr)"/>
-            </xsl:attribute>
+            <xsl:if test="w:trPr">
+              <!-- an automaitic style is only generated for rows with a w:trPr node -->
+              <xsl:attribute name="table:style-name">
+                <xsl:value-of select="generate-id(self::w:tr)"/>
+              </xsl:attribute>
+            </xsl:if>
             <xsl:apply-templates />
           </table:table-row>
         </table:table-header-rows>
       </xsl:when>
       <xsl:otherwise>
         <table:table-row>
-          <xsl:attribute name="table:style-name">
-            <xsl:value-of select="generate-id(self::w:tr)"/>
-          </xsl:attribute>
+          <xsl:if test="w:trPr">
+            <!-- an automaitic style is only generated for rows with a w:trPr node -->
+            <xsl:attribute name="table:style-name">
+              <xsl:value-of select="generate-id(self::w:tr)"/>
+            </xsl:attribute>
+          </xsl:if>
 
           <!-- Insert empty cells for gridBefore -->
           <xsl:call-template name="InsertEmptyCells">

@@ -30,7 +30,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:v="urn:schemas-microsoft-com:vml" 
+  xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
@@ -122,8 +123,7 @@
       <w:pict>
 
         <!-- this properties are needed to make z-index work properly -->
-        <v:shapetype coordsize="21600,21600" path="m,l,21600r21600,l21600,xe"
-          xmlns:o="urn:schemas-microsoft-com:office:office">
+        <v:shapetype coordsize="21600,21600" path="m,l,21600r21600,l21600,xe">
           <v:stroke joinstyle="miter"/>
           <v:path gradientshapeok="t" o:connecttype="rect"/>
         </v:shapetype>

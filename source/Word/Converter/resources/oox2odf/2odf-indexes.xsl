@@ -34,7 +34,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:oox="urn:oox"
-  exclude-result-prefixes="w text style oox">
+  exclude-result-prefixes="w b r text style oox">
   
   <xsl:key name="tocBookmark" match="w:bookmarkStart" use="@w:name"/>
   <xsl:key name="OutlineLevel" match="w:outlineLvl" use="''"/>
