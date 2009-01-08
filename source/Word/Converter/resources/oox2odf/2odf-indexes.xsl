@@ -704,14 +704,15 @@
   <xsl:template name="ExtractOptionTFromTOCDefinition">
     <xsl:param name ="string" />
     <xsl:param name ="result" />
-    <xsl:choose>
+    <xsl:choose>      
       <xsl:when test="contains($string,'\t')">
         <xsl:call-template name="ExtractOptionTFromTOCDefinition">
           <xsl:with-param name="string">
             <xsl:value-of select="substring-after($string,'\t')" />
           </xsl:with-param>
           <xsl:with-param name="result">
-            <xsl:value-of select="concat($result,substring-before(substring-after(substring-after($string,'\t'),'&quot;'),'&quot;'))" />
+            <xsl:variable name="quot">"</xsl:variable>
+            <xsl:value-of select="concat($result,substring-before(substring-after(substring-after($string,'\t'),$quot),$quot))" />
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
@@ -768,8 +769,12 @@
                 <xsl:when test="key('StyleId', $styleName)" >
                   <xsl:value-of select ="$styleName"/>
                 </xsl:when>
-                <xsl:otherwise>                  
-                     <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[w:name/@w:val=$styleName]/@w:styleId" />                                      
+                <xsl:when test="key('Part', 'word/styles.xml')/w:styles/w:style[w:name/@w:val=$styleName]">
+                  <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[w:name/@w:val=$styleName]/@w:styleId" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--clam, dialogika: this is a bugfix for a bug in #2188774-->
+                  <xsl:value-of select="key('Part', 'word/styles.xml')/w:styles/w:style[w:name/@w:val=translate($styleName, 'ABCDEFGHIJKLMNOPQRSTYVW','abcdefghijklmnopqrstyvw')]/@w:styleId" />                                      
                 </xsl:otherwise>                  
               </xsl:choose>
             </xsl:variable>
