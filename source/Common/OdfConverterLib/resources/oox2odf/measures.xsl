@@ -339,9 +339,15 @@
     <xsl:param name="addUnit">true</xsl:param> <!-- (string) If set to 'true', will append the convertion unit to the result -->
     
     <xsl:choose>
-      <xsl:when
-        test="$length='' or $length='0' or $length='0cm' or $length='0mm' or $length='0in' or $length='0pt' or $length='0twip' or $length='0pika' or $length='0dpt' or $length='0px'">
-        <xsl:value-of select="'0'"/>
+      <xsl:when test="$length='' or $length='0' or $length='0cm' or $length='0mm' or $length='0in' or $length='0pt' or $length='0twip' or $length='0pika' or $length='0dpt' or $length='0px'">
+        <xsl:choose>
+          <xsl:when test="$addUnit = 'true'">
+            <xsl:value-of select="concat('0', $destUnit)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'0'"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <!-- used when unit type is given in length string -->
       <xsl:when test="$sourceUnit = ''">
