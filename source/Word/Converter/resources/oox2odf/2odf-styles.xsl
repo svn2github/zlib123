@@ -1600,9 +1600,7 @@
               <xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of
-                select="preceding::w:sectPr[w:footerReference/@w:type = 'even'][1]/w:footerReference[./@w:type = 'even']/@r:id"
-            />
+              <xsl:value-of select="preceding::w:sectPr[w:footerReference/@w:type = 'even'][1]/w:footerReference[./@w:type = 'even']/@r:id" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -1629,7 +1627,8 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
-    </xsl:template>
+    </xsl:if>
+  </xsl:template>
 
   <xsl:template name="HeaderFooterFirst">
     <xsl:variable name="headerId">

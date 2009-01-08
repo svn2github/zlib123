@@ -37,8 +37,8 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
-  xmlns:o="urn:schemas-microsoft-com:office:office" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
@@ -55,13 +55,13 @@
   This stylesheet handles the conversion of DrawingML pictures.
   *************************************************************************
   -->
-  
+
   <!-- 
   *************************************************************************
   MATCHING TEMPLATES
   *************************************************************************
   -->
-  
+
   <xsl:template match="w:drawing">
     <xsl:apply-templates select="wp:inline | wp:anchor"/>
   </xsl:template>
@@ -183,52 +183,73 @@
   <xsl:template name="DrawingMLToZindex" >
     <xsl:param name="wpAnchor" />
 
-    <xsl:variable name="index" select="number($wpAnchor/@relativeHeight)" />
-    
+    <xsl:variable name="z-index">
+      <xsl:choose>
+        <xsl:when test="$wpAnchor/@relativeHeight">
+          <xsl:value-of select="number($wpAnchor/@relativeHeight)" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="0" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:attribute name="draw:z-index">
+      <xsl:call-template name="NormalizeZIndex">
+        <xsl:with-param name="z-index" select="$z-index" />
+      </xsl:call-template>
+    </xsl:attribute>
+  </xsl:template>
+
+  <xsl:template name="NormalizeZIndex">
+    <xsl:param name="z-index" />
+
     <!--
-    makz:
-    Z-Index normalization:
+    z-index normalization:
     We put the values in new reserved ranges:
     hdr/ftr background: 0 - 500.000.000
     hdr/ftr foreground: 500.000.001 - 1.000.000.000
     maindoc background: 1.000.000.001 - 1.500.000.000
     maindoc foreground: 1.500.000.001 - 2.147.483.647
     -->
-    <xsl:variable name="normalizedIndex">
-      <xsl:choose>
-        <xsl:when test ="ancestor::*[w:hdr] or ancestor::*[w:ftr]">
-          <xsl:choose>
-            <xsl:when test="$wpAnchor/@behindDoc='1'">
-              <!-- DML in hdr ftr background -->
-              <xsl:value-of select="0 + $index" />
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- DML in hdr ftr foreground -->
-              <xsl:value-of select="500000001 + $index" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="$wpAnchor/@behindDoc='1'">
-              <!-- DML in main doc background -->
-              <xsl:value-of select="1500000000 - $index" />
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- DML in main doc foreground -->
-              <xsl:value-of select="1500000001 + $index" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <xsl:attribute name="draw:z-index">
-      <xsl:value-of select="$normalizedIndex"/>
-    </xsl:attribute>
+    <xsl:choose>
+      <xsl:when test ="ancestor::*[w:hdr] or ancestor::*[w:ftr]">
+        <xsl:choose>
+          <xsl:when test="$z-index &lt; 0">
+            <!-- VML in hdr ftr background -->
+            <xsl:value-of select="500000000 - number($z-index)" />
+          </xsl:when>
+          <xsl:when test="$z-index &gt;= 0">
+            <!-- VML in hdr ftr foreground -->
+            <xsl:value-of select="500000001 + number($z-index)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- index not set -->
+            <xsl:value-of select="500000001" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$z-index = ''">
+            <xsl:value-of select="0"/>
+          </xsl:when>
+          <xsl:when test="$z-index &lt; 0">
+            <!-- VML in main doc background -->
+            <xsl:value-of select="1500000000 - number($z-index)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- VML in main doc foreground -->
+            <xsl:value-of select="1500000001 + number($z-index)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+
+
   </xsl:template>
-  
-  
+
+
   <!--
   Summary: Writes the anchor-type attribute
   Author: Clever Age
@@ -445,7 +466,7 @@
   -->
   <xsl:template name="InsertPictureProperties">
     <xsl:param name="drawing" />
-    
+
     <xsl:call-template name="InsertImagePosH"/>
     <xsl:call-template name="InsertImagePosV"/>
     <xsl:call-template name="InsertImageFlip"/>
@@ -459,17 +480,17 @@
   </xsl:template>
 
   <xsl:template name="InsertImageFlowWithText">
-	  <!-- @layoutInCell: Specifies how this DrawingML object shall behave when its anchor is located in a table
+    <!-- @layoutInCell: Specifies how this DrawingML object shall behave when its anchor is located in a table
 			cell; and its specified position would cause it to intersect with a table cell displayed in the document.-->
     <xsl:variable name="layoutInCell" select="(wp:inline/@layoutInCell | wp:anchor/@layoutInCell) and ./ancestor::w:tc"/>
     <xsl:attribute name="draw:flow-with-text">
       <xsl:choose>
         <!--If the pic is inside the table-->
         <xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and (./ancestor::w:tc)">
-           <xsl:text>true</xsl:text>
+          <xsl:text>true</xsl:text>
         </xsl:when>
         <xsl:when test="$layoutInCell = 1">
-			<!--only set to true of actually inside a table. @draw:flow-with-text has an effect 
+          <!--only set to true of actually inside a table. @draw:flow-with-text has an effect 
 				in OOo even when the shape is not inside a table -->
           <xsl:text>true</xsl:text>
         </xsl:when>
@@ -576,7 +597,7 @@
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
-    
+
     <!--
     makz:
     If no wrap is specified, Word wraps the picture in front of the text.
@@ -707,7 +728,7 @@
         </xsl:when>
         <xsl:when test ="$relativeFrom='inner-margin-area' or $relativeFrom='outer-margin-area'">
           <xsl:if test ="$align='left'">
-          <xsl:text>inside</xsl:text>
+            <xsl:text>inside</xsl:text>
           </xsl:if>
           <xsl:if test ="$align='right'">
             <xsl:text>outside</xsl:text>
@@ -720,11 +741,11 @@
         <!-- Sona: #2149141 changes because mirror margins was lost-->
         <xsl:when test="$align = 'absolute' ">
           <xsl:text>from-left</xsl:text>
-        </xsl:when>        
+        </xsl:when>
         <xsl:when test="$align and $align != '' ">
           <xsl:value-of select="$align"/>
         </xsl:when>
-          
+
         <xsl:otherwise>
           <xsl:text>from-left</xsl:text>
         </xsl:otherwise>
@@ -761,11 +782,11 @@
         <!-- COMMENT : following values not defined in OOX spec, but used by Word 2007 -->
         <!--added by chhavi to improve absolute and alignment position-->
         <xsl:when test="$relativeFrom = 'left-margin-area' or $relativeFrom = 'outer-margin-area'">
-          <!-- Sona: #2149141 changes because mirror margins was lost-->          
-              <xsl:text>page-start-margin</xsl:text> 
+          <!-- Sona: #2149141 changes because mirror margins was lost-->
+          <xsl:text>page-start-margin</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'right-margin-area' or $relativeFrom = 'inner-margin-area'">               
-            <xsl:text>page-end-margin</xsl:text>          
+        <xsl:when test="$relativeFrom = 'right-margin-area' or $relativeFrom = 'inner-margin-area'">
+          <xsl:text>page-end-margin</xsl:text>
         </xsl:when>
 
         <!--end here-->
@@ -970,11 +991,11 @@
         </xsl:variable>
 
         <xsl:variable name="leftCrop">
-            <xsl:call-template name="GetCropSize">
-              <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@l"/>
-              <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@r"/>
-              <xsl:with-param name="resultSize" select="$width"/>
-            </xsl:call-template>
+          <xsl:call-template name="GetCropSize">
+            <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@l"/>
+            <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@r"/>
+            <xsl:with-param name="resultSize" select="$width"/>
+          </xsl:call-template>
         </xsl:variable>
 
         <xsl:variable name="rightCrop">
@@ -1008,7 +1029,7 @@
               select="concat('rect(',$topCrop,'cm ',$rightCrop,'cm ',$bottomCrop,'cm ',$leftCrop,'cm',')')"
             />
           </xsl:variable>
-          
+
           <xsl:variable name="filecode" select="pic:blipFill/a:blip/@r:embed"></xsl:variable>
           <xsl:variable name="filename" select="key('Part', 'word/_rels/document.xml.rels')/rels:Relationships/rels:Relationship[@Id = $filecode]/@Target"></xsl:variable>
           <xsl:value-of select="concat('COMPUTEODFCROPPING[', pic:blipFill/a:srcRect/@r, ',' ,pic:blipFill/a:srcRect/@l, ',' , pic:blipFill/a:srcRect/@t, ',' ,pic:blipFill/a:srcRect/@b, ',word/' , $filename,  ',' , $oldValue, ']')"/>
@@ -1016,5 +1037,5 @@
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
-  
+
 </xsl:stylesheet>

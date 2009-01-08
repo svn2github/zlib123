@@ -305,7 +305,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                     {
                         if (_currentPzipElement.Attributes.ContainsKey(PZIP.SourceAttr))
                         {
-                            _binarySource += _currentPzipElement.Attributes[PZIP.SourceAttr];
+                            _binarySource += _currentPzipElement.Attributes[PZIP.SourceAttr].Value;
                             Debug.WriteLine("copy source=" + _binarySource);
                         }
                         if (_currentPzipElement.Attributes.ContainsKey(PZIP.TargetAttr))

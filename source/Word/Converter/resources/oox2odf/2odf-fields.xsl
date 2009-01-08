@@ -1227,7 +1227,7 @@
       -->
       <xsl:choose>
         <xsl:when test="name() = 'w:fldSimple'">
-          <xsl:apply-templates select="w:r" />
+          <xsl:apply-templates select="w:r//w:t" />
         </xsl:when>
         <xsl:when test="name() = 'w:instrText'">
           <!--get this field id -->
@@ -1305,9 +1305,9 @@
   <xsl:template name="InsertCreationDateFormat">
     <number:date-style style:name="{generate-id()}">
       <number:day/>
-      <number:text xml:space="preserve"> </number:text>
+      <number:text> </number:text>
       <number:month number:style="long" number:textual="true"/>
-      <number:text xml:space="preserve"> </number:text>
+      <number:text> </number:text>
       <number:year number:style="long"/>
     </number:date-style>
   </xsl:template>

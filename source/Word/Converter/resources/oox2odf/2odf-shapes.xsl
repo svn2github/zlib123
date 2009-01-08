@@ -1611,10 +1611,10 @@
           <xsl:when test="@opacity">
             <xsl:choose>
               <xsl:when test="contains(@opacity,'f')">
-                <xsl:value-of select="round((number(substring-before(@opacity,'f')) div 65536) * 100) "/>
+                <xsl:value-of select="concat(round((number(substring-before(@opacity,'f')) div 65536) * 100), '%')" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="round(@opacity * 100) "/>
+                <xsl:value-of select="concat(round(@opacity * 100), '%')" />
               </xsl:otherwise>
             </xsl:choose>
             <!-- calculate opacity -->
@@ -1630,10 +1630,10 @@
 
             <xsl:choose>
               <xsl:when test="contains(@o:opacity2,'f')">
-                <xsl:value-of select="round((number(substring-before(@o:opacity2,'f')) div 65536) * 100) "/>
+                <xsl:value-of select="concat(round((number(substring-before(@o:opacity2,'f')) div 65536) * 100), '%')" />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="round(@o:opacity2 * 100) "/>
+                <xsl:value-of select="concat(round(@o:opacity2 * 100), '%')" />
               </xsl:otherwise>
             </xsl:choose>
             <!-- calculate opacity -->
@@ -4448,58 +4448,19 @@
   <xsl:template name="InsertShapeZindex">
     <xsl:param name="shape" select="."/>
 
-    <xsl:variable name="index">
+    <xsl:variable name="z-index">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="shape" select="$shape"/>
         <xsl:with-param name="propertyName" select="'z-index'"/>
       </xsl:call-template>
     </xsl:variable>
 
-    <!--
-    makz:
-    Z-Index normalization:
-    We put the values in new reserved ranges:
-    hdr/ftr background: 0 - 500.000.000
-    hdr/ftr foreground: 500.000.001 - 1.000.000.000
-    maindoc background: 1.000.000.001 - 1.500.000.000
-    maindoc foreground: 1.500.000.001 - 2.147.483.647
-    -->
-    <xsl:variable name="normalizedIndex">
-      <xsl:choose>
-        <xsl:when test ="ancestor::*[w:hdr] or ancestor::*[w:ftr]">
-          <xsl:choose>
-            <xsl:when test="$index &lt; 0">
-              <!-- VML in hdr ftr background -->
-              <xsl:value-of select="500000000 - number($index)" />
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- VML in hdr ftr foreground -->
-              <xsl:value-of select="500000001 + number($index)" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="$index = ''">
-              <xsl:value-of select="0"/>
-            </xsl:when>
-            <xsl:when test="$index &lt; 0">
-              <!-- VML in main doc background -->
-              <xsl:value-of select="1500000000 - number($index)" />
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- VML in main doc foreground -->
-              <xsl:value-of select="1500000001 + number($index)" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
     <xsl:attribute name="draw:z-index">
-      <xsl:value-of select="$normalizedIndex"/>
+      <xsl:call-template name="NormalizeZIndex">
+        <xsl:with-param name="z-index" select="$z-index" />
+      </xsl:call-template>
     </xsl:attribute>
-
+    
   </xsl:template>
 
   <xsl:template name="InsertShapeStyleName">

@@ -50,12 +50,12 @@ namespace OdfConverter.Wordprocessing
         {
             string replacement = text;
 
-            if (_isBookMarkElement && _isBoorkmarkId && text.StartsWith("http://www.dialogika.de/replace/bookmarkid/"))
+            if (_isBookMarkElement && _isBoorkmarkId && text.StartsWith("urn:odf-converter:replace:bookmarkid:"))
             {
                 replacement = "";
 
                 //Replace bookmark IDs
-                char[] id = text.Substring(text.LastIndexOf("/") + 1).ToLower().ToCharArray();
+                char[] id = text.Substring(text.LastIndexOf(":") + 1).ToLower().ToCharArray();
 
                 //Replace the chars by their numbers
                 for (int i = 0; i < id.Length; i++)
