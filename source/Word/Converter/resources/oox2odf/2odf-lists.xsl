@@ -829,8 +829,8 @@
 
 						<!--  TODO - continue numbering-->
 						<xsl:attribute name="text:continue-numbering">true</xsl:attribute>
-						
-						<xsl:choose>
+
+            <xsl:choose>
 							<xsl:when test="$listLevel + 1 &lt; $ilvl">
 								<!-- a list level has been omitted, e.g. the list start with level 2 -->
 								<xsl:apply-templates select="." mode="list">
@@ -854,8 +854,7 @@
 					<text:list-item>
 						<text:list>
 							<xsl:attribute name="text:continue-numbering">true</xsl:attribute>
-							
-							<xsl:choose>
+             	<xsl:choose>
 								<xsl:when test="$listLevel + 1 &lt; $ilvl">
 									<!-- a list level has been omitted, e.g. the list jumps from level 1 to level 3-->
 									<xsl:apply-templates select="." mode="list">
@@ -916,7 +915,7 @@
 				<xsl:choose>
 					<xsl:when test="$listLevel = $ilvl">
 						<text:list-item>
-							<!-- insert list item content -->
+             	<!-- insert list item content -->
 							<xsl:variable name="outlineLevel">
 								<xsl:call-template name="GetOutlineLevel">
 									<xsl:with-param name="node" select="$node"/>
@@ -928,7 +927,16 @@
 									<xsl:apply-templates select="$node" mode="heading"/>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:apply-templates select="$node" mode="paragraph"/>
+
+                  <!--clam, dialogika: work-around for bug #2343196-->
+                  <!--first list items (with no numPr) in lists that are inside a list with lower ilvl shall restart-->
+                  <xsl:if test="not(./w:pPr/w:numPr) and preceding-sibling::w:p[1]/w:pPr/w:pStyle and (preceding-sibling::w:p[1]/w:pPr/w:pStyle/@w:val != ./w:pPr/w:pStyle/@w:val)">
+                    <xsl:if test="preceding-sibling::w:p[1]/w:pPr/w:numPr and preceding-sibling::w:p[1]/w:pPr/w:numPr/w:ilvl/@w:val &lt; $ilvl">
+                      <xsl:attribute name="text:start-value">1</xsl:attribute>
+                    </xsl:if>
+                  </xsl:if>
+
+                  <xsl:apply-templates select="$node" mode="paragraph"/>
 								</xsl:otherwise>
 							</xsl:choose>
 						</text:list-item>
