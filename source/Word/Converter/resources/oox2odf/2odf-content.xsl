@@ -1207,6 +1207,11 @@
 					<xsl:attribute name="style:font-name-complex">
 						<xsl:value-of select="@w:font"/>
 					</xsl:attribute>
+          <xsl:if test="../w:rPr/w:position">
+            <xsl:for-each select="../w:rPr">
+              <xsl:call-template name="InsertTextPosition"/>
+            </xsl:for-each>
+          </xsl:if>
 				</style:text-properties>
 			</xsl:if>
 		</style:style>
