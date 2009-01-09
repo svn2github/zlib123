@@ -192,7 +192,17 @@
   <!-- appearance and behaviour for set of list paragraphs -->
   <xsl:template match="text:list" mode="numbering">
     <xsl:param name="offset" select="0"/>
-    <xsl:variable name="listStyleName" select="@text:style-name"/>
+    <!--<xsl:variable name="listStyleName" select="@text:style-name"/>-->
+    <xsl:variable name="listStyleName">
+      <xsl:choose>
+        <xsl:when test="@text:style-name">
+          <xsl:value-of select="@text:style-name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="../../@text:style-name"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <w:abstractNum
       w:abstractNumId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
       <xsl:choose>
@@ -1029,7 +1039,7 @@
     <xsl:choose>
 
       <!-- first, if list is a restarting special overriding num-->
-      <xsl:when test="parent::text:list/text:list-item/@text:start-value and count(ancestor::text:list) = 1">
+      <xsl:when test="parent::text:list/text:list-item/@text:start-value and count(ancestor::text:list) > 0">
         <xsl:value-of
           select="count(parent::text:list/preceding-sibling::text:list[text:list-item/@text:start-value])+2+$stylesListStyleCount + $automaticListStylesCount"
         />
