@@ -749,8 +749,8 @@
 
       <!--fields-->
       <!--xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate']"-->
-      <xsl:when test="@oox:f and $ignoreFieldFlag!='true'">
-        <xsl:call-template name="InsertField" />
+      <xsl:when test="@oox:fid and $ignoreFieldFlag!='true'">
+        <xsl:call-template name="InsertComplexField" />
       </xsl:when>
 
       <!-- Comments -->
@@ -760,7 +760,7 @@
         </xsl:call-template>
       </xsl:when>
 
-      <!--  Track changes    -->
+      <!--  Track changes -->
       <xsl:when test="parent::w:del">
         <xsl:call-template name="TrackChangesDeleteMade" />
       </xsl:when>
