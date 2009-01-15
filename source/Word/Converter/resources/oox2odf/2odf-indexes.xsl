@@ -57,10 +57,10 @@
       <xsl:when test="w:r[contains(w:instrText,'TOC')]">
         <xsl:choose>
           <xsl:when test="not(contains($instrTextContent,'\c'))">
-            <text:table-of-content text:style-name="Sect1">
-              <xsl:message terminate="no">translation.oox2odf.toc.protection.manualChange</xsl:message>
-              <xsl:attribute name="text:protected">false</xsl:attribute>
-              <xsl:attribute name="text:name">Table of Contents1</xsl:attribute>
+            <xsl:message terminate="no">translation.oox2odf.toc.protection.manualChange</xsl:message>
+            <text:table-of-content text:style-name="Sect1" 
+                                   text:protected="false"
+                                   text:name="Table of Contents1">
               <xsl:call-template name="InsertIndexProperties">
                 <xsl:with-param name="type">TOC</xsl:with-param>
                 <xsl:with-param name="instrTextContent" select="$instrTextContent" />
@@ -71,10 +71,10 @@
             </text:table-of-content>
           </xsl:when>
           <xsl:otherwise>
-            <text:table-index text:style-name="Sect1">
-              <xsl:message terminate="no">translation.oox2odf.toc.protection.manualChange</xsl:message>
-              <xsl:attribute name="text:protected">false</xsl:attribute>
-              <xsl:attribute name="text:name">Index of Tables1</xsl:attribute>
+            <xsl:message terminate="no">translation.oox2odf.toc.protection.manualChange</xsl:message>
+            <text:table-index text:style-name="Sect1" 
+                              text:protected="false"
+                              text:name="Index of Tables1">
               <xsl:call-template name="InsertIndexProperties">
                 <xsl:with-param name="type">INDEX</xsl:with-param>
                 <xsl:with-param name="instrTextContent" select="$instrTextContent" />
@@ -87,15 +87,12 @@
         </xsl:choose>
       </xsl:when>
       <xsl:when test="w:r[contains(w:instrText,'INDEX')]">
-        <text:alphabetical-index>
-          <!-- TODO : localization -->
-          <xsl:message terminate="no">feedback:many alphabetical index properties</xsl:message>
-          <xsl:attribute name="text:style-name">
-            <!--<xsl:value-of select="generate-id(key('p', @oox:id+1)/descendant::w:sectPr)" /> clam bugfix #1771286 -->
-            <xsl:value-of select="generate-id(following::w:sectPr[1])" />
-          </xsl:attribute>
-          <xsl:attribute name="text:protected">false</xsl:attribute>
-          <xsl:attribute name="text:name">Alphabetical Index1</xsl:attribute>
+        <!-- TODO : localization -->
+        <xsl:message terminate="no">feedback:many alphabetical index properties</xsl:message>
+        <!-- TODO: use the exising pre-processing ( @oox:s with the corresponding key to replace the following:: -->
+        <text:alphabetical-index text:style-name="{generate-id(following::w:sectPr[1])}" 
+                                 text:protected="false"
+                                 text:name="Alphabetical Index1">
           <xsl:call-template name="InsertIndexProperties">
             <xsl:with-param name="type">INDEXA</xsl:with-param>
             <xsl:with-param name="instrTextContent" select="$instrTextContent" />
@@ -106,10 +103,7 @@
         </text:alphabetical-index>
       </xsl:when>
       <xsl:when test="w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
-        <text:bibliography>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="generate-id(w:r[contains(w:instrText,'BIBLIOGRAPHY')])" />
-          </xsl:attribute>
+        <text:bibliography text:name="{generate-id(w:r[contains(w:instrText,'BIBLIOGRAPHY')])}" >
           <text:bibliography-source>
             <text:index-title-template />
             <xsl:call-template name="InsertBibliographyProperties" />
@@ -138,7 +132,6 @@
   </xsl:template>
 
   <!-- template to create string containing styles include in TOC with appropriate levels -->
-
   <xsl:template match="w:p" mode="stylesOfTOC">
     <xsl:param name="stylesWithLevel" />
 
@@ -163,16 +156,12 @@
       </xsl:choose>
     </xsl:variable>
     <!-- outline level -->
-    <xsl:variable name="thisLevel">
-      <xsl:value-of select="substring(w:pPr/w:pStyle/@w:val,string-length(w:pPr/w:pStyle/@w:val))" />
-    </xsl:variable>
-
+    <xsl:variable name="thisLevel" select="substring(w:pPr/w:pStyle/@w:val,string-length(w:pPr/w:pStyle/@w:val))" />
+    
     <!--math, dialogika: added for bugfix #1802258 BEGIN -->
     <xsl:variable name="IsDefaultHeading">
       <xsl:call-template name="CheckDefaultHeading">
-        <xsl:with-param name="Name">
-          <xsl:value-of select="key('StyleId',$thisStyle)/w:name/@w:val" />
-        </xsl:with-param>
+        <xsl:with-param name="Name" select="key('StyleId',$thisStyle)/w:name/@w:val" />
       </xsl:call-template>
     </xsl:variable>
     <!--math, dialogika: added for bugfix #1802258 END -->
@@ -441,9 +430,7 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="GetStyleForLevel">
-              <xsl:with-param name="stylesWithLevels">
-                <xsl:value-of select="substring-after(substring-after($stylesWithLevels,';'),';')" />
-              </xsl:with-param>
+              <xsl:with-param name="stylesWithLevels" select="substring-after(substring-after($stylesWithLevels,';'),';')" />
               <xsl:with-param name="level" select="$level" />
             </xsl:call-template>
           </xsl:otherwise>
@@ -483,9 +470,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:with-param>
-          <xsl:with-param name="count">
-            <xsl:value-of select="$count - 1" />
-          </xsl:with-param>
+          <xsl:with-param name="count" select="$count - 1" />
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
@@ -502,9 +487,7 @@
       <xsl:choose>
         <xsl:when test="contains($instrTextContent,'\t')">
           <xsl:call-template name="GetMaxLevelFromStyles">
-            <xsl:with-param name="stylesWithLevels">
-              <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')" />
-            </xsl:with-param>
+            <xsl:with-param name="stylesWithLevels" select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')" />
             <xsl:with-param name="defaultLevel">
               <xsl:choose>
                 <xsl:when test="contains($instrTextContent,'-')">
@@ -1144,10 +1127,7 @@
         </xsl:if>
 
         <xsl:if test="string-length($NumId) > 0 and not($suff)">
-          <text:index-entry-tab-stop>
-            <xsl:attribute name="style:type">left</xsl:attribute>
-            <xsl:attribute name="style:position">1cm</xsl:attribute>
-          </text:index-entry-tab-stop>
+          <text:index-entry-tab-stop style:type="left" style:position="1cm" />
         </xsl:if>
 
         <text:index-entry-text />
@@ -1156,8 +1136,7 @@
             <xsl:apply-templates select="$ParagraphPropertiesTabs[@w:val='right'][number(last())]" mode="TOCentry" />
           </xsl:when>
           <xsl:when test="$type='TOC'">
-            <text:index-entry-tab-stop>
-              <xsl:attribute name="style:type">right</xsl:attribute>
+            <text:index-entry-tab-stop style:type="right">
               <xsl:call-template name="InsertStyleLeaderChar">
                 <xsl:with-param name="leaderChar">dot</xsl:with-param>
               </xsl:call-template>
@@ -1173,9 +1152,7 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
-
 
   <!-- template which inserts hyperlink start tag in TOC formatting-->
   <xsl:template name="InsertHyperlinkStartToTOC">
@@ -1193,17 +1170,13 @@
   </xsl:template>
 
   <!--insert Bibliography properties -->
-
   <xsl:template name="InsertBibliographyProperties">
 
-    <xsl:variable name="Style">
-      <xsl:value-of select="key('Part', 'customXml/item1.xml')/b:Sources/@StyleName" />
-    </xsl:variable>
+    <xsl:variable name="Style" select="key('Part', 'customXml/item1.xml')/b:Sources/@StyleName" />
 
-    <text:bibliography-entry-template text:bibliography-type="book">
-      <xsl:attribute name="text:style-name">
-        <xsl:value-of select="generate-id()" />
-      </xsl:attribute>
+    <text:bibliography-entry-template text:bibliography-type="book"
+                                      text:style-name="{generate-id()}" >
+      
       <xsl:choose>
         <xsl:when test="$Style = 'APA'">
           <text:index-entry-bibliography text:bibliography-data-field="author" />
@@ -1316,29 +1289,19 @@
 
   <!-- insert page number -->
   <xsl:template match="w:t" mode="entry">
-    <xsl:variable name="text">
-      <xsl:value-of select="child::text()" />
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="number($text)">
-        <text:index-entry-page-number />
-      </xsl:when>
-      <xsl:otherwise />
-    </xsl:choose>
+    <xsl:if test="number(child::text())">
+      <text:index-entry-page-number />
+    </xsl:if>
   </xsl:template>
 
   <!-- clam, DIaLOGIKa: this template is only used inside the TOC -->
   <!-- insert entry properties for tabs -->
   <xsl:template match="w:tab" mode="TOCentry">
-    <xsl:param name="TOCMODE"></xsl:param>
-    <xsl:variable name="tabCount">
-      <xsl:value-of select="count(parent::w:r/preceding-sibling::w:r/w:tab)+1" />
-    </xsl:variable>
-
-    <xsl:variable name="leaderChar">
-      <xsl:value-of select="@w:leader" />
-    </xsl:variable>
-
+    <xsl:param name="TOCMODE" />
+    
+    <xsl:variable name="tabCount" select="count(parent::w:r/preceding-sibling::w:r/w:tab)+1" />
+    <xsl:variable name="leaderChar" select="@w:leader" />
+    
     <!-- clam, DIaLOGIKa: in ODT, only 'left' tabs can have a position in the TOC-->
     <xsl:variable name="styleType">
       <xsl:choose>
@@ -1354,12 +1317,6 @@
     <xsl:if test="$styleType != '' and $styleType != 'clear'">
 
       <!--math, dialogika: bugfix #1804154 BEGIN-->
-
-      <xsl:variable name="InstrText">
-        <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:instrText" />
-      </xsl:variable>
-
-
       <text:index-entry-tab-stop style:type="{$styleType}">
         <!--if style type is left, there must be style:position attribute -->
 
@@ -1374,8 +1331,8 @@
                   <xsl:value-of select="@w:pos" />
                 </xsl:otherwise>
               </xsl:choose>
-
             </xsl:variable>
+
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length" select="$position" />
               <xsl:with-param name="unit">cm</xsl:with-param>
@@ -1413,27 +1370,21 @@
         <xsl:with-param name="maxtabCount" select="$tabCount" />
       </xsl:call-template>
     </xsl:variable>
+    
     <xsl:if test="$styleType != '' and $styleType != 'clear'">
 
       <!--math, dialogika: bugfix #1804154 BEGIN-->
-
-      <xsl:variable name="InstrText">
-        <xsl:value-of select="key('Part', 'word/document.xml')/w:document/w:body//w:instrText" />
-      </xsl:variable>
+      <xsl:variable name="InstrText" select="key('Part', 'word/document.xml')/w:document/w:body//w:instrText" />
+      
       <xsl:choose>
-
         <!--if \p is not contained, word always uses right align. Propably, use of '\p' can not be correctly converted to ODT
             The existing code in this bugfix has not been changed for this case-->
         <xsl:when test="not($TOCMODE) and not(contains($InstrText,'\p'))">
           <text:index-entry-tab-stop style:type="right" >
-            <xsl:variable name="StyleId">
-              <xsl:value-of select="../../w:pPr/w:pStyle/@w:val" />
-            </xsl:variable>
-
-            <xsl:variable name="StyleLeaderChar">
-              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:tabs/w:tab/@w:leader" />
-            </xsl:variable>
-
+            
+            <xsl:variable name="StyleId" select="../../w:pPr/w:pStyle/@w:val" />
+            <xsl:variable name="StyleLeaderChar" select="key('StyleId',$StyleId)/w:pPr/w:tabs/w:tab/@w:leader" />
+            
             <!--default: 'dot'-->
             <xsl:if test="$StyleLeaderChar=''">
               <xsl:call-template name="InsertStyleLeaderChar">
@@ -1449,12 +1400,10 @@
 
           </text:index-entry-tab-stop>
         </xsl:when>
-
         <!--math, dialogika: bugfix #1804154 END-->
 
 
         <xsl:otherwise>
-
           <text:index-entry-tab-stop style:type="{$styleType}">
             <!--if style type is left, there must be style:position attribute -->
 
@@ -1480,11 +1429,8 @@
             </xsl:if>
 
           </text:index-entry-tab-stop>
-
         </xsl:otherwise>
-
       </xsl:choose>
-
     </xsl:if>
   </xsl:template>
 
@@ -1530,9 +1476,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="GetTabParamsFromStyles">
-          <xsl:with-param name="tabStyle">
-            <xsl:value-of select="ancestor::w:p/w:pPr/w:pStyle/@w:val" />
-          </xsl:with-param>
+          <xsl:with-param name="tabStyle" select="ancestor::w:p/w:pPr/w:pStyle/@w:val" />
           <xsl:with-param name="attribute" select="$param" />
           <xsl:with-param name="tabCount" select="$maxtabCount" />
           <xsl:with-param name="maxtabCount" select="$maxtabCount" />
@@ -1564,9 +1508,7 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="GetTabParamsFromStyles">
-                <xsl:with-param name="tabStyle">
-                  <xsl:value-of select="$ancestor-style" />
-                </xsl:with-param>
+                <xsl:with-param name="tabStyle" select="$ancestor-style" />
                 <xsl:with-param name="attribute" select="$attribute" />
                 <xsl:with-param name="tabCount" select="number($tabCount)-1" />
                 <xsl:with-param name="maxtabCount" select="$maxtabCount" />
@@ -1576,9 +1518,7 @@
         </xsl:when>
         <xsl:when test="key('StyleId', $tabStyle)[1]/w:basedOn/@w:val">
           <xsl:call-template name="GetTabParamsFromStyles">
-            <xsl:with-param name="tabStyle">
-              <xsl:value-of select="key('StyleId', $tabStyle)[1]/w:basedOn/@w:val" />
-            </xsl:with-param>
+            <xsl:with-param name="tabStyle" select="key('StyleId', $tabStyle)[1]/w:basedOn/@w:val" />
             <xsl:with-param name="attribute" select="$attribute" />
             <xsl:with-param name="tabCount" select="$maxtabCount" />
             <xsl:with-param name="maxtabCount" select="$maxtabCount" />
@@ -1596,9 +1536,8 @@
   <!-- template to search TOC level in paragraph parent style -->
   <xsl:template match="w:p" mode="toclevel">
     <xsl:param name="level" />
-    <xsl:variable name="thisLevel">
-      <xsl:value-of select="number(substring(w:pPr/w:pStyle/@w:val,string-length(w:pPr/w:pStyle/@w:val)))" />
-    </xsl:variable>
+    <xsl:variable name="thisLevel" select="number(substring(w:pPr/w:pStyle/@w:val,string-length(w:pPr/w:pStyle/@w:val)))" />
+    
     <xsl:choose>
       <xsl:when test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
         <xsl:apply-templates select="following-sibling::w:p[1]" mode="toclevel">
