@@ -34,7 +34,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:oox="urn:oox"
   exclude-result-prefixes="w b r oox">
@@ -46,9 +46,12 @@
   <!-- paragraph which starts table of content -->
   <xsl:template match="w:p" mode="tocstart">
     <xsl:variable name="instrTextContent">
-      <xsl:apply-templates select="w:r/w:instrText[1]" mode="textContent">
+      <xsl:call-template name="BuildFieldCode">
+        <xsl:with-param name="ooxFieldId" select="w:r[@oox:fid][1]/@oox:fid" />
+      </xsl:call-template>
+      <!--<xsl:apply-templates select="w:r/w:instrText[1]" mode="textContent">
         <xsl:with-param name="textContent" />
-      </xsl:apply-templates>
+      </xsl:apply-templates>-->
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="w:r[contains(w:instrText,'TOC')]">
@@ -911,23 +914,6 @@
 
 
   <!--math: Added for bugfix #1934315 START-->
-  <!--xsl:template name ="CheckDefaultTOCStyle">
-    <xsl:param name="name" />
-    <xsl:param name="Counter" select="1" />
-    <xsl:choose>
-      <xsl:when test="$Counter &gt; 9" >false</xsl:when>
-      <xsl:when test="concat('TOC',$Counter) = $Name">true</xsl:when>
-      <xsl:when test="$Name = 'TOCHeading'">true</xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="CheckDefaultTOCStyle">
-          <xsl:with-param name="name" select="$Name" />
-          <xsl:with-param name="Counter">
-            <xsl:value-of select="$Counter + 1" />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template-->
   <xsl:template name ="CheckDefaultTOCStyle">
     <xsl:param name="name" />
     <xsl:choose>
@@ -953,7 +939,7 @@
 
     <!--math: Added for bugfix #1934315 START-->
     <xsl:variable name="isDefaultTOCStyle">
-      <xsl:call-template name ="CheckDefaultTOCStyle">
+      <xsl:call-template name="CheckDefaultTOCStyle">
         <xsl:with-param name="name">
           <xsl:value-of select="$styleValue" />
         </xsl:with-param>
@@ -1103,7 +1089,7 @@
 
         </xsl:when>
         <xsl:otherwise>
-          <xsl:for-each select="following-sibling::w:p[1]">
+          <xsl:for-each select="following-sibling::w:p[1][w:r/@oox:f]">
             <xsl:call-template name="EntryIterator">
               <xsl:with-param name="fieldCharCount" select="$count" />
               <xsl:with-param name="level" select="$level" />
@@ -1606,73 +1592,6 @@
   <!-- handle text in table-of content -->
   <xsl:template match="text()" mode="entry" />
 
-
-
-  <!--
-  makz: There is no need for a special handling for runs in TOCs
-  
-  <xsl:template match="w:r" mode="index">
-    <xsl:choose>
-      <xsl:when test="parent::w:hyperlink">
-        <xsl:call-template name="InsertTOCHyperlink" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="InsertTOCText" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  <xsl:template match="w:r" mode="indexa">
-    <xsl:choose>
-      <xsl:when test="parent::w:hyperlink">
-        <xsl:call-template name="InsertTOCHyperlink" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="InsertTOCText" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  -->
-  <!-- Insert TOC text -->
-  <!--
-  <xsl:template name="InsertTOCText">
-    <xsl:choose>
-      -->
-  <!--  ignore text when we are in field-->
-  <!--
-      <xsl:when test="w:fldChar or w:instrText" />
-      -->
-  <!--attach style-->
-  <!--
-      <xsl:when test="w:rPr">
-        <text:span text:style-name="{generate-id(self::node())}">
-          <xsl:apply-templates />
-        </text:span>
-      </xsl:when>
-      -->
-  <!--default scenario-->
-  <!--
-      <xsl:otherwise>
-        <xsl:apply-templates />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
- -->
-  <!-- Insert TOC Hyperlinks -->
-  <!--
-  <xsl:template name="InsertTOCHyperlink">    
-    <text:a xlink:type="simple">
-      <xsl:attribute name="xlink:href">
-        <xsl:value-of select="concat('#',parent::w:hyperlink/@w:anchor)" />
-      </xsl:attribute>
-      -->
-  <!--TOC hyperlink text-->
-  <!--
-      <xsl:call-template name="InsertTOCText" />
-    </text:a>
-  </xsl:template>
-  -->
 
   <!-- template to search TOC level in paragraph parent style -->
   <xsl:template match="w:p" mode="toclevel">
