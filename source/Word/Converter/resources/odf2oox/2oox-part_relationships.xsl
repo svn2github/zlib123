@@ -99,11 +99,18 @@
         <xsl:when test="($shapeStyle/@style:parent-style-name) and (self::node()[name()='draw:frame'] or parent::node()[name()='draw:frame'])">
           <xsl:for-each select="$shapeStyle/style:graphic-properties/style:background-image">
             <xsl:if test="@xlink:href !=''">
-              <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media',substring-after(@xlink:href,'Pictures'))}" />
+              <xsl:variable name="imageName">
+                <xsl:call-template name="substring-after-last">
+                  <xsl:with-param name="string" select="@xlink:href" />
+                  <xsl:with-param name="occurrence" select="'/'" />
+                </xsl:call-template>
+              </xsl:variable>
+
+              <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media/', $imageName)}" />
               <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                             Id="{concat('Bitmap_',$shapeRelId)}"
-                            Target="{concat('media',substring-after(@xlink:href,'Pictures'))}" />
+                            Target="{concat('media/', $imageName)}" />
 
             </xsl:if>
           </xsl:for-each>
@@ -113,12 +120,19 @@
             <xsl:variable name="BitmapName" select="@draw:fill-image-name" />
             <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/draw:fill-image[@draw:name = $BitmapName]">
               <xsl:if test="@xlink:href !=''">
-                <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media',substring-after(@xlink:href,'Pictures'))}" />
+                <xsl:variable name="imageName">
+                  <xsl:call-template name="substring-after-last">
+                    <xsl:with-param name="string" select="@xlink:href" />
+                    <xsl:with-param name="occurrence" select="'/'" />
+                  </xsl:call-template>
+                </xsl:variable>
+                
+                <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media/', $imageName)}" />
 
                 <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                               Id="{concat('Bitmap_',$shapeRelId)}"
-                              Target="{concat('media',substring-after(@xlink:href,'Pictures'))}" />
+                              Target="{concat('media/', $imageName)}" />
 
               </xsl:if>
             </xsl:for-each>
@@ -137,9 +151,19 @@
     <xsl:param name="oleObjects" />
 
     <xsl:for-each select="$oleObjects">
-      <xsl:variable name="oleFile" select="substring-after(@xlink:href, './')" />
+      <xsl:variable name="oleFile">
+      <xsl:call-template name="substring-after-last">
+        <xsl:with-param name="string" select="@xlink:href" />
+        <xsl:with-param name="occurrence" select="'./'" />
+      </xsl:call-template>
+    </xsl:variable>
       <xsl:variable name="oleId" select="generate-id(.)" />
-      <xsl:variable name="olePicture" select="substring-after(../draw:image[1]/@xlink:href, './')" />
+      <xsl:variable name="olePicture">
+        <xsl:call-template name="substring-after-last">
+          <xsl:with-param name="string" select="../draw:image[1]/@xlink:href" />
+          <xsl:with-param name="occurrence" select="'./'" />
+        </xsl:call-template>
+      </xsl:variable> 
       <xsl:variable name="olePictureId" select="generate-id(../draw:image[1])" />
       <xsl:variable name="olePictureType">
         <xsl:call-template name="GetOLEPictureType">
@@ -148,8 +172,24 @@
       </xsl:variable>
 
       <xsl:choose>
+        <!-- external OLE in folder -->
+        <xsl:when test="substring-before(@xlink:href, '/')='..'">
+
+          <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                        Id="{$oleId}"
+                        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
+                        Target="{concat('urn:odf-converter:makeWordPath#', @xlink:href)}"
+                        TargetMode="External" />
+
+          <xsl:call-template name="HandleOlePreview">
+            <xsl:with-param name="olePicture" select="$olePicture" />
+            <xsl:with-param name="olePictureId" select="$olePictureId" />
+            <xsl:with-param name="olePictureType" select="$olePictureType" />
+          </xsl:call-template>
+
+        </xsl:when>
         <!-- internal OLE -->
-        <xsl:when test="substring-before(@xlink:href, '/')='.'">
+        <xsl:when test="not(contains(@xlink:href, ':')) and not (starts-with(@xlink:href, '/'))">
           <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
 
           <!-- 
@@ -158,12 +198,12 @@
             application/vnd.oasis.opendocument.spreadsheet
           -->
           <xsl:choose>
-            <xsl:when test="$oleType='application/vnd.sun.star.oleobject'">
-              <pzip:copy pzip:source="{$oleFile}" pzip:target="word/embeddings/{$oleId}.bin" />
+            <xsl:when test="$oleType='application/vnd.sun.star.oleobject' or $oleType='application/octet-stream'">
+              <pzip:copy pzip:source="{$oleFile}" pzip:target="{concat('word/embeddings/', $oleId, '.bin')}" />
               <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                             Id="{$oleId}"
                             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
-                            Target="concat('embeddings/', $oleId, '.bin')"
+                            Target="{concat('embeddings/', $oleId, '.bin')}"
                             TargetMode="Internal" />
 
             </xsl:when>
@@ -177,7 +217,7 @@
 
         </xsl:when>
         <!-- external OLE on network or driver -->
-        <xsl:when test="substring-before(@xlink:href, '/')=''">
+        <xsl:when test="substring-before(@xlink:href, '/')='' or contains(@xlink:href, ':')">
 
           <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                         Id="{$oleId}"
@@ -192,31 +232,16 @@
           </xsl:call-template>
 
         </xsl:when>
-        <!-- external OLE in folder -->
-        <xsl:when test="substring-before(@xlink:href, '/')='..'">
-
-          <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-                        Id="{$oleId}"
-                        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
-                        Target="concat('urn:odf-converter:makeWordPath#', @xlink:href)"
-                        TargetMode="External" />
-
-          <xsl:call-template name="HandleOlePreview">
-            <xsl:with-param name="olePicture" select="$olePicture" />
-            <xsl:with-param name="olePictureId" select="$olePictureId" />
-            <xsl:with-param name="olePictureType" select="$olePictureType" />
-          </xsl:call-template>
-
-        </xsl:when>
+        
       </xsl:choose>
 
     </xsl:for-each>
   </xsl:template>
 
   <!-- 
-  Summary: copies the preview image of a OLE object and inserts the relationship
-  Author: makz (DIaLOGIKa)
-  Date: 9.11.2007
+    Summary: copies the preview image of a OLE object and inserts the relationship
+    Author: makz (DIaLOGIKa)
+    Date: 9.11.2007
   -->
   <xsl:template name="HandleOlePreview">
     <xsl:param name="olePicture" />
@@ -226,7 +251,7 @@
     <xsl:choose>
       <xsl:when test="not($olePictureType='')">
         <!-- copy picture -->
-        <pzip:copy pzip:source="{$olePicture}" pzip:target="word/media/{$olePictureId}.{$olePictureType}" />
+        <pzip:copy pzip:source="{$olePicture}" pzip:target="{concat('word/media/', $olePictureId, '.', $olePictureType)}" />
         <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                       Id="{$olePictureId}"
                       Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
@@ -235,11 +260,11 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- copy placeholder picture -->
-        <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#" pzip:target="word/media/{$olePictureId}.png" />
+        <pzip:copy pzip:source="#CER#WordprocessingConverter.dll#OdfConverter.Wordprocessing.resources.OLEplaceholder.png#" pzip:target="{concat('word/media/', $olePictureId, '.png')}" />
         <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                       Id="{$olePictureId}"
                       Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-                      Target="concat('media/', $olePictureId, '.png')" />
+                      Target="{concat('media/', $olePictureId, '.png')}" />
 
       </xsl:otherwise>
     </xsl:choose>
@@ -293,51 +318,8 @@
       </xsl:variable>
       <xsl:if test="@xlink:href and $supported = 'true' ">
         <xsl:choose>
-          <!-- Internal image -->
-          <xsl:when test="starts-with(@xlink:href, 'Pictures/')">
-            <!-- copy this image to the oox package -->
-            <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')" />
-            <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media/', $imageName)}" />
-            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-                          Id="{generate-id(.)}"
-                          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-                          Target="media/{$imageName}" />
-
-            <xsl:if test="ancestor::draw:a">
-              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-                            Id="{generate-id(ancestor::draw:a)}"
-                            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-                            TargetMode="External">
-                <xsl:attribute name="Target">
-                  <xsl:choose>
-
-                    <!-- converting relative path -->
-                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '../')">
-                      <xsl:call-template name="HandlingSpaces">
-                        <xsl:with-param name="path" select="substring-after(ancestor::draw:a/@xlink:href,'../')" />
-                      </xsl:call-template>
-                    </xsl:when>
-
-                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '/')">
-                      <xsl:call-template name="HandlingSpaces">
-                        <xsl:with-param name="path" select="substring-after(ancestor::draw:a/@xlink:href,'/')" />
-                      </xsl:call-template>
-                    </xsl:when>
-
-                    <xsl:otherwise>
-                      <xsl:call-template name="HandlingSpaces">
-                        <xsl:with-param name="path">
-                          <xsl:value-of select="ancestor::draw:a/@xlink:href" />
-                        </xsl:with-param>
-                      </xsl:call-template>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
-              </Relationship>
-            </xsl:if>
-          </xsl:when>
-          <xsl:otherwise>
-
+          <!-- External IRI (either contains a protocal such as http: or starts with a slash) -->
+          <xsl:when test="contains(@xlink:href, ':') or starts-with(@xlink:href, '/')">
             <!-- External image : If relative path, image may not be converted. -->
             <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                           Id="{generate-id(.)}"
@@ -363,6 +345,53 @@
                             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
                             TargetMode="External"
                             Target="{ancestor::draw:a/@xlink:href}" />
+            </xsl:if>            
+          </xsl:when>
+          <!-- Internal image -->
+          <xsl:otherwise>
+            <!-- copy this image to the oox package -->
+            <xsl:variable name="imageName">
+              <xsl:call-template name="substring-after-last">
+                <xsl:with-param name="string" select="@xlink:href" />
+                <xsl:with-param name="occurrence" select="'/'" />
+              </xsl:call-template>
+            </xsl:variable>
+                          
+            <pzip:copy pzip:source="{@xlink:href}" pzip:target="{concat('word/media/', $imageName)}" />
+            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                          Id="{generate-id(.)}"
+                          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                          Target="{concat('media/', $imageName)}" />
+
+            <xsl:if test="ancestor::draw:a">
+              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                            Id="{generate-id(ancestor::draw:a)}"
+                            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                            TargetMode="External">
+                <xsl:attribute name="Target">
+                  <xsl:choose>
+
+                    <!-- converting relative path -->
+                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '../')">
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path" select="substring-after(ancestor::draw:a/@xlink:href,'../')" />
+                      </xsl:call-template>
+                    </xsl:when>
+
+                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '/')">
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path" select="substring-after(ancestor::draw:a/@xlink:href,'/')" />
+                      </xsl:call-template>
+                    </xsl:when>
+
+                    <xsl:otherwise>
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path" select="ancestor::draw:a/@xlink:href" />
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </Relationship>
             </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
@@ -430,13 +459,13 @@
       <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                     Id="{generate-id()}"
                     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
-                    Target="header{position()}.xml" />
+                    Target="{concat('header', position(), '.xml')}" />
     </xsl:for-each>
     <xsl:for-each select="$masterPages/style:footer | $masterPages/style:footer-left">
       <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                     Id="{generate-id()}"
                     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
-                    Target="footer{position()}.xml" />
+                    Target="{concat('footer', position(), '.xml')}" />
     </xsl:for-each>
   </xsl:template>
 

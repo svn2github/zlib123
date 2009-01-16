@@ -29,6 +29,7 @@
 using System;
 using System.Xml;
 using System.Collections;
+using System.Collections.Generic;
 using CleverAge.OdfConverter.OdfConverterLib;
 using System.IO;
 
@@ -53,8 +54,10 @@ namespace OdfConverter.Wordprocessing
         private Stack currentNode;
         private Stack context;
         private Stack currentParagraphStyleName;
-        private Hashtable cStyles;
-        private Hashtable pStyles;
+        private Dictionary<string, Element> cStyles;
+        private Dictionary<string, Element> pStyles;
+        private Dictionary<string, Element> cStylesAdded = new Dictionary<string, Element>();
+        private Dictionary<string, Element> pStylesAdded = new Dictionary<string, Element>();
         // keep track of lower case styles to avoid conflicts
         private ArrayList cStylesLowerCaseList;
         private ArrayList pStylesLowerCaseList;
@@ -69,8 +72,8 @@ namespace OdfConverter.Wordprocessing
             this.context = new Stack();
             this.context.Push("root");
             this.currentParagraphStyleName = new Stack();
-            this.cStyles = new Hashtable();
-            this.pStyles = new Hashtable();
+            this.cStyles = new Dictionary<string, Element>();
+            this.pStyles = new Dictionary<string, Element>();
             this.cStylesLowerCaseList = new ArrayList();
             this.pStylesLowerCaseList = new ArrayList();
         }
@@ -250,7 +253,7 @@ namespace OdfConverter.Wordprocessing
                 if (IsCharacterStyle(element))
                 {
                     string key = element.GetAttributeValue("styleId", NAMESPACE);
-                    if (!cStyles.Contains(key))
+                    if (!cStyles.ContainsKey(key))
                     {
                         // if a style exists having same lower-case name, replace with new name.
                         string name = element.GetChild("name", NAMESPACE).GetAttributeValue("val", NAMESPACE);
@@ -272,7 +275,7 @@ namespace OdfConverter.Wordprocessing
                 else if (IsParagraphStyle(element))
                 {
                     string key = element.GetAttributeValue("styleId", NAMESPACE);
-                    if (!pStyles.Contains(key))
+                    if (!pStyles.ContainsKey(key))
                     {
                         // if a style exists having same lower-case name, replace with new name.
                         string name = element.GetChild("name", NAMESPACE).GetAttributeValue("val", NAMESPACE);
@@ -491,25 +494,19 @@ namespace OdfConverter.Wordprocessing
 
         private void AddParagraphStyleProperties(Element pPr, string styleName)
         {
-            Element style = (Element)pStyles[styleName];
-            // to avoid crash when wrong styles applied
-            if (style == null)
-            {
-                return;
-            }
-            if (IsAutomaticStyle(style))
+            if (pStyles.ContainsKey(styleName) && IsAutomaticStyle(pStyles[styleName]))
             {
                 // add run properties
-                AddParagraphProperties(pPr, style);
+                AddParagraphProperties(pPr, pStyles[styleName]);
 
                 // add parent style properties
-                Element basedOn = (Element)style.GetChild("basedOn", NAMESPACE);
+                Element basedOn = pStyles[styleName].GetChild("basedOn", NAMESPACE);
                 if (basedOn != null)
                 {
-                    string val = basedOn.GetAttributeValue("val", NAMESPACE);
-                    if (val.Length > 0 && !val.Equals(styleName))
+                    string baseStyleName = basedOn.GetAttributeValue("val", NAMESPACE);
+                    if (baseStyleName.Length > 0 && !baseStyleName.Equals(styleName))
                     {
-                        AddParagraphStyleProperties(pPr, val);
+                        AddParagraphStyleProperties(pPr, baseStyleName);
                     }
                 }
             }
@@ -610,7 +607,7 @@ namespace OdfConverter.Wordprocessing
             if (!IsInRunProperties() && "r".Equals(this.context.Peek()))
             {
                 string styleName = (string)this.currentParagraphStyleName.Peek();
-                if (!"".Equals(styleName) && IsAutomaticStyle((Element)pStyles[styleName]))
+                if (!"".Equals(styleName) && IsAutomaticStyle(pStyles[styleName]))
                 {
                     Element rPr = new Element("w", "rPr", NAMESPACE);
                     AddRunStyleProperties(rPr, styleName, false);
@@ -716,13 +713,9 @@ namespace OdfConverter.Wordprocessing
             }
             // add paragraph run properties (if automatic)
             string styleName = (string)this.currentParagraphStyleName.Peek();
-            if (!"".Equals(styleName) && IsAutomaticStyle((Element)pStyles[styleName]))
+            if (!"".Equals(styleName) && pStyles.ContainsKey(styleName) && IsAutomaticStyle(pStyles[styleName]))
             {
-                Element style = (Element)pStyles[styleName];
-                if (style != null)
-                {
-                    AddRunProperties(rPr, style);
-                }
+                AddRunProperties(rPr, pStyles[styleName]);
             }
             // add style name
             if (rStyle != null)
@@ -737,19 +730,33 @@ namespace OdfConverter.Wordprocessing
 
         private void AddRunStyleProperties(Element rPr, string styleName, bool isCharacterStyle)
         {
-            Element style = null;
-            if (isCharacterStyle)
+            cStylesAdded.Clear();
+            pStylesAdded.Clear();
+            AddRunStylePropertiesRecursive(rPr, styleName, isCharacterStyle);
+        }
+
+        private void AddRunStylePropertiesRecursive(Element rPr, string styleName, bool isCharacterStyle)
+        {
+            if (isCharacterStyle && cStylesAdded.ContainsKey(styleName) || pStylesAdded.ContainsKey(styleName))
             {
-                style = (Element)cStyles[styleName];
+                // check for cycles in style hierarchy
+                return;
+            } 
+                
+            Element style = null;
+            if (isCharacterStyle && cStyles.ContainsKey(styleName))
+            {
+                style = cStyles[styleName];
+                cStylesAdded.Add(styleName, style);
+            }
+            else if (pStyles.ContainsKey(styleName))
+            {
+                style = pStyles[styleName];
+                pStylesAdded.Add(styleName, style);
             }
             else
             {
-                style = (Element)pStyles[styleName];
-            }
-
-            // to avoid crash when wrong styles applied
-            if (style == null)
-            {
+                // to avoid crash when wrong styles applied
                 return;
             }
 
@@ -760,10 +767,10 @@ namespace OdfConverter.Wordprocessing
             Element basedOn = (Element)style.GetChild("basedOn", NAMESPACE);
             if (basedOn != null)
             {
-                string val = basedOn.GetAttributeValue("val", NAMESPACE);
-                if (val.Length > 0 && !val.Equals(styleName))
+                string parentStyleName = basedOn.GetAttributeValue("val", NAMESPACE);
+                if (parentStyleName.Length > 0)
                 {
-                    AddRunStyleProperties(rPr, val, isCharacterStyle);
+                    AddRunStylePropertiesRecursive(rPr, parentStyleName, isCharacterStyle);
                 }
             }
         }
@@ -819,18 +826,17 @@ namespace OdfConverter.Wordprocessing
         private void AddStyleDeclaration(Element element, string styleName, string styleType)
         {
             Element style = null;
-            if ("rStyle".Equals(styleType))
+            if ("rStyle".Equals(styleType) && cStyles.ContainsKey(styleName))
             {
-                style = (Element)cStyles[styleName];
+                style =  cStyles[styleName];
+            }
+            else if (pStyles.ContainsKey(styleName))
+            {
+                style = pStyles[styleName];
             }
             else
             {
-                style = (Element)pStyles[styleName];
-            }
-
-            // to avoid crash when wrong styles applied
-            if (style == null)
-            {
+                // to avoid crash when wrong styles applied
                 return;
             }
 

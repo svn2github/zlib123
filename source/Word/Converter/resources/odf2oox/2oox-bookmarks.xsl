@@ -34,7 +34,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="text fo style office draw">
+  exclude-result-prefixes="text fo style office draw xlink">
 
 	<!-- divo/20081008 xsl:strip-space must only be defined once in odf2oox.xls -->
 	<!--<xsl:strip-space elements="*"/>

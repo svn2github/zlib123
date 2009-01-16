@@ -27,19 +27,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:w10="urn:schemas-microsoft-com:office:word"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  xmlns:w10="urn:schemas-microsoft-com:office:word"
   exclude-result-prefixes="xlink draw svg fo office style text">
 
   <!--
@@ -60,7 +61,9 @@
   Summary: frames containing external images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and not(starts-with(@xlink:href, 'Pictures/'))]]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and (starts-with(@xlink:href, '/') or contains(@xlink:href, ':'))]]" mode="paragraph">
+    <!-- Note: An external path either starts with a slash or with a protocol such as http:, thats why we check for ':' in the href -->
+    
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
 
@@ -108,7 +111,9 @@
   Summary: frames containing internal images
   Author: Clever Age
   -->
-  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]" mode="paragraph">
+  <xsl:template match="draw:frame[not(./draw:object-ole or ./draw:object) and not(starts-with(./draw:image/@xlink:href, '/') or contains(./draw:image/@xlink:href,':'))]" mode="paragraph">
+    <!-- Note: An internal path neither starts with a slash nor with a protocol such as http:, thats why we check for ':' in the href -->
+    
     <!-- insert link to TOC field when required (user indexes) -->
     <xsl:call-template name="InsertTCField"/>
 
@@ -960,7 +965,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:if test="$border != '' and $border != 'none'">
+    <xsl:if test="$border != '' and not(contains($border, 'none'))">
       <xsl:variable name="strokeColor" select="substring-after($border,'#')"/>
 
       <xsl:variable name="strokeWeight">
@@ -974,7 +979,7 @@
         </xsl:call-template>
       </xsl:variable>
 
-      <a:ln xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+      <a:ln>
         <xsl:attribute name="cmpd">
           <xsl:choose>
             <xsl:when test="substring-before(substring-after($border,' ' ),' ' ) != 'solid' ">
@@ -996,8 +1001,7 @@
 
                 <xsl:variable name="outerLineWidth">
                   <xsl:call-template name="point-measure">
-                    <xsl:with-param name="length"
-                      select="substring-after(substring-after($borderLineWidth,' ' ),' ' )"/>
+                    <xsl:with-param name="length" select="substring-after(substring-after($borderLineWidth,' ' ),' ' )"/>
                   </xsl:call-template>
                 </xsl:variable>
 

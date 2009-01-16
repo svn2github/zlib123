@@ -842,7 +842,7 @@
   <!-- bibliography entry -->
   <xsl:template match="text:bibliography-mark" mode="paragraph">
     <xsl:variable name="ref" select="generate-id(.)"/>
-    <!-- create an entry only for the first occurence of the reference -->
+    <!-- create an entry only for the first occurrence of the reference -->
     <xsl:if test="$ref = generate-id(key('bibliography-entries', @text:identifier)[1])">
       <xsl:call-template name="InsertIndexFieldCodeSimpleStart"/>
       <w:r>

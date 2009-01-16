@@ -34,6 +34,7 @@
   exclude-result-prefixes="odf style text number">
 
   <xsl:import href="measures.xsl"/>
+  <xsl:import href="utils.xsl" />
   <xsl:import href="2oox-common.xsl"/>
   <xsl:import href="2oox-docprops.xsl"/>
   <xsl:import href="2oox-document.xsl"/>

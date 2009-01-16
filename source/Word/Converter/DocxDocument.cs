@@ -5,6 +5,7 @@ using CleverAge.OdfConverter.OdfConverterLib;
 using System.Xml;
 using CleverAge.OdfConverter.OdfZipUtils;
 using System.Diagnostics;
+using System.Collections;
 
 namespace OdfConverter.Wordprocessing
 {
@@ -38,6 +39,9 @@ namespace OdfConverter.Wordprocessing
             bool fieldBegin = false;
             List<RelationShip> rels = new List<RelationShip>();
 
+            XmlDocument xmlDocument = new XmlDocument();
+            XmlNode bookmarkEnd = null;
+
             RelationShip rel = new RelationShip();
 
             while (xtr.Read())
@@ -62,7 +66,22 @@ namespace OdfConverter.Wordprocessing
                             rel = new RelationShip();
                         }
 
-                        if (!xtr.LocalName.Equals("proofErr"))
+                        if (xtr.Name.Equals("w:bookmarkEnd") && xtr.Depth == 2)
+                        {
+                            // closing bookmark tags below w:body will be moved inside the following w:p tag
+                            // because in ODF bookmarks can only be closed in paragraph-content
+                            bookmarkEnd = xmlDocument.CreateElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
+                            if (xtr.HasAttributes)
+                            {
+                                while (xtr.MoveToNextAttribute())
+                                {
+                                    XmlAttribute xmlAttribute = xmlDocument.CreateAttribute(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
+                                    xmlAttribute.Value = xtr.Value;
+                                    bookmarkEnd.Attributes.Append(xmlAttribute);
+                                }
+                            }
+                        }
+                        else if (!xtr.LocalName.Equals("proofErr"))
                         {
                             xtw.WriteStartElement(xtr.Prefix, xtr.LocalName, xtr.NamespaceURI);
 
@@ -124,6 +143,19 @@ namespace OdfConverter.Wordprocessing
                                     xtw.WriteAttributeString(NS_PREFIX, "id", PACKAGE_NS, _paraId.ToString());
                                     xtw.WriteAttributeString(NS_PREFIX, "s", PACKAGE_NS, _sectPrId.ToString());
                                     _paraId++;
+
+                                    if (bookmarkEnd != null)
+                                    {
+                                        xtw.WriteStartElement(bookmarkEnd.Prefix, bookmarkEnd.LocalName, bookmarkEnd.NamespaceURI);
+
+                                        foreach (XmlAttribute attrib in bookmarkEnd.Attributes)
+                                        {
+                                            xtw.WriteAttributeString(attrib.Prefix, attrib.LocalName, attrib.NamespaceURI, attrib.Value);
+                                        }
+                                        xtw.WriteEndElement();
+                                        bookmarkEnd = null;
+                                    }
+
                                     break;
                                 case "altChunk":
                                 case "bookmarkEnd":

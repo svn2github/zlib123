@@ -209,7 +209,7 @@
               </xsl:when>
               <xsl:otherwise>
 
-                <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+                <!--math, dialogika: Changed to avoid that all occurrences of a style which is used in a paragraph
                     where an outline level is directly applied (not via style) are added to TOC. BEGIN -->
 
                 <!--<xsl:if test="$thisStyle and $thisStyle!=''">
@@ -227,7 +227,7 @@
                   </xsl:otherwise>
                 </xsl:choose>
 
-                <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+                <!--math, dialogika: Changed to avoid that all occurrences of a style which is used in a paragraph
                     where an outline level is directly applied (not via style) are added to TOC. END -->
 
               </xsl:otherwise>
@@ -247,7 +247,7 @@
           </xsl:when>
           <xsl:otherwise>
 
-            <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+            <!--math, dialogika: Changed to avoid that all occurrences of a style which is used in a paragraph
                 where an outline level is directly applied (not via style) are added to TOC. BEGIN -->
 
             <!--<xsl:value-of select="concat($stylesWithLevel,$thisStyle,':',$thisLevel,'.')" />-->
@@ -264,7 +264,7 @@
             </xsl:choose>
           </xsl:otherwise>
 
-          <!--math, dialogika: Changed to avoid that all occurences of a style which is used in a paragraph
+          <!--math, dialogika: Changed to avoid that all occurrences of a style which is used in a paragraph
               where an outline level is directly applied (not via style) are added to TOC. END -->
 
         </xsl:choose>
@@ -712,7 +712,7 @@
   </xsl:template>
 
 
-  <!--math, dialogika: Replace occurences of substring1 in string with substring2-->
+  <!--math, dialogika: Replace occurrences of substring1 in string with substring2-->
   <xsl:template name="StringReplace">
     <xsl:param name ="string" />
     <xsl:param name ="substring1" />

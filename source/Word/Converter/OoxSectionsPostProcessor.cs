@@ -681,11 +681,12 @@ namespace OdfConverter.Wordprocessing
                         WriteHeaderFooter(page, "headerReference");
                         WriteHeaderFooter(page, "footerReference");
 
-                        // titlePg
-                        if (page.FirstDefault)
-                        {
-                            this.titlePg.Write(nextWriter);
-                        }
+                        // titlePg must follow layout properties
+                        //// titlePg
+                        //if (page.FirstDefault)
+                        //{
+                        //    this.titlePg.Write(nextWriter);
+                        //}
                     }
 
                     // footnotes config
@@ -698,7 +699,15 @@ namespace OdfConverter.Wordprocessing
                     // page geometry properties
                     WritePageLayout(page);
 
-
+                    // header / footer reference
+                    if (page.Use == 1)
+                    {
+                        // titlePg
+                        if (page.FirstDefault)
+                        {
+                            this.titlePg.Write(nextWriter);
+                        }
+                    }
 
                     nextWriter.WriteEndElement(); // end sectPr
 

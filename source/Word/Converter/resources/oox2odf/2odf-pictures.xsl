@@ -429,15 +429,10 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:for-each
-      select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
+    <xsl:for-each select="key('Part', concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
       <xsl:if test="./@Id=$id">
-        <xsl:variable name="targetmode">
-          <xsl:value-of select="./@TargetMode"/>
-        </xsl:variable>
-        <xsl:variable name="pzipsource">
-          <xsl:value-of select="./@Target"/>
-        </xsl:variable>
+        <xsl:variable name="targetmode" select="./@TargetMode"/>
+        <xsl:variable name="pzipsource" select="./@Target"/>
         <xsl:variable name="pziptarget">
           <xsl:choose>
             <xsl:when test="$targetName != ''">

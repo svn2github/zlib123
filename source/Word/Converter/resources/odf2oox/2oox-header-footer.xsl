@@ -33,7 +33,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="text style office pzip xlink draw">
 
   <xsl:template name="header">

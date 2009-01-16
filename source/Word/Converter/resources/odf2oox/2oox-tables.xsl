@@ -164,16 +164,6 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- match columns for gridCols -->
-  <xsl:template match="table:table-column" mode="gridCol">
-    <xsl:call-template name="InsertGridCol">
-      <xsl:with-param name="width">
-        <xsl:call-template name="ComputeColumnWidth"/>
-      </xsl:with-param>
-      <xsl:with-param name="number" select="@table:number-columns-repeated"/>
-    </xsl:call-template>
-  </xsl:template>
-
   <!-- 
   *************************************************************************
   CALLED TEMPLATES
@@ -497,7 +487,15 @@
   <!-- Inserts a table grid -->
   <xsl:template name="InsertTblGrid">
     <w:tblGrid>
-      <xsl:apply-templates select="table:table-column" mode="gridCol"/>
+      <!-- table:table-column may be directly below table:table or within a table:table-columns container -->
+      <xsl:for-each select="table:table-columns/table:table-column | table:table-column">
+        <xsl:call-template name="InsertGridCol">
+          <xsl:with-param name="width">
+            <xsl:call-template name="ComputeColumnWidth"/>
+          </xsl:with-param>
+          <xsl:with-param name="number" select="@table:number-columns-repeated"/>
+        </xsl:call-template>
+      </xsl:for-each>
     </w:tblGrid>
   </xsl:template>
 

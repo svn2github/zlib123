@@ -14,8 +14,8 @@
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:w10="urn:schemas-microsoft-com:office:word"
-                xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
-  exclude-result-prefixes="xlink draw svg fo office style text">
+  xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+  exclude-result-prefixes="xlink draw svg fo office style text manifest">
 
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
 
@@ -185,7 +185,13 @@
     <xsl:param name="shapeId" />
     <xsl:param name="olePictureType" />
 
-    <xsl:variable name="oleFile" select="substring-after(draw:object-ole/@xlink:href, './')" />
+    <xsl:variable name="oleFile">
+      <xsl:call-template name="substring-after-last">
+        <xsl:with-param name="string" select="draw:object-ole/@xlink:href" />
+        <xsl:with-param name="occurrence" select="'./'" />
+      </xsl:call-template>
+    </xsl:variable>
+                  
     <xsl:variable name="oleType" select="document('META-INF/manifest.xml')/manifest:manifest/manifest:file-entry[@manifest:full-path=$oleFile]/@manifest:media-type" />
     <xsl:variable name="suffix" select="translate(substring-after($oleFile, '.'), 
                     'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
@@ -196,7 +202,7 @@
     application/vnd.oasis.opendocument.spreadsheet
     -->
     <xsl:choose>
-      <xsl:when test="$oleType='application/vnd.sun.star.oleobject'">
+      <xsl:when test="$oleType='application/vnd.sun.star.oleobject' or $oleType='application/octet-stream'">
         <o:OLEObject Type="Embed" ProgID="Package" ObjectID="_1256106730" >
           <!-- shape id -->
           <xsl:attribute name="ShapeID">

@@ -28,10 +28,14 @@
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:o="urn:schemas-microsoft-com:office:office" 
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" 
+  xmlns:w10="urn:schemas-microsoft-com:office:word" 
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -40,7 +44,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="office text table fo style draw xlink v svg number config">
+  exclude-result-prefixes="config svg office number text table style fo draw xlink">
 
   <xsl:import href="2oox-tables.xsl"/>
   <xsl:import href="2oox-indexes.xsl"/>
@@ -1173,7 +1177,7 @@
             <!--
             makz: context switch for-each to insert the paragraph properties
             divo: This must be the last properties defined. We ahve to define all overriden properties for lists first
-                because OoxParagraphsPostProcessor only taks the first occurence of a property into account. 
+                because OoxParagraphsPostProcessor only taks the first occurrence of a property into account. 
                 Example: List formatting such as indent is defined by the templates above. Template InsertParagraphProperties also sets the list
                   indent, but this definition will be ignored in the postprocessor. What an awful design. But it wasnt me...
             -->
