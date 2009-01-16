@@ -99,5 +99,8 @@
   <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\utils.xsl" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\utils.xsl" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
